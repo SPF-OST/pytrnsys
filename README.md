@@ -5,12 +5,16 @@ The TRNSYS tool provides basic functionality written in python to run and proces
 Nevertheless, many functions can be used to process and plot other kind of data such as those extracted from monitoring systems
 or exported from other softwares like Polysun.
 
-Main developers : 
-- Dr. Daniel Carbonell : Institut für Solartechnik SPF, Rapperswil, Switzerland.
+#####Main developer: 
+- Daniel Carbonell : Institut für Solartechnik SPF, Rapperswil, Switzerland.
+- To be able to commit contact : dani.carbonell@spf.ch
+#####Collaborators:
+- Mattia Battaglia : Institut für Solartechnik SPF, Rapperswil, Switzerland.
+- Jeremias Schmidli : Institut für Solartechnik SPF, Rapperswil, Switzerland.
 
 This code was not developed with the intention to be shared with others, but after realizing that 
 it could help the community to have a better workflow with TRNSYS we decided to share it with you. 
-However, we dont have any budget for software development and therefore we will not be able to solve your particular problems.
+However, we don't have any budget for software development and therefore we will not be able to solve your particular problems.
 We also expect that by sharing it some of you will be able to improve it and make it better.
  
 ##Aknowledgements
@@ -27,19 +31,23 @@ being able to share the code with the consortium and improve the code to make it
 - Install python 2.7 with numpy, scipy, matplotlib and pandas
 - CoolProp package is nedded if physical properties of fluids need to be used, otherwise it's not mandatory
 - We recommend to install anaconda with default installation packages
-- Choose the python editor you like, such as PyCharm, spyder or alike. This readme file is automatically processed by PyCharm
-in an html visual sytle   
+- Choose the python editor you like, such as PyCharm, Spyder or alike. This readme file is automatically processed by PyCharm
+in a html visual style   
 
 ```
  https://www.anaconda.com/distribution/
 ```
 
-## Installation of LaTeX foe reporting
+## Installation of LaTeX for reporting
 - For all processing cases, a pdf made with LaTeX will be generated.
 Therefore LaTeX is highly recommended. We suggest MiKTeX, but other packages can be used.
 - In order to use the LaTeX class for preparing the pdf, the enviromental variables 
   that tell LaTeX where to find local files need to  be specified
--
+- Create an enviromental variable named TEXINPUTS and give a path to it 
+
+```
+TEXINPUTS => ....\TrnsysTools\lib\reporting\LaTexDoc
+```
  
 ## Activate the import of the spfPythonTool package into python environment
 
@@ -49,16 +57,15 @@ Therefore LaTeX is highly recommended. We suggest MiKTeX, but other packages can
 
 For example copy the spfTrnsysToolLocalPath.pth to: 
 ```
-C:\Users\dcarbone\AppData\Local\Continuum\anaconda2\Lib\site-packages
+...\Users\dcarbone\AppData\Local\Continuum\anaconda2\Lib\site-packages
 ```
-
 
 ## Define enviromental variables (do we need this?)
 
 create avariable named TRNSYS_EXE and define the path of executable, for example
 
 ```
- TRNSYS_EXE => D:\MyPrograms\Trnsys17\Exe\TRNExe.exe
+TRNSYS_EXE => D:\MyPrograms\Trnsys17\Exe\TRNExe.exe
 ```
 create avariable named LATEX_EXE and define the path of executable, for example
 
