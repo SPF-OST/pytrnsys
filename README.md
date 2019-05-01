@@ -5,10 +5,10 @@ The TRNSYS tool provides basic functionality written in python to run and proces
 Nevertheless, many functions can be used to process and plot other kind of data such as those extracted from monitoring systems
 or exported from other softwares like Polysun.
 
-#####Main developer: 
+##### Main developer: 
 - Daniel Carbonell : Institut für Solartechnik SPF, Rapperswil, Switzerland.
 - To be able to commit contact : dani.carbonell@spf.ch
-#####Collaborators:
+##### Collaborators:
 - Mattia Battaglia : Institut für Solartechnik SPF, Rapperswil, Switzerland.
 - Jeremias Schmidli : Institut für Solartechnik SPF, Rapperswil, Switzerland.
 
@@ -17,7 +17,7 @@ it could help the community to have a better workflow with TRNSYS we decided to 
 However, we don't have any budget for software development and therefore we will not be able to solve your particular problems.
 We also expect that by sharing it some of you will be able to improve it and make it better.
  
-##Aknowledgements
+## Aknowledgements
  
 A first version of this package was first created in 2013 and since then it has evolved considerably. 
 We would like to thank the Swiss Federal Office Of Energy (SFOE) 
