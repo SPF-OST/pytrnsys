@@ -5,7 +5,7 @@ We need to include in this class any processing Class
 customized for new projects
 Author : Daniel Carbonell
 Date   : 01-10-2018
-ToDo:   Copy config file to results folder automatically
+ToDo:   Copy config file to results folder automatically, remove processDataGshp and make it generic
 """
 
 
@@ -15,7 +15,6 @@ import multiprocessing as mp
 import runParallel as run
 import bigIceTrnsysClass as ice
 import utilsSpf as utils
-import exampleTrnsysBaseClass as example
 import readConfigTrnsys as readConfig
 import GshpTrnsysBaseClass as gshp
 import AlStoreTrnsysBaseClass as alu
@@ -197,8 +196,6 @@ class ProcessParallelTrnsys():
             baseClass = alu.AlStoreTrnsysBaseClass(pathFolder,fileName)
         elif (classProcessing == "BigIce"):
             baseClass = ice.BigIceTrnsysClass(pathFolder,fileName)
-        elif (classProcessing == "Example"):
-            baseClass = example.ExampleTrnsysBaseClass(pathFolder,fileName)
         else:
             baseClass = None
 

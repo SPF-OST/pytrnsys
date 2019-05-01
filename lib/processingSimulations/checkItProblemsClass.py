@@ -11,12 +11,6 @@ ToDo :
 
 
 import os
-import shutil
-import string
-import utilsLatex
-import numpy as num
-import bigIceTrnsysClass as ice
-import matplotlib.pyplot as plt
 import processTrnsysFiles as processTrnsys
 import loadBaseNumpy as load
 import LogTrnsys

@@ -10,7 +10,7 @@ ToDo :
 
 import os
 import numpy as num
-import utilsLatex as latex
+import latexReport as latex
 
 class PlotGle():  
         

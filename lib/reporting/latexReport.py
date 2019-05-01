@@ -145,7 +145,6 @@ class LatexReport():
         
         line="\\documentclass[english]{%s}\n" % (self.documentClass) ; self.lines = self.lines + line               
         line="\\usepackage{subfigure}\n" ; self.lines = self.lines + line 
-        line="\\usepackage{spfFigures}\n" ; self.lines = self.lines + line
         line="\\usepackage{longtable}\n" ; self.lines = self.lines + line
 
         line="\\usepackage{url}\n" ; self.lines = self.lines + line

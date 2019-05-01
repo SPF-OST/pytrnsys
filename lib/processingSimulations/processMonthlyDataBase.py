@@ -10,7 +10,7 @@ ToDo   : clean unused functions and variables
 import string, os, time, sys
 import processFiles as spfUtils
 import utilsSpf as utils
-import utilsLatex as latex
+import latexReport as latex
 import matplotlib.pyplot as plt
 import numpy as num
 import matplotlib

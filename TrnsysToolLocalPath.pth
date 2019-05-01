@@ -1,6 +1,8 @@
-..\TrnsysTool\lib\plotting
-..\TrnsysTool\lib\processingData
-..\TrnsysTool\lib\processingSimulations
-..\TrnsysTool\lib\Trnsys
-..\TrnsysTool\lib\utilities
-..\TrnsysTool\lib\physicalProperties
+...\TrnsysTools\lib\plotting
+...\TrnsysTools\lib\processingData
+...\TrnsysTools\lib\processingSimulations
+...\TrnsysTools\lib\Trnsys
+...\TrnsysTools\lib\utilities
+...\TrnsysTools\lib\physicalProperties
+...\TrnsysTools\lib\reporting
+
