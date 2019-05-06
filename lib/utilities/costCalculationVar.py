@@ -10,7 +10,7 @@ ToDo :
 """
 
 import utilsSpf as utils
-import utilsLatex as latex
+import latexReport as latex
 import matplotlib.pyplot as plt
 import matplotlib
 import costCalculation as mycost

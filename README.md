@@ -12,18 +12,18 @@ or exported from other softwares like Polysun.
 - Mattia Battaglia : Institut für Solartechnik SPF, Rapperswil, Switzerland.
 - Jeremias Schmidli : Institut für Solartechnik SPF, Rapperswil, Switzerland.
 
-This code was not developed with the intention to be shared with others, but after realizing that 
-it could help the community to have a better workflow with TRNSYS we decided to share it with you. 
-However, we don't have any budget for software development and therefore we will not be able to solve your particular problems.
-We also expect that by sharing it some of you will be able to improve it and make it better.
+This code was not initially developed with the intention to be shared with others, 
+but after realizing that it could help the community to have a better workflow with TRNSYS 
+we decided to share it. Currently this code is in testing phase under the European project 
+TRI-HP with Grant Agreement No. 81488. 
  
 ## Aknowledgements
  
 A first version of this package was first created in 2013 and since then it has evolved considerably. 
 We would like to thank the Swiss Federal Office Of Energy (SFOE) 
 who supported many projects related to simulations of renewable energy systems where this code has been developed. We would also like to thank the European Union’s Horizon 2020 research and innovation programme
-for the funding received in TRI-HP under the Grant Agreement No.  81488. This project allowed to decidate effords in
-being able to share the code with the consortium and improve the code to make it usable for the others.  
+for the funding received in TRI-HP under the Grant Agreement No.  81488. This project allowed to decicate 
+efforts in to share the code with the consortium and to make the code usable for the others.  
 
   
 ## Installation of python 2.7 and needed libraries
