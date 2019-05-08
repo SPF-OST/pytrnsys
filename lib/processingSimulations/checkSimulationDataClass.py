@@ -14,7 +14,7 @@ ToDo :
 import os
 import shutil
 import string
-import utilsLatex
+import latexReport as latex
 import numpy as num
 import bigIceTrnsysClass as ice
 import matplotlib.pyplot as plt
@@ -159,7 +159,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
 
         nameLatex = "SimulationsErrorCheck"
 
-        doc = utilsLatex.LatexReport(self.path,nameLatex)
+        doc = latex.LatexReport(self.path,nameLatex)
         doc.setCleanMode(True)
 
         doc.setTitle("Errors in simulations")

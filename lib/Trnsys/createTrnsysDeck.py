@@ -20,8 +20,8 @@ class CreateTrnsysDeck():
         print "name:%s path:%s deckName:%s\n" % (self.originalName,self.path,self.originalDeckName)
         
         split = self.originalName.split('-')
-#        T44A38-SGSHP-45-HE 
-        try:             
+
+        try: #DC : Why do we need a special strucutre of the name? Can we ignore that?
             self.case = split[0]
             self.system = split[1]
             self.building = split[2]
@@ -36,13 +36,14 @@ class CreateTrnsysDeck():
         # if we have changed something from the original we will no see the changes if this is set to False.
         # I will erase this if no utility after a while.
 
-        #I guess this functions assumed we haev a base deck to apply the changes
     def generateDecks(self):
-                 
+        """
+        This function will generate as many deck cases as the number of variations defined in the confg file.
+        The deck are stored in self.path using the variations and the base name to create the individual names
+        :return:
+        """
         self.myListOfParameterDicts =[]
-         
-        print self.variations
-        
+
         if(self.combineAllCases==False):
             for i in range (len(self.variations)):
                 
@@ -65,7 +66,8 @@ class CreateTrnsysDeck():
                             valuesOfVariation = valuesOfVariationInFile
 #                            print "Comma NOT found valueFile=%s valueUsed=%s" % (valuesOfVariationInFile,valuesOfVariation)
                         
-                        
+                        #ToDo : DC To me we shuold not use of this naming structure but just take the name we find and add variaitons at the end
+
                         nameDeck = "%s-%s%s%s-%s-%s" % (self.case,self.system,nameLabelOfVariation,valuesOfVariationInFile,self.building,self.city)            
                         self.deckOutputs.append(nameDeck)
                         nameDeckCreated = "%s\%s.dck" % (self.path,nameDeck)
@@ -175,196 +177,7 @@ class CreateTrnsysDeck():
     
 #    def getParameters(self)        
 #        return self.deckOutputs
-    
-class ChangeTrnsysDeckDataFromCase():
-    
-    def __init__(self,_building,_city,_system=None):
-        
-        self.building = _building
-        self.city = _city
-        self.system = _system        
-        self.parameters = {}              
-        
-# This is only valid if the system is the same than the one 
-# used to be modified, so if SGSHP we can not switch to SASHP. 
-# Many changed need to be implemented. However it can be done easily, if necessary  !!
-      
-    def changeSystemParameters(self):
-        
-                
-        if(self.system=="SISHP"): # SOlAR + ICE SOURCE HEAT PUMP     
-        
-            areaHx = 2.104
-            qEvap = string.atof(self.parameters["sizeHpUsed"])*0.79*1000. # W
-            nHx = int(qEvap/(140.*areaHx))
-            lBorehole = qEvap/50.            
-#            nHx = "%s" % nHx
-            
-            if(self.building=="SFH15"):
-            
-                self.parameters.update({
-                    "VIceS" : "20.0",
-                    "NHx1"  : nHx,    # 0.79 *  
-                    "AcollAp" : "15",
-                    "AcollApUC" : "5",
-                    "NghxProbes" : "1",
-                    "lghxProbes" : lBorehole
 
-                })
-                
-            elif(self.building=="SFH45"):
-                
-                self.parameters.update({
-                    "VIceS" : "30.0",
-                    "NHx1"  : nHx,
-                    "AcollAp" : "25",
-                    "AcollApUC" : "7",
-                    "NghxProbes" : "1",
-                    "lghxProbes" : lBorehole
-                })
-                
-            elif(self.building=="SFH100"):
-                
-                self.parameters.update({
-                    "VIceS" : "40.0",
-                    "NHx1"  : nHx,
-                    "AcollAp" : "35",
-                    "AcollApUC" : "10",
-                    "NghxProbes" : "1",
-                    "lghxProbes" : lBorehole
-                })
-        elif(self.system=="SGSHP" or self.system=="SASHP"):
-            pass
-        else:
-            raise ValueError("System unknown ",self.system)
-            
-    def changeBuildingBaseParameters(self):     
-        
-         if(self.building=="SFH15"):
 
-            self.parameters = {
-            "Nbui" : "1",     # Building type
-            "TambHS" : "12",  # Temperature below which heating season is activated, °C
-            "UaBui" : "97",  # Heat loss rate, W/K 
-            "m_Rd" : "1.1",   # radiator exponent, -
-            "CeffRad" : "40000",  # Thermal Cap. of Radiator, kJ/K
-            "UGrFloor" : "0.141", #U-Value of Ground floor, W/m2K                
-            "buildingName" : "T44A38sfh015.bui"
-            }
-            
-         elif(self.building=="SFH45"):
-            self.parameters = {
-            "Nbui" : "2",     # Building type
-            "TambHS" : "14",  # Temperature below which heating season is activated, °C
-            "UaBui" : "168",  # Heat loss rate, W/K 
-            "m_Rd" : "1.1",   # radiator exponent, -
-            "CeffRad" : "40000",  # Thermal Cap. of Radiator, kJ/K
-            "UGrFloor" : "0.183", #U-Value of Ground floor, W/m2K                
-            "buildingName" : "T44A38sfh045.bui"
-            }
-            
-         elif(self.building=="SFH100"):
-            self.parameters = {
-            "Nbui" : "3",     # Building type
-            "TambHS" : "15",  # Temperature below which heating season is activated, °C
-            "UaBui" : "290",  # Heat loss rate, W/K 
-            "m_Rd" : "1.3",   # radiator exponent, -
-            "CeffRad" : "1150",  # Thermal Cap. of Radiator, kJ/K
-            "UGrFloor" : "0.278", #U-Value of Ground floor, W/m2K
-            "buildingName" : "T44A38sfh100.bui"
-            }
-         else:
-            raise ValueError("Building unknown ",self.building)
-     
-    def getChangedParameters(self):
-                
-        self.changeBuildingBaseParameters()
-        
-        self.changeBuildingCityParameters()
-        
-        self.changeSystemParameters()
-                
-        # A dictionary with the parameters changed 
-        return self.parameters
-     
-    def changeBuildingCityParameters(self):
-        
-                        
-         if(self.city=="HE"):    
-            
-            raise ValueError("Helsinki still ot finish. Check Borehols and sizeHp")
-            
-            if(self.building=="SFH15"):
-                
-                self.parameters.update({                
-                "PheatBuiD" : "11149.2",  # Design heating rate for building an location [kJ/h]
-                "TBuiFlNom" : "35", # Design flow temp. heating syst. [°C]                   
-                "TBuiRtNom" : "30", # Design return temp. heating syst. [°C]    
-                "NghxProbes" : "1", # Number of boreholes, -
-                "lghxProbes" : "75"# length of boreholes, m
-                })
-            elif(self.building=="SFH45"):
-                self.parameters.update({                
-                "PheatBuiD" : "22734",  # Design heating rate for building an location [kJ/h]
-                "TBuiFlNom" : "40", # Design flow temp. heating syst. [°C]                   
-                "TBuiRtNom" : "35", # Design return temp. heating syst. [°C]    
-                "NghxProbes" : "2", # Number of boreholes, -
-                "lghxProbes" : "95"# length of boreholes, m
-        #            ASSIGN  building\T44A38sfh015.bui 56     ! Building def. file, -
-                })
-            elif(self.building=="SFH100"):
-                self.parameters.update({                
-                "PheatBuiD" : "39351.6",  # Design heating rate for building an location [kJ/h]
-                "TBuiFlNom" : "60", # Design flow temp. heating syst. [°C]                   
-                "TBuiRtNom" : "50", # Design return temp. heating syst. [°C]    
-                "NghxProbes" : "4", # Number of boreholes, -
-                "lghxProbes" : "95",# length of boreholes, m
-                #ASSIGN  building\T44A38sfh100.bui 56     ! Building def. file, -
-                })
-            
-            
-         elif(self.city=="ST"):    
-            
-            if(self.building=="SFH15"):
-                
-                self.parameters.update({
-               
-                "PheatBuiD" : "6451.2",  # Design heating rate for building an location [kJ/h]
-                "TBuiFlNom" : "35", # Design flow temp. heating syst. [°C]                   
-                "TBuiRtNom" : "30", # Design return temp. heating syst. [°C]    
-                "NghxProbes" : "1", # Number of boreholes, -
-                "lghxProbes" : "75",# length of boreholes, m
-                "dghxProbes" : "0.026", # diameter of boreholes, m
-                "sizeHpUsed" : "4.0",    # sizeHpUsed 
-                })
-                
-            elif(self.building=="SFH45"):
-                self.parameters.update({
-              
-                "PheatBuiD" : "14659.2",  # Design heating rate for building an location [kJ/h]
-                "TBuiFlNom" : "35", # Design flow temp. heating syst. [°C]                   
-                "TBuiRtNom" : "30", # Design return temp. heating syst. [°C]    
-                "NghxProbes" : "1", # Number of boreholes, -
-                "lghxProbes" : "90", # length of boreholes, m
-                "dghxProbes" : "0.032", # diameter of boreholes, m
-                "sizeHpUsed" : "6.5",    # sizeHpUsed 
-                })
-                
-            elif(self.building=="SFH100"):
-                self.parameters.update({                
-                "PheatBuiD" : "26413.2",  # Design heating rate for building an location [kJ/h]
-                "TBuiFlNom" : "55", # Design flow temp. heating syst. [°C]                   
-                "TBuiRtNom" : "45", # Design return temp. heating syst. [°C]    
-                "NghxProbes" : "1", # Number of boreholes, -
-                "lghxProbes" : "170",# length of boreholes, m
-                "dghxProbes" : "0.032", # diameter of boreholes, m
-                "sizeHpUsed" : "11.3",    # sizeHpUsed 
-               
-                })               
-         else:            
-            raise ValueError("ONLY AUTOMATIC CHANGED WITH HELSINKI OR STRASBOURG")
-        
-   
 
-    
-#Missing 
+#Missing

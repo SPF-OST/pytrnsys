@@ -1,5 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+"""
+Author : Dani Carbonell
+Date   : 30.09.2016
+ToDo
+"""
 
 import createTrnsysDeck as createDeck
 import executeTrnsys as exeTrnsys
@@ -15,18 +19,18 @@ import shutil
 class RunParallelTrnsys():
 
     def __init__(self,_path,_name,_configFile=False):
-        # TODO: (MB) Do we aim towards having a config file for each simulation?
-        # In that case I would move the read in of the config file here in the constructor.
+
         self.path = _path
 
         self.defaultInputs()
         if _configFile:
             self.readConfig(self.path,_configFile)
-
             self.nameBase = self.inputs['nameRef']
+            self.path = self.inputs['pathBaseSimulations']
+            self.getConfig(self.inputs["ddckListPath"],self.inputs["ddckListPath"])
+
         else:
             self.nameBase = _name
-
 
     def setDeckName(self,_name):
         self.nameBase = _name
@@ -41,11 +45,13 @@ class RunParallelTrnsys():
         self.inputs["reduceCpu"] = 0
         self.inputs["combineAllCases"]   = True
         self.inputs["parseFileCreated"]  = True
-        self.inputs["commonTrnsyFolder"] = None
+        self.inputs["HOME$"] = None
         self.inputs["trnsysVersion" ]    = "TRNSYS_EXE"
         self.inputs["trnsysExePath"]     = "enviromentalVariable"
         self.inputs["copyBuildingData"]  = False #activate when Type 55 is used or change the path to the source
         self.inputs["addResultsFolder"]  = False
+        self.inputs["rerunFailedCases"]       = False
+
 
         self.outputFileDebugRun = os.path.join(self.path,"debugParallelRun.dat")
 
@@ -81,7 +87,7 @@ class RunParallelTrnsys():
         for i in range(len(fileNames)):
 
             tests.append(exeTrnsys.ExecuteTrnsys(self.path, fileNames[i]))
-            tests[i].setCommonTrnsysFolderPath(self.inputs["commonTrnsyFolder"])
+            tests[i].setHOMEPath(self.inputs["HOME$"])
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
             tests[i].setAddBuildingData(self.inputs["copyBuildingData"])
             tests[i].loadDeck()
@@ -150,14 +156,14 @@ class RunParallelTrnsys():
 
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
             tests[i].setAddBuildingData(self.inputs["copyBuildingData"])
-            tests[i].setCommonTrnsysFolderPath(self.inputs["commonTrnsyFolder"])
+            tests[i].setHOMEPath(self.inputs["HOME$"])
             # tests[i].setTrnsysVersion("TRNSYS17_EXE")
 
             tests[i].moveFileFromSource(fileName[i] + ".dck")
 
             tests[i].loadDeck()
 
-            tests[i].changeAssignPath(commonTrnsysFolder=self.inputs['commonTrnsyFolder'])
+            tests[i].changeAssignPath(HOMEPath=self.inputs['HOME$'])
 
             tests[i].changeParameter(localCopyPar)
             if (self.inputs["ignoreOnlinePlotter"] == True):
@@ -276,9 +282,10 @@ class RunParallelTrnsys():
         if(found==False):
             print Warning("changeFile was not able to change %s by %s"%(source,end))
 
-    def getConfig(self,baseList):
+    def getConfig(self,pathDdck,pathDdck2):
 
-        self.pathDdck = baseList
+        self.pathDdck = pathDdck
+        self.pathDdck2 = pathDdck2
 
         # The vector self.inputs used in python has been filled. Now other variables for Trnsys will be filled
 
@@ -311,6 +318,10 @@ class RunParallelTrnsys():
             elif (splitLine[0] == "Base"):
 
                 self.listDdck.append(os.path.join(self.pathDdck,splitLine[1]))
+
+            elif (splitLine[0] == "Base2"):
+
+                self.listDdck.append(os.path.join(self.pathDdck2,splitLine[1]))
 
             elif(splitLine[0] == "Relative"):
 

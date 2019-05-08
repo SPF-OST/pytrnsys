@@ -190,6 +190,8 @@ class ProcessParallelTrnsys():
 
     def getBaseClass(self,classProcessing,pathFolder,fileName):
 
+        raise ValueError("This function needs to be defined for each processing case")
+
         if (classProcessing == "Erlacker"):
             baseClass = erlacker.P2GErlackerTrnsysClass(pathFolder,fileName)
         elif (classProcessing == "AlStore"):

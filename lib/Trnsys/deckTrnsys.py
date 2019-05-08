@@ -1,12 +1,23 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+"""
+Author : Dani Carbonell
+Date   : 30.09.2016
+ToDo :  the double comment.
+Now Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
+"""
 
 import os
 import string,shutil
 import processFiles as spfUtils
 
-
 class DeckTrnsys():
+    """
+    This class gives the functionality to dck files:
+    -to set a new path for the deck
+    -to comment all online plotters
+    -change the name of the deck
+    -change the assign path
+    """
 
     def __init__(self,_path,_name):        
         
@@ -17,6 +28,7 @@ class DeckTrnsys():
         
         self.linesChanged = ""
         self.cleanMode = False
+        self.useAbsoluteTempPath = True #actually False does not work since trnsys does not work with  ./temp/whatever
                      
         #True is not working becasue it looks for files in the D:\MyPrograms\Trnsys17 as local path           
         self.eliminateComments = False
@@ -27,8 +39,12 @@ class DeckTrnsys():
                  
             print "Warning. TRNSYS_DATA_FOLDER not defined as a enviromental variable."
 
+        self.packageNameTrnsysFiles="None"
 
-     
+    def setPackageNameTrnsysFiles(self,name):
+
+        self.packageNameTrnsysFiles=name
+
     def setPathAndNames(self,_path,_name):
         
         self.fileName = _name #_name.split('.')[0]                
@@ -56,15 +72,7 @@ class DeckTrnsys():
 
         if(self.useRelativePath==False):         
             self.filesOutputPath = self.pathOutput
-        
-#        print "CHANGE NAME OF DECK"
-#        print self.path        
-#        print self.nameDck 
-#        print self.pathOutput
-#        print self.tempFolderEnd
-#        print self.nameDckPathOutput
-#        
-        
+
     def createDeckBackUp(self):
 
         nameDeckBck = "%s-bck" % self.nameDck        
@@ -119,18 +127,7 @@ class DeckTrnsys():
         if(self.eliminateComments==True):
             self.linesChanged = spfUtils.purgueComments(self.linesChanged,['!'])
         
-#        print self.linesChanged
         infile.close()
-
-        
-        #Create temporary file
-        
-#        tempName = "%s.temp" % self.nameDck
-#        print "tempName:%s" % tempName
-#        tempFile=open(tempName,'w')
-#
-#        tempFile.writelines(self.linesChanged)
-#        tempFile.close()
 
     def loadDeckAndEraseWhiteSpaces(self):        
 
@@ -172,9 +169,10 @@ class DeckTrnsys():
         tempFile.writelines(self.linesChanged)
         tempFile.close()
 
-    def changeAssignPath(self,commonTrnsysFolder=False):
-
-
+    def changeAssignPath(self,HOMEPath=False):
+        """
+        This file only changes the assign path of those that start with HOME$, so we use for those the absolute path
+        """
         for i in range(len(self.linesChanged)):
             splitBlank = self.linesChanged[i].split()
 
@@ -183,45 +181,26 @@ class DeckTrnsys():
                     splitPath = splitBlank[1].split("\\")
                     lineChanged=False
                     for j in range (len(splitPath)):
-                        if(splitPath[j]=="spfTrnsysFiles"):
+                        if(splitPath[j]=="HOME$"):
                             name = os.path.join(*splitPath[j+1:]) #* sot joining the vector, j+1 becasue we dont need spfTrnsysFiles,already in the path my commonTrnsysFolder
-                            if commonTrnsysFolder:
+                            if HOMEPath:
                                 if len(splitBlank)>2:
-                                    lineChanged ="ASSIGN \"%s\" %s \n" % (os.path.join(commonTrnsysFolder,name),splitBlank[2])
+                                    lineChanged ="ASSIGN \"%s\" %s \n" % (os.path.join(HOMEPath,name),splitBlank[2])
                                 else:
-                                    lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(commonTrnsysFolder, name))
+                                    lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(HOMEPath, name))
                             else:
                                 print("Warning: Common Trnsys Folder from config file not used. Use TRNSYS_DATA_FOLDER enviroment variable instead (deprecated)")
                                 if len(splitBlank)>2:
-                                    lineChanged = "ASSIGN \"%s\" %s \n" % (os.path.join(self.myCommonTrnsysFolder, name), splitBlank[2])
+                                    lineChanged = "ASSIGN \"%s\" %s \n" % (os.path.join(self.HOMEPath, name), splitBlank[2])
                                 else:
-                                    lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(self.myCommonTrnsysFolder, name))
+                                    lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(self.HOMEPath, name))
                     if(lineChanged!=False):
                         self.linesChanged[i] = lineChanged
             except:
                 pass
 
 
-    def changeAssignDeprecated(self,nameActual,nameChanged):
-        
-        for i in range(len(self.linesChanged)):
-                 
-            splitBlank = self.linesChanged[i].split()
 
-            try:       
-                if(splitBlank[0]=="ASSIGN"): 
-                    print splitBlank[1]
-                    print "\"%s\""%nameActual
-                    if(splitBlank[1]=="\"%s\""%nameActual):
-                        self.linesChanged[i] = "ASSIGN \"%s\" %s \n" % (nameChanged,splitBlank[2])
-                    
-                        print self.linesChanged[i] 
-            except:
-                pass
-#                    if(splitBank[1]==nameActual)     
-#                    fileNameWithoutCommas = string.replace(splitBlank[1],"\"","")
-#                    buildingSplit = fileNameWithoutCommas.split("building\\")      
-#                    self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
     def ignoreOnlinePlotter(self):
           
         jBegin = 0
@@ -355,7 +334,7 @@ class DeckTrnsys():
 
     def getVariables(self):
         
-        self.eliminateComments = True  #BE CAREFUL, THIS CAN CHANGE  [30,1] by [301] so it does not WORK !!!!
+        self.eliminateComments = True  #BE CAREFUL, THIS CAN CHANGE  [30,1] by [301] so it does not WORK !!!! DC: Is this updated?
         self.loadDeck(self.nameDckPathOutput)
         
         self.variablesNames   = []
@@ -396,7 +375,7 @@ class DeckTrnsys():
         outfile.writelines(lines)
         outfile.close() 
                           
-    def changeParameter(self,_parameters):
+    def changeParameter(self,_parameters): #Is this used??
 
                  
 #         print "linesChanged"
@@ -483,7 +462,7 @@ class DeckTrnsys():
                          compressorDataSplit = fileNameWithoutCommas.split("Compressor\\")                         
                                  
                          if(len(compressorDataSplit)>1):     
-                             myFileInNewPath = self.myCommonTrnsysFolder + "Compressor\\" + "%s" % compressorDataSplit[1]
+                             myFileInNewPath = self.HOMEPath + "Compressor\\" + "%s" % compressorDataSplit[1]
                              self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
                              
                              print "Compressor data changed :%s " % self.linesChanged[i]
@@ -511,10 +490,14 @@ class DeckTrnsys():
                          
                          try:
 #                             print "split[0]:%f splt[1]:%s" % (fileNameWithoutCommas[0],fileNameWithoutCommas[1])
-                             myFileInNewPath = self.filesOutputPath +"\\temp\\"+ nameSplited[1]
-                             self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
-                             
-#                             print "lineChanged-0 : %s pathOut:%s nameSplied:%s" % (self.linesChanged[i],self.pathOutput,nameSplited[1])
+                             if(self.useAbsoluteTempPath):
+                                 myFileInNewPath = self.filesOutputPath +"\\temp\\"+ nameSplited[1]
+                                 self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+                             else:
+                                myFileInNewPath =  "\\temp\\" + nameSplited[1]
+                                self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
+
+    #                             print "lineChanged-0 : %s pathOut:%s nameSplied:%s" % (self.linesChanged[i],self.pathOutput,nameSplited[1])
 
                          except:
                              

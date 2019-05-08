@@ -1,12 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Mar 02 08:35:07 2017
-
-@author: dcarbone
-"""
-
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Author : Dani Carbonell
 # Date   : 14.12.2012
 import sys, os, time

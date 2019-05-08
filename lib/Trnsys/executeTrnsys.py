@@ -1,17 +1,25 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+"""
+Author : Dani Carbonell
+Date   : 30.09.2016
+ToDo
+"""
 
 import os
 import string,shutil
 import processFiles as spfUtils
 import deckTrnsys 
 
-# 
-#
-#
 
 class ExecuteTrnsys():
-
+    """
+    This class uses DeckTrnsys class to read a dck file.
+    It also gives functionality by means of DeckTrnsys
+    -to set a new path for the deck
+    -to comment all online plotters
+    -change the name of the deck
+    -change the assign path
+    """
     def __init__(self,_path,_name):        
                 
         self.fileName = _name #_name.split('.')[0]                
@@ -20,6 +28,7 @@ class ExecuteTrnsys():
         self.linesChanged = ""
         self.titleOfLatex = "%s" % self.fileName
 
+        # DC: I guess these shoud be deprecated with new structure and config files
         self.addGround=False #Added Ground file for ground calculations
         self.addWWProfile=False
         self.addBuildingData=True #if ISo model set to FALSE
@@ -27,7 +36,7 @@ class ExecuteTrnsys():
 
         self.trnsysVersion="TRNSYS_EXE"
         self.trnsysExePath="enviromentalVariable"
-        self.myCommonTrnsysFolder= None
+        self.HOMEPath= None
 
         self.pathOutput = os.path.join(self.path, self.fileName)
         
@@ -66,8 +75,8 @@ class ExecuteTrnsys():
     def setAddBuildingData(self,add):
         self.addBuildingData=add
 
-    def setCommonTrnsysFolderPath(self,path):
-        self.myCommonTrnsysFolder = path
+    def setHOMEPath(self,path):
+        self.HOMEPath = path
 
     def setTrnsysExePath(self,path):
         self.trnsysExePath = path
@@ -83,6 +92,10 @@ class ExecuteTrnsys():
         self.tempFolder = os.path.join(self.path, 'temp')
         self.tempFolderEnd = os.path.join(self.pathOutput, 'temp')          
         self.nameDckPathOutput = os.path.join(self.pathOutput, _name + '.dck')
+
+    def setPackageNameTrnsysFiles(self,name):
+
+        self.deckTrnsys.setPackageNameTrnsysFiles(name)
 
     def ignoreOnlinePlotter(self,useOutputDeck=False):
 
@@ -113,14 +126,7 @@ class ExecuteTrnsys():
         if(self.useRelativePath==False):         
             self.filesOutputPath = self.pathOutput
                 
-#        print self.path        
-#        print self.nameDck 
-#        print self.pathOutput
-        
-#        print self.tempFolderEnd
-#        print self.nameDckPathOutput
-#        
-        
+
     def createDeckBackUp(self):
 
         nameDeckBck = "%s-bck" % self.nameDck        
@@ -153,12 +159,12 @@ class ExecuteTrnsys():
         #with this function we obtain some data from the deck file.
 
 
-    def changeAssignPath(self,commonTrnsysFolder=False):
+    def changeAssignPath(self,HOMEPath=False):
 
 
         # self.deckTrnsys.changeAssign(_nameActual,_nameChanged)
 
-        self.deckTrnsys.changeAssignPath(commonTrnsysFolder=commonTrnsysFolder)
+        self.deckTrnsys.changeAssignPath(HOMEPath=HOMEPath)
 
     def getDataFromDeck(self,myName):
         
@@ -199,15 +205,15 @@ class ExecuteTrnsys():
         
     def copyFilesForRunning(self):
 
-        if(self.myCommonTrnsysFolder==None):
+        if(self.HOMEPath==None):
 
-            self.myCommonTrnsysFolder = os.getenv("TRNSYS_DATA_FOLDER") + "\\"
+            self.HOMEPath = os.getenv("TRNSYS_DATA_FOLDER") + "\\"
 
-            if (self.myCommonTrnsysFolder == None):
+            if (self.HOMEPath == None):
                 raise ValueError("FATAL. The user must define TRNSYS_DATA_FOLDER as a enviromental variable. \
-                     In this folder you must place the folders needed for calculation, for example add_data, climate, etc. My TrnsysFolder:%s" % self.myCommonTrnsysFolder)
+                     In this folder you must place the folders needed for calculation, for example add_data, climate, etc. My TrnsysFolder:%s" % self.HOMEPath)
         else:
-            self.myCommonTrnsysFolder=self.myCommonTrnsysFolder+ "\\"
+            self.HOMEPath=self.HOMEPath+ "\\"
 
          # File used for Ground calculation of Type 708        
 
@@ -226,8 +232,8 @@ class ExecuteTrnsys():
         self.moveFileFromSource(nameFile)
         
         for nameFolder in self.foldersForRunning:     
-            print "executeTrnsys.py Folder for running from common folder :%s" % nameFolder            
-            self.copyFolderFromCommonFolder(nameFolder)        
+            print "executeTrnsys.py Folder for running from HOME$ folder :%s" % nameFolder
+            self.copyFolderFromHomePath(nameFolder)
 
         for nameFolder in self.foldersForRunningFromSource:
             print "folder for running from source folder :%s" % nameFolder                        
@@ -283,9 +289,9 @@ class ExecuteTrnsys():
 
         self.copyFolderFrom(self.path,name)
         
-    def copyFolderFromCommonFolder(self,name):
+    def copyFolderFromHomePath(self,name):
             
-        self.copyFolderFrom(self.myCommonTrnsysFolder,name)
+        self.copyFolderFrom(self.HOMEPath,name)
             
     def setTrnsysVersion(self,version):
         self.trnsysVersion = version

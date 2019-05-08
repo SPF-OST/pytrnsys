@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
 """
-Created on Fri Sep 30 10:02:57 2016
-
-@author: dcarbone
+Author : Dani Carbonell
+Date   : 30.09.2016
+ToDo :
 """
 
 import processFiles as spfUtils
@@ -11,9 +11,20 @@ import os
 import Tkinter as tk
 import tkMessageBox
 
-class BuildTrnsysDeck():
+"""
+This class uses a list of ddck files to built a complete TRNSYS deck file
+"""
 
-    def __init__(self,_pathDeck,_nameDeck,_nameList,_pathList):        
+class BuildTrnsysDeck():
+    """
+    Class used to built a deck file out of a list of ddck files
+    inputs :
+    - pathDeck : outlet path where we want to built the dck file
+    - nameDeck : the base name of the deck. This could be modified by the results of each simulation if variants are used in the cofing file
+    - nameList : the list of ddck files needed to built a deck
+    - pathList : the Base path of the ddck files
+    """
+    def __init__(self,_pathDeck,_nameDeck,_nameList,_pathList):
       
         self.pathDeck = _pathDeck
         self.nameDeck  = self.pathDeck + "\%s.dck" % _nameDeck
@@ -48,9 +59,13 @@ class BuildTrnsysDeck():
         
         infile.close()
         
-        return lines[0:3]
+        return lines[0:3] #only returns the caption with the info of the file
 
+    #
     def readDeckListConfig(self):
+        """
+        It uses the list of ddck to built a deck file
+        """
 
         for i in range(len(self.nameList)):
 
@@ -77,7 +92,11 @@ class BuildTrnsysDeck():
             self.deckText = self.deckText + addedLines
 
     def readDeckList(self):
-                
+        """
+         Reads all ddck files form the nameList and creates a single string with all in self.deckText
+        :param self: nameList
+        :return: self.deckText
+        """
         for i in range(len(self.nameList)):
             
             split = self.nameList[i].split("\\")
@@ -93,7 +112,7 @@ class BuildTrnsysDeck():
                     else:
                         pathList =  pathList+"\\"+pathVec[i]
 
-            elif(split[0].lower() == "local"): #We use a local path
+            elif(split[0].lower() == "local"): #We use a local path. This needs to be checked !!!
                 pathVec = split[:-2] # Assuming last two names are the name group/type.ddck and the others are the path
                 pathList=""
                 for i in range(len(pathVec)):            
@@ -121,6 +140,12 @@ class BuildTrnsysDeck():
             self.deckText =  self.deckText + addedLines
         
     def writeDeck(self,addedLines=None):
+
+        """
+         Created the ddck file out of the self.deckText string
+        :param self: deckText, self.nameDeck
+        :return: a dcck file created
+        """
 
         tempName = "%s" % self.nameDeck
 
