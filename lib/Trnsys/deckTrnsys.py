@@ -169,7 +169,7 @@ class DeckTrnsys():
         tempFile.writelines(self.linesChanged)
         tempFile.close()
 
-    def changeAssignPath(self,HOMEPath=False):
+    def changeAssignPath(self, inputsDict = False):
         """
         This file only changes the assign path of those that start with HOME$, so we use for those the absolute path
         """
@@ -181,19 +181,20 @@ class DeckTrnsys():
                     splitPath = splitBlank[1].split("\\")
                     lineChanged=False
                     for j in range (len(splitPath)):
-                        if(splitPath[j]=="HOME$"):
+
+                        if splitPath[j] in inputsDict.keys():
                             name = os.path.join(*splitPath[j+1:]) #* sot joining the vector, j+1 becasue we dont need spfTrnsysFiles,already in the path my commonTrnsysFolder
-                            if HOMEPath:
+                            if inputsDict:
                                 if len(splitBlank)>2:
-                                    lineChanged ="ASSIGN \"%s\" %s \n" % (os.path.join(HOMEPath,name),splitBlank[2])
+                                    lineChanged ="ASSIGN \"%s\" %s \n" % (os.path.join(inputsDict[splitPath[j]],name),splitBlank[2])
                                 else:
-                                    lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(HOMEPath, name))
+                                    lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(inputsDict[splitPath[j]], name))
                             else:
                                 print("Warning: Common Trnsys Folder from config file not used. Use TRNSYS_DATA_FOLDER enviroment variable instead (deprecated)")
                                 if len(splitBlank)>2:
-                                    lineChanged = "ASSIGN \"%s\" %s \n" % (os.path.join(self.HOMEPath, name), splitBlank[2])
+                                    lineChanged = "ASSIGN \"%s\" %s \n" % (os.path.join(inputsDict[splitPath[j]], name), splitBlank[2])
                                 else:
-                                    lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(self.HOMEPath, name))
+                                    lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(inputsDict[splitPath[j]], name))
                     if(lineChanged!=False):
                         self.linesChanged[i] = lineChanged
             except:

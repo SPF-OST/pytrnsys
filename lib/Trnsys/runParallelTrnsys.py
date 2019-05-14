@@ -27,7 +27,7 @@ class RunParallelTrnsys():
             self.readConfig(self.path,_configFile)
             self.nameBase = self.inputs['nameRef']
             self.path = self.inputs['pathBaseSimulations']
-            self.getConfig(self.inputs["ddckListPath"],self.inputs["ddckListPath"])
+            self.getConfig()
 
         else:
             self.nameBase = _name
@@ -163,7 +163,7 @@ class RunParallelTrnsys():
 
             tests[i].loadDeck()
 
-            tests[i].changeAssignPath(HOMEPath=self.inputs['HOME$'])
+            tests[i].changeAssignPath(inputsDict=self.inputs)
 
             tests[i].changeParameter(localCopyPar)
             if (self.inputs["ignoreOnlinePlotter"] == True):
@@ -282,7 +282,7 @@ class RunParallelTrnsys():
         if(found==False):
             print Warning("changeFile was not able to change %s by %s"%(source,end))
 
-    def getConfig(self,pathDdck,pathDdck2):
+    def getConfig(self,pathDdck=None,pathDdck2=None):
 
         self.pathDdck = pathDdck
         self.pathDdck2 = pathDdck2
@@ -334,6 +334,9 @@ class RunParallelTrnsys():
                 self.listFit[splitLine[1]] = [splitLine[2],splitLine[3],splitLine[4]]
             elif (splitLine[0] == "fitobs"):
                 self.listFitObs.append(splitLine[1])
+
+            elif (splitLine[0] in self.inputs.keys()):
+                self.listDdck.append(os.path.join(self.inputs[splitLine[0]], splitLine[1]))
             else:
 
                 pass

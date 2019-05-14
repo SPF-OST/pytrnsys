@@ -33,7 +33,6 @@ class ExecuteTrnsys():
         self.addWWProfile=False
         self.addBuildingData=True #if ISo model set to FALSE
         self.addSimData=False #MB you have to activate this in your case.
-
         self.trnsysVersion="TRNSYS_EXE"
         self.trnsysExePath="enviromentalVariable"
         self.HOMEPath= None
@@ -159,12 +158,12 @@ class ExecuteTrnsys():
         #with this function we obtain some data from the deck file.
 
 
-    def changeAssignPath(self,HOMEPath=False):
+    def changeAssignPath(self,inputsDict=False):
 
 
         # self.deckTrnsys.changeAssign(_nameActual,_nameChanged)
 
-        self.deckTrnsys.changeAssignPath(HOMEPath=HOMEPath)
+        self.deckTrnsys.changeAssignPath(inputsDict=inputsDict)
 
     def getDataFromDeck(self,myName):
         
