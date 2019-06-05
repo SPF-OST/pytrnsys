@@ -16,6 +16,9 @@ import runParallel as runPar
 import readConfigTrnsys as readConfig
 import shutil
 
+import imp
+from sets import Set
+
 class RunParallelTrnsys():
 
     def __init__(self,_path,_name,_configFile=False):
@@ -252,9 +255,40 @@ class RunParallelTrnsys():
             #         for k in range(nVariables):
             #             self.variationsOutput[n].append(variations[n][i])
 
-    def runParallel(self):
-
+    def runParallel(self,writeLogFile=True):
+        if writeLogFile:
+            self.writeRunLogFile()
         runPar.runParallel(self.cmds, reduceCpu=int(self.inputs["reduceCpu"]), outputFile=self.outputFileDebugRun)
+
+
+    def writeRunLogFile(self):
+        logfile = open(os.path.join(self.path,'runLogFile.dat'),'w')
+        username = os.getenv('username')
+        logfile.write('Run created by '+username+'\n')
+        logfile.write('Ddck repositories used:\n')
+        try:
+            imp.find_module('git')
+            found = True
+            import git
+        except ImportError:
+            found = False
+
+        for path in self.listDdckPaths:
+            logfile.write(path+'\n')
+            logfile.write('Revision Hash number: ')
+            if found:
+                try:
+                    repo = git.Repo(path,search_parent_directories=True)
+                    logfile.write(str(repo.head.object.hexsha)+'\n')
+                except git.exc.InvalidGitRepositoryError:
+                    logfile.write('None - Not in a Git repository \n')
+            else:
+                logfile.write('not found \n')
+        logfile.write('\nConfig file used: \n\n')
+        for line in self.lines:
+            logfile.write(line+'\n')
+        logfile.close()
+
 
     def readConfig(self,path,name,parseFileCreated=False):
 
@@ -295,6 +329,7 @@ class RunParallelTrnsys():
         self.parameters = {} #deck parameters fixed for all simulations
         self.listFit = {}
         self.listFitObs = []
+        self.listDdckPaths = Set()
         for line in self.lines:
 
             splitLine = line.split()
@@ -337,6 +372,7 @@ class RunParallelTrnsys():
 
             elif (splitLine[0] in self.inputs.keys()):
                 self.listDdck.append(os.path.join(self.inputs[splitLine[0]], splitLine[1]))
+                self.listDdckPaths.add(self.inputs[splitLine[0]])
             else:
 
                 pass
