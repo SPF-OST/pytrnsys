@@ -262,10 +262,10 @@ class RunParallelTrnsys():
 
 
     def writeRunLogFile(self):
-        logfile = open(os.path.join(self.path,'runLogFile.dat'),'w')
-        username = os.getenv('username')
-        logfile.write('Run created by '+username+'\n')
-        logfile.write('Ddck repositories used:\n')
+        logfile = open(os.path.join(self.path,'runLogFile.config'),'w')
+        username = os.getenv('# username')
+        logfile.write('# Run created by '+username+'\n')
+        logfile.write('# Ddck repositories used:\n')
         try:
             imp.find_module('git')
             found = True
@@ -274,8 +274,8 @@ class RunParallelTrnsys():
             found = False
 
         for path in self.listDdckPaths:
-            logfile.write(path+'\n')
-            logfile.write('Revision Hash number: ')
+            logfile.write('# '+path+'\n')
+            logfile.write('# Revision Hash number: ')
             if found:
                 try:
                     repo = git.Repo(path,search_parent_directories=True)
@@ -284,7 +284,7 @@ class RunParallelTrnsys():
                     logfile.write('None - Not in a Git repository \n')
             else:
                 logfile.write('not found \n')
-        logfile.write('\nConfig file used: \n\n')
+        logfile.write('\n# Config file used: \n\n')
         for line in self.lines:
             logfile.write(line+'\n')
         logfile.close()
