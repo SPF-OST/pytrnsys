@@ -10,12 +10,12 @@ ToDo : Copy config file to results folder automatically, remove processDataGshp 
 """
 
 import os
-import TrnsysTools.processingSimulations.debugProcess
+import TrnsysTools.processingSimulations.debugProcess as debugProcess
 import multiprocessing as mp
 import runParallel as run
 import bigIceTrnsysClass as ice
 import TrnsysTools.utilities.utilsSpf as utils
-import readConfigTrnsys as readConfig
+import TrnsysTools.Trnsys.readConfigTrnsys as readConfig
 import GshpTrnsysBaseClass as gshp
 import AlStoreTrnsysBaseClass as alu
 import p2GErlackerTrnsysClass as erlacker
@@ -190,7 +190,7 @@ class ProcessParallelTrnsys():
 
     def getBaseClass(self,classProcessing,pathFolder,fileName):
 
-        raise ValueError("This function needs to be defined for each processing case")
+
 
         if (classProcessing == "Erlacker"):
             baseClass = erlacker.P2GErlackerTrnsysClass(pathFolder,fileName)
@@ -200,6 +200,7 @@ class ProcessParallelTrnsys():
             baseClass = ice.BigIceTrnsysClass(pathFolder,fileName)
         else:
             baseClass = None
+            raise ValueError("This function needs to be defined for each processing case")
 
         return baseClass
 
