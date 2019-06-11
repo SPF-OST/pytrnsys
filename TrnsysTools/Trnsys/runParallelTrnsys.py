@@ -15,6 +15,7 @@ import string
 import runParallel as runPar
 import readConfigTrnsys as readConfig
 import shutil
+import sys
 
 import imp
 from sets import Set
@@ -263,7 +264,7 @@ class RunParallelTrnsys():
 
     def writeRunLogFile(self):
         logfile = open(os.path.join(self.path,'runLogFile.config'),'w')
-        username = os.getenv('# username')
+        username = os.getenv('username')
         logfile.write('# Run created by '+username+'\n')
         logfile.write('# Ddck repositories used:\n')
         try:
@@ -288,6 +289,8 @@ class RunParallelTrnsys():
         for line in self.lines:
             logfile.write(line+'\n')
         logfile.close()
+        mainFile = sys.argv[0]
+        shutil.copy(mainFile,os.path.join(self.path,'runMainFile.py'))
 
 
     def readConfig(self,path,name,parseFileCreated=False):
