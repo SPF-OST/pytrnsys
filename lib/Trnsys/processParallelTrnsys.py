@@ -61,7 +61,7 @@ def processDataGeneral(casesInputs):
         monthsSplit = []
 
     if (processQvsT == True):
-        test.loadQvsT("QVsT.Plt", monthsSplit=monthsSplit, addDhwCirc=False, normalized=True)
+        test.loadQvsT("QVsT.Plt", monthsSplit=monthsSplit, addDhwCirc=False, normalized=True,cut=True)
 
     doProcess = True
 

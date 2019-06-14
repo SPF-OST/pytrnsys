@@ -482,9 +482,8 @@ class PlotMatplotlib():
         return namePdf
     
     #xvar 1d yVar 2D, so several lines
-    def plotDynamic(self,xVar,yVar,legends,nameFile=None,xLabel="Days",plotJpg=False,printData=False,printEvery=1):
-        
-        
+    def plotDynamic(self,xVar,yVar,legends,nameFile=None,xLabel="Days",yLabel=None,plotJpg=False,printData=False,printEvery=1):
+
         try:
             size = len(xVar)
         except:            
@@ -502,8 +501,10 @@ class PlotMatplotlib():
             
         axes.legend(legends,loc='upper left', borderaxespad=0.)
             
-        axes.set_xlabel('%s'%xLabel,fontsize=20)        
-#        axes.set_ylabel('%s'%myLabel,fontsize=20)
+        axes.set_xlabel('%s'%xLabel,fontsize=20)
+
+        if(yLabel != None):
+           axes.set_ylabel('%s'%yLabel,fontsize=20)
            
         if(self.useXLimits):
             plt.xlim([self.lowXLimit,self.highXLimit])
@@ -693,7 +694,7 @@ class PlotMatplotlib():
         
         return namePdf  
     
-    def calcAndPrintQVersusT(self,fileName,tFlow,eFlow,legends,printEvery=1,normalized=False):
+    def calcAndPrintQVersusT(self,fileName,tFlow,eFlow,legends,printEvery=1,normalized=False,cut=False):
         
         nVar = len(legends)
         
@@ -722,12 +723,17 @@ class PlotMatplotlib():
             lines = lines + line
             i=i+2
         line = "\n"; lines = lines + line
-        
+
+
         for i in range(nTimeStep):                    
             if(i!= 0 and i!=nTimeStep-1 and i%printEvery==0):
                 line = "%d "%(i); lines = lines+line
                 for j in range(nVar):
-                        line = "%f %f " % (tSortVec[j][i],cumEnerVec[j][i]); lines = lines+line
+                        if(cumEnerVec[j][i]<=0.99*cumEnerVec[j][nTimeStep-1]): # cut at 99%
+                            line = "%f %f " % (tSortVec[j][i],cumEnerVec[j][i]); lines = lines+line
+                        else:
+                            line = "- - "; lines = lines+line
+
                 line = "\n"; lines = lines+line
                 
         myFileName = self.path + "//" + fileName + ".dat"

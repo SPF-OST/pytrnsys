@@ -258,6 +258,7 @@ class PlotGle():
         line = "set texlabels 1\n" ; lines = lines +line
         line = "begin graph\n" ; lines = lines +line
         line = "size 12 8\n" ; lines = lines +line
+        
         if(normalized):
             line = "ytitle \"$Q_{cumulative}/Q_{demand}$\" \n" ; lines = lines +line
         else:

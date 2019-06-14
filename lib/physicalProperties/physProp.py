@@ -171,8 +171,8 @@ class PhysProp():
                 return self.constantMu
         else:               
             try:                
-                if(newVersion==True): return (PropsSI('L','T',T+273.15,'P',self.pressure,self.name)*1000.)
-                else: return (Props('L','T',T+273.15,'P',self.pressure,self.name)*1000.)
+                if(newVersion==True): return (PropsSI('L','T',T+273.15,'P',self.pressure,self.name))
+                else: return (Props('L','T',T+273.15,'P',self.pressure,self.name))
             except:
                 print "Error in Lambda T:%f"%T
                 if(newVersion==True): return (PropsSI('L','T',T+0.1+273.15,'P',self.pressure,self.name)*1000.)

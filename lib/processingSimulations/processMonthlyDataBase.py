@@ -206,12 +206,15 @@ class ProcessMonthlyDataBase():
     # Section for plots
     #############################################
 
-    def plotMonthlyWeatherData(self,yearlyFactor=10):
+    def plotMonthlyWeatherData(self,yearlyFactor=10,printData=False):
 
         self.nameWeatherDataPlotPdf = self.plot.plotMonthly2Bar(self.iTHorizontalkWPerM2, self.iTColkWPerM2,
                                                                 ['At horitzontal surface', 'At collector surface'],
                                                                 "Solar radiation $[kWh/m^2]$", "weatherDataMonthly",
                                                                 yearlyFactor=yearlyFactor)
+
+        self.nameWeatherDataHoPlotPdf = self.plot.plotMonthly(self.iTHorizontalkWPerM2,"Solar radiation $[kWh/m^2]$","weatherDataMonthly",yearlyFactor=yearlyFactor,printData=printData)
+
 
     def plotBuildingMonthlyEnergyBalance(self,yearlyFactor=10,useYear=True,printData=False,printImb=True):
         
