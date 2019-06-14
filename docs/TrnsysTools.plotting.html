@@ -1,0 +1,447 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>TrnsysTools.plotting package &#8212; TrnsysTools 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="TrnsysTools.processingData package" href="TrnsysTools.processingData.html" />
+    <link rel="prev" title="TrnsysTools.Trnsys package" href="TrnsysTools.Trnsys.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-TrnsysTools.plotting">
+<span id="trnsystools-plotting-package"></span><h1>TrnsysTools.plotting package<a class="headerlink" href="#module-TrnsysTools.plotting" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-TrnsysTools.plotting.DownSizeForPlotting">
+<span id="trnsystools-plotting-downsizeforplotting-module"></span><h2>TrnsysTools.plotting.DownSizeForPlotting module<a class="headerlink" href="#module-TrnsysTools.plotting.DownSizeForPlotting" title="Permalink to this headline">¶</a></h2>
+<p>Class to down resize time step data in order to plot faster with less data points
+It does not interpolate, it just eliminates points depending on the new time step chosen.
+Author : Dani Carbonell
+Date   : 14.12.2012</p>
+<dl class="class">
+<dt id="TrnsysTools.plotting.DownSizeForPlotting.DownSizeForPlotting">
+<em class="property">class </em><code class="descclassname">TrnsysTools.plotting.DownSizeForPlotting.</code><code class="descname">DownSizeForPlotting</code><span class="sig-paren">(</span><em>_path</em>, <em>_name</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.DownSizeForPlotting.DownSizeForPlotting" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="TrnsysTools.plotting.DownSizeForPlotting.DownSizeForPlotting.cut">
+<code class="descname">cut</code><span class="sig-paren">(</span><em>_timeBegin</em>, <em>_timeEnd</em>, <em>timeStepOld</em>, <em>timeStepNew</em>, <em>skypedLines=0</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.DownSizeForPlotting.DownSizeForPlotting.cut" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.DownSizeForPlotting.DownSizeForPlotting.downSize">
+<code class="descname">downSize</code><span class="sig-paren">(</span><em>timeStepOld</em>, <em>timeStepNew</em>, <em>skypedLines=0</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.DownSizeForPlotting.DownSizeForPlotting.downSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.DownSizeForPlotting.DownSizeForPlotting.recalculateColumn">
+<code class="descname">recalculateColumn</code><span class="sig-paren">(</span><em>column</em>, <em>factor</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.DownSizeForPlotting.DownSizeForPlotting.recalculateColumn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-TrnsysTools.plotting.plotGle">
+<span id="trnsystools-plotting-plotgle-module"></span><h2>TrnsysTools.plotting.plotGle module<a class="headerlink" href="#module-TrnsysTools.plotting.plotGle" title="Permalink to this headline">¶</a></h2>
+<p>Class to plot using GLE graphic design layout
+Author : Daniel Carbonell
+Date   : 2017
+ToDo :</p>
+<dl class="class">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle">
+<em class="property">class </em><code class="descclassname">TrnsysTools.plotting.plotGle.</code><code class="descname">PlotGle</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.changeDataFromGleTextFile">
+<code class="descname">changeDataFromGleTextFile</code><span class="sig-paren">(</span><em>namePlots</em>, <em>parametersDict</em>, <em>modifyNameGle=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.changeDataFromGleTextFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.createFunction">
+<code class="descname">createFunction</code><span class="sig-paren">(</span><em>name</em>, <em>nCases</em>, <em>col1</em>, <em>col2</em>, <em>xtitle</em>, <em>ytitle</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.createFunction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.createGleQvsT">
+<code class="descname">createGleQvsT</code><span class="sig-paren">(</span><em>fileName</em>, <em>legends</em>, <em>normalized=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.createGleQvsT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.createLatexFromGlePlots">
+<code class="descname">createLatexFromGlePlots</code><span class="sig-paren">(</span><em>namePlots</em>, <em>latexFile</em>, <em>titleLatex</em>, <em>subTileLatex</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.createLatexFromGlePlots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.executeGLE">
+<code class="descname">executeGLE</code><span class="sig-paren">(</span><em>fileName</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.executeGLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.getBarBalancePlot">
+<code class="descname">getBarBalancePlot</code><span class="sig-paren">(</span><em>nameGleFile</em>, <em>fileNameData</em>, <em>legends</em>, <em>sizeIn</em>, <em>sizeOut</em>, <em>xnames=None</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.getBarBalancePlot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.getBarPlot">
+<code class="descname">getBarPlot</code><span class="sig-paren">(</span><em>nameGleFile</em>, <em>fileNameData</em>, <em>legends</em>, <em>xnames=None</em>, <em>xmin=0.5</em>, <em>xmax=13.5</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.getBarPlot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.getCaptionGraph">
+<code class="descname">getCaptionGraph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.getCaptionGraph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.getEasyPlot">
+<code class="descname">getEasyPlot</code><span class="sig-paren">(</span><em>nameGleFile</em>, <em>fileNameData</em>, <em>legends</em>, <em>useSameStyle=True</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.getEasyPlot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.getFigCaption">
+<code class="descname">getFigCaption</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.getFigCaption" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGle.PlotGle.setUseMarkers">
+<code class="descname">setUseMarkers</code><span class="sig-paren">(</span><em>use</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGle.PlotGle.setUseMarkers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-TrnsysTools.plotting.plotGround">
+<span id="trnsystools-plotting-plotground-module"></span><h2>TrnsysTools.plotting.plotGround module<a class="headerlink" href="#module-TrnsysTools.plotting.plotGround" title="Permalink to this headline">¶</a></h2>
+<p>Plotting functionality customized for data printed by TYPE ?? developed by SPF.
+This type solves the ground in 2D and is used to couple ice storages with the ground
+for undergound storages.
+Author : Dani Carbonell
+Date   : 20.02.2014</p>
+<dl class="class">
+<dt id="TrnsysTools.plotting.plotGround.PlotGround">
+<em class="property">class </em><code class="descclassname">TrnsysTools.plotting.plotGround.</code><code class="descname">PlotGround</code><span class="sig-paren">(</span><em>_path</em>, <em>_name</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGround.PlotGround" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="TrnsysTools.plotting.plotGround.PlotGround.loadGroundField">
+<code class="descname">loadGroundField</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGround.PlotGround.loadGroundField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGround.PlotGround.plotGroundMesh">
+<code class="descname">plotGroundMesh</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGround.PlotGround.plotGroundMesh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGround.PlotGround.plotLines">
+<code class="descname">plotLines</code><span class="sig-paren">(</span><em>name</em>, <em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGround.PlotGround.plotLines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGround.PlotGround.plotTGround">
+<code class="descname">plotTGround</code><span class="sig-paren">(</span><em>name</em>, <em>hour</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGround.PlotGround.plotTGround" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGround.PlotGround.plotTwelveGround">
+<code class="descname">plotTwelveGround</code><span class="sig-paren">(</span><em>name</em>, <em>hour</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGround.PlotGround.plotTwelveGround" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotGround.PlotGround.readTemperatureField">
+<code class="descname">readTemperatureField</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotGround.PlotGround.readTemperatureField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-TrnsysTools.plotting.plotMatplotlib">
+<span id="trnsystools-plotting-plotmatplotlib-module"></span><h2>TrnsysTools.plotting.plotMatplotlib module<a class="headerlink" href="#module-TrnsysTools.plotting.plotMatplotlib" title="Permalink to this headline">¶</a></h2>
+<p>Class to plot using matplotlib</p>
+<p>Author : Daniel Carbonell
+Date   : 05-05-2018
+ToDo :</p>
+<dl class="class">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib">
+<em class="property">class </em><code class="descclassname">TrnsysTools.plotting.plotMatplotlib.</code><code class="descname">PlotMatplotlib</code><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot TRNSYS Results with Matplotlib</p>
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.calcAndPrintQVersusT">
+<code class="descname">calcAndPrintQVersusT</code><span class="sig-paren">(</span><em>fileName</em>, <em>tFlow</em>, <em>eFlow</em>, <em>legends</em>, <em>printEvery=1</em>, <em>normalized=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.calcAndPrintQVersusT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.initialize">
+<code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.initialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotDaily">
+<code class="descname">plotDaily</code><span class="sig-paren">(</span><em>var</em>, <em>myLabel</em>, <em>nameFile</em>, <em>plotJpg=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotDaily" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotDynamic">
+<code class="descname">plotDynamic</code><span class="sig-paren">(</span><em>xVar</em>, <em>yVar</em>, <em>legends</em>, <em>nameFile=None</em>, <em>xLabel='Days'</em>, <em>plotJpg=False</em>, <em>printData=False</em>, <em>printEvery=1</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotDynamic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotDynamicBalance">
+<code class="descname">plotDynamicBalance</code><span class="sig-paren">(</span><em>xVar</em>, <em>yVarPos</em>, <em>yVarNeg</em>, <em>legends</em>, <em>nameFile=None</em>, <em>xLabel='Days'</em>, <em>plotJpg=False</em>, <em>printData=False</em>, <em>printEvery=1</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotDynamicBalance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotDynamicOneVar">
+<code class="descname">plotDynamicOneVar</code><span class="sig-paren">(</span><em>xVar</em>, <em>yVar</em>, <em>myLegend</em>, <em>nameFile</em>, <em>plotJpg=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotDynamicOneVar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotMonthly">
+<code class="descname">plotMonthly</code><span class="sig-paren">(</span><em>var</em>, <em>myLabel</em>, <em>nameFile</em>, <em>yearlyFactor</em>, <em>useYearlyFactorAsValue=False</em>, <em>startMonth=1</em>, <em>myTitle=None</em>, <em>plotEmf=False</em>, <em>printData=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotMonthly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot Monthly Values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>var</strong> (<em>ndarray</em>) – 1D array of length 12 (not containing a yearly value) or 13 (containing a yearly value)</li>
+<li><strong>myLabel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Label of the y-Axis</li>
+<li><strong>nameFile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of the plot file to be saved</li>
+<li><strong>yearlyFactor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Value of the yearly Factor</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotMonthly2Bar">
+<code class="descname">plotMonthly2Bar</code><span class="sig-paren">(</span><em>var1</em>, <em>var2</em>, <em>legends</em>, <em>myLabel</em>, <em>nameFile</em>, <em>yearlyFactor</em>, <em>startMonth=1</em>, <em>myTitle=None</em>, <em>plotEmf=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotMonthly2Bar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotMonthlyBalance">
+<code class="descname">plotMonthlyBalance</code><span class="sig-paren">(</span><em>inVar</em>, <em>outVar</em>, <em>legends</em>, <em>myLabel</em>, <em>nameFile</em>, <em>unit</em>, <em>startMonth=1</em>, <em>colors=False</em>, <em>printImb=True</em>, <em>yearlyFactor=1</em>, <em>useYear=False</em>, <em>plotEmf=False</em>, <em>printData=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotMonthlyBalance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotPie">
+<code class="descname">plotPie</code><span class="sig-paren">(</span><em>var</em>, <em>labels</em>, <em>myTitle</em>, <em>nameFile</em>, <em>printData=False</em>, <em>extension='pdf'</em>, <em>sort=True</em>, <em>fontSize=10</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotPie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotYearlyEnergyBalance">
+<code class="descname">plotYearlyEnergyBalance</code><span class="sig-paren">(</span><em>inVar</em>, <em>outVar</em>, <em>legends</em>, <em>myLabel</em>, <em>nameFile</em>, <em>unit</em>, <em>useShares=False</em>, <em>colors=False</em>, <em>printImb=True</em>, <em>plotEmf=False</em>, <em>printData=False</em>, <em>useTwoColumns=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.plotYearlyEnergyBalance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.setDefaultColors">
+<code class="descname">setDefaultColors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.setDefaultColors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.setPath">
+<code class="descname">setPath</code><span class="sig-paren">(</span><em>_path</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.setPath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.setXLimits">
+<code class="descname">setXLimits</code><span class="sig-paren">(</span><em>xmin</em>, <em>xmax</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.setXLimits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.setYLimits">
+<code class="descname">setYLimits</code><span class="sig-paren">(</span><em>ymin</em>, <em>ymax</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotMatplotlib.PlotMatplotlib.setYLimits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-TrnsysTools.plotting.plotTrnsysUtils">
+<span id="trnsystools-plotting-plottrnsysutils-module"></span><h2>TrnsysTools.plotting.plotTrnsysUtils module<a class="headerlink" href="#module-TrnsysTools.plotting.plotTrnsysUtils" title="Permalink to this headline">¶</a></h2>
+<p>Class to plot hourly or time step data from TRNSYS
+Author : Dani Carbonell
+Date   : 2018
+ToDo   :</p>
+<dl class="class">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils">
+<em class="property">class </em><code class="descclassname">TrnsysTools.plotting.plotTrnsysUtils.</code><code class="descname">PlotTrnsysUtils</code><span class="sig-paren">(</span><em>_path</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>nameX</em>, <em>nameY</em>, <em>scale=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.changePath">
+<code class="descname">changePath</code><span class="sig-paren">(</span><em>_path</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.changePath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.clean">
+<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.integrateCumulative">
+<code class="descname">integrateCumulative</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.integrateCumulative" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.load">
+<code class="descname">load</code><span class="sig-paren">(</span><em>_name</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.load" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.loadHourly">
+<code class="descname">loadHourly</code><span class="sig-paren">(</span><em>_name</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.loadHourly" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.moveAllX">
+<code class="descname">moveAllX</code><span class="sig-paren">(</span><em>move</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.moveAllX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.moveX">
+<code class="descname">moveX</code><span class="sig-paren">(</span><em>move</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.moveX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.scaleAllX">
+<code class="descname">scaleAllX</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.scaleAllX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.scaleAllY">
+<code class="descname">scaleAllY</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.scaleAllY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.scaleX">
+<code class="descname">scaleX</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.scaleX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.scaleY">
+<code class="descname">scaleY</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.scaleY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.setYLabel">
+<code class="descname">setYLabel</code><span class="sig-paren">(</span><em>ylabel</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.setYLabel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>name=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.plotting.plotTrnsysUtils.PlotTrnsysUtils.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">TrnsysTools</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">TrnsysTools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="TrnsysTools.html">TrnsysTools package</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">TrnsysTools</a><ul>
+  <li><a href="TrnsysTools.html">TrnsysTools package</a><ul>
+      <li>Previous: <a href="TrnsysTools.Trnsys.html" title="previous chapter">TrnsysTools.Trnsys package</a></li>
+      <li>Next: <a href="TrnsysTools.processingData.html" title="next chapter">TrnsysTools.processingData package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Daniel Carbonell, Mattia Battaglia, Jeremias Schmidli.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/TrnsysTools.plotting.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

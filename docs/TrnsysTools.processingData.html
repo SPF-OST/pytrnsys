@@ -1,0 +1,258 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>TrnsysTools.processingData package &#8212; TrnsysTools 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="TrnsysTools.processingSimulations package" href="TrnsysTools.processingSimulations.html" />
+    <link rel="prev" title="TrnsysTools.plotting package" href="TrnsysTools.plotting.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-TrnsysTools.processingData">
+<span id="trnsystools-processingdata-package"></span><h1>TrnsysTools.processingData package<a class="headerlink" href="#module-TrnsysTools.processingData" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-TrnsysTools.processingData.loadBase">
+<span id="trnsystools-processingdata-loadbase-module"></span><h2>TrnsysTools.processingData.loadBase module<a class="headerlink" href="#module-TrnsysTools.processingData.loadBase" title="Permalink to this headline">¶</a></h2>
+<p>Class to load results file storing the names into self.namesVariables
+and the results into self.variables. As a difference of the loadBaseNumpy the
+results are stored into a normal list instead of numpy arrays.
+Author : Dani Carbonell
+Date   : 14.12.2012</p>
+<dl class="class">
+<dt id="TrnsysTools.processingData.loadBase.loadBase">
+<em class="property">class </em><code class="descclassname">TrnsysTools.processingData.loadBase.</code><code class="descname">loadBase</code><span class="sig-paren">(</span><em>_name</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBase.loadBase" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="TrnsysTools.processingData.loadBase.loadBase.loadFile">
+<code class="descname">loadFile</code><span class="sig-paren">(</span><em>skypChar</em>, <em>replaceChar</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBase.loadBase.loadFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBase.loadBase.setReadLabels">
+<code class="descname">setReadLabels</code><span class="sig-paren">(</span><em>_labels</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBase.loadBase.setReadLabels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBase.loadBase.setSkypedLines">
+<code class="descname">setSkypedLines</code><span class="sig-paren">(</span><em>_number</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBase.loadBase.setSkypedLines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBase.loadBase.setSplitArgument">
+<code class="descname">setSplitArgument</code><span class="sig-paren">(</span><em>_split</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBase.loadBase.setSplitArgument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBase.loadBase.setVerbose">
+<code class="descname">setVerbose</code><span class="sig-paren">(</span><em>_verbose</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBase.loadBase.setVerbose" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-TrnsysTools.processingData.loadBaseNumpy">
+<span id="trnsystools-processingdata-loadbasenumpy-module"></span><h2>TrnsysTools.processingData.loadBaseNumpy module<a class="headerlink" href="#module-TrnsysTools.processingData.loadBaseNumpy" title="Permalink to this headline">¶</a></h2>
+<p>Class to load results file storing the names into self.namesVariables
+and the results into self.variables. Results are stored into numpy arrays.</p>
+<p>Author : Dani Carbonell
+Date   : 14.12.2012</p>
+<dl class="class">
+<dt id="TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy">
+<em class="property">class </em><code class="descclassname">TrnsysTools.processingData.loadBaseNumpy.</code><code class="descname">loadBaseNumpy</code><span class="sig-paren">(</span><em>_name</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.changeName">
+<code class="descname">changeName</code><span class="sig-paren">(</span><em>_name</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.changeName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.cleanMemory">
+<code class="descname">cleanMemory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.cleanMemory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>name</em>, <em>useZero=False</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.getByIndex">
+<code class="descname">getByIndex</code><span class="sig-paren">(</span><em>indexColumn</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.getByIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.getByLine">
+<code class="descname">getByLine</code><span class="sig-paren">(</span><em>indexLine</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.getByLine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.loadFile">
+<code class="descname">loadFile</code><span class="sig-paren">(</span><em>skypChar=None</em>, <em>replaceChar=None</em>, <em>skypedLines=0</em>, <em>splitArgument=None</em>, <em>readLabels=True</em>, <em>verbose=True</em>, <em>cutBlank=False</em>, <em>typeVariables='float'</em>, <em>fmt=''</em>, <em>dateExt=''</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.loadFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.loadFileAndCut">
+<code class="descname">loadFileAndCut</code><span class="sig-paren">(</span><em>timeBegin</em>, <em>timeEnd</em>, <em>verbose=True</em>, <em>skypedLines=0</em>, <em>format='%Y.%m.%d %H:%M:%S.%f'</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.loadFileAndCut" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.loadFileYear">
+<code class="descname">loadFileYear</code><span class="sig-paren">(</span><em>year</em>, <em>splitArgument=None</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.loadFileYear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.writeFile">
+<code class="descname">writeFile</code><span class="sig-paren">(</span><em>name</em>, <em>verbose=False</em>, <em>printNames=True</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadBaseNumpy.loadBaseNumpy.writeFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-TrnsysTools.processingData.loadInputFile">
+<span id="trnsystools-processingdata-loadinputfile-module"></span><h2>TrnsysTools.processingData.loadInputFile module<a class="headerlink" href="#module-TrnsysTools.processingData.loadInputFile" title="Permalink to this headline">¶</a></h2>
+<p>Author : Dani Carbonell
+Date   : 14.12.2012</p>
+<dl class="class">
+<dt id="TrnsysTools.processingData.loadInputFile.loadInputFile">
+<em class="property">class </em><code class="descclassname">TrnsysTools.processingData.loadInputFile.</code><code class="descname">loadInputFile</code><span class="sig-paren">(</span><em>_name</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadInputFile.loadInputFile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="TrnsysTools.processingData.loadInputFile.loadInputFile.cleanMemory">
+<code class="descname">cleanMemory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadInputFile.loadInputFile.cleanMemory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadInputFile.loadInputFile.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>name</em>, <em>ifNotFoundEqualToZero=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadInputFile.loadInputFile.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="TrnsysTools.processingData.loadInputFile.loadInputFile.loadFile">
+<code class="descname">loadFile</code><span class="sig-paren">(</span><em>skypChar=None</em>, <em>replaceChar=None</em>, <em>skypedLines=0</em>, <em>splitArgument=None</em>, <em>verbose=True</em>, <em>indexToRead=1</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.loadInputFile.loadInputFile.loadFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-TrnsysTools.processingData.processFiles">
+<span id="trnsystools-processingdata-processfiles-module"></span><h2>TrnsysTools.processingData.processFiles module<a class="headerlink" href="#module-TrnsysTools.processingData.processFiles" title="Permalink to this headline">¶</a></h2>
+<p>Author : Dani Carbonell
+Date   : 14.12.2012</p>
+<dl class="function">
+<dt id="TrnsysTools.processingData.processFiles.purgueComments">
+<code class="descclassname">TrnsysTools.processingData.processFiles.</code><code class="descname">purgueComments</code><span class="sig-paren">(</span><em>lines</em>, <em>commentsChar</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.processFiles.purgueComments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="TrnsysTools.processingData.processFiles.purgueLines">
+<code class="descclassname">TrnsysTools.processingData.processFiles.</code><code class="descname">purgueLines</code><span class="sig-paren">(</span><em>lines</em>, <em>skypChar</em>, <em>replaceChar</em>, <em>skypedLines=0</em>, <em>removeBlankLines=False</em>, <em>removeBlankSpaces=False</em><span class="sig-paren">)</span><a class="headerlink" href="#TrnsysTools.processingData.processFiles.purgueLines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="trnsystools-processingdata-processhourly-module">
+<h2>TrnsysTools.processingData.processHourly module<a class="headerlink" href="#trnsystools-processingdata-processhourly-module" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">TrnsysTools</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">TrnsysTools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="TrnsysTools.html">TrnsysTools package</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">TrnsysTools</a><ul>
+  <li><a href="TrnsysTools.html">TrnsysTools package</a><ul>
+      <li>Previous: <a href="TrnsysTools.plotting.html" title="previous chapter">TrnsysTools.plotting package</a></li>
+      <li>Next: <a href="TrnsysTools.processingSimulations.html" title="next chapter">TrnsysTools.processingSimulations package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Daniel Carbonell, Mattia Battaglia, Jeremias Schmidli.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/TrnsysTools.processingData.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,52 @@
+lib.utilities package
+=====================
+
+.. automodule:: lib.utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+lib.utilities.cleanFiles module
+-------------------------------
+
+.. automodule:: lib.utilities.cleanFiles
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+lib.utilities.costCalculation module
+------------------------------------
+
+.. automodule:: lib.utilities.costCalculation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+lib.utilities.costCalculationVar module
+---------------------------------------
+
+.. automodule:: lib.utilities.costCalculationVar
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+lib.utilities.unitConverter module
+----------------------------------
+
+.. automodule:: lib.utilities.unitConverter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+lib.utilities.utilsSpf module
+-----------------------------
+
+.. automodule:: lib.utilities.utilsSpf
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
