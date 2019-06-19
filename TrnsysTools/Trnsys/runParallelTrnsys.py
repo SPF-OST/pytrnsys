@@ -170,6 +170,7 @@ class RunParallelTrnsys():
             tests[i].changeAssignPath(inputsDict=self.inputs)
 
             tests[i].changeParameter(localCopyPar)
+
             if (self.inputs["ignoreOnlinePlotter"] == True):
                 tests[i].ignoreOnlinePlotter()
 
@@ -179,7 +180,7 @@ class RunParallelTrnsys():
             #            tests[i].resizeParameters()
             tests[i].copyFilesForRunning()
 
-            cmds.append(tests[i].getExecuteTrnsys())
+            cmds.append(tests[i].getExecuteTrnsys(self.inputs))
 
         self.cmds = cmds
 

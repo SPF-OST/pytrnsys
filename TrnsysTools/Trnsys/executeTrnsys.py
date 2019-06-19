@@ -295,7 +295,7 @@ class ExecuteTrnsys():
     def setTrnsysVersion(self,version):
         self.trnsysVersion = version
         
-    def getExecuteTrnsys(self,useDeckName=False):
+    def getExecuteTrnsys(self,inputDict,useDeckName=False):
 
         if(self.trnsysExePath=="enviromentalVariable"):
 
@@ -307,11 +307,16 @@ class ExecuteTrnsys():
         else:
             self.trnsysExe = self.trnsysExePath
 
-        if(useDeckName==False):
-            cmd = self.trnsysExe +" "+ self.nameDckPathOutput + " /H"
+        if (inputDict["ignoreOnlinePlotter"] == True):
+            if(useDeckName==False):
+                cmd = self.trnsysExe +" "+ self.nameDckPathOutput + " /H"
+            else:
+                cmd = self.trnsysExe +" "+ useDeckName + " /H"
         else:
-            cmd = self.trnsysExe +" "+ useDeckName + " /H"
-        
+            if(useDeckName==False):
+                cmd = self.trnsysExe +" "+ self.nameDckPathOutput + " /N"
+            else:
+                cmd = self.trnsysExe +" "+ useDeckName + " /N"
         
 #        myCmd ='"%s"'%cmd #for blank spaces in paths
         
