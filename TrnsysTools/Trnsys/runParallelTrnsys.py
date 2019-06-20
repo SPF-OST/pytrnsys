@@ -353,13 +353,13 @@ class RunParallelTrnsys():
 
                 self.parameters[splitLine[1]] = string.atof(splitLine[2])
 
-            elif (splitLine[0] == "Base"):
-
-                self.listDdck.append(os.path.join(self.pathDdck,splitLine[1]))
-
-            elif (splitLine[0] == "Base2"):
-
-                self.listDdck.append(os.path.join(self.pathDdck2,splitLine[1]))
+            # elif (splitLine[0] == "Base"):
+            #
+            #     self.listDdck.append(os.path.join(self.pathDdck,splitLine[1]))
+            #
+            # elif (splitLine[0] == "Base2"):
+            #
+            #     self.listDdck.append(os.path.join(self.pathDdck2,splitLine[1]))
 
             elif(splitLine[0] == "Relative"):
 

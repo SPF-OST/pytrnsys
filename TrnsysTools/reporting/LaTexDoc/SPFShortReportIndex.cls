@@ -48,7 +48,9 @@
 
 \definecolor{spfRed}{rgb}{0.,0.,0.}
 \def\thickhrule{\textcolor{black}{\hrule height 1pt}}  
-     
+
+\renewcommand{\familydefault}{lmss}
+   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%                Title                        %%%             
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

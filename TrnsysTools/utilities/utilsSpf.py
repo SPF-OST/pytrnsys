@@ -75,7 +75,7 @@ def getNameFromUserName():
     userName = getpass.getuser()
     
     if(userName=="dcarbone"):
-        return "Dani Carbonell"
+        return "Daniel Carbonell"
     elif(userName=="mgranzot"):
         return "Martin Granzotto"
     elif(userName=="dphilipp"):
