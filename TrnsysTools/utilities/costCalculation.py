@@ -201,11 +201,11 @@ class CostCalculation():
         doc.addTable(caption,sizeBox,names,units,label,lines,useFormula=False)
         
         #inVar in Fr. !!!
-    def plotCostShare(self,inVar,legends,nameFile,sizeFont=15,plotJpg=False,writeFile=False):
+    def plotCostShare(self,inVar,legends,nameFile,plotSize=15,sizeFont=15,plotJpg=False,writeFile=False):
         
         mpl.rcParams['font.size'] = sizeFont
 
-        fig = plt.figure(1,figsize=(15,15))
+        fig = plt.figure(1,figsize=(plotSize,plotSize))
         
         fig.add_subplot(111)
                    
@@ -223,7 +223,8 @@ class CostCalculation():
             explode.append(0.) #(0.05)
         
         patches, texts, autotexts = plt.pie(fracs, labels=legends,explode=explode,colors=colors,autopct='%1.1f%%', shadow=False, startangle=0)
-        
+
+
         for i in range(len(texts)):
             texts[i].set_fontsize(sizeFont)
         
@@ -236,8 +237,9 @@ class CostCalculation():
 
 #        matplotlib.rcParams.update({'font.size':50})
 
-        myTitle = "Total cost %.2f [kFr]" % (total/1000.)
-        plt.title(myTitle, bbox={'facecolor':'0.9','pad':10},fontsize=sizeFont)
+        #myTitle = "Total cost %.2f [kFr]" % (total/1000.)
+        # plt.title(myTitle, bbox={'facecolor':'0.9','pad':10},fontsize=sizeFont)
+        plt.title("",bbox={'facecolor':'0.9','pad':10},fontsize=sizeFont)
 
 # This is working , just erase the labels section
 #        plt.legend(bbox_to_anchor=(0.15,0.9),loc='upper right', borderaxespad=0.,fontsize=8)
@@ -262,7 +264,7 @@ class CostCalculation():
         plt.close()
         
         if(writeFile):
-            lines = "!Each column has the added value of the previous. To print a bar column ontop of each other\n"
+            lines = ""
             line = "!Units kFr.\n";lines=lines+line
             line = "!";lines=lines+line
             for i in range(len(legends)):
@@ -271,7 +273,9 @@ class CostCalculation():
 
             sumVar = 0.
             for i in range(len(legends)):
-                sumVar = sumVar+inVar[i]/1000. #I assume Fr. and change to kFr. !!!!       
+                # sumVar = sumVar+inVar[i]/1000. #I assume Fr. and change to kFr. !!!!
+                sumVar = inVar[i]/1000. #I assume Fr. and change to kFr. !!!!
+
                 line = "%f\t"%sumVar;lines=lines+line
             line = "\n";lines=lines+line
             nameDat = '%s.dat'%nameFile 
