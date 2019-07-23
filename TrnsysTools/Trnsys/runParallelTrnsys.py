@@ -5,15 +5,15 @@ Date   : 30.09.2016
 ToDo
 """
 
-import createTrnsysDeck as createDeck
-import executeTrnsys as exeTrnsys
-import BuildTrnsysDeck as build
+import TrnsysTools.Trnsys.createTrnsysDeck as createDeck
+import TrnsysTools.Trnsys.executeTrnsys as exeTrnsys
+import TrnsysTools.Trnsys.BuildTrnsysDeck as build
 import numpy as num
 import os
 import TrnsysTools.processingData.processFiles
 import string
-import runParallel as runPar
-import readConfigTrnsys as readConfig
+import TrnsysTools.Trnsys.runParallel as runPar
+import TrnsysTools.Trnsys.readConfigTrnsys as readConfig
 import shutil
 import sys
 
@@ -178,11 +178,16 @@ class RunParallelTrnsys():
             #             RESIZE PARAMETERS PIPE DIAMETER
             # ==============================================================================
             #            tests[i].resizeParameters()
-            tests[i].copyFilesForRunning()
+            tests[i].cleanAndCreateResultsTempFolder()
+            tests[i].moveFileFromSource()
 
             cmds.append(tests[i].getExecuteTrnsys(self.inputs))
 
         self.cmds = cmds
+
+    #def checkTempFolderForFinishedSimulation(self,basePath):
+    #    for file in os.listdir(os.path.join(basePath,'temp')):
+    #        if file.endswith('.Prt')
 
     def createLocationFolders(path, locations):
         for location in locations:
@@ -334,6 +339,7 @@ class RunParallelTrnsys():
         self.listFit = {}
         self.listFitObs = []
         self.listDdckPaths = Set()
+        self.caseDict = {}
         for line in self.lines:
 
             splitLine = line.split()
@@ -371,6 +377,8 @@ class RunParallelTrnsys():
                 self.listDdck.append(splitLine[1])
             elif(splitLine[0] == "fit"):
                 self.listFit[splitLine[1]] = [splitLine[2],splitLine[3],splitLine[4]]
+            elif (splitLine[0] == "case"):
+                self.listFit[splitLine[1]] = splitLine[2:]
             elif (splitLine[0] == "fitobs"):
                 self.listFitObs.append(splitLine[1])
 

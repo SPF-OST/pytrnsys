@@ -248,7 +248,8 @@ class ExecuteTrnsys():
             fileWithPath = os.path.join(self.pathOutput,files)
             shutil.rmtree(fileWithPath)
         
-    def moveFileFromSource(self,name):
+    def moveFileFromSource(self,name=""):
+        name = "%s.dck" % self.fileName
         
         fileSource = os.path.join(self.path,name)
         fileEnd    = os.path.join(self.pathOutput,name)
