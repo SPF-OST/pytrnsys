@@ -5,15 +5,15 @@ Date   : 30.09.2016
 ToDo
 """
 
-import TrnsysTools.Trnsys.createTrnsysDeck as createDeck
-import TrnsysTools.Trnsys.executeTrnsys as exeTrnsys
-import TrnsysTools.Trnsys.BuildTrnsysDeck as build
+import PyTrnsys.Trnsys.createTrnsysDeck as createDeck
+import PyTrnsys.Trnsys.executeTrnsys as exeTrnsys
+import PyTrnsys.Trnsys.BuildTrnsysDeck as build
 import numpy as num
 import os
-import TrnsysTools.processingData.processFiles
+import PyTrnsys.processingData.processFiles
 import string
-import TrnsysTools.Trnsys.runParallel as runPar
-import TrnsysTools.Trnsys.readConfigTrnsys as readConfig
+import PyTrnsys.Trnsys.runParallel as runPar
+import PyTrnsys.Trnsys.readConfigTrnsys as readConfig
 import shutil
 import sys
 
@@ -32,7 +32,6 @@ class RunParallelTrnsys():
             self.nameBase = self.inputs['nameRef']
             self.path = self.inputs['pathBaseSimulations']
             self.getConfig()
-
         else:
             self.nameBase = _name
 

@@ -12,7 +12,7 @@ ToDo :
 import matplotlib.pyplot as plt
 import numpy as num
 import matplotlib
-import TrnsysTools.utilities.utilsSpf as utils
+import PyTrnsys.utilities.utilsSpf as utils
 import time
 import plotGle as gle
 

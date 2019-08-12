@@ -10,15 +10,15 @@ ToDo :
 
 import os
 import string,shutil
-import TrnsysTools.processingData.processFiles as spfUtils
+import PyTrnsys.processingData.processFiles as spfUtils
 import processMonthlyDataBase as monthlyData #changed in order to clean the processing of files
-import TrnsysTools.utilities.utilsSpf as utils
+import PyTrnsys.utilities.utilsSpf as utils
 import time
 import numpy as num
 import matplotlib.pyplot as plt
-import TrnsysTools.Trnsys.readTrnsysFiles as readTrnsysFiles
-import unitConverter as unit
-import TrnsysTools.Trnsys.LogTrnsys as LogTrnsys
+import PyTrnsys.Trnsys.readTrnsysFiles as readTrnsysFiles
+import PyTrnsys.utilities.unitConverter as unit
+import PyTrnsys.Trnsys.LogTrnsys as LogTrnsys
 
 class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 

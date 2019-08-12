@@ -7,7 +7,7 @@ ToDo
 
 import os
 import string,shutil
-import TrnsysTools.processingData.processFiles as spfUtils
+import PyTrnsys.processingData.processFiles as spfUtils
 import deckTrnsys 
 
 

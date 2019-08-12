@@ -11,7 +11,7 @@ import executeTrnsys as exeTrnsys
 import BuildTrnsysDeck as build
 import numpy as num
 import os
-import TrnsysTools.processingData.processFiles as processFiles
+import PyTrnsys.processingData.processFiles as processFiles
 import string
 import runParallel as runPar
 

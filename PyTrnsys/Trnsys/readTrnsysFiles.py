@@ -8,9 +8,9 @@ ToDo :   Copy config file to results folder automatically
 """
 
 
-import TrnsysTools.processingData.loadBaseNumpy as load
+import PyTrnsys.processingData.loadBaseNumpy as load
 import numpy as num
-import TrnsysTools.utilities.utilsSpf as utils
+import PyTrnsys.utilities.utilsSpf as utils
 import deckTrnsys
 import string
 

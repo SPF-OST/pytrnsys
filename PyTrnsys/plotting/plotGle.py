@@ -10,7 +10,7 @@ ToDo :
 
 import os
 import numpy as num
-import TrnsysTools.reporting.latexReport as latex
+import PyTrnsys.reporting.latexReport as latex
 
 class PlotGle():  
         

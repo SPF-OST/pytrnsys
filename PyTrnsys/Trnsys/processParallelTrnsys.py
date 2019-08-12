@@ -10,15 +10,15 @@ ToDo : Copy config file to results folder automatically, remove processDataGshp 
 """
 
 import os
-import TrnsysTools.processingSimulations.debugProcess as debugProcess
+import PyTrnsys.processingSimulations.debugProcess as debugProcess
 import multiprocessing as mp
 import runParallel as run
-import bigIceTrnsysClass as ice
-import TrnsysTools.utilities.utilsSpf as utils
-import TrnsysTools.Trnsys.readConfigTrnsys as readConfig
-import GshpTrnsysBaseClass as gshp
-import AlStoreTrnsysBaseClass as alu
-import p2GErlackerTrnsysClass as erlacker
+import PyTriHpTrnsys as ice
+import PyTrnsys.utilities.utilsSpf as utils
+import PyTrnsys.Trnsys.readConfigTrnsys as readConfig
+import PyTriHpTrnsys.ProcessingSimulations.GshpTrnsysBaseClass as gshp
+import PySpfTrnsys.ProcessingSimulations.AlStoreTrnsysBaseClass as alu
+import PySpfTrnsys.ProcessingSimulations.p2GErlackerTrnsysClass as erlacker
 import warnings
 #we would need to pass the Class as inputs
 

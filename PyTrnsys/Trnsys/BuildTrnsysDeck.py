@@ -5,8 +5,8 @@ Date   : 30.09.2016
 ToDo :
 """
 
-import TrnsysTools.processingData.processFiles as spfUtils
-import TrnsysTools.Trnsys.deckTrnsys as deck
+import PyTrnsys.processingData.processFiles as spfUtils
+import PyTrnsys.Trnsys.deckTrnsys as deck
 import os
 import Tkinter as tk
 import tkMessageBox
