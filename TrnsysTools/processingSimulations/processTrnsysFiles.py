@@ -366,7 +366,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         # if(sum(self.qAuxHeaterSh)==0.0):
         # self.qAuxHeaterSh = self.readTrnsysFiles.get("PelHeater_kW",ifNotFoundEqualToZero=True)
               
-        self.pumpSolar = self.readTrnsysFiles.get("PelPuC_kW")       
+        self.pumpSolar = self.readTrnsysFiles.get("PelPuC_kW",ifNotFoundEqualToZero=True)
         self.pumpDHW = self.readTrnsysFiles.get("PelPuDHW_kW",ifNotFoundEqualToZero=True)
         self.pElControllerSolar = self.readTrnsysFiles.get("PelContr_kW",ifNotFoundEqualToZero=True)
         self.pElControllerHp = self.readTrnsysFiles.get("PelContr_kW",ifNotFoundEqualToZero=True)

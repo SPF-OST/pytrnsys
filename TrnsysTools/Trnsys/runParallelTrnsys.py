@@ -46,6 +46,8 @@ class RunParallelTrnsys():
 
         self.inputs = {}
         self.inputs["ignoreOnlinePlotter"] = False
+        self.inputs["removePopUpWindow"] = False
+
         self.inputs["reduceCpu"] = 0
         self.inputs["combineAllCases"]   = True
         self.inputs["parseFileCreated"]  = True
@@ -99,6 +101,7 @@ class RunParallelTrnsys():
             if (self.inputs["ignoreOnlinePlotter"] == True):
                 tests[i].ignoreOnlinePlotter()
 
+            tests[i].setRemovePopUpWindow(self.inputs["removePopUpWindow"])
             tests[i].copyFilesForRunning()
 
             # tests[i].setTrnsysVersion("TRNSYS17_EXE")
@@ -161,6 +164,8 @@ class RunParallelTrnsys():
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
             tests[i].setAddBuildingData(self.inputs["copyBuildingData"])
             tests[i].setHOMEPath(self.inputs["HOME$"])
+            tests[i].setRemovePopUpWindow(self.inputs["removePopUpWindow"])
+
             # tests[i].setTrnsysVersion("TRNSYS17_EXE")
 
             tests[i].moveFileFromSource(fileName[i] + ".dck")

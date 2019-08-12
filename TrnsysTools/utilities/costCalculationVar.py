@@ -75,10 +75,8 @@ class CostCalculationVar(mycost.CostCalculation):
 #                inVar.append(groupCost)
 #                legends.append(self.group[i])
                 
-        print inVar
-        print legends
-        
-        self.nameCostPdf = self.plotCostShare(inVar,legends,"costShare"+"-"+self.fileName,sizeFont=30,plotJpg=False,writeFile=False)                   
+
+        self.nameCostPdf = self.plotCostShare(inVar,legends,"costShare"+"-"+self.fileName,sizeFont=30,plotJpg=True,writeFile=False)
         
         
         
@@ -106,8 +104,8 @@ class CostCalculationVar(mycost.CostCalculation):
         inVar.append(self.anMaint)
         legends.append("Maintenance")
 
-#        inVar.append(self.anElec)
-#        legends.append("El. purchased \n from the grid")
+        inVar.append(self.anElec)
+        legends.append("El. purchased \n from the grid")
         
         for i in range(len(self.yearlyComp)):
         
@@ -124,7 +122,7 @@ class CostCalculationVar(mycost.CostCalculation):
         
 #        self.annuity        
         
-        self.nameCostAnnuityPdf = self.plotCostShare(inVar,legends,"costShareAnnuity"+"-"+self.fileName,sizeFont=30,plotJpg=False,writeFile=False)                   
+        self.nameCostAnnuityPdf = self.plotCostShare(inVar,legends,"costShareAnnuity"+"-"+self.fileName,plotSize=17,sizeFont=30,plotJpg=True,writeFile=False)
 
 
     def addComponent(self,name,size,base,var,varUnit,group,lifeTime):
@@ -303,7 +301,7 @@ class CostCalculationVar(mycost.CostCalculation):
             if(i>0 and self.group[i] != self.group[i-1]):
                 if(j>1):
                     line = "&\cline{1-5} \n"; lines = lines + line
-                    line = " &\\textbf{Total %s} &  & & & %.0f (%.0f %s) \\\\ \n"%(self.group[i-1],sumGroup,100*sumGroup/self.totalInvestCost,symbol); lines = lines + line
+                    line = " &\\textbf{Total %s} &  & & & %.0f (%.1f %s) \\\\ \n"%(self.group[i-1],sumGroup,100*sumGroup/self.totalInvestCost,symbol); lines = lines + line
                 line = "\\hline \\\\ \n" ; lines = lines + line
                 group = self.group[i]
                 j=0
@@ -313,10 +311,10 @@ class CostCalculationVar(mycost.CostCalculation):
                 
             if(self.costComponent[i]>0.):
                 if(j==0):
-                    line = "\\textbf{%s} & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.0f %s) \\\\ \n"%(group,self.components[i],\
+                    line = "\\textbf{%s} & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n"%(group,self.components[i],\
                     self.baseCost[i],self.varCost[i],self.varUnit[i],self.size[i],self.varUnit[i],self.lifeTimeComp[i],self.costComponent[i]*unit,100*self.costComponent[i]/self.totalInvestCost,symbol)
                 else:
-                    line = " & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.0f %s) \\\\ \n"%(self.components[i],\
+                    line = " & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n"%(self.components[i],\
                     self.baseCost[i],self.varCost[i],self.varUnit[i],self.size[i],self.varUnit[i],self.lifeTimeComp[i],self.costComponent[i]*unit,100*self.costComponent[i]/self.totalInvestCost,symbol)
                     
                 lines = lines + line
