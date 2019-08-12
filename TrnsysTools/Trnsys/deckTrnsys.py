@@ -28,9 +28,9 @@ class DeckTrnsys():
         
         self.linesChanged = ""
         self.cleanMode = False
-        self.useAbsoluteTempPath = True #actually False does not work since trnsys does not work with  ./temp/whatever
-                     
-        #True is not working becasue it looks for files in the D:\MyPrograms\Trnsys17 as local path           
+        self.useAbsoluteTempPath = False #actually False does not work since trnsys does not work with  ./temp/whatever. Corrected False works since temp/whatever works !!
+
+        #True is not working becasue it looks for files in the D:\MyPrograms\Trnsys17 as local path
         self.eliminateComments = False
         try:
             self.myCommonTrnsysFolder = os.getenv("TRNSYS_DATA_FOLDER")+"\\"
@@ -322,8 +322,12 @@ class DeckTrnsys():
                     nameSplited = fileNameWithoutCommas.split("temp\\")
                      
                     try:
-                         myFileInNewPath = self.filesOutputPath +"\\temp\\"+ nameSplited[1]
-                         self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+                        if(self.useAbsoluteTempPath):
+                            myFileInNewPath = self.filesOutputPath +"\\temp\\"+ nameSplited[1]
+                        else:
+                            myFileInNewPath = "temp\\" + nameSplited[1]
+
+                        self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
     
                     except:
                          
@@ -495,7 +499,7 @@ class DeckTrnsys():
                                  myFileInNewPath = self.filesOutputPath +"\\temp\\"+ nameSplited[1]
                                  self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
                              else:
-                                myFileInNewPath =  "\\temp\\" + nameSplited[1]
+                                myFileInNewPath =  "temp\\" + nameSplited[1]
                                 self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
 
     #                             print "lineChanged-0 : %s pathOut:%s nameSplied:%s" % (self.linesChanged[i],self.pathOutput,nameSplited[1])

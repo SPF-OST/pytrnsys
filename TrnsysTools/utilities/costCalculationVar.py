@@ -301,7 +301,7 @@ class CostCalculationVar(mycost.CostCalculation):
             if(i>0 and self.group[i] != self.group[i-1]):
                 if(j>1):
                     line = "&\cline{1-5} \n"; lines = lines + line
-                    line = " &\\textbf{Total %s} &  & & & %.0f (%.0f %s) \\\\ \n"%(self.group[i-1],sumGroup,100*sumGroup/self.totalInvestCost,symbol); lines = lines + line
+                    line = " &\\textbf{Total %s} &  & & & %.0f (%.1f %s) \\\\ \n"%(self.group[i-1],sumGroup,100*sumGroup/self.totalInvestCost,symbol); lines = lines + line
                 line = "\\hline \\\\ \n" ; lines = lines + line
                 group = self.group[i]
                 j=0
@@ -311,10 +311,10 @@ class CostCalculationVar(mycost.CostCalculation):
                 
             if(self.costComponent[i]>0.):
                 if(j==0):
-                    line = "\\textbf{%s} & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.0f %s) \\\\ \n"%(group,self.components[i],\
+                    line = "\\textbf{%s} & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n"%(group,self.components[i],\
                     self.baseCost[i],self.varCost[i],self.varUnit[i],self.size[i],self.varUnit[i],self.lifeTimeComp[i],self.costComponent[i]*unit,100*self.costComponent[i]/self.totalInvestCost,symbol)
                 else:
-                    line = " & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.0f %s) \\\\ \n"%(self.components[i],\
+                    line = " & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n"%(self.components[i],\
                     self.baseCost[i],self.varCost[i],self.varUnit[i],self.size[i],self.varUnit[i],self.lifeTimeComp[i],self.costComponent[i]*unit,100*self.costComponent[i]/self.totalInvestCost,symbol)
                     
                 lines = lines + line

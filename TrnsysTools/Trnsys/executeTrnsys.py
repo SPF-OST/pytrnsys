@@ -56,8 +56,10 @@ class ExecuteTrnsys():
    
         self.filesOutputPath = "."
         #True is not working becasue it looks for files in the D:\MyPrograms\Trnsys17 as local path 
-        self.useRelativePath = False 
-   
+        self.useRelativePath = False
+
+        self.removePopUpWindow = False
+
         if(self.useRelativePath==False):         
             self.filesOutputPath = self.pathOutput
 
@@ -70,6 +72,9 @@ class ExecuteTrnsys():
 #        print "file:%s path:%s pathOutput:%s filesOutputPath:%s\n" % (self.fileName,self.path,self.pathOutput,self.filesOutputPath)
 
         # self.copyFilesForRunning() #I move this in order to be able to set the path self.myCommonTrnsysFolder manually.
+
+    def setRemovePopUpWindow(self,removePopUpWindow):
+        self.removePopUpWindow=removePopUpWindow
 
     def setAddBuildingData(self,add):
         self.addBuildingData=add
@@ -309,10 +314,14 @@ class ExecuteTrnsys():
             self.trnsysExe = self.trnsysExePath
 
         if (inputDict["ignoreOnlinePlotter"] == True):
-            if(useDeckName==False):
-                cmd = self.trnsysExe +" "+ self.nameDckPathOutput + " /H"
+            if(self.removePopUpWindow==True):
+                ext = " /H"
             else:
-                cmd = self.trnsysExe +" "+ useDeckName + " /H"
+                ext = " /N"
+            if(useDeckName==False):
+                cmd = self.trnsysExe +" "+ self.nameDckPathOutput + ext
+            else:
+                cmd = self.trnsysExe +" "+ useDeckName + ext
         else:
             if(useDeckName==False):
                 cmd = self.trnsysExe +" "+ self.nameDckPathOutput + " /N"
