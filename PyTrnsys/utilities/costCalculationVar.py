@@ -9,10 +9,6 @@ Date   : 19-01-2018
 ToDo :
 """
 
-import utilsSpf as utils
-import TrnsysTools.reporting.latexReport as latex
-import matplotlib.pyplot as plt
-import matplotlib
 import costCalculation as mycost
 import numpy as num
 

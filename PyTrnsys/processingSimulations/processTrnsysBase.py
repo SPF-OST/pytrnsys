@@ -4,10 +4,10 @@ Date   : 09.05.2018
 ToDo   :
 """
 
-import utilsLatex as latex
-import plotMatplotlib as plot
-import unitConverter as unit
-import TrnsysTools.Trnsys.readTrnsysFiles as readTrnsysFiles
+import PyTrnsys.reporting.latexReport as latex
+import PyTrnsys.plotting.plotMatplotlib as plot
+import PyTrnsys.utilities.unitConverter as unit
+import PyTrnsys.Trnsys.readTrnsysFiles as readTrnsysFiles
 
 class ProcessTrnsysBase():
     

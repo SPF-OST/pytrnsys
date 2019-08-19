@@ -12,9 +12,9 @@ ToDo :
 
 import os
 import processTrnsysFiles as processTrnsys
-import TrnsysTools.processingData.loadBaseNumpy as load
-import TrnsysTools.Trnsys.LogTrnsys as LogTrnsys
-import TrnsysTools.Trnsys.deckTrnsys as deckTrnsys
+import PyTrnsys.processingData.loadBaseNumpy as load
+import PyTrnsys.Trnsys.LogTrnsys as LogTrnsys
+import PyTrnsys.Trnsys.deckTrnsys as deckTrnsys
 
 
 class checkIterationProblemsClass(processTrnsys.ProcessTrnsys):

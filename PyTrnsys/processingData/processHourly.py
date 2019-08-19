@@ -9,11 +9,11 @@ Date   : 17.11.2017
 """
 
 import loadBaseNumpy as load
-import TrnsysTools.utilities.utilsSpf as utils
+import PyTrnsys.utilities.utilsSpf as utils
 import matplotlib.pyplot as plt
 import numpy as num
 import matplotlib
-import utilsLatex as latex
+import PyTrnsys.reporting.latexReport as latex
 
 
 class processHourly():

@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import interpolation
 import string
-import TrnsysTools.utilities.utilsSpf as utils
+import PyTrnsys.utilities.utilsSpf as utils
 import math
 import os
 

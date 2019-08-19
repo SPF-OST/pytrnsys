@@ -5,7 +5,7 @@ We need to include in this class any processing Class
 customized for new projects
 Author : Daniel Carbonell
 Date   : 01-10-2018
-ToDo : Copy config file to results folder automatically, remove processDataGshp and make it generic
+ToDo : remove processDataGshp and make it generic
        getBaseClass should be defined outside this function so that this class is not changet at all
 """
 
@@ -13,7 +13,7 @@ import os
 import PyTrnsys.processingSimulations.debugProcess as debugProcess
 import multiprocessing as mp
 import runParallel as run
-import PyTriHpTrnsys as ice
+import PyTriHpTrnsys.ProcessingSimulations.solarIceTrnsysBaseClass as ice
 import PyTrnsys.utilities.utilsSpf as utils
 import PyTrnsys.Trnsys.readConfigTrnsys as readConfig
 import PyTriHpTrnsys.ProcessingSimulations.GshpTrnsysBaseClass as gshp
