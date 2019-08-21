@@ -32,16 +32,16 @@ class loadInputFile():
     def loadFile(self,skypChar=None,replaceChar=None,skypedLines=0,splitArgument=None,verbose=True,indexToRead=1):
                     
         if(verbose):   
-            print self.doubleLine
-            print "Reading the file: %s " % self.fileNameWithExtension
+            print ("%s"%self.doubleLine)
+            print ("Reading the file: %s " % self.fileNameWithExtension)
             
         infile=open(self.fileNameWithExtension,'r')
         lines=infile.readlines()[skypedLines:]                                      
      
         if(skypChar != None or replaceChar != None):
             if(verbose):
-                print self.doubleLine
-                print "Purgin the input file"
+                print ("%s" % self.doubleLine)
+                print ("Purgin the input file")
 
             lines = spfUtils.purgueLines(lines,skypChar,replaceChar,removeBlankLines=self.removeBlankLines,removeBlankSpaces=True)      
 

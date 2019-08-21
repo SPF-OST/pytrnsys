@@ -156,9 +156,9 @@ class ProcessMonthlyDataBase():
                 self.SPFhpsWithDisPen[i] = 0.0
             else:
                 self.SPFhpsWithDisPen[i] = self.qDemand[i] / self.pElTotalDis[i]
-                print "SPF:%f qD:%f Pel:%f wcp:%f pen:%f aux:%f" % (
+                print ("SPF:%f qD:%f Pel:%f wcp:%f pen:%f aux:%f" % (
                 self.SPFhpsWithDisPen[i], self.qDemand[i], self.pElTotalDis[i], self.qWcpHP[i], self.pElPenalty[i],
-                self.qAuxHeaterTotal[i])
+                self.qAuxHeaterTotal[i]))
 
 
         self.yearQCondHp = sum(self.qCondHP)
@@ -181,7 +181,7 @@ class ProcessMonthlyDataBase():
         self.yearSPFhpsBeforeTes = (sum(self.qTesFromSolar) + sum(self.qHpToSh) + sum(self.qTesFromHp)) / (
                     sum(self.pElTotal) + 1e-30)
 
-        print "EXIST SOLAR LOOP :%s " % self.existSolarLoop
+        print ("EXIST SOLAR LOOP :%s " % self.existSolarLoop)
 
         if (self.existSolarLoop):
             self.yearQSolarToTes = sum(self.qSolarToTes)
@@ -192,8 +192,8 @@ class ProcessMonthlyDataBase():
             self.yearCOPeSolar = (self.yearQSolarToTes + sum(self.qSolarToPcm)) / (
                         sum(self.pumpSolar) + sum(self.pElControllerSolar) + 1e-30)
 
-            print "COPt:%f solarToCs:%f solarToWs:%f qSunToCol:%f" % (self.yearCOPtSolar, sum(self.qSolarToPcm), \
-                                                                      self.yearQSolarToTes, sum(self.qSunToCol))
+            print ("COPt:%f solarToCs:%f solarToWs:%f qSunToCol:%f" % (self.yearCOPtSolar, sum(self.qSolarToPcm), \
+                                                                      self.yearQSolarToTes, sum(self.qSunToCol)))
 
         else:
             self.yearQSolarToTes = 0.

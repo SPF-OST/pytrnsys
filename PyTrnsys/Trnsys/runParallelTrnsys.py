@@ -16,9 +16,10 @@ import PyTrnsys.Trnsys.runParallel as runPar
 import PyTrnsys.Trnsys.readConfigTrnsys as readConfig
 import shutil
 import sys
-
 import imp
-from sets import Set
+import warnings
+
+# from sets import Set
 
 class RunParallelTrnsys():
 
@@ -139,7 +140,7 @@ class RunParallelTrnsys():
 
         for i in range(len(fileName)):
 
-            print "name to run :%s" % fileName[i]
+            print ("name to run :%s" % fileName[i])
             #        if useLocationStructure:
             #            variablePath = os.path.join(path,location) #assign subfolder for path
 
@@ -197,7 +198,7 @@ class RunParallelTrnsys():
         for location in locations:
             if not os.path.exists(location):
                 os.makedirs(location)
-                print "created directory '" + path + location + "'"
+                print ("created directory '") + path + location + "'"
 
     def moveResultsFolder(path, resultsFolder, destinationFolder):
         root_src_dir = os.path.join(path, resultsFolder)
@@ -327,7 +328,8 @@ class RunParallelTrnsys():
                 found=True
 
         if(found==False):
-            print Warning("changeFile was not able to change %s by %s"%(source,end))
+            # print Warning("change File was not able to change %s by %s"%(source,end))
+            warnings.warn("change File was not able to change %s by %s"%(source,end))
 
     def getConfig(self,pathDdck=None,pathDdck2=None):
 
@@ -342,7 +344,7 @@ class RunParallelTrnsys():
         self.parameters = {} #deck parameters fixed for all simulations
         self.listFit = {}
         self.listFitObs = []
-        self.listDdckPaths = Set()
+        self.listDdckPaths = set() #Set()
         self.caseDict = {}
         for line in self.lines:
 
@@ -356,13 +358,13 @@ class RunParallelTrnsys():
                     elif (i<=2):
                         variation.append(splitLine[i])
                     else:
-                        variation.append(string.atof(splitLine[i]))
+                        variation.append(float(splitLine[i]))
 
                 self.variation.append(variation)
 
             elif (splitLine[0] == "deck"):
 
-                self.parameters[splitLine[1]] = string.atof(splitLine[2])
+                self.parameters[splitLine[1]] =float(splitLine[2])
 
             # elif (splitLine[0] == "Base"):
             #
@@ -408,5 +410,5 @@ class RunParallelTrnsys():
         dstPath = os.path.join(self.inputs["pathRef"],self.inputs["addResultsFolder"],self.inputs["nameRef"],configName)
         dstPath = os.path.join(self.inputs["pathRef"],self.inputs["addResultsFolder"],configName)
         shutil.copyfile(configFile, dstPath)
-        print "print copied config file to: %s" % dstPath
+        print ("print copied config file to: %s"% dstPath)
 

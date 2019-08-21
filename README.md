@@ -26,9 +26,10 @@ for the funding received in TRI-HP under the Grant Agreement No.  81488. This pr
 efforts in to share the code with the consortium and to make the code usable for the others.  
 
   
-## Installation of python 2.7 and needed libraries
+## Installation of python 3.5 and needed libraries
 
-- Install python 2.7 with numpy, scipy, matplotlib and pandas
+- Install python 3.5 with numpy, scipy, matplotlib and pandas and Tk
+    - in conda enviroment you can 
 - CoolProp package is nedded if physical properties of fluids need to be used, otherwise it's not mandatory
 - We recommend to install anaconda with default installation packages
 - Choose the python editor you like, such as PyCharm, Spyder or alike. This readme file is automatically processed by PyCharm

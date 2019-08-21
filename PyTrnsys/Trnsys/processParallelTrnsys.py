@@ -12,7 +12,7 @@ ToDo : remove processDataGshp and make it generic
 import os
 import PyTrnsys.processingSimulations.debugProcess as debugProcess
 import multiprocessing as mp
-import runParallel as run
+import PyTrnsys.Trnsys.runParallel as run
 import PyTriHpTrnsys.ProcessingSimulations.solarIceTrnsysBaseClass as ice
 import PyTrnsys.utilities.utilsSpf as utils
 import PyTrnsys.Trnsys.readConfigTrnsys as readConfig
@@ -28,7 +28,7 @@ def processDataGeneral(casesInputs):
     (baseClass,locationPath, fileName, avoidUser, maxMinAvoided, yearReadedInMonthlyFile, cleanModeLatex, firstMonthUsed,\
       processQvsT,firstMonthUsed,buildingArea,dllTrnsysPath,setPrintDataForGle,firstConsideredTime) = casesInputs
 
-    print "starting processing of: " + fileName
+    print ("starting processing of: %s"% fileName)
     #    locationPath = inputs.pop(0)
     #    fileName,avoidUser,maxMinAvoided,yearReadedInMonthlyFile,cleanModeLatex,firstMonthUsed,processQvsT
 
@@ -109,7 +109,7 @@ def processDataGshp(casesInputs):
     (locationPath, fileName, avoidUser, maxMinAvoided, yearReadedInMonthlyFile, cleanModeLatex, firstMonthUsed,\
       processQvsT,firstMonthUsed,buildingArea,dllTrnsysPath,setPrintDataForGle,firstConsideredTime) = casesInputs
 
-    print "starting processing of: " + fileName
+    print ("starting processing of: "%  fileName)
 
     test = gshp.GshpTrnsysBaseClass(locationPath, fileName)
 
@@ -179,6 +179,7 @@ class ProcessParallelTrnsys():
         self.inputs["processQvsT"] = True
         self.inputs["dllTrnsysPath"] = False
         self.inputs["classProcessing"] = False
+        self.inputs["latexExePath"] = "Unknown"
 
     def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
@@ -225,17 +226,15 @@ class ProcessParallelTrnsys():
                     nameWithPath = os.path.join(pathFolder, "%s\\%s-results.dat" % (name, name))
 
                     if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                        print "file :%s already processed" % name
+                        print ("file :%s already processed" % name)
 
                     elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.dat" % (name, name))) and  self.inputs["forceProcess"] == False:
-                        print "file :%s already processed" % name
+                        print ("file :%s already processed" % name)
 
                     else:
                         baseClass = self.getBaseClass(self.inputs["classProcessing"],pathFolder,name)
 
-
-
-                        print "file :%s will be processed" % name
+                        print ("file :%s will be processed" % name)
                         casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
                                             self.inputs["cleanModeLatex"],self.inputs["firstMonthUsed"],self.inputs["processQvsT"],self.inputs["firstMonthUsed"],self.inputs["buildingArea"],\
                                             self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
@@ -260,9 +259,9 @@ class ProcessParallelTrnsys():
                 nameWithPath = os.path.join(pathFolder, "%s\\%s-results.dat" % (name, name))
 
                 if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                    print "file :%s already processed" % name
+                    print ("file :%s already processed" % name)
                 else:
-                    print "file :%s will be processed" % name
+                    print ("file :%s will be processed" % name)
                     
 
                     baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder,self.inputs["fileName"])
@@ -292,15 +291,15 @@ class ProcessParallelTrnsys():
                         nameWithPath = os.path.join(pathFolder, "%s\\%s-results.dat" % (name, name))
 
                         if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                            print "file :%s already processed" % name
+                            print ("file :%s already processed" % name)
 
                         elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.dat" % (name, name))) and self.inputs["forceProcess"] == False:
-                            print "file :%s already processed" % name
+                            print ("file :%s already processed" % name)
 
                         else:
                             baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)
 
-                            print "file :%s will be processed" % name
+                            print ("file :%s will be processed" % name)
 
 
                             if "hourly" in name and not "Mean" in name:
@@ -369,4 +368,4 @@ class ProcessParallelTrnsys():
                 found=True
 
         if(found==False):
-            print Warning("changeFile was not able to change %s by %s"%(source,end))
+            print ("changeFile was not able to change %s by %s"%(source,end))

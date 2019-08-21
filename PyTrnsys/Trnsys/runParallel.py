@@ -127,7 +127,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
     activeP = [0] * maxNumberOfCPU
     
     for core in cP.keys():
-        print cP[core]
+        # print cP[core]
         
         cP[core]['cmd']= "start /wait /affinity %s "%(getCpuHexadecimal(cP[core]['cpu'])) + openCmds.pop(0)
         cP[core]['case']=caseNr
@@ -144,17 +144,17 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
         return p.poll() is not None
     
     def success(p):
-        print "SUCCESS :%s"%p.poll()
+        print ("SUCCESS :%s"%p.poll())
         
         return p.returncode == 0
     def fail():
-        print "PARALLEL RUN HAS FAILED"
+        print ("PARALLEL RUN HAS FAILED")
         sys.exit(1)
 
     processes = []
     
     if(len(processes)>maxNumberOfCPU):
-        print "WARNING : runParallel. You are triying tu run %d processes and only have %d CPU\n" % (len(processes),maxNumberOfCPU)
+        print ("WARNING : runParallel. You are triying tu run %d processes and only have %d CPU\n" % (len(processes),maxNumberOfCPU))
         
 #    while True:
         
@@ -214,7 +214,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                         
     
                     else:
-                        print 'p', p
+                        # print ('p')%p
     #                    print 'processes', processes
                         fail()
 

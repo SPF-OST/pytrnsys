@@ -11,7 +11,7 @@ ToDo :
 import os
 import string,shutil
 import PyTrnsys.processingData.processFiles as spfUtils
-import processMonthlyDataBase as monthlyData #changed in order to clean the processing of files
+import PyTrnsys.processingSimulations.processMonthlyDataBase as  monthlyData #changed in order to clean the processing of files
 import PyTrnsys.utilities.utilsSpf as utils
 import time
 import numpy as num
@@ -114,7 +114,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 
         namesDll = []
         myset = set(self.readTrnsysFiles.TrnsysTypes)  # get the unique names (all repeated ones are excluded)
-        print myset
+        print (myset)
 
         for number in myset:
             nameType = "type%s" % number
@@ -124,7 +124,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 
         self.buildingModel = None
         for dll in self.dllVersions:
-            print dll
+            print (dll)
             if (dll[0:6] == "type56"):
                 self.buildingModel = "Type56"
             elif (dll[0:8] == "type5998"):
@@ -140,14 +140,14 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             else:
                 trnsysExe  = os.getenv(self.trnsysVersion)
 
-            print trnsysExe
+            print (trnsysExe)
 
             mySplit = trnsysExe.split("Exe")
             self.trnsysDllPath = mySplit[0] + "\\UserLib\\ReleaseDLLs"
         else:
             pass
 
-        print "Dll path:%s" % self.trnsysDllPath
+        print ("Dll path:%s" % self.trnsysDllPath)
         
         listDll= os.listdir(self.trnsysDllPath)
         
@@ -160,10 +160,10 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
                     if(dll.count(name)==1 and nameFound==False):
                         nameFound = True
                         dllVersion.append(dll)    
-                        print "FOUND %s %s" % (dll,name)  
+                        print ("FOUND %s %s" % (dll,name))
                         break
              
-        print dllVersion
+        print (dllVersion)
 #        raise ValueError()
         
         return dllVersion
@@ -200,7 +200,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
              for i in range(self.numberOfMonthsSimulated):
                  self.qSolarToTes[i] = self.qSolarToSystem[i] - self.qLossPipeSolarLoop[i]                            
          else:
-             print "Serial system and qSolartoTes must be readed from Storage data"
+             print ("Serial system and qSolartoTes must be readed from Storage data")
 
     def loadWeatherData(self,_name):
            
@@ -229,7 +229,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
       
         if(abs(sum(self.qTesFromHp) - (sum(self.qTesDhwFromHp)+sum(self.qTesShFromHp))>1)):
             
-           print "Something goes wrong QTesFromHp:%f QTesFromHPDhwSh:%f "%(sum(self.qTesFromHp),sum(self.qTesDhwFromHp)+sum(self.qTesShFromHp))
+           print ("Something goes wrong QTesFromHp:%f QTesFromHPDhwSh:%f "%(sum(self.qTesFromHp),sum(self.qTesDhwFromHp)+sum(self.qTesShFromHp)))
 
         self.qOutFromTes = num.zeros(12)
 
@@ -290,7 +290,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.readTrnsysFiles.readHourlyBuildingFile(_name)                  
         self.buildingDataLoaded =True
                                       
-        print "READING HORLY DATA FROM BUILDING TYPE 56"
+        print ("READING HORLY DATA FROM BUILDING TYPE 56")
        
 
 #['TIME', 'REL_BAL_ENERGY', '1_B4_QBAL=-', '1_B4_DQAIRdT+', '1_B4_QHEAT-', '1_B4_QCOOL+', '1_B4_QINF+', '1_B4_QVENT+', '1B4_QCOUP+', '1_B4_QTRANS+', '1_B4_QGINT+', '1_B4_QWGAIN+', '1_B4_QSOL+', '1_B4_QSOLAIR+']
@@ -331,10 +331,10 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
                 
         yearlyHeatDemand = sum(self.qBuiSolarGains)+sum(self.qBuiGains)+sum(self.qBuiTransLosses)+sum(self.qBuiInfLosses)+sum(self.qBuiVentLosses)
         
-        print "YEARLY DEMAND IN BUILDING :%f kWh"% yearlyHeatDemand
+        print ("YEARLY DEMAND IN BUILDING :%f kWh"% yearlyHeatDemand)
         
         for i in range(12):
-            print "month:%d GAIN solar:%f int(rad+conv):%f LOSS Inf:%f Trns:%f Vent:%f"% (i+1,self.qBuiSolarGains[i],self.qBuiGains[i],self.qBuiInfLosses[i],self.qBuiTransLosses[i],self.qBuiVentLosses[i])
+            print ("month:%d GAIN solar:%f int(rad+conv):%f LOSS Inf:%f Trns:%f Vent:%f"% (i+1,self.qBuiSolarGains[i],self.qBuiGains[i],self.qBuiInfLosses[i],self.qBuiTransLosses[i],self.qBuiVentLosses[i]))
 
     def loadDHW(self,_name):
         
@@ -476,7 +476,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             #This includes then the PiAuxRt pipe losses
             self.qHpToTesSh  = self.qHpInShMode - self.qHpToSh
             
-            print "QHpInSHMode:%f QHpToTesSH:%f QHpToSHLoop:%f"%(sum(self.qHpInShMode),sum(self.qHpToTesSh),sum(self.qHpToSh))
+            print ("QHpInSHMode:%f QHpToTesSH:%f QHpToSHLoop:%f"%(sum(self.qHpInShMode),sum(self.qHpToTesSh),sum(self.qHpToSh)))
 
         self.qHpToTesDhw = self.qHpInDhwMode
         self.qHpToTes    = self.qHpToTesSh+self.qHpToTesDhw

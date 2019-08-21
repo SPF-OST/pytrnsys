@@ -39,7 +39,7 @@ class LogTrnsys():
         
     def loadLog(self):        
 
-        print "nameLog:%s" % self.nameLog 
+        print ("nameLog:%s" % self.nameLog)
 
         try:
             infile=open(self.nameLog,'r')
@@ -69,7 +69,7 @@ class LogTrnsys():
             try:
                 if (split[0].strip() == sentence):
                     ntime= split[1].strip()
-                    time = string.atof(ntime.split()[0]) / 60.
+                    time = float(ntime.split()[0]) / 60.
                     return time
             except:
                 pass
@@ -88,14 +88,14 @@ class LogTrnsys():
                 try:    
                   
                    self.numberOfFailedIt = split[1].replace("%","\%")               
-                   print self.numberOfFailedIt
+                   print (self.numberOfFailedIt)
 
                 except:
                     pass
                                 
         except:
             self.numberOfFailedIt = -99
-            print "LOG FILE NOT FOUND"
+            print ("LOG FILE NOT FOUND")
             
         return None
 
@@ -119,7 +119,7 @@ class LogTrnsys():
                     if(mysplit[1] != None):
                       
 
-                        hourOfYear = string.atof(self.lines[i-3].split(":")[1])
+                        hourOfYear = float(self.lines[i-3].split(":")[1])
                         self.hourWhereItProblems.append(hourOfYear)
 
                         units = self.lines[i+1].split(sentenceUnit)[1]
@@ -136,7 +136,7 @@ class LogTrnsys():
                     pass
                                 
         except:
-            print "LOG FILE NOT FOUND"
+            print ("LOG FILE NOT FOUND")
 
         return iteMonth
 
@@ -155,7 +155,7 @@ class LogTrnsys():
 
         nameItProblem = self.path + nameFile
 
-        print "It problems printed in %s"%nameItProblem
+        print ("It problems printed in %s"%nameItProblem)
 
         infile=open(nameItProblem,'w')
         lines=infile.writelines(lines)

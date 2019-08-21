@@ -50,11 +50,11 @@ def isWhole(x):
 def addYearlyValue(array,yearlyFactor=1.0):
 
     if(len(array) == 13):
-        print Warning("addYearlyValue found an array of 13 lenght. SO I assume that it was already added and I return the same value")
+        print ("addYearlyValue found an array of 13 lenght. So I assume that it was already added and I return the same value")
         return array
         
     if(len(array) != 12):
-        print array
+        print (array)
         raise ValueError("Error. You are trying to add a yearly value to a non monthly array")
                     
     sumQ = sum(array)
@@ -62,7 +62,7 @@ def addYearlyValue(array,yearlyFactor=1.0):
     myArray.resize(13)
     if(yearlyFactor==0):
         yearlyFactor=1
-        print Warning("yearlyFactor should be different from 0, 1 is assumed")
+        print ("yearlyFactor should be different from 0, 1 is assumed")
         
 #        raise ValueError("yearlyFactor should be different from 0")
         
@@ -302,7 +302,7 @@ def getNumberOfDaysOfMonth(i):
     elif(i==12):
         return 31
     else:
-        print "Error.  Index out of range i:%d" % i
+        print ("Error.  Index out of range i:%d" % i)
         
 def getHourBeginAndEndForMonth(monthBegin,monthEnd):
     
@@ -485,7 +485,7 @@ def calculateMonthlyAveragesFromUserDefinedTimeStep(varUserDefined,timeStepInSec
         month = m-1                      
         
         if(i>0 and month0 != month):                            
-            print "New Month(0-12):%d count=%d month:%f month(avg):%f"%(month-1,count,varMonth[month-1],varMonth[month-1]/count)
+            print ("New Month(0-12):%d count=%d month:%f month(avg):%f"%(month-1,count,varMonth[month-1],varMonth[month-1]/count))
             
             varMonth[month-1]=varMonth[month-1]/count
             
@@ -498,7 +498,7 @@ def calculateMonthlyAveragesFromUserDefinedTimeStep(varUserDefined,timeStepInSec
         month0 = month
         
     if(month0 == month):                            
-        print "New Last Month(0-12):%d count=%d month:%f month(avg):%f"%(month,count,varMonth[month],varMonth[month]/count)            
+        print ("New Last Month(0-12):%d count=%d month:%f month(avg):%f"%(month,count,varMonth[month],varMonth[month]/count))
         varMonth[month]=varMonth[month]/count
             
     return varMonth      
@@ -538,7 +538,7 @@ def getMonthlySliceFromUserDefinedTimeStep(varUserDefined,timeStepInSeconds,mont
         monthFound = False    
         
         if(monthDesired<1 or monthDesired>12):
-            print "month:%d out of range[1-12]"%monthDesired
+            print ("month:%d out of range[1-12]")%monthDesired
             raise ValueError("month:%d out of range[1-12]"%monthDesired)
             
         for i in range(len(varUserDefined)):
@@ -560,10 +560,10 @@ def getMonthlySliceFromUserDefinedTimeStep(varUserDefined,timeStepInSeconds,mont
                     indexEnd = i-1
         
         if(indexEnd==None):
-            print "final index not found. Last time step used."
+            print ("final index not found. Last time step used.")
             indexEnd = i=len(varUserDefined)-1
             
-        print "month:%d indexBegin:%d indexEnd:%d"%(monthDesired,indexBegin,indexEnd)
+        print ("month:%d indexBegin:%d indexEnd:%d"%(monthDesired,indexBegin,indexEnd))
         
         return indexBegin,indexEnd
 
@@ -935,7 +935,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[0] = min(jan)
             avgMonth[0] = varMonth[0]/janIt
         except:          
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: Januray is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: Januray is not calculated")
             pass    
         
         try:
@@ -944,7 +944,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[1] = min(feb)
             avgMonth[1] = varMonth[1]/febIt
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: February is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: February is not calculated")
             pass
         
         try:
@@ -953,7 +953,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[2] = min(mar)
             avgMonth[2] = varMonth[2]/marIt
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: March is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: March is not calculated")
             pass
 
         try:
@@ -963,7 +963,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[3] = min(apr)
             avgMonth[3] = varMonth[3]/aprIt
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: April is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: April is not calculated")
 
             pass
     
@@ -974,7 +974,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[4] = min(may)
             avgMonth[4] = varMonth[4]/mayIt
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: May is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: May is not calculated")
 
             pass
     
@@ -984,7 +984,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[5] = min(jun)
             avgMonth[5] = varMonth[5]/junIt
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: June is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: June is not calculated")
 
             pass
     
@@ -994,7 +994,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[6] = min(jul)
             avgMonth[6] = varMonth[6]/julIt
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: July is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: July is not calculated")
 
             pass
     
@@ -1005,7 +1005,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[7] = min(aug)
             avgMonth[7] = varMonth[7]/julIt
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: August is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: August is not calculated")
 
             pass
     
@@ -1016,7 +1016,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[8] = min(sep)
             avgMonth[8] = varMonth[8]/augIt    
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: September is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: September is not calculated")
 
             pass
             
@@ -1026,7 +1026,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[9] = min(octo)
             avgMonth[9] = varMonth[9]/sepIt        
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: October is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: October is not calculated")
 
             pass
             
@@ -1036,7 +1036,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[10] = min(nov)
             avgMonth[10] = varMonth[10]/novIt
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: November is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: November is not calculated")
 
             pass
 
@@ -1046,7 +1046,7 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined,timeSt
             minMonth[11] = min(dec)
             avgMonth[11] = varMonth[11]/decIt
         except:
-            print Warning("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: December is not calculated")
+            print ("calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep: December is not calculated")
 
             pass
                 
@@ -1214,7 +1214,7 @@ def calcAndPrintQVersusT(outputPath,fileName,tShFl,tShRt,eSh,tColFl,eColToTes,eC
 #    name = fileName + "TVsQcum_Y.dat"
     myFileName = outputPath + "//" + fileName + ".dat"
     
-    print "File created :%s"%myFileName
+    print ("File created :%s"%myFileName)
     
     outfile=open(myFileName,'w')    
     outfile.writelines(lines)
@@ -1230,7 +1230,7 @@ def calcAndPrintQVersusT_new(outputPath,fileName,tShFl,tShRt,eSh,tColFl,eColToTe
                  
     numberOfTimesteps = len(tShFl)
     
-    print "sum tShFl:%f tShRt:%f"%(sum(tShFl),sum(tShRt))
+    print ("sum tShFl:%f tShRt:%f"%(sum(tShFl),sum(tShRt)))
     
     tShFlSort,cumulativeEShFl = calcQvsT(tShFl,eSh)
     tShRtSort,cumulativeEShRt  = calcQvsT(tShRt,eSh)
@@ -1261,7 +1261,7 @@ def calcAndPrintQVersusT_new(outputPath,fileName,tShFl,tShRt,eSh,tColFl,eColToTe
 #    name = fileName + "TVsQcum_Y.dat"
     myFileName = outputPath + "//" + fileName + ".dat"
     
-    print "File created :%s"%myFileName
+    print ("File created :%s"%myFileName)
     
     outfile=open(myFileName,'w')    
     outfile.writelines(lines)

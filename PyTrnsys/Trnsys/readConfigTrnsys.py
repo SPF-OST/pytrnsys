@@ -6,14 +6,14 @@ Date   : 01-10-2018
 ToDo:   Copy config file to results folder automatically
 """
 
-import createTrnsysDeck as createDeck
-import executeTrnsys as exeTrnsys
-import BuildTrnsysDeck as build
+import PyTrnsys.Trnsys.createTrnsysDeck as createDeck
+import PyTrnsys.Trnsys.executeTrnsys as exeTrnsys
+import PyTrnsys.Trnsys.BuildTrnsysDeck as build
 import numpy as num
 import os
 import PyTrnsys.processingData.processFiles as processFiles
 import string
-import runParallel as runPar
+import PyTrnsys.Trnsys.runParallel as runPar
 
 
 class ReadConfigTrnsys():
@@ -51,7 +51,7 @@ class ReadConfigTrnsys():
             if (splitLine[0] == "bool"):
                 inputs[splitLine[1]] = self.str2bool(splitLine[2])
             elif (splitLine[0] == "int"):
-                inputs[splitLine[1]] = string.atoi(splitLine[2])
+                inputs[splitLine[1]] = int(splitLine[2])
             elif (splitLine[0] == "string"):
                 if(len(splitLine)!=3):
                     raise ValueError("Error in string : %s"%lines[i])

@@ -27,7 +27,9 @@ class LatexReport():
         self.title = "unknown"
         self.subTitle = "unknown"
         self.documentClass = "SPFShortReport"
-                            
+
+        self.latexExePath = "enviromentalVariable"
+
         # Every time we add a plot we increase this vector and it is used
         # to remove them after pdf creation if cleanMode=True 
         
@@ -64,11 +66,11 @@ class LatexReport():
         for plotName in self.plotsAdded:
             pdfWithPath = "%s\\%s" % (self.outputPath,plotName)
             
-            print "Cleaning Latex Mode file %s"% pdfWithPath
+            print ("Cleaning Latex Mode file %s"% pdfWithPath)
             os.remove(pdfWithPath)
             
             
-    def executeLatexFile(self,removeAuxFiles=False,pathLatex=False,moveToTrnsysLogFile=False,runTwice=False,LatexPackage="pdflatex"):
+    def executeLatexFile(self,removeAuxFiles=False,pathLatexExe=False,moveToTrnsysLogFile=False,runTwice=False,LatexPackage="pdflatex"):
         'function to execute latex file, the function can use either "pdflatex" or "texify" to create pdf.'
 
         logFile = '%s\%s.log' % (self.outputPath,self.fileName)
@@ -80,17 +82,17 @@ class LatexReport():
             
             try:
                 shutil.copy(logFile,logFileEnd)      
-                print "copy file %s to %s" % (logFile,logFileEnd)
+                print ("copy file %s to %s" % (logFile,logFileEnd))
             except:
-                print "FAIL to copy the file %s to %s" % (logFile,logFileEnd)
-                
-        if pathLatex==False:
+                print ("FAIL to copy the file %s to %s" % (logFile,logFileEnd))
+
+        if pathLatexExe==False:
             latexExe = os.getenv("LATEX_EXE")
 
             latexExe ='"%s"'% latexExe
         else:
-            latexExe = '"%s"' % pathLatex
-        
+            latexExe = '"%s"' % pathLatexExe
+
 
 #        fileNameTexWithPath = '"%s\\%s"'%(self.outputPath,self.fileNameTex)
         if LatexPackage=="texify":
@@ -100,7 +102,7 @@ class LatexReport():
             cmd = "pdflatex --silent --output-directory=\"%s\" %s" %(self.outputPath, self.fileNameTex)
         else:
             raise ValueError('The specified LatexPackage \"%s\" is not implemented yet or does not exist.'%LatexPackage)
-        
+
 #        print cmd
         myCmd ='"%s"'%cmd #for blank spaces in paths
         os.system(myCmd)  
@@ -115,13 +117,13 @@ class LatexReport():
         try:
             os.remove(name)        
         except:
-            print name + " could not be removed, maybe there was a problem with the Latex File..."
+            print (name + " could not be removed, maybe there was a problem with the Latex File...")
             
         name='%s\%s.aux' % (self.outputPath,self.fileName)
         try:
             os.remove(name)        
         except:
-            print name + " could not be removed, maybe there was a problem with the Latex File..."
+            print (name + " could not be removed, maybe there was a problem with the Latex File...")
 
         
         if LatexPackage=="texify":
@@ -129,16 +131,16 @@ class LatexReport():
             try:
                 os.remove(name)        
             except:
-                print name + " could not be removed, maybe there was a problem with the Latex File..."
+                print (name + " could not be removed, maybe there was a problem with the Latex File...")
             
         if os.path.isfile(self.outputPath + "\\" + self.fileName + ".pdf"):
-           print "Latex File created sucessfully"
+           print ("Latex File created sucessfully")
         else:
             raise ValueError('PDF was not generated, or not saved in the right directory')
           
         
         if(self.cleanMode):
-            print "Eraising plots because cleanMode is True"
+            print ("Eraising plots because cleanMode is True")
             self.cleanFiles()
         
     def addBeginDocument(self):                              
@@ -225,7 +227,6 @@ class LatexReport():
         line="\\hline\n" ; self.lines = self.lines + line 
 
         if(addCaptionLines != False):
-            print addCaptionLines
             self.lines = self.lines + addCaptionLines
             line="\\hline\n" ; self.lines = self.lines + line
 
@@ -252,7 +253,7 @@ class LatexReport():
                     else:
                         line = "%s &" % _units[i]; self.lines = self.lines + line
             else:
-                print "Units size differ from names, so we use the first one for all"
+                print ("Units size differ from names, so we use the first one for all")
 
                 for i in range(len(_names)):
                     if(i==0):
@@ -375,7 +376,7 @@ class LatexReport():
                         line = "%s &" % _units[i];
                         self.lines = self.lines + line
             else:
-                print "Units size differ from names, so we use the first one for all"
+                print ("Units size differ from names, so we use the first one for all")
 
                 for i in range(len(_names)):
                     if (i == 0):
