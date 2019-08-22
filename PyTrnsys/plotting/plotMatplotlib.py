@@ -274,7 +274,7 @@ class PlotMatplotlib():
 
         plot.set_xticklabels([monthSequence[i] for i in showMonths],fontsize=10,rotation='45')
                 
-        namePdf = '%s.svg'%nameFile
+        namePdf = '%s.pdf'%nameFile
         nameWithPath = '%s\%s' % (self.path,namePdf)
 
         print "plotMonthly name:%s"%nameWithPath
