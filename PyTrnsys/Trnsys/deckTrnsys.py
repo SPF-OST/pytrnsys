@@ -37,7 +37,7 @@ class DeckTrnsys():
         except:
             self.myCommonTrnsysFolder=None
                  
-            print "Warning. TRNSYS_DATA_FOLDER not defined as a enviromental variable."
+            print ("Warning. TRNSYS_DATA_FOLDER not defined as a enviromental variable.")
 
         self.packageNameTrnsysFiles="None"
 
@@ -101,10 +101,10 @@ class DeckTrnsys():
 
         if(useDeckName==False):
             pass
-            print "DECK TRNSYS::LOAD DECK nameDeck:%s eliminateCmments=%s" % (self.nameDck,self.eliminateComments)
+            print ("DECK TRNSYS::LOAD DECK nameDeck:%s eliminateCmments=%s" % (self.nameDck,self.eliminateComments))
 
         else:
-            print "DECK TRNSYS::LOAD DECK nameDeck:%s eliminateCmments=%s USEDECKNAME:%s" % (self.nameDck,self.eliminateComments,useDeckName)
+            print ("DECK TRNSYS::LOAD DECK nameDeck:%s eliminateCmments=%s USEDECKNAME:%s" % (self.nameDck,self.eliminateComments,useDeckName))
             self.nameDck = useDeckName    
             self.nameDckPathOutput = useDeckName 
             
@@ -131,7 +131,7 @@ class DeckTrnsys():
 
     def loadDeckAndEraseWhiteSpaces(self):        
 
-        print "nameDeck:%s" % self.nameDck 
+        print ("nameDeck:%s"%self.nameDck)
  
         infile=open(self.nameDck,'r')
         lines=infile.readlines()        
@@ -164,7 +164,7 @@ class DeckTrnsys():
     def writeDeck(self):
 
         tempName = "%s" % self.nameDck
-        print "tempName:%s" % tempName
+        print ("tempName:%s" % tempName)
         tempFile=open(tempName,'w')
         tempFile.writelines(self.linesChanged)
         tempFile.close()
@@ -229,7 +229,7 @@ class DeckTrnsys():
                       
             
                       nLabelString = splitBlank[1].replace(" ","")
-                      nLabel  = string.atoi(nLabelString)
+                      nLabel  = int(nLabelString)
                       
                       jEnd = i+nLabel
                       
@@ -289,7 +289,9 @@ class DeckTrnsys():
             try:       
                 if(splitBlank[0]=="ASSIGN"):                    
                          
-                    fileNameWithoutCommas = string.replace(splitBlank[1],"\"","")
+                    # fileNameWithoutCommas = string.replace(splitBlank[1],"\"","")
+                    fileNameWithoutCommas = splitBlank[1].replace("\"","")
+
                     buildingSplit = fileNameWithoutCommas.split("building\\")                         
                              
                                                     
@@ -313,7 +315,7 @@ class DeckTrnsys():
 #                                     myFileInNewPath = self.myCommonTrnsysFolder +"\\building\\"+ buildingSplit[1]
 #                                     self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
                              
-                         print "Building changed :%s " % self.linesChanged[i]
+                         print ("Building changed :%s " % self.linesChanged[i])
 
 #==============================================================================
 #                               TEMP FOLDER
@@ -380,23 +382,19 @@ class DeckTrnsys():
         outfile.writelines(lines)
         outfile.close() 
                           
-    def changeParameter(self,_parameters): #Is this used??
+    def changeParameter(self,_parameters):
 
                  
 #         print "linesChanged"
 #         print self.linesChanged
-         print "Change Parameters deckTrnsys Class"
+         print ("Change Parameters deckTrnsys Class")
 #         print _parameters
          
          if(_parameters != None):
              
              self.parameters = _parameters
 
-#             print "execute TRNSYS. Parameters"                       
-#             print self.parameters
-#             for key in self.parameters.iterkeys():                                                         
-#                 print "key:%s"%key
-             
+
              for i in range(len(self.linesChanged)):
                  
                  splitEquality = self.linesChanged[i].split('=')
@@ -415,13 +413,10 @@ class DeckTrnsys():
                          
 #                         print "Im IN %s %s %s " % (splitBlank[0],splitBlank[1],splitBlank[2])
                          
-                         fileNameWithoutCommas = string.replace(splitBlank[1],"\"","")
-                         
-#                         print "fileNameWithoutCommas:%s" % fileNameWithoutCommas
-                         
+                         fileNameWithoutCommas = splitBlank[1].replace("\"","")
 
-                       
-                             
+#                         print "fileNameWithoutCommas:%s" % fileNameWithoutCommas
+
     #==============================================================================
     #                              BUILDING DATA 
     #==============================================================================
@@ -446,20 +441,7 @@ class DeckTrnsys():
 #
 #                              print "Building changed :%s " % self.linesChanged[i]
 
-#==============================================================================
-#                              ADD DATA 
-#==============================================================================
-                        
-                         # addDataSplit = fileNameWithoutCommas.split("add_dat\\")
-                         #
-                         #
-                         # if(len(addDataSplit)>1):
-                         #     myFileInNewPath = self.myCommonTrnsysFolder + "add_dat\\" + "%s" % addDataSplit[1]
-                         #
-                         #     self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
-                         #
-                         #     print "Add_dat changed :%s " % self.linesChanged[i]
- 
+
 #==============================================================================
 #                               COMPRESSOR
 #==============================================================================
@@ -470,20 +452,7 @@ class DeckTrnsys():
                              myFileInNewPath = self.HOMEPath + "Compressor\\" + "%s" % compressorDataSplit[1]
                              self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
                              
-                             print "Compressor data changed :%s " % self.linesChanged[i]
-
-#==============================================================================
-#                               CLIMATE
-#==============================================================================
-                                        
-                         # climateDataSplit = fileNameWithoutCommas.split("climate\\")
-                         #
-                         # if(len(climateDataSplit)>1):
-                         #     myFileInNewPath = self.myCommonTrnsysFolder + "climate\\" + "%s" % climateDataSplit[1]
-                         #     self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
-                         #
-                         #     print "Climate data changed :%s " % self.linesChanged[i]
-
+                             print ("Compressor data changed :%s " % self.linesChanged[i])
                         
 #==============================================================================
 #                               TEMP FOLDER
@@ -526,16 +495,16 @@ class DeckTrnsys():
                      
 #                     print myName,value
                      
-                     for key in self.parameters.iterkeys():                                                         
+                     for key in self.parameters.keys():
                          
-#                         print "IN TRY key:%s"%key
+                         print ("IN TRY key:%s"%key)
 
 #                         myName = string.replace(name," ","")
                                               
                          if(key.lower()==myName.lower()): #avoid case sensitive
 #                                                     
                              myNewLine = "%s=%s ! value changed from original by executeTrnsys.py\n" % (key,self.parameters[key])
-                             print "NEW LINE %s" % myNewLine  
+                             print ("NEW LINE %s" % myNewLine)
 #                             
                              self.linesChanged[i] = myNewLine
                                                                             
@@ -545,7 +514,7 @@ class DeckTrnsys():
                 
                 
                              
-             print 'OUPUT AT %s' % self.nameDck
+             print ('OUPUT AT %s' % self.nameDck)
                  
              outfile=open(self.nameDck,'w') 
             
@@ -617,7 +586,7 @@ class DeckTrnsys():
 #                    print "unit:%s nUnit:%s types:%s ntype:%s"%(unit,nUnit,types,ntype)
 
                     if(nUnit.lower()==myUnit.lower()):
-                        print "UNIT FOUND myUnit:%s type:%s"%(myUnit,ntype)
+                        print ("UNIT FOUND myUnit:%s type:%s"%(myUnit,ntype))
                         return ntype
                 
             except:
@@ -652,9 +621,9 @@ class DeckTrnsys():
             return None
             
         if(typeValue=="double"):
-            return string.atof(value)
+            return float(value)
         elif(typeValue=="int"):
-            return string.atoi(value)
+            return int(value)
         elif(typeValue=="string"):
             return value
         else:
@@ -674,7 +643,7 @@ class DeckTrnsys():
                 
                 lineError = i+1
                 try:
-                    numberOfValues = string.atoi(splitBlank[1])
+                    numberOfValues = int(splitBlank[1])
                 except:
                     raise ValueError("checkEquationsAndConstants %s can't be split in line i:%d (missing number?)"%(splitBlank,i))
                     
@@ -796,9 +765,9 @@ class DeckTrnsys():
         dInCol,UPipeCol = self.getPipeData(massFlowCol)
         #PIPE HP EVAPORATOR
                 
-        print "RESIZE PARAMETERS"
-        print "massFlow:%f [kg/h] areaCov:%f useCov:%d areaUnc:%f useUInc:%d"%(massFlowCol,areaCov,useCov,areaUnc,useUnc)
-        print "sizeHpUsed:%f sizeHpNom:%f nominalFlowEvap:%d realFlowEvap:%f nominalFlowCond:%d realFlowCond:%f"%(sizeHpUsed,sizeHpNom,massFlowHpEvapNom,massFlowHpEvap,massFlowHpCondNom,massFlowHpCond)
+        print ("RESIZE PARAMETERS")
+        print ("massFlow:%f [kg/h] areaCov:%f useCov:%d areaUnc:%f useUInc:%d")%(massFlowCol,areaCov,useCov,areaUnc,useUnc)
+        print ("sizeHpUsed:%f sizeHpNom:%f nominalFlowEvap:%d realFlowEvap:%f nominalFlowCond:%d realFlowCond:%f")%(sizeHpUsed,sizeHpNom,massFlowHpEvapNom,massFlowHpEvap,massFlowHpCondNom,massFlowHpCond)
         
         
         myParameters = { 
@@ -810,7 +779,7 @@ class DeckTrnsys():
         "UPiHydUncorr" : UPipeSh
         }
 
-        print myParameters
+        # print myParameters
         
         self.changeParameter(myParameters)
 

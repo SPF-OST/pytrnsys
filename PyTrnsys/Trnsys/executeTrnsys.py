@@ -8,8 +8,7 @@ ToDo
 import os
 import string,shutil
 import PyTrnsys.processingData.processFiles as spfUtils
-import deckTrnsys 
-
+import PyTrnsys.Trnsys.deckTrnsys as deckTrnsys
 
 class ExecuteTrnsys():
     """
@@ -40,7 +39,7 @@ class ExecuteTrnsys():
         self.pathOutput = os.path.join(self.path, self.fileName)
         
         if not os.path.exists(self.pathOutput):
-            print self.pathOutput
+            # print self.pathOutput
             os.makedirs(self.pathOutput)
         
         self.tempFolder = os.path.join(self.path, 'temp')
@@ -90,7 +89,7 @@ class ExecuteTrnsys():
         self.pathOutput = self.path
         
         if not os.path.exists(self.pathOutput):
-            print self.pathOutput
+            # print self.pathOutput
             os.makedirs(self.pathOutput)
         
         self.tempFolder = os.path.join(self.path, 'temp')
@@ -143,8 +142,8 @@ class ExecuteTrnsys():
     def loadDeck(self,useDeckName=False,check=False,eliminateComments=False):        
                     
               
-        print self.path
-        print self.fileName
+        # print self.path
+        # print self.fileName
                 
         self.deckTrnsys = deckTrnsys.DeckTrnsys(self.path,self.fileName)
 
@@ -231,16 +230,16 @@ class ExecuteTrnsys():
             self.copyFileFromSource(nameFile)
 
         nameFile = "%s.dck" % self.fileName
-        print nameFile            
+        # print nameFile
         
         self.moveFileFromSource(nameFile)
         
         for nameFolder in self.foldersForRunning:     
-            print "executeTrnsys.py Folder for running from HOME$ folder :%s" % nameFolder
+            print ("executeTrnsys.py Folder for running from HOME$ folder :%s") % nameFolder
             self.copyFolderFromHomePath(nameFolder)
 
         for nameFolder in self.foldersForRunningFromSource:
-            print "folder for running from source folder :%s" % nameFolder                        
+            print ("folder for running from source folder :%s") % nameFolder
             self.copyFolderFromSource(nameFolder)
 
     def cleanFilesForRunning(self):
@@ -259,14 +258,14 @@ class ExecuteTrnsys():
         fileSource = os.path.join(self.path,name)
         fileEnd    = os.path.join(self.pathOutput,name)
 
-        print 'Path', self.path
-        print 'PathOutput', self.pathOutput
+        print ('Path %s'%self.path)
+        print ('PathOutput %s'%self.pathOutput)
 
         try:
             shutil.move(fileSource,fileEnd)      
-            print "\nmove file %s to %s\n" % (name,fileEnd)
+            print ("\nmove file %s to %s\n" % (name,fileEnd))
         except:
-            print "\nFAIL to move the file %s to %s" % (name,fileEnd)
+            print ("\nFAIL to move the file %s to %s" % (name,fileEnd))
 
     def copyFileFromSource(self,name):
         
@@ -275,9 +274,9 @@ class ExecuteTrnsys():
 
         try:
             shutil.copy(fileSource,fileEnd)      
-            print "\ncopy file %s to %s\n" % (name,fileEnd)
+            print ("\ncopy file %s to %s\n" % (name,fileEnd))
         except:
-            print "\nFAIL to copy the file %s to %s\n" % (name,fileEnd)
+            print ("\nFAIL to copy the file %s to %s\n" % (name,fileEnd))
         
     def copyFolderFrom(self,sourcePath,name):
         
@@ -286,9 +285,9 @@ class ExecuteTrnsys():
                 
         try:
             shutil.copytree(folderSource,folderEnd)      
-            print "copy folder %s to %s" % (name,folderEnd)
+            print ("copy folder %s to %s" % (name,folderEnd))
         except:
-            print "FAIL to copy the folder %s from %s to %s" % (name,folderSource,folderEnd)
+            print ("FAIL to copy the folder %s from %s to %s" % (name,folderSource,folderEnd))
             
     def copyFolderFromSource(self,name):
 
@@ -330,7 +329,7 @@ class ExecuteTrnsys():
         
 #        myCmd ='"%s"'%cmd #for blank spaces in paths
         
-        print "getExecuteTrnsys cmd:%s"%cmd
+        print ("getExecuteTrnsys cmd:%s"%cmd)
         
 #        os.system(myCmd)         
         
@@ -341,7 +340,7 @@ class ExecuteTrnsys():
         #use this '"%s"' to handle blank spaces in executable name like Program Files/
         myCmd ='"%s"'%self.getExecuteTrnsys(useDeckName)            
         
-        print myCmd 
+        # print myCmd
         
         os.system(myCmd)
 
@@ -354,20 +353,20 @@ class ExecuteTrnsys():
        nameSource  = self.path + nameFile
        nameOut     = self.pathOutput + nameFile
        
-       print nameSource
-       print nameOut
+       # print nameSource
+       # print nameOut
        
        shutil.copy(nameSource,nameOut)
            
     def cleanAndCreateResultsTempFolder(self):
       
        try:
-           print "removing temp : %s " % self.tempFolderEnd
-           shutil.rmtree(self.tempFolderEnd)   
+           print ("removing temp : %s " % self.tempFolderEnd)
+           shutil.rmtree(self.tempFolderEnd)
            os.makedirs(self.tempFolderEnd)
            
        except:
-           print "creating temp : %s " % self.tempFolderEnd
+           print ("creating temp : %s " % self.tempFolderEnd)
            os.makedirs(self.tempFolderEnd)
            pass
 

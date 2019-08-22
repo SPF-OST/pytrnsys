@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import interpolation
 import string
-import TrnsysTools.utilities.utilsSpf as utils
+import PyTrnsys.utilities.utilsSpf as utils
 import math
 import os
 
@@ -242,7 +242,6 @@ class PlotGround():
 
         size = 1000
 
-        #        hour = string.atoi(hour)
         (month, day, year) = utils.getMonthIndexByHourOfYear(hour + 24)
         year = 2012 + year
         plot.set_title("%d-%d-%d" % (day, month, year), fontsize=8)

@@ -10,7 +10,7 @@ Date   : 14.12.2012
 import sys,time
 import getopt
 import numpy as num
-import TrnsysTools.processingData.loadBaseNumpy as load
+import PyTrnsys.processingData.loadBaseNumpy as load
 
 class DownSizeForPlotting():
     

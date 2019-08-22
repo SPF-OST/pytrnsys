@@ -17,7 +17,7 @@ class CreateTrnsysDeck():
         self.originalDeckName = os.path.join(self.path ,self.originalName +'.dck')
         self.variations = _variations                
         
-        print "name:%s path:%s deckName:%s\n" % (self.originalName,self.path,self.originalDeckName)
+        print ("name:%s path:%s deckName:%s\n"% (self.originalName,self.path,self.originalDeckName))
         
         split = self.originalName.split('-')
 
@@ -61,7 +61,7 @@ class CreateTrnsysDeck():
                         #If the name has 00 means 0. because the fileName will suffer from having points as names.
                         if(valuesOfVariationInFile=="00"):
                             valuesOfVariation = "0."+ valuesOfVariationInFile[2:]                                    
-                            print "Comma found valueFile=%s valueUsed=%s" % (valuesOfVariationInFile,valuesOfVariation)
+                            print ("Comma found valueFile=%s valueUsed=%s") % (valuesOfVariationInFile,valuesOfVariation)
                         else:
                             valuesOfVariation = valuesOfVariationInFile
 #                            print "Comma NOT found valueFile=%s valueUsed=%s" % (valuesOfVariationInFile,valuesOfVariation)
@@ -79,7 +79,7 @@ class CreateTrnsysDeck():
                                 os.remove(nameDeckCreated)
                                 shutil.copy(self.originalDeckName,nameDeckCreated)                            
                             else:
-                                print "File exist, I do not create a new one"                        
+                                print ("File exist, I do not create a new one")
                             pass
                         else:                     
                             shutil.copy(self.originalDeckName,nameDeckCreated)    
@@ -87,7 +87,7 @@ class CreateTrnsysDeck():
                         parameterDict = {}
                         parameterDict[nameVariationInDeck]= valuesOfVariation
         
-                        print parameterDict                                
+                        # print parameterDict
                         self.myListOfParameterDicts.append(parameterDict)
         else:
             #For this case we assume they all have the same lenght
@@ -139,7 +139,7 @@ class CreateTrnsysDeck():
                                 os.remove(nameDeckCreated)
                                 shutil.copy(self.originalDeckName,nameDeckCreated)
                             else:
-                                print "File exist, I do not create a new one"
+                                print ("File exist, I do not create a new one")
                             pass
                         else:
                             shutil.copy(self.originalDeckName,nameDeckCreated)
@@ -151,14 +151,14 @@ class CreateTrnsysDeck():
 
                             if(variationString[:2]=="00"):
                                 valuesOfVariation = "0."+ variationString[2:]
-                                print "Comma found valueFile=%s valueUsed=%s" % (variationString,valuesOfVariation)
+                                print ("Comma found valueFile=%s valueUsed=%s" % (variationString,valuesOfVariation))
                             else:
                                 valuesOfVariation = variationString
-                                print "Comma NOT found valueFile=%s valueUsed=%s" % (variationString,valuesOfVariation)
+                                print ("Comma NOT found valueFile=%s valueUsed=%s" % (variationString,valuesOfVariation))
 
                             parameterDict[nameVariationInDeck[nvar]]= valuesOfVariation
 
-                        print parameterDict
+                        # print parameterDict
                         self.myListOfParameterDicts.append(parameterDict)
 
 #            print "myListOfParameterDict"

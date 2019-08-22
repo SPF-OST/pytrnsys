@@ -8,8 +8,9 @@ ToDo :
 import PyTrnsys.processingData.processFiles as spfUtils
 import PyTrnsys.Trnsys.deckTrnsys as deck
 import os
-import Tkinter as tk
-import tkMessageBox
+# import Tkinter as tk
+import tkinter as tk
+import tkinter.messagebox as tkMessageBox
 
 """
 This class uses a list of ddck files to built a complete TRNSYS deck file

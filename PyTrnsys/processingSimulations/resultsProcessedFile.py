@@ -10,9 +10,7 @@ ToDo   :
 import os
 import shutil
 import string
-import TrnsysTools.reporting.latexReport as latex
-import numpy as num
-import bigIceTrnsysClass as ice
+import PyTrnsys.reporting.latexReport as latex
 import matplotlib.pyplot as plt
 
 class ResultsProcessedFile():
@@ -31,7 +29,7 @@ class ResultsProcessedFile():
     def get(self, name, resultList):
         for lines in resultList:
             if (lines.split("\t")[0] == name):
-                return string.atof(lines.split("\t")[1])
+                return float(lines.split("\t")[1])
 
     def readResultsData(self):
 
@@ -60,7 +58,7 @@ class ResultsProcessedFile():
                 split = lines.split("\t")
                 if(len(split)==2):
                     try:
-                        dictRes[split[0]] = string.atof(split[1][:-1])
+                        dictRes[split[0]] = float(split[1][:-1])
                     except:
                         dictRes[split[0]] = split[1][:-1]
 
@@ -69,7 +67,7 @@ class ResultsProcessedFile():
                     dictRes[split[0]] = monthVal
                 else:
                     try:
-                        dictRes[split[0]] = string.atof(split[1])
+                        dictRes[split[0]] = float(split[1])
                     except:
                         dictRes[split[0]] = split[1]
 

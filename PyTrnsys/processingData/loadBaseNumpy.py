@@ -9,7 +9,7 @@ Date   : 14.12.2012
 """
 
 import string, os
-import processFiles as spfUtils
+import PyTrnsys.processingData.processFiles as spfUtils
 import numpy as np
 import time
 import datetime
@@ -46,8 +46,8 @@ class loadBaseNumpy():
     def loadFile(self,skypChar=None,replaceChar=None,skypedLines=0,splitArgument=None,readLabels=True,verbose=True,cutBlank=False,typeVariables="float",fmt='',dateExt=''):            
                     
         if(verbose):   
-            print self.doubleLine
-            print "Reading the file: %s " % self.fileNameWithExtension
+            print ("%s"%self.doubleLine)
+            print ("Reading the file: %s " % self.fileNameWithExtension)
             
         infile=open(self.fileNameWithExtension,'r')
         lines=infile.readlines()[skypedLines:]                                      
@@ -62,16 +62,16 @@ class loadBaseNumpy():
             
             for i in range(len(lines)):
                 if(verbose):
-                    print "lines:%s size:%d"%(lines[i],len(lines[i]))
+                    print ("lines:%s size:%d"%(lines[i],len(lines[i])))
                 try:
                     if(lines[i].split("\t")[1]=="Maximum Instantaneous Values"):
                         j = i-2
                         if(verbose):
-                            print "BREAK j:%d lines:%s\n"%(j,lines[j])
+                            print ("BREAK j:%d lines:%s\n"%(j,lines[j]))
                         break;
                 except:
                     if(verbose):
-                        print "BLANK LINE:%d lines:%s\n"%(i,lines[i])
+                        print ("BLANK LINE:%d lines:%s\n"%(i,lines[i]))
                     j=i
                     break;
             
@@ -85,8 +85,8 @@ class loadBaseNumpy():
                       
         if(skypChar != None or replaceChar != None):
             if(verbose):
-                print self.doubleLine
-                print "Purgin the input file"
+                print ("%s"%self.doubleLine)
+                print ("Purgin the input file")
 
             lines = spfUtils.purgueLines(lines,skypChar,replaceChar,removeBlankLines=self.removeBlankLines)      
 
@@ -118,12 +118,12 @@ class loadBaseNumpy():
         self.namesVariables = np.arange(self.numberOfVariables,dtype=object)   
         
         if(verbose): 
-            print self.doubleLine
-            print "numberOfDataPoints:%d numberOfVariables:%d" % (self.numberOfDataPoints,self.numberOfVariables)
+            print ("%s"%self.doubleLine)
+            print ("numberOfDataPoints:%d numberOfVariables:%d" % (self.numberOfDataPoints,self.numberOfVariables))
 
         if(verbose):                  
-            print self.doubleLine
-            print "Copying Data from file to variables array"        
+            print ("%s"%self.doubleLine)
+            print ("Copying Data from file to variables array")
             
         startIndex = 0    
         if(readLabels==True):
@@ -157,7 +157,7 @@ class loadBaseNumpy():
                         
                             if(self.printWarning==True and j>=1):
 #                                print "i:%d j:%d len(lines):%d startIndex:%d"%(i,j,len(lines),startIndex)
-                                print Warning("LoadBaseNumpy loadFile Not controlled number :",splittedLine[j]," for column j: ",j+1," line: ",i)
+                                print ("LoadBaseNumpy loadFile Not controlled number :",splittedLine[j]," for column j: ",j+1," line: ",i)
                                 self.variables[j][i-startIndex] = 0.0
                       
                 k = k+1
@@ -165,8 +165,8 @@ class loadBaseNumpy():
        
         
         if(verbose): 
-            print self.doubleLine
-            print "End of copying Data"           
+            print ("%s"%self.doubleLine)
+            print ("End of copying Data")
         
         infile.close()       
 
@@ -175,9 +175,9 @@ class loadBaseNumpy():
     def loadFileAndCut(self,timeBegin,timeEnd,verbose=True,skypedLines=0,format="%Y.%m.%d %H:%M:%S.%f"):
                     
         if(verbose):   
-            print self.doubleLine
-            print "Reading the file: %s " % self.fileNameWithExtension
-            print "Use timeBegin:%f timeEnd:%f"%(timeBegin,timeEnd)
+            print ("%s"%self.doubleLine)
+            print ("Reading the file: %s " % self.fileNameWithExtension)
+            print ("Use timeBegin:%f timeEnd:%f"%(timeBegin,timeEnd))
             
         infile=open(self.fileNameWithExtension,'r')
 #        lines = infile.readlines()
@@ -190,8 +190,7 @@ class loadBaseNumpy():
         self.numberOfVariables  = len(lines[0].split())
         
         if(verbose):
-            print lines[0]
-            print "numberOfVariables:%d nData:%d"%(self.numberOfVariables,numberOfDataPoints)
+            print ("numberOfVariables:%d nData:%d"%(self.numberOfVariables,numberOfDataPoints))
 #            raise ValueError("")
             
         self.namesVariables = np.arange(self.numberOfVariables,dtype=object)   
@@ -212,7 +211,7 @@ class loadBaseNumpy():
         k=1
         for i in range(numberOfDataPoints):
             splittedLine  = lines[k].split()
-            time = string.atof(splittedLine[0])
+            time = float(splittedLine[0])
               
             if(time>=timeBegin and time<=timeEnd):
                 linesCut.append(lines[k])
@@ -220,17 +219,17 @@ class loadBaseNumpy():
                 
         self.numberOfDataPoints = len(linesCut)
         
-        print "numberOfVariables:%d numberOfDataPoints:%d"%(self.numberOfVariables,self.numberOfDataPoints)
+        print ("numberOfVariables:%d numberOfDataPoints:%d"%(self.numberOfVariables,self.numberOfDataPoints))
         #NumPy array
         self.variables = np.arange(self.numberOfVariables*self.numberOfDataPoints,dtype=float).reshape(self.numberOfVariables,self.numberOfDataPoints)
         
         if(verbose): 
-            print self.doubleLine
-            print "numberOfDataPoints:%d numberOfVariables:%d" % (self.numberOfDataPoints,self.numberOfVariables)
+            print ("%s"%self.doubleLine)
+            print ("numberOfDataPoints:%d numberOfVariables:%d" % (self.numberOfDataPoints,self.numberOfVariables))
 
         if(verbose):                  
-            print self.doubleLine
-            print "Copying Data from file to variables array"        
+            print ("%s"%self.doubleLine)
+            print ("Copying Data from file to variables array")
 
         for i in range(self.numberOfDataPoints):
             
@@ -245,19 +244,19 @@ class loadBaseNumpy():
                     
                         if(self.printWarning==True and j>=1):
 #                                print "i:%d j:%d len(lines):%d startIndex:%d"%(i,j,len(lines),startIndex)
-                            print Warning("LoadBaseNumpy loadFile Not controlled number :",splittedLine[j]," for column j: ",j+1," line: ",i)
+                            print ("LoadBaseNumpy loadFile Not controlled number :",splittedLine[j]," for column j: ",j+1," line: ",i)
                             self.variables[j][i] = 0.0
                             
         if(verbose): 
-            print self.doubleLine
-            print "End of copying Data"           
+            print ("%s"%self.doubleLine)
+            print ("End of copying Data")
                 
   #it loads a file specifiyng the desired year. TIME must be in the first column !!!!
     def loadFileYear(self,year,splitArgument=None,verbose=True):
                     
         if(verbose):   
-            print self.doubleLine
-            print "Reading the file: %s " % self.fileNameWithExtension
+            print (self.doubleLine)
+            print ("Reading the file: %s " % self.fileNameWithExtension)
             
         infile=open(self.fileNameWithExtension,'r')
         linesTitle = infile.readlines()[0]
@@ -280,7 +279,7 @@ class loadBaseNumpy():
         
         self.numberOfDataPoints = len(lines)
 
-        print "indexBegin:%d indexEnd:%d nData:%d"%(indexBegin,indexEnd,self.numberOfDataPoints)
+        print ("indexBegin:%d indexEnd:%d nData:%d"%(indexBegin,indexEnd,self.numberOfDataPoints))
                              
 #        if(skypChar != None or replaceChar != None):
 #            if(verbose):
@@ -312,22 +311,22 @@ class loadBaseNumpy():
             # I erase the last two characters
             self.namesVariables[self.numberOfVariables-1] = self.namesVariables[self.numberOfVariables-1][:-1]
                        
-        if(verbose):
-            print self.namesVariables
+        # if(verbose):
+        #     print self.namesVariables
             
        
                     
-        print "numberOfVariables:%d numberOfDataPoints:%d"%(self.numberOfVariables,self.numberOfDataPoints)
+        print ("numberOfVariables:%d numberOfDataPoints:%d"%(self.numberOfVariables,self.numberOfDataPoints))
         #NumPy array
         self.variables = np.arange(self.numberOfVariables*self.numberOfDataPoints,dtype=float).reshape(self.numberOfVariables,self.numberOfDataPoints)
         
         if(verbose): 
-            print self.doubleLine
-            print "numberOfDataPoints:%d numberOfVariables:%d" % (self.numberOfDataPoints,self.numberOfVariables)
+            print ("%s"%self.doubleLine)
+            print ("numberOfDataPoints:%d numberOfVariables:%d" % (self.numberOfDataPoints,self.numberOfVariables))
 
         if(verbose):                  
-            print self.doubleLine
-            print "Copying Data from file to variables array"        
+            print ("%s"%self.doubleLine)
+            print ("Copying Data from file to variables array")
 
 #        for i in range(indexBegin,indexEnd):
         for i in range(self.numberOfDataPoints):
@@ -343,12 +342,12 @@ class loadBaseNumpy():
                     
                         if(self.printWarning==True and j>=1):
 #                                print "i:%d j:%d len(lines):%d startIndex:%d"%(i,j,len(lines),startIndex)
-                            print Warning("LoadBaseNumpy loadFile Not controlled number :",splittedLine[j]," for column j: ",j+1," line: ",i)
+                            print ("LoadBaseNumpy loadFile Not controlled number :",splittedLine[j]," for column j: ",j+1," line: ",i)
                             self.variables[j][i] = 0.0    
         
         if(verbose): 
-            print self.doubleLine
-            print "End of copying Data"           
+            print ("%s"%self.doubleLine)
+            print ("End of copying Data")
         
 #        infile.close()       
         
@@ -377,19 +376,19 @@ class loadBaseNumpy():
              
              if(self.namesVariables[j].lower()==name.lower()):
                  if(verbose==True):
-                     print "FOUND j:%d name(input):%s nameVar(stored):%s" % (j,name,self.namesVariables[j])
+                     print ("FOUND j:%d name(input):%s nameVar(stored):%s" % (j,name,self.namesVariables[j]))
                  return self.variables[j][:]
              
          if(verbose==True):
-             print "NOT FOUND j:%d name:%s"%(j,name)         
+             print ("NOT FOUND j:%d name:%s"%(j,name))
         
          return None     
 
     def writeFile(self,name,verbose=False,printNames=True):
        
         if(verbose): 
-            print self.doubleLine
-            print "Writting output file : %s" % name
+            print ("%s"%self.doubleLine)
+            print ("Writting output file : %s" % name)
 
         # for print as the input file readed !!
         X = self.variables.T               
@@ -405,7 +404,7 @@ class loadBaseNumpy():
                     myHeader = myHeader + "%s\t"%self.namesVariables[i]
             
                 if(verbose): 
-                    print self.namesVariables[i]
+                    print (self.namesVariables[i])
                       
         footer = ""
         np.savetxt(name, X, fmt='%+.8e', delimiter=' ', newline='\n', header=myHeader, footer=footer, comments='# ')
@@ -428,11 +427,11 @@ if __name__ == '__main__':
 
     pilot.loadFile(skypChar=None,verbose=True,skypedLines=4)
     
-    print pilot.get("TPcmExp1")
+    print (pilot.get("TPcmExp1"))
 
 #    print pilot.getTranspose("TPcmExp1")
 
-    print "END OF LOADBASENUMPY"
+    print ("END OF LOADBASENUMPY")
     
     myFileOut = "%s\%s-End.dat" % (path,name.split('.')[0])
     

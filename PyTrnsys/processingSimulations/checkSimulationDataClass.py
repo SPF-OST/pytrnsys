@@ -13,10 +13,7 @@ ToDo :
 
 import os
 import shutil
-import string
-import TrnsysTools.reporting.latexReport as latex
-import numpy as num
-import bigIceTrnsysClass as ice
+import PyTrnsys.reporting.latexReport as latex
 import matplotlib.pyplot as plt
 import resultsProcessedFile as results
 

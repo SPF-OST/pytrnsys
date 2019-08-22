@@ -11,7 +11,7 @@ ToDo :   Copy config file to results folder automatically
 import PyTrnsys.processingData.loadBaseNumpy as load
 import numpy as num
 import PyTrnsys.utilities.utilsSpf as utils
-import deckTrnsys
+import PyTrnsys.Trnsys.deckTrnsys as deckTrnsys
 import string
 
 import os
@@ -65,11 +65,11 @@ class ReadTrnsysFiles():
             yearsSimulated = time[len(time)-1]/8760
             if(utils.isWhole(yearsSimulated)):
                 firstConsideredTime = time[len(time)-1] - 8760.
-                print "Number of years simulated : %d. First time considered is:%f. Last Time is :%f" % (yearsSimulated,firstConsideredTime,time[len(time)-1])
+                print ("Number of years simulated : %d. First time considered is:%f. Last Time is :%f" % (yearsSimulated,firstConsideredTime,time[len(time)-1]))
                 self.initialTime = firstConsideredTime
             else:    
                 firstConsideredTime = self.initialTime
-                print "readUserDefinedFiles. First considered Time is initialTime:%f" % firstConsideredTime
+                print ("readUserDefinedFiles. First considered Time is initialTime:%f" % firstConsideredTime)
             
         k = 0
         for i in range(len(time)):
@@ -79,7 +79,8 @@ class ReadTrnsysFiles():
                 break
         
   
-        print "time[i-1]:%f time[i]:%f k:%d" % (time[k-1],time[k],k)
+        print ("time[i-1]:%f time[i]:%f k:%d" % (time[k-1],time[k],k))
+
         if(useOnlyOneYear==True):
             
             last = 0
@@ -88,7 +89,7 @@ class ReadTrnsysFiles():
                     last=i
                     break
             
-            print "INDEX FOR ONE YEAR begin:%d last:%d"%(k,last)
+            print ("INDEX FOR ONE YEAR begin:%d last:%d"%(k,last))
             
             self.timeInHours = time[k:last]             
             myVar                  =  self.load.variables.T
@@ -138,7 +139,7 @@ class ReadTrnsysFiles():
         
         nameUserDefinedFile = os.path.join(self.path,_nameFile)
             
-        print nameUserDefinedFile
+        print (nameUserDefinedFile)
         
         infile=open(nameUserDefinedFile,'r')
 
@@ -166,7 +167,7 @@ class ReadTrnsysFiles():
                         initialTime = linesWithSign[0]
                         if(firstConsideredTime==None):
                             firstConsideredTime = initialTime
-                        print "firstConsideredTime:%f"%     firstConsideredTime
+                        print ("firstConsideredTime:%f"%firstConsideredTime)
                         
                     if(linesWithSign[0]>=firstConsideredTime): # if Time>firstConsideredTime
                         linesWithSign = [float(list_item) for list_item in linesWithSign]                            
@@ -214,7 +215,7 @@ class ReadTrnsysFiles():
                                      
                 if(len(linesWithSign)>0):   
                     
-                    time = string.atof(linesWithSign[0])                                    
+                    time = float(linesWithSign[0])
                     
                     if(k==indexTime and time==8016):
                         firstConsideredTime = 8760
@@ -223,13 +224,13 @@ class ReadTrnsysFiles():
                         var = []
                         for i in range(len(linesWithSign)):                        
                             if(linesWithSign[i] != "|"):                                
-                                var.append(string.atof(linesWithSign[i]))   
+                                var.append(float(linesWithSign[i]))
                         self.variables.append(var)
             k = k+1             
         
-        print "HOURLY DATA FROM BUILDING firstConsideredTime=%f" % firstConsideredTime
+        print ("HOURLY DATA FROM BUILDING firstConsideredTime=%f" % firstConsideredTime)
         
-        print self.name
+        print (self.name)
         
         infile.close()    
         
@@ -275,7 +276,7 @@ class ReadTrnsysFiles():
                       
     def readMonthlyFiles(self,_nameFile,firstMonth="January",myYear=-1):
         
-        print 'namefile', _nameFile
+        print ('namefile %s'% _nameFile)
         
         self.clean()
         
@@ -305,7 +306,7 @@ class ReadTrnsysFiles():
         
         m = utils.getMonthNameIndex(firstMonth)-1 
         
-        print "firstMonth=%s month:%d indexToStart:%d" % (firstMonth,m+1,self.indexToStart)
+        print ("firstMonth=%s month:%d indexToStart:%d" % (firstMonth,m+1,self.indexToStart))
 #        raise ValueError("")
         
         nMonth = 0
@@ -345,11 +346,11 @@ class ReadTrnsysFiles():
         infile.close()                 
         
         if(self.indexToStart==0):
-            print "Tag month not found in file:%s" % nameMonthlyFile
+            print ("Tag month not found in file:%s" % nameMonthlyFile)
             
         self.numberOfMonthsSimulated = nMonth
         
-        print "Number of simulated months:%d yearConsidered:%d" % (self.numberOfMonthsSimulated,myYear)
+        print ("Number of simulated months:%d yearConsidered:%d" % (self.numberOfMonthsSimulated,myYear))
         
 #        print self.variables
         
@@ -368,7 +369,7 @@ class ReadTrnsysFiles():
         self.deck.readAllTypes()
         self.TrnsysTypes = self.deck.TrnsysTypes
         self.TrnsysUnits = self.deck.TrnsysUnits
-        print "types loaded"
+        print ("types loaded")
 
     def writeTrnsysTypesUsed(self,name):
 
@@ -383,7 +384,7 @@ class ReadTrnsysFiles():
 
         nameFile = os.path.join(self.path,name)
 
-        print "Type file :%s created"%nameFile
+        print ("Type file :%s created"%nameFile)
         outfile=open(nameFile,'w')
         outfile.writelines(lines)
 

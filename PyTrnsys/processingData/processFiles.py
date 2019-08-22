@@ -59,10 +59,10 @@ def purgueLines(lines,skypChar,replaceChar,skypedLines=0,removeBlankLines=False,
 
                 if(replaceChar != None):
 
-                    for replace in replaceChar:
+                    for r in replaceChar:
     #                    print "replaceChar:%s"%replace
                         #Replacing the replceChar for nothing to convert 2,500.0 for 2500.0 for example
-                        fline = string.replace(fline,replace,"")
+                        fline = fline.replace(r,"")
                 flines.append(fline)
 
 
@@ -126,14 +126,15 @@ def purgueComments(lines,commentsChar):
             #We use this line of its not a void line        
             if fline!='\n':
                 #Replacing the , for nothing to convert 2,100.45 => 2100.45
-                flines.append(string.replace(fline,",",""))
-    
+                # flines.append(string.replace(fline,",",""))
+                flines.append(fline.replace(",",""))
+
         filename = 'C:\Temp\purgueComments.tmp'
         outfile=open(filename,'w')
         outfile.writelines(flines)
         outfile.close()
     
-        print " end of Purgue Lines"
+        print ("end of Purgue Lines")
 
         return flines
         

@@ -12,9 +12,9 @@ ToDo :
 
 import os
 import processTrnsysFiles as processTrnsys
-import TrnsysTools.processingData.loadBaseNumpy as load
-import TrnsysTools.Trnsys.LogTrnsys as LogTrnsys
-import TrnsysTools.Trnsys.deckTrnsys as deckTrnsys
+import PyTrnsys.processingData.loadBaseNumpy as load
+import PyTrnsys.Trnsys.LogTrnsys as LogTrnsys
+import PyTrnsys.Trnsys.deckTrnsys as deckTrnsys
 
 
 class checkIterationProblemsClass(processTrnsys.ProcessTrnsys):
@@ -117,13 +117,13 @@ class checkIterationProblemsClass(processTrnsys.ProcessTrnsys):
 
         nameWithPath=os.path.join(self.outputPath,name)
 
-        print "file Printed :%s"%nameWithPath
+        print ("file Printed :%s"%nameWithPath)
 
         outfile = open(nameWithPath, 'w')
         outfile.writelines(lines)
         outfile.close()
 
-        print "End of printing errors in file:%s"%nameWithPath
+        print ("End of printing errors in file:%s"%nameWithPath)
 
 
 

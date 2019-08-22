@@ -14,7 +14,7 @@ import numpy as num
 import matplotlib
 import PyTrnsys.utilities.utilsSpf as utils
 import time
-import plotGle as gle
+import PyTrnsys.plotting.plotGle as gle
 
 class PlotMatplotlib():
     """Plot TRNSYS Results with Matplotlib"""
@@ -25,6 +25,8 @@ class PlotMatplotlib():
         self.setDefaultColors()
 
     def initialize(self):
+
+        self.extensionPlot="pdf"
 
         self.sizeFigX = 10
         self.sizeFigY = 6
@@ -167,7 +169,7 @@ class PlotMatplotlib():
         namePdf = '%s.pdf'%nameFile
         nameWithPath = '%s\%s' % (self.path,namePdf)
 
-        print "plotMonthly name:%s"%nameWithPath
+        print ("plotMonthly name:%s"%nameWithPath)
         
         plt.xlim([-0.5,12.5])
         
@@ -274,10 +276,10 @@ class PlotMatplotlib():
 
         plot.set_xticklabels([monthSequence[i] for i in showMonths],fontsize=10,rotation='45')
                 
-        namePdf = '%s.pdf'%nameFile
+        namePdf = '%s.%s'%(nameFile,self.extensionPlot)
         nameWithPath = '%s\%s' % (self.path,namePdf)
 
-        print "plotMonthly name:%s"%nameWithPath
+        print ("plotMonthly name:%s"%nameWithPath)
         
         plt.xlim([-0.5,N+1.5])
         
@@ -421,10 +423,10 @@ class PlotMatplotlib():
         plot.legend(allbar,legends, bbox_to_anchor=(1.05,1),loc=2, borderaxespad=0.,fontsize=self.sizeLegend)
 
         
-        namePdf = '%s.svg'%nameFile
+        namePdf = '%s.%s'%(nameFile,self.extensionPlot)
         nameWithPath = '%s\%s' % (self.path,namePdf)
 
-        print "PlotMonthlyBalance name:%s"%nameWithPath
+        print ("PlotMonthlyBalance name:%s"%nameWithPath)
         
         if(useYear==True):
             plt.xlim([-0.5,13.5])        
@@ -607,7 +609,7 @@ class PlotMatplotlib():
         try:
             size = len(xVar)
         except:
-            xVar = num.arange(len(yVar[0]))
+            xVar = num.arange(len(yVarPos[0]))
 
         fig = plt.figure(1, figsize=(self.sizeFigX, self.sizeFigY))
 
@@ -663,7 +665,7 @@ class PlotMatplotlib():
             line = "\n";
             lines = lines + line
 
-            for j in range(len(yVar[0])):
+            for j in range(len(yVarPos[0])):
                 if (j % printEvery == 0):
                     line = "%f\t" % xVar[j];
                     lines = lines + line
@@ -720,7 +722,7 @@ class PlotMatplotlib():
             namePdf = '%s.pdf'%nameFile
             nameWithPath = '%s\%s' % (self.path,namePdf)
     
-            print "plotDynamic: Save plot name:%s"%nameWithPath
+            print ("plotDynamic: Save plot name:%s"%nameWithPath)
             
             plt.savefig(nameWithPath)
             
@@ -748,7 +750,7 @@ class PlotMatplotlib():
         cumEnerVec = []
         
         for i in range(nVar):
-            print "calcAndPrintQVersusT var:%s "%legends[i]
+            print ("calcAndPrintQVersusT var:%s "%legends[i])
             tSort,cumE = utils.calcQvsT(tFlow[i],eFlow[i])
             tSortVec.append(tSort)
             cumEnerVec.append(cumE)
@@ -779,7 +781,7 @@ class PlotMatplotlib():
                 
         myFileName = self.path + "//" + fileName + ".dat"
         
-        print "File created :%s"%myFileName
+        print ("File created :%s"%myFileName)
         
         outfile=open(myFileName,'w')    
         outfile.writelines(lines)
@@ -1029,7 +1031,7 @@ class PlotMatplotlib():
         namePdf = '%s.pdf'%nameFile
         nameWithPath = '%s\%s' % (self.path,namePdf)
 
-        print "PlotMonthlyBalance name:%s"%nameWithPath
+        print ("PlotMonthlyBalance name:%s"%nameWithPath)
         
         plt.xlim([-0.5,1.5])        
         

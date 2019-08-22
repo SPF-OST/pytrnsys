@@ -27,8 +27,7 @@ class loadBase():
         self.fileName = name[0]                                     
         self.rootPath=os.getcwd()         
         
-        print self.rootPath              
-                
+
         self.numberOfDataPoints =0
         self.numberOfVariables =0
         
@@ -52,20 +51,20 @@ class loadBase():
     def loadFile(self,skypChar,replaceChar):
                     
         if(self.verbose):            
-            print "Reading the file: %s " % self.fileNameWithExtension
+            print ("Reading the file: %s " % self.fileNameWithExtension)
             
         infile=open(self.fileNameWithExtension,'r')
         lines=infile.readlines()                              
         
         if(skypChar != None or replaceChar != None):
             if(self.verbose):
-                print "Purgin the input file"
+                print ("Purgin the input file")
             lines = spfUtils.purgueLines(lines,skypChar,replaceChar,self.skypedLines)      
             
 
         k=0                  
         if(self.verbose):                  
-            print "Copying Data from file to variables array"
+            print ("Copying Data from file to variables array")
             
        
         
@@ -84,7 +83,6 @@ class loadBase():
                     linesWithSign = [float(list_item) for list_item in linesWithSign]        
 #                    The previous line does the same as is doing the next but faster
 #                    for i in range(len(linesWithSign)):
-#                        linesWithSign[i] = string.atof(linesWithSign[i])                                                          
                     self.variables.append(linesWithSign)
                     
 #                    print linesWithSign
@@ -103,8 +101,8 @@ class loadBase():
                 self.namesVariables[self.numberOfVariables-1] = self.namesVariables[self.numberOfVariables-1][:-1]
         
         if(self.verbose): 
-            print "End of copying Data"
-            print "numberOfDataPoints:%d numberOfVariables:%d\n" % (self.numberOfDataPoints,self.numberOfVariables)
+            print ("End of copying Data")
+            print ("numberOfDataPoints:%d numberOfVariables:%d\n") % (self.numberOfDataPoints,self.numberOfVariables)
 #        print self.namesVariables
         
         infile.close()        

@@ -162,7 +162,7 @@ class PlotGle():
         if(len(legends) != (sizeIn+sizeOut)):
             lines = "!This case will not work because size of legend:%d is different from sizeIn:%d + sizeOut%d\n"%(len(legends),sizeIn,sizeOut)
             lines = lines+"!The last values on the negative side that correspond to some from the positive will not be printed automatically.\n !The rest should be correct\n"
-            print  Warning(lines)
+            print  (lines)
             
         lines = lines+self.getFigCaption()
         lines = lines+self.getCaptionGraph()
@@ -297,7 +297,7 @@ class PlotGle():
         
         cmd = "%s -vb 0 -d pdf %s\%s" % (gleExe,self.path,fileName)                      
         
-        print cmd 
+        print (cmd)
         
         os.system(cmd)   
 
@@ -344,15 +344,15 @@ class PlotGle():
                     myName = splitEquality[0].replace(" ","")
                     value  = splitEquality[1].replace(" ","")                 
                         
-                    print "myName:%s value:%s"%(myName,value)
+                    print ("myName:%s value:%s"%(myName,value))
                     
                     for key in parametersDict.iterkeys(): 
-                        print "key:%s- myName:%s-"%(key,myName)                                                        
+                        print ("key:%s- myName:%s-"%(key,myName))
                         
                         if(key==myName):  
                                                                  
                             myNewLine = "%s=%s ! value changed from original by plotGle.py\n" % (key,parametersDict[key])
-                            print "NEW LINE %s" % myNewLine  
+                            print ("NEW LINE %s" % myNewLine)
                                        
                             lines[i] = myNewLine        
                 except:

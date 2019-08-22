@@ -82,7 +82,7 @@ class PhysProp():
         
         self.concentration = conc
         if(self.nameIsSet==False):
-            print "FATAL ERROR. First setName and then concentration"
+            print ("FATAL ERROR. First setName and then concentration")
             sys.exit(0)
         
 #        'EG-20%'
@@ -91,7 +91,7 @@ class PhysProp():
 #            myName = self.name[0:3]+'%.2f%%' % self.concentration
             myName = self.name[0:3]+'-%.0f%%' % self.concentration
 
-            print "name [0:3]:%s name:%s concen:%f myName:%s"%(self.name[0:3],self.name,self.concentration,myName)
+            print ("name [0:3]:%s name:%s concen:%f myName:%s"%(self.name[0:3],self.name,self.concentration,myName))
             self.name = myName
             
         else:
@@ -106,7 +106,7 @@ class PhysProp():
         
         if(self.useConstantProperties):
             if(self.constantRhoIsSet==False):
-                print "FATAL ERROR setConstantRho must be defined if constant properties are used"
+                print ("FATAL ERROR setConstantRho must be defined if constant properties are used")
                 sys.exit(0)
             else:    
                 return self.constantRho
@@ -126,7 +126,7 @@ class PhysProp():
 
         if(self.useConstantProperties):
             if(self.constantCpIsSet==False):
-                print "FATAL ERROR setConstartCp must be defined if constant properties are used"
+                print ("FATAL ERROR setConstartCp must be defined if constant properties are used")
                 sys.exit(0)
             else:    
                 return self.constantCp
@@ -149,7 +149,7 @@ class PhysProp():
 
         if(self.useConstantProperties):
             if(self.constantMuIsSet==False):
-                print "FATAL ERROR setConstartMu must be defined if constant properties are used"
+                print ("FATAL ERROR setConstartMu must be defined if constant properties are used")
                 sys.exit(0)
             else:    
                 return self.constantMu
@@ -165,7 +165,7 @@ class PhysProp():
 
         if(self.useConstantProperties):
             if(self.constantMuIsSet==False):
-                print "FATAL ERROR setConstartMu must be defined if constant properties are used"
+                print ("FATAL ERROR setConstartMu must be defined if constant properties are used")
                 sys.exit(0)
             else:    
                 return self.constantMu
@@ -174,7 +174,7 @@ class PhysProp():
                 if(newVersion==True): return (PropsSI('L','T',T+273.15,'P',self.pressure,self.name))
                 else: return (Props('L','T',T+273.15,'P',self.pressure,self.name))
             except:
-                print "Error in Lambda T:%f"%T
+                print ("Error in Lambda T:%f"%T)
                 if(newVersion==True): return (PropsSI('L','T',T+0.1+273.15,'P',self.pressure,self.name)*1000.)
                 else: return (Props('L','T',T+0.1+273.15,'P',self.pressure,self.name)*1000.)
                 
@@ -183,7 +183,7 @@ class PhysProp():
         
         if(self.useConstantProperties):
             if(self.constantEnthalpyIsSet==False):
-                print "FATAL ERROR setConstantEnthalpy must be defined if constant properties are used"
+                print ("FATAL ERROR setConstantEnthalpy must be defined if constant properties are used")
                 sys.exit(0)
             else:    
                 return self.constantEnthalpy
@@ -203,7 +203,7 @@ class PhysProp():
         if(self.name=="H2O"):
             return ((0.8 * pow(T, 0.5348) - 1.9114) * 1e-4) 
         else:
-            print "FATAL: ERROR getBeta() is only defined for Water"
+            print ("FATAL: ERROR getBeta() is only defined for Water")
             sys.exit(0)
 
     def getSaturationProperties(self,propertie,valueAtSat):
