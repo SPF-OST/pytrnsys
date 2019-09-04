@@ -273,6 +273,8 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.qAcumRadiator   = self.readTrnsysFiles.get("QAcumRadiator",ifNotFoundEqualToZero=True)
 
         self.qBuiAcum       = self.readTrnsysFiles.get("PAcumBui_kW",ifNotFoundEqualToZero=True)
+
+        self.pElShPenalty = self.readTrnsysFiles.get("PpenSH_kW", ifNotFoundEqualToZero=True)
                 
         self.qBuiHeat = num.zeros(12)            
         self.qBuiCool = num.zeros(12)    
@@ -408,8 +410,9 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 
         self.readTrnsysFiles.readMonthlyFiles(_name,firstMonth=self.firstMonth,myYear=self.yearReadedInMonthylFile)
                     
-        self.onOffPumpCol   = self.readTrnsysFiles.get("BoCnoOn",ifNotFoundEqualToZero=True)    
-        self.onOffPumpHpDhw = self.readTrnsysFiles.get("BoAuxWWon",ifNotFoundEqualToZero=True)  
+        # self.onOffPumpCol   = self.readTrnsysFiles.get("BoCnoOn",ifNotFoundEqualToZero=True)    JS: depracated BoCnoOn
+        self.onOffPumpCol   = self.readTrnsysFiles.get("pumpColOn",ifNotFoundEqualToZero=True)    #JS: pumpColOn instead of BoCnoOn
+        self.onOffPumpHpDhw = self.readTrnsysFiles.get("BoAuxWWon",ifNotFoundEqualToZero=True)
         self.onOffPumpHpSh  = self.readTrnsysFiles.get("BoAuxSHOn",ifNotFoundEqualToZero=True)          
         self.onOffPumpSh    = self.readTrnsysFiles.get("BoPumpShOn",ifNotFoundEqualToZero=True)
 

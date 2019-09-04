@@ -432,7 +432,6 @@ class PlotMatplotlib():
             plt.xlim([-0.5,13.5])        
         else:
             plt.xlim([-0.5,len(showMonths)+1.5])
-        plt.ylim([-20,20])
         plt.savefig(nameWithPath)
         
         if(plotEmf):
