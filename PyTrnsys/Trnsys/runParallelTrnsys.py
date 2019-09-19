@@ -407,8 +407,9 @@ class RunParallelTrnsys():
     def copyConfigFile(self,configPath,configName):
 
         configFile = os.path.join(configPath,configName)
-        dstPath = os.path.join(self.inputs["pathRef"],self.inputs["addResultsFolder"],self.inputs["nameRef"],configName)
-        dstPath = os.path.join(self.inputs["pathRef"],self.inputs["addResultsFolder"],configName)
+        # dstPath = os.path.join(self.inputs["pathRef"],self.inputs["addResultsFolder"],self.inputs["nameRef"],configName)
+        # dstPath = os.path.join(self.inputs["pathRef"],self.inputs["addResultsFolder"],configName)
+        dstPath = os.path.join(configPath,self.inputs["addResultsFolder"],configName)
         shutil.copyfile(configFile, dstPath)
-        print ("print copied config file to: %s"% dstPath)
+        print("copied config file to: %s"% dstPath)
 
