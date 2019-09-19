@@ -15,7 +15,7 @@ import os
 import shutil
 import PyTrnsys.reporting.latexReport as latex
 import matplotlib.pyplot as plt
-import resultsProcessedFile as results
+import PyTrnsys.processingSimulations.resultsProcessedFile as results
 
 class checkSimulationDataClass(results.ResultsProcessedFile):
 

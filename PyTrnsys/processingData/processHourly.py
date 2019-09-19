@@ -49,7 +49,10 @@ class processHourly():
 
         self.loadFile.loadFile(skypChar="#",skypedLines=0,splitArgument="\t")  
 
-            
+
+    def get(self,name):
+        self.loadFile.get(name)
+
     def calculateMonthly(self,varHourly):
         
         return utils.calculateMonthlyValues(varHourly) 
