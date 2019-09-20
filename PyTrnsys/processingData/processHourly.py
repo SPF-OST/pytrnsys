@@ -8,7 +8,7 @@ Author : Dani Carbonell
 Date   : 17.11.2017
 """
 
-import loadBaseNumpy as load
+import PyTrnsys.processingData.loadBaseNumpy as load
 import PyTrnsys.utilities.utilsSpf as utils
 import matplotlib.pyplot as plt
 import numpy as num
@@ -42,7 +42,12 @@ class processHourly():
         self.myColorsImb = 'k'
         
         self.addLatexTables =""
-    
+
+    def setFileNameToRead(self,name):
+
+        self.name = name
+        self.fileNameRead = self.path + "\\" + self.name
+
     def loadHourly(self):  
     
         self.loadFile = load.loadBaseNumpy(self.fileNameRead)

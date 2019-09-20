@@ -17,11 +17,11 @@ import PyTrnsys.Trnsys.LogTrnsys as LogTrnsys
 import PyTrnsys.Trnsys.deckTrnsys as deckTrnsys
 
 
-class checkIterationProblemsClass(processTrnsys.ProcessTrnsys):
+class checkIterationProblemsClass(processTrnsys.ProcessTrnsysBase):
 
     def __init__(self, _path, _name):
 
-        processTrnsys.ProcessTrnsys.__init__(self, _path, _name)
+        processTrnsys.ProcessTrnsysBase.__init__(self, _path, _name)
 
     def loadStatus(self,_name):
 
