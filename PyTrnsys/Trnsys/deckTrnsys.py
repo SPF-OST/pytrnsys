@@ -824,7 +824,7 @@ class DeckTrnsys():
         elif (typeNum == 929):
             return "TeePiece (SPF)"
         elif (typeNum == 931):
-            return "Pipe (reverted option) (SPF)"
+            return "Type 931 CHECK (SPF)"
         elif (typeNum == 1792):
             return "Radiant floor (SPF)"
         elif (typeNum == 5998):
@@ -833,6 +833,10 @@ class DeckTrnsys():
             return "Collector controller"
         elif (typeNum == 935):
             return "Flow solver (SPF)"
+        elif (typeNum == 711):
+            return "2D Ground model (SPF)"
+        elif (typeNum == 979):
+            return "Low temperature Al-reactor (SPF)"
 
         else:
             return "Unknown"
