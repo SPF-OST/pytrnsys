@@ -368,10 +368,13 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.qWcpHPPlusAux = self.readTrnsysFiles.get("PelAuxTot_kW")                    
         self.qWcpHP = self.readTrnsysFiles.get("PelAuxComp_kW") 
            
-        self.pumpHPsink = self.readTrnsysFiles.get("PelPuAuxTot_kW",ifNotFoundEqualToZero=True)            
-        self.pumpHPsource = self.readTrnsysFiles.get("PelPuBri_kW")                 
+        # self.pumpHPsink = self.readTrnsysFiles.get("PelPuAuxTot_kW",ifNotFoundEqualToZero=True) # JS: update for value that is actually calculated
+        self.pumpHPsink = self.readTrnsysFiles.get("PelPuAuxSH_kW",ifNotFoundEqualToZero=True)
 
-        if(self.pumpHPsource == None):
+        # self.pumpHPsource = self.readTrnsysFiles.get("PelPuBri_kW")  # JS: update for value that is actually calculated
+        self.pumpHPsource = self.readTrnsysFiles.get("PelPuAuxBri_kW")
+
+        if(self.pumpHPsource.any() == None):
             self.pumpHPsource = self.readTrnsysFiles.get("PelPuGHX_kW",ifNotFoundEqualToZero=True)                   
        
         # if(sum(self.qAuxHeaterSh)==0.0):
