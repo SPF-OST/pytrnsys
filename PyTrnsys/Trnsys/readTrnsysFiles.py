@@ -363,6 +363,8 @@ class ReadTrnsysFiles():
         self.deck = deckTrnsys.DeckTrnsys(path,name)
 #        self.deck.setEliminateComments(True)        
         self.deck.loadDeckWithoutComments()
+        self.deckVariables = self.deck.getAllDataFromDeck()
+        return self.deckVariables
             
     def readAllTypes(self):
         
