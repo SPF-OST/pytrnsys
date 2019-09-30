@@ -37,7 +37,7 @@ class PlotGround():
 
         nameWithPath = "%s\%s" % (self.outputPath, name)
 
-        print nameWithPath
+        print(nameWithPath)
 
         infile = open(nameWithPath, 'r')
 
@@ -111,7 +111,7 @@ class PlotGround():
 
         nameGroundWithPath = "%s\%s" % (self.outputPath, self.nameWithExtension)
 
-        print nameGroundWithPath
+        print(nameGroundWithPath)
 
         infile = open(nameGroundWithPath, 'r')
 
@@ -272,7 +272,7 @@ class PlotGround():
 
         fig.clear()
 
-
+        return os.path.basename(myName)
 #        myX = "%s/%s-NODX.dat" % (self.outputPath,name.split('.')[0])
 #        num.savetxt(myX,self.xDataMesh)
 
