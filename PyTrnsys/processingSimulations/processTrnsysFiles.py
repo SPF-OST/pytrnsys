@@ -247,10 +247,16 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.readTrnsysFiles.readMonthlyFiles(_name,myYear=self.yearReadedInMonthylFile,firstMonth=self.firstMonth)
         # self.numberOfMonthsSimulated = self.readTrnsysFiles.numberOfMonthsSimulated
 
-        self.qSHDemand = self.readTrnsysFiles.get("PheatBui_kW")      
+        self.qSHDemand = self.readTrnsysFiles.get("PheatBui_kW")
+
+        self.qSC = self.readTrnsysFiles.get("PcoolBui_kW",ifNotFoundEqualToZero=True)
+
+        self.qSHSCDemand = self.readTrnsysFiles.get("PtotBui_kW",ifNotFoundEqualToZero=True)
+
         self.qRadiator = self.readTrnsysFiles.get("PRdIn_kW",ifNotFoundEqualToZero=True)
 
         self.qSH = self.qSHDemand #Changed !!
+
 
         self.qBuiGroundLosses = self.readTrnsysFiles.get("PBuiGrd_kW",ifNotFoundEqualToZero=True)
 
@@ -273,6 +279,11 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.qAcumRadiator   = self.readTrnsysFiles.get("QAcumRadiator",ifNotFoundEqualToZero=True)
 
         self.qBuiAcum       = self.readTrnsysFiles.get("PAcumBui_kW",ifNotFoundEqualToZero=True)
+
+        self.pElShPenalty = self.readTrnsysFiles.get("PpenSH_kW", ifNotFoundEqualToZero=True)
+
+        self.pElCoolPenalty = self.readTrnsysFiles.get("PpenSC_kW", ifNotFoundEqualToZero=True)
+
                 
         self.qBuiHeat = num.zeros(12)            
         self.qBuiCool = num.zeros(12)    
@@ -393,7 +404,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.pElController = num.zeros(12)
 
         for i in range(self.numberOfMonthsSimulated):                                                   
-            self.pElPenalty[i] = self.pElShPenalty[i]+self.pElDhwPenalty[i]
+            self.pElPenalty[i] = self.pElShPenalty[i]+self.pElDhwPenalty[i]+self.pElCoolPenalty[i]
 
             #In the results we get the sum of both values so:It may be the case that there is only one pump to Sh so the pumpHpsink=0
             self.pumpHPsink[i] = max(self.pumpHPsink[i] - self.pumpHPsource[i],0.0)
@@ -408,8 +419,9 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 
         self.readTrnsysFiles.readMonthlyFiles(_name,firstMonth=self.firstMonth,myYear=self.yearReadedInMonthylFile)
                     
-        self.onOffPumpCol   = self.readTrnsysFiles.get("BoCnoOn",ifNotFoundEqualToZero=True)    
-        self.onOffPumpHpDhw = self.readTrnsysFiles.get("BoAuxWWon",ifNotFoundEqualToZero=True)  
+        # self.onOffPumpCol   = self.readTrnsysFiles.get("BoCnoOn",ifNotFoundEqualToZero=True)    JS: depracated BoCnoOn
+        self.onOffPumpCol   = self.readTrnsysFiles.get("pumpColOn",ifNotFoundEqualToZero=True)    #JS: pumpColOn instead of BoCnoOn
+        self.onOffPumpHpDhw = self.readTrnsysFiles.get("BoAuxWWon",ifNotFoundEqualToZero=True)
         self.onOffPumpHpSh  = self.readTrnsysFiles.get("BoAuxSHOn",ifNotFoundEqualToZero=True)          
         self.onOffPumpSh    = self.readTrnsysFiles.get("BoPumpShOn",ifNotFoundEqualToZero=True)
 
@@ -497,7 +509,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.qDemandFound=True
 
         self.pElPenalty = self.pElShPenalty + self.pElDhwPenalty
-        self.qUse = self.qDHW + self.qSH
+        self.qUse = self.qDHW + self.qSH + self.qSC
         self.qDemand = self.qUse + self.pElShPenalty + self.pElDhwPenalty
         self.qDemandDhw = self.qDHW + self.pElDhwPenalty
         self.qDemandSh = self.qSH + self.pElShPenalty

@@ -89,6 +89,7 @@ class ProcessMonthlyDataBase():
         self.pElTotalDis = num.zeros(12)
         self.fSolar = num.zeros(12)
         self.SPFhps = num.zeros(12)
+        self.SPFhpsNoCool = num.zeros(12)
         self.SPFhpsWithDis = num.zeros(12)
         self.SPFhpsPen = num.zeros(12)
         self.SPFhpsWithDisPen = num.zeros(12)
@@ -140,6 +141,8 @@ class ProcessMonthlyDataBase():
             else:
                 self.SPFhps[i] = self.qUse[i] / self.pElTotal[i]
 
+                self.SPFhpsNoCool[i] = (self.qUse[i]-self.qSC[i] )/ self.pElTotal[i]
+
             # SPF SOLAR + HP WITH DISRTIBUTION
 
             if ((self.pElTotalDis[i] + self.qWcpHP[i]) <= 0.0):
@@ -163,6 +166,7 @@ class ProcessMonthlyDataBase():
 
         self.yearQCondHp = sum(self.qCondHP)
         self.yearQUse = sum(self.qUse)
+        self.yearQSC = sum(self.qSC)
         self.yearQWcpHp = sum(self.qWcpHP)
         self.yearPumpSourceHp = sum(self.pumpHPsource)
         self.yearPumpSinkHp = sum(self.pumpHPsink)
@@ -174,10 +178,15 @@ class ProcessMonthlyDataBase():
         self.yearSPFhp = self.yearQCondHp / (sum(self.qWcpHP) + sum(self.qAuxHeaterHp) + sum(
             self.pElVentilatorHP) + self.yearPumpSourceHp + self.yearPumpSinkHp + sum(self.pElControllerHp) + 1e-30)
         self.yearSPFhps = self.yearQUse / (sum(self.pElTotal) + 1e-30)
+
+        self.yearSPFhpsNoCool = (self.yearQUse-self.yearQSC) / (sum(self.pElTotal) + 1e-30)
         self.yearSPFhpsWithDis = self.yearQUse / (sum(self.pElTotalDis) + 1e-30)
 
         self.yearSPFhpsPen = sum(self.qDemand) / (sum(self.pElTotal) + 1e-30)
+
         self.yearSPFhpsWithDisPen = sum(self.qDemand) / (sum(self.pElTotalDis) + 1e-30)
+        self.yearSPFhpsWithDisPenNoCool = sum(self.qDemand- self.qSC) / (sum(self.pElTotalDis) + 1e-30)
+
         self.yearSPFhpsBeforeTes = (sum(self.qTesFromSolar) + sum(self.qHpToSh) + sum(self.qTesFromHp)) / (
                     sum(self.pElTotal) + 1e-30)
 
@@ -525,8 +534,20 @@ class ProcessMonthlyDataBase():
 #        var13 = self.SPFhps.copy()
 #        var13.resize(13)
 #        var13[12] = self.yearSPFhps
-            
-        self.nameSpfPdf = self.plot.plotMonthly(self.SPFhps,"$SPF_{SHP}$","SPFMonthly",yearlyFactor,useYearlyFactorAsValue=True,printData=printData)
+
+        if (self.SPFhps==self.SPFhpsNoCool).all():
+            self.nameSpfPdf = self.plot.plotMonthly(self.SPFhps,"$SPF_{SHP}$","SPFMonthly",yearlyFactor,useYearlyFactorAsValue=True,printData=printData)
+        else:
+
+            legend = ["$SPF_{SHP}$","$SPF_{SHP,NoCool}$"]
+
+            spf = num.append(self.SPFhps,self.yearSPFhps)
+
+            spfNoCool = num.append(self.SPFhpsNoCool,self.yearSPFhpsNoCool)
+
+            yearlyFactor = 1
+
+            self.nameSpfPdf = self.plot.plotMonthly2Bar(spf, spfNoCool, legend, "$SPF_{SHP}$", "SPFMonthly", yearlyFactor)
 
     def plotCOPMonthly(self,printData=False):
         

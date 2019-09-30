@@ -65,8 +65,8 @@ class PlotMatplotlib():
 
         self.myColorsImb = 'k'
 
-        self.colorGLE = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','9467bd','8c564b','e377c2','7f7f7f','bcbd22',\
-        '17becf','lightblue','slateblue','khaki','darkorange','firebrick','deepskyblue','gray50']
+        self.colorGLE = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22',\
+        '#17becf','lightblue','slateblue','khaki','darkorange','firebrick','deepskyblue','gray50']
 
         # "#1f77b4" #blue
         # "#ff7f0e" #orange
@@ -432,7 +432,6 @@ class PlotMatplotlib():
             plt.xlim([-0.5,13.5])        
         else:
             plt.xlim([-0.5,len(showMonths)+1.5])
-        plt.ylim([-20,20])
         plt.savefig(nameWithPath)
         
         if(plotEmf):
