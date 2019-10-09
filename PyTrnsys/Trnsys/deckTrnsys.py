@@ -9,6 +9,7 @@ Now Only one comment is erased, so that if we hve ! comment1 ! comment2 only the
 import os
 import string,shutil
 import PyTrnsys.processingData.processFiles as spfUtils
+import re
 
 class DeckTrnsys():
     """
@@ -628,6 +629,59 @@ class DeckTrnsys():
             return value
         else:
             raise ValueError("typeValue must be double,int or string")
+
+    def getAllDataFromDeck(self):
+        self.deckVariables = {}
+        for line in self.linesReadedNoComments:
+            if '=' in line:
+                line = line.strip('\n')
+                splitEquality = line.split('=')
+                name = splitEquality[0].replace(" ", "")
+                value = splitEquality[1].replace(" ", "")
+                try:
+                    self.deckVariables[name] = float(value)
+                except:
+                    if '[' not in line:
+                        namespace = {}
+                        parts = re.split(r'[*/+-]',re.sub(r'()','',value))
+                        for part1 in parts:
+                            namespace[part1]=self.getDataFromDeckRecursively(part1)
+                        try:
+                            finalValue = eval(value, namespace)
+                            self.deckVariables[name] = float(finalValue)
+                        except:
+                            pass
+        return self.deckVariables
+
+    def getDataFromDeckRecursively(self,part):
+        for line in self.linesReadedNoComments:
+            if '=' in line:
+                line = line.strip('\n')
+                splitEquality = line.split('=')
+                name = splitEquality[0].replace(" ", "")
+                value = splitEquality[1].replace(" ", "")
+                if name.lower()==part.lower():
+                    try:
+                        return float(value)
+                    except:
+                        if '[' not in line:
+                            namespace = {}
+                            parts = re.split(r'[*/+-]', re.sub(r'()','',value))
+                            for part1 in parts:
+                                namespace[part1] = self.getDataFromDeckRecursively(part1)
+                            try:
+                                finalValue = eval(value, namespace)
+                                dict[name] = float(finalValue)
+                                return dict[name]
+                            except:
+                                return None
+                                pass
+                        else:
+                            return None
+
+
+
+
         
     # it does not work if 
         # ______ ! dlskdkd

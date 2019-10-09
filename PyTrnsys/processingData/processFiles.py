@@ -96,7 +96,8 @@ def purgueComments(lines,commentsChar):
                 #If the character is a commented character
                 for comment in commentsChar:
                     if line[i] == comment:
-                        iComment=i
+                        if iComment==len(line):
+                            iComment=i
 #                        try:
 #                            #checks if the previous character is a " so that we have "* 
 #                            if line[i-1]=='"':
