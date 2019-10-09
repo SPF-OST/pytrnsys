@@ -549,6 +549,10 @@ class ProcessMonthlyDataBase():
 
             self.nameSpfPdf = self.plot.plotMonthly2Bar(spf, spfNoCool, legend, "$SPF_{SHP}$", "SPFMonthly", yearlyFactor)
 
+            self.nameSpfNoCoolPdf = self.plot.plotMonthly(self.SPFhps,"$SPF^{heatOnly}_{SHP}$","SPFNoCoolMonthly",self.yearSPFhps,useYearlyFactorAsValue=True,printData=printData)
+
+            self.nameSpfCoolPdf = self.plot.plotMonthly(self.SPFhpsNoCool,"$SPF^{HC}_{SHP}$","SPFCoolMonthly",self.yearSPFhpsNoCool,useYearlyFactorAsValue=True,printData=printData)
+
     def plotCOPMonthly(self,printData=False):
         
         yearlyFactor = self.yearCOP
