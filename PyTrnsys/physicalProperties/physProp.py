@@ -9,7 +9,7 @@ ToDo :
 """
 
 
-import CoolProp.CoolProp as cool
+#import CoolProp.CoolProp as cool
 
 try:
     from CoolProp.CoolProp import PropsSI
