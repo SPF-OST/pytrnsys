@@ -11,9 +11,9 @@ Date   : 20.02.2014
 import numpy as num
 import matplotlib.pyplot as plt
 import matplotlib
-import interpolation
+import pytrnsys.utils.interpolation
 import string
-import PyTrnsys.utilities.utilsSpf as utils
+import pytrnsys.utils.utilsSpf as utils
 import math
 import os
 

@@ -7,7 +7,7 @@ Date   : 2018
 ToDo   :
 """
 
-import PyTrnsys.Trnsys.readTrnsysFiles as readTrnsysFiles
+import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 import matplotlib.pyplot as plt
 import matplotlib
 import os

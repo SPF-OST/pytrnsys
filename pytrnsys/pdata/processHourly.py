@@ -8,12 +8,12 @@ Author : Dani Carbonell
 Date   : 17.11.2017
 """
 
-import PyTrnsys.processingData.loadBaseNumpy as load
-import PyTrnsys.utilities.utilsSpf as utils
+import pytrnsys.pdata.loadBaseNumpy as load
+import pytrnsys.utils.utilsSpf as utils
 import matplotlib.pyplot as plt
 import numpy as num
 import matplotlib
-import PyTrnsys.reporting.latexReport as latex
+import pytrnsys.report.latexReport as latex
 
 
 class processHourly():

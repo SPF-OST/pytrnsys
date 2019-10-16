@@ -13,9 +13,9 @@ ToDo :
 
 import os
 import shutil
-import PyTrnsys.reporting.latexReport as latex
+import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
-import PyTrnsys.processingSimulations.resultsProcessedFile as results
+import pytrnsys.psim.resultsProcessedFile as results
 
 class checkSimulationDataClass(results.ResultsProcessedFile):
 

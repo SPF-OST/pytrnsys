@@ -11,7 +11,7 @@ ToDo :
 
 
 import utilsSpf as utils
-import PyTrnsys.reporting.latexReport as latex
+import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import matplotlib
 import matplotlib as mpl

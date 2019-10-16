@@ -12,6 +12,7 @@ import numpy as num
 import getpass
 import math
 import time
+import os
 
 def filterPath(path):
     

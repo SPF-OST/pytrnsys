@@ -10,7 +10,7 @@ ToDo   : Make use of runParallel and avoid repetition.
 
 import sys, os, time
 import subprocess
-from subprocess import Popen, list2cmdline
+from subprocess import Popen #, list2cmdline
 
 
 def getNumberOfCPU():

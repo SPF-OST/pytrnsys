@@ -3,7 +3,7 @@
 # Date   : 14.12.2012
 import sys, os, time
 import subprocess
-from subprocess import Popen, list2cmdline
+from subprocess import Popen #, list2cmdline
 
 #from __future__ import print_function 
 
