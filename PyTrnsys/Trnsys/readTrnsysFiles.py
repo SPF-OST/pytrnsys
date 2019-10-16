@@ -169,7 +169,7 @@ class ReadTrnsysFiles():
                             firstConsideredTime = initialTime
                         print ("firstConsideredTime:%f"%firstConsideredTime)
                         
-                    if(linesWithSign[0]>=firstConsideredTime): # if Time>firstConsideredTime
+                    if(int(linesWithSign[0])>=firstConsideredTime): # if Time>firstConsideredTime
                         linesWithSign = [float(list_item) for list_item in linesWithSign]                            
                         self.variables.append(linesWithSign)                        
             k = k+1             
