@@ -69,7 +69,14 @@ class RunParallelTrnsys():
 
         fileNames = [name for name in os.listdir(pathRun) if os.path.isdir(pathRun + "\\" + name)]
 
-        return fileNames
+        returnNames= []
+        for n in fileNames:
+            if(n[0]=="."): #filfer folders such as ".gle" and so on
+                pass
+            else:
+                returnNames.append(n)
+
+        return returnNames
 
         # self.runFromNames(fileNames)
 
@@ -86,16 +93,16 @@ class RunParallelTrnsys():
                 cases.append(line[:-1])  # remove \n
 
         return cases
-    def runFromNames(self,fileNames):
+    def runFromNames(self,path,fileNames):
 
         tests = []
         self.cmds = []
         for i in range(len(fileNames)):
 
-            tests.append(exeTrnsys.ExecuteTrnsys(self.path, fileNames[i]))
+            tests.append(exeTrnsys.ExecuteTrnsys(path, fileNames[i]))
             tests[i].setHOMEPath(self.inputs["HOME$"])
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
-            tests[i].setAddBuildingData(self.inputs["copyBuildingData"])
+            # tests[i].setAddBuildingData(self.inputs["copyBuildingData"]) I comment it until we use again a case where we need this functionality. I guess we dont need this anymore.
             tests[i].loadDeck()
             tests[i].changeParameter(self.parameters)
             if (self.inputs["ignoreOnlinePlotter"] == True):
@@ -106,9 +113,22 @@ class RunParallelTrnsys():
 
             # tests[i].setTrnsysVersion("TRNSYS17_EXE")
 
-            self.cmds.append(tests[i].getExecuteTrnsys())
+            self.cmds.append(tests[i].getExecuteTrnsys(self.inputs))
 
         self.runParallel()
+
+    def runConfig(self):
+
+        if(self.inputs['runCase']=="runFromCases"):
+            cases = self.readCasesToRun(self.inputs['pathWithCasesToRun'],self.inputs['fileWithCasesToRun'])
+            self.runFromNames(self.inputs['pathWithCasesToRun'],cases)
+        elif(self.inputs['runCase']=="runFromFolder"):
+            cases = self.readFromFolder(self.inputs['pathFolderToRun'])
+            self.runFromNames(self.inputs['pathFolderToRun'],cases)
+        elif (self.inputs['runCase'] == "runFromConfig"):
+            runTool.buildTrnsysDeck()
+            runTool.createDecksFromVariant()
+
 
     def createDecksFromVariant(self,fitParameters={}):
 
@@ -366,21 +386,15 @@ class RunParallelTrnsys():
 
                 self.parameters[splitLine[1]] =float(splitLine[2])
 
-            # elif (splitLine[0] == "Base"):
+
+            # elif(splitLine[0] == "Relative"):
             #
-            #     self.listDdck.append(os.path.join(self.pathDdck,splitLine[1]))
+            #     self.listDdck.append(os.path.join(self.path, splitLine[1]))
             #
-            # elif (splitLine[0] == "Base2"):
+            # elif(splitLine[0] == "Absolute"):
             #
-            #     self.listDdck.append(os.path.join(self.pathDdck2,splitLine[1]))
+            #     self.listDdck.append(splitLine[1])
 
-            elif(splitLine[0] == "Relative"):
-
-                self.listDdck.append(os.path.join(self.path, splitLine[1]))
-
-            elif(splitLine[0] == "Absolute"):
-
-                self.listDdck.append(splitLine[1])
             elif(splitLine[0] == "fit"):
                 self.listFit[splitLine[1]] = [splitLine[2],splitLine[3],splitLine[4]]
             elif (splitLine[0] == "case"):

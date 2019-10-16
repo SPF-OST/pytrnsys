@@ -76,6 +76,11 @@ There are several types of variables with scape separator:
 \item \textbf{string} : with ``any string'' as possible value
 \item \textbf{deck} : with any float as possible value
 \item \textbf{STRING\$}: ddck file path. STRING\$ needs to define one path of the ddck folder. 
+\item \textbf{fit} : ask Mattia
+\item \textbf{case} : ask Mattia
+\item \textbf{fitobs} : ask Mattia
+
+
 
 \end{itemize}
 \section{Revison history}
@@ -98,17 +103,24 @@ There are several types of variables with scape separator:
  %\multicolumn{4}{c}{\small Booleans}  \\ \hline \hline
  bool & ignoreOnlinePlotter &  It comments all online plotters  \\
  bool & runCases & if set to False it created all cases but do not execute TRNSYS  \\
- bool & runFromCases & to check \\
- bool & rerunCases & to check  \\
+% bool & runFromCases & True/False. 
+ %bool & runFromFolder & True/False.  \\
+ %bool & rerunCases & to check  \\
  bool & parseFileCreated &  to check  \\
- bool & copyBuildingData &  of no use anymore?   \\
+% bool & copyBuildingData &  of no use anymore?   \\
  % \multicolumn{4}{c}{\small Integers} \\
  int & reduceCpu &  uses the value to reduce the number of CPU. \\&&Suggested 1 or 2 if you would like to work when parallel simulations are running  \\
  % \multicolumn{4}{c}{\small Strings} \\
+string & runCase & \textbf{``runFromCases''} : runs the cases defined in a file and path defined by strings pathWithCasesToRun and fileWithCasesToRun. \\
+&& \textbf{``runFromFolder''} : It executes all the cases found in a specific folder defined by string pathFolderToRun. This used to execute failed cases that were moved to a specific folder. \\
+&& \textbf{``runFromConfig''} : it builts and executes the cases as defined in the config file \\
+string & pathWithCasesToRun & `'path'' of file with cases to run. Only active if runFromCases=True \\
+string & fileWithCasesToRun & `fileName'' added to the pathWithCasesToRun defined. Only active if runFromCases=True \\
+string & pathFolderToRun & `'path'' of the folder with all cases to run. Only active if runFromFolder=True \\
  string & trnsysExePath & including the exe file, e.g. \textit{"C:/Trnsys17/Exe/TRNExe.exe"} \\
  string & addResultsFolder & False to deactivate. If defined as a ``stringPath'' it creates a folder on the main path and creates all simulations folders inside this folder path\\
   string & STRING\$ & the symbol \$ denotes a path used for find ddck files. The STRING\$ defined can be used as path to look for the ddck files.\\
- string & commonTrnsysFolder & needed ?? \\
+% string & commonTrnsysFolder & needed ?? \\
   % \multicolumn{4}{c}{\small Variation} \\
   variation & see format& It builds dck files using all variation given.  By defaul all permutations are used. Format: variation nameFolderResults nameVariableDDck listOfvalues. Example:   variation Ac AcolAp 100 200\\
   % \multicolumn{4}{c}{\small Deck} \\
