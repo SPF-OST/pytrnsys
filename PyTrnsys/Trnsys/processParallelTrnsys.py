@@ -16,9 +16,9 @@ import PyTrnsys.Trnsys.runParallel as run
 import PyTriHpTrnsys.ProcessingSimulations.solarIceTrnsysBaseClass as ice
 import PyTrnsys.utilities.utilsSpf as utils
 import PyTrnsys.Trnsys.readConfigTrnsys as readConfig
-import PyTriHpTrnsys.ProcessingSimulations.GshpTrnsysBaseClass as gshp
-import PySpfTrnsys.ProcessingSimulations.AlStoreTrnsysBaseClass as alu
-import PySpfTrnsys.ProcessingSimulations.p2GErlackerTrnsysClass as erlacker
+#import PyTriHpTrnsys.ProcessingSimulations.GshpTrnsysBaseClass as gshp
+#import PySpfTrnsys.ProcessingSimulations.AlStoreTrnsysBaseClass as alu
+#import PySpfTrnsys.ProcessingSimulations.p2GErlackerTrnsysClass as erlacker
 import warnings
 #we would need to pass the Class as inputs
 
