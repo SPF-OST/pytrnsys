@@ -9,7 +9,7 @@ Date   : 14.12.2012
 """
 
 import string, os
-import PyTrnsys.processingData.processFiles as spfUtils
+import pytrnsys.pdata.processFiles as spfUtils
 import numpy as np
 import time
 import datetime

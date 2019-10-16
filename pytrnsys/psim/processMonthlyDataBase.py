@@ -8,13 +8,13 @@ ToDo   : clean unused functions and variables
 """
 
 import string, os, time, sys
-import PyTrnsys.processingData.processFiles as spfUtils
-import PyTrnsys.utilities.utilsSpf as utils
-import PyTrnsys.reporting.latexReport as latex
+import pytrnsys.pdata.processFiles as spfUtils
+import pytrnsys.utils.utilsSpf as utils
+import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import numpy as num
 import matplotlib
-import PyTrnsys.plotting.plotMatplotlib as plot
+import pytrnsys.plot.plotMatplotlib as plot
 
 class ProcessMonthlyDataBase():
     

@@ -1,7 +1,7 @@
 
-# PyTRNSYS : the python TRNSYS Tool-kit 
+# pytrnsys : the python TRNSYS Tool-kit 
  
-The PyTRNSYS tool provides basic functionality written in python to run and process, plot and report TRNSYS simulations.
+The pytrnsys tool provides basic functionality written in python to run and process, plot and report TRNSYS simulations.
 Nevertheless, many functions can be used to process and plot other kind of data such as those extracted from monitoring systems
 or exported from other softwares like Polysun.
 
@@ -47,26 +47,19 @@ Therefore LaTeX is highly recommended. We suggest MiKTeX, but other packages can
 - Create an enviromental variable named TEXINPUTS and give a path to it 
 
 ```
-TEXINPUTS => ....\PyTrnsys\PyTrnsys\reporting\LaTexDoc
+TEXINPUTS => ....\pytrnsys\pytrnsys\reporting\latex_doc
 ```
  
 ## Activate the import of the spfPythonTool package into python environment
 
 
-- Modify the PyTrnsysPath.pth file according to your paths 
-- Copy the PyTrnsysPath.pth this file to ...\Lib\site-packages. 
+- Modify the pytrnsysPath.pth file according to your paths 
+- Copy the pytrnsysPath.pth this file to ...\Lib\site-packages. 
 
-For example copy the PyTrnsysPath.pth to: 
+For example copy the pytrnsysPath.pth to: 
 ```
 ...\Users\dcarbone\AppData\Local\Continuum\anaconda2\Lib\site-packages
 ```
 
-## Define enviromental variables (do we need this? to be done in config file)
-
-create avariable named LATEX_EXE and define the path of executable, for example
-
-``` 
-LATEX_EXE => D:\MyPrograms\MiKTeX\miktex\bin\texify.exe
-```
 
 

@@ -8,7 +8,7 @@ Now Only one comment is erased, so that if we hve ! comment1 ! comment2 only the
 
 import os
 import string,shutil
-import PyTrnsys.processingData.processFiles as spfUtils
+import pytrnsys.pdata.processFiles as spfUtils
 import re
 
 class DeckTrnsys():

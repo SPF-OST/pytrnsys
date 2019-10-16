@@ -6,14 +6,14 @@ Date   : 01-10-2018
 ToDo:   Copy config file to results folder automatically
 """
 
-import PyTrnsys.Trnsys.createTrnsysDeck as createDeck
-import PyTrnsys.Trnsys.executeTrnsys as exeTrnsys
-import PyTrnsys.Trnsys.BuildTrnsysDeck as build
+import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
+import pytrnsys.rsim.executeTrnsys as exeTrnsys
+import pytrnsys.trnsys_util.buildTrnsysDeck as build
 import numpy as num
 import os
-import PyTrnsys.processingData.processFiles as processFiles
+import pytrnsys.pdata.processFiles as processFiles
 import string
-import PyTrnsys.Trnsys.runParallel as runPar
+import pytrnsys.rsim.runParallel as runPar
 
 
 class ReadConfigTrnsys():

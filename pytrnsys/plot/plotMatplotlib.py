@@ -12,9 +12,9 @@ ToDo :
 import matplotlib.pyplot as plt
 import numpy as num
 import matplotlib
-import PyTrnsys.utilities.utilsSpf as utils
+import pytrnsys.utils.utilsSpf as utils
 import time
-import PyTrnsys.plotting.plotGle as gle
+import pytrnsys.plot.plotGle as gle
 
 class PlotMatplotlib():
     """Plot TRNSYS Results with Matplotlib"""

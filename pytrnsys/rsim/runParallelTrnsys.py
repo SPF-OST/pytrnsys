@@ -5,15 +5,15 @@ Date   : 30.09.2016
 ToDo
 """
 
-import PyTrnsys.Trnsys.createTrnsysDeck as createDeck
-import PyTrnsys.Trnsys.executeTrnsys as exeTrnsys
-import PyTrnsys.Trnsys.BuildTrnsysDeck as build
+import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
+import pytrnsys.rsim.executeTrnsys as exeTrnsys
+import pytrnsys.trnsys_util.buildTrnsysDeck as build
 import numpy as num
 import os
-import PyTrnsys.processingData.processFiles
+import pytrnsys.pdata.processFiles
 import string
-import PyTrnsys.Trnsys.runParallel as runPar
-import PyTrnsys.Trnsys.readConfigTrnsys as readConfig
+import pytrnsys.rsim.runParallel as runPar
+import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import shutil
 import sys
 import imp

@@ -5,12 +5,13 @@ Date   : 30.09.2016
 ToDo :
 """
 
-import PyTrnsys.processingData.processFiles as spfUtils
-import PyTrnsys.Trnsys.deckTrnsys as deck
+import pytrnsys.pdata.processFiles as spfUtils
+import pytrnsys.trnsys_util.deckTrnsys as deck
 import os
 # import Tkinter as tk
 import tkinter as tk
-import tkinter.messagebox as tkMessageBox
+#import Tkinter.messagebox as tkMessageBox
+from tkinter import messagebox as tkMessageBox
 
 """
 This class uses a list of ddck files to built a complete TRNSYS deck file

@@ -3,8 +3,8 @@
 
 import os
 import string,shutil
-import PyTrnsys.processingData.processFiles as spfUtils
-import PyTrnsys.utilities.utilsSpf as utils
+import pytrnsys.pdata.processFiles as spfUtils
+import pytrnsys.utils.utilsSpf as utils
 import numpy as num
 
 class LogTrnsys():

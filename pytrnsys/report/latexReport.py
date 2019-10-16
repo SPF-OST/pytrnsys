@@ -9,7 +9,7 @@ ToDo :
 """
 
 import string, os
-import PyTrnsys.utilities.utilsSpf as utils
+import pytrnsys.utils.utilsSpf as utils
 import shutil
 
 class LatexReport():
