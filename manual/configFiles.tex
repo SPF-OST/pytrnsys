@@ -1,0 +1,123 @@
+% SPF Report:
+\documentclass[english]{SPFReport}
+
+%\usepackage{spfFigures}
+\usepackage{longtable}
+\usepackage{amsfonts}
+\usepackage{color,xcolor}
+\usepackage{listings}
+\usepackage{footnote}
+\usepackage{longtable}
+\usepackage{siunitx}
+\usepackage[sfdefault,condensed]{roboto}
+\sisetup{detect-all=true,text-rm=\robotocondensed}
+
+\newcommand\Tstrut{\rule{0pt}{2.6ex}}         % = `top' strut
+\newcommand\Bstrut{\rule[-0.9ex]{0pt}{0pt}}   % = `bottom' strut
+
+\renewcommand{\thefootnote}{\thempfootnote}
+
+% Environment Variables:
+\newcommand{\ud}{\mathrm{d}}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+%\renewcommand{\thefootnote}{\fnsymbol{footnote}} 	
+
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+ 
+%\lstset{ %
+%  language=[90]Fortran,           % the language of the code
+%  basicstyle=\footnotesize\ttfamily,       % the size of the fonts that are used for the code
+%  numbers=left,                   % where to put the line-numbers
+%  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+%  stepnumber=1000,                   % the step between two line-numbers.
+%  numbersep=1pt,                  % how far the line-numbers are from the code
+%  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+%  showspaces=false,               % show spaces adding particular underscores
+%  showstringspaces=false,         % underline spaces within strings
+%  showtabs=false,                 % show tabs within strings adding particular underscores
+%  extendedchars=true,            % allow special characters
+%  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks
+%  tabsize=1,                      % sets default tabsize to 2 spaces
+%  captionpos=b,                   % sets the caption-position to bottom
+%  breaklines=true,                % sets automatic line breaking
+%  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+%  keywordstyle=\color{blue},      % keyword style
+%  commentstyle=\color{dkgreen},   % comment style
+%  stringstyle=\color{mauve},      % string literal style
+%  morekeywords={double,precision}            % if you want to add more keywords to the set
+%}
+
+\reportName{Config files }
+\reportSubName{Explanation of confing files for running and processing TRNSYS files useing PyTrnsys}
+
+\reportDate{14$^{st}$ October of 2019} % or writte the date manually 
+\author{Dr. Daniel Carbonell}
+\address{Dani.Carbonell@spf.ch}
+
+\abstract{ 
+This report explains the main funcitonalities included in the config files for the running and processing of TRNSYS results.
+}
+
+\begin{document} 
+
+
+\section{Introduction}
+
+The idea of the config files is to include general functionality without having to type python code for the user.
+Thus, this config file will grow as long as users believe some functionality is used so often that its worth to implemente it within the config file. All the functionality not included in the config file will need to be implemented as python code and thus will be a bit limited to those knowing how to program in python. 
+
+There are several types of variables with scape separator:
+\begin{itemize}
+\item \textbf{bool} :with True/False as possible value
+\item \textbf{int} : with any interger as possible value
+\item \textbf{string} : with ``any string'' as possible value
+\item \textbf{deck} : with any float as possible value
+\item \textbf{STRING\$}: ddck file path. STRING\$ needs to define one path of the ddck folder. 
+
+\end{itemize}
+\section{Revison history}
+
+
+\begin{tabular}{| l |  l | l  | p{80mm} | }\hline
+
+    \textbf{Date} & \textbf{Version} & \textbf{Author}&\textbf{Changes}  \\\hline
+\Tstrut\Bstrut     Oct 14, 2019 & v1.0 & D. Carbonell&First version released \\\hline
+  \end{tabular}
+
+\section{Config file for running TRNSYS cases}
+
+%\begin{minipage}
+
+\begin{tabular}{| p{15mm} |  p{35mm} | p{100mm}  |}
+\hline
+\textbf{Type} & \textbf{Name} & \textbf{Description} \\
+\hline
+ %\multicolumn{4}{c}{\small Booleans}  \\ \hline \hline
+ bool & ignoreOnlinePlotter &  It comments all online plotters  \\
+ bool & runCases & if set to False it created all cases but do not execute TRNSYS  \\
+ bool & runFromCases & to check \\
+ bool & rerunCases & to check  \\
+ bool & parseFileCreated &  to check  \\
+ bool & copyBuildingData &  of no use anymore?   \\
+ % \multicolumn{4}{c}{\small Integers} \\
+ int & reduceCpu &  uses the value to reduce the number of CPU. \\&&Suggested 1 or 2 if you would like to work when parallel simulations are running  \\
+ % \multicolumn{4}{c}{\small Strings} \\
+ string & trnsysExePath & including the exe file, e.g. \textit{"C:/Trnsys17/Exe/TRNExe.exe"} \\
+ string & addResultsFolder & False to deactivate. If defined as a ``stringPath'' it creates a folder on the main path and creates all simulations folders inside this folder path\\
+  string & STRING\$ & the symbol \$ denotes a path used for find ddck files. The STRING\$ defined can be used as path to look for the ddck files.\\
+ string & commonTrnsysFolder & needed ?? \\
+  % \multicolumn{4}{c}{\small Variation} \\
+  variation & see format& It builds dck files using all variation given.  By defaul all permutations are used. Format: variation nameFolderResults nameVariableDDck listOfvalues. Example:   variation Ac AcolAp 100 200\\
+  % \multicolumn{4}{c}{\small Deck} \\
+    deck & any ddck variable & It changes the value (only int or float accepted) of the variable \\
+   % \multicolumn{4}{c}{\small List of Ddck files to built the dck} \\
+   STRING\$ & fileNamePath & The file path will be added to the STRING\$ path \\   
+% \multicolumn{4}{c}{\small -- continued on next page --} \\
+\hline
+\end{tabular}
+
+
+\end{document}
