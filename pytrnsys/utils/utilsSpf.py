@@ -12,7 +12,6 @@ import numpy as num
 import getpass
 import math
 import time
-import os
 
 def filterPath(path):
     
@@ -20,18 +19,6 @@ def filterPath(path):
     pathChanged =  path.replace("\\","/")
 #    print "filterPath changed :%s"%pathChanged
     return pathChanged
-
-def replaceStringsInFilesOfDirectory(path,string,replacement,ignoreSubfolder='.git'):
-    
-    for dname, dirs, files in os.walk(path):
-        dirs[:] = [d for d in dirs if d != ignoreSubfolder]  # skip .svn dirs
-        for fname in files:
-            fpath = os.path.join(dname, fname)
-            with open(fpath) as f:
-                s = f.read()
-            s = s.replace(string, replacement)
-            with open(fpath, "w") as f:
-                f.write(s)
     
 #array numpy array becasue of resize function
 def isInteger(n):

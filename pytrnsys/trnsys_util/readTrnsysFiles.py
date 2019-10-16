@@ -8,10 +8,10 @@ ToDo :   Copy config file to results folder automatically
 """
 
 
-import pytrnsys.pdata.loadBaseNumpy as load
+import PyTrnsys.processingData.loadBaseNumpy as load
 import numpy as num
-import pytrnsys.utils.utilsSpf as utils
-import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
+import PyTrnsys.utilities.utilsSpf as utils
+import PyTrnsys.Trnsys.deckTrnsys as deckTrnsys
 import string
 
 import os
@@ -169,7 +169,7 @@ class ReadTrnsysFiles():
                             firstConsideredTime = initialTime
                         print ("firstConsideredTime:%f"%firstConsideredTime)
                         
-                    if(int(linesWithSign[0])>=firstConsideredTime): # if Time>firstConsideredTime
+                    if(float(linesWithSign[0])>=firstConsideredTime): # if Time>firstConsideredTime
                         linesWithSign = [float(list_item) for list_item in linesWithSign]                            
                         self.variables.append(linesWithSign)                        
             k = k+1             

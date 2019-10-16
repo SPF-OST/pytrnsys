@@ -10,12 +10,12 @@ ToDo : remove processDataGshp and make it generic
 """
 
 import os
-import pytrnsys.psim.debugProcess as debugProcess
+import PyTrnsys.processingSimulations.debugProcess as debugProcess
 import multiprocessing as mp
-import pytrnsys.rsim.runParallel as run
-#import pyTriHpTrnsys.ProcessingSimulations.solarIceTrnsysBaseClass as ice
-import pytrnsys.utils.utilsSpf as utils
-import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
+import PyTrnsys.Trnsys.runParallel as run
+import pyTriHpTrnsys.ProcessingSimulations.solarIceTrnsysBaseClass as ice
+import PyTrnsys.utilities.utilsSpf as utils
+import PyTrnsys.Trnsys.readConfigTrnsys as readConfig
 #import PyTriHpTrnsys.ProcessingSimulations.GshpTrnsysBaseClass as gshp
 #import PySpfTrnsys.ProcessingSimulations.AlStoreTrnsysBaseClass as alu
 #import PySpfTrnsys.ProcessingSimulations.p2GErlackerTrnsysClass as erlacker
