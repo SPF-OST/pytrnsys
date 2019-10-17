@@ -57,7 +57,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
     ''' Exec commands in parallel in multiple process 
     (as much as we have CPU)
     '''
-    maxNumberOfCPU = min(getNumberOfCPU() - reduceCpu,len(cmds))
+    maxNumberOfCPU = max(min(getNumberOfCPU() - reduceCpu,len(cmds)),1)
     newCmds = []
     
     #################### new code

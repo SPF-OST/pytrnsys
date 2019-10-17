@@ -30,7 +30,7 @@ class ExecuteTrnsys():
         # DC: I guess these shoud be deprecated with new structure and config files
         self.addGround=False #Added Ground file for ground calculations
         self.addWWProfile=False
-        self.addBuildingData=True #if ISo model set to FALSE
+        self.addBuildingData=False #if ISO model set to FALSE, for TYPE 56 we might need this
         self.addSimData=False #MB you have to activate this in your case.
         self.trnsysVersion="TRNSYS_EXE"
         self.trnsysExePath="enviromentalVariable"
@@ -197,6 +197,7 @@ class ExecuteTrnsys():
         
         if(self.addBuildingData==True):
             self.addFoldersForRunning("building")
+
         if(self.addSimData==True):      self.addFoldersForRunning("SimData")
 
 #        I use them from a common folder 

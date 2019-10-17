@@ -9,6 +9,7 @@
 \usepackage{footnote}
 \usepackage{longtable}
 \usepackage{siunitx}
+\usepackage[obeyspaces]{url}
 \usepackage[sfdefault,condensed]{roboto}
 \sisetup{detect-all=true,text-rm=\robotocondensed}
 
@@ -76,6 +77,13 @@ There are several types of variables with scape separator:
 \item \textbf{string} : with ``any string'' as possible value
 \item \textbf{deck} : with any float as possible value
 \item \textbf{STRING\$}: ddck file path. STRING\$ needs to define one path of the ddck folder. 
+\item \textbf{variation} : used to do parametric variations of chaginfg deck variables. For parallel simulations
+\item \textbf{changeDdckFile} : used to do changes on the ddck files loaded in the config, e.g. weather data
+\item \textbf{fit} : ask Mattia
+\item \textbf{case} : ask Mattia
+\item \textbf{fitobs} : ask Mattia
+
+
 
 \end{itemize}
 \section{Revison history}
@@ -89,35 +97,156 @@ There are several types of variables with scape separator:
 
 \section{Config file for running TRNSYS cases}
 
+The separator used is a blank space.
 %\begin{minipage}
 
-\begin{tabular}{| p{15mm} |  p{35mm} | p{100mm}  |}
+\begin{tabular}{| p{25mm} |  p{35mm} | p{90mm}  |}
 \hline
 \textbf{Type} & \textbf{Name} & \textbf{Description} \\
 \hline
  %\multicolumn{4}{c}{\small Booleans}  \\ \hline \hline
  bool & ignoreOnlinePlotter &  It comments all online plotters  \\
  bool & runCases & if set to False it created all cases but do not execute TRNSYS  \\
- bool & runFromCases & to check \\
- bool & rerunCases & to check  \\
+% bool & runFromCases & True/False. 
+ %bool & runFromFolder & True/False.  \\
+ %bool & rerunCases & to check  \\
  bool & parseFileCreated &  to check  \\
- bool & copyBuildingData &  of no use anymore?   \\
+ bool & combineAllCases & True : all possible combinations of the variation are used; False : variations are executed case to case, so all of them need to be of the same size\\
+% bool & copyBuildingData &  of no use anymore?   \\
  % \multicolumn{4}{c}{\small Integers} \\
  int & reduceCpu &  uses the value to reduce the number of CPU. \\&&Suggested 1 or 2 if you would like to work when parallel simulations are running  \\
  % \multicolumn{4}{c}{\small Strings} \\
+string & runType & \textbf{``runFromCases''} : runs the cases defined in a file and path defined by strings pathWithCasesToRun and fileWithCasesToRun. \\
+&& \textbf{``runFromFolder''} : It executes all the cases found in a specific folder defined by string pathFolderToRun. This used to execute failed cases that were moved to a specific folder. \\
+&& \textbf{``runFromConfig''} : it builts and executes the cases as defined in the config file \\
+string & pathWithCasesToRun & `'path'' of file with cases to run. Only active if runFromCases=True \\
+string & fileWithCasesToRun & `fileName'' added to the pathWithCasesToRun defined. Only active if runFromCases=True \\
+string & pathFolderToRun & `'path'' of the folder with all cases to run. Only active if runFromFolder=True \\
  string & trnsysExePath & including the exe file, e.g. \textit{"C:/Trnsys17/Exe/TRNExe.exe"} \\
  string & addResultsFolder & False to deactivate. If defined as a ``stringPath'' it creates a folder on the main path and creates all simulations folders inside this folder path\\
   string & STRING\$ & the symbol \$ denotes a path used for find ddck files. The STRING\$ defined can be used as path to look for the ddck files.\\
- string & commonTrnsysFolder & needed ?? \\
+ string & scaling & False or "toDemand" or ``toNormalDemand'' (custom for TRI-HP) \\
+string &pathRef & path to look for th reference case if scaling !=False (custom for TRI-HP)  \\
+string &nameRef & file to look for th reference case if scaling !=False  (custom for TRI-HP) \\
+
+% string & commonTrnsysFolder & needed ?? \\
   % \multicolumn{4}{c}{\small Variation} \\
-  variation & see format& It builds dck files using all variation given.  By defaul all permutations are used. Format: variation nameFolderResults nameVariableDDck listOfvalues. Example:   variation Ac AcolAp 100 200\\
+  variation & list & It builds dck files using all variation given.  By defaul all permutations are used. Format: variation nameFolderResults nameVariableDDck listOfvalues.\\
   % \multicolumn{4}{c}{\small Deck} \\
-    deck & any ddck variable & It changes the value (only int or float accepted) of the variable \\
+    deck & any ddck variable & It changes the value (int/float) of the variable \\
+    
+changeDDckFile & list of names &  nameToChange changedName1 changedName2 etc \\
+addDDckFolder & liost of names &  folderForChangeName1 folderForChangeName2 \\
+
    % \multicolumn{4}{c}{\small List of Ddck files to built the dck} \\
-   STRING\$ & fileNamePath & The file path will be added to the STRING\$ path \\   
+   STRING\$ & ddckNamePath & The ddck file path will be added to the STRING\$ path \\   
 % \multicolumn{4}{c}{\small -- continued on next page --} \\
 \hline
 \end{tabular}
+
+
+\section{Example}
+\# used to filter lines and comments \\
+\textcolor{blue}{bool} ignoreOnlinePlotter  True  \\
+\textcolor{blue}{int} reduceCpu  1  \\
+\textcolor{blue}{bool} parseFileCreated True  \\
+\textcolor{blue}{bool} runCases False  \\
+
+\textcolor{blue}{string} trnsysExePath \path{"C:\Trnsys17\Exe\TRNExe.exe"} \\
+\textcolor{blue}{string} addResultsFolder "DebugHydCool"  \\
+
+\path{######################} \\
+\# DDeck paths definition \\
+\path{######################} \\
+\textcolor{blue}{string} HOME\$ \path{"C:\Daten\spfPackages\GIT\TriHpTrnsysDDeck"} \\
+\textcolor{blue}{string} SPF\$  \path{"C:\Daten\spfPackages\GIT\spfTrnsysFiles"} \\
+
+
+\textcolor{blue}{string} scaling False \#"toDemand" \\
+\textcolor{blue}{string} pathRef  \path{"C:\Daten\OngoingProject\\BigIce\Simulations\BICE-HydD_circ-8Cities-Ref"} \\
+\textcolor{blue}{string} nameRef  \path{"BICE-HydD_circ-Ac136.4-Vice27.3-MFH"} \\
+
+\path{######################} \\
+\# Type of Running \\
+\path{######################} \\
+\textcolor{blue}{string} runType "runFromConfig" \#"runFromCases","runFromFolder" \\
+\path{############} if runType = "runFromCases" \\
+\textcolor{blue}{string} fileWithCasesToRun "TestCases.txt" \\
+\textcolor{blue}{string} pathWithCasesToRun \path{"C:\\Daten\\OngoingProject\\BigIce\\Simulations\\Cooling\\TestCooling"} \\
+\path{############} if runType = "runFromPath" \\
+\textcolor{blue}{string} pathFolderToRun \path{"C:\\Daten\\OngoingProject\\BigIce\\Simulations\\GSHPCity-failed"} \\
+\path{############} if runType = "runFromConfig" \\
+
+\path{########} VARIATIONS \\
+
+\textcolor{blue}{bool} combineAllCases True \# True for all combinations, False for one to one simulation ALL variation MUST have same lengh \\
+\textcolor{blue}{variation} Ac AcollAp 1.5      \\
+\textcolor{blue}{variation} Vice VIceS 0.3      \\
+
+\path{######################} \\
+\#FIXED NAMES CHANGED IN DECKS. \\
+\path{######################} \\
+\textcolor{blue}{deck} START 4344   \# START  is a variable that exist in one of the ddck files. \\
+\textcolor{blue}{deck} STOP2 13104   \\
+\textcolor{blue}{deck} maxIceFrac 0.8   \\ 
+\textcolor{blue}{deck} ratioIceBegin 0   \\
+\textcolor{blue}{deck} yBetweenHx 0.1   \\
+\textcolor{blue}{deck} TiceIni 25   \\
+
+\path{######################} \\
+\#CHANGE DDCK FILES \\
+\path{######################} \\
+
+\#\textcolor{blue}{changeDDckFile} nameToChange changedName1 changedName2 etc... \\
+\textcolor{blue}{changeDDckFile} \path{CityKLO_dryN  CityDAV_dryN CityGVE_dryN} \\
+\# we can use all path from the end if desired e.g. \path{SIA\Normal\CityKLO_dryN}\\
+\#\textcolor{blue}{addDDckFolder} folderForChangeName1 folderForChangeName2 etc... \\
+\textcolor{blue}{addDDckFolder} City1 City2 \# It will move results of changedName1 to City1 and changedName2 to City2 \\
+
+\path{######################} \\
+\#NAMES OF DDCK \\
+\path{######################} \\
+\path{HOME$ Generic\Head} \\
+\path{HOME$  Control\Control-Cooling-888} \\
+\path{HOME$  Control\Control-Cooling-863} \\
+\path{HOME$  Control\Control-863_Printer} \\
+
+\path{HOME$  DemandsDHW\DHW-MFH} \\
+\path{HOME$  DemandsDHW\DHW-MFH_Printer} \\
+
+\path{HOME$  weatherData\WeatherData} \\
+\path{HOME$  weatherData\WeatherData_Printer} \\
+\path{HOME$  weatherData\SIA\Normal\CityKLO_dryN} \\
+
+\path{HOME$ Building\Bui-ISO-MFH2019-RadFloor-Cooling} \\
+\path{HOME$ Building\Bui-ISO-MFH2019-RadFloor-Cooling_Printer} \\
+
+\path{HOME$ IceStore\FP-Hx-IceStorage} \\
+\path{HOME$ IceStore\IceStore-Cooling-861Generic} \\
+\path{HOME$ IceStore\IceStore-861Generic_Printer} \\
+\path{HOME$ IceStore\CellarIceCoupled} \\
+
+\path{HOME$ SolarCollector\SolarCollector} \\
+\path{HOME$ SolarCollector\SolarCollector_Printer} \\
+\path{HOME$ SolarCollector\uncoveredNonSelectiveESSA} \\
+
+\path{HOME$ HeatPump\HeatPumpBase} \\
+\path{HOME$  HeatPump\BrineToWater\Cadena\ProDomo13-R410A\ProDomo13-R410A} \\
+\path{HOME$  HeatPump\PrinterHP-SolarIce} \\
+
+\path{HOME$  Tes\Tes-HxSolar-CircDirect} \\
+\path{HOME$  Tes\TesPrinter-SolarIce} \\
+
+\path{HOME$  HX\Const_Eff_HX} \\
+\path{HOME$  Hydraulics\HydD_circOk} \\
+\path{#HOME$ Hydraulics\pumps} \\
+
+\path{HOME$  Printers\coolingPrinter} \\
+\path{HOME$  Printers\MonthlyPrinter} \\
+\path{HOME$  Printers\PrinterQvsT-SolarIce} \\
+\path{HOME$  Printers\debugPrinter} \\
+
+\path{HOME$  Generic\End} \\
 
 
 \end{document}
