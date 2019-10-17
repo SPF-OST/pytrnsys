@@ -415,7 +415,7 @@ class LatexReport():
         line = "\\end{tiny}\n";
         self.lines = self.lines + line
 
-    def addTableMonthly(self,var,names,_units,caption,label,begin=0,nMonth=11,addLines=False,sizeBox=None):
+    def addTableMonthly(self,var,names,_units,caption,label,begin=0,nMonth=12,addLines=False,sizeBox=None):
                     
         if(len(names) != len(_units)): 
             units= []

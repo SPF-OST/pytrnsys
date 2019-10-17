@@ -13,7 +13,7 @@ import os
 import pytrnsys.psim.debugProcess as debugProcess
 import multiprocessing as mp
 import pytrnsys.rsim.runParallel as run
-#import pyTriHpTrnsys.ProcessingSimulations.solarIceTrnsysBaseClass as ice
+import pytrnsys_trihp.psim.solarIceTrnsysBaseClass as ice
 import pytrnsys.utils.utilsSpf as utils
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 #import PyTriHpTrnsys.ProcessingSimulations.GshpTrnsysBaseClass as gshp
