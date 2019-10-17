@@ -36,7 +36,7 @@ class CreateTrnsysDeck():
         # if we have changed something from the original we will no see the changes if this is set to False.
         # I will erase this if no utility after a while.
 
-    def generateDecks(self):
+    def generateDecksDeprecated(self):
         """
         This function will generate as many deck cases as the number of variations defined in the confg file.
         The deck are stored in self.path using the variations and the base name to create the individual names
@@ -168,7 +168,86 @@ class CreateTrnsysDeck():
 #        print self.deckOutputs
         
         return  self.deckOutputs
-               
+
+    def generateDecks(self):
+        """
+        This function will generate as many deck cases as the number of variations defined in the confg file.
+        The deck are stored in self.path using the variations and the base name to create the individual names
+        :return:
+        """
+
+        self.myListOfParameterDicts = []
+
+        # For this case we assume they all have the same lenght
+
+        nameLabelOfVariation = []
+        nameVariationInDeck = []
+
+        for nvar in range(len(self.variations)):
+            nameLabelOfVariation.append(self.variations[nvar][0])
+            nameVariationInDeck.append(self.variations[nvar][1])
+
+        # all tags must have the same number of values
+
+        if (len(self.variations) > 0):
+            for j in range(2, len(self.variations[0])):
+
+                variationsLine = ""
+                for nvar in range(len(self.variations)):
+
+                    valuesOfVariationInFile = self.variations[nvar][j]
+
+                    # If I write variation = ["","","GFX",...] then I add the name to the deck but no variation is used
+                    if (len(self.variations[nvar][0]) == 0 and len(self.variations[nvar][1]) == 0):
+                        variationsLine = variationsLine + "-%s" % (valuesOfVariationInFile)
+
+                    # If I write variation = ["","useCovered",0,1] then no value is printed
+                    elif (len(self.variations[nvar][0]) > 0):
+                        variationsLine = variationsLine + "-%s%s" % (
+                        self.variations[nvar][0], valuesOfVariationInFile)
+
+                nameDeck = "%s%s" % (self.case, variationsLine)
+
+                #DC deprecated
+                # try:
+                #     nameDeck = "%s-%s%s-%s-%s" % (
+                #     self.case, self.system, variationsLine, self.building, self.city)
+                # except:
+                #     nameDeck = "%s%s" % (self.case, variationsLine)
+
+
+                self.deckOutputs.append(nameDeck)
+                nameDeckCreated = "%s\%s.dck" % (self.path, nameDeck)
+
+                if (os.path.isfile(nameDeckCreated)):
+                    if (self.createNewOne):
+                        os.remove(nameDeckCreated)
+                        shutil.copy(self.originalDeckName, nameDeckCreated)
+                    else:
+                        print ("File exist, I do not create a new one")
+                    pass
+                else:
+                    shutil.copy(self.originalDeckName, nameDeckCreated)
+
+                parameterDict = {}
+
+                for nvar in range(len(self.variations)):
+                    variationString = "%s" % self.variations[nvar][j]
+
+                    if (variationString[:2] == "00"):
+                        valuesOfVariation = "0." + variationString[2:]
+                        print ("Comma found valueFile=%s valueUsed=%s" % (variationString, valuesOfVariation))
+                    else:
+                        valuesOfVariation = variationString
+                        print ("Comma NOT found valueFile=%s valueUsed=%s" % (
+                        variationString, valuesOfVariation))
+
+                    parameterDict[nameVariationInDeck[nvar]] = valuesOfVariation
+
+                self.myListOfParameterDicts.append(parameterDict)
+
+        return self.deckOutputs
+
     def getParameters(self,i):
            
         return self.myListOfParameterDicts[i]

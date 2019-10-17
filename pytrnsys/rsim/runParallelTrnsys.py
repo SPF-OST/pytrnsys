@@ -119,16 +119,41 @@ class RunParallelTrnsys():
 
     def runConfig(self):
 
-        if(self.inputs['runCase']=="runFromCases"):
+
+        if(self.inputs['runType']=="runFromCases"):
             cases = self.readCasesToRun(self.inputs['pathWithCasesToRun'],self.inputs['fileWithCasesToRun'])
             self.runFromNames(self.inputs['pathWithCasesToRun'],cases)
-        elif(self.inputs['runCase']=="runFromFolder"):
+        elif(self.inputs['runType']=="runFromFolder"):
             cases = self.readFromFolder(self.inputs['pathFolderToRun'])
             self.runFromNames(self.inputs['pathFolderToRun'],cases)
-        elif (self.inputs['runCase'] == "runFromConfig"):
-            runTool.buildTrnsysDeck()
-            runTool.createDecksFromVariant()
+        elif (self.inputs['runType'] == "runFromConfig"):
+            if (self.changeDDckFilesUsed == True):
+                #It actually loops around the changed files and then execute the parameters variations for each
+                #so the definitons of two weathers will run all variations in two cities
 
+                for i in range(len(self.sourceFilesToChange)):
+                    sourceFile = self.sourceFilesToChange[i]
+                    for j in range(len(self.sinkFilesToChange[i])):
+                        sinkFile = self.sinkFilesToChange[i][j]
+                        self.changeDDckFile(sourceFile,sinkFile)
+                        sourceFile=sinkFile #for each case the listddck will be changed to the new one, so we need to compare with the updated string
+
+                        if (self.foldersForDDckVariationUsed == True):
+                            addFolder = self.foldersForDDckVariation[j]
+                            originalPath = self.path
+                            self.path = os.path.join(self.path, addFolder)
+                            if not os.path.isdir(self.path):
+                                os.mkdir(self.path)
+
+                        self.buildTrnsysDeck()
+                        self.createDecksFromVariant()
+
+                        if (self.foldersForDDckVariationUsed == True):
+                            self.path=originalPath #recall the original path, otherwise the next folder will be cerated inside the first
+
+            else:
+                self.buildTrnsysDeck()
+                self.createDecksFromVariant()
 
     def createDecksFromVariant(self,fitParameters={}):
 
@@ -161,6 +186,7 @@ class RunParallelTrnsys():
         for i in range(len(fileName)):
 
             print ("name to run :%s" % fileName[i])
+
             #        if useLocationStructure:
             #            variablePath = os.path.join(path,location) #assign subfolder for path
 
@@ -206,7 +232,8 @@ class RunParallelTrnsys():
             tests[i].cleanAndCreateResultsTempFolder()
             tests[i].moveFileFromSource()
 
-            cmds.append(tests[i].getExecuteTrnsys(self.inputs))
+            if(self.inputs['runCases']==True):
+                cmds.append(tests[i].getExecuteTrnsys(self.inputs))
 
         self.cmds = cmds
 
@@ -248,15 +275,10 @@ class RunParallelTrnsys():
         return deck.nameDeck
 
     def addParametricVariations(self,variations):
-
-        # nVariables = len(variations)
-        # for n in range(nVariables):
-        #     names = []
-        #     names.append(variations[n][0]) #namesPrinted
-        #     names.append(variations[n][1]) #nameDeck
-        #
-        #     self.variationsOutput.append(names)
-
+        """
+            it fills a variableOutput with a list of all variations to run
+            format <class 'list'>: [['Ac', 'AcollAp', 1.5, 2.0, 1.5, 2.0], ['Vice', 'VIceS', 0.3, 0.3, 0.4, 0.4]]
+        """
 
         if(self.inputs["combineAllCases"]==True):
 
@@ -271,21 +293,14 @@ class RunParallelTrnsys():
             self.variablesOutput = result.tolist()
 
         else:
-            raise ValueError("Not implemented yet")
+            nVariations = len(variations)
+            sizeOneVariation = len(variations[0])-2
+            for n in range(len(variations)):
+                sizeCase = len(variations[n])-2
+                if(sizeCase != sizeOneVariation):
+                    raise ValueError("for combineAllCases=False all variations must have same lenght :%d case n:%d has a lenght of :%d"%(sizeOneVariation,n+1,sizeCase))
 
-            # for n in range(nVariables):
-            #     size = 0
-            #     for k in range(nVariables):
-            #         if(n!=k):
-            #             size = size+len(variations[k])-2 #two positions are for names
-            #     for m in range(size):
-            #         for i in range(2,len(variations[n]),1):
-            #             variationsOutput[n].append(variations[n][i])
-
-            # for n in range(nVariables):
-            #     for i in range(2, len(variations[n]), 1):
-            #         for k in range(nVariables):
-            #             self.variationsOutput[n].append(variations[n][i])
+            self.variablesOutput = variations
 
     def runParallel(self,writeLogFile=True):
         if writeLogFile:
@@ -326,6 +341,10 @@ class RunParallelTrnsys():
 
     def readConfig(self,path,name,parseFileCreated=False):
 
+        """
+            It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
+            It also loads the readed lines into self.lines
+        """
         tool = readConfig.ReadConfigTrnsys()
 
         self.lines = tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated,controlDataType=False)
@@ -340,11 +359,37 @@ class RunParallelTrnsys():
 
     def changeFile(self,source,end):
 
+        """
+            It uses the self-lines readed by readConfig and change the lines from source to end.
+            This is used to change a ddck file readed for another. A typical example is the weather data file
+        """
         found=False
         for i in range(len(self.lines)):
-            # self.lines[i].replace(source,end)
-            if(self.lines[i]==source):
+            lineFilter = self.lines[i]
+
+            if(lineFilter==source):
                 self.lines[i] = end
+                found=True
+
+        if(found==False):
+            # print Warning("change File was not able to change %s by %s"%(source,end))
+            warnings.warn("change File was not able to change %s by %s"%(source,end))
+
+    def changeDDckFile(self,source,end):
+
+        """
+            It uses the  self.listDdck readed by readConfig and change the lines from source to end.
+            This is used to change a ddck file readed for another. A typical example is the weather data file
+        """
+        found=False
+        nCharacters=len(source)
+
+        for i in range(len(self.listDdck)):
+            # self.lines[i].replace(source,end)
+            mySource = self.listDdck[i][-nCharacters:] # I read only the last characters with the same size as the end file
+            if(mySource==source):
+                newDDck = self.listDdck[i][0:-nCharacters]+end
+                self.listDdck[i]=newDDck
                 found=True
 
         if(found==False):
@@ -366,6 +411,10 @@ class RunParallelTrnsys():
         self.listFitObs = []
         self.listDdckPaths = set() #Set()
         self.caseDict = {}
+        self.sourceFilesToChange = []
+        self.sinkFilesToChange = []
+        self.foldersForDDckVariation = []
+
         for line in self.lines:
 
             splitLine = line.split()
@@ -386,7 +435,24 @@ class RunParallelTrnsys():
 
                 self.parameters[splitLine[1]] =float(splitLine[2])
 
+            elif (splitLine[0] == "changeDDckFile"):
+                self.sourceFilesToChange.append(splitLine[1])
+                sinkFilesToChange = []
+                for i in range(len(splitLine)):
+                    if (i<2):
+                        pass
+                    else:
+                        sinkFilesToChange.append(splitLine[i])
+                self.sinkFilesToChange.append(sinkFilesToChange)
 
+            elif(splitLine[0] == "addDDckFolder"):
+                for i in range(len(splitLine)):
+                    if(i>0):
+                        self.foldersForDDckVariation.append(splitLine[i])
+
+
+
+            # elif (splitLine[0] == "")
             # elif(splitLine[0] == "Relative"):
             #
             #     self.listDdck.append(os.path.join(self.path, splitLine[1]))
@@ -416,7 +482,15 @@ class RunParallelTrnsys():
         else:
             self.variationsUsed=False
 
+        if(len(self.sourceFilesToChange)>0):
+            self.changeDDckFilesUsed=True
+        else:
+            self.changeDDckFilesUsed=False
 
+        if(len(self.foldersForDDckVariation)>0):
+            self.foldersForDDckVariationUsed = True
+        else:
+            self.foldersForDDckVariationUsed = False
 
     def copyConfigFile(self,configPath,configName):
 
