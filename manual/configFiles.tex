@@ -75,7 +75,7 @@ There are several types of variables with scape separator:
 \item \textbf{bool} :with True/False as possible value
 \item \textbf{int} : with any interger as possible value
 \item \textbf{string} : with ``any string'' as possible value
-\item \textbf{deck} : with any float as possible value
+\item \textbf{deck} : with any float/int as possible value. If a string is needed then the format deck name string anystring should be used
 \item \textbf{STRING\$}: ddck file path. STRING\$ needs to define one path of the ddck folder. 
 \item \textbf{variation} : used to do parametric variations of chaginfg deck variables. For parallel simulations
 \item \textbf{changeDdckFile} : used to do changes on the ddck files loaded in the config, e.g. weather data
@@ -133,7 +133,7 @@ string &nameRef & file to look for th reference case if scaling !=False  (custom
   % \multicolumn{4}{c}{\small Variation} \\
   variation & list & It builds dck files using all variation given.  By defaul all permutations are used. Format: variation nameFolderResults nameVariableDDck listOfvalues.\\
   % \multicolumn{4}{c}{\small Deck} \\
-    deck & any ddck variable & It changes the value (int/float) of the variable \\
+    deck & any ddck variable & It changes the value (int/float) of the variable. Format deck name value(int/float) or deck name string anystring (used for equations) \\
     
 changeDDckFile & list of names &  nameToChange changedName1 changedName2 etc \\
 addDDckFolder & liost of names &  folderForChangeName1 folderForChangeName2 \\
@@ -190,7 +190,7 @@ addDDckFolder & liost of names &  folderForChangeName1 folderForChangeName2 \\
 \textcolor{blue}{deck} STOP2 13104   \\
 \textcolor{blue}{deck} maxIceFrac 0.8   \\ 
 \textcolor{blue}{deck} ratioIceBegin 0   \\
-\textcolor{blue}{deck} yBetweenHx 0.1   \\
+\textcolor{blue}{deck} yBetweenHx string 0.05+0.05 \#used to add equations   \\
 \textcolor{blue}{deck} TiceIni 25   \\
 
 \path{######################} \\
