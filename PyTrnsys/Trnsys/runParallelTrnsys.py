@@ -14,6 +14,7 @@ import PyTrnsys.processingData.processFiles
 import string
 import PyTrnsys.Trnsys.runParallel as runPar
 import PyTrnsys.Trnsys.readConfigTrnsys as readConfig
+import PyTrnsys.Trnsys.readTrnsysFiles as readTrnsysFiles
 import shutil
 import sys
 import imp
@@ -188,6 +189,14 @@ class RunParallelTrnsys():
 
             cmds.append(tests[i].getExecuteTrnsys(self.inputs))
 
+            self.readTrnsysFiles = readTrnsysFiles.ReadTrnsysFiles(tests[i].tempFolderEnd)
+            self.readTrnsysFiles.readDeck(tests[i].filesOutputPath,tests[i].fileName)
+            self.readTrnsysFiles.readAllTypes()
+
+            self.readTrnsysFiles.writeTrnsysTypesUsed("Types.info")
+
+
+
         self.cmds = cmds
 
     #def checkTempFolderForFinishedSimulation(self,basePath):
@@ -224,7 +233,7 @@ class RunParallelTrnsys():
         deck.writeDeck(addedLines=deckExplanation)
         self.overwriteForcedByUser=deck.overwriteForcedByUser
         deck.checkTrnsysDeck()
-
+        
         return deck.nameDeck
 
     def addParametricVariations(self,variations):
@@ -413,3 +422,23 @@ class RunParallelTrnsys():
         shutil.copyfile(configFile, dstPath)
         print("copied config file to: %s"% dstPath)
 
+    def getCityFromConfig(self):
+
+        for line in self.lines:
+            if "City" in line:
+                cityLine = line
+                break
+            else:
+                pass
+        self.weatherFile = cityLine.split("City")[1]
+        self.city = self.weatherFile.split("_")[0]
+
+    def getHydFromConfig(self):
+
+        for line in self.lines:
+            if "Hydraulics\\" in line:
+                hydLine = line
+                break
+            else:
+                pass
+        self.hyd = hydLine.split("Hydraulics\\")[1]
