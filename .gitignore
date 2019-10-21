@@ -2,4 +2,6 @@
 /build/
 docs/build/
 /.idea/
+*gz
 *.orig
+
