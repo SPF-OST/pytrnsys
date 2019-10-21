@@ -14,7 +14,7 @@ import pytrnsys.pdata.processFiles
 import string
 import pytrnsys.rsim.runParallel as runPar
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
-import PyTrnsys.Trnsys.readTrnsysFiles as readTrnsysFiles
+import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 import shutil
 import sys
 import imp
