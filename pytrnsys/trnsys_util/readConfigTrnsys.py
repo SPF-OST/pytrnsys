@@ -54,7 +54,18 @@ class ReadConfigTrnsys():
                 inputs[splitLine[1]] = int(splitLine[2])
             elif (splitLine[0] == "string"):
                 if(len(splitLine)!=3):
-                    raise ValueError("Error in string : %s"%lines[i])
+                    splitString = ""
+                    for i in range(len(splitLine) - 2):
+                        if i == 0:
+                            splitString += splitLine[i + 2][1:]
+                            splitString += " "
+                        elif i == len(splitLine) - 3:
+                            splitString += splitLine[i + 2][:-1]
+                        else:
+                            splitString += splitLine[i + 2]
+                            splitString += " "
+                    inputs[splitLine[1]] = splitString
+                    # raise ValueError("Error in string : %s"%lines[i])
                 else:
                     inputs[splitLine[1]] = splitLine[2][1:-1] #I delete the "
             elif (splitLine[0] == "stringArray"):

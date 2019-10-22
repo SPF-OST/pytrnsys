@@ -216,13 +216,13 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.readTrnsysFiles.readMonthlyFiles(_name,firstMonth=self.firstMonth,myYear=self.yearReadedInMonthylFile)
         self.numberOfMonthsSimulated = self.readTrnsysFiles.numberOfMonthsSimulated              
                       
-        self.qTesFromSolar = abs(self.readTrnsysFiles.get("PSC_kW"))     
-        self.qOutFromTesToSH = abs(self.readTrnsysFiles.get("PSB_kW"))
-        self.qOutFromTesToDHW = abs(self.readTrnsysFiles.get("PSD_kW"))
-        self.qLossTes = self.readTrnsysFiles.get("PSt_loss_kW")                              
+        self.qTesFromSolar = abs(self.readTrnsysFiles.get("PSC_kW",ifNotFoundEqualToZero=True))
+        self.qOutFromTesToSH = abs(self.readTrnsysFiles.get("PSB_kW",ifNotFoundEqualToZero=True))
+        self.qOutFromTesToDHW = abs(self.readTrnsysFiles.get("PSD_kW",ifNotFoundEqualToZero=True))
+        self.qLossTes = self.readTrnsysFiles.get("PSt_loss_kW",ifNotFoundEqualToZero=True)
                   
-        self.qTesDhwFromHp  = self.readTrnsysFiles.get("PSA1_kW")        
-        self.qTesShFromHp  = self.readTrnsysFiles.get("PSA2_kW")        
+        self.qTesDhwFromHp  = self.readTrnsysFiles.get("PSA1_kW",ifNotFoundEqualToZero=True)
+        self.qTesShFromHp  = self.readTrnsysFiles.get("PSA2_kW",ifNotFoundEqualToZero=True)
         
         self.qTesFromHp  = self.qTesShFromHp + self.qTesDhwFromHp
         
@@ -368,10 +368,13 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.qWcpHPPlusAux = self.readTrnsysFiles.get("PelAuxTot_kW")                    
         self.qWcpHP = self.readTrnsysFiles.get("PelAuxComp_kW") 
            
-        self.pumpHPsink = self.readTrnsysFiles.get("PelPuAuxTot_kW",ifNotFoundEqualToZero=True)            
-        self.pumpHPsource = self.readTrnsysFiles.get("PelPuBri_kW")                 
+        # self.pumpHPsink = self.readTrnsysFiles.get("PelPuAuxTot_kW",ifNotFoundEqualToZero=True) # JS: update for value that is actually calculated
+        self.pumpHPsink = self.readTrnsysFiles.get("PelPuAuxSH_kW",ifNotFoundEqualToZero=True)
 
-        if(self.pumpHPsource == None):
+        # self.pumpHPsource = self.readTrnsysFiles.get("PelPuBri_kW")  # JS: update for value that is actually calculated
+        self.pumpHPsource = self.readTrnsysFiles.get("PelPuAuxBri_kW")
+
+        if(self.pumpHPsource.any() == None):
             self.pumpHPsource = self.readTrnsysFiles.get("PelPuGHX_kW",ifNotFoundEqualToZero=True)                   
        
         # if(sum(self.qAuxHeaterSh)==0.0):

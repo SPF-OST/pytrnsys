@@ -1590,14 +1590,18 @@ class ProcessMonthlyDataBase():
 
         self.doc.addSection("Storage")
 
-        self.addLatexStorageComponentData()
+        if self.useTwoStorages:
 
-        self.addLatexStorageData()
+            pass
+        else:
+            self.addLatexStorageComponentData()
 
-        self.doc.addPlot(self.nameMonthlyTesEnergyPlotPdf, "Storage Tes balance", "balTes", 13)
+            self.addLatexStorageData()
 
-        if (self.existTesForDwhOnly):
-            self.addLatexStorageDataDhwOnly()
+            self.doc.addPlot(self.nameMonthlyTesEnergyPlotPdf, "Storage Tes balance", "balTes", 13)
+
+            if (self.existTesForDwhOnly):
+                self.addLatexStorageDataDhwOnly()
 
         # self.doc.clearPage()
 
