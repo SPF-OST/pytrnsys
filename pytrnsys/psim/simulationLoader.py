@@ -61,7 +61,7 @@ class SimulationLoader():
 
             elif self.mode == 'array':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.monData.keys())]
-                dict = {k: num.array(v.to_list()) for k, v in file[cols_to_use].items()}
+                dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.monData = {**self.monData, **dict}
 
 
@@ -76,7 +76,7 @@ class SimulationLoader():
                 
             elif self.mode == 'array':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.houData.keys())]
-                dict = {k: num.array(v.to_list()) for k, v in file[cols_to_use].items()}
+                dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.houData = {**self.houData, **self.dict}
 
         elif fileType == ResultsFileType.TIMESTEP:
@@ -90,7 +90,7 @@ class SimulationLoader():
                 
             elif self.mode == 'array':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.steData.keys())]
-                dict = {k: num.array(v.to_list()) for k, v in file[cols_to_use].items()}
+                dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.steData = {**self.steData, **dict}
 
     def fileSniffer(self, file):
