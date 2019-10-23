@@ -1,7 +1,14 @@
-TrnsysTools
-===========
+pytrnsys
+========
 
 .. toctree::
    :maxdepth: 4
 
-   TrnsysTools
+   pytrnsys.pdata
+   pytrnsys.rsim
+   pytrnsys.psim
+   pytrnsys.trnsys_util
+   pytrnsys.plot
+   pytrnsys.report
+   pytrnsys.utils
+   pytrnsys.physprop

@@ -9,7 +9,7 @@ Date   : 19-01-2018
 ToDo :
 """
 
-import costCalculation as mycost
+import pytrnsys.utils.costCalculation as mycost
 import numpy as num
 
 class CostCalculationVar(mycost.CostCalculation):
@@ -51,22 +51,22 @@ class CostCalculationVar(mycost.CostCalculation):
         
         for i in range(self.nComp):
             
-            print "group:%s"%self.group[i]
+            print("group:%s"%self.group[i])
             
             if(i<(self.nComp-1) and self.group[i] != self.group[i+1]):
                 groupCost=groupCost+self.costComponent[i]
                 inVar.append(groupCost)
                 legends.append(self.group[i])
                 groupCost=0.
-                print "Inside group:%s"%self.group[i]
+                print("Inside group:%s"%self.group[i])
             elif(i==(self.nComp-1)):
                 groupCost=groupCost+self.costComponent[i]
                 inVar.append(groupCost)
                 legends.append(self.group[i])
-                print "Last group:%s"%self.group[i]                
+                print("Last group:%s"%self.group[i])
             else:              
                 groupCost=groupCost+self.costComponent[i]       
-                print "groupCost:%f group:%s"%(groupCost,self.group[i])
+                print("groupCost:%f group:%s"%(groupCost,self.group[i]))
                 
 #                inVar.append(groupCost)
 #                legends.append(self.group[i])
@@ -79,7 +79,7 @@ class CostCalculationVar(mycost.CostCalculation):
     def setGeneralInputs(self,rate,analysPeriod,costElecFix,costEleckWh,increaseElecCost):
         
         
-        print "===================SET GENERAL INPUTS========================"
+        print("===================SET GENERAL INPUTS========================")
         self.rate = rate
         self.analysPeriod = analysPeriod
         self.costElecFix = costElecFix
@@ -87,7 +87,7 @@ class CostCalculationVar(mycost.CostCalculation):
        
         self.increaseElecCost = increaseElecCost
        
-        print "rate:%f analysisPeriod:%f"%(self.rate,self.analysPeriod)
+        print("rate:%f analysisPeriod:%f"%(self.rate,self.analysPeriod))
 
     def doPlotsAnnuity(self):
 
@@ -105,7 +105,7 @@ class CostCalculationVar(mycost.CostCalculation):
         
         for i in range(len(self.yearlyComp)):
         
-            print "cost:%f name:%s"%(self.costComponent[i],self.yearlyComp[i])
+            print("cost:%f name:%s"%(self.costComponent[i],self.yearlyComp[i]))
             
             if(self.yearlyCompCost[i]>0.):
                 inVar.append(self.anYearlyComp[i])
@@ -134,7 +134,7 @@ class CostCalculationVar(mycost.CostCalculation):
         self.costComponent.append(cost)
     
         return cost
-        print "cost:%f name:%s base:%f var:%f"%(cost,name,base,var)
+        print("cost:%f name:%s base:%f var:%f"%(cost,name,base,var))
         
     def addYearlyComponentCost(self,name,size,base,var,varUnit):
         
@@ -146,7 +146,7 @@ class CostCalculationVar(mycost.CostCalculation):
         cost = base+var*size
         self.yearlyCompCost.append(cost)
         
-        print "cost:%f name:%s base:%f var:%f"%(cost,name,base,var)
+        print("cost:%f name:%s base:%f var:%f"%(cost,name,base,var))
 
     def setSystemInputs(self,qDemand,elDemand,MaintenanceRate,costResidual,lifeTimeRes):
     
@@ -170,7 +170,7 @@ class CostCalculationVar(mycost.CostCalculation):
         
         self.totalInvestCost = 0.
         for i in range (self.nComp):
-            print "ncomp:%d rate:%f lifeTime%f"%(i,self.rate,self.lifeTimeComp[i])
+            print("ncomp:%d rate:%f lifeTime%f"%(i,self.rate,self.lifeTimeComp[i]))
             
 #            npv = self.getNPV(self.rate,self.lifeTimeComp[i]) # All is lifetime or analysisPeriod?
             ann = self.getAnnuity(self.rate,self.lifeTimeComp[i]) 
@@ -230,8 +230,8 @@ class CostCalculationVar(mycost.CostCalculation):
                  
         self.npvSystem = self.totalInvestCost+sum(self.costNpvYearlyComp)+self.npvElec+self.npvMaintenance-self.npvResVal
         
-        print "npvSystem:%f totalInvestCost :%f AlMatcost:%f npvElec :%f npvMaintenance:%f npvResVal:%f"%(self.npvSystem,self.totalInvestCost,\
-        sum(self.costNpvYearlyComp),self.npvElec,self.npvMaintenance,self.npvResVal)
+        print("npvSystem:%f totalInvestCost :%f AlMatcost:%f npvElec :%f npvMaintenance:%f npvResVal:%f"%(self.npvSystem,self.totalInvestCost,\
+        sum(self.costNpvYearlyComp),self.npvElec,self.npvMaintenance,self.npvResVal))
 
         #===================================================
         #ANNUITY
@@ -259,15 +259,15 @@ class CostCalculationVar(mycost.CostCalculation):
         
         self.annuity = self.anToInvCost+self.anElec+self.anMaint+self.anResVal+sum(self.anYearlyComp)
         
-        print " AnElectricity:%f npvElec:%f npvFacElec:%f annnuityFac:%f   "% (self.anElec,self.npvElec,self.npvFacElec,self.annuityFac)
+        print(" AnElectricity:%f npvElec:%f npvFacElec:%f annnuityFac:%f   "% (self.anElec,self.npvElec,self.npvFacElec,self.annuityFac))
         
         self.heatGenCost = self.annuity/self.qDemand  # Fr./kWh    
 #        self.heatGenCostNpv = self.npvSystem/self.qDemand/self.analysPeriod        
 
 #        print "NPV Factor:%f  AnnuityFac:%f  "% (sum(self.npvFac),self.annuityFac)
 #        print "Heat Generation Cost Annuity:%f NPV:%f"%(self.heatGenCost,self.heatGenCostNpv)
-        print "AnnuityFac:%f  "% (self.annuityFac)
-        print "Heat Generation Cost Annuity:%f "%(self.heatGenCost)
+        print("AnnuityFac:%f  "% (self.annuityFac))
+        print("Heat Generation Cost Annuity:%f "%(self.heatGenCost))
 
    
     def addTableCosts(self,doc,unit=1):
@@ -319,7 +319,7 @@ class CostCalculationVar(mycost.CostCalculation):
             sumGroup = sumGroup+self.costComponent[i]*unit
         
         if(j>1): #The last component
-            print "===================================j:%d==============================="%j
+            print("===================================j:%d==============================="%j)
             line = "&\cline{1-5} \n"; lines = lines + line
             line = " &\\textbf{Total %s} &  & & & %.0f (%.0f %s) \\\\ \n"%(self.group[self.nComp-1],sumGroup,100*sumGroup/self.totalInvestCost,symbol); lines = lines + line
 

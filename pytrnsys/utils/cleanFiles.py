@@ -91,7 +91,7 @@ class CleanFiles():
     def ignore_notToBeCopied(self, dir, files):
         ignoreFiles = []
         for f in files:
-            print f
+            print(f)
             if os.path.isfile(os.path.join(dir, f)):
                 # if not f in self.filesToBeCopied:
                 # return f
@@ -130,7 +130,7 @@ class CleanFiles():
         #     os.mkdir(dst + "\\" + folder)
 
         shutil.copytree(self.path, dst, ignore=self.ig_f)
-        print "copytree"
+        print("copytree")
         return self.folderNames
 
     def copyTree(self,dst):
@@ -152,7 +152,7 @@ class CleanFiles():
 #                   print i
                    if(erase==i):
                      removedFolder = os.path.join(root,i)
-                     print "removedFolder : %s" % removedFolder
+                     print("removedFolder : %s" % removedFolder)
                      shutil.rmtree(removedFolder)          
 
            
@@ -181,7 +181,7 @@ class CleanFiles():
                            
                    if(remove):
                      removedFile = os.path.join(root,i)
-                     print "removedFile : %s" % removedFile
+                     print("removedFile : %s" % removedFile)
                      os.remove(removedFile)
 
     def copyFilesToNewFolder(self,dstFolder):
@@ -223,7 +223,7 @@ class CleanFiles():
                         else:
                             dstPath = dstFolder + "\\" + root.split("\\")[-1] + "\\" + i
 
-                        print "copiedFile : %s" % copiedFile
+                        print("copiedFile : %s" % copiedFile)
                         shutil.copyfile(copiedFile,dstPath)
         pass
                
