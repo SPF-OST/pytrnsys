@@ -412,7 +412,9 @@ class RunParallelTrnsys():
             mySource = self.listDdck[i][-nCharacters:] # I read only the last characters with the same size as the end file
             if(mySource==source):
                 newDDck = self.listDdck[i][0:-nCharacters]+end
+                self.dictDdckPaths[newDDck] = self.dictDdckPaths[self.listDdck[i]]
                 self.listDdck[i]=newDDck
+
                 found=True
 
         if(found==False):
