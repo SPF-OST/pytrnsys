@@ -13,12 +13,8 @@ import os
 import pytrnsys.psim.debugProcess as debugProcess
 import multiprocessing as mp
 import pytrnsys.rsim.runParallel as run
-import pytrnsys_trihp.psim.solarIceTrnsysBaseClass as ice
 import pytrnsys.utils.utilsSpf as utils
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
-#import PyTriHpTrnsys.ProcessingSimulations.GshpTrnsysBaseClass as gshp
-#import PySpfTrnsys.ProcessingSimulations.AlStoreTrnsysBaseClass as alu
-#import PySpfTrnsys.ProcessingSimulations.p2GErlackerTrnsysClass as erlacker
 import warnings
 #we would need to pass the Class as inputs
 
@@ -103,49 +99,49 @@ def processDataGeneral(casesInputs):
     return " Finished: " + fileName
 
 
-def processDataGshp(casesInputs):
-#Include this in the generic function
-
-    (locationPath, fileName, avoidUser, maxMinAvoided, yearReadedInMonthlyFile, cleanModeLatex, firstMonthUsed,\
-      processQvsT,firstMonthUsed,buildingArea,dllTrnsysPath,setPrintDataForGle,firstConsideredTime) = casesInputs
-
-    print ("starting processing of: "%  fileName)
-
-    test = gshp.GshpTrnsysBaseClass(locationPath, fileName)
-
-    test.setBuildingArea(buildingArea)
-    test.setTrnsysDllPath(dllTrnsysPath)
-
-    test.setPrintDataForGle(setPrintDataForGle)
-
-    test.avoidUserDefinedCalculation = avoidUser
-    test.maxMinAvoided = maxMinAvoided
-    test.yearReadedInMonthylFile = yearReadedInMonthlyFile
-    test.cleanModeLatex = cleanModeLatex
-    test.firstConsideredTime = firstConsideredTime
-
-    myFirstMonthLong = utils.getMonthLongName(firstMonthUsed + 1)  # starts at 1
-    test.firstMonth = myFirstMonthLong
-    test.firstMonthIndex = 0  # firstMonthUsed
-
-    splitMonths = False
-
-    if (splitMonths == True):
-        monthsSplit = [3, 4, 5, 6]  # [5,10,11,12]
-    else:
-        monthsSplit = []
-
-    if (processQvsT == True):
-        test.loadQvsT("QVsT.Plt", monthsSplit=monthsSplit, addDhwCirc=True, normalized=True)
-
-    doProcess = True
-
-    if (doProcess):
-        test.loadAndProcess()
-
-    del test
-
-    return " Finished: " + fileName
+# def processDataGshp(casesInputs):
+# #Include this in the generic function
+#
+#     (locationPath, fileName, avoidUser, maxMinAvoided, yearReadedInMonthlyFile, cleanModeLatex, firstMonthUsed,\
+#       processQvsT,firstMonthUsed,buildingArea,dllTrnsysPath,setPrintDataForGle,firstConsideredTime) = casesInputs
+#
+#     print ("starting processing of: "%  fileName)
+#
+#     test = gshp.GshpTrnsysBaseClass(locationPath, fileName)
+#
+#     test.setBuildingArea(buildingArea)
+#     test.setTrnsysDllPath(dllTrnsysPath)
+#
+#     test.setPrintDataForGle(setPrintDataForGle)
+#
+#     test.avoidUserDefinedCalculation = avoidUser
+#     test.maxMinAvoided = maxMinAvoided
+#     test.yearReadedInMonthylFile = yearReadedInMonthlyFile
+#     test.cleanModeLatex = cleanModeLatex
+#     test.firstConsideredTime = firstConsideredTime
+#
+#     myFirstMonthLong = utils.getMonthLongName(firstMonthUsed + 1)  # starts at 1
+#     test.firstMonth = myFirstMonthLong
+#     test.firstMonthIndex = 0  # firstMonthUsed
+#
+#     splitMonths = False
+#
+#     if (splitMonths == True):
+#         monthsSplit = [3, 4, 5, 6]  # [5,10,11,12]
+#     else:
+#         monthsSplit = []
+#
+#     if (processQvsT == True):
+#         test.loadQvsT("QVsT.Plt", monthsSplit=monthsSplit, addDhwCirc=True, normalized=True)
+#
+#     doProcess = True
+#
+#     if (doProcess):
+#         test.loadAndProcess()
+#
+#     del test
+#
+#     return " Finished: " + fileName
 
 
 

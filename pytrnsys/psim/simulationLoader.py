@@ -138,10 +138,14 @@ class SimulationLoader():
                 dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.monData = {**self.monData, **dict}
 
+<<<<<<< HEAD
 
 
 
         elif fileType == _ResultsFileType.HOURLY:
+=======
+        elif fileType == ResultsFileType.HOURLY:
+>>>>>>> master
             file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26).rename(columns=lambda x: x.strip())
             file["Period"] = datetime(2018, 1, 1) + pd.to_timedelta(file['Period'], unit='h')
             file.set_index('Period', inplace=True)
