@@ -277,7 +277,7 @@ class RunParallelTrnsys():
         deckExplanation = []
         deckExplanation.append("! ** New solar-ice deck. **\n")
         deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck,self.pathDdck)
-        deck.readDeckList(doAutoUnitNumbering=self.inputs['doAutoUnitNumbering'])
+        deck.readDeckList(doAutoUnitNumbering=self.inputs['doAutoUnitNumbering'],dictPaths=self.dictDdckPaths)
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
         deck.writeDeck(addedLines=deckExplanation)
@@ -432,7 +432,8 @@ class RunParallelTrnsys():
         self.parameters = {} #deck parameters fixed for all simulations
         self.listFit = {}
         self.listFitObs = []
-        self.listDdckPaths = set() #Set()
+        self.listDdckPaths = set()
+        self.dictDdckPaths = {}
         self.caseDict = {}
         self.sourceFilesToChange = []
         self.sinkFilesToChange = []
@@ -495,8 +496,10 @@ class RunParallelTrnsys():
                 self.listFitObs.append(splitLine[1])
 
             elif (splitLine[0] in self.inputs.keys()):
-                self.listDdck.append(os.path.join(self.inputs[splitLine[0]], splitLine[1]))
+                fullPath=os.path.join(self.inputs[splitLine[0]], splitLine[1])
+                self.listDdck.append(fullPath)
                 self.listDdckPaths.add(self.inputs[splitLine[0]])
+                self.dictDdckPaths[fullPath]=self.inputs[splitLine[0]]
             else:
 
                 pass

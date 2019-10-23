@@ -63,10 +63,35 @@ class BuildTrnsysDeck():
 
         if(self.eliminateComments==True):
             self.linesChanged = spfUtils.purgueComments(self.linesChanged,['!'])
+
         
         infile.close()
         
         return lines[0:3] #only returns the caption with the info of the file
+
+    def changeAssignPath(self,rootPath):
+        """
+        This file only changes the assign path of those that start with HOME$, so we use for those the absolute path
+        """
+        for i in range(len(self.linesChanged)):
+            splitBlank = self.linesChanged[i].split()
+
+            try:
+                if (splitBlank[0] == "ASSIGN"):
+                    splitPath = splitBlank[1].split("\\")
+                    lineChanged=False
+                    for j in range (len(splitPath)):
+                        if splitPath[j].lower() == 'path$':
+                            name = os.path.join(*splitPath[j + 1:])
+                            if len(splitBlank) > 2:
+                                lineChanged = "ASSIGN \"%s\" %s \n" % (
+                                os.path.join(rootPath, name), splitBlank[2])
+                            else:
+                                lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(rootPath, name))
+                    if(lineChanged!=False):
+                        self.linesChanged[i] = lineChanged
+            except:
+                pass
 
     #
     def readDeckListConfig(self):
@@ -101,7 +126,7 @@ class BuildTrnsysDeck():
 
             self.deckText = self.deckText + addedLines
 
-    def readDeckList(self,doAutoUnitNumbering=True):
+    def readDeckList(self,doAutoUnitNumbering=True,dictPaths=False):
         """
          Reads all ddck files form the nameList and creates a single string with all in self.deckText
         :param self: nameList
@@ -142,8 +167,8 @@ class BuildTrnsysDeck():
                 pathList = self.pathList
                 nameList = self.nameList[i]
                 
-            firstThreeLines=self.loadDeck(pathList,nameList)            
-            
+            firstThreeLines=self.loadDeck(pathList,nameList)
+            self.changeAssignPath(dictPaths[os.path.join(pathList,nameList)])
             addedLines = firstThreeLines+self.linesChanged
             
             caption = " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"%(nameList,pathList)

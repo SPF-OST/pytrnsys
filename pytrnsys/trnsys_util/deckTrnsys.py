@@ -177,6 +177,9 @@ class DeckTrnsys():
                         if splitPath[j] in inputsDict.keys():
                             name = os.path.join(*splitPath[j+1:]) #* sot joining the vector, j+1 becasue we dont need spfTrnsysFiles,already in the path my commonTrnsysFolder
                             if inputsDict:
+                                print("Warning: Using " + str(splitPath[
+                                                                  j]) + "specified in the config file (deprecated). Root of the ddck library should be indicated as PATH$")
+
                                 if len(splitBlank)>2:
                                     lineChanged ="ASSIGN \"%s\" %s \n" % (os.path.join(inputsDict[splitPath[j]],name),splitBlank[2])
                                 else:
