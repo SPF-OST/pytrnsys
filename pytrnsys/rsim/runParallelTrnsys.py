@@ -283,14 +283,14 @@ class RunParallelTrnsys():
         deck.writeDeck(addedLines=deckExplanation)
         self.overwriteForcedByUser=deck.overwriteForcedByUser
 
-        deck.checkTrnsysDeck()
+        deck.checkTrnsysDeck(deck.nameDeck)
 
         if(self.generateUnitTypesUsed==True):
 
             deck.saveUnitTypeFile()
 
         if (self.addAutomaticEnergyBalance == True):
-            deck.automaticEnegyBalanceStaff(unit=600)
+            deck.automaticEnegyBalanceStaff()
             deck.writeDeck()  # Deck rewritten with added printer
 
         # deck.addEnergyBalance()

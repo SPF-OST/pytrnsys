@@ -69,7 +69,7 @@ class checkIterationProblemsClass(processTrnsys.ProcessTrnsysBase):
         self.unitsItProblems = log.unitsInvolvedItProlems
 
         deck = deckTrnsys.DeckTrnsys(self.outputPath,self.fileName)
-        deck.loadDeckWithoutComments()
+        deck.loadDeckWithNotes()
         deck.readAllTypes()
 
         self.namesUnitsItProblems = []

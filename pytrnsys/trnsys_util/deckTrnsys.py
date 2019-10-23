@@ -8,7 +8,7 @@ Now Only one comment is erased, so that if we hve ! comment1 ! comment2 only the
 
 import os
 import string,shutil
-import pytrnsys.pdata.processFiles as spfUtils
+import pytrnsys.trnsys_util.deckUtils as deckUtils
 import re
 import numpy as num
 
@@ -79,79 +79,41 @@ class DeckTrnsys():
 
         nameDeckBck = "%s-bck" % self.nameDck        
         shutil.copy(self.nameDck,nameDeckBck)
-      
 
-    def loadDeckWithoutComments(self):        
-                    
-        infile=open(self.nameDck,'r')
-        lines=infile.readlines()        
-        
-#        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
-        skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
+    # def loadDeckWithComments(self):
+        """
+        It reads the deck without removing comments and files starting with ***.
+        Return
+        ----------
+            linesWithComments : list of lines from the read deck.
+        """
+        # nameDck = self.nameDck
+        # self.linesReadedNoComments=deckUtils.loadDeck(nameDck,eraseBeginComment=False,eliminateComments=False)
 
-        replaceChar = None #[',','\''] #This characters will be eliminated, so replaced by nothing 
+        # return self.linesReadedNoComments
 
-        self.linesReadedNoComments = spfUtils.purgueLines(lines,skypChar,replaceChar,removeBlankLines=False)   
-
-        #Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
-        self.linesReadedNoComments = spfUtils.purgueComments(self.linesReadedNoComments,['!'])
-        
-#        print self.linesChanged
-        infile.close()
-        
-    def loadDeck(self,useDeckName=False,eraseBeginComment=True):        
+    def loadDeck(self,useDeckName=False,eraseBeginComment=True,eliminateComments=True):
+        """
+        It reads the deck  removing files starting with ***.
+        Attributes
+        ----------
+            linesChanged : :list of lines from the read deck.
+        """
 
         if(useDeckName==False):
             pass
-            print ("DECK TRNSYS::LOAD DECK nameDeck:%s eliminateCmments=%s" % (self.nameDck,self.eliminateComments))
+            print ("DECK TRNSYS::LOAD DECK nameDeck:%s" % (self.nameDck))
 
         else:
-            print ("DECK TRNSYS::LOAD DECK nameDeck:%s eliminateCmments=%s USEDECKNAME:%s" % (self.nameDck,self.eliminateComments,useDeckName))
+            print ("DECK TRNSYS::LOAD DECK nameDeck:%s USEDECKNAME:%s" % (self.nameDck,useDeckName))
+
             self.nameDck = useDeckName    
-            self.nameDckPathOutput = useDeckName 
-            
-        infile=open(self.nameDckPathOutput,'r')
-        
-        lines=infile.readlines()        
-        
-#        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
-        if(eraseBeginComment==True):
-            skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
-        else:
-            skypChar = ['!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
-            
-        replaceChar = None #[',','\''] #This characters will be eliminated, so replaced by nothing 
+            self.nameDckPathOutput = useDeckName
 
-        self.linesChanged = spfUtils.purgueLines(lines,skypChar,replaceChar,removeBlankLines=True)   
+        self.linesChanged=deckUtils.loadDeck(self.nameDckPathOutput,eraseBeginComment=eraseBeginComment,eliminateComments=eliminateComments)
 
-        #Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
-        if(self.eliminateComments==True):
-            self.linesChanged = spfUtils.purgueComments(self.linesChanged,['!'])
-        
-        infile.close()
+        return self.linesChanged
 
-    def loadDeckAndEraseWhiteSpaces(self):        
-
-        print ("nameDeck:%s"%self.nameDck)
- 
-        infile=open(self.nameDck,'r')
-        lines=infile.readlines()        
-        
-       
-#        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
-        skypChar = ['*','      \n']    #['*'] #This will eliminate the lines starting with skypChar
-
-        replaceChar = None #[',','\''] #This characters will be eliminated, so replaced by nothing 
-
-        self.linesChanged = spfUtils.purgueLines(lines,skypChar,replaceChar,removeBlankLines=True)   
-
-        #Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
-        if(self.eliminateComments==True):
-            self.linesChanged = spfUtils.purgueComments(self.linesChanged,['!'])
-        
-        infile.close()
-
-        
 
     def writeDeck(self):
 
@@ -164,6 +126,7 @@ class DeckTrnsys():
     def changeAssignPath(self, inputsDict = False):
         """
         This file only changes the assign path of those that start with HOME$, so we use for those the absolute path
+        It assumess that self.linesChanged is loaded.
         """
         for i in range(len(self.linesChanged)):
             splitBlank = self.linesChanged[i].split()
@@ -194,7 +157,6 @@ class DeckTrnsys():
                         self.linesChanged[i] = lineChanged
             except:
                 pass
-
 
 
     def ignoreOnlinePlotter(self):
@@ -379,7 +341,8 @@ class DeckTrnsys():
                           
     def changeParameter(self,_parameters):
 
-                 
+         lines=self.linesChanged
+
 #         print "linesChanged"
 #         print self.linesChanged
          print ("Change Parameters deckTrnsys Class")
@@ -390,10 +353,10 @@ class DeckTrnsys():
              self.parameters = _parameters
 
 
-             for i in range(len(self.linesChanged)):
+             for i in range(len(lines)):
                  
-                 splitEquality = self.linesChanged[i].split('=')
-                 splitBlank = self.linesChanged[i].split()
+                 splitEquality = lines[i].split('=')
+                 splitBlank = lines[i].split()
                  
 #                 print splitEquality
                  #print splitBlank
@@ -445,9 +408,9 @@ class DeckTrnsys():
                                  
                          if(len(compressorDataSplit)>1):     
                              myFileInNewPath = self.HOMEPath + "Compressor\\" + "%s" % compressorDataSplit[1]
-                             self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+                             lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
                              
-                             print ("Compressor data changed :%s " % self.linesChanged[i])
+                             print ("Compressor data changed :%s " % lines[i])
                         
 #==============================================================================
 #                               TEMP FOLDER
@@ -461,10 +424,10 @@ class DeckTrnsys():
 #                             print "split[0]:%f splt[1]:%s" % (fileNameWithoutCommas[0],fileNameWithoutCommas[1])
                              if(self.useAbsoluteTempPath):
                                  myFileInNewPath = self.filesOutputPath +"\\temp\\"+ nameSplited[1]
-                                 self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+                                 lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
                              else:
                                 myFileInNewPath =  "temp\\" + nameSplited[1]
-                                self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
+                                lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
 
     #                             print "lineChanged-0 : %s pathOut:%s nameSplied:%s" % (self.linesChanged[i],self.pathOutput,nameSplited[1])
 
@@ -473,7 +436,7 @@ class DeckTrnsys():
                              if(nameSplited[0]=="Temp_zone.BAL" or nameSplited[0]=="Energy_zone.BAL"):
                                   
                                  myFileInNewPath = self.filesOutputPath +"\\"+ nameSplited[0]
-                                 self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])      
+                                 lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
 #                                 print "lineChanged-1 : %s pathOut:%s nameSplited:%s" % (self.linesChanged[i],self.pathOutput,nameSplited[0])
                                            
                  except: 
@@ -501,7 +464,7 @@ class DeckTrnsys():
                              myNewLine = "%s=%s ! value changed from original by executeTrnsys.py\n" % (key,self.parameters[key])
                              print ("NEW LINE %s" % myNewLine)
 #                             
-                             self.linesChanged[i] = myNewLine
+                             lines[i] = myNewLine
                                                                             
                  except:
 #                    print "Not an equality name:%s\n" % name
@@ -513,87 +476,16 @@ class DeckTrnsys():
                  
              outfile=open(self.nameDck,'w') 
             
-             outfile.writelines(self.linesChanged)
+             outfile.writelines(lines)
              outfile.close() 
-             
-    #with this function we obtain some data from the deck file.
-             
-#    def getDataFromDeck(self,myName):
-#        
-#        for i in range(len(self.linesChanged)):
-#            
-#            splitEquality = self.linesChanged[i].split('=')
-#        
-#            try:    
-#                name = splitEquality[0].replace(" ","")
-#                value = splitEquality[1].replace(" ","")                                      
-#
-#                if(name.lower()==myName.lower()):  
-#                    return value
-#                
-#            except:
-#                pass
-#                 
-#        return None
-        
+
     def getTypeFromUnit(self,myUnit):
 
-        for i in range(len(self.linesReadedNoComments)):
-            
-            splitEquality =  self.linesReadedNoComments[i].split()
-        
-            try:
-                unit  = splitEquality[0].replace(" ","")
-                nUnit = splitEquality[1].replace(" ","")
-                types =  splitEquality[2].replace(" ","")
-                ntype =  splitEquality[3].replace(" ","")
-                
-                
-                if(unit.lower()=="unit".lower() and types.lower()=="Type".lower()):
-#                    print "unit:%s nUnit:%s types:%s ntype:%s"%(unit,nUnit,types,ntype)
-
-                    if(nUnit.lower()==myUnit.lower()):
-                        print ("UNIT FOUND myUnit:%s type:%s"%(myUnit,ntype))
-                        return ntype
-            except:
-                pass
-                 
-        return None
-       
-       
-    def getMyDataFromDeck(self,myName):
-        
-        for i in range(len(self.linesReadedNoComments)):
-            
-            splitEquality =  self.linesReadedNoComments[i].split('=')
-        
-            try:    
-                name = splitEquality[0].replace(" ","")
-                value = splitEquality[1].replace(" ","")                                      
-
-                if(name.lower()==myName.lower()):  
-                    return value
-                
-            except:
-                pass
-                 
-        return None
+        return deckUtils.getTypeFromUnit(myUnit,self.linesReadedNoComments)
 
     def getDataFromDeck(self,myName,typeValue="string"):
-    
-        value = self.getMyDataFromDeck(myName)               
-        
-        if(value==None):
-            return None
-            
-        if(typeValue=="double"):
-            return float(value)
-        elif(typeValue=="int"):
-            return int(value)
-        elif(typeValue=="string"):
-            return value
-        else:
-            raise ValueError("typeValue must be double,int or string")
+
+        return deckUtils.getDataFromDeck(self.linesReadedNoComments,myName)
 
     def getAllDataFromDeck(self):
         self.deckVariables = {}
@@ -651,104 +543,8 @@ class DeckTrnsys():
     # it does not work if 
         # ______ ! dlskdkd
         #  EQUATIONS ! sdsds
-    def readEnergyBalanceVariablesFromDeck(self):
-        """Reading all the variables defined in the deck that follow the energy balance standard.
-           This function reads from self.linesChanged filled in the loadDeck function.
-           The standard nomenclature of energy balance variables are:
-           elSysIn_ for electricity given into the system
-           elSysOut_ for electricity going out of the system
-           qSysIn_ for heat given into the system
-           qSysOut_ for heat going out of the system
-        """
-
-        # self.qBalanceIn  = []
-        # self.qBalanceOut = []
-        # self.elBalanceIn  = []
-        # self.elBalanceOut = []
-
-        self.eBalance = []
-        for i in range(len(self.linesChanged)):
-            splitBlank = self.linesChanged[i].split()
-
-            if(splitBlank[0][0:7]=="elSysIn"):
-                self.eBalance.append(splitBlank[0])
-            if(splitBlank[0][0:8]=="elSysOut"):
-                self.eBalance.append(splitBlank[0])
-            if(splitBlank[0][0:6]=="qSysIn"):
-                self.eBalance.append(splitBlank[0])
-            if(splitBlank[0][0:7]=="qSysOut"):
-                self.eBalance.append(splitBlank[0])
 
 
-    def addEnergyBalanceMonthlyPrinter(self,unit):
-        """
-            Adds a monthly printer in the deck using the energy balance variables.
-            It also calulates the most common KPI such as monthly and yearly SPF
-        """
-
-        # size = len(self.qBalanceIn)+len(self.qBalanceOut)+len(self.elBalanceIn)+len(self.elBalanceOut)
-
-        lines = []
-        line = "***************************************************************\n";lines.append(line)
-        line = "**BEGIN energy Balance printer automatically geneated from DDck\n";lines.append(line)
-        line = "***************************************************************\n";lines.append(line)
-        line = "ASSIGN temp\ENERGY_BALANCE_MO.Prt %d\n"%unit;lines.append(line)
-        line = "UNIT %d Type 46\n"%unit;lines.append(line)
-        line = "PARAMETERS 6\n";lines.append(line)
-        line = "%d !1: Logical unit number\n"%unit;lines.append(line)
-        line = "-1 !2: for monthly summaries\n";lines.append(line)
-        line = "1  !3: 1:print at absolute times\n";lines.append(line)
-        line = "-1 !4 -1: monthly integration\n";lines.append(line)
-        line = "1  !5 number of outputs to avoid integration\n";lines.append(line)
-        line = "1  !6 output number to avoid integration\n";lines.append(line)
-        line = "INPUTS %d\n"%len(self.eBalance);lines.append(line)
-        allvars = " ".join(self.eBalance)
-        line = "%s\n"%allvars;lines.append(line)
-        line = "*******************************\n";lines.append(line)
-        line = "%s\n"%allvars;lines.append(line)
-
-        # self.linesChanged=self.linesChanged+lines
-        return lines
-
-    def checkEquationsAndConstants(self,lines):
-
-        #lines=linesChanged
-        for i in range(len(lines)):
-           
-            splitBlank = lines[i].split()
-           
-            
-            if(splitBlank[0].lower()=="EQUATIONS".lower() or splitBlank[0].lower()=="CONSTANTS".lower()):               
-                
-                lineError = i+1
-                try:
-                    numberOfValues = int(splitBlank[1])
-                except:
-                    raise ValueError("checkEquationsAndConstants %s can't be split in line i:%d (missing number?)"%(splitBlank,i))
-                    
-                countedValues = 0 # start counting                
-                error = 0                         
-                while(error==0):
-                    i = i+1
-                    
-                    splitEquality = lines[i].split('=')
-                    error = 1
-#                    print "count=%d"%countedValues
-#                    print splitEquality
-                    
-                    if(len(splitEquality)>=2):
-#                        print "counting at %s"%(self.linesChanged[i])
-                        error=0                                  
-                        countedValues = countedValues+1
-                                                
-                if(countedValues != numberOfValues):
-                    parsedFile = "%s.parse" % self.nameDck
-                    outfile=open(parsedFile,'w')
-                    outfile.writelines(lines)
-                    outfile.close()
-                        
-                    raise ValueError("FATAL Error in : ",splitBlank[0]," at line ",lineError," of parsed file =",\
-                    parsedFile,". Number set is ",numberOfValues," and there are ",countedValues)
 
     def getPipeData(self,massFlow):
 
@@ -805,7 +601,7 @@ class DeckTrnsys():
     def resizeParameters(self,read=True):
         
         if(read):
-            self.loadDeckWithoutComments()
+            self.loadDeckWithNotes()
 
         massFlowHpEvapNom = self.getDataFromDeck("MfrHpEvapRef",typeValue="double")
         massFlowHpCondNom = self.getDataFromDeck("MfrHpCondRef",typeValue="double")
@@ -862,69 +658,4 @@ class DeckTrnsys():
         
         self.changeParameter(myParameters)
 
-    def getTypeName(self, typeNum):
-
-        if (typeNum == 888):
-            return "General Controller (SPF)"
-        if (typeNum == 65):
-            return "Online plotter (TRNSYS)"
-        elif (typeNum == 816):
-            return "Averaging"
-        elif (typeNum == 862):
-            return "TColl control expected for switch (SPF)"
-        elif (typeNum == 817):
-            return "Time delay"
-        elif (typeNum == 863):
-            return "Ice controller (SPF)"
-        elif (typeNum == 993):
-            return "Recall"
-        elif (typeNum == 46):
-            return "Monthly integrator (TRNSYS)"
-        elif (typeNum == 9):
-            return "Data reader (TRNSYS)"
-        elif (typeNum == 109):
-            return "Weather data processor (TRNSYS)"
-        elif (typeNum == 33):
-            return "Psychrometrics"
-        elif (typeNum == 69):
-            return "Sky temperature"
-        elif (typeNum == 194):
-            return "PV module (TRNSYS)"
-        elif (typeNum == 320):
-            return "PID controller"
-        elif (typeNum == 861):
-            return "Ice Storage non-deiceable (SPF)"
-        elif (typeNum == 25):
-            return "User defined printer (TRNSYS)"
-        elif (typeNum == 889):
-            return "Adapted PD-controller"
-        elif (typeNum == 833):
-            return "Collector with condensation (SPF)"
-        elif (typeNum == 951):
-            return "EWS with integrated g-functions (SPF)"
-        elif (typeNum == 977):
-            return "Parameter fit heat pump (SPF)"
-        elif (typeNum == 1925 or typeNum == 1924):
-            return "Plug-flow TES (SPF)"
-        elif (typeNum == 811):
-            return "Tempering valve (SPF)"
-        elif (typeNum == 929):
-            return "TeePiece (SPF)"
-        elif (typeNum == 931):
-            return "Type 931 CHECK (SPF)"
-        elif (typeNum == 1792):
-            return "Radiant floor (SPF)"
-        elif (typeNum == 5998):
-            return "Building ISO (SPF)"
-        elif (typeNum == 2):
-            return "Collector controller (TRNSYS)"
-        elif (typeNum == 935):
-            return "Flow solver (SPF)"
-        elif (typeNum == 711):
-            return "2D Ground model (SPF)"
-        elif (typeNum == 979):
-            return "Low temperature Al-reactor (SPF)"
-
-        else:
-            return "Unknown"
 
