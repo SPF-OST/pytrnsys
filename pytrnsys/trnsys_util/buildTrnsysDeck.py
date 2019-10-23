@@ -201,9 +201,7 @@ class BuildTrnsysDeck():
         nameDeck = nameDeck.split("\\")[-1]
         self.myDeck = deck.DeckTrnsys(self.pathDeck,nameDeck)
 
-        self.myDeck.eliminateComments=False
-        self.myDeck.loadDeckAndEraseWhiteSpaces()
-        self.linesDeckReaded = self.myDeck.linesChanged
+        self.linesDeckReaded = self.myDeck.loadDeckWithComments()
 
         # self.myDeck.loadDeckWithoutComments()
         # self.linesDeckReaded = self.myDeck.linesReadedNoComments
@@ -211,7 +209,7 @@ class BuildTrnsysDeck():
     def checkTrnsysDeck(self):
 
         self.readTrnsyDeck()
-        self.myDeck.checkEquationsAndConstants(self.linesDeckReaded)
+        deckUtils.checkEquationsAndConstants(self.linesDeckReaded)
         # self.myDeck.checkEquationsAndConstants(self.deckText) #This does not need to read
 
     def saveUnitTypeFile(self):
@@ -219,7 +217,6 @@ class BuildTrnsysDeck():
         (self.TrnsysUnits, self.TrnsysTypes,self.filesUsedInDdck,self.filesUnitUsedInDdck) = deckUtils.readAllTypes(self.deckText,sort=False)
 
         self.writeTrnsysTypesUsed("UnitsType.info")
-
 
     def writeTrnsysTypesUsed(self, name):
 

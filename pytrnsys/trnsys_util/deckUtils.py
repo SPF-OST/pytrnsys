@@ -1,5 +1,7 @@
 
 import numpy as num
+import pytrnsys.pdata.processFiles as spfUtils
+
 
 def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesUsedInDdck):
 
@@ -178,3 +180,79 @@ def getMyDataFromDeck(linesReadedNoComments,myName):
             pass
 
     return None
+
+
+def loadDeck(nameDck,eraseBeginComment=True,eliminateComments=True):
+    """
+    Parameters
+    ----------
+    nameDck : str
+        name of the TRNSYS deck to be loaded
+    eraseBeginComment : bool
+        True will delete all lines starting with *, !, and blank, but also the comments *********anyComment*********
+        False will delete all lines starting with !, and blank, but keep the ones starting with **
+    Return
+    ------
+    lines : str
+        list of lines obateined form the deck without the comments
+    """
+
+    infile = open(nameDck, 'r')
+
+    lines = infile.readlines()
+
+    #        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
+    if (eraseBeginComment == True):
+        skypChar = ['*', '!', '      \n']  # ['*'] #This will eliminate the lines starting with skypChar
+    else:
+        skypChar = ['!', '      \n']  # ['*'] #This will eliminate the lines starting with skypChar
+
+    replaceChar = None  # [',','\''] #This characters will be eliminated, so replaced by nothing
+
+    linesChanged = spfUtils.purgueLines(lines, skypChar, replaceChar, removeBlankLines=True)
+
+    # Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
+    if (eliminateComments == True):
+        linesChanged = spfUtils.purgueComments(linesChanged, ['!'])
+
+    return linesChanged
+
+
+def checkEquationsAndConstants(lines):
+    # lines=linesChanged
+    for i in range(len(lines)):
+
+        splitBlank = lines[i].split()
+
+        if (splitBlank[0].lower() == "EQUATIONS".lower() or splitBlank[0].lower() == "CONSTANTS".lower()):
+
+            lineError = i + 1
+            try:
+                numberOfValues = int(splitBlank[1])
+            except:
+                raise ValueError(
+                    "checkEquationsAndConstants %s can't be split in line i:%d (missing number?)" % (splitBlank, i))
+
+            countedValues = 0  # start counting
+            error = 0
+            while (error == 0):
+                i = i + 1
+
+                splitEquality = lines[i].split('=')
+                error = 1
+                #                    print "count=%d"%countedValues
+                #                    print splitEquality
+
+                if (len(splitEquality) >= 2):
+                    #                        print "counting at %s"%(self.linesChanged[i])
+                    error = 0
+                    countedValues = countedValues + 1
+
+            if (countedValues != numberOfValues):
+                parsedFile = "%s.parse" % self.nameDck
+                outfile = open(parsedFile, 'w')
+                outfile.writelines(lines)
+                outfile.close()
+
+                raise ValueError("FATAL Error in : ", splitBlank[0], " at line ", lineError, " of parsed file =", \
+                                 parsedFile, ". Number set is ", numberOfValues, " and there are ", countedValues)

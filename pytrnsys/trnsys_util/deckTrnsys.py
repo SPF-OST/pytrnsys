@@ -8,7 +8,7 @@ Now Only one comment is erased, so that if we hve ! comment1 ! comment2 only the
 
 import os
 import string,shutil
-import pytrnsys.pdata.processFiles as spfUtils
+import pytrnsys.trnsys_util.deckUtils as deckUtils
 import re
 import numpy as num
 
@@ -79,79 +79,85 @@ class DeckTrnsys():
 
         nameDeckBck = "%s-bck" % self.nameDck        
         shutil.copy(self.nameDck,nameDeckBck)
-      
 
-    def loadDeckWithoutComments(self):        
-                    
-        infile=open(self.nameDck,'r')
-        lines=infile.readlines()        
-        
-#        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
-        skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
+    def loadDeckWithComments(self):
+        """
+        It reads the deck without removing comments and files starting with ***.
+        Return
+        ----------
+            linesWithComments : list of lines from the read deck.
+        """
+        return deckUtils.loadDeck(self.nameDck,eraseBeginComment=False,eliminateComments=False)
 
-        replaceChar = None #[',','\''] #This characters will be eliminated, so replaced by nothing 
+    # def loadDeckWithNotes(self):
+        """
+        It reads the deck without removing files starting with ***. This allows to keep the Explanations and Notes
+        Attributes
+        ----------
+            linesReadedNoComments : :list of lines from the read deck.
+        """
+        # return deckUtils.loadDeck(self.nameDck,eraseBeginComment=False)
 
-        self.linesReadedNoComments = spfUtils.purgueLines(lines,skypChar,replaceChar,removeBlankLines=False)   
-
-        #Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
-        self.linesReadedNoComments = spfUtils.purgueComments(self.linesReadedNoComments,['!'])
-        
-#        print self.linesChanged
-        infile.close()
-        
-    def loadDeck(self,useDeckName=False,eraseBeginComment=True):        
+    def loadDeck(self,useDeckName=False):
+        """
+        It reads the deck  removing files starting with ***.
+        Attributes
+        ----------
+            linesChanged : :list of lines from the read deck.
+        """
 
         if(useDeckName==False):
             pass
-            print ("DECK TRNSYS::LOAD DECK nameDeck:%s eliminateCmments=%s" % (self.nameDck,self.eliminateComments))
+            print ("DECK TRNSYS::LOAD DECK nameDeck:%s eliminateComments=%s" % (self.nameDck,self.eliminateComments))
 
         else:
             print ("DECK TRNSYS::LOAD DECK nameDeck:%s eliminateCmments=%s USEDECKNAME:%s" % (self.nameDck,self.eliminateComments,useDeckName))
             self.nameDck = useDeckName    
-            self.nameDckPathOutput = useDeckName 
-            
-        infile=open(self.nameDckPathOutput,'r')
-        
-        lines=infile.readlines()        
-        
-#        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
-        if(eraseBeginComment==True):
-            skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
-        else:
-            skypChar = ['!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
-            
-        replaceChar = None #[',','\''] #This characters will be eliminated, so replaced by nothing 
+            self.nameDckPathOutput = useDeckName
 
-        self.linesChanged = spfUtils.purgueLines(lines,skypChar,replaceChar,removeBlankLines=True)   
+        return deckUtils.loadDeck(self.nameDckPathOutput,eraseBeginComment=True)
 
-        #Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
-        if(self.eliminateComments==True):
-            self.linesChanged = spfUtils.purgueComments(self.linesChanged,['!'])
-        
-        infile.close()
+#         infile=open(self.nameDckPathOutput,'r')
+#
+#         lines=infile.readlines()
+#
+# #        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
+#         if(eraseBeginComment==True):
+#             skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
+#         else:
+#             skypChar = ['!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
+#
+#         replaceChar = None #[',','\''] #This characters will be eliminated, so replaced by nothing
+#
+#         self.linesChanged = spfUtils.purgueLines(lines,skypChar,replaceChar,removeBlankLines=True)
+#
+#         #Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
+#         if(self.eliminateComments==True):
+#             self.linesChanged = spfUtils.purgueComments(self.linesChanged,['!'])
+#
+#         infile.close()
 
-    def loadDeckAndEraseWhiteSpaces(self):        
+#     def loadDeckAndEraseWhiteSpaces(self):
+#
+#         print ("nameDeck:%s"%self.nameDck)
+#
+#         infile=open(self.nameDck,'r')
+#         lines=infile.readlines()
+#
+#
+# #        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
+#         skypChar = ['*','      \n']    #['*'] #This will eliminate the lines starting with skypChar
+#
+#         replaceChar = None #[',','\''] #This characters will be eliminated, so replaced by nothing
+#
+#         self.linesChanged = spfUtils.purgueLines(lines,skypChar,replaceChar,removeBlankLines=True)
+#
+#         #Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
+#         if(self.eliminateComments==True):
+#             self.linesChanged = spfUtils.purgueComments(self.linesChanged,['!'])
+#
+#         infile.close()
 
-        print ("nameDeck:%s"%self.nameDck)
- 
-        infile=open(self.nameDck,'r')
-        lines=infile.readlines()        
-        
-       
-#        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
-        skypChar = ['*','      \n']    #['*'] #This will eliminate the lines starting with skypChar
-
-        replaceChar = None #[',','\''] #This characters will be eliminated, so replaced by nothing 
-
-        self.linesChanged = spfUtils.purgueLines(lines,skypChar,replaceChar,removeBlankLines=True)   
-
-        #Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
-        if(self.eliminateComments==True):
-            self.linesChanged = spfUtils.purgueComments(self.linesChanged,['!'])
-        
-        infile.close()
-
-        
 
     def writeDeck(self):
 
@@ -556,41 +562,10 @@ class DeckTrnsys():
                 pass
                  
         return None
-       
-       
-    def getMyDataFromDeck(self,myName):
-        
-        for i in range(len(self.linesReadedNoComments)):
-            
-            splitEquality =  self.linesReadedNoComments[i].split('=')
-        
-            try:    
-                name = splitEquality[0].replace(" ","")
-                value = splitEquality[1].replace(" ","")                                      
-
-                if(name.lower()==myName.lower()):  
-                    return value
-                
-            except:
-                pass
-                 
-        return None
 
     def getDataFromDeck(self,myName,typeValue="string"):
-    
-        value = self.getMyDataFromDeck(myName)               
-        
-        if(value==None):
-            return None
-            
-        if(typeValue=="double"):
-            return float(value)
-        elif(typeValue=="int"):
-            return int(value)
-        elif(typeValue=="string"):
-            return value
-        else:
-            raise ValueError("typeValue must be double,int or string")
+
+        return deckUtils.getDataFromDeck(self.linesReadedNoComments,myName)
 
     def getAllDataFromDeck(self):
         self.deckVariables = {}
@@ -707,45 +682,7 @@ class DeckTrnsys():
         # self.linesChanged=self.linesChanged+lines
         return lines
 
-    def checkEquationsAndConstants(self,lines):
 
-        #lines=linesChanged
-        for i in range(len(lines)):
-           
-            splitBlank = lines[i].split()
-           
-            
-            if(splitBlank[0].lower()=="EQUATIONS".lower() or splitBlank[0].lower()=="CONSTANTS".lower()):               
-                
-                lineError = i+1
-                try:
-                    numberOfValues = int(splitBlank[1])
-                except:
-                    raise ValueError("checkEquationsAndConstants %s can't be split in line i:%d (missing number?)"%(splitBlank,i))
-                    
-                countedValues = 0 # start counting                
-                error = 0                         
-                while(error==0):
-                    i = i+1
-                    
-                    splitEquality = lines[i].split('=')
-                    error = 1
-#                    print "count=%d"%countedValues
-#                    print splitEquality
-                    
-                    if(len(splitEquality)>=2):
-#                        print "counting at %s"%(self.linesChanged[i])
-                        error=0                                  
-                        countedValues = countedValues+1
-                                                
-                if(countedValues != numberOfValues):
-                    parsedFile = "%s.parse" % self.nameDck
-                    outfile=open(parsedFile,'w')
-                    outfile.writelines(lines)
-                    outfile.close()
-                        
-                    raise ValueError("FATAL Error in : ",splitBlank[0]," at line ",lineError," of parsed file =",\
-                    parsedFile,". Number set is ",numberOfValues," and there are ",countedValues)
 
     def getPipeData(self,massFlow):
 
@@ -802,7 +739,7 @@ class DeckTrnsys():
     def resizeParameters(self,read=True):
         
         if(read):
-            self.loadDeckWithoutComments()
+            self.loadDeckWithNotes()
 
         massFlowHpEvapNom = self.getDataFromDeck("MfrHpEvapRef",typeValue="double")
         massFlowHpCondNom = self.getDataFromDeck("MfrHpCondRef",typeValue="double")
