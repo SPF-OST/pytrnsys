@@ -39,7 +39,7 @@ class RunParallelTrnsys():
 
         self.addAutomaticEnergyBalance=True
 
-        self.generateUnitTypesUsed=True
+        self.generateUnitTypesUsed=False
 
 
     def setDeckName(self,_name):

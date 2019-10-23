@@ -51,9 +51,12 @@ def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
 
         splitBlank = lines[i].split()
 
-        if (splitBlank[0] == "ASSIGN"):
-            filesUsedInDdck.append(splitBlank[1])
-            filesUnitUsedInDdck.append(splitBlank[2])
+        try:
+            if (splitBlank[0] == "ASSIGN"):
+                filesUsedInDdck.append(splitBlank[1])
+                filesUnitUsedInDdck.append(splitBlank[2])
+        except:
+            pass
 
         try:
             unit = splitBlank[0].replace(" ", "")

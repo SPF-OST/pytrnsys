@@ -44,7 +44,7 @@ class BuildTrnsysDeck():
         self.skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
         self.eliminateComments = False
 
-        self.replaceAutomaticUnits=True
+        self.replaceAutomaticUnits=False
 
 
     def loadDeck(self,_path,_name):        
