@@ -14,6 +14,7 @@ import pytrnsys.pdata.processFiles
 import string
 import pytrnsys.rsim.runParallel as runPar
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
+import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 import shutil
 import sys
 import imp
@@ -293,7 +294,7 @@ class RunParallelTrnsys():
             deck.writeDeck()  # Deck rewritten with added printer
 
         # deck.addEnergyBalance()
-
+        
         return deck.nameDeck
 
     def addParametricVariations(self,variations):
@@ -526,3 +527,23 @@ class RunParallelTrnsys():
         shutil.copyfile(configFile, dstPath)
         print("copied config file to: %s"% dstPath)
 
+    def getCityFromConfig(self):
+
+        for line in self.lines:
+            if "City" in line:
+                cityLine = line
+                break
+            else:
+                pass
+        self.weatherFile = cityLine.split("City")[1]
+        self.city = self.weatherFile.split("_")[0]
+
+    def getHydFromConfig(self):
+
+        for line in self.lines:
+            if "Hydraulics\\" in line:
+                hydLine = line
+                break
+            else:
+                pass
+        self.hyd = hydLine.split("Hydraulics\\")[1]

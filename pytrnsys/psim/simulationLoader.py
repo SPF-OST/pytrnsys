@@ -13,6 +13,7 @@ from enum import Enum
 import pandas as pd
 import os
 from datetime import datetime, timedelta
+import numpy as num
 
 
 class SimulationLoader():
@@ -60,7 +61,7 @@ class SimulationLoader():
 
             elif self.mode == 'array':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.monData.keys())]
-                dict = {k: v.to_numpy() for k, v in file[cols_to_use].items()}
+                dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.monData = {**self.monData, **dict}
 
         elif fileType == ResultsFileType.HOURLY:
@@ -74,8 +75,8 @@ class SimulationLoader():
                 
             elif self.mode == 'array':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.houData.keys())]
-                dict = {k: v.to_numpy() for k, v in file[cols_to_use].items()}
-                self.houData = {**self.houData, **self.dict}
+                dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
+                self.houData = {**self.houData, **dict}
 
         elif fileType == ResultsFileType.TIMESTEP:
             file = pd.read_csv(pathFile, header=0, delimiter='\t', nrows=nRows - 1).rename(columns=lambda x: x.strip())
@@ -88,7 +89,7 @@ class SimulationLoader():
                 
             elif self.mode == 'array':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.steData.keys())]
-                dict = {k: v.to_numpy() for k, v in file[cols_to_use].items()}
+                dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.steData = {**self.steData, **dict}
 
     def fileSniffer(self, file):
