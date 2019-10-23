@@ -77,7 +77,7 @@ class SimulationLoader():
             elif self.mode == 'array':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.houData.keys())]
                 dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
-                self.houData = {**self.houData, **self.dict}
+                self.houData = {**self.houData, **dict}
 
         elif fileType == ResultsFileType.TIMESTEP:
             file = pd.read_csv(pathFile, header=0, delimiter='\t', nrows=nRows - 1).rename(columns=lambda x: x.strip())
