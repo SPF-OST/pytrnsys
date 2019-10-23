@@ -130,21 +130,19 @@ class ExecuteTrnsys():
         
     def loadDeck(self,useDeckName=False,check=False,eliminateComments=False):
 
-        self.linesChanged= deckUtils.loadDeck(self.nameDck, eraseBeginComment=False)
+        if(useDeckName==False):
+            nameDck = self.fileName #self.nameDckPathOutput
+        else:
+            nameDck=useDeckName
+
+        # self.linesChanged= deckUtils.loadDeck(nameDck, eraseBeginComment=False)
+
+        self.deckTrnsys = deckTrnsys.DeckTrnsys(self.path,nameDck)
+
+        lines = self.deckTrnsys.loadDeck(eraseBeginComment=False,eliminateComments=False)
 
         if(check==True):
-            deckUtils.checkEquationsAndConstants(self.linesChanged)
-
-        # if(check==True):
-        #     self.deckTrnsys.checkEquationsAndConstants()
-
-        # self.deckTrnsys = deckTrnsys.DeckTrnsys(self.path,self.fileName)
-        #
-        # if(eliminateComments==False):
-        #     self.deckTrnsys.eliminateComments =False
-            
-        # self.deckTrnsys.loadDeckWithNotes() # in order to let information about each file in the deck
-        
+            deckUtils.checkEquationsAndConstants(lines)
 
     def changeParameter(self,_parameters):
 
