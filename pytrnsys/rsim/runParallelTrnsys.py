@@ -36,6 +36,11 @@ class RunParallelTrnsys():
         else:
             self.nameBase = _name
 
+        self.addAutomaticEnergyBalance=True
+
+        self.generateUnitTypesUsed=True
+
+
     def setDeckName(self,_name):
         self.nameBase = _name
 
@@ -58,6 +63,7 @@ class RunParallelTrnsys():
         self.inputs["addResultsFolder"]  = False
         self.inputs["rerunFailedCases"]       = False
 
+        self.inputs["doAutoUnitNumbering"] = False
 
         self.outputFileDebugRun = os.path.join(self.path,"debugParallelRun.dat")
 
@@ -254,7 +260,11 @@ class RunParallelTrnsys():
         shutil.move(root_src_dir, root_target_dir)
 
     def buildTrnsysDeck(self):
+        """
+            It builds a TRNSYS Deck from a listDdck with pathDdck using the BuildingTrnsysDeck Class.
+            it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
 
+        """
         # ==============================================================================
         # BUILDING OF TRNSYS DECK
         # ==============================================================================
@@ -266,11 +276,23 @@ class RunParallelTrnsys():
         deckExplanation = []
         deckExplanation.append("! ** New solar-ice deck. **\n")
         deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck,self.pathDdck)
-        deck.readDeckList()
+        deck.readDeckList(doAutoUnitNumbering=self.inputs['doAutoUnitNumbering'])
+
         deck.overwriteForcedByUser = self.overwriteForcedByUser
         deck.writeDeck(addedLines=deckExplanation)
         self.overwriteForcedByUser=deck.overwriteForcedByUser
+
         deck.checkTrnsysDeck()
+
+        if(self.generateUnitTypesUsed==True):
+
+            deck.saveUnitTypeFile()
+
+        if (self.addAutomaticEnergyBalance == True):
+            deck.automaticEnegyBalanceStaff(unit=600)
+            deck.writeDeck()  # Deck rewritten with added printer
+
+        # deck.addEnergyBalance()
 
         return deck.nameDeck
 
