@@ -10,6 +10,7 @@ import os
 import string,shutil
 import pytrnsys.pdata.processFiles as spfUtils
 import re
+import numpy as num
 
 class DeckTrnsys():
     """
@@ -109,7 +110,6 @@ class DeckTrnsys():
             self.nameDck = useDeckName    
             self.nameDckPathOutput = useDeckName 
             
-#        infile=open(self.nameDck,'r')            
         infile=open(self.nameDckPathOutput,'r')
         
         lines=infile.readlines()        
@@ -149,18 +149,9 @@ class DeckTrnsys():
         if(self.eliminateComments==True):
             self.linesChanged = spfUtils.purgueComments(self.linesChanged,['!'])
         
-#        print self.linesChanged
         infile.close()
 
         
-        #Create temporary file
-        
-#        tempName = "%s.temp" % self.nameDck
-#        print "tempName:%s" % tempName
-#        tempFile=open(tempName,'w')
-#
-#        tempFile.writelines(self.linesChanged)
-#        tempFile.close()
 
     def writeDeck(self):
 
@@ -498,7 +489,7 @@ class DeckTrnsys():
                      
                      for key in self.parameters.keys():
                          
-                         print ("IN TRY key:%s"%key)
+                         # print ("IN TRY key:%s"%key)
 
 #                         myName = string.replace(name," ","")
                                               
@@ -542,45 +533,17 @@ class DeckTrnsys():
 #                 
 #        return None
         
-
-    def readAllTypes(self):
-
-        self.TrnsysTypes = []
-        self.TrnsysUnits = []
-        
-        for i in range(len(self.linesReadedNoComments)):
-            
-            splitEquality =  self.linesReadedNoComments[i].split()
-        
-            try:    
-                unit  = splitEquality[0].replace(" ","")
-                nUnit = splitEquality[1].replace(" ","")                                      
-                types =  splitEquality[2].replace(" ","")     
-                ntype =  splitEquality[3].replace(" ","")     
-                
-                
-                if(unit.lower()=="unit".lower() and types.lower()=="Type".lower()):
-#                    print "unit:%s nUnit:%s types:%s ntype:%s"%(unit,nUnit,types,ntype)
-                    self.TrnsysTypes.append(int(ntype))
-                    self.TrnsysUnits.append(int(nUnit))
-                
-            except:
-                pass
-                 
-        return None
-
-   
     def getTypeFromUnit(self,myUnit):
 
         for i in range(len(self.linesReadedNoComments)):
             
             splitEquality =  self.linesReadedNoComments[i].split()
         
-            try:    
+            try:
                 unit  = splitEquality[0].replace(" ","")
-                nUnit = splitEquality[1].replace(" ","")                                      
-                types =  splitEquality[2].replace(" ","")     
-                ntype =  splitEquality[3].replace(" ","")     
+                nUnit = splitEquality[1].replace(" ","")
+                types =  splitEquality[2].replace(" ","")
+                ntype =  splitEquality[3].replace(" ","")
                 
                 
                 if(unit.lower()=="unit".lower() and types.lower()=="Type".lower()):
@@ -589,7 +552,6 @@ class DeckTrnsys():
                     if(nUnit.lower()==myUnit.lower()):
                         print ("UNIT FOUND myUnit:%s type:%s"%(myUnit,ntype))
                         return ntype
-                
             except:
                 pass
                  
@@ -686,11 +648,71 @@ class DeckTrnsys():
     # it does not work if 
         # ______ ! dlskdkd
         #  EQUATIONS ! sdsds
-    def checkEquationsAndConstants(self):
-              
+    def readEnergyBalanceVariablesFromDeck(self):
+        """Reading all the variables defined in the deck that follow the energy balance standard.
+           This function reads from self.linesChanged filled in the loadDeck function.
+           The standard nomenclature of energy balance variables are:
+           elSysIn_ for electricity given into the system
+           elSysOut_ for electricity going out of the system
+           qSysIn_ for heat given into the system
+           qSysOut_ for heat going out of the system
+        """
+
+        # self.qBalanceIn  = []
+        # self.qBalanceOut = []
+        # self.elBalanceIn  = []
+        # self.elBalanceOut = []
+
+        self.eBalance = []
         for i in range(len(self.linesChanged)):
-           
             splitBlank = self.linesChanged[i].split()
+
+            if(splitBlank[0][0:7]=="elSysIn"):
+                self.eBalance.append(splitBlank[0])
+            if(splitBlank[0][0:8]=="elSysOut"):
+                self.eBalance.append(splitBlank[0])
+            if(splitBlank[0][0:6]=="qSysIn"):
+                self.eBalance.append(splitBlank[0])
+            if(splitBlank[0][0:7]=="qSysOut"):
+                self.eBalance.append(splitBlank[0])
+
+
+    def addEnergyBalanceMonthlyPrinter(self,unit):
+        """
+            Adds a monthly printer in the deck using the energy balance variables.
+            It also calulates the most common KPI such as monthly and yearly SPF
+        """
+
+        # size = len(self.qBalanceIn)+len(self.qBalanceOut)+len(self.elBalanceIn)+len(self.elBalanceOut)
+
+        lines = []
+        line = "***************************************************************\n";lines.append(line)
+        line = "**BEGIN energy Balance printer automatically geneated from DDck\n";lines.append(line)
+        line = "***************************************************************\n";lines.append(line)
+        line = "ASSIGN temp\ENERGY_BALANCE_MO.Prt %d\n"%unit;lines.append(line)
+        line = "UNIT %d Type 46\n"%unit;lines.append(line)
+        line = "PARAMETERS 6\n";lines.append(line)
+        line = "%d !1: Logical unit number\n"%unit;lines.append(line)
+        line = "-1 !2: for monthly summaries\n";lines.append(line)
+        line = "1  !3: 1:print at absolute times\n";lines.append(line)
+        line = "-1 !4 -1: monthly integration\n";lines.append(line)
+        line = "1  !5 number of outputs to avoid integration\n";lines.append(line)
+        line = "1  !6 output number to avoid integration\n";lines.append(line)
+        line = "INPUTS %d\n"%len(self.eBalance);lines.append(line)
+        allvars = " ".join(self.eBalance)
+        line = "%s\n"%allvars;lines.append(line)
+        line = "*******************************\n";lines.append(line)
+        line = "%s\n"%allvars;lines.append(line)
+
+        # self.linesChanged=self.linesChanged+lines
+        return lines
+
+    def checkEquationsAndConstants(self,lines):
+
+        #lines=linesChanged
+        for i in range(len(lines)):
+           
+            splitBlank = lines[i].split()
            
             
             if(splitBlank[0].lower()=="EQUATIONS".lower() or splitBlank[0].lower()=="CONSTANTS".lower()):               
@@ -706,7 +728,7 @@ class DeckTrnsys():
                 while(error==0):
                     i = i+1
                     
-                    splitEquality = self.linesChanged[i].split('=')
+                    splitEquality = lines[i].split('=')
                     error = 1
 #                    print "count=%d"%countedValues
 #                    print splitEquality
@@ -719,7 +741,7 @@ class DeckTrnsys():
                 if(countedValues != numberOfValues):
                     parsedFile = "%s.parse" % self.nameDck
                     outfile=open(parsedFile,'w')
-                    outfile.writelines(self.linesChanged)                
+                    outfile.writelines(lines)
                     outfile.close()
                         
                     raise ValueError("FATAL Error in : ",splitBlank[0]," at line ",lineError," of parsed file =",\
@@ -841,6 +863,8 @@ class DeckTrnsys():
 
         if (typeNum == 888):
             return "General Controller (SPF)"
+        if (typeNum == 65):
+            return "Online plotter (TRNSYS)"
         elif (typeNum == 816):
             return "Averaging"
         elif (typeNum == 862):
@@ -852,29 +876,35 @@ class DeckTrnsys():
         elif (typeNum == 993):
             return "Recall"
         elif (typeNum == 46):
-            return "Monthly integrator"
+            return "Monthly integrator (TRNSYS)"
         elif (typeNum == 9):
-            return "Data reader"
+            return "Data reader (TRNSYS)"
         elif (typeNum == 109):
-            return "Weather data processor"
+            return "Weather data processor (TRNSYS)"
         elif (typeNum == 33):
             return "Psychrometrics"
         elif (typeNum == 69):
             return "Sky temperature"
+        elif (typeNum == 194):
+            return "PV module (TRNSYS)"
+        elif (typeNum == 320):
+            return "PID controller"
         elif (typeNum == 861):
             return "Ice Storage non-deiceable (SPF)"
         elif (typeNum == 25):
-            return "User defined printer"
+            return "User defined printer (TRNSYS)"
         elif (typeNum == 889):
             return "Adapted PD-controller"
         elif (typeNum == 833):
             return "Collector with condensation (SPF)"
+        elif (typeNum == 951):
+            return "EWS with integrated g-functions (SPF)"
         elif (typeNum == 977):
             return "Parameter fit heat pump (SPF)"
         elif (typeNum == 1925 or typeNum == 1924):
             return "Plug-flow TES (SPF)"
         elif (typeNum == 811):
-            return "Tempering valve"
+            return "Tempering valve (SPF)"
         elif (typeNum == 929):
             return "TeePiece (SPF)"
         elif (typeNum == 931):
@@ -884,7 +914,7 @@ class DeckTrnsys():
         elif (typeNum == 5998):
             return "Building ISO (SPF)"
         elif (typeNum == 2):
-            return "Collector controller"
+            return "Collector controller (TRNSYS)"
         elif (typeNum == 935):
             return "Flow solver (SPF)"
         elif (typeNum == 711):

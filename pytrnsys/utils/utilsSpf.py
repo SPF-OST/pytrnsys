@@ -60,6 +60,7 @@ def addYearlyValue(array,yearlyFactor=1.0):
     sumQ = sum(array)
     myArray = array.copy()
     myArray.resize(13,refcheck=False)
+
     if(yearlyFactor==0):
         yearlyFactor=1
         print ("yearlyFactor should be different from 0, 1 is assumed")

@@ -8,6 +8,8 @@ ToDo :
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deck
 import os
+import pytrnsys.trnsys_util.deckUtils as deckUtils
+import numpy as num
 # import Tkinter as tk
 import tkinter as tk
 # import Tkinter.messagebox as tkMessageBox
@@ -41,7 +43,10 @@ class BuildTrnsysDeck():
 
         self.skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
         self.eliminateComments = False
-        
+
+        self.replaceAutomaticUnits=True
+
+
     def loadDeck(self,_path,_name):        
             
         nameOneDck = _path + "\%s.%s" % (_name,self.extOneSheetDeck)
@@ -92,15 +97,19 @@ class BuildTrnsysDeck():
 
             self.deckText.append(caption)
 
+
+
             self.deckText = self.deckText + addedLines
 
-    def readDeckList(self):
+    def readDeckList(self,doAutoUnitNumbering=True):
         """
          Reads all ddck files form the nameList and creates a single string with all in self.deckText
         :param self: nameList
         :return: self.deckText
 
         """
+
+        self.unitId=9 #I start at 10 becasue it seems thta UNIT 4 and 6 can't be used?
 
         for i in range(len(self.nameList)):
             
@@ -138,8 +147,13 @@ class BuildTrnsysDeck():
             addedLines = firstThreeLines+self.linesChanged
             
             caption = " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"%(nameList,pathList)
-            
-            
+
+            if(doAutoUnitNumbering):
+                (unit,types,fileAssign,fileAssignUnit)=deckUtils.readAllTypes(addedLines)
+                print ("Replacemenet of Units of file:%s"%nameList)
+                self.unitId = deckUtils.replaceAllUnits(addedLines,self.unitId,unit,fileAssignUnit,fileAssign)
+
+
             self.deckText.append(caption)
             
             self.deckText =  self.deckText + addedLines
@@ -177,15 +191,66 @@ class BuildTrnsysDeck():
         else:
             raise ValueError("Not Accepted by user")
         
-        
-    def checkTrnsysDeck(self):
-        
+
+
+    def readTrnsyDeck(self):
+        """
+         It reads the deck generated using the DeckTrnsys Class and saves it into self.myDeck class DeckTrnsys.
+        """
         nameDeck = self.nameDeck.split(".")[0]
         nameDeck = nameDeck.split("\\")[-1]
-        myDeck = deck.DeckTrnsys(self.pathDeck,nameDeck)
+        self.myDeck = deck.DeckTrnsys(self.pathDeck,nameDeck)
 
-        myDeck.eliminateComments=False
-        myDeck.loadDeckAndEraseWhiteSpaces()
-        myDeck.checkEquationsAndConstants()
-        
-        
+        self.myDeck.eliminateComments=False
+        self.myDeck.loadDeckAndEraseWhiteSpaces()
+        self.linesDeckReaded = self.myDeck.linesChanged
+
+        # self.myDeck.loadDeckWithoutComments()
+        # self.linesDeckReaded = self.myDeck.linesReadedNoComments
+
+    def checkTrnsysDeck(self):
+
+        self.readTrnsyDeck()
+        self.myDeck.checkEquationsAndConstants(self.linesDeckReaded)
+        # self.myDeck.checkEquationsAndConstants(self.deckText) #This does not need to read
+
+    def saveUnitTypeFile(self):
+
+        (self.TrnsysUnits, self.TrnsysTypes,self.filesUsedInDdck,self.filesUnitUsedInDdck) = deckUtils.readAllTypes(self.deckText,sort=False)
+
+        self.writeTrnsysTypesUsed("UnitsType.info")
+
+
+    def writeTrnsysTypesUsed(self, name):
+
+        lines = "UNIT\tTYPE\tName\n"
+
+        for i in range(len(self.TrnsysTypes)):
+
+            line = "%4d\t%4d\t%s\n" % (
+            self.TrnsysUnits[i], self.TrnsysTypes[i], self.myDeck.getTypeName(self.TrnsysTypes[i]))
+            lines = lines + line
+
+        for i in range(len(self.filesUsedInDdck)):
+            nameUnitFile=deckUtils.getDataFromDeck(self.linesDeckReaded,self.filesUnitUsedInDdck[i])
+            line = "%s\t%s\t%s\n" % (self.filesUnitUsedInDdck[i],nameUnitFile[:-1],self.filesUsedInDdck[i])
+            lines = lines + line
+
+        nameFile = os.path.join(self.pathDeck, name)
+
+        print ("Type file :%s created" % nameFile)
+        outfile = open(nameFile, 'w')
+        outfile.writelines(lines)
+
+
+    def automaticEnegyBalanceStaff(self,unit=600):
+        """
+            It reads and generates a onthly printer for energy system calculations in an automatic way
+            It needs the data read by checkTrnsysDeck
+        """
+        self.myDeck.readEnergyBalanceVariablesFromDeck()
+        lines = self.myDeck.addEnergyBalanceMonthlyPrinter(unit)
+        self.deckText = self.deckText[:-4] + lines +self.deckText[-4:]
+        self.writeDeck() # Deck rewritten with added printer
+
+

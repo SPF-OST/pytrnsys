@@ -68,7 +68,7 @@ class DownSizeForPlotting():
         self.timeStepNew = timeStepNew
         self.skypLine = int(self.timeStepNew/self.timeStepOld)
 
-        print "timeBegin:%f timeEnd:%f"%(_timeBegin,_timeEnd)
+        print("timeBegin:%f timeEnd:%f"%(_timeBegin,_timeEnd))
         
         self.load.loadFileAndCut(_timeBegin,_timeEnd,skypedLines)
 
@@ -92,7 +92,7 @@ class DownSizeForPlotting():
         for k in range(len(column)):
             for j in range(len(self.variablesDownSized[0])):
                 if(j+1 == column[k]):
-                    print "RECALCULATE COLUMN :%d with factor :%f"%(column[k],factor[k])
+                    print("RECALCULATE COLUMN :%d with factor :%f"%(column[k],factor[k]))
                     for i in range(len(self.variablesDownSized)):                         
                         self.variablesDownSized[i][j] = self.variablesDownSized[i][j]*factor[k]
             

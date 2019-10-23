@@ -10,7 +10,7 @@ Date   : 14.12.2012
 """
 
 import string, os
-import processFiles as spfUtils
+import pytrnsys.pdata.processFiles as spfUtils
 
 class loadBase():
     

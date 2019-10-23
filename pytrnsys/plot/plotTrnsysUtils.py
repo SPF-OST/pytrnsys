@@ -11,7 +11,7 @@ import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 import matplotlib.pyplot as plt
 import matplotlib
 import os
-import plotMatplotlib
+import pytrnsys.plot.plotMatplotlib
 import numpy as num
 
 class PlotTrnsysUtils():

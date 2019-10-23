@@ -366,21 +366,26 @@ class ReadTrnsysFiles():
         self.deckVariables = self.deck.getAllDataFromDeck()
         return self.deckVariables
             
-    def readAllTypes(self):
+    def readAllTypes(self): #It should be deprecated. Done at building Deck level
         
         self.deck.readAllTypes()
         self.TrnsysTypes = self.deck.TrnsysTypes
         self.TrnsysUnits = self.deck.TrnsysUnits
         print ("types loaded")
 
-    def writeTrnsysTypesUsed(self,name):
 
-        iSort = num.argsort(self.TrnsysUnits)
+    def writeTrnsysTypesUsed(self,name,doSort=False): #It should be deprecated. Done at building deck level
+
+        if(doSort):
+            iSort = num.argsort(self.TrnsysUnits)
 
         lines = "UNIT\tTYPE\tName\n"
 
         for i in range(len(self.TrnsysTypes)):
-            k = iSort[i]
+            if(doSort):
+                k = iSort[i]
+            else:
+                k=i
             line="%4d\t%4d\t%s\n"%(self.TrnsysUnits[k],self.TrnsysTypes[k],self.deck.getTypeName(self.TrnsysTypes[k]))
             lines=lines+line
 

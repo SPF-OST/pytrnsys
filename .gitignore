@@ -1,6 +1,8 @@
 *pyc
 /build/
-docs/build/
+/docs/_static/
+/docs/_build/
+/docs/_templates
 /.idea/
 *gz
 *.orig

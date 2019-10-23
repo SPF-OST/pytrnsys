@@ -11,8 +11,8 @@ ToDo :
 
 
 import os
-import pytrnsys.processingSimulations.processTrnsysBase as processTrnsys
-import pytrnsys.processingData.loadBaseNumpy as load
+import pytrnsys.psim.processTrnsysBase as processTrnsys
+import pytrnsys.pdata.loadBaseNumpy as load
 import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
 import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
 

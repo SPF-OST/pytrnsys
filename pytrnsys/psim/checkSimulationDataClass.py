@@ -54,7 +54,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
                             k += 1
                 if k != 1:
                     failedCases.append(case + "\n")
-                    print case + " failed, number of Fatal errors = " +str(k-1)
+                    print(case + " failed, number of Fatal errors = " +str(k-1))
 
 
                 else:
@@ -90,7 +90,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
             dst = dstFolder
             shutil.move(src, dst)
 
-            print "moved failed cases from " + self.path + " to " + dstFolder
+            print("moved failed cases from " + self.path + " to " + dstFolder)
 
 
     def checkNumberOfMonthsSimulated(self):
