@@ -36,6 +36,14 @@ pytrnsys.trnsys\_util.deckTrnsys module
    :undoc-members:
    :show-inheritance:
 
+pytrnsys.trnsys\_util.deckUtils module
+--------------------------------------
+
+.. automodule:: pytrnsys.trnsys_util.deckUtils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pytrnsys.trnsys\_util.readConfigTrnsys module
 ---------------------------------------------
 
