@@ -19,15 +19,7 @@ class CreateTrnsysDeck():
         
         print ("name:%s path:%s deckName:%s\n"% (self.originalName,self.path,self.originalDeckName))
         
-        split = self.originalName.split('-')
-
-        try: #DC : Why do we need a special strucutre of the name? Can we ignore that?
-            self.case = split[0]
-            self.system = split[1]
-            self.building = split[2]
-            self.city = split[3] 
-        except:
-            pass
+        self.case = _name #.split('-')
         
         self.deckOutputs = []
         self.combineAllCases=False

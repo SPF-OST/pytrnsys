@@ -1,5 +1,8 @@
 
 import numpy as num
+import pytrnsys.pdata.processFiles as spfUtils
+import os
+
 
 def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesUsedInDdck):
 
@@ -15,7 +18,7 @@ def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesU
         try:
             filesUnitUsedInDdck[i] = int(filesUnitUsedInDdck[i])
 
-            print ("fileUnit is an integer %d. THIS IS NOT RECOMENDED SINCE AUTOMATIC UNIT NUMBERING DOES NOT WORK" % filesUnitUsedInDdck[i])
+            raise ValueError("fileUnit is an integer %d. THIS IS NOT ALLOWED IF AUTOMATIC UNIT NUMBERING IS ACTIVE" % filesUnitUsedInDdck[i])
 
         except:
             # print ("fileUnit is a string %s. Look for the string unit" % self.filesUnitUsedInDdck[i])
@@ -181,3 +184,245 @@ def getMyDataFromDeck(linesReadedNoComments,myName):
             pass
 
     return None
+
+
+def loadDeck(nameDck,eraseBeginComment=True,eliminateComments=True):
+    """
+    Parameters
+    ----------
+    nameDck : str
+        name of the TRNSYS deck to be loaded
+    eraseBeginComment : bool
+        True will delete all lines starting with *, !, and blank, but also the comments *********anyComment*********
+        False will delete all lines starting with !, and blank, but keep the ones starting with **
+    Return
+    ------
+    lines : str
+        list of lines obateined form the deck without the comments
+    """
+
+    infile = open(nameDck, 'r')
+
+    lines = infile.readlines()
+
+    #        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
+    if (eraseBeginComment == True):
+        skypChar = ['*', '!', '      \n']  # ['*'] #This will eliminate the lines starting with skypChar
+    else:
+        skypChar = ['!', '      \n']  # ['*'] #This will eliminate the lines starting with skypChar
+
+    replaceChar = None  # [',','\''] #This characters will be eliminated, so replaced by nothing
+
+    linesChanged = spfUtils.purgueLines(lines, skypChar, replaceChar, removeBlankLines=True)
+
+    # Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
+    if (eliminateComments == True):
+        linesChanged = spfUtils.purgueComments(linesChanged, ['!'])
+
+    return linesChanged
+
+
+def checkEquationsAndConstants(lines):
+    # lines=linesChanged
+    for i in range(len(lines)):
+
+        splitBlank = lines[i].split()
+
+        if (splitBlank[0].lower() == "EQUATIONS".lower() or splitBlank[0].lower() == "CONSTANTS".lower()):
+
+            lineError = i + 1
+            try:
+                numberOfValues = int(splitBlank[1])
+            except:
+                raise ValueError(
+                    "checkEquationsAndConstants %s can't be split in line i:%d (missing number?)" % (splitBlank, i))
+
+            countedValues = 0  # start counting
+            error = 0
+            while (error == 0):
+                i = i + 1
+
+                splitEquality = lines[i].split('=')
+                error = 1
+                #                    print "count=%d"%countedValues
+                #                    print splitEquality
+
+                if (len(splitEquality) >= 2):
+                    #                        print "counting at %s"%(self.linesChanged[i])
+                    error = 0
+                    countedValues = countedValues + 1
+
+            if (countedValues != numberOfValues):
+                parsedFile = "%s.parse" % self.nameDck
+                outfile = open(parsedFile, 'w')
+                outfile.writelines(lines)
+                outfile.close()
+
+                raise ValueError("FATAL Error in : ", splitBlank[0], " at line ", lineError, " of parsed file =", \
+                                 parsedFile, ". Number set is ", numberOfValues, " and there are ", countedValues)
+
+def getTypeName(typeNum):
+
+    if (typeNum == 888):
+        return "General Controller (SPF)"
+    if (typeNum == 65):
+        return "Online plotter (TRNSYS)"
+    elif (typeNum == 816):
+        return "Averaging"
+    elif (typeNum == 862):
+        return "TColl control expected for switch (SPF)"
+    elif (typeNum == 817):
+        return "Time delay"
+    elif (typeNum == 863):
+        return "Ice controller (SPF)"
+    elif (typeNum == 993):
+        return "Recall"
+    elif (typeNum == 46):
+        return "Monthly integrator (TRNSYS)"
+    elif (typeNum == 9):
+        return "Data reader (TRNSYS)"
+    elif (typeNum == 109):
+        return "Weather data processor (TRNSYS)"
+    elif (typeNum == 33):
+        return "Psychrometrics"
+    elif (typeNum == 69):
+        return "Sky temperature"
+    elif (typeNum == 194):
+        return "PV module (TRNSYS)"
+    elif (typeNum == 320):
+        return "PID controller"
+    elif (typeNum == 861):
+        return "Ice Storage non-deiceable (SPF)"
+    elif (typeNum == 25):
+        return "User defined printer (TRNSYS)"
+    elif (typeNum == 889):
+        return "Adapted PD-controller"
+    elif (typeNum == 833):
+        return "Collector with condensation (SPF)"
+    elif (typeNum == 951):
+        return "EWS with integrated g-functions (SPF)"
+    elif (typeNum == 977):
+        return "Parameter fit heat pump (SPF)"
+    elif (typeNum == 1925 or typeNum == 1924):
+        return "Plug-flow TES (SPF)"
+    elif (typeNum == 811):
+        return "Tempering valve (SPF)"
+    elif (typeNum == 929):
+        return "TeePiece (SPF)"
+    elif (typeNum == 931):
+        return "Type 931 CHECK (SPF)"
+    elif (typeNum == 1792):
+        return "Radiant floor (SPF)"
+    elif (typeNum == 5998):
+        return "Building ISO (SPF)"
+    elif (typeNum == 2):
+        return "Collector controller (TRNSYS)"
+    elif (typeNum == 935):
+        return "Flow solver (SPF)"
+    elif (typeNum == 711):
+        return "2D Ground model (SPF)"
+    elif (typeNum == 979):
+        return "Low temperature Al-reactor (SPF)"
+
+    else:
+        return "Unknown"
+
+def readEnergyBalanceVariablesFromDeck(lines):
+    """Reading all the variables defined in the deck that follow the energy balance standard.
+       This function reads from self.linesChanged filled in the loadDeck function.
+       The standard nomenclature of energy balance variables are:
+       elSysIn_ for electricity given into the system
+       elSysOut_ for electricity going out of the system
+       qSysIn_ for heat given into the system
+       qSysOut_ for heat going out of the system
+
+       Return
+       ------
+       eBalance:  a list with all energy balance terms
+    """
+
+
+    eBalance = []
+    for i in range(len(lines)):
+        splitBlank = lines[i].split()
+
+        if(splitBlank[0][0:7]=="elSysIn"):
+            eBalance.append(splitBlank[0])
+        if(splitBlank[0][0:8]=="elSysOut"):
+            eBalance.append(splitBlank[0])
+        if(splitBlank[0][0:6]=="qSysIn"):
+            eBalance.append(splitBlank[0])
+        if(splitBlank[0][0:7]=="qSysOut"):
+            eBalance.append(splitBlank[0])
+
+    return eBalance
+
+def addEnergyBalanceMonthlyPrinter(unit,eBalance):
+    """
+        Adds a monthly printer in the deck using the energy balance variables.
+        It also calulates the most common KPI such as monthly and yearly SPF
+    """
+
+    # size = len(self.qBalanceIn)+len(self.qBalanceOut)+len(self.elBalanceIn)+len(self.elBalanceOut)
+
+    lines = []
+    line = "***************************************************************\n";lines.append(line)
+    line = "**BEGIN energy Balance printer automatically geneated from DDck\n";lines.append(line)
+    line = "***************************************************************\n";lines.append(line)
+    line = "ASSIGN temp\ENERGY_BALANCE_MO.Prt %d\n"%unit;lines.append(line)
+    line = "UNIT %d Type 46\n"%unit;lines.append(line)
+    line = "PARAMETERS 6\n";lines.append(line)
+    line = "%d !1: Logical unit number\n"%unit;lines.append(line)
+    line = "-1 !2: for monthly summaries\n";lines.append(line)
+    line = "1  !3: 1:print at absolute times\n";lines.append(line)
+    line = "-1 !4 -1: monthly integration\n";lines.append(line)
+    line = "1  !5 number of outputs to avoid integration\n";lines.append(line)
+    line = "1  !6 output number to avoid integration\n";lines.append(line)
+    line = "INPUTS %d\n"%len(eBalance);lines.append(line)
+    allvars = " ".join(eBalance)
+    line = "%s\n"%allvars;lines.append(line)
+    line = "*******************************\n";lines.append(line)
+    line = "%s\n"%allvars;lines.append(line)
+
+    # self.linesChanged=self.linesChanged+lines
+    return lines
+
+
+def changeAssignPath(lines,key, rootPath):
+    """
+
+    Parameters
+    ----------
+    lines : obj:list obj: of obj:str
+        List containing all the lines of the dck file
+    key : str
+        key that will be replaced by the path
+    rootPath : str
+        path of the root directory that will replace the key
+
+    Returns
+    -------
+    lines : str
+        list of lines obateined form replacing the keys
+    """
+    try:
+        for i in range(len(lines)):
+            splitBlank = lines[i].split()
+
+
+            if (splitBlank[0] == "ASSIGN"):
+                splitPath = splitBlank[1].split("\\")
+                lineChanged = False
+                for j in range(len(splitPath)):
+                    if splitPath[j].lower() == key:
+                        name = os.path.join(*splitPath[j + 1:])
+                        if len(splitBlank) > 2:
+                            lineChanged = "ASSIGN \"%s\" %s \n" % (
+                                os.path.join(rootPath, name), splitBlank[2])
+                        else:
+                            lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(rootPath, name))
+                if (lineChanged != False):
+                    lines[i] = lineChanged
+        return lines
+    except:
+        raise ValueError('Unable to replace path$ in ddck' + name + 'with corresponding root directory')

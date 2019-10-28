@@ -9,6 +9,7 @@ import os
 import string,shutil
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
+import pytrnsys.trnsys_util.deckUtils as deckUtils
 
 class ExecuteTrnsys():
     """
@@ -62,16 +63,6 @@ class ExecuteTrnsys():
         if(self.useRelativePath==False):         
             self.filesOutputPath = self.pathOutput
 
-        
-        # if True it reads files from common folder defined by TRNSYS_DATA_FOLDER
-        # the problem is that some files like building fail if tried to open by several trnsys executables
-        
-#        self.useSameCommonFolder=True
-        
-#        print "file:%s path:%s pathOutput:%s filesOutputPath:%s\n" % (self.fileName,self.path,self.pathOutput,self.filesOutputPath)
-
-        # self.copyFilesForRunning() #I move this in order to be able to set the path self.myCommonTrnsysFolder manually.
-
     def setRemovePopUpWindow(self,removePopUpWindow):
         self.removePopUpWindow=removePopUpWindow
 
@@ -124,11 +115,9 @@ class ExecuteTrnsys():
         self.deckTrnsys.pathOutput = self.pathOutput
         self.deckTrnsys.tempFolderEnd = self.tempFolderEnd
         self.deckTrnsys.nameDckPathOutput = self.nameDckPathOutput
-        
 
         if(self.useRelativePath==False):         
             self.filesOutputPath = self.pathOutput
-                
 
     def createDeckBackUp(self):
 
@@ -139,22 +128,22 @@ class ExecuteTrnsys():
         
         self.deckTrnsys.resizeParameters(read=True)
         
-    def loadDeck(self,useDeckName=False,check=False,eliminateComments=False):        
-                    
-              
-        # print self.path
-        # print self.fileName
-                
-        self.deckTrnsys = deckTrnsys.DeckTrnsys(self.path,self.fileName)
+    def loadDeck(self,useDeckName=False,check=False,eliminateComments=False):
 
-        if(eliminateComments==False):
-            self.deckTrnsys.eliminateComments =False   
-            
-        self.deckTrnsys.loadDeck(useDeckName,eraseBeginComment=False) #neglectBeginComment=True in order to let information about each file in the deck
-        
+        if(useDeckName==False):
+            nameDck = self.fileName #self.nameDckPathOutput
+        else:
+            nameDck=useDeckName
+
+        # self.linesChanged= deckUtils.loadDeck(nameDck, eraseBeginComment=False)
+
+        self.deckTrnsys = deckTrnsys.DeckTrnsys(self.path,nameDck)
+
+        lines = self.deckTrnsys.loadDeck(eraseBeginComment=False,eliminateComments=False)
+
         if(check==True):
-            self.deckTrnsys.checkEquationsAndConstants()
-        
+            deckUtils.checkEquationsAndConstants(lines)
+
     def changeParameter(self,_parameters):
 
         self.deckTrnsys.changeParameter(_parameters)
