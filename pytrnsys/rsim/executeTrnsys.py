@@ -128,18 +128,16 @@ class ExecuteTrnsys():
         
         self.deckTrnsys.resizeParameters(read=True)
         
-    def loadDeck(self,useDeckName=False,check=False,eliminateComments=False):
+    def loadDeck(self,useDeckName=False,check=False,eliminateComments=False,useDeckOutputPath=False):
 
         if(useDeckName==False):
             nameDck = self.fileName #self.nameDckPathOutput
         else:
             nameDck=useDeckName
 
-        # self.linesChanged= deckUtils.loadDeck(nameDck, eraseBeginComment=False)
-
         self.deckTrnsys = deckTrnsys.DeckTrnsys(self.path,nameDck)
 
-        lines = self.deckTrnsys.loadDeck(eraseBeginComment=False,eliminateComments=False)
+        lines = self.deckTrnsys.loadDeck(eraseBeginComment=False,eliminateComments=False,useDeckOutputPath=useDeckOutputPath)
 
         if(check==True):
             deckUtils.checkEquationsAndConstants(lines)

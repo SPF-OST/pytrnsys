@@ -32,6 +32,8 @@ class LatexReport():
 
         # Every time we add a plot we increase this vector and it is used
         # to remove them after pdf creation if cleanMode=True
+
+
         pathReport = os.path.join(os.path.dirname(__file__),'latex_doc')
         if pathReport:
             if 'TEXINPUTS' in os.environ:

@@ -59,7 +59,7 @@ class DeckTrnsys():
         if(self.useRelativePath==False):         
             self.filesOutputPath = self.pathOutput
        
-        # self.nameDckPathOutput = self.pathOutput + "\%s.%s" % (_name,self.extensionDeck)
+        self.nameDckPathOutput = self.pathOutput + "\%s.%s" % (_name,self.extensionDeck)
         
     def setEliminateComments(self,comment):
         self.eliminateComments = comment
@@ -81,7 +81,7 @@ class DeckTrnsys():
         shutil.copy(self.nameDck,nameDeckBck)
 
 
-    def loadDeck(self,useDeckName=False,eraseBeginComment=True,eliminateComments=True):
+    def loadDeck(self,useDeckName=False,eraseBeginComment=True,eliminateComments=True,useDeckOutputPath=False):
         """
         It reads the deck  removing files starting with ***.
         Attributes
@@ -90,16 +90,21 @@ class DeckTrnsys():
         """
 
         if(useDeckName==False):
-            pass
+
+            if(useDeckOutputPath==True):
+                nameDck = self.nameDckPathOutput
+            else:
+                nameDck = self.nameDck
+
             print ("DECK TRNSYS::LOAD DECK nameDeck:%s" % (self.nameDck))
 
         else:
             print ("DECK TRNSYS::LOAD DECK nameDeck:%s USEDECKNAME:%s" % (self.nameDck,useDeckName))
 
-            self.nameDck = useDeckName    
+            # self.nameDck = useDeckName
             # self.nameDckPathOutput = useDeckName
-
-        lines=deckUtils.loadDeck(self.nameDck,eraseBeginComment=eraseBeginComment,eliminateComments=eliminateComments)
+            nameDck = useDeckName
+        lines=deckUtils.loadDeck(nameDck,eraseBeginComment=eraseBeginComment,eliminateComments=eliminateComments)
 
         self.linesDeck = lines
 

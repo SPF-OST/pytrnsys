@@ -223,7 +223,7 @@ class RunParallelTrnsys():
 
             tests[i].moveFileFromSource(fileName[i] + ".dck")
 
-            tests[i].loadDeck()
+            tests[i].loadDeck(useDeckOutputPath=True)
 
             tests[i].changeAssignPath(inputsDict=self.inputs)
 
