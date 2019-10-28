@@ -1,6 +1,7 @@
 
 import numpy as num
 import pytrnsys.pdata.processFiles as spfUtils
+import os
 
 
 def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesUsedInDdck):
@@ -53,9 +54,12 @@ def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
 
         splitBlank = lines[i].split()
 
-        if (splitBlank[0] == "ASSIGN"):
-            filesUsedInDdck.append(splitBlank[1])
-            filesUnitUsedInDdck.append(splitBlank[2])
+        try:
+            if (splitBlank[0] == "ASSIGN"):
+                filesUsedInDdck.append(splitBlank[1])
+                filesUnitUsedInDdck.append(splitBlank[2])
+        except:
+            pass
 
         try:
             unit = splitBlank[0].replace(" ", "")
@@ -382,3 +386,43 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
 
     # self.linesChanged=self.linesChanged+lines
     return lines
+
+
+def changeAssignPath(lines,key, rootPath):
+    """
+
+    Parameters
+    ----------
+    lines : obj:list obj: of obj:str
+        List containing all the lines of the dck file
+    key : str
+        key that will be replaced by the path
+    rootPath : str
+        path of the root directory that will replace the key
+
+    Returns
+    -------
+    lines : str
+        list of lines obateined form replacing the keys
+    """
+    try:
+        for i in range(len(lines)):
+            splitBlank = lines[i].split()
+
+
+            if (splitBlank[0] == "ASSIGN"):
+                splitPath = splitBlank[1].split("\\")
+                lineChanged = False
+                for j in range(len(splitPath)):
+                    if splitPath[j].lower() == key:
+                        name = os.path.join(*splitPath[j + 1:])
+                        if len(splitBlank) > 2:
+                            lineChanged = "ASSIGN \"%s\" %s \n" % (
+                                os.path.join(rootPath, name), splitBlank[2])
+                        else:
+                            lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(rootPath, name))
+                if (lineChanged != False):
+                    lines[i] = lineChanged
+        return lines
+    except:
+        raise ValueError('Unable to replace path$ in ddck' + name + 'with corresponding root directory')

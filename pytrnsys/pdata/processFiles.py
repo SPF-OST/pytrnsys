@@ -75,10 +75,7 @@ def purgueLines(lines,skypChar,replaceChar,skypedLines=0,removeBlankLines=False,
 #            print "after replace"
 #            print flines[n]   
                 
-    filename = 'C:\Temp\purgueLines.tmp'
-    outfile=open(filename,'w')
-    outfile.writelines(flines)
-    outfile.close()
+
 
 #    print " end of Purgue Lines"
     return flines    
@@ -130,10 +127,7 @@ def purgueComments(lines,commentsChar):
                 # flines.append(string.replace(fline,",",""))
                 flines.append(fline.replace(",",""))
 
-        filename = 'C:\Temp\purgueComments.tmp'
-        outfile=open(filename,'w')
-        outfile.writelines(flines)
-        outfile.close()
+
     
         print ("end of Purgue Lines")
 
