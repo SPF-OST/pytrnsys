@@ -44,7 +44,7 @@ class BuildTrnsysDeck():
         self.skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
         self.eliminateComments = False
 
-        self.replaceAutomaticUnits=True
+        self.replaceAutomaticUnits=False
 
 
     def loadDeck(self,_path,_name):        
@@ -156,9 +156,7 @@ class BuildTrnsysDeck():
                 print ("Replacemenet of Units of file:%s"%nameList)
                 self.unitId = deckUtils.replaceAllUnits(addedLines,self.unitId,unit,fileAssignUnit,fileAssign)
 
-
             self.deckText.append(caption)
-            
             self.deckText =  self.deckText + addedLines
         
     def writeDeck(self,addedLines=None):

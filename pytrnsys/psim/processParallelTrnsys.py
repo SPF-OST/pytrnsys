@@ -20,6 +20,18 @@ import warnings
 
 
 def processDataGeneral(casesInputs):
+    """
+    processes all the specified cases
+
+    Parameters
+    ----------
+    casesInputs: list of str
+        list of strings with all cases to run
+
+    Returns
+    -------
+
+    """
 
     (baseClass,locationPath, fileName, avoidUser, maxMinAvoided, yearReadedInMonthlyFile, cleanModeLatex, firstMonthUsed,\
       processQvsT,firstMonthUsed,buildingArea,dllTrnsysPath,setPrintDataForGle,firstConsideredTime) = casesInputs

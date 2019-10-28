@@ -54,9 +54,12 @@ def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
 
         splitBlank = lines[i].split()
 
-        if (splitBlank[0] == "ASSIGN"):
-            filesUsedInDdck.append(splitBlank[1])
-            filesUnitUsedInDdck.append(splitBlank[2])
+        try:
+            if (splitBlank[0] == "ASSIGN"):
+                filesUsedInDdck.append(splitBlank[1])
+                filesUnitUsedInDdck.append(splitBlank[2])
+        except:
+            pass
 
         try:
             unit = splitBlank[0].replace(" ", "")
@@ -173,6 +176,7 @@ def getMyDataFromDeck(linesReadedNoComments,myName):
         try:
             name = splitEquality[0].replace(" ", "")
             value = splitEquality[1].replace(" ", "")
+            value = splitEquality[1].replace("\n", "")
 
             if (name.lower() == myName.lower()):
                 return value
@@ -208,7 +212,7 @@ def loadDeck(nameDck,eraseBeginComment=True,eliminateComments=True):
     else:
         skypChar = ['!', '      \n']  # ['*'] #This will eliminate the lines starting with skypChar
 
-    replaceChar = None  # [',','\''] #This characters will be eliminated, so replaced by nothing
+    replaceChar =  None #[',','\''] #This characters will be eliminated, so replaced by nothing
 
     linesChanged = spfUtils.purgueLines(lines, skypChar, replaceChar, removeBlankLines=True)
 
@@ -376,7 +380,7 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
     line = "1  !5 number of outputs to avoid integration\n";lines.append(line)
     line = "1  !6 output number to avoid integration\n";lines.append(line)
     line = "INPUTS %d\n"%len(eBalance);lines.append(line)
-    allvars = " ".join(eBalance)
+    allvars = "TIME "+" ".join(eBalance)
     line = "%s\n"%allvars;lines.append(line)
     line = "*******************************\n";lines.append(line)
     line = "%s\n"%allvars;lines.append(line)

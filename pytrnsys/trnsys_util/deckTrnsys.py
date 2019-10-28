@@ -28,7 +28,7 @@ class DeckTrnsys():
 
         self.setPathAndNames(_path,_name)
         
-        self.linesChanged = ""
+        self.linesDeck = ""
         self.cleanMode = False
         self.useAbsoluteTempPath = False #actually False does not work since trnsys does not work with  ./temp/whatever. Corrected False works since temp/whatever works !!
 
@@ -59,7 +59,7 @@ class DeckTrnsys():
         if(self.useRelativePath==False):         
             self.filesOutputPath = self.pathOutput
        
-        self.nameDckPathOutput = self.pathOutput + "\%s.%s" % (_name,self.extensionDeck)
+        # self.nameDckPathOutput = self.pathOutput + "\%s.%s" % (_name,self.extensionDeck)
         
     def setEliminateComments(self,comment):
         self.eliminateComments = comment
@@ -70,7 +70,7 @@ class DeckTrnsys():
         self.pathOutput = self.path + "\%s" % newName
         self.titleOfLatex = "%s" % newName
         self.tempFolderEnd = "%s\\temp" % self.pathOutput   
-        self.nameDckPathOutput = self.pathOutput + "\%s.%s" % (newName,self.extensionDeck)
+        # self.nameDckPathOutput = self.pathOutput + "\%s.%s" % (newName,self.extensionDeck)
 
         if(self.useRelativePath==False):         
             self.filesOutputPath = self.pathOutput
@@ -80,24 +80,13 @@ class DeckTrnsys():
         nameDeckBck = "%s-bck" % self.nameDck        
         shutil.copy(self.nameDck,nameDeckBck)
 
-    # def loadDeckWithComments(self):
-        """
-        It reads the deck without removing comments and files starting with ***.
-        Return
-        ----------
-            linesWithComments : list of lines from the read deck.
-        """
-        # nameDck = self.nameDck
-        # self.linesReadedNoComments=deckUtils.loadDeck(nameDck,eraseBeginComment=False,eliminateComments=False)
-
-        # return self.linesReadedNoComments
 
     def loadDeck(self,useDeckName=False,eraseBeginComment=True,eliminateComments=True):
         """
         It reads the deck  removing files starting with ***.
         Attributes
         ----------
-            linesChanged : :list of lines from the read deck.
+            linesDeck : :list of lines from the read deck.
         """
 
         if(useDeckName==False):
@@ -108,11 +97,13 @@ class DeckTrnsys():
             print ("DECK TRNSYS::LOAD DECK nameDeck:%s USEDECKNAME:%s" % (self.nameDck,useDeckName))
 
             self.nameDck = useDeckName    
-            self.nameDckPathOutput = useDeckName
+            # self.nameDckPathOutput = useDeckName
 
-        self.linesChanged=deckUtils.loadDeck(self.nameDckPathOutput,eraseBeginComment=eraseBeginComment,eliminateComments=eliminateComments)
+        lines=deckUtils.loadDeck(self.nameDck,eraseBeginComment=eraseBeginComment,eliminateComments=eliminateComments)
 
-        return self.linesChanged
+        self.linesDeck = lines
+
+        return lines
 
 
     def writeDeck(self):
@@ -120,16 +111,16 @@ class DeckTrnsys():
         tempName = "%s" % self.nameDck
         print ("tempName:%s" % tempName)
         tempFile=open(tempName,'w')
-        tempFile.writelines(self.linesChanged)
+        tempFile.writelines(self.linesDeck)
         tempFile.close()
 
     def changeAssignPath(self, inputsDict = False):
         """
         This file only changes the assign path of those that start with HOME$, so we use for those the absolute path
-        It assumess that self.linesChanged is loaded.
+        It assumess that self.linesDeck is loaded.
         """
-        for i in range(len(self.linesChanged)):
-            splitBlank = self.linesChanged[i].split()
+        for i in range(len(self.linesDeck)):
+            splitBlank = self.linesDeck[i].split()
 
             try:
                 if (splitBlank[0] == "ASSIGN"):
@@ -154,7 +145,7 @@ class DeckTrnsys():
                                 else:
                                     lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(inputsDict[splitPath[j]], name))
                     if(lineChanged!=False):
-                        self.linesChanged[i] = lineChanged
+                        self.linesDeck[i] = lineChanged
             except:
                 pass
 
@@ -167,9 +158,9 @@ class DeckTrnsys():
         
         plotterFound = 0
         
-        for i in range(len(self.linesChanged)):
+        for i in range(len(self.linesDeck)):
                  
-            splitBlank =  self.linesChanged[i].split() 
+            splitBlank =  self.linesDeck[i].split() 
                    
 #            if(jBegin>0 and i>jBegin+30):
 #                raise ValueError("jBegin found and not finishd yet")
@@ -196,7 +187,7 @@ class DeckTrnsys():
                       
                       for j in range(jBegin,jEnd+1,1):
 #                          print "COMMENT (1) FROM j:%d"%(j)
-                          self.linesChanged[j]="**IGNORE ONLINE PLOTTER - 1"+self.linesChanged[j]
+                          self.linesDeck[j]="**IGNORE ONLINE PLOTTER - 1"+self.linesDeck[j]
                       
                       found=False
                       i=jEnd #it does nothing !!!
@@ -204,7 +195,7 @@ class DeckTrnsys():
                       
               except:
 #                print "COMMENT (3) FROM i:%d"%(i)
-                self.linesChanged[i]="**IGNORE ONLINE PLOTTER 3 - \n"+self.linesChanged[i]
+                self.linesDeck[i]="**IGNORE ONLINE PLOTTER 3 - \n"+self.linesDeck[i]
                 
             else: #First it looks for the unit number corresponding to the TYPE and comments util it enters into the LABEL (try section above)
                 found=False
@@ -218,7 +209,7 @@ class DeckTrnsys():
                     if(unit.lower()=="unit".lower() and types.lower()=="Type".lower() and ntype=="65"):
                         jBegin=i                                      
                         found=True    
-                        self.linesChanged[i]="** IGNORE ONLINE PLOTTER - "+self.linesChanged[i]
+                        self.linesDeck[i]="** IGNORE ONLINE PLOTTER - "+self.linesDeck[i]
 #                        print "FOUND CASE i:%d %s"%(i,ntype) 
                         plotterFound = plotterFound+1
                         
@@ -231,7 +222,7 @@ class DeckTrnsys():
         outfile=open(self.nameDck,'w')
 
 
-        outfile.writelines(self.linesChanged)
+        outfile.writelines(self.linesDeck)
         outfile.close() 
              
         return None
@@ -239,9 +230,9 @@ class DeckTrnsys():
     # used to change the path os files when we move the deck. It is assumed that common folders are the same       
     def updatePath(self):
                 
-        for i in range(len(self.linesChanged)):
+        for i in range(len(self.linesDeck)):
                  
-            splitBlank = self.linesChanged[i].split()
+            splitBlank = self.linesDeck[i].split()
 
             try:       
                 if(splitBlank[0]=="ASSIGN"):                    
@@ -260,19 +251,19 @@ class DeckTrnsys():
                          #Not used from the common folder becasue if some executable try to read the same file it fails.                                                                                                 
                          try: #It changes the buildign anme if set in parameters
                              myFileInNewPath = self.pathOutput +"\\building\\"+ self.parameters["buildingName"]
-                             self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+                             self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
                          except: #change the path to the common Trnsys folder 
                              myFileInNewPath = self.pathOutput +"\\building\\"+ buildingSplit[1]
-                             self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+                             self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
                              
 #                                 try: #It changes the buildign anme if set in parameters
 #                                     myFileInNewPath = self.myCommonTrnsysFolder +"\\building\\"+ self.parameters["buildingName"]
-#                                     self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+#                                     self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
 #                                 except: #change the path to the common Trnsys folder 
 #                                     myFileInNewPath = self.myCommonTrnsysFolder +"\\building\\"+ buildingSplit[1]
-#                                     self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+#                                     self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
                              
-                         print ("Building changed :%s " % self.linesChanged[i])
+                         print ("Building changed :%s " % self.linesDeck[i])
 
 #==============================================================================
 #                               TEMP FOLDER
@@ -286,27 +277,28 @@ class DeckTrnsys():
                         else:
                             myFileInNewPath = "temp\\" + nameSplited[1]
 
-                        self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+                        self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
     
                     except:
                          
                          if(nameSplited[0]=="Temp_zone.BAL" or nameSplited[0]=="Energy_zone.BAL"):                              
                              myFileInNewPath = self.filesOutputPath +"\\"+ nameSplited[0]
-                             self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])      
+                             self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])      
             except:
                 pass
 
     def getVariables(self):
         
         self.eliminateComments = True  #BE CAREFUL, THIS CAN CHANGE  [30,1] by [301] so it does not WORK !!!! DC: Is this updated?
-        self.loadDeck(self.nameDckPathOutput)
-        
+        # self.loadDeck(self.nameDckPathOutput)
+        self.loadDeck(self.nameDck)
+
         self.variablesNames   = []
         self.variablesResults = []
         
-        for i in range(len(self.linesChanged)):
+        for i in range(len(self.linesDeck)):
                  
-             splitEquality = self.linesChanged[i].split('=')
+             splitEquality = self.linesDeck[i].split('=')
              try:                
                  myName = splitEquality[0].replace(" ","")
                  myValue = splitEquality[1].replace(" ","")
@@ -341,10 +333,10 @@ class DeckTrnsys():
                           
     def changeParameter(self,_parameters):
 
-         lines=self.linesChanged
+         lines=self.linesDeck
 
-#         print "linesChanged"
-#         print self.linesChanged
+#         print "linesDeck"
+#         print self.linesDeck
          print ("Change Parameters deckTrnsys Class")
 #         print _parameters
          
@@ -385,19 +377,19 @@ class DeckTrnsys():
 #                              #Not used from the common folder becasue if some executable try to read the same file it fails.
 #                              try: #It changes the buildign anme if set in parameters
 #                                  myFileInNewPath = self.pathOutput +"\\building\\"+ self.parameters["buildingName"]
-#                                  self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+#                                  self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
 #                              except: #change the path to the common Trnsys folder
 #                                  myFileInNewPath = self.pathOutput +"\\building\\"+ buildingSplit[1]
-#                                  self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+#                                  self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
 #
 # #                                 try: #It changes the buildign anme if set in parameters
 # #                                     myFileInNewPath = self.myCommonTrnsysFolder +"\\building\\"+ self.parameters["buildingName"]
-# #                                     self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+# #                                     self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
 # #                                 except: #change the path to the common Trnsys folder
 # #                                     myFileInNewPath = self.myCommonTrnsysFolder +"\\building\\"+ buildingSplit[1]
-# #                                     self.linesChanged[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
+# #                                     self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
 #
-#                              print "Building changed :%s " % self.linesChanged[i]
+#                              print "Building changed :%s " % self.linesDeck[i]
 
 
 #==============================================================================
@@ -429,7 +421,7 @@ class DeckTrnsys():
                                 myFileInNewPath =  "temp\\" + nameSplited[1]
                                 lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
 
-    #                             print "lineChanged-0 : %s pathOut:%s nameSplied:%s" % (self.linesChanged[i],self.pathOutput,nameSplited[1])
+    #                             print "lineChanged-0 : %s pathOut:%s nameSplied:%s" % (self.linesDeck[i],self.pathOutput,nameSplited[1])
 
                          except:
                              
@@ -437,7 +429,7 @@ class DeckTrnsys():
                                   
                                  myFileInNewPath = self.filesOutputPath +"\\"+ nameSplited[0]
                                  lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
-#                                 print "lineChanged-1 : %s pathOut:%s nameSplited:%s" % (self.linesChanged[i],self.pathOutput,nameSplited[0])
+#                                 print "lineChanged-1 : %s pathOut:%s nameSplited:%s" % (self.linesDeck[i],self.pathOutput,nameSplited[0])
                                            
                  except: 
                     pass
@@ -481,15 +473,18 @@ class DeckTrnsys():
 
     def getTypeFromUnit(self,myUnit):
 
-        return deckUtils.getTypeFromUnit(myUnit,self.linesReadedNoComments)
+        return deckUtils.getTypeFromUnit(myUnit,self.linesDeck)
 
-    def getDataFromDeck(self,myName,typeValue="string"):
+    def getDataFromDeck(self,myName,typeValue="double"):
 
-        return deckUtils.getDataFromDeck(self.linesReadedNoComments,myName)
+        return deckUtils.getDataFromDeck(self.linesDeck,myName,typeValue=typeValue)
 
     def getAllDataFromDeck(self):
+
+        linesDeck=self.linesDeck
+        
         self.deckVariables = {}
-        for line in self.linesReadedNoComments:
+        for line in linesDeck:
             if '=' in line:
                 line = line.strip('\n')
                 splitEquality = line.split('=')
@@ -502,7 +497,7 @@ class DeckTrnsys():
                         namespace = {}
                         parts = re.split(r'[*/+-]',re.sub(r'()','',value))
                         for part1 in parts:
-                            namespace[part1]=self.getDataFromDeckRecursively(part1)
+                            namespace[part1]=self.getDataFromDeckRecursively(part1,linesDeck)
                         try:
                             finalValue = eval(value, namespace)
                             self.deckVariables[name] = float(finalValue)
@@ -510,8 +505,8 @@ class DeckTrnsys():
                             pass
         return self.deckVariables
 
-    def getDataFromDeckRecursively(self,part):
-        for line in self.linesReadedNoComments:
+    def getDataFromDeckRecursively(self,part,linesDeck):
+        for line in linesDeck:
             if '=' in line:
                 line = line.strip('\n')
                 splitEquality = line.split('=')
@@ -525,7 +520,7 @@ class DeckTrnsys():
                             namespace = {}
                             parts = re.split(r'[*/+-]', re.sub(r'()','',value))
                             for part1 in parts:
-                                namespace[part1] = self.getDataFromDeckRecursively(part1)
+                                namespace[part1] = self.getDataFromDeckRecursively(part1,linesDeck)
                             try:
                                 finalValue = eval(value, namespace)
                                 dict[name] = float(finalValue)
