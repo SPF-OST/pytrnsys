@@ -375,7 +375,7 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
     line = "1  !5 number of outputs to avoid integration\n";lines.append(line)
     line = "1  !6 output number to avoid integration\n";lines.append(line)
     line = "INPUTS %d\n"%len(eBalance);lines.append(line)
-    allvars = " ".join(eBalance)
+    allvars = "TIME "+" ".join(eBalance)
     line = "%s\n"%allvars;lines.append(line)
     line = "*******************************\n";lines.append(line)
     line = "%s\n"%allvars;lines.append(line)

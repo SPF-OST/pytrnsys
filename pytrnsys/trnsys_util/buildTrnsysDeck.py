@@ -178,9 +178,7 @@ class BuildTrnsysDeck():
                 print ("Replacemenet of Units of file:%s"%nameList)
                 self.unitId = deckUtils.replaceAllUnits(addedLines,self.unitId,unit,fileAssignUnit,fileAssign)
 
-
             self.deckText.append(caption)
-            
             self.deckText =  self.deckText + addedLines
         
     def writeDeck(self,addedLines=None):
