@@ -176,6 +176,7 @@ def getMyDataFromDeck(linesReadedNoComments,myName):
         try:
             name = splitEquality[0].replace(" ", "")
             value = splitEquality[1].replace(" ", "")
+            value = splitEquality[1].replace("\n", "")
 
             if (name.lower() == myName.lower()):
                 return value
@@ -211,7 +212,7 @@ def loadDeck(nameDck,eraseBeginComment=True,eliminateComments=True):
     else:
         skypChar = ['!', '      \n']  # ['*'] #This will eliminate the lines starting with skypChar
 
-    replaceChar = None  # [',','\''] #This characters will be eliminated, so replaced by nothing
+    replaceChar =  None #[',','\''] #This characters will be eliminated, so replaced by nothing
 
     linesChanged = spfUtils.purgueLines(lines, skypChar, replaceChar, removeBlankLines=True)
 

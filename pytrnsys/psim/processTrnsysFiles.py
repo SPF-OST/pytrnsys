@@ -109,26 +109,29 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.nItProblems = self.log.numberOfFailedIt
 
     def getVersionsDll(self):
-        #
-        #        namesDll= ["type860","type1924","type709","type878","type859","Type832","Type833"]
+        
+        if(0):
+            raise ValueError("Deprecated. File created in simulaiton folder. To be improved")
+            #
+            #        namesDll= ["type860","type1924","type709","type878","type859","Type832","Type833"]
 
-        namesDll = []
-        myset = set(self.readTrnsysFiles.TrnsysTypes)  # get the unique names (all repeated ones are excluded)
-        print (myset)
+            namesDll = []
+            myset = set(self.readTrnsysFiles.TrnsysTypes)  # get the unique names (all repeated ones are excluded)
+            print (myset)
 
-        for number in myset:
-            nameType = "type%s" % number
-            namesDll.append(nameType)
+            for number in myset:
+                nameType = "type%s" % number
+                namesDll.append(nameType)
 
-        self.dllVersions = self.getDllVersionFromType(namesDll)
+            self.dllVersions = self.getDllVersionFromType(namesDll)
 
-        self.buildingModel = None
-        for dll in self.dllVersions:
-            print (dll)
-            if (dll[0:6] == "type56"):
-                self.buildingModel = "Type56"
-            elif (dll[0:8] == "type5998"):
-                self.buildingModel = "ISO"
+            self.buildingModel = None
+            for dll in self.dllVersions:
+                print (dll)
+                if (dll[0:6] == "type56"):
+                    self.buildingModel = "Type56"
+                elif (dll[0:8] == "type5998"):
+                    self.buildingModel = "ISO"
 
     def getDllVersionFromType(self,typeNumber):
 

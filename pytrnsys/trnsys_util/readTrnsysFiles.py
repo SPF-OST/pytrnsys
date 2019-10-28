@@ -12,6 +12,8 @@ import pytrnsys.pdata.loadBaseNumpy as load
 import numpy as num
 import pytrnsys.utils.utilsSpf as utils
 import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
+import pytrnsys.trnsys_util.deckUtils as deckUtils
+
 import string
 
 import os
@@ -367,34 +369,36 @@ class ReadTrnsysFiles():
         self.deckVariables = self.deck.getAllDataFromDeck()
         return self.deckVariables
             
-    def readAllTypes(self): #It should be deprecated. Done at building Deck level
-        
-        self.deck.readAllTypes()
-        self.TrnsysTypes = self.deck.TrnsysTypes
-        self.TrnsysUnits = self.deck.TrnsysUnits
-        print ("types loaded")
+    # def readAllTypes(self): #It should be deprecated. Done at building Deck level
 
+        # TrnsysUnitsSorted, TrnsysTypesSorted, filesUsedInDdck, filesUnitUsedInDdck
 
-    def writeTrnsysTypesUsed(self,name,doSort=False): #It should be deprecated. Done at building deck level
-
-        if(doSort):
-            iSort = num.argsort(self.TrnsysUnits)
-
-        lines = "UNIT\tTYPE\tName\n"
-
-        for i in range(len(self.TrnsysTypes)):
-            if(doSort):
-                k = iSort[i]
-            else:
-                k=i
-            line="%4d\t%4d\t%s\n"%(self.TrnsysUnits[k],self.TrnsysTypes[k],self.deck.getTypeName(self.TrnsysTypes[k]))
-            lines=lines+line
-
-        nameFile = os.path.join(self.path,name)
-
-        print ("Type file :%s created"%nameFile)
-        outfile=open(nameFile,'w')
-        outfile.writelines(lines)
+        # deckUtils.readAllTypes(self.deck.linesDeck)
+        # self.TrnsysTypes = self.deck.TrnsysTypes
+        # self.TrnsysUnits = self.deck.TrnsysUnits
+        # print ("types loaded")
+    #
+    #
+    # def writeTrnsysTypesUsed(self,name,doSort=False): #It should be deprecated. Done at building deck level
+    #
+    #     if(doSort):
+    #         iSort = num.argsort(self.TrnsysUnits)
+    #
+    #     lines = "UNIT\tTYPE\tName\n"
+    #
+    #     for i in range(len(self.TrnsysTypes)):
+    #         if(doSort):
+    #             k = iSort[i]
+    #         else:
+    #             k=i
+    #         line="%4d\t%4d\t%s\n"%(self.TrnsysUnits[k],self.TrnsysTypes[k],self.deck.getTypeName(self.TrnsysTypes[k]))
+    #         lines=lines+line
+    #
+    #     nameFile = os.path.join(self.path,name)
+    #
+    #     print ("Type file :%s created"%nameFile)
+    #     outfile=open(nameFile,'w')
+    #     outfile.writelines(lines)
 
 
     def getDataFromDeck(self,myName,typeValue="double",ifNotFoundEqualToZero=False):
@@ -411,7 +415,7 @@ class ReadTrnsysFiles():
             else:
                 return None
                 
-#        print value        
+        print (value)
         
 
         
