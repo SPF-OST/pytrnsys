@@ -13,7 +13,7 @@ Thus, this config file will grow as long as users believe some functionality is 
 2. Python code
 ----------------------
 
-The simulation specified in the config-file can be started with the following python code::
+The simulation specified in the :ref:`config-file <configFile>` can be started with the following python code::
 
    import pytrnsys.rsim.runParallelTrnsys as runTrnsys
    

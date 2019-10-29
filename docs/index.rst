@@ -12,7 +12,7 @@ Welcome to pytrnsys's documentation!
    :maxdepth: 2
 
    guide/index
-   modules
+   CodeReference
 
 
 Indices and tables
