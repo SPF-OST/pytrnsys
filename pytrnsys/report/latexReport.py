@@ -35,13 +35,13 @@ class LatexReport():
 
 
         pathReport = os.path.join(os.path.dirname(__file__),'latex_doc')
-        if pathReport:
-            if 'TEXINPUTS' in os.environ:
-                texinputs = os.environ['TEXINPUTS']
-                if pathReport not in texinputs:
-                    os.environ['TEXINPUTS']+=os.pathsep + pathReport
-            else:
-                os.environ['TEXINPUTS'] =pathReport
+
+        if 'TEXINPUTS' in os.environ:
+            texinputs = os.environ['TEXINPUTS']
+            if pathReport not in texinputs:
+                os.environ['TEXINPUTS']+=os.pathsep + pathReport
+        else:
+            os.environ['TEXINPUTS'] =pathReport
         
         self.cleanMode=False
         self.plotsAdded = [] 
