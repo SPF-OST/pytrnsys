@@ -2,6 +2,7 @@
 import numpy as num
 import pytrnsys.pdata.processFiles as spfUtils
 import os
+import re
 
 
 def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesUsedInDdck):
@@ -41,6 +42,9 @@ def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
         It also reads the files used and which units are used for them. IN order to be able to change automatically the unit numbers afterwards
         we need that each ASSIGN uses a variable for the unit, e.g. unitReadWeather and that this variable is used in the ddck file.
 
+        The problems of this function is that we can change a unit number of an already changed unit number.
+        For example we change 20 for 45 and the 45 is already in the file, so after we change 45 for 46, so we change all the [45, for [46,
+
         returns:
         --------
         TrnsysUnitsSorted,TrnsysTypesSorted,filesUsedInDdck,filesUnitUsedInDdck
@@ -50,22 +54,35 @@ def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
     filesUsedInDdck = []
     filesUnitUsedInDdck = []
 
+    filesWithoutUnit = []
     for i in range(len(lines)):
 
         splitBlank = lines[i].split()
 
         try:
             if (splitBlank[0] == "ASSIGN"):
-                filesUsedInDdck.append(splitBlank[1])
-                filesUnitUsedInDdck.append(splitBlank[2])
+                if(len(splitBlank)>2):
+                    filesUnitUsedInDdck.append(splitBlank[2])
+                    filesUsedInDdck.append(splitBlank[1])
+                else:
+                    filesWithoutUnit.append(splitBlank[1])
+
+                # if(i>1 and lines[i-1][0:5]=="LABELS"):
+                #     unitAssigned=False
+                #     filesWithoutUnit.append(splitBlank[1])
+                # else:
+                #     unitAssigned=True
+                #
+                # if(unitAssigned==True):
+
         except:
             pass
 
         try:
-            unit = splitBlank[0].replace(" ", "")
             nUnit = splitBlank[1].replace(" ", "")
             types = splitBlank[2].replace(" ", "")
             ntype = splitBlank[3].replace(" ", "")
+            unit = splitBlank[0].replace(" ", "")
 
             if (unit.lower() == "unit".lower() and types.lower() == "Type".lower()):
                 #                    print "unit:%s nUnit:%s types:%s ntype:%s"%(unit,nUnit,types,ntype)
@@ -95,27 +112,74 @@ def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
 
     return TrnsysUnitsSorted,TrnsysTypesSorted,filesUsedInDdck,filesUnitUsedInDdck
 
-def replaceUnitNumber(linesRead,oldUnit,newUnit):
+def ireplace(old, new, text):
+    """
+    Handles insensitive upper,lower replace
+    Parameters
+    ----------
+    old
+    new
+    text
 
+    Returns
+    -------
+
+    """
+    idx = 0
+    while idx < len(text):
+        index_l = text.lower().find(old.lower(), idx)
+        if index_l == -1:
+            return text
+        text = text[:index_l] + new + text[index_l + len(old):]
+        idx = index_l + len(new)
+    return text
+
+
+
+def replaceUnitNumber(linesRead,oldUnit,newUnit):
+    """
+    Check if the lines contain more than one [XX,XX] and make it crash. It will not work
+    """
     lines = linesRead
 
     unitFromTypeChanged=False
 
+
+
     if(oldUnit==newUnit):
         pass
     else:
+
+        oldString = "UNIT %d" % (oldUnit)
+        newString = "UNIT %d" % (newUnit)
+
+        if(newUnit==44):
+            pass
+        else:
+            pass
+
+        myAddText = "Changed automatically\n"
+
         for i in range(len(lines)):
 
-            if(unitFromTypeChanged==False):
-                oldString = "UNIT %d" % (oldUnit)
-                newString = "UNIT %d" % (newUnit)
+            mySplit = lines[i].split("!")
+            alreadyChanged = False
+            if (len(mySplit) > 1):
+                if (mySplit[1] == myAddText): #We check if already changed
+                    alreadyChanged = True
 
-                newLine= lines[i].replace(oldString, newString)
+            if(unitFromTypeChanged==False and alreadyChanged==False):
+
+                # newLine= lines[i].replace(oldString, newString)
+                newLine= ireplace(oldString, newString,lines[i])
 
                 if(newLine!=lines[i]):
                     unitFromTypeChanged=True
                     print ("replacement SUCCESS from %s to %s"%(oldString,newString))
-                    lines[i]=newLine
+                    splitLine = newLine.split("!")
+                    splitLineNoBreak = splitLine[0].replace("\n","")
+                    lines[i]=splitLineNoBreak+" !"+myAddText
+
 
         if (unitFromTypeChanged == False):
             print ("replacement FAILURE from %s to %s" % (oldUnit, newUnit))
@@ -124,10 +188,30 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
 
                 oldString = "[%d," % (oldUnit)
                 newString = "[%d," % (newUnit)
-                newLine = lines[i].replace(oldString, newString)
-                if(newLine!=lines[i]):
-                    # print ("replacement SUCCESS from %s to %s"%(oldString,newString))
-                    lines[i] = newLine
+
+                mySplit = lines[i].split("!")
+                alreadyChanged=False
+                if (len(mySplit) > 1):
+                    if(mySplit[1]==myAddText):
+                        alreadyChanged=True
+
+                if(alreadyChanged==False): #If we ahev already changed we can't do it again
+                    # newLine = lines[i].replace(oldString, newString) Not working becasue it can change the comment and believe that it was a succesfull change
+                    newLine = mySplit[0].replace(oldString, newString)
+                    replaced=False
+                    if(newLine!=mySplit[0]):
+                        myNewSplit = newLine.split("!")
+                        # print ("replacement SUCCESS from %s to %s"%(oldString,newString))
+                        # lines[i] = newLine
+                        lineWithoutBreak = myNewSplit[0].replace("\n", "")
+                        lines[i] = lineWithoutBreak +" !" + myAddText
+                        # if(len(myNewSplit)>1):
+                        #     lines[i] = myNewSplit[0] + myAddText
+                        # else:
+                        #     lineWithoutBreak = newLine.replace("\n","")
+                        #     lines[i] = lineWithoutBreak + myAddText #remove of \n
+                        # lines[i] = newLine
+                        # pass
 
 def getTypeFromUnit(myUnit,linesReadedNoComments):
 
@@ -223,7 +307,7 @@ def loadDeck(nameDck,eraseBeginComment=True,eliminateComments=True):
     return linesChanged
 
 
-def checkEquationsAndConstants(lines):
+def checkEquationsAndConstants(lines,nameDck):
     # lines=linesChanged
     for i in range(len(lines)):
 
@@ -254,7 +338,7 @@ def checkEquationsAndConstants(lines):
                     countedValues = countedValues + 1
 
             if (countedValues != numberOfValues):
-                parsedFile = "%s.parse" % self.nameDck
+                parsedFile = "%s.parse" % nameDck
                 outfile = open(parsedFile, 'w')
                 outfile.writelines(lines)
                 outfile.close()

@@ -16,6 +16,29 @@ import string
 import pytrnsys.rsim.runParallel as runPar
 
 
+def getCityFromConfig(lines):
+    for line in lines:
+        if "City" in line:
+            cityLine = line
+            break
+        else:
+            pass
+    weatherFile = cityLine.split("City")[1]
+    city = weatherFile.split("_")[0]
+
+    return weatherFile, city
+
+
+def getHydFromConfig(lines):
+    for line in lines:
+        if "Hydraulics\\" in line:
+            hydLine = line
+            break
+        else:
+            pass
+    hyd = hydLine.split("Hydraulics\\")[1]
+    return hyd
+
 class ReadConfigTrnsys():
 
     def __init__(self):
@@ -81,3 +104,4 @@ class ReadConfigTrnsys():
                     pass
 
         return lines
+

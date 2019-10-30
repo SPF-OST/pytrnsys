@@ -37,9 +37,7 @@ class RunParallelTrnsys():
         else:
             self.nameBase = _name
 
-        self.addAutomaticEnergyBalance=False
 
-        self.generateUnitTypesUsed=False
 
 
     def setDeckName(self,_name):
@@ -63,8 +61,11 @@ class RunParallelTrnsys():
         self.inputs["copyBuildingData"]  = False #activate when Type 55 is used or change the path to the source
         self.inputs["addResultsFolder"]  = False
         self.inputs["rerunFailedCases"]       = False
+        self.inputs["scaling"]       = False
 
         self.inputs["doAutoUnitNumbering"] = False
+        self.inputs["addAutomaticEnergyBalance"] = False
+        self.inputs["generateUnitTypesUsed"]=True
 
         self.outputFileDebugRun = os.path.join(self.path,"debugParallelRun.dat")
 
@@ -285,11 +286,11 @@ class RunParallelTrnsys():
 
         deck.checkTrnsysDeck(deck.nameDeck)
 
-        if(self.generateUnitTypesUsed==True):
+        if(self.inputs["generateUnitTypesUsed"]==True):
 
             deck.saveUnitTypeFile()
 
-        if (self.addAutomaticEnergyBalance == True):
+        if (self.inputs["addAutomaticEnergyBalance"] == True):
             deck.automaticEnegyBalanceStaff()
             deck.writeDeck()  # Deck rewritten with added printer
 
@@ -379,6 +380,8 @@ class RunParallelTrnsys():
 
             if not os.path.isdir(self.path):
                 os.mkdir(self.path)
+
+
 
     def changeFile(self,source,end):
 
@@ -523,6 +526,13 @@ class RunParallelTrnsys():
         else:
             self.foldersForDDckVariationUsed = False
 
+
+
+        if(self.inputs["scaling"]!=None):
+            self.weatherFile,self.cityRef=readConfig.getCityFromConfig(self.lines)
+            self.setReferenceCase(self.inputs["pathRef"], self.inputs["nameRef"], self.weatherFile)
+            self.scaleVariables()
+
     def copyConfigFile(self,configPath,configName):
 
         configFile = os.path.join(configPath,configName)
@@ -532,23 +542,44 @@ class RunParallelTrnsys():
         shutil.copyfile(configFile, dstPath)
         print("copied config file to: %s"% dstPath)
 
-    def getCityFromConfig(self):
 
-        for line in self.lines:
-            if "City" in line:
-                cityLine = line
-                break
-            else:
-                pass
-        self.weatherFile = cityLine.split("City")[1]
-        self.city = self.weatherFile.split("_")[0]
+    def setReferenceCase(self,pathRef,nameRefCase,cityRef):
+        self.pathRef = pathRef
+        self.nameRefCase = nameRefCase
+        self.cityRef = cityRef
 
-    def getHydFromConfig(self):
+    def getScalingFactor(self,pathRef,nameRefBase,scaling,case):
 
-        for line in self.lines:
-            if "Hydraulics\\" in line:
-                hydLine = line
-                break
-            else:
-                pass
-        self.hyd = hydLine.split("Hydraulics\\")[1]
+        loadDemand = 0
+        if scaling == "toNormalDemand":
+            resultFile = open("%s\\%s-" % (pathRef, nameRefBase) + \
+                              case[:3] + "_dryN\\%s-" % (nameRefBase) + case[:3] + "_dryN-results.dat", "r")
+            loadDemand = float(resultFile.readlines()[10].split()[1]) / 1000.
+            resultFile.close()
+
+        elif scaling == "toDemand":
+            resultFile = open("%s\\%s-" % (pathRef, nameRefBase) + \
+                              case + "\\%s-" % (nameRefBase) + case + "-results.dat", "r")
+            loadDemand = float(resultFile.readlines()[10].split()[1]) / 1000.
+            resultFile.close()
+        else:
+            loadDemand = 1.
+
+        return loadDemand
+
+    def calculateScalingFactor(self,scaling):
+
+        self.loadDemand = self.getScalingFactor(self.pathRef,self.nameRefCase,scaling,self.cityRef)
+
+    def scaleVariables(self,option=None):
+
+        ###############SCALING WHEN NEEDED########################
+        if option==None:
+            self.loadDemand = self.getScalingFactor(self.pathRef,self.nameRefCase,self.inputs["scaling"],self.cityRef)
+        else:
+            self.loadDemand = self.getScalingFactor(self.pathRef, self.nameRefCase, self.inputs["scaling"],
+                                                    self.inputs["addResultsFolder"]+"_"+option)
+
+        for j in range(len(self.variablesOutput)):
+            for i in range(2, len(self.variablesOutput[j]), 1):
+                self.variablesOutput[j][i] = round(self.variablesOutput[j][i] * self.loadDemand, 2)

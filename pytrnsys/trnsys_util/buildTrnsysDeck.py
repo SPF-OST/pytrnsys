@@ -213,7 +213,7 @@ class BuildTrnsysDeck():
         # deckUtils.checkEquationsAndConstants(self.linesDeckReaded)
 
         lines=deckUtils.loadDeck(nameDck,eraseBeginComment=True,eliminateComments=True)
-        deckUtils.checkEquationsAndConstants(lines)
+        deckUtils.checkEquationsAndConstants(lines,self.nameDeck)
 
         self.linesDeckReaded=lines
         # self.myDeck.checkEquationsAndConstants(self.deckText) #This does not need to read
@@ -236,10 +236,12 @@ class BuildTrnsysDeck():
 
         for i in range(len(self.filesUsedInDdck)):
             nameUnitFile=deckUtils.getDataFromDeck(self.linesDeckReaded,self.filesUnitUsedInDdck[i])
+
             if(nameUnitFile==None):
                 line = "%s\tNone\t%s\n" % (self.filesUnitUsedInDdck[i],self.filesUsedInDdck[i])
             else:
-                line = "%s\t%s\t%s\n" % (self.filesUnitUsedInDdck[i],nameUnitFile[:-1],self.filesUsedInDdck[i])
+                line = "%s\t%s\t%s\n" % (self.filesUnitUsedInDdck[i],nameUnitFile,self.filesUsedInDdck[i])
+                # line = "%s\t%s\t%s\n" % (self.filesUnitUsedInDdck[i],nameUnitFile[:-1],self.filesUsedInDdck[i])
 
             lines = lines + line
 
