@@ -9,10 +9,10 @@ Welcome to pytrnsys's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 6
-   :caption: Contents:
+   :maxdepth: 2
 
-   modules
+   guide/index
+   CodeReference
 
 
 Indices and tables
