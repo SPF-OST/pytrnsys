@@ -108,7 +108,6 @@ class RunParallelTrnsys():
         for i in range(len(fileNames)):
 
             tests.append(exeTrnsys.ExecuteTrnsys(path, fileNames[i]))
-            tests[i].setHOMEPath(self.inputs["HOME$"])
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
             # tests[i].setAddBuildingData(self.inputs["copyBuildingData"]) I comment it until we use again a case where we need this functionality. I guess we dont need this anymore.
             tests[i].loadDeck()
@@ -216,17 +215,14 @@ class RunParallelTrnsys():
             tests.append(exeTrnsys.ExecuteTrnsys(variablePath, fileName[i]))
 
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
-            tests[i].setAddBuildingData(self.inputs["copyBuildingData"])
-            tests[i].setHOMEPath(self.inputs["HOME$"])
+
             tests[i].setRemovePopUpWindow(self.inputs["removePopUpWindow"])
 
             # tests[i].setTrnsysVersion("TRNSYS17_EXE")
 
-            tests[i].moveFileFromSource(fileName[i] + ".dck")
+            tests[i].moveFileFromSource()
 
             tests[i].loadDeck(useDeckOutputPath=True)
-
-            tests[i].changeAssignPath(inputsDict=self.inputs)
 
             tests[i].changeParameter(localCopyPar)
 
