@@ -67,6 +67,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         variations = self.fileName.split('-')[1:]
         names = [re.sub(r'[\d\.]', '',variation) for variation in variations]
         values = [re.sub(r'[^\d\.]', '', variation) for variation in variations]
+        values = [value if len(value)>0 else name for value,name in zip(values,names)]
         self.resultsDict = dict(zip(names,values))
         self.resultsDict= {**self.resultsDict,**resultsDict}
         if os.path.exists(self.summaryFile):
