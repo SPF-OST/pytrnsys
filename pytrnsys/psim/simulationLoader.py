@@ -74,8 +74,8 @@ class SimulationLoader():
         elif self.mode == 'complete':
             self.monData = {}
             self.monDataDf = pd.DataFrame()
-            self.hourData = {}
-            self.hourDataDf = pd.DataFrame()
+            self.houData = {}
+            self.houDataDf = pd.DataFrame()
             self.steData = {}
             self.steDataDf = pd.DataFrame()
 
