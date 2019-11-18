@@ -63,7 +63,7 @@ class RunParallelTrnsys():
         self.inputs["rerunFailedCases"]       = False
         self.inputs["scaling"]       = False
 
-        self.inputs["doAutoUnitNumbering"] = False
+        self.inputs["doAutoUnitNumbering"] = True
         self.inputs["addAutomaticEnergyBalance"] = False
         self.inputs["generateUnitTypesUsed"]=True
 

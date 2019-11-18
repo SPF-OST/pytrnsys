@@ -11,7 +11,7 @@ def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesU
 
     for i in range(len(TrnsysUnits)):
         unitId=unitId+1
-        replaceUnitNumber(linesRead ,int(TrnsysUnits[i]) ,unitId)
+        replaceUnitNumber(linesRead ,int(TrnsysUnits[i]) ,'£'+str(unitId))
 
 
     for i in range(len(filesUnitUsedInDdck)):
@@ -151,7 +151,7 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
     else:
 
         oldString = "UNIT %d" % (oldUnit)
-        newString = "UNIT %d" % (newUnit)
+        newString = "UNIT %s" % (newUnit)
 
         if(newUnit==44):
             pass
@@ -187,13 +187,13 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
             for i in range(len(lines)):
 
                 oldString = "[%d," % (oldUnit)
-                newString = "[%d," % (newUnit)
+                newString = "[%s," % (newUnit)
 
                 mySplit = lines[i].split("!")
                 alreadyChanged=False
-                if (len(mySplit) > 1):
-                    if(mySplit[1]==myAddText):
-                        alreadyChanged=True
+                #if (len(mySplit) > 1):
+                #    if(mySplit[1]==myAddText):
+                #        alreadyChanged=True
 
                 if(alreadyChanged==False): #If we ahev already changed we can't do it again
                     # newLine = lines[i].replace(oldString, newString) Not working becasue it can change the comment and believe that it was a succesfull change
