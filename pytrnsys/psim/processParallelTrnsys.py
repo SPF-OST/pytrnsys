@@ -19,7 +19,7 @@ import warnings
 #we would need to pass the Class as inputs
 
 
-def processDataGeneral(casesInputs):
+def processDataGeneralDeprecated(casesInputs):
     """
     processes all the specified cases
 
@@ -59,18 +59,6 @@ def processDataGeneral(casesInputs):
     test.firstMonth = myFirstMonthLong
     test.firstMonthIndex = 0  # firstMonthUsed
 
-    splitMonths = False
-
-    if (splitMonths == True):
-        # monthsSplit = [1,2,3,4,5,6,7,8,9,10,11,12]  #[5,10,11,12]
-        monthsSplit = [3, 4, 5, 6]  # [5,10,11,12]
-
-    else:
-        monthsSplit = []
-
-    if (processQvsT == True):
-        test.loadQvsT("QVsT.Plt", monthsSplit=monthsSplit, addDhwCirc=False, normalized=True,cut=True)
-
     doProcess = True
 
     if (doProcess):
@@ -91,7 +79,7 @@ def processDataGeneral(casesInputs):
                     "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
                                 renameFile + newEnding))
 
-        # rename files if multiple years are available:
+    # rename files if multiple years are available:
     if yearReadedInMonthlyFile != -1:
         renameFile = os.path.join(locationPath, fileName, fileName)
 
@@ -110,51 +98,89 @@ def processDataGeneral(casesInputs):
 
     return " Finished: " + fileName
 
+def processDataGeneral(casesInputs):
+    """
+    processes all the specified cases
 
-# def processDataGshp(casesInputs):
-# #Include this in the generic function
-#
-#     (locationPath, fileName, avoidUser, maxMinAvoided, yearReadedInMonthlyFile, cleanModeLatex, firstMonthUsed,\
-#       processQvsT,firstMonthUsed,buildingArea,dllTrnsysPath,setPrintDataForGle,firstConsideredTime) = casesInputs
-#
-#     print ("starting processing of: "%  fileName)
-#
-#     test = gshp.GshpTrnsysBaseClass(locationPath, fileName)
-#
-#     test.setBuildingArea(buildingArea)
-#     test.setTrnsysDllPath(dllTrnsysPath)
-#
-#     test.setPrintDataForGle(setPrintDataForGle)
-#
-#     test.avoidUserDefinedCalculation = avoidUser
-#     test.maxMinAvoided = maxMinAvoided
-#     test.yearReadedInMonthylFile = yearReadedInMonthlyFile
-#     test.cleanModeLatex = cleanModeLatex
-#     test.firstConsideredTime = firstConsideredTime
-#
-#     myFirstMonthLong = utils.getMonthLongName(firstMonthUsed + 1)  # starts at 1
-#     test.firstMonth = myFirstMonthLong
-#     test.firstMonthIndex = 0  # firstMonthUsed
-#
-#     splitMonths = False
-#
-#     if (splitMonths == True):
-#         monthsSplit = [3, 4, 5, 6]  # [5,10,11,12]
-#     else:
-#         monthsSplit = []
-#
-#     if (processQvsT == True):
-#         test.loadQvsT("QVsT.Plt", monthsSplit=monthsSplit, addDhwCirc=True, normalized=True)
-#
-#     doProcess = True
-#
-#     if (doProcess):
-#         test.loadAndProcess()
-#
-#     del test
-#
-#     return " Finished: " + fileName
+    Parameters
+    ----------
+    casesInputs: list of str
+        list of strings with all cases to run
 
+    Returns
+    -------
+
+    """
+
+    (baseClass,locationPath, fileName, inputs) = casesInputs
+
+    print ("starting processing of: %s"% fileName)
+    #    locationPath = inputs.pop(0)
+    #    fileName,avoidUser,maxMinAvoided,yearReadedInMonthlyFile,cleanModeLatex,firstMonthUsed,processQvsT
+
+    test = baseClass
+
+    # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
+    #                     self.inputs["cleanModeLatex"],self.inputs["firstMonthUsed"],self.inputs["processQvsT"],self.inputs["firstMonthUsed"],self.inputs["buildingArea"],\
+    #                     self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
+
+
+    test.setInputs(inputs)
+    test.setBuildingArea(inputs["buildingArea"])
+    test.setTrnsysDllPath(inputs["dllTrnsysPath"])
+
+    # test.setTrnsysVersion("TRNSYS17_EXE")
+
+    test.setPrintDataForGle(inputs["setPrintDataForGle"])
+
+    # test.avoidUserDefinedCalculation = inputs["avoidUser"]
+    # test.maxMinAvoided = inputs["maxMinAvoided"]
+    test.yearReadedInMonthylFile = inputs["yearReadedInMonthlyFile"]
+    test.cleanModeLatex = inputs["cleanModeLatex"]
+    # test.firstConsideredTime = firstConsideredTime
+
+    # myFirstMonthLong = utils.getMonthLongName(firstMonthUsed + 1)  # starts at 1
+    # test.firstMonth = myFirstMonthLong
+    # test.firstMonthIndex = 0  # firstMonthUsed
+
+    doProcess = True
+
+    if (doProcess):
+        test.loadAndProcess()
+
+    # rename files if multiple years are available:
+    if inputs["yearReadedInMonthlyFile"] != -1:
+        renameFile = os.path.join(locationPath, fileName, fileName)
+
+        fileEndingsDefault = ["-results.dat", "-report.pdf"]
+
+        for ending in fileEndingsDefault:
+            newEnding = "-Year%i" % inputs["yearReadedInMonthlyFile"] + ending
+            try:
+                os.rename(renameFile + ending, renameFile + newEnding)
+            except:
+                warnings.warn(
+                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
+                                renameFile + newEnding))
+
+    # rename files if multiple years are available:
+    if inputs["yearReadedInMonthlyFile"] != -1:
+        renameFile = os.path.join(locationPath, fileName, fileName)
+
+        fileEndingsDefault = ["-results.dat", "-report.pdf"]
+
+        for ending in fileEndingsDefault:
+            newEnding = "-Year%i" % inputs["yearReadedInMonthlyFile"] + ending
+            try:
+                os.rename(renameFile + ending, renameFile + newEnding)
+            except:
+                warnings.warn(
+                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
+                                renameFile + newEnding))
+
+    del test  # time.sleep(5)
+
+    return " Finished: " + fileName
 
 
 class ProcessParallelTrnsys():
@@ -162,7 +188,6 @@ class ProcessParallelTrnsys():
     def __init__(self):
 
         self.defaultInputs()
-
         self.filteredfolder = [".gle"]
 
     def defaultInputs(self):
@@ -184,7 +209,6 @@ class ProcessParallelTrnsys():
         self.inputs['firstConsideredTime'] = None #Be carefull here. Thsi will not be proprly filtered
         self.inputs["buildingArea"] = 1072.
         self.inputs["parseFileCreated"] = False
-        self.inputs["processQvsT"] = True
         self.inputs["dllTrnsysPath"] = False
         self.inputs["classProcessing"] = False
         self.inputs["latexExePath"] = "Unknown"
@@ -199,19 +223,7 @@ class ProcessParallelTrnsys():
 
     def getBaseClass(self,classProcessing,pathFolder,fileName):
 
-
-
-        if (classProcessing == "Erlacker"):
-            baseClass = erlacker.P2GErlackerTrnsysClass(pathFolder,fileName)
-        elif (classProcessing == "AlStore"):
-            baseClass = alu.AlStoreTrnsysBaseClass(pathFolder,fileName)
-        elif (classProcessing == "BigIce"):
-            baseClass = ice.BigIceTrnsysClass(pathFolder,fileName)
-        else:
-            baseClass = None
-            raise ValueError("This function needs to be defined for each processing case")
-
-        return baseClass
+        raise ValueError("This function needs to be defined for each processing case")
 
     def process(self):
 
@@ -246,9 +258,11 @@ class ProcessParallelTrnsys():
                         baseClass = self.getBaseClass(self.inputs["classProcessing"],pathFolder,name)
 
                         print ("file :%s will be processed" % name)
-                        casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
-                                            self.inputs["cleanModeLatex"],self.inputs["firstMonthUsed"],self.inputs["processQvsT"],self.inputs["firstMonthUsed"],self.inputs["buildingArea"],\
-                                            self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
+                        # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
+                        #                     self.inputs["cleanModeLatex"],self.inputs["firstMonthUsed"],self.inputs["processQvsT"],self.inputs["firstMonthUsed"],self.inputs["buildingArea"],\
+                        #                     self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
+
+                        casesInputs.append((baseClass,pathFolder, name, self.inputs))
 
         elif self.inputs["typeOfProcess"] == "casesDefined":
 
@@ -278,13 +292,15 @@ class ProcessParallelTrnsys():
                     baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder,self.inputs["fileName"])
 
 
-                    casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"], self.inputs["maxMinAvoided"],
-                                    self.inputs["yearReadedInMonthlyFile"], \
-                                    self.inputs["cleanModeLatex"], self.inputs["firstMonthUsed"],
-                                    self.inputs["processQvsT"], self.inputs["firstMonthUsed"],
-                                    self.inputs["buildingArea"], \
-                                    self.inputs["dllTrnsysPath"], self.inputs["setPrintDataForGle"],
-                                    self.inputs["firstConsideredTime"]))
+                    # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"], self.inputs["maxMinAvoided"],
+                    #                 self.inputs["yearReadedInMonthlyFile"], \
+                    #                 self.inputs["cleanModeLatex"], self.inputs["firstMonthUsed"],
+                    #                 self.inputs["processQvsT"], self.inputs["firstMonthUsed"],
+                    #                 self.inputs["buildingArea"], \
+                    #                 self.inputs["dllTrnsysPath"], self.inputs["setPrintDataForGle"],
+                    #                 self.inputs["firstConsideredTime"]))
+
+                    casesInputs.append((baseClass,pathFolder, name, self.inputs))
 
         elif self.inputs["typeOfProcess"] == "citiesFolder":
 
@@ -315,21 +331,26 @@ class ProcessParallelTrnsys():
 
                             if "hourly" in name and not "Mean" in name:
                                 for i in range(self.inputs["numberOfYearsInHourlyFile"]):
-                                    casesInputs.append((baseClass, pathFolder, name, self.inputs["avoidUser"], self.inputs["maxMinAvoided"],
-                                                i+1, self.inputs["cleanModeLatex"], self.inputs["firstMonthUsed"],
-                                                self.inputs["processQvsT"], self.inputs["firstMonthUsed"],
-                                                self.inputs["buildingArea"], \
-                                                self.inputs["dllTrnsysPath"], self.inputs["setPrintDataForGle"],
-                                                self.inputs["firstConsideredTime"]))
+                                    self.inputs["yearReadedInMonthlyFile"]=i+1
+                                    # casesInputs.append((baseClass, pathFolder, name, self.inputs["avoidUser"], self.inputs["maxMinAvoided"],
+                                    #             i+1, self.inputs["cleanModeLatex"], self.inputs["firstMonthUsed"],
+                                    #             self.inputs["processQvsT"], self.inputs["firstMonthUsed"],
+                                    #             self.inputs["buildingArea"], \
+                                    #             self.inputs["dllTrnsysPath"], self.inputs["setPrintDataForGle"],
+                                    #             self.inputs["firstConsideredTime"]))
+                                    casesInputs.append((baseClass, pathFolder, name, self.inputs))
+
                             else:
-                                casesInputs.append((baseClass, pathFolder, name, self.inputs["avoidUser"],
-                                                    self.inputs["maxMinAvoided"],
-                                                    self.inputs["yearReadedInMonthlyFile"], \
-                                                    self.inputs["cleanModeLatex"], self.inputs["firstMonthUsed"],
-                                                    self.inputs["processQvsT"], self.inputs["firstMonthUsed"],
-                                                    self.inputs["buildingArea"], \
-                                                    self.inputs["dllTrnsysPath"], self.inputs["setPrintDataForGle"],
-                                                    self.inputs["firstConsideredTime"]))
+                                # casesInputs.append((baseClass, pathFolder, name, self.inputs["avoidUser"],
+                                #                     self.inputs["maxMinAvoided"],
+                                #                     self.inputs["yearReadedInMonthlyFile"], \
+                                #                     self.inputs["cleanModeLatex"], self.inputs["firstMonthUsed"],
+                                #                     self.inputs["processQvsT"], self.inputs["firstMonthUsed"],
+                                #                     self.inputs["buildingArea"], \
+                                #                     self.inputs["dllTrnsysPath"], self.inputs["setPrintDataForGle"],
+                                #                     self.inputs["firstConsideredTime"]))
+                                casesInputs.append((baseClass, pathFolder, name, self.inputs))
+
 
             #sort to process 10 year files first and all 10 years:
 
@@ -361,11 +382,8 @@ class ProcessParallelTrnsys():
             debug.finish()
         else:
             for i in range(len(casesInputs)):
-                if (self.inputs["classProcessing"] == "GSHP"):
-                    processDataGshp(casesInputs[i])
-                else:
-                    # test = erlacker.P2GErlackerTrnsysClass(pathFolder,fileName[i])
-                    processDataGeneral(casesInputs[i])
+                processDataGeneral(casesInputs[i])
+
 
     def changeFile(self,source,end):
 

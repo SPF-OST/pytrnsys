@@ -11,7 +11,7 @@ def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesU
 
     for i in range(len(TrnsysUnits)):
         unitId=unitId+1
-        replaceUnitNumber(linesRead ,int(TrnsysUnits[i]) ,unitId)
+        replaceUnitNumber(linesRead ,int(TrnsysUnits[i]) ,'£'+str(unitId))
 
 
     for i in range(len(filesUnitUsedInDdck)):
@@ -151,7 +151,7 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
     else:
 
         oldString = "UNIT %d" % (oldUnit)
-        newString = "UNIT %d" % (newUnit)
+        newString = "UNIT %s" % (newUnit)
 
         if(newUnit==44):
             pass
@@ -187,13 +187,13 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
             for i in range(len(lines)):
 
                 oldString = "[%d," % (oldUnit)
-                newString = "[%d," % (newUnit)
+                newString = "[%s," % (newUnit)
 
                 mySplit = lines[i].split("!")
                 alreadyChanged=False
-                if (len(mySplit) > 1):
-                    if(mySplit[1]==myAddText):
-                        alreadyChanged=True
+                #if (len(mySplit) > 1):
+                #    if(mySplit[1]==myAddText):
+                #        alreadyChanged=True
 
                 if(alreadyChanged==False): #If we ahev already changed we can't do it again
                     # newLine = lines[i].replace(oldString, newString) Not working becasue it can change the comment and believe that it was a succesfull change
@@ -243,7 +243,11 @@ def getDataFromDeck(linesReadedNoComments, myName, typeValue="string"):
         return None
 
     if (typeValue == "double"):
-        return float(value)
+        try:
+            return float(value)
+        except:
+            raise ValueError("getDataFromDeck tried to get a float but it most likely be a string:%s."%value)
+
     elif (typeValue == "int"):
         return int(value)
     elif (typeValue == "string"):
@@ -251,18 +255,23 @@ def getDataFromDeck(linesReadedNoComments, myName, typeValue="string"):
     else:
         raise ValueError("typeValue must be double,int or string")
 
+
+
 def getMyDataFromDeck(linesReadedNoComments,myName):
+
 
     for i in range(len(linesReadedNoComments)):
 
         splitEquality = linesReadedNoComments[i].split('=')
 
+        found=False
         try:
             name = splitEquality[0].replace(" ", "")
             value = splitEquality[1].replace(" ", "")
             value = splitEquality[1].replace("\n", "")
 
             if (name.lower() == myName.lower()):
+                found=True
                 return value
 
         except:
@@ -429,16 +438,11 @@ def readEnergyBalanceVariablesFromDeck(lines):
 
     eBalance = []
     for i in range(len(lines)):
-        splitBlank = lines[i].split()
 
-        if(splitBlank[0][0:7]=="elSysIn"):
-            eBalance.append(splitBlank[0])
-        if(splitBlank[0][0:8]=="elSysOut"):
-            eBalance.append(splitBlank[0])
-        if(splitBlank[0][0:6]=="qSysIn"):
-            eBalance.append(splitBlank[0])
-        if(splitBlank[0][0:7]=="qSysOut"):
-            eBalance.append(splitBlank[0])
+        if(len(lines[i].split("qSysIn_"))>1 or len(lines[i].split("qSysOut_"))>1 or len(lines[i].split("elSysIn_"))>1 or len(lines[i].split("elSysOut_"))>1):
+            varBalance = lines[i].split("=")[0]
+            eBalance.append(varBalance.replace(" ",""))
+
 
     return eBalance
 
@@ -452,18 +456,20 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
 
     lines = []
     line = "***************************************************************\n";lines.append(line)
-    line = "**BEGIN energy Balance printer automatically geneated from DDck\n";lines.append(line)
+    line = "**BEGIN Energy Balance printer automatically generated from DDck files\n";lines.append(line)
     line = "***************************************************************\n";lines.append(line)
-    line = "ASSIGN temp\ENERGY_BALANCE_MO.Prt %d\n"%unit;lines.append(line)
+    line = "CONSTANTS 1\n";lines.append(line)
+    line = "unitPrintEBal=%d\n"%unit;lines.append(line)
+    line = "ASSIGN temp\ENERGY_BALANCE_MO.Prt unitPrintEBal\n";lines.append(line)
     line = "UNIT %d Type 46\n"%unit;lines.append(line)
     line = "PARAMETERS 6\n";lines.append(line)
-    line = "%d !1: Logical unit number\n"%unit;lines.append(line)
+    line = "unitPrintEBal !1: Logical unit number\n";lines.append(line)
     line = "-1 !2: for monthly summaries\n";lines.append(line)
     line = "1  !3: 1:print at absolute times\n";lines.append(line)
     line = "-1 !4 -1: monthly integration\n";lines.append(line)
     line = "1  !5 number of outputs to avoid integration\n";lines.append(line)
     line = "1  !6 output number to avoid integration\n";lines.append(line)
-    line = "INPUTS %d\n"%len(eBalance);lines.append(line)
+    line = "INPUTS %d\n"%(len(eBalance)+1);lines.append(line)
     allvars = "TIME "+" ".join(eBalance)
     line = "%s\n"%allvars;lines.append(line)
     line = "*******************************\n";lines.append(line)

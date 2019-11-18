@@ -156,6 +156,9 @@ class BuildTrnsysDeck():
                 print ("Replacemenet of Units of file:%s"%nameList)
                 self.unitId = deckUtils.replaceAllUnits(addedLines,self.unitId,unit,fileAssignUnit,fileAssign)
 
+                unitModifiedLines = [line.replace('£','') for line in addedLines]
+                addedLines = unitModifiedLines
+
             self.deckText.append(caption)
             self.deckText =  self.deckText + addedLines
         
@@ -259,8 +262,6 @@ class BuildTrnsysDeck():
         """
         eBalance = deckUtils.readEnergyBalanceVariablesFromDeck(self.deckText)
         unitId=self.unitId+1
-        if(self.unitId<=10):
-            unitId=600
 
         lines = deckUtils.addEnergyBalanceMonthlyPrinter(unitId,eBalance)
         self.deckText = self.deckText[:-4] + lines +self.deckText[-4:]

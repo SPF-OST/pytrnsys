@@ -4,7 +4,7 @@
 This is the Base Class for reading and processing TRNSYS monthly results.
 Author : Dani Carbonell
 Date   : 2018
-ToDo   : clean unused functions and variables
+ToDo   : THIS FILE IS TO BE DEPRECATED !!!
 """
 
 import string, os, time, sys

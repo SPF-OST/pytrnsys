@@ -160,6 +160,8 @@ class LatexReport():
         line="\\usepackage{longtable}\n" ; self.lines = self.lines + line
 
         line="\\usepackage{url}\n" ; self.lines = self.lines + line
+
+        line="\\usepackage{adjustbox}\n" ; self.lines = self.lines + line
         line="\\usepackage{gensymb}\n" ; self.lines = self.lines + line
 
         line="\\usepackage{booktabs}\n" ; self.lines = self.lines + line
@@ -201,7 +203,26 @@ class LatexReport():
         line=" \\clearpage \n" 
         
         self.lines = self.lines + line
-        
+
+    def addPlotShort(self, namePdf, caption="any", label="any"):
+
+        self.plotsAdded.append(namePdf)
+
+        line = "\\begin{figure}[!ht]\n";
+        self.lines = self.lines + line
+        line = "\\begin{center}\n";
+        self.lines = self.lines + line
+        line = "\\includegraphics[width=1\\textwidth]{%s/%s}\n" % (utils.filterPath(self.outputPath), namePdf);
+        self.lines = self.lines + line
+        line = "\\caption{%s}\n" % caption;
+        self.lines = self.lines + line
+        line = "\\label{%s}\n" % label;
+        self.lines = self.lines + line
+        line = "\\end{center}\n";
+        self.lines = self.lines + line
+        line = "\\end{figure}\n";
+        self.lines = self.lines + line
+
     def addPlot(self,namePdf,caption,label,size):
                 
         self.plotsAdded.append(namePdf)
@@ -214,25 +235,28 @@ class LatexReport():
         line="\\end{center}\n";self.lines = self.lines + line 
         line="\\end{figure}\n";self.lines = self.lines + line
         
-    def addTable(self,_caption,_sizeBox,_names,_units,_label,_linesResults,useFormula=False,addCaptionLines=False):
+    def addTable(self,_caption,_names,_units,_label,_linesResults,useFormula=False,addCaptionLines=False):
 
 
         line="\\begin{table}[!ht]\n" ; self.lines = self.lines + line
-
-        line="\\begin{small}\n" ; self.lines = self.lines + line 
+        line = "\\centering\n" ; self.lines = self.lines + line
+        # line="\\begin{small}\n" ; self.lines = self.lines + line
         line="\\caption{%s}\n" % _caption ; self.lines = self.lines + line 
-        line="\\begin{center}\n" ; self.lines = self.lines + line 
-        if(_sizeBox != None):
-            line="\\resizebox{%dcm}{!} \n" % _sizeBox;self.lines = self.lines + line 
-        line="{\n" ;self.lines = self.lines + line 
-        
-        line="\\begin{tabular}{l | "; self.lines = self.lines + line 
-        
-            
+        # line="\\begin{center}\n" ; self.lines = self.lines + line
+
+        # if(_sizeBox != None):
+        #     line="\\resizebox{%dcm}{!} \n" % _sizeBox;self.lines = self.lines + line
+        # else:
+
+        line="\\begin{adjustbox}{max width =\\textwidth}\n" ; self.lines = self.lines + line
+
+        # line="{\n" ;self.lines = self.lines + line
+
+        line="\\begin{tabular}{l | "; self.lines = self.lines + line
         for i in range(len(_names)-1):
              line = "c "; self.lines = self.lines + line 
                  
-        line = "} \n" ; self.lines = self.lines + line 
+        line = "} \n" ; self.lines = self.lines + line
         line="\\hline\n" ; self.lines = self.lines + line 
         line="\\hline\n" ; self.lines = self.lines + line 
 
@@ -289,11 +313,14 @@ class LatexReport():
             
         line="\\hline\n" ; self.lines = self.lines + line 
         line="\\hline\n" ; self.lines = self.lines + line
+        # line="}\n" ; self.lines = self.lines + line
         line ="\\end{tabular}\n";self.lines = self.lines + line
-        line="}\n" ; self.lines = self.lines + line 
+        # if (_sizeBox == None):
+        line ="\\end{adjustbox}\n";self.lines = self.lines + line
+
         line="\\label{%s}\n" % _label; self.lines = self.lines + line 
-        line="\\end{center}\n" ; self.lines = self.lines + line 
-        line="\\end{small}\n" ; self.lines = self.lines + line
+        # line="\\end{center}\n" ; self.lines = self.lines + line
+        # line="\\end{small}\n" ; self.lines = self.lines + line
         line="\\end{table}\n" ; self.lines = self.lines + line
 
     def addPandasTable(self, _caption, _sizeBox, _units, _label, _pandasTable, useFormula=False,
@@ -436,13 +463,16 @@ class LatexReport():
                     units.append(_units)
                     
         lines = ""        
-        
-        for n in range(begin,begin+nMonth):                    
-            line = "%s"%utils.getMonthKey(n+1);lines=lines+line                     
+
+
+
+        for n in range(begin,begin+nMonth):
+            line = "%s"%utils.getMonthKey(n+1);lines=lines+line
             for i in range(len(var)):
                 line = "&%.1f"%var[i][n];lines = lines + line
-            line="\\\\ \n";lines = lines + line            
-            
+            line="\\\\ \n";lines = lines + line
+
+
         line="\\hline\n" ; lines = lines + line                          
         
         if(len(var[0])<=12):
@@ -463,4 +493,53 @@ class LatexReport():
         self.addTable(caption,sizeBox,names,units,label,lines,useFormula=False)
    
         return lines
-       
+
+    def addTableMonthlyDf(self, var, names, _units, caption, label,defMonths,addLines=False, sizeBox=None):
+
+        if (len(names) != len(_units)):
+            units = []
+            for i in range(len(names)):
+                if (i == 0):
+                    units.append("")  # motnh
+                else:
+                    units.append(_units)
+        else:
+            units=_units
+
+        lines = ""
+
+
+        for n in range(len(defMonths)):
+            line = "%s" % defMonths[n]
+            lines = lines + line
+            for i in range(len(var)):
+                line = "&%.1f" % var[i][n];
+                lines = lines + line
+            line = "\\\\ \n";
+            lines = lines + line
+
+        line = "\\hline\n";
+        lines = lines + line
+
+        if (len(var[0]) <= 12):
+            for i in range(len(var)):
+                line = "&%.1f" % sum(var[i]);
+                lines = lines + line
+            line = "\\\\ \n";
+            lines = lines + line
+        else:
+            if (len(var[0]) != 13):
+                raise ValueError("size should be either either below 12 or 13.")
+
+            for i in range(len(var)):
+                line = "&%.1f" % var[i][12];
+                lines = lines + line
+            line = "\\\\ \n";
+            lines = lines + line
+
+        if (addLines != False):
+            lines = lines + addLines
+
+        self.addTable(caption,  names, units, label, lines, useFormula=False)
+
+        return lines
