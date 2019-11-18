@@ -216,11 +216,18 @@ class ProcessMonthlyDataBase():
     #############################################
 
     def plotMonthlyWeatherData(self,yearlyFactor=10,printData=False):
-
-        self.nameWeatherDataPlotPdf = self.plot.plotMonthly2Bar(self.iTHorizontalkWPerM2, self.iTColkWPerM2,
+        
+        try:
+            self.nameWeatherDataPlotPdf = self.plot.plotMonthly2Bar(self.iTHorizontalkWPerM2, self.iTColkWPerM2,
                                                                 ['At horitzontal surface', 'At collector surface'],
                                                                 "Solar radiation $[kWh/m^2]$", "weatherDataMonthly",
                                                                 yearlyFactor=yearlyFactor)
+        except:
+            self.iTColkWPerM2 = self.qSolar/self.Acol
+            self.nameWeatherDataPlotPdf = self.plot.plotMonthly2Bar(self.iTHorizontalkWPerM2, self.iTColkWPerM2,
+                                                                    ['At horitzontal surface', 'At collector surface'],
+                                                                    "Solar radiation $[kWh/m^2]$", "weatherDataMonthly",
+                                                                    yearlyFactor=yearlyFactor)
 
         self.nameWeatherDataHoPlotPdf = self.plot.plotMonthly(self.iTHorizontalkWPerM2,"Solar radiation $[kWh/m^2]$","weatherDataMonthly",yearlyFactor=yearlyFactor,printData=printData)
 

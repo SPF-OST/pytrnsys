@@ -237,8 +237,11 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
          self.numberOfMonthsSimulated = self.readTrnsysFiles.numberOfMonthsSimulated
 
          self.iTHorizontalkWPerM2 = self.readTrnsysFiles.get("IT_H_KW") 
-         self.iTColkWPerM2        = self.readTrnsysFiles.get("IT_Coll_kW")
+         self.iTColkWPerM2        = self.readTrnsysFiles.get("IT_Coll_kW") #depracated, this should now be defined in SOLAR_MO.Prt
          self.tAmb                = self.readTrnsysFiles.get("tAmb")
+
+         if self.iTColkWPerM2 == None:
+            self.iTColkWPerM2 = self.qIrradTilt
 
     def loadStorage(self,_name):
                               
