@@ -46,7 +46,7 @@ class SimulationLoader():
     steDataDf : :obj:`pandas.DataFrame`
         Dataframe containingt the values printed in timesteps
     """
-    def __init__(self, path, fileNameList=False, mode='complete',fullYear ='True',firstMonth='January',year=-1, sortMonths=False):
+    def __init__(self, path, fileNameList=False, mode='complete',fullYear ='True',firstMonth='January',year=-1, sortMonths=False,monthlyUsed=True,hourlyUsed=True,timeStepUsed=True):
 
         self.path = path
         self.mode = mode
@@ -54,6 +54,10 @@ class SimulationLoader():
         self.firstMonth = firstMonth
         self.year = year
         self.sortMonths = sortMonths
+
+        self.monthlyUsed = monthlyUsed
+        self.hourlyUsed  = hourlyUsed
+        self.timeStepUsed = timeStepUsed
 
         if self.mode == 'dataframe':
             self.monData = None
@@ -74,8 +78,8 @@ class SimulationLoader():
         elif self.mode == 'complete':
             self.monData = {}
             self.monDataDf = pd.DataFrame()
-            self.hourData = {}
-            self.hourDataDf = pd.DataFrame()
+            self.houData = {}
+            self.houDataDf = pd.DataFrame()
             self.steData = {}
             self.steDataDf = pd.DataFrame()
 
@@ -104,7 +108,7 @@ class SimulationLoader():
         fileType = self._fileSniffer(pathFile)
         nRows = self._fileLen(pathFile)
 
-        if fileType == _ResultsFileType.MONTHLY:
+        if (fileType == _ResultsFileType.MONTHLY and self.monthlyUsed==True):
             file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26, mangle_dupe_cols=True).rename(
                 columns=lambda x: x.strip())
             file = file[file.columns[:-1]]
@@ -138,7 +142,9 @@ class SimulationLoader():
                 dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.monData = {**self.monData, **dict}
 
-        elif fileType == _ResultsFileType.HOURLY:
+                print (self.monData.keys())
+
+        elif (fileType == _ResultsFileType.HOURLY and self.hourlyUsed==True):
             file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26).rename(columns=lambda x: x.strip())
             file["Period"] = datetime(2018, 1, 1) + pd.to_timedelta(file['Period'], unit='h')
             file.set_index('Period', inplace=True)
@@ -152,7 +158,7 @@ class SimulationLoader():
                 dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.houData = {**self.houData, **dict}
 
-        elif fileType == _ResultsFileType.TIMESTEP:
+        elif (fileType == _ResultsFileType.TIMESTEP and self.timeStepUsed==True):
             file = pd.read_csv(pathFile, header=0, delimiter='\t', nrows=nRows - 1).rename(columns=lambda x: x.strip())
             file["TIME"] = datetime(2018, 1, 1) + pd.to_timedelta(file['TIME'], unit='h')
             file.set_index('TIME', inplace=True)
