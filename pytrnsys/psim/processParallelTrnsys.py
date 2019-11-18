@@ -231,6 +231,9 @@ class ProcessParallelTrnsys():
         fileName = []
         classList = []
 
+        if os.path.exists(os.path.join(self.inputs['pathBase'],'Summary.dat')):
+            os.remove(os.path.join(self.inputs['pathBase'],'Summary.dat'))
+
         if (self.inputs["typeOfProcess"] == "completeFolder"):
 
             pathFolder = self.inputs["pathBase"]
@@ -368,10 +371,10 @@ class ProcessParallelTrnsys():
 
             # if(self.inputs["classProcessing"]=="BigIce"):
             #     results = pool.map(processDataGeneral,casesInputs)
-            if(self.inputs["classProcessing"]=="GSHP"):
-                results = pool.map(processDataGshp,casesInputs)
-            else:
-                results = pool.map(processDataGeneral, casesInputs)
+            #if(self.inputs["classProcessing"]=="GSHP"):
+            #    results = pool.map(processDataGshp,casesInputs)
+            #else:
+            #    results = pool.map(processDataGeneral, casesInputs)
 
             pool.close()
 

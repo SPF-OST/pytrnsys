@@ -28,14 +28,10 @@ class ExecuteTrnsys():
         self.linesChanged = ""
         self.titleOfLatex = "%s" % self.fileName
 
-        # DC: I guess these shoud be deprecated with new structure and config files
-        self.addGround=False #Added Ground file for ground calculations
-        self.addWWProfile=False
-        self.addBuildingData=False #if ISO model set to FALSE, for TYPE 56 we might need this
-        self.addSimData=False #MB you have to activate this in your case.
+
         self.trnsysVersion="TRNSYS_EXE"
         self.trnsysExePath="enviromentalVariable"
-        self.HOMEPath= None
+
 
         self.pathOutput = os.path.join(self.path, self.fileName)
         
@@ -52,7 +48,6 @@ class ExecuteTrnsys():
         
         self.foldersForRunning = []
         self.filesForRunning = []
-        self.foldersForRunningFromSource = []
    
         self.filesOutputPath = "."
         #True is not working becasue it looks for files in the D:\MyPrograms\Trnsys17 as local path 
@@ -66,17 +61,10 @@ class ExecuteTrnsys():
     def setRemovePopUpWindow(self,removePopUpWindow):
         self.removePopUpWindow=removePopUpWindow
 
-    def setAddBuildingData(self,add):
-        self.addBuildingData=add
-
-    def setHOMEPath(self,path):
-        self.HOMEPath = path
-
     def setTrnsysExePath(self,path):
         self.trnsysExePath = path
 
     def redefinePath(self,path,_name):
-
         self.pathOutput = self.path
         
         if not os.path.exists(self.pathOutput):
@@ -149,86 +137,11 @@ class ExecuteTrnsys():
         #with this function we obtain some data from the deck file.
 
 
-    def changeAssignPath(self,inputsDict=False):
-
-
-        # self.deckTrnsys.changeAssign(_nameActual,_nameChanged)
-
-        self.deckTrnsys.changeAssignPath(inputsDict=inputsDict)
-
     def getDataFromDeck(self,myName):
         
         return self.deckTrnsys.getDataFromDeck(myName)            
-        
-    def addFilesForRunning(self,nameFiles):
-        
-        self.filesForRunning.append(nameFiles)
-        
-    def addFoldersForRunning(self,nameFolder):
-        
-        self.foldersForRunning.append(nameFolder)
-     
-    def addFoldersForRunningFromSource(self,nameFolder):
- 
-        self.foldersForRunningFromSource.append(nameFolder)
- 
-    def addAllFilesAndFoldersForRunning(self):
-        
-#        self.addFilesForRunning("fort.93" )
-#        self.addFilesForRunning("Temp_zone.BAL" )
-#        self.addFilesForRunning("Energy_zone.BAL")
-#        self.addFilesForRunning("temp\Month_sum_zone.BAL")
-        
-        if(self.addGround==True):         self.addFilesForRunning("TGroundIni.dat")
-        if(self.addWWProfile==True):      self.addFoldersForRunning("Wastewaterprofil")        
-        
-        if(self.addBuildingData==True):
-            self.addFoldersForRunning("building")
 
-        if(self.addSimData==True):      self.addFoldersForRunning("SimData")
 
-#        I use them from a common folder 
-        
-#        self.addFoldersForRunning("Climate")
-#        self.addFoldersForRunning("Compressor")
-#        self.addFoldersForRunning("add_dat")
-
-        
-    def copyFilesForRunning(self):
-
-        if(self.HOMEPath==None):
-
-            self.HOMEPath = os.getenv("TRNSYS_DATA_FOLDER") + "\\"
-
-            if (self.HOMEPath == None):
-                raise ValueError("FATAL. The user must define TRNSYS_DATA_FOLDER as a enviromental variable. \
-                     In this folder you must place the folders needed for calculation, for example add_data, climate, etc. My TrnsysFolder:%s" % self.HOMEPath)
-        else:
-            self.HOMEPath=self.HOMEPath+ "\\"
-
-         # File used for Ground calculation of Type 708        
-
-        self.cleanAndCreateResultsTempFolder()
-
-        #This function should be called by the class of specific case Solar and Heat Pump or Ice ...
-
-        self.addAllFilesAndFoldersForRunning()
-              
-        for nameFile in self.filesForRunning:
-            self.copyFileFromSource(nameFile)
-
-        nameFile = "%s.dck" % self.fileName
-        # print nameFile
-        
-        self.moveFileFromSource(nameFile)
-        
-        for nameFolder in self.foldersForRunning:     
-            print ("executeTrnsys.py Folder for running from HOME$ folder :%s") % nameFolder
-            self.copyFolderFromHomePath(nameFolder)
-
-        for nameFolder in self.foldersForRunningFromSource:
-            print ("folder for running from source folder :%s") % nameFolder
-            self.copyFolderFromSource(nameFolder)
 
     def cleanFilesForRunning(self):
 
@@ -240,7 +153,7 @@ class ExecuteTrnsys():
             fileWithPath = os.path.join(self.pathOutput,files)
             shutil.rmtree(fileWithPath)
         
-    def moveFileFromSource(self,name=""):
+    def moveFileFromSource(self):
         name = "%s.dck" % self.fileName
         
         fileSource = os.path.join(self.path,name)
@@ -276,29 +189,14 @@ class ExecuteTrnsys():
             print ("copy folder %s to %s" % (name,folderEnd))
         except:
             print ("FAIL to copy the folder %s from %s to %s" % (name,folderSource,folderEnd))
-            
-    def copyFolderFromSource(self,name):
 
-        self.copyFolderFrom(self.path,name)
-        
-    def copyFolderFromHomePath(self,name):
-            
-        self.copyFolderFrom(self.HOMEPath,name)
+
             
     def setTrnsysVersion(self,version):
         self.trnsysVersion = version
         
     def getExecuteTrnsys(self,inputDict,useDeckName=False):
 
-        if(self.trnsysExePath=="enviromentalVariable"):
-
-            self.trnsysExe = os.getenv(self.trnsysVersion)
-
-            if(self.trnsysExe==None):
-
-                raise ValueError("FATAL. The user must define TRNSYS_EXE as a enviromental variable.")
-        else:
-            self.trnsysExe = self.trnsysExePath
 
         if (inputDict["ignoreOnlinePlotter"] == True):
             if(self.removePopUpWindow==True):
@@ -306,14 +204,14 @@ class ExecuteTrnsys():
             else:
                 ext = " /N"
             if(useDeckName==False):
-                cmd = self.trnsysExe +" "+ self.nameDckPathOutput + ext
+                cmd = self.trnsysExePath +" "+ self.nameDckPathOutput + ext
             else:
-                cmd = self.trnsysExe +" "+ useDeckName + ext
+                cmd = self.trnsysExePath +" "+ useDeckName + ext
         else:
             if(useDeckName==False):
-                cmd = self.trnsysExe +" "+ self.nameDckPathOutput + " /N"
+                cmd = self.trnsysExePath +" "+ self.nameDckPathOutput + " /N"
             else:
-                cmd = self.trnsysExe +" "+ useDeckName + " /N"
+                cmd = self.trnsysExePath +" "+ useDeckName + " /N"
         
 #        myCmd ='"%s"'%cmd #for blank spaces in paths
         
@@ -334,17 +232,7 @@ class ExecuteTrnsys():
 
         if(self.cleanMode):
             self.cleanFilesForRunning()
-        
-    def copyReadFiles(self):
-        
-       nameFile =  "\\temp\\DhwOut.plt" 
-       nameSource  = self.path + nameFile
-       nameOut     = self.pathOutput + nameFile
-       
-       # print nameSource
-       # print nameOut
-       
-       shutil.copy(nameSource,nameOut)
+
            
     def cleanAndCreateResultsTempFolder(self):
       

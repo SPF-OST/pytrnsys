@@ -156,6 +156,9 @@ class BuildTrnsysDeck():
                 print ("Replacemenet of Units of file:%s"%nameList)
                 self.unitId = deckUtils.replaceAllUnits(addedLines,self.unitId,unit,fileAssignUnit,fileAssign)
 
+                unitModifiedLines = [line.replace('£','') for line in addedLines]
+                addedLines = unitModifiedLines
+
             self.deckText.append(caption)
             self.deckText =  self.deckText + addedLines
         

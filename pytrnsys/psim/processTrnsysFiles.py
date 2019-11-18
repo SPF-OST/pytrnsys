@@ -9,6 +9,7 @@ ToDo :
 """
 
 import os
+import re
 import string,shutil
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.psim.processMonthlyDataBase as  monthlyData #changed in order to clean the processing of files
@@ -61,6 +62,31 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.nameClass = "ProcessTrnsys"
         self.unit = unit.UnitConverter()
         self.trnsysDllPath = False
+        self.summaryFile = os.path.join(self.executingPath, 'Summary.dat')
+
+    def writeToSummaryFile(self,resultsDict):
+        self.resultsDict = {}
+        variations = self.fileName.split('-')[1:]
+        names = [re.sub(r'[\d\.]', '',variation) for variation in variations]
+        values = [re.sub(r'[^\d\.]', '', variation) for variation in variations]
+        values = [value if len(value)>0 else name for value,name in zip(values,names)]
+        self.resultsDict = dict(zip(names,values))
+        self.resultsDict= {**self.resultsDict,**resultsDict}
+        if os.path.exists(self.summaryFile):
+            written = False
+            while not written:
+                try:
+                    file = open(self.summaryFile, 'a')
+                    file.write('\t'.join(map(str, list(self.resultsDict.values())))+'\n')
+                    written = True
+                except:
+                    time.sleep(0.1)
+                    print("Summary File Used By Other Process! Wait...")
+        else:
+            file = open(self.summaryFile, 'w')
+            file.write('\t'.join(map(str,list(self.resultsDict.keys())))+'\n')
+            file.write('\t'.join(map(str,list(self.resultsDict.values())))+'\n')
+        file.close()
 
 
 #    def readTrnsysDeck(self):
