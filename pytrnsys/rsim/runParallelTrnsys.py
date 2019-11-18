@@ -524,7 +524,7 @@ class RunParallelTrnsys():
 
 
 
-        if(self.inputs["scaling"]!=None):
+        if(not(self.inputs["scaling"] in ["on","off",None])):
             self.weatherFile,self.cityRef=readConfig.getCityFromConfig(self.lines)
             self.setReferenceCase(self.inputs["pathRef"], self.inputs["nameRef"], self.weatherFile)
             self.scaleVariables()
