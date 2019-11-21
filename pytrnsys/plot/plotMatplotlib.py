@@ -20,7 +20,8 @@ import os, subprocess
 class PlotMatplotlib():
     """Plot TRNSYS Results with Matplotlib"""
     
-    def __init__(self):        
+    def __init__(self,language='en',stylesheet="word.mplstyle"):
+        self.language = language
         root = os.path.dirname(os.path.abspath(__file__))
         if stylesheet:
             plt.style.use(os.path.join(root,r".\\stylesheets",stylesheet))
@@ -134,13 +135,19 @@ class PlotMatplotlib():
             plot.set_title(myTitle,size=20)
             
         plot.set_xticks(ind)
-        
-        if(yearlyFactor==1 or useYearlyFactorAsValue==True):
-            yearTag="Year"
-        else:
-            yearTag = "Year/%d"%yearlyFactor
+
+        if self.language == 'en':
+            if (yearlyFactor == 1):
+                yearTag = "Year"
+            else:
+                yearTag = "Year/%d" % yearlyFactor
+        if self.language == 'de':
+            if (yearlyFactor == 1):
+                yearTag = "Jahr"
+            else:
+                yearTag = "Jahr/%d" % yearlyFactor
             
-        monthSequence = utils.getMonthNameSequence(startMonth)
+        monthSequence = utils.getMonthNameSequence(startMonth,language=self.language)
         monthSequence.append(yearTag)
         
         plot.set_xticklabels(monthSequence,rotation='45')
@@ -246,13 +253,21 @@ class PlotMatplotlib():
             plot.set_title(myTitle)
             
         plot.set_xticks(ind)
-        
+
         plot.axes.grid(which='major', axis='y')
-            yearTag="Year"
-        else:
-            yearTag = "Year/%d"%yearlyFactor
+
+        if self.language == 'en':
+            if (yearlyFactor == 1):
+                yearTag = "Year"
+            else:
+                yearTag = "Year/%d" % yearlyFactor
+        if self.language == 'de':
+            if (yearlyFactor == 1):
+                yearTag = "Jahr"
+            else:
+                yearTag = "Jahr/%d" % yearlyFactor
         
-        monthSequence = utils.getMonthNameSequence(startMonth)
+        monthSequence = utils.getMonthNameSequence(startMonth,language=self.language)
         monthSequence.append(yearTag)
 
 

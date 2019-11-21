@@ -155,37 +155,62 @@ def getMonthNameIndex(_month):
     else:
         return -1
         
-def getMonthKey(i):
-        
-    if(i==1):
-        return "Jan"
-    elif(i==2):
-        return "Feb"
-    elif(i==3):
-        return "Mar"
-    elif(i==4):
-        return "Apr"
-    elif(i==5):
-        return "May"
-    elif(i==6):
-        return "Jun"
-    elif(i==7):
-        return "Jul"
-    elif(i==8):
-        return "Aug"
-    elif(i==9):
-        return "Sep"
-    elif(i==10):
-        return "Oct"
-    elif(i==11):
-        return "Nov"
-    elif(i==12):
-        return "Dec"
+def getMonthKey(i,language='en'):
+    if language=='en':
+        if(i==1):
+            return "Jan"
+        elif(i==2):
+            return "Feb"
+        elif(i==3):
+            return "Mar"
+        elif(i==4):
+            return "Apr"
+        elif(i==5):
+            return "May"
+        elif(i==6):
+            return "Jun"
+        elif(i==7):
+            return "Jul"
+        elif(i==8):
+            return "Aug"
+        elif(i==9):
+            return "Sep"
+        elif(i==10):
+            return "Oct"
+        elif(i==11):
+            return "Nov"
+        elif(i==12):
+            return "Dec"
+    elif language=='de':
+        if (i == 1):
+            return "Jan"
+        elif (i == 2):
+            return "Feb"
+        elif (i == 3):
+            return "Mär"
+        elif (i == 4):
+            return "Apr"
+        elif (i == 5):
+            return "Mai"
+        elif (i == 6):
+            return "Jun"
+        elif (i == 7):
+            return "Jul"
+        elif (i == 8):
+            return "Aug"
+        elif (i == 9):
+            return "Sep"
+        elif (i == 10):
+            return "Okt"
+        elif (i == 11):
+            return "Nov"
+        elif (i == 12):
+            return "Dez"
 
 #startMonth [1-12]    
 def reorganizeMonthlyFile(var,startMonth):
             
-    varNew = num.zeros(len(var)) #it could be 13 for yearly value !!
+    varNew = num.zeros(num.size(var)) #it could be 13 for yearly value !!
     
     if(startMonth>12):
         raise ValueError("reorganizeMonthlyFile startMonth:%d [1-12]"%startMonth)
@@ -207,7 +232,7 @@ def reorganizeMonthlyFile(var,startMonth):
     
     return varNew
 
-def getMonthNameSequence(startMonth):
+def getMonthNameSequence(startMonth,language='en'):
     
     monthSeq = []
     
@@ -215,38 +240,62 @@ def getMonthNameSequence(startMonth):
     for i in range(12):        
         if(j==13):
             j=1
-        monthSeq.append(getMonthKey(j))
+        monthSeq.append(getMonthKey(j,language=language))
         j=j+1
         
     return monthSeq
 
-def getMonthLongName(i):
-        
-    if(i==1):
-        return "January"
-    elif(i==2):
-        return "February"
-    elif(i==3):
-        return "March"
-    elif(i==4):
-        return "April"
-    elif(i==5):
-        return "May"
-    elif(i==6):
-        return "June"
-    elif(i==7):
-        return "July"
-    elif(i==8):
-        return "August"
-    elif(i==9):
-        return "September"
-    elif(i==10):
-        return "October"
-    elif(i==11):
-        return "November"
-    elif(i==12):
-        return "December"
-
+def getMonthLongName(i,language='en'):
+    if language=='en':
+        if(i==1):
+            return "January"
+        elif(i==2):
+            return "February"
+        elif(i==3):
+            return "March"
+        elif(i==4):
+            return "April"
+        elif(i==5):
+            return "May"
+        elif(i==6):
+            return "June"
+        elif(i==7):
+            return "July"
+        elif(i==8):
+            return "August"
+        elif(i==9):
+            return "September"
+        elif(i==10):
+            return "October"
+        elif(i==11):
+            return "November"
+        elif(i==12):
+            return "December"
+    elif language=='de':
+        if (i == 1):
+            return "Januar"
+        elif (i == 2):
+            return "Februar"
+        elif (i == 3):
+            return "März"
+        elif (i == 4):
+            return "April"
+        elif (i == 5):
+            return "Mai"
+        elif (i == 6):
+            return "Juni"
+        elif (i == 7):
+            return "Juli"
+        elif (i == 8):
+            return "August"
+        elif (i == 9):
+            return "September"
+        elif (i == 10):
+            return "Oktober"
+        elif (i == 11):
+            return "November"
+        elif (i == 12):
+            return "Dezember"
    
 def getNumberOfAccumulatedDays(month,day):
             
