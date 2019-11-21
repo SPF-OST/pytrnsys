@@ -207,6 +207,47 @@ def getMonthKey(i,language='en'):
         elif (i == 12):
             return "Dez"
 
+def getShortMonthyNameArray(monthVec):
+
+    monthShort=[]
+
+    for i in range(len(monthVec)):
+        monthShort.append(getShortMonthNames(monthVec[i]))
+
+    return monthShort
+
+def getShortMonthNames(month):
+
+    _month=month.replace(" ","")
+
+    if (_month == "January"):
+        return "Jan"
+    elif (_month == "February"):
+        return "Feb"
+    elif (_month == "March"):
+        return "Mar"
+    elif (_month == "April"):
+        return "Apr"
+    elif (_month == "May"):
+        return "May"
+    elif (_month == "June"):
+        return "Jun"
+    elif (_month == "July"):
+        return "Jul"
+    elif (_month == "August"):
+        return "Aug"
+    elif (_month == "September"):
+        return "Sep"
+    elif (_month == "October"):
+        return "Oct"
+    elif (_month == "November"):
+        return "Nov"
+    elif (_month == "December"):
+        return "Dec"
+    else:
+        return -1
+
+
 #startMonth [1-12]    
 def reorganizeMonthlyFile(var,startMonth):
             

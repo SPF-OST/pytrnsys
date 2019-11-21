@@ -295,16 +295,11 @@ class ReadTrnsysFiles():
         self.name = []
         self.indexToStart = 0        
         self.indexToStart = self.getIndexAndTagNames(lines,self.name,myYear,firstMonth)
-        
-                               
+
         self.name = self.name[1:] # I do not want the name Month
                           
         self.numberOfVariables  = len(self.name)    
         self.variables = num.zeros(12*self.numberOfVariables,dtype=float).reshape(self.numberOfVariables,12)
-        
-        
-               
-        
         
         m = utils.getMonthNameIndex(firstMonth)-1 
         

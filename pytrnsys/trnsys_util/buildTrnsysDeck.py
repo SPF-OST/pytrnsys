@@ -262,8 +262,6 @@ class BuildTrnsysDeck():
         """
         eBalance = deckUtils.readEnergyBalanceVariablesFromDeck(self.deckText)
         unitId=self.unitId+1
-        if(self.unitId<=10):
-            unitId=600
 
         lines = deckUtils.addEnergyBalanceMonthlyPrinter(unitId,eBalance)
         self.deckText = self.deckText[:-4] + lines +self.deckText[-4:]
