@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
 """
 This is the Base Class for reading and processing TRNSYS monthly results.
 Author : Dani Carbonell
