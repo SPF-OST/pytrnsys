@@ -23,7 +23,8 @@ from pytrnsys.psim.simulationLoader import SimulationLoader
 import pandas as pd
 import pytrnsys.report.latexReport as latex
 import pytrnsys.plot.plotMatplotlib as plot
-
+import json
+# from collections import OrderedDict
 
 
 class ProcessTrnsysDf():
@@ -98,6 +99,7 @@ class ProcessTrnsysDf():
         self.loadFiles()
         self.process()
         self.doLatexPdf()
+        self.addResultsFile()
 
     def setLoaderParameters(self):
 
@@ -536,3 +538,21 @@ class ProcessTrnsysDf():
 
         self.readTrnsysFiles.setPath(_path)
 
+    def addResultsFile(self):
+        """
+        Save results to a results.json file.
+
+        Function uses results stringArray from config file to provide keys that will be saved
+        :return:
+        """
+        print("creating results.json file")
+
+        self.resultsDict = {}
+
+        for key in self.inputs['results']:
+            self.resultsDict[key] = self.__dict__[key]
+
+        fileName = self.fileName+'_results.json'
+        fileNamePath = os.path.join(self.outputPath, fileName)
+        with open(fileNamePath, 'w') as fp:
+            json.dump(self.resultsDict, fp, indent = 2, separators=(',', ': '),sort_keys=True)
