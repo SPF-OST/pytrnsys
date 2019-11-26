@@ -32,8 +32,11 @@ def purgueLines(lines,skypChar,replaceChar,skypedLines=0,removeBlankLines=False,
             
             
         #The last character is \n and we do not want it. We only do that if the line is not empty
-        if(len(lines[n])>1):    
-            line=lines[n][:-1]
+        if(len(lines[n])>1):
+            if lines[n][-1]=="\n": #only remove the \n if it exists
+                line=lines[n][:-1]
+            else:
+                line = lines[n]
             lineExist=True
         else:
             lineExist=False
