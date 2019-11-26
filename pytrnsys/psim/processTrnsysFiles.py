@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+# -*- coding: utf-8 -*-
 """
 Child class from ProcessMonthlyDataBase used for processing all TRNSYS simulations.
 
@@ -8,7 +8,7 @@ Date   : 2018
 ToDo :
 """
 
-import os
+import os, subprocess
 import re
 import string,shutil
 import pytrnsys.pdata.processFiles as spfUtils
@@ -25,9 +25,9 @@ import pandas as pd
 
 class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 
-    def __init__(self,_path,_name):
+    def __init__(self,_path,_name,language='en'):
                         
-        monthlyData.ProcessMonthlyDataBase.__init__(self,_path,_name)
+        monthlyData.ProcessMonthlyDataBase.__init__(self,_path,_name,language=language)
 #        
 #        self.fileName = _name.split('.')[0]                                          
 #        self.outputPath = _path + "\%s" % self.fileName              

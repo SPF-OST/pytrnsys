@@ -272,7 +272,7 @@ class RunParallelTrnsys():
         #  path = "C:\Daten\OngoingProject\Ice-Ex\systemSimulations\\check\\"
 
         deckExplanation = []
-        deckExplanation.append("! ** New solar-ice deck. **\n")
+        deckExplanation.append("! ** New deck built from list of ddcks. **\n")
         deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck,self.pathDdck)
         deck.readDeckList(doAutoUnitNumbering=self.inputs['doAutoUnitNumbering'],dictPaths=self.dictDdckPaths)
 

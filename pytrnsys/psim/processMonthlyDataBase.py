@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
 """
 This is the Base Class for reading and processing TRNSYS monthly results.
 Author : Dani Carbonell
@@ -18,7 +18,7 @@ import pytrnsys.plot.plotMatplotlib as plot
 
 class ProcessMonthlyDataBase():
     
-    def __init__(self,_path,_name):
+    def __init__(self,_path,_name,language='en'):
               
         self.fileName = _name
         self.outputPath = _path + "\%s" % self.fileName  
@@ -34,7 +34,7 @@ class ProcessMonthlyDataBase():
                           
         self.doc = latex.LatexReport(self.outputPath,self.fileName)
 
-        self.plot = plot.PlotMatplotlib()
+        self.plot = plot.PlotMatplotlib(language=language)
         self.plot.setPath(self.outputPath)
 
         self.initializeData()
