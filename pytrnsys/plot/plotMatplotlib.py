@@ -251,7 +251,7 @@ class PlotMatplotlib():
 
             plot.bar(ind - move * width, var13, width, color='b')
 
-            plot.set_ylabel(myLabel, size=self.sizeAxis)
+            plot.set_ylabel(myLabel)
 
             box = plot.get_position()
             plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
@@ -269,7 +269,7 @@ class PlotMatplotlib():
             monthSequence = defMonths.copy()
             monthSequence.append(yearTag)
 
-            plot.set_xticklabels(monthSequence, fontsize=self.sizeAxis, rotation='45')
+            plot.set_xticklabels(monthSequence, rotation='45')
 
             namePdf = '%s.pdf' % nameFile
             nameWithPath = '%s\%s' % (self.path, namePdf)
@@ -851,7 +851,7 @@ class PlotMatplotlib():
         imbNeg = num.arange(nMonth)
         imb = num.arange(nMonth)
 
-        fig = plt.figure(1, figsize=(12, 8))
+        fig = plt.figure(1)
         plot = fig.add_subplot(111)
 
         for m in range(nMonth):
@@ -904,7 +904,7 @@ class PlotMatplotlib():
             bar.append(plot.bar(ind - move * width, -imbNeg, width, color=self.myColorsImb, bottom=addVar))
 
         myLabel = myLabel + " [%s]" % unit
-        plot.set_ylabel(myLabel, size=self.sizeAxis)
+        plot.set_ylabel(myLabel)
 
         box = plot.get_position()
         plot.set_position([box.x0, box.y0, box.width * 0.8 / 12 * nMonth, box.height])
@@ -912,13 +912,13 @@ class PlotMatplotlib():
         #        plot.set_title('Title',size=20)
         plot.set_xticks(ind)
 
-        plot.set_xticklabels([monthSequence[i] for i in showMonths], fontsize=self.sizeAxis, rotation='45')
+        plot.set_xticklabels([monthSequence[i] for i in showMonths], rotation='45')
 
         allbar = []
         for b in bar:
             allbar.append(b[0])
 
-        plot.legend(allbar, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=self.sizeLegend)
+        plot.legend(allbar, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
         namePdf = '%s.%s' % (nameFile, self.extensionPlot)
         nameWithPath = '%s\%s' % (self.path, namePdf)

@@ -550,7 +550,11 @@ class ProcessTrnsysDf():
         self.resultsDict = {}
 
         for key in self.inputs['results']:
-            self.resultsDict[key] = self.__dict__[key]
+            if type(self.__dict__[key]) == num.ndarray:
+                value = list(self.__dict__[key])
+            else:
+                value = self.__dict__[key]
+            self.resultsDict[key] = value
 
         fileName = self.fileName+'_results.json'
         fileNamePath = os.path.join(self.outputPath, fileName)
