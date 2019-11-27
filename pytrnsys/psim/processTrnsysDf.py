@@ -54,7 +54,7 @@ class ProcessTrnsysDf():
         self.tempFolderEnd = "%s\\temp" % self.outputPath
 
         self.trnsysVersion = "standard"
-        self.yearReadedInMonthylFile = -1  # -1 means the last
+        self.yearReadedInMonthlyFile = -1  # -1 means the last
         self.firstMonth = "January"
 
         self.yearlyFactor = 10.  # value to divide yerarly values when plotted along with monthly data
@@ -110,12 +110,23 @@ class ProcessTrnsysDf():
         self.fileNameListToRead = False
         self.loadMode = "complete"
 
+        if 'firstMonth' in self.inputs.keys():
+            self.firstMonth = self.inputs['firstMonth']
+        else:
+            self.firstMonth = "January"
+        if 'yearReadedInMonthlyFile' in self.inputs.keys():
+            self.yearReadedInMonthlyFile = self.inputs['yearReadedInMonthlyFile']
+        else:
+            self.yearReadedInMonthlyFile = -1
+
     def loadFiles(self):
 
         self.setLoaderParameters()
+
+
         self.loader = SimulationLoader(self.outputPath + '//temp', fileNameList=self.fileNameListToRead,
                                        mode=self.loadMode, monthlyUsed=self.monthlyUsed, hourlyUsed=self.hourlyUsed,
-                                       timeStepUsed=self.timeStepUsed)
+                                       timeStepUsed=self.timeStepUsed,firstMonth=self.firstMonth, year = self.yearReadedInMonthlyFile)
         # self.monData = self.loader.monData
         self.monDataDf = self.loader.monDataDf
         self.houDataDf = self.loader.houDataDf
@@ -556,7 +567,7 @@ class ProcessTrnsysDf():
                 value = self.__dict__[key]
             self.resultsDict[key] = value
 
-        fileName = self.fileName+'_results.json'
+        fileName = self.fileName+'-results.json'
         fileNamePath = os.path.join(self.outputPath, fileName)
         with open(fileNamePath, 'w') as fp:
             json.dump(self.resultsDict, fp, indent = 2, separators=(',', ': '),sort_keys=True)
