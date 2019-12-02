@@ -149,13 +149,9 @@ class SimulationLoader():
             file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26).rename(columns=lambda x: x.strip())
             file.set_index('Period', inplace=True, drop=False)
 
-
-
-
-
             if self.fullYear:
                 if self.year==-1:
-                    file=file[-12:]
+                    file=file[-8760:]
 
                 else:
                     firstHourNumber = (datetime(2018, firstMonthN , 1)-datetime(2018, 1 , 1)).days*24 + self.year * 8760
