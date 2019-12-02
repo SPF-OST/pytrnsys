@@ -491,7 +491,7 @@ class LatexReport():
         if(addLines!=False):
             lines=lines+addLines
 
-        self.addTable(caption,sizeBox,names,units,label,lines,useFormula=False)
+        self.addTable(caption,names,units,label,lines,useFormula=False)
    
         return lines
 

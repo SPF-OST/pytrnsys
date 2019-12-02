@@ -28,6 +28,7 @@ class CreateTrnsysDeck():
         # if we have changed something from the original we will no see the changes if this is set to False.
         # I will erase this if no utility after a while.
 
+    @property
     def generateDecksDeprecated(self):
         """
         This function will generate as many deck cases as the number of variations defined in the confg file.
@@ -86,6 +87,9 @@ class CreateTrnsysDeck():
         
             nameLabelOfVariation = []
             nameVariationInDeck = []
+            
+            
+            
             
             for nvar in range (len(self.variations)):
                 nameLabelOfVariation.append(self.variations[nvar][0])
@@ -191,12 +195,12 @@ class CreateTrnsysDeck():
 
                     # If I write variation = ["","","GFX",...] then I add the name to the deck but no variation is used
                     if (len(self.variations[nvar][0]) == 0 and len(self.variations[nvar][1]) == 0):
-                        variationsLine = variationsLine + "-%s" % (valuesOfVariationInFile)
+                        variationsLine = variationsLine + "-%.4f" % float(valuesOfVariationInFile)
 
                     # If I write variation = ["","useCovered",0,1] then no value is printed
                     elif (len(self.variations[nvar][0]) > 0):
-                        variationsLine = variationsLine + "-%s%s" % (
-                        self.variations[nvar][0], valuesOfVariationInFile)
+                        variationsLine = variationsLine + "-%s%.4f" % (
+                        self.variations[nvar][0], float(valuesOfVariationInFile))
 
                 nameDeck = "%s%s" % (self.case, variationsLine)
 

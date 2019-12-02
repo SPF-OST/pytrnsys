@@ -8,10 +8,10 @@ Date   : 2018
 ToDo :
 """
 
-import os
+import os , subprocess
 import string, shutil
 import pytrnsys.pdata.processFiles as spfUtils
-import pytrnsys.psim.processMonthlyDataBase as  monthlyData  # changed in order to clean the processing of files
+#import pytrnsys.psim.processMonthlyDataBase as  monthlyData  # changed in order to clean the processing of files
 import pytrnsys.utils.utilsSpf as utils
 import time
 import numpy as num
@@ -24,12 +24,14 @@ import pandas as pd
 import pytrnsys.report.latexReport as latex
 import pytrnsys.plot.plotMatplotlib as plot
 import json
+from string import ascii_letters, digits, whitespace
+import locale
 # from collections import OrderedDict
 
 
 class ProcessTrnsysDf():
 
-    def __init__(self, _path, _name):
+    def __init__(self, _path, _name,language='en'):
 
         self.fileName = _name
         self.outputPath = _path + "\%s" % self.fileName
@@ -45,7 +47,7 @@ class ProcessTrnsysDf():
 
         self.doc = latex.LatexReport(self.outputPath, self.fileName)
 
-        self.plot = plot.PlotMatplotlib()
+        self.plot = plot.PlotMatplotlib(language=language)
         self.plot.setPath(self.outputPath)
 
         self.cleanModeLatex = False
@@ -122,8 +124,7 @@ class ProcessTrnsysDf():
     def loadFiles(self):
 
         self.setLoaderParameters()
-
-
+        locale.setlocale(locale.LC_ALL,'enn')
         self.loader = SimulationLoader(self.outputPath + '//temp', fileNameList=self.fileNameListToRead,
                                        mode=self.loadMode, monthlyUsed=self.monthlyUsed, hourlyUsed=self.hourlyUsed,
                                        timeStepUsed=self.timeStepUsed,firstMonth=self.firstMonth, year = self.yearReadedInMonthlyFile)
@@ -142,7 +143,7 @@ class ProcessTrnsysDf():
 
     def executeLatexFile(self):
 
-        self.doc.executeLatexFile(moveToTrnsysLogFile=True, runTwice=True)
+        self.doc.executeLatexFile(moveToTrnsysLogFile=True, runTwice=False)
 
     def doLatexPdf(self, documentClass="SPFShortReportIndex"):
 
@@ -459,7 +460,7 @@ class ProcessTrnsysDf():
         else:
             niceName = self.getCustomeNiceLatexNames(name)
             if(niceName==None):
-                niceName = "$%s$" % name
+                niceName = "$%s$" % "".join([c for c in name if c in ascii_letters+digits])
 
         return niceName
 
@@ -571,3 +572,20 @@ class ProcessTrnsysDf():
         fileNamePath = os.path.join(self.outputPath, fileName)
         with open(fileNamePath, 'w') as fp:
             json.dump(self.resultsDict, fp, indent = 2, separators=(',', ': '),sort_keys=True)
+
+
+    def plot_as_emf(self,figure, **kwargs):
+        inkscape_path = kwargs.get('inkscape', "C://Program Files//Inkscape//inkscape.exe")
+        filepath = kwargs.get('filename', None)
+
+        if filepath is not None:
+            path, filename = os.path.split(filepath)
+            filename, extension = os.path.splitext(filename)
+
+            svg_filepath = os.path.join(path, filename + '.svg')
+            emf_filepath = os.path.join(path, filename + '.emf')
+
+            figure.savefig(svg_filepath, format='svg')
+
+            subprocess.call([inkscape_path, svg_filepath, '--export-emf', emf_filepath])
+            os.remove(svg_filepath)

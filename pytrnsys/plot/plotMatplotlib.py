@@ -29,6 +29,7 @@ class PlotMatplotlib():
 
         self.setDefaultColors()
 
+
     def initialize(self):
 
         self.extensionPlot="pdf"
@@ -497,7 +498,7 @@ class PlotMatplotlib():
 
         plot.legend(bars, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
         plot.tick_params(axis='y')
-        if ylims:
+        if ylim:
             plot.set_ylim(ylims)
         if (myTitle != None):
             plot.set_title(myTitle)
