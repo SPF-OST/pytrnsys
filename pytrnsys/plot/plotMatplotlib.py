@@ -799,12 +799,47 @@ class PlotMatplotlib():
 
         return namePdf
 
-    def plotMonthlyBalanceDf(self, inVar, outVar, legends, myLabel, nameFile, unit, defMonths, colors=False,
+    def plotMonthlyBalanceDf(self, inVar, outVar, legends, myLabel, nameFile, unit, defMonths,
                                printImb=True, yearlyFactor=1, useYear=False, plotEmf=False, printData=False,
-                               showMonths=False):
+                               showMonths=False,ylims=None):
         """
-        It is assumed that legends take first in and then out names.
+        Plots monthly energy balance of system input variables and system output variables.
+
+        Parameters
+        ----------
+        inVar : ndarray
+            1D array of length 12 containing monthly values of system input variables
+        outVar : ndarray
+            1D array of length 12 containing monthly values of system output variables
+        legends : list of str
+                    list of strings containing N entries for the legend. Input variables go first Output vairables go second)
+        myLabel : str
+                    Label of the y-Axis
+        nameFile : str
+                    Name of the plot file to be saved
+        defMonths : list of str
+            list of strings with the month names
+        printImb : bool, optional
+            Print the monthly imbalance between in and out variables, Default is True
+        yearlyFactor : float, optional
+            Value for the reduction of the yearly sum to make it fit in the y-axis, Default is 1
+        useYear : bool, optional
+            Show the yearly sum, Default is false
+        plotEmf : bool, optional
+            Print the plot as an emf (requres an installation of inkscape), Default is False
+        printData : bool, optional
+            Print the data to a .dat file, Default is false
+        showMonths : list of int, optional
+            list with numbers of which months to plot (0=january), Default is False (shows all files)
+        ylims : [lower,upper], optional
+            lower and upper limit for y axi, Default is False (automatic limits by matplotlib)
+
+        Returns
+        -------
+        str
+            Path of Pdf created.
         """
+
         move = 0
         if (yearlyFactor == 1):
             yearTag = "Year"
@@ -812,19 +847,18 @@ class PlotMatplotlib():
             yearTag = "Year/%d" % yearlyFactor
 
         monthSequence = defMonths.copy()
+        variables = inVar.copy()
         for var in outVar:
-            inVar.append(-var)
+            variables.append(-var)
         if (useYear == True):
 
             nMonth = 13
-            inVar13 = []
-
-
+            variables13 = []
             monthSequence.append(yearTag)
 
-            for i in range(len(inVar)):
+            for i in range(len(variables)):
 
-                inVar13.append(utils.addYearlyValue(inVar[i], yearlyFactor=yearlyFactor))
+                variables13.append(utils.addYearlyValue(variables[i], yearlyFactor=yearlyFactor))
 
             if (showMonths == False):
                 showMonths = [i for i in range(13)]
@@ -833,13 +867,13 @@ class PlotMatplotlib():
                 nMonth = len(showMonths)
         else:
             nMonth = 12
-            inVar13 = inVar
+            variables13 = variables
             if (showMonths == False):
                 showMonths = [i for i in range(12)]
             else:
                 nMonth = len(showMonths)
 
-        data = num.array(inVar13)
+        data = num.array(variables13)
         if printImb:
             data = num.append(data, [num.sum(data[:,showMonths], axis=0)], axis=0)
 
@@ -857,8 +891,8 @@ class PlotMatplotlib():
         plot = fig.add_subplot(111)
         bar = []
 
-        for i in range(len(inVar13)):
-            bar.append(plot.bar(ind - move * width, inVar13[i][showMonths], width, color=self.myColorsIn[i],
+        for i in range(len(variables13)):
+            bar.append(plot.bar(ind - move * width, variables13[i][showMonths], width, color=self.myColorsIn[i],
                                 bottom=data_stack[i]))
 
         bar.append(plot.bar(ind - move * width, data[-1][showMonths], width, color='k',
@@ -866,13 +900,9 @@ class PlotMatplotlib():
 
         myLabel = myLabel + " [%s]" % unit
         plot.set_ylabel(myLabel)
-
         box = plot.get_position()
         plot.set_position([box.x0, box.y0, box.width * 0.8 / 12 * nMonth, box.height])
-
-        #        plot.set_title('Title',size=20)
         plot.set_xticks(ind)
-
         plot.set_xticklabels([monthSequence[i] for i in showMonths], rotation='45')
 
         allbar = []
@@ -890,6 +920,9 @@ class PlotMatplotlib():
             plt.xlim([-0.5, 13.5])
         else:
             plt.xlim([-0.5, len(showMonths) + 1.5])
+
+        if ylims is not None:
+            plt.ylim(ylims)
 
         plt.savefig(nameWithPath)
 
@@ -913,21 +946,22 @@ class PlotMatplotlib():
             line = "\n";
             lines = lines + line
 
-            # inVar(nVar,nMonth)
+            # variables(nVar,nMonth)
 
             for j in range(nMonth):
                 line = "%d\t" % (j + 1);
                 lines = lines + line
-
                 sumVar = 0.
                 sumVarNeg = 0.
-                for i in range(len(inVar13)):
-                    if inVar13[i][j]>=0:
-                        sumVar = sumVar + inVar13[i][j]
+                for i in range(len(variables13)):
+                    if variables13[i][j]>=0:
+                        sumVar = sumVar + variables13[i][j]
                         line = "%.2f\t" % sumVar;
+
                     else:
-                        sumVarNeg +=inVar[i][j]
+                        sumVarNeg +=variables[i][j]
                         line = "%.2f\t" % sumVarNeg;
+
                     lines = lines + line
 
                 line = "\n";
@@ -938,13 +972,9 @@ class PlotMatplotlib():
             outfile.writelines(lines)
             outfile.close()
 
-            #            if(len(outVar)==0):
-            #                self.gle.getBarPlot(nameFile,nameWithPath,legends,xnames=monthSequence)
-            #            else:
-            self.gle.getBarBalancePlot(nameFile, nameWithPath, legends, len(inVar13), 0,
+            self.gle.getBarBalancePlot(nameFile, nameWithPath, legends, len(variables13), 0,
                                        xnames=monthSequence)
 
-        #        self.addLatexMonthlyData("",legends,unit,inVar,outVar,imb)
         return namePdf
 
 
