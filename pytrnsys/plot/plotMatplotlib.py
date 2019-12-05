@@ -250,7 +250,7 @@ class PlotMatplotlib():
 
             if (useYearlyFactorAsValue): var13[12] = yearlyFactor
 
-            plot.bar(ind - move * width, var13, width, color='b')
+            plot.bar(ind - move * width, var13, width)
 
             plot.set_ylabel(myLabel)
 
