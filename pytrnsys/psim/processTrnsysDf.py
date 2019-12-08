@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 import pytrnsys.utils.unitConverter as unit
 import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
+import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
 from pytrnsys.psim.simulationLoader import SimulationLoader
 import pandas as pd
 import pytrnsys.report.latexReport as latex
@@ -132,6 +133,12 @@ class ProcessTrnsysDf():
         self.monDataDf = self.loader.monDataDf
         self.houDataDf = self.loader.houDataDf
         self.steDataDf = self.loader.steDataDf
+
+        self.deck = deckTrnsys.DeckTrnsys(self.outputPath,self.fileName)
+        self.deck.loadDeck()
+        self.deckData = self.deck.getAllDataFromDeck()
+
+
 
         self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
