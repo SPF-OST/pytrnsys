@@ -567,12 +567,12 @@ class ProcessTrnsysDf():
         print("creating results.json file")
 
         self.resultsDict = {}
-
+        jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__}
         for key in self.inputs['results']:
-            if type(self.__dict__[key]) == num.ndarray:
-                value = list(self.__dict__[key])
+            if type(jointDicts[key]) == num.ndarray:
+                value = list(jointDicts[key])
             else:
-                value = self.__dict__[key]
+                value = jointDicts[key]
             self.resultsDict[key] = value
 
         fileName = self.fileName+'-results.json'
