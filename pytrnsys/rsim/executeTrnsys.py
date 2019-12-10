@@ -112,9 +112,6 @@ class ExecuteTrnsys():
         nameDeckBck = "%s-bck" % self.nameDck        
         shutil.copy(self.nameDck,nameDeckBck)
         
-    def resizeParameters(self):
-        
-        self.deckTrnsys.resizeParameters(read=True)
         
     def loadDeck(self,useDeckName=False,check=False,eliminateComments=False,useDeckOutputPath=False):
 

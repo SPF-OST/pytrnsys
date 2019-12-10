@@ -3,6 +3,7 @@ import numpy as num
 import pytrnsys.pdata.processFiles as spfUtils
 import os
 import re
+from string import digits
 
 
 def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesUsedInDdck):
@@ -77,21 +78,22 @@ def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
                 # if(unitAssigned==True):
 
         except:
-            pass
+            raise ValueError('Logical ASSIGN number of the following ddck-line cannot be changed: '+line)
 
         try:
-            nUnit = splitBlank[1].replace(" ", "")
-            types = splitBlank[2].replace(" ", "")
-            ntype = splitBlank[3].replace(" ", "")
-            unit = splitBlank[0].replace(" ", "")
+            if len(splitBlank)>3:
+                nUnit = "".join([c for c in splitBlank[1].replace(" ", "") if c in digits])
+                types = splitBlank[2].replace(" ", "")
+                ntype = "".join([c for c in splitBlank[3].replace(" ", "") if c in digits])
+                unit = splitBlank[0].replace(" ", "")
 
-            if (unit.lower() == "unit".lower() and types.lower() == "Type".lower()):
-                #                    print "unit:%s nUnit:%s types:%s ntype:%s"%(unit,nUnit,types,ntype)
-                TrnsysTypes.append(int(ntype))
-                TrnsysUnits.append(int(nUnit))
+                if (unit.lower() == "unit".lower() and types.lower() == "Type".lower()):
+                    #                    print "unit:%s nUnit:%s types:%s ntype:%s"%(unit,nUnit,types,ntype)
+                    TrnsysTypes.append(int(ntype))
+                    TrnsysUnits.append(int(nUnit))
 
         except:
-            pass
+            raise ValueError('Unit number of the following ddck-line cannot be changed: '+line)
 
     # We need to sort them for units. Otherwise when we change unit numbers we can change something already changed
     # for example we replace UNIT 400 for UNIT 20 and at the end we have UNIT 20 again and we change it for UNIT 100

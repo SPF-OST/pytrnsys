@@ -16,6 +16,7 @@ import pytrnsys.rsim.runParallel as run
 import pytrnsys.utils.utilsSpf as utils
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import warnings
+import copy
 #we would need to pass the Class as inputs
 
 
@@ -68,31 +69,18 @@ def processDataGeneralDeprecated(casesInputs):
     if yearReadedInMonthlyFile != -1:
         renameFile = os.path.join(locationPath, fileName, fileName)
 
-        fileEndingsDefault = ["-results.dat", "-report.pdf"]
+        fileEndingsDefault = ["-results.json", "-report.pdf"]
 
         for ending in fileEndingsDefault:
             newEnding = "-Year%i" % yearReadedInMonthlyFile + ending
             try:
                 os.rename(renameFile + ending, renameFile + newEnding)
+                print("renamed %s"%newEnding)
             except:
                 warnings.warn(
                     "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
                                 renameFile + newEnding))
 
-    # rename files if multiple years are available:
-    if yearReadedInMonthlyFile != -1:
-        renameFile = os.path.join(locationPath, fileName, fileName)
-
-        fileEndingsDefault = ["-results.dat", "-report.pdf"]
-
-        for ending in fileEndingsDefault:
-            newEnding = "-Year%i" % yearReadedInMonthlyFile + ending
-            try:
-                os.rename(renameFile + ending, renameFile + newEnding)
-            except:
-                warnings.warn(
-                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
-                                renameFile + newEnding))
 
     del test  # time.sleep(5)
 
@@ -152,27 +140,13 @@ def processDataGeneral(casesInputs):
     if inputs["yearReadedInMonthlyFile"] != -1:
         renameFile = os.path.join(locationPath, fileName, fileName)
 
-        fileEndingsDefault = ["-results.dat", "-report.pdf"]
+        fileEndingsDefault = ["-results.json", "-report.pdf","-plots.html"]
 
         for ending in fileEndingsDefault:
             newEnding = "-Year%i" % inputs["yearReadedInMonthlyFile"] + ending
             try:
                 os.rename(renameFile + ending, renameFile + newEnding)
-            except:
-                warnings.warn(
-                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
-                                renameFile + newEnding))
-
-    # rename files if multiple years are available:
-    if inputs["yearReadedInMonthlyFile"] != -1:
-        renameFile = os.path.join(locationPath, fileName, fileName)
-
-        fileEndingsDefault = ["-results.dat", "-report.pdf"]
-
-        for ending in fileEndingsDefault:
-            newEnding = "-Year%i" % inputs["yearReadedInMonthlyFile"] + ending
-            try:
-                os.rename(renameFile + ending, renameFile + newEnding)
+                os.remove(renameFile + ending)
             except:
                 warnings.warn(
                     "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
@@ -246,12 +220,12 @@ class ProcessParallelTrnsys():
                     if (name == self.filteredfolder[i]):
                         folderUsed=False
                 if(folderUsed):
-                    nameWithPath = os.path.join(pathFolder, "%s\\%s-results.dat" % (name, name))
+                    nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
 
                     if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
                         print ("file :%s already processed" % name)
 
-                    elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.dat" % (name, name))) and  self.inputs["forceProcess"] == False:
+                    elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (name, name))) and  self.inputs["forceProcess"] == False:
                         print ("file :%s already processed" % name)
 
                     else:
@@ -281,7 +255,7 @@ class ProcessParallelTrnsys():
                 if (name == self.filteredfolder[i]):
                     folderUsed = False
             if (folderUsed):
-                nameWithPath = os.path.join(pathFolder, "%s\\%s-results.dat" % (name, name))
+                nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
 
                 if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
                     print ("file :%s already processed" % name)
@@ -315,12 +289,12 @@ class ProcessParallelTrnsys():
                         if (name == self.filteredfolder[i]):
                             folderUsed = False
                     if (folderUsed):
-                        nameWithPath = os.path.join(pathFolder, "%s\\%s-results.dat" % (name, name))
+                        nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
 
                         if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
                             print ("file :%s already processed" % name)
 
-                        elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.dat" % (name, name))) and self.inputs["forceProcess"] == False:
+                        elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (name, name))) and self.inputs["forceProcess"] == False:
                             print ("file :%s already processed" % name)
 
                         else:
@@ -329,28 +303,68 @@ class ProcessParallelTrnsys():
                             print ("file :%s will be processed" % name)
 
 
-                            if "hourly" in name and not "Mean" in name:
-                                for i in range(self.inputs["numberOfYearsInHourlyFile"]):
-                                    self.inputs["yearReadedInMonthlyFile"]=i+1
-                                    # casesInputs.append((baseClass, pathFolder, name, self.inputs["avoidUser"], self.inputs["maxMinAvoided"],
-                                    #             i+1, self.inputs["cleanModeLatex"], self.inputs["firstMonthUsed"],
-                                    #             self.inputs["processQvsT"], self.inputs["firstMonthUsed"],
-                                    #             self.inputs["buildingArea"], \
-                                    #             self.inputs["dllTrnsysPath"], self.inputs["setPrintDataForGle"],
-                                    #             self.inputs["firstConsideredTime"]))
-                                    casesInputs.append((baseClass, pathFolder, name, self.inputs))
-
+                            if ("hourly" in name or "hourlyOld" in name) and not "Mean" in name:
+                                inputs = []
+                                if self.inputs["yearReadedInMonthlyFile"] == -1:
+                                    for i in range(self.inputs["numberOfYearsInHourlyFile"]):
+                                        inputs.append(copy.deepcopy(self.inputs))
+                                        inputs[i]['yearReadedInMonthlyFile'] = i
+                                        casesInputs.append((baseClass, pathFolder, name, inputs[i]))
+                                else:
+                                    for i in range(self.inputs["numberOfYearsInHourlyFile"]):
+                                        inputs.append(copy.deepcopy(self.inputs))
+                                        inputs[i]['yearReadedInMonthlyFile'] = self.inputs["yearReadedInMonthlyFile"] + i
+                                        casesInputs.append((baseClass, pathFolder, name, inputs[i]))
                             else:
-                                # casesInputs.append((baseClass, pathFolder, name, self.inputs["avoidUser"],
-                                #                     self.inputs["maxMinAvoided"],
-                                #                     self.inputs["yearReadedInMonthlyFile"], \
-                                #                     self.inputs["cleanModeLatex"], self.inputs["firstMonthUsed"],
-                                #                     self.inputs["processQvsT"], self.inputs["firstMonthUsed"],
-                                #                     self.inputs["buildingArea"], \
-                                #                     self.inputs["dllTrnsysPath"], self.inputs["setPrintDataForGle"],
-                                #                     self.inputs["firstConsideredTime"]))
                                 casesInputs.append((baseClass, pathFolder, name, self.inputs))
 
+        elif self.inputs["typeOfProcess"] == "config":
+
+            for city in self.inputs["cities"]:
+                pathFolder = os.path.join(self.inputs["pathBase"], city)
+                fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
+
+                for name in fileName:
+
+                    for type in self.inputs['fileTypes']:
+                        if type in name:
+
+                            folderUsed = True
+                            for i in range(len(self.filteredfolder)):
+                                if (name == self.filteredfolder[i]):
+                                    folderUsed = False
+                            if (folderUsed):
+                                nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
+
+                                if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
+                                    print("file :%s already processed" % name)
+
+                                elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (name, name))) and \
+                                        self.inputs["forceProcess"] == False:
+                                    print("file :%s already processed" % name)
+
+                                else:
+                                    baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)
+
+                                    print("file :%s will be processed" % name)
+
+                                    if ("hourly" in name or "hourlyOld" in name) and not "Mean" in name:
+                                        inputs = []
+                                        if self.inputs["yearReadedInMonthlyFile"] == -1:
+                                            for i in range(self.inputs["numberOfYearsInHourlyFile"]):
+                                                inputs.append(copy.deepcopy(self.inputs))
+                                                inputs[i]['yearReadedInMonthlyFile'] = i
+                                                casesInputs.append((baseClass, pathFolder, name, inputs[i]))
+                                        else:
+                                            for i in range(self.inputs["numberOfYearsInHourlyFile"]):
+                                                inputs.append(copy.deepcopy(self.inputs))
+                                                inputs[i]['yearReadedInMonthlyFile'] = self.inputs[
+                                                                                           "yearReadedInMonthlyFile"] + i
+                                                casesInputs.append((baseClass, pathFolder, name, inputs[i]))
+                                    else:
+                                        casesInputs.append((baseClass, pathFolder, name, self.inputs))
+                        else:
+                            pass
 
             #sort to process 10 year files first and all 10 years:
 

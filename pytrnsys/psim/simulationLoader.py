@@ -104,6 +104,7 @@ class SimulationLoader():
 
 
         """
+        firstMonthN = pd.to_datetime(self.firstMonth, format='%B').month
         pathFile = os.path.join(self.path, file)
         fileType = self._fileSniffer(pathFile)
         nRows = self._fileLen(pathFile)
@@ -119,7 +120,7 @@ class SimulationLoader():
                     file=file[-12:]
 
                 else:
-                    firstMonthNumber = pd.to_datetime(self.firstMonth, format='%B').month + self.year * 12
+                    firstMonthNumber = firstMonthN + self.year * 12
                     try:
                         file = file.loc[firstMonthNumber:firstMonthNumber+11]
 
@@ -146,12 +147,38 @@ class SimulationLoader():
 
         elif (fileType == _ResultsFileType.HOURLY and self.hourlyUsed==True):
             file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26).rename(columns=lambda x: x.strip())
+            file.set_index('Period', inplace=True, drop=False)
+
+            if self.fullYear:
+                if self.year==-1:
+                    try:
+                        file=file[-8760:]
+                    except:
+                        file=file[-8758:] #this is here because of the trnsys bug in type 99
+
+                else:
+                    firstHourNumber = (datetime(2018, firstMonthN , 1)-datetime(2018, 1 , 1)).days*24 + self.year * 8760
+                    try:
+                        file = file.loc[firstHourNumber:firstHourNumber+8760]
+
+                    except:
+                        raise ValueError(pathFile+' is not in the right Format to read hours '+str(firstHourNumber)+' to '+str(firstHourNumber+8760))
+
+                # file['Number'] = pd.to_datetime(file['Period'].str.strip(), format='%B').dt.hour
+                # file.set_index('Number', inplace=True)
+
+            # if self.sortMonths:
+            #     file.sort_index(inplace=True)
+            # file['Datetime'] = pd.to_datetime(file['Month'].str.strip(), format='%B')
+
+
+
             file["Period"] = datetime(2018, 1, 1) + pd.to_timedelta(file['Period'], unit='h')
             file.set_index('Period', inplace=True)
             
             if self.mode == 'dataframe' or self.mode == 'complete':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.houDataDf.columns)]
-                self.houDataDf = pd.merge(self.houDataDf, file, left_index=True, right_index=True, how='outer')
+                self.houDataDf = pd.merge(self.houDataDf, file[cols_to_use], left_index=True, right_index=True, how='outer')
                 
             if self.mode == 'array' or self.mode == 'complete':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.houData.keys())]

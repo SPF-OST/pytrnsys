@@ -8,10 +8,10 @@ Date   : 2018
 ToDo :
 """
 
-import os
+import os , subprocess
 import string, shutil
 import pytrnsys.pdata.processFiles as spfUtils
-import pytrnsys.psim.processMonthlyDataBase as  monthlyData  # changed in order to clean the processing of files
+#import pytrnsys.psim.processMonthlyDataBase as  monthlyData  # changed in order to clean the processing of files
 import pytrnsys.utils.utilsSpf as utils
 import time
 import numpy as num
@@ -19,16 +19,21 @@ import matplotlib.pyplot as plt
 import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 import pytrnsys.utils.unitConverter as unit
 import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
+import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
 from pytrnsys.psim.simulationLoader import SimulationLoader
 import pandas as pd
 import pytrnsys.report.latexReport as latex
 import pytrnsys.plot.plotMatplotlib as plot
-
+import json
+import pytrnsys.plot.plotBokeh as pltB
+from string import ascii_letters, digits, whitespace
+import locale
+# from collections import OrderedDict
 
 
 class ProcessTrnsysDf():
 
-    def __init__(self, _path, _name):
+    def __init__(self, _path, _name,language='en'):
 
         self.fileName = _name
         self.outputPath = _path + "\%s" % self.fileName
@@ -44,8 +49,10 @@ class ProcessTrnsysDf():
 
         self.doc = latex.LatexReport(self.outputPath, self.fileName)
 
-        self.plot = plot.PlotMatplotlib()
+        self.plot = plot.PlotMatplotlib(language=language)
         self.plot.setPath(self.outputPath)
+        
+        self.pltB = pltB.PlotBokeh()
 
         self.cleanModeLatex = False
 
@@ -53,7 +60,7 @@ class ProcessTrnsysDf():
         self.tempFolderEnd = "%s\\temp" % self.outputPath
 
         self.trnsysVersion = "standard"
-        self.yearReadedInMonthylFile = -1  # -1 means the last
+        self.yearReadedInMonthlyFile = -1  # -1 means the last
         self.firstMonth = "January"
 
         self.yearlyFactor = 10.  # value to divide yerarly values when plotted along with monthly data
@@ -98,6 +105,7 @@ class ProcessTrnsysDf():
         self.loadFiles()
         self.process()
         self.doLatexPdf()
+        self.addResultsFile()
 
     def setLoaderParameters(self):
 
@@ -108,16 +116,32 @@ class ProcessTrnsysDf():
         self.fileNameListToRead = False
         self.loadMode = "complete"
 
+        if 'firstMonth' in self.inputs.keys():
+            self.firstMonth = self.inputs['firstMonth']
+        else:
+            self.firstMonth = "January"
+        if 'yearReadedInMonthlyFile' in self.inputs.keys():
+            self.yearReadedInMonthlyFile = self.inputs['yearReadedInMonthlyFile']
+        else:
+            self.yearReadedInMonthlyFile = -1
+
     def loadFiles(self):
 
         self.setLoaderParameters()
+        locale.setlocale(locale.LC_ALL,'enn')
         self.loader = SimulationLoader(self.outputPath + '//temp', fileNameList=self.fileNameListToRead,
                                        mode=self.loadMode, monthlyUsed=self.monthlyUsed, hourlyUsed=self.hourlyUsed,
-                                       timeStepUsed=self.timeStepUsed)
+                                       timeStepUsed=self.timeStepUsed,firstMonth=self.firstMonth, year = self.yearReadedInMonthlyFile)
         # self.monData = self.loader.monData
         self.monDataDf = self.loader.monDataDf
         self.houDataDf = self.loader.houDataDf
         self.steDataDf = self.loader.steDataDf
+
+        self.deck = deckTrnsys.DeckTrnsys(self.outputPath,self.fileName)
+        self.deck.loadDeck()
+        self.deckData = self.deck.getAllDataFromDeck()
+
+
 
         self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
@@ -125,11 +149,14 @@ class ProcessTrnsysDf():
 
     def process(self):
 
-        pass
+        if "plotHourly" in self.inputs.keys():
+            self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"])
+        else:
+            pass
 
     def executeLatexFile(self):
 
-        self.doc.executeLatexFile(moveToTrnsysLogFile=True, runTwice=True)
+        self.doc.executeLatexFile(moveToTrnsysLogFile=True, runTwice=False)
 
     def doLatexPdf(self, documentClass="SPFShortReportIndex"):
 
@@ -207,7 +234,9 @@ class ProcessTrnsysDf():
             else:
                 self.SpfShpDis[i] = self.qDemand[i] / self.elHeatSysTotal[i]
 
-        self.yearSpfShpDis = sum(self.qDemand) / sum(self.elHeatSysTotal)
+        self.yearQDemand = sum(self.qDemand)
+        self.yearElHeatSysTotal = sum(self.elHeatSysTotal)
+        self.yearSpfShpDis = self.yearQDemand / self.yearElHeatSysTotal
         self.SpfShpDis[12] = self.yearSpfShpDis
 
     def addSPFSystem(self, printData=False):
@@ -446,7 +475,7 @@ class ProcessTrnsysDf():
         else:
             niceName = self.getCustomeNiceLatexNames(name)
             if(niceName==None):
-                niceName = "$%s$" % name
+                niceName = "$%s$" % "".join([c for c in name if c in ascii_letters+digits])
 
         return niceName
 
@@ -536,3 +565,42 @@ class ProcessTrnsysDf():
 
         self.readTrnsysFiles.setPath(_path)
 
+    def addResultsFile(self):
+        """
+        Save results to a results.json file.
+
+        Function uses results stringArray from config file to provide keys that will be saved
+        :return:
+        """
+        print("creating results.json file")
+
+        self.resultsDict = {}
+        jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__}
+        for key in self.inputs['results']:
+            if type(jointDicts[key]) == num.ndarray:
+                value = list(jointDicts[key])
+            else:
+                value = jointDicts[key]
+            self.resultsDict[key] = value
+
+        fileName = self.fileName+'-results.json'
+        fileNamePath = os.path.join(self.outputPath, fileName)
+        with open(fileNamePath, 'w') as fp:
+            json.dump(self.resultsDict, fp, indent = 2, separators=(',', ': '),sort_keys=True)
+
+
+    def plot_as_emf(self,figure, **kwargs):
+        inkscape_path = kwargs.get('inkscape', "C://Program Files//Inkscape//inkscape.exe")
+        filepath = kwargs.get('filename', None)
+
+        if filepath is not None:
+            path, filename = os.path.split(filepath)
+            filename, extension = os.path.splitext(filename)
+
+            svg_filepath = os.path.join(path, filename + '.svg')
+            emf_filepath = os.path.join(path, filename + '.emf')
+
+            figure.savefig(svg_filepath, format='svg')
+
+            subprocess.call([inkscape_path, svg_filepath, '--export-emf', emf_filepath])
+            os.remove(svg_filepath)

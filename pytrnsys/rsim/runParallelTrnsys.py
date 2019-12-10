@@ -272,7 +272,7 @@ class RunParallelTrnsys():
         #  path = "C:\Daten\OngoingProject\Ice-Ex\systemSimulations\\check\\"
 
         deckExplanation = []
-        deckExplanation.append("! ** New solar-ice deck. **\n")
+        deckExplanation.append("! ** New deck built from list of ddcks. **\n")
         deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck,self.pathDdck)
         deck.readDeckList(doAutoUnitNumbering=self.inputs['doAutoUnitNumbering'],dictPaths=self.dictDdckPaths)
 
@@ -524,7 +524,7 @@ class RunParallelTrnsys():
 
 
 
-        if(not(self.inputs["scaling"] in ["on","off",None])):
+        if(not(self.inputs["scaling"] in ["on","off",None,False])):
             self.weatherFile,self.cityRef=readConfig.getCityFromConfig(self.lines)
             self.setReferenceCase(self.inputs["pathRef"], self.inputs["nameRef"], self.weatherFile)
             self.scaleVariables()

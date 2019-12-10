@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+# -*- coding: utf-8 -*-
 """
 Child class from ProcessMonthlyDataBase used for processing all TRNSYS simulations.
 
@@ -8,7 +8,7 @@ Date   : 2018
 ToDo :
 """
 
-import os
+import os, subprocess
 import re
 import string,shutil
 import pytrnsys.pdata.processFiles as spfUtils
@@ -25,9 +25,9 @@ import pandas as pd
 
 class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 
-    def __init__(self,_path,_name):
+    def __init__(self,_path,_name,language='en'):
                         
-        monthlyData.ProcessMonthlyDataBase.__init__(self,_path,_name)
+        monthlyData.ProcessMonthlyDataBase.__init__(self,_path,_name,language=language)
 #        
 #        self.fileName = _name.split('.')[0]                                          
 #        self.outputPath = _path + "\%s" % self.fileName              
@@ -63,6 +63,22 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.unit = unit.UnitConverter()
         self.trnsysDllPath = False
         self.summaryFile = os.path.join(self.executingPath, 'Summary.dat')
+
+    def plot_as_emf(self,figure, **kwargs):
+        inkscape_path = kwargs.get('inkscape', "C://Program Files//Inkscape//inkscape.exe")
+        filepath = kwargs.get('filename', None)
+
+        if filepath is not None:
+            path, filename = os.path.split(filepath)
+            filename, extension = os.path.splitext(filename)
+
+            svg_filepath = os.path.join(path, filename + '.svg')
+            emf_filepath = os.path.join(path, filename + '.emf')
+
+            figure.savefig(svg_filepath, format='svg')
+
+            subprocess.call([inkscape_path, svg_filepath, '--export-emf', emf_filepath])
+            os.remove(svg_filepath)
 
     def writeToSummaryFile(self,resultsDict):
         self.resultsDict = {}
@@ -564,8 +580,11 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
          self.numberOfMonthsSimulated = self.readTrnsysFiles.numberOfMonthsSimulated
 
          self.iTHorizontalkWPerM2 = self.readTrnsysFiles.get("IT_H_KW") 
-         self.iTColkWPerM2        = self.readTrnsysFiles.get("IT_Coll_kW",ifNotFoundEqualToZero=True)
+         self.iTColkWPerM2        = self.readTrnsysFiles.get("IT_Coll_kW") #depracated, this should now be defined in SOLAR_MO.Prt
          self.tAmb                = self.readTrnsysFiles.get("tAmb")
+
+         if self.iTColkWPerM2 == None:
+            self.iTColkWPerM2 = self.qIrradTilt
 
     def loadStorage(self,_name):
                               
@@ -785,7 +804,8 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             self.onOffPumpHp[i] = self.onOffPumpHpDhw[i]+self.onOffPumpHpSh[i]
             
     def loadWorkingHours(self,_name):
-
+        
+       
         self.readTrnsysFiles.readUserDefinedFiles(_name)
         
         self.onOffPumpColUserDefined   = self.readTrnsysFiles.get("BoCnoOn")

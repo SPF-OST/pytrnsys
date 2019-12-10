@@ -11,6 +11,7 @@ ToDo :
 import string, os
 import pytrnsys.utils.utilsSpf as utils
 import shutil
+import codecs
 
 class LatexReport():
     
@@ -158,7 +159,7 @@ class LatexReport():
         line="\\documentclass[english]{%s}\n" % (self.documentClass) ; self.lines = self.lines + line               
         line="\\usepackage{subfigure}\n" ; self.lines = self.lines + line 
         line="\\usepackage{longtable}\n" ; self.lines = self.lines + line
-
+        line="\\usepackage[utf8]{inputenc}\n" ; self.lines = self.lines + line
         line="\\usepackage{url}\n" ; self.lines = self.lines + line
 
         line="\\usepackage{adjustbox}\n" ; self.lines = self.lines + line
@@ -184,7 +185,7 @@ class LatexReport():
 
 #        print self.fileNameTexWithPath
         
-        outfile=open(self.fileNameTexWithPath,'w')   
+        outfile=codecs.open(self.fileNameTexWithPath,'w', "utf-8")
 
         outfile.writelines(self.lines)
         outfile.close() 
@@ -509,7 +510,7 @@ class LatexReport():
         if(addLines!=False):
             lines=lines+addLines
 
-        self.addTable(caption,sizeBox,names,units,label,lines,useFormula=False)
+        self.addTable(caption,names,units,label,lines,useFormula=False)
    
         return lines
 
