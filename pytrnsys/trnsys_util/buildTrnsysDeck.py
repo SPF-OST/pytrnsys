@@ -104,7 +104,7 @@ class BuildTrnsysDeck():
 
             self.deckText = self.deckText + addedLines
 
-    def readDeckList(self,doAutoUnitNumbering=True,dictPaths=False):
+    def readDeckList(self,doAutoUnitNumbering=False,dictPaths=False):
         """
          Reads all ddck files form the nameList and creates a single string with all in self.deckText
         :param self: nameList

@@ -149,10 +149,6 @@ class SimulationLoader():
             file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26).rename(columns=lambda x: x.strip())
             file.set_index('Period', inplace=True, drop=False)
 
-
-
-
-
             if self.fullYear:
                 if self.year==-1:
                     try:

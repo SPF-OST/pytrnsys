@@ -29,6 +29,7 @@ class PlotMatplotlib():
 
         self.setDefaultColors()
 
+
     def initialize(self):
 
         self.extensionPlot="pdf"
@@ -249,7 +250,7 @@ class PlotMatplotlib():
 
             if (useYearlyFactorAsValue): var13[12] = yearlyFactor
 
-            plot.bar(ind - move * width, var13, width, color='b')
+            plot.bar(ind - move * width, var13, width)
 
             plot.set_ylabel(myLabel)
 
@@ -497,7 +498,7 @@ class PlotMatplotlib():
 
         plot.legend(bars, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
         plot.tick_params(axis='y')
-        if ylims:
+        if ylim:
             plot.set_ylim(ylims)
         if (myTitle != None):
             plot.set_title(myTitle)
@@ -798,12 +799,47 @@ class PlotMatplotlib():
 
         return namePdf
 
-    def plotMonthlyBalanceDf(self, inVar, outVar, legends, myLabel, nameFile, unit, defMonths, colors=False,
+    def plotMonthlyBalanceDf(self, inVar, outVar, legends, myLabel, nameFile, unit, defMonths,
                                printImb=True, yearlyFactor=1, useYear=False, plotEmf=False, printData=False,
-                               showMonths=False):
+                               showMonths=False,ylims=None):
         """
-        It is assumed that legends take first in and then out names.
+        Plots monthly energy balance of system input variables and system output variables.
+
+        Parameters
+        ----------
+        inVar : ndarray
+            1D array of length 12 containing monthly values of system input variables
+        outVar : ndarray
+            1D array of length 12 containing monthly values of system output variables
+        legends : list of str
+                    list of strings containing N entries for the legend. Input variables go first Output vairables go second)
+        myLabel : str
+                    Label of the y-Axis
+        nameFile : str
+                    Name of the plot file to be saved
+        defMonths : list of str
+            list of strings with the month names
+        printImb : bool, optional
+            Print the monthly imbalance between in and out variables, Default is True
+        yearlyFactor : float, optional
+            Value for the reduction of the yearly sum to make it fit in the y-axis, Default is 1
+        useYear : bool, optional
+            Show the yearly sum, Default is false
+        plotEmf : bool, optional
+            Print the plot as an emf (requres an installation of inkscape), Default is False
+        printData : bool, optional
+            Print the data to a .dat file, Default is false
+        showMonths : list of int, optional
+            list with numbers of which months to plot (0=january), Default is False (shows all files)
+        ylims : [lower,upper], optional
+            lower and upper limit for y axi, Default is False (automatic limits by matplotlib)
+
+        Returns
+        -------
+        str
+            Path of Pdf created.
         """
+
         move = 0
         if (yearlyFactor == 1):
             yearTag = "Year"
@@ -811,26 +847,19 @@ class PlotMatplotlib():
             yearTag = "Year/%d" % yearlyFactor
 
         monthSequence = defMonths.copy()
-
+        variables = inVar.copy()
+        for var in outVar:
+            variables.append(-var)
         if (useYear == True):
 
             nMonth = 13
-            inVar13 = []
-            outVar13 = []
-
+            variables13 = []
             monthSequence.append(yearTag)
 
-            for i in range(len(inVar)):
-                #                print "useYear i:%d (inVar below)"%i
-                #                print inVar[i]
+            for i in range(len(variables)):
 
-                inVar13.append(utils.addYearlyValue(inVar[i], yearlyFactor=yearlyFactor))
+                variables13.append(utils.addYearlyValue(variables[i], yearlyFactor=yearlyFactor))
 
-            #                print "useYear i:%d (inVar13 below)"%i
-            #                print inVar13[i]
-
-            for i in range(len(outVar)):
-                outVar13.append(utils.addYearlyValue(outVar[i], yearlyFactor=yearlyFactor))
             if (showMonths == False):
                 showMonths = [i for i in range(13)]
                 nMonth = 13
@@ -838,80 +867,42 @@ class PlotMatplotlib():
                 nMonth = len(showMonths)
         else:
             nMonth = 12
-            inVar13 = inVar
-            outVar13 = outVar
+            variables13 = variables
             if (showMonths == False):
                 showMonths = [i for i in range(12)]
             else:
                 nMonth = len(showMonths)
 
+        data = num.array(variables13)
+        if printImb:
+            data = num.append(data, [num.sum(data[:,showMonths], axis=0)], axis=0)
+
+        cumulated_data = self._get_cumulated_array(data, min=0)
+        cumulated_data_neg = self._get_cumulated_array(data, max=0)
+
+        row_mask = (data < 0)
+        cumulated_data[row_mask] = cumulated_data_neg[row_mask]
+        data_stack = cumulated_data
+
         width = 0.35  # the width of the bars
         ind = num.arange(len(showMonths))  # the x locations for the groups
-        imbPlus = num.arange(nMonth)
-        imbNeg = num.arange(nMonth)
-        imb = num.arange(nMonth)
 
         fig = plt.figure(1)
         plot = fig.add_subplot(111)
-
-        for m in range(nMonth):
-            sumIn = 0.
-            for i in range(len(inVar13)):
-                sumIn = sumIn + inVar13[i][m]
-            #                if(m==3):
-            #                print "month:%d i:%d sumIn:%f inVar:%f"%(m,i,sumIn,inVar13[i][m])
-
-            sumOut = 0.
-            for i in range(len(outVar13)):
-                sumOut = sumOut + outVar13[i][m]
-
-            #                print "month:%d i:%d sumOut:%f outVar:%f"%(m,i,sumOut,outVar13[i][m])
-
-            imbNeg[m] = max(sumIn - sumOut, 0)
-            imbPlus[m] = max(sumOut - sumIn, 0)
-            imb[m] = imbNeg[m] + imbPlus[m]
-        #            if(m==3):            
-        #                print "month:%d imbNeg:%f imbPos:%f imb:%f"%(m,imbNeg[m],imbPlus[m],imb[m]) 
-
         bar = []
 
-        addVar = [0 for i in range(len(showMonths))]
-        for i in range(len(inVar13)):
-            #            print "i:%d colorsIn:%s"%(i,self.myColorsIn[i])
-            bar.append(plot.bar(ind - move * width, inVar13[i][showMonths], width, color=self.myColorsIn[i],
-                                bottom=addVar))
-            addVar = addVar + inVar13[i][showMonths]
-        #            if(i==0):               
-        #                bar.append(plot.bar(ind-0.5*width, inVar13[i], width, color=self.myColorsIn[i]))
-        #                addVar = inVar13[i]
-        #            else:                    
-        #                bar.append(plot.bar(ind-0.5*width, inVar13[i], width, color=self.myColorsIn[i],bottom=addVar))        
-        #                addVar = addVar+inVar13[i]
+        for i in range(len(variables13)):
+            bar.append(plot.bar(ind - move * width, variables13[i][showMonths], width, color=self.myColorsIn[i],
+                                bottom=data_stack[i]))
 
-        if (printImb == True):
-            plot.bar(ind - move * width, imbPlus, width, color=self.myColorsImb, bottom=addVar)
-
-        for i in range(len(outVar13)):
-            if (i == 0):
-                bar.append(plot.bar(ind - move * width, -outVar13[i][showMonths], width, color=self.myColorsOut[i]))
-                addVar = -outVar13[i][showMonths]
-            else:
-                bar.append(plot.bar(ind - move * width, -outVar13[i][showMonths], width, color=self.myColorsOut[i],
-                                    bottom=addVar))
-                addVar = addVar - outVar13[i][showMonths]
-
-        if (printImb == True):
-            bar.append(plot.bar(ind - move * width, -imbNeg, width, color=self.myColorsImb, bottom=addVar))
+        bar.append(plot.bar(ind - move * width, data[-1][showMonths], width, color='k',
+                            bottom=data_stack[-1]))
 
         myLabel = myLabel + " [%s]" % unit
         plot.set_ylabel(myLabel)
-
         box = plot.get_position()
         plot.set_position([box.x0, box.y0, box.width * 0.8 / 12 * nMonth, box.height])
-
-        #        plot.set_title('Title',size=20)
         plot.set_xticks(ind)
-
         plot.set_xticklabels([monthSequence[i] for i in showMonths], rotation='45')
 
         allbar = []
@@ -923,12 +914,15 @@ class PlotMatplotlib():
         namePdf = '%s.%s' % (nameFile, self.extensionPlot)
         nameWithPath = '%s\%s' % (self.path, namePdf)
 
-        print ("PlotMonthlyBalance name:%s" % nameWithPath)
+        print("PlotMonthlyBalance name:%s" % nameWithPath)
 
         if (useYear == True):
             plt.xlim([-0.5, 13.5])
         else:
             plt.xlim([-0.5, len(showMonths) + 1.5])
+
+        if ylims is not None:
+            plt.ylim(ylims)
 
         plt.savefig(nameWithPath)
 
@@ -952,22 +946,22 @@ class PlotMatplotlib():
             line = "\n";
             lines = lines + line
 
-            # inVar(nVar,nMonth)
+            # variables(nVar,nMonth)
 
             for j in range(nMonth):
                 line = "%d\t" % (j + 1);
                 lines = lines + line
-
                 sumVar = 0.
-                for i in range(len(inVar13)):
-                    sumVar = sumVar + inVar13[i][j]
-                    line = "%.2f\t" % sumVar;
-                    lines = lines + line
+                sumVarNeg = 0.
+                for i in range(len(variables13)):
+                    if variables13[i][j]>=0:
+                        sumVar = sumVar + variables13[i][j]
+                        line = "%.2f\t" % sumVar;
 
-                sumVar = 0
-                for i in range(len(outVar13)):
-                    sumVar = sumVar - outVar13[i][j]
-                    line = "%.2f\t" % sumVar;
+                    else:
+                        sumVarNeg +=variables[i][j]
+                        line = "%.2f\t" % sumVarNeg;
+
                     lines = lines + line
 
                 line = "\n";
@@ -978,15 +972,20 @@ class PlotMatplotlib():
             outfile.writelines(lines)
             outfile.close()
 
-            #            if(len(outVar)==0):
-            #                self.gle.getBarPlot(nameFile,nameWithPath,legends,xnames=monthSequence)
-            #            else:
-            self.gle.getBarBalancePlot(nameFile, nameWithPath, legends, len(inVar13), len(outVar13),
+            self.gle.getBarBalancePlot(nameFile, nameWithPath, legends, len(variables13), 0,
                                        xnames=monthSequence)
 
-        #        self.addLatexMonthlyData("",legends,unit,inVar,outVar,imb)
+        return namePdf
+
+
 
         return namePdf
+    def _get_cumulated_array(self,data,**kwargs):
+        cum = data.clip(**kwargs)
+        cum = num.cumsum(cum, axis=0)
+        d = num.zeros(num.shape(data))
+        d[1:] = cum[:-1]
+        return d
 
     def plotDaily(self,var,myLabel,nameFile,plotJpg=False):
                

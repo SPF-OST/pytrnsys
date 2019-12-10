@@ -435,17 +435,22 @@ class DeckTrnsys():
                 line = line.strip('\n')
                 splitEquality = line.split('=')
                 name = splitEquality[0].replace(" ", "")
-                value = splitEquality[1].replace(" ", "")
+                value = splitEquality[1].replace(" ", "").replace("^","**")
                 try:
-                    self.deckVariables[name] = float(value)
+                    if '[' not in value:
+                        self.deckVariables[name] = eval(value,self.deckVariables)
+                    else:
+                        float(value)
                 except:
                     if '[' not in line:
-                        namespace = {}
-                        parts = re.split(r'[*/+-]',re.sub(r'()','',value))
+
+                        parts = re.split(r'[*/+-]',value.replace(r'(','').replace(r')',''))
                         for part1 in parts:
-                            namespace[part1]=self.getDataFromDeckRecursively(part1,linesDeck)
+                            reValue = self.getDataFromDeckRecursively(part1, linesDeck)
+                            if reValue is not None:
+                                self.deckVariables[part1] = reValue
                         try:
-                            finalValue = eval(value, namespace)
+                            finalValue = eval(value, self.deckVariables)
                             self.deckVariables[name] = float(finalValue)
                         except:
                             pass
@@ -460,15 +465,20 @@ class DeckTrnsys():
                 value = splitEquality[1].replace(" ", "")
                 if name.lower()==part.lower():
                     try:
-                        return float(value)
+                        if '[' not in value:
+                            self.deckVariables[name] = eval(value, self.deckVariables)
+                        else:
+                            float(value)
                     except:
                         if '[' not in line:
-                            namespace = {}
-                            parts = re.split(r'[*/+-]', re.sub(r'()','',value))
+                            parts = re.split(r'[*/+-]', value.replace(r'(','').replace(r')',''))
                             for part1 in parts:
-                                namespace[part1] = self.getDataFromDeckRecursively(part1,linesDeck)
+                                reValue = self.getDataFromDeckRecursively(part1,linesDeck)
+                                if reValue is not None:
+                                    self.deckVariables[part1] = reValue
                             try:
-                                finalValue = eval(value, namespace)
+                                finalValue = eval(value, self.deckVariables)
+                                dict = {}
                                 dict[name] = float(finalValue)
                                 return dict[name]
                             except:
