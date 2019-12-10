@@ -155,7 +155,10 @@ class SimulationLoader():
 
             if self.fullYear:
                 if self.year==-1:
-                    file=file[-12:]
+                    try:
+                        file=file[-8760:]
+                    except:
+                        file=file[-8758:] #this is here because of the trnsys bug in type 99
 
                 else:
                     firstHourNumber = (datetime(2018, firstMonthN , 1)-datetime(2018, 1 , 1)).days*24 + self.year * 8760
@@ -179,7 +182,7 @@ class SimulationLoader():
             
             if self.mode == 'dataframe' or self.mode == 'complete':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.houDataDf.columns)]
-                self.houDataDf = pd.merge(self.houDataDf, file, left_index=True, right_index=True, how='outer')
+                self.houDataDf = pd.merge(self.houDataDf, file[cols_to_use], left_index=True, right_index=True, how='outer')
                 
             if self.mode == 'array' or self.mode == 'complete':
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.houData.keys())]
