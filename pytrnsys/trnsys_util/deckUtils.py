@@ -35,6 +35,7 @@ def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesU
 
     return unitId
 
+
 def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
 
     """
