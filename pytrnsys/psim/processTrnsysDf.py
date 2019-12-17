@@ -25,6 +25,7 @@ import pandas as pd
 import pytrnsys.report.latexReport as latex
 import pytrnsys.plot.plotMatplotlib as plot
 import json
+import pytrnsys.plot.plotBokeh as pltB
 from string import ascii_letters, digits, whitespace
 import locale
 # from collections import OrderedDict
@@ -53,6 +54,8 @@ class ProcessTrnsysDf():
 
         self.plot = plot.PlotMatplotlib(language=language)
         self.plot.setPath(self.outputPath)
+        
+        self.pltB = pltB.PlotBokeh()
 
         self.cleanModeLatex = False
 
@@ -150,7 +153,10 @@ class ProcessTrnsysDf():
 
     def process(self):
 
-        pass
+        if "plotHourly" in self.inputs.keys():
+            self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"])
+        else:
+            pass
 
     def executeLatexFile(self):
 
@@ -232,7 +238,9 @@ class ProcessTrnsysDf():
             else:
                 self.SpfShpDis[i] = self.qDemand[i] / self.elHeatSysTotal[i]
 
-        self.yearSpfShpDis = sum(self.qDemand) / sum(self.elHeatSysTotal)
+        self.yearQDemand = sum(self.qDemand)
+        self.yearElHeatSysTotal = sum(self.elHeatSysTotal)
+        self.yearSpfShpDis = self.yearQDemand / self.yearElHeatSysTotal
         self.SpfShpDis[12] = self.yearSpfShpDis
 
     def addSPFSystem(self, printData=False):

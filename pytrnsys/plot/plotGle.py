@@ -35,7 +35,6 @@ class PlotGle():
         # "#bcbd22" #yellow
         # "#17becf" #cyan
 
-
         self.sizeLine = 0.02
 
     def setUseMarkers(self,use):
