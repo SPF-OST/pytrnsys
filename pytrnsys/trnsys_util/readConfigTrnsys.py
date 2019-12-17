@@ -57,6 +57,11 @@ class ReadConfigTrnsys():
 
         lines = processFiles.purgueLines(lines, skypChar, None,removeBlankLines=True, removeBlankSpaces=False)
         lines = processFiles.purgueComments(lines, skypChar)
+        if "calcMonthly" not in inputs:
+            inputs["calcMonthly"]=[]
+
+        if "calc" not in inputs:
+            inputs["calc"]=[]
 
         if (parseFileCreated):
             parsedFile = "%s.parse.dat" % configFile
@@ -96,6 +101,12 @@ class ReadConfigTrnsys():
                 for i in range(len(splitLine)-2):
                     strEl = splitLine[i+2][1:-1] #I delete the "
                     inputs[splitLine[1]].append(strEl)
+
+            elif (splitLine[0]== "calcMonthly"):
+                inputs["calcMonthly"].append(" ".join(splitLine[1:]))
+            elif (splitLine[0]== "calc"):
+                inputs["calc"].append(" ".join(splitLine[1:]))
+
 
             else:
                 if(controlDataType):

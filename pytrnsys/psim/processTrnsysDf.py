@@ -31,6 +31,9 @@ import locale
 
 
 class ProcessTrnsysDf():
+    """
+
+    """
 
     def __init__(self, _path, _name,language='en'):
 
@@ -139,6 +142,7 @@ class ProcessTrnsysDf():
         self.deckData = self.deck.getAllDataFromDeck()
 
 
+        self.calcConfigEquations()
 
         self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
@@ -271,6 +275,19 @@ class ProcessTrnsysDf():
                                           myTitle=None, printData=printData)
 
         self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+
+    def calcConfigEquations(self):
+        for equation in self.inputs['calc']:
+            namespace = {**self.deckData,**self.__dict__}
+            expression = equation.replace(' ','')
+            exec(expression,globals(),namespace)
+            self.deckData = namespace
+            print(expression)
+        for equation in self.inputs["calcMonthly"]:
+            kwargs = {"local_dict":self.deckData}
+            self.monDataDf.eval(equation,inplace=True,**kwargs)
+
+
 
 
     def addHeatBalance(self, printData=False):
