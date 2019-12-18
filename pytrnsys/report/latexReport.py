@@ -224,14 +224,33 @@ class LatexReport():
         line = "\\end{figure}\n";
         self.lines = self.lines + line
 
-    def addPlot(self,namePdf,caption,label,size):
+    def addPlot(self,namePdf,caption,label,size,overWritePath=False):
+        """
+        This function adds a plot into the LaTeX doc class
+
+        Parameters
+        ----------
+        namePdf
+        caption
+        label
+        size : TO BE REMOVED !!!!
+        overWritePath : False or set the name fo the file to be plot including the absolute path
+
+        Returns
+        -------
+
+        """
                 
         self.plotsAdded.append(namePdf)
         
-        line="\\begin{figure}[!ht]\n";self.lines = self.lines + line 
-        line="\\begin{center}\n";self.lines = self.lines + line 
-        line="\\includegraphics[width=1\\textwidth]{%s/%s}\n" % (utils.filterPath(self.outputPath),namePdf);self.lines = self.lines + line
-        line="\\caption{%s}\n"%caption;self.lines = self.lines + line 
+        line="\\begin{figure}[!htbp]\n";self.lines = self.lines + line
+        line="\\begin{center}\n";self.lines = self.lines + line
+        if(overWritePath==False):
+            line="\\includegraphics[width=1\\textwidth]{%s/%s}\n" % (utils.filterPath(self.outputPath),namePdf);self.lines = self.lines + line
+        else:
+            line="\\includegraphics[width=1\\textwidth]{%s}\n" % (utils.filterPath(overWritePath));self.lines = self.lines + line
+
+        line="\\caption{%s}\n"%caption;self.lines = self.lines + line
         line="\\label{%s}\n"%label;self.lines = self.lines + line 
         line="\\end{center}\n";self.lines = self.lines + line 
         line="\\end{figure}\n";self.lines = self.lines + line

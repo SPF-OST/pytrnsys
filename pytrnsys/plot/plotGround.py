@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
 """
@@ -7,7 +8,7 @@ for undergound storages.
 Author : Dani Carbonell
 Date   : 20.02.2014
 """
-
+import subprocess
 import numpy as num
 import matplotlib.pyplot as plt
 import matplotlib
@@ -145,7 +146,6 @@ class PlotGround():
 
         axes = fig.add_subplot(111)
 
-        matplotlib.rcParams.update({'font.size': 17})
 
         beginX = self.xPoints[0]
         endX = self.xPoints[len(self.xPoints) - 1]
@@ -235,6 +235,78 @@ class PlotGround():
 
         fig.clear()
 
+
+    def plotNGround(self, name, hour,tRange ,plotEmf=False):
+
+        size = 50
+
+        nPlots = len(hour)
+
+        # be carefull. This is wrong we must use nodx and not vclx
+        if (self.revertPlotT):
+            self.xDataMesh, self.yDataMesh = num.meshgrid(self.xPoints, -self.yPoints)
+        else:
+            self.xDataMesh, self.yDataMesh = num.meshgrid(self.xPoints, self.yPoints)
+
+        fig = plt.figure(figsize=(6.4, 5.5))
+
+        #        levels = [0,5,10,15,20,25,30,35,40,45,50,55,60]
+
+        for i in range(nPlots):
+            nXPlots = int(num.ceil(num.sqrt(nPlots)))
+            nYPlots = int(num.floor(num.sqrt(nPlots)))
+            plot = fig.add_subplot(nXPlots, nYPlots, i + 1)
+
+            self.readTemperatureField(name[i])
+
+            axes = plot.contourf(self.xDataMesh, num.max(num.max(self.yDataMesh))-self.yDataMesh, self.T.T,levels = num.linspace(tRange[0],tRange[1],tRange[1]-tRange[0]+1))
+            plot.invert_yaxis()
+            for c in axes.collections:
+                c.set_edgecolor("face")
+            plot.set_ylabel('Tiefe [m]')
+            plot.set_xlabel('Distanz zu Gebäudemitte [m]')
+            plot.tick_params(axis='both', which='major')
+            plot.tick_params(axis='both', which='minor')
+
+            (month, day, year) = utils.getMonthIndexByHourOfYear(hour[i] + 24)
+            year = 'Jahr '+ str(year)
+            plot.set_title("%s: %d.%d." % (year,day, month),fontsize=8)
+
+        fig.subplots_adjust(right=0.8,hspace=0.35,wspace = 0.3)
+        cbar_ax = fig.add_axes([0.85, 0.15, 0.02, 0.7])
+        cbar = fig.colorbar(axes, cax=cbar_ax)
+        cbar.set_label('Temperatur [°C]')
+        nameFile = r'groundPlot1.pdf'
+        self.nameGroundWithPath1 = "%s/groundPlot1.pdf" % (self.outputPath)
+
+        fig.savefig(self.nameGroundWithPath1)
+        if (plotEmf):
+
+            nameEmfWithPath = '%s\%s' % (self.outputPath, nameFile)
+
+            self._plot_as_emf(fig, filename=nameEmfWithPath)
+
+        fig.clear()
+        return os.path.basename(self.nameGroundWithPath1)
+
+    def _plot_as_emf(self, figure, **kwargs):
+
+
+        inkscape_path = kwargs.get('inkscape', "C://Program Files//Inkscape//inkscape.exe")
+        filepath = kwargs.get('filename', None)
+
+        if filepath is not None:
+            path, filename = os.path.split(filepath)
+            filename1, extension = os.path.splitext(filename)
+            svg_filepath = os.path.join(path, filename1 + '.svg')
+            emf_filepath = os.path.join(path, filename1 + '.emf')
+
+            figure.savefig(svg_filepath, format='svg')
+
+            subprocess.call([inkscape_path, svg_filepath, '--export-emf', emf_filepath])
+            os.remove(svg_filepath)
+
+
     def plotTGround(self, name, hour):
 
         fig = plt.figure()
@@ -252,7 +324,7 @@ class PlotGround():
         else:
             self.xDataMesh, self.yDataMesh = num.meshgrid(self.xPoints, self.yPoints)
 
-        axes = plot.contourf(self.xDataMesh, self.yDataMesh, self.T.T, size)
+        axes = plot.contourf(self.xDataMesh, self.yDataMesh, self.T.T,levels = num.linspace(-10,20,100))
 
         plot.tick_params(axis='both', which='major', labelsize=8)
         plot.tick_params(axis='both', which='minor', labelsize=8)

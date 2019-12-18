@@ -36,7 +36,8 @@ def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesU
 
     return unitId
 
-def readAllTypes(lines,sort=True):
+
+def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
 
     """
         It reads all types and units from a a list of lines readed from a deck file.

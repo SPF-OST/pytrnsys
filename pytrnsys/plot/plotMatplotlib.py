@@ -41,7 +41,7 @@ class PlotMatplotlib():
 
         myColorsIn = plt.rcParams['axes.prop_cycle'].by_key()['color']
         
-        self.myColorsIn = myColorsIn+myColorsIn
+        self.myColorsIn = myColorsIn+myColorsIn+myColorsIn
         self.myColorsOut = self.myColorsIn[::-1]
 
         self.myColorsImb = 'k'
@@ -812,11 +812,11 @@ class PlotMatplotlib():
         outVar : ndarray
             1D array of length 12 containing monthly values of system output variables
         legends : list of str
-                    list of strings containing N entries for the legend. Input variables go first Output vairables go second)
+            list of strings containing N entries for the legend. Input variables go first Output vairables go second)
         myLabel : str
-                    Label of the y-Axis
+            Label of the y-Axis
         nameFile : str
-                    Name of the plot file to be saved
+            Name of the plot file to be saved
         defMonths : list of str
             list of strings with the month names
         printImb : bool, optional
