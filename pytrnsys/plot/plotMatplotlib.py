@@ -894,9 +894,9 @@ class PlotMatplotlib():
         for i in range(len(variables13)):
             bar.append(plot.bar(ind - move * width, variables13[i][showMonths], width, color=self.myColorsIn[i],
                                 bottom=data_stack[i]))
-
-        bar.append(plot.bar(ind - move * width, data[-1][showMonths], width, color='k',
-                            bottom=data_stack[-1]))
+        if printImb:
+            bar.append(plot.bar(ind - move * width, data[-1][showMonths], width, color='k',
+                                bottom=data_stack[-1]))
 
         myLabel = myLabel + " [%s]" % unit
         plot.set_ylabel(myLabel)
