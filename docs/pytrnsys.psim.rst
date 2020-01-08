@@ -60,6 +60,14 @@ pytrnsys.psim.processTrnsysBase module
    :undoc-members:
    :show-inheritance:
 
+pytrnsys.psim.processTrnsysDf module
+------------------------------------
+
+.. automodule:: pytrnsys.psim.processTrnsysDf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pytrnsys.psim.processTrnsysFiles module
 ---------------------------------------
 
