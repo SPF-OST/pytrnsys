@@ -170,7 +170,14 @@ class ProcessTrnsysDf():
 
     def addLatexContent(self):
 
-        raise ValueError("process needs to be defined in each particuar child class")
+        self.calculateDemands()
+        self.calculateElConsumption()
+        self.calculateSPFSystem()
+        self.addDemands()
+        self.addHeatBalance()
+        self.addElConsumption()
+        # self.addPlotAndLatexPV()
+        self.addSPFSystem()
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
 
