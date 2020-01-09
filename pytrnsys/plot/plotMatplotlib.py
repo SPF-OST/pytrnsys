@@ -977,9 +977,6 @@ class PlotMatplotlib():
 
         return namePdf
 
-
-
-        return namePdf
     def _get_cumulated_array(self,data,**kwargs):
         cum = data.clip(**kwargs)
         cum = num.cumsum(cum, axis=0)
