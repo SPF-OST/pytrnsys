@@ -170,7 +170,14 @@ class ProcessTrnsysDf():
 
     def addLatexContent(self):
 
-        raise ValueError("process needs to be defined in each particuar child class")
+        self.calculateDemands()
+        self.calculateElConsumption()
+        self.calculateSPFSystem()
+        self.addDemands()
+        self.addHeatBalance()
+        self.addElConsumption()
+        # self.addPlotAndLatexPV()
+        self.addSPFSystem()
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
 
@@ -589,35 +596,41 @@ class ProcessTrnsysDf():
         Function uses results stringArray from config file to provide keys that will be saved
         :return:
         """
-        print("creating results.json file")
+        if 'results' in self.inputs:
+            print("creating results.json file")
 
-        self.resultsDict = {}
-        jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__}
-        for key in self.inputs['results']:
-            if type(jointDicts[key]) == num.ndarray:
-                value = list(jointDicts[key])
-            else:
-                value = jointDicts[key]
-            self.resultsDict[key] = value
+            self.resultsDict = {}
+            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__}
+            for key in self.inputs['results']:
+                if type(jointDicts[key]) == num.ndarray:
+                    value = list(jointDicts[key])
+                else:
+                    value = jointDicts[key]
+                self.resultsDict[key] = value
 
-        fileName = self.fileName+'-results.json'
-        fileNamePath = os.path.join(self.outputPath, fileName)
-        with open(fileNamePath, 'w') as fp:
-            json.dump(self.resultsDict, fp, indent = 2, separators=(',', ': '),sort_keys=True)
+            fileName = self.fileName+'-results.json'
+            fileNamePath = os.path.join(self.outputPath, fileName)
+            with open(fileNamePath, 'w') as fp:
+                json.dump(self.resultsDict, fp, indent = 2, separators=(',', ': '),sort_keys=True)
 
 
     def plot_as_emf(self,figure, **kwargs):
-        inkscape_path = kwargs.get('inkscape', "C://Program Files//Inkscape//inkscape.exe")
-        filepath = kwargs.get('filename', None)
-
-        if filepath is not None:
-            path, filename = os.path.split(filepath)
-            filename, extension = os.path.splitext(filename)
-
-            svg_filepath = os.path.join(path, filename + '.svg')
-            emf_filepath = os.path.join(path, filename + '.emf')
-
-            figure.savefig(svg_filepath, format='svg')
-
-            subprocess.call([inkscape_path, svg_filepath, '--export-emf', emf_filepath])
-            os.remove(svg_filepath)
+        if 'inkscape' in self.inputs:
+            try:
+                inkscape_path = kwargs.get('inkscape', self.inputs['inkscape'])
+                filepath = kwargs.get('filename', None)
+        
+                if filepath is not None:
+                    path, filename = os.path.split(filepath)
+                    filename, extension = os.path.splitext(filename)
+        
+                    svg_filepath = os.path.join(path, filename + '.svg')
+                    emf_filepath = os.path.join(path, filename + '.emf')
+        
+                    figure.savefig(svg_filepath, format='svg')
+        
+                    subprocess.call([inkscape_path, svg_filepath, '--export-emf', emf_filepath])
+                    os.remove(svg_filepath)
+            except:
+                raise ValueError('Inkscape path is not set correctly.')
+                

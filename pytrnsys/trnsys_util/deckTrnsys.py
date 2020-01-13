@@ -83,10 +83,12 @@ class DeckTrnsys():
 
     def loadDeck(self,useDeckName=False,eraseBeginComment=True,eliminateComments=True,useDeckOutputPath=False):
         """
-        It reads the deck  removing files starting with ***.
-        Attributes
+        It reads the deck  removing files starting with \*\*\*.
+
+        Return
         ----------
-            linesDeck : :list of lines from the read deck.
+        linesDeck : list of str
+            list containing the lines of the deck from the read deck.
         """
 
         if(useDeckName==False):

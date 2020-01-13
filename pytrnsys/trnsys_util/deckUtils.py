@@ -37,19 +37,34 @@ def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesU
     return unitId
 
 
-def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
+def readAllTypes(lines,sort=True):
 
     """
-        It reads all types and units from a a list of lines readed from a deck file.
-        It also reads the files used and which units are used for them. IN order to be able to change automatically the unit numbers afterwards
-        we need that each ASSIGN uses a variable for the unit, e.g. unitReadWeather and that this variable is used in the ddck file.
+    It reads all types and units from a a list of lines readed from a deck file.
+    It also reads the files used and which units are used for them. IN order to be able to change automatically the unit numbers afterwards
+    we need that each ASSIGN uses a variable for the unit, e.g. unitReadWeather and that this variable is used in the ddck file.
 
-        The problems of this function is that we can change a unit number of an already changed unit number.
-        For example we change 20 for 45 and the 45 is already in the file, so after we change 45 for 46, so we change all the [45, for [46,
+    The problems of this function is that we can change a unit number of an already changed unit number.
+    For example we change 20 for 45 and the 45 is already in the file, so after we change 45 for 46, so we change all the [45, for [46,
 
-        returns:
-        --------
-        TrnsysUnitsSorted,TrnsysTypesSorted,filesUsedInDdck,filesUnitUsedInDdck
+    Parameters
+    ----------
+    lines : list of str
+        list containing lines of the file to be used
+    sort : bool
+        Sort the unit numbers, optional, default: True
+
+    Returns
+    -------
+    TrnsysUnitsSorted : list of int
+        list of all trnsys units used in ddck
+    TrnsysTypesSorted : list of int
+        list of all trnsys type numbers used in ddck
+    filesUsedInDdck : list of str
+        list of all file paths used in ddck in ASSIGN statements
+    filesUnitUsedInDdck : list of int
+        list of all files units used in ddck
+
     """
     TrnsysTypes = []
     TrnsysUnits = []
@@ -425,17 +440,24 @@ def getTypeName(typeNum):
         return "Unknown"
 
 def readEnergyBalanceVariablesFromDeck(lines):
-    """Reading all the variables defined in the deck that follow the energy balance standard.
-       This function reads from self.linesChanged filled in the loadDeck function.
-       The standard nomenclature of energy balance variables are:
-       elSysIn_ for electricity given into the system
-       elSysOut_ for electricity going out of the system
-       qSysIn_ for heat given into the system
-       qSysOut_ for heat going out of the system
+    """
+    Reading all the variables defined in the deck that follow the energy balance standard.
+    This function reads from self.linesChanged filled in the loadDeck function.
+    The standard nomenclature of energy balance variables are:
+    elSysIn\_ for electricity given into the system
+    elSysOut\_ for electricity going out of the system
+    qSysIn\_ for heat given into the system
+    qSysOut\_ for heat going out of the system
 
-       Return
-       ------
-       eBalance:  a list with all energy balance terms
+    Parameters
+    ----------
+    lines : list of str
+        lines of the deck-file to be modified
+
+    Return
+    ------
+    eBalance:  list of str
+        a list with all energy balance terms
     """
 
 
@@ -487,7 +509,7 @@ def changeAssignPath(lines,key, rootPath):
 
     Parameters
     ----------
-    lines : obj:list obj: of obj:str
+    lines : list of str
         List containing all the lines of the dck file
     key : str
         key that will be replaced by the path

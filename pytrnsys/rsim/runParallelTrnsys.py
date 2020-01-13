@@ -23,19 +23,50 @@ import warnings
 # from sets import Set
 
 class RunParallelTrnsys():
+    """
+    Main class that represents a simulation job of pytrnsys. The standardized way of initiating it is by providing a
+    config-file, in which case the run defined in the config case is started automatically.
 
-    def __init__(self,_path,_name,_configFile=False):
+    Args
+    ----------
+    path : str
+        Path to the config file.
+    name : str
+        Main name of the Deck file, optional, default: "TrnsysRun". (Deprecated - should be defined in the config file.)
+    configFile : str, None
+        Name of the config file. If no argument is passed, the run has to be started by executing the methods externally
+        , optional, default: None.
 
-        self.path = _path
+    Attributes
+    ----------
+    inputs : dict
+        Dictionary containing the entries of the config file
+
+    """
+
+    def __init__(self,pathConfig,name="TrnsysRun",configFile=None):
+
+
+        self.pathConfig = pathConfig
 
         self.defaultInputs()
-        if _configFile:
-            self.readConfig(self.path,_configFile)
-            self.nameBase = self.inputs['nameRef']
-            self.path = self.inputs['pathBaseSimulations']
+        self.cmds = []
+        self.path = self.pathConfig
+        if configFile is not None:
+            self.readConfig(self.pathConfig,configFile)
+            if 'nameRef' in self.inputs:
+                self.nameBase = self.inputs['nameRef']
+            else:
+                self.nameBase = name
+            self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
             self.getConfig()
+            self.runConfig()
+            self.runParallel()
         else:
-            self.nameBase = _name
+            self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
+            self.nameBase = name
+
+
 
 
 
@@ -67,7 +98,7 @@ class RunParallelTrnsys():
         self.inputs["addAutomaticEnergyBalance"] = False
         self.inputs["generateUnitTypesUsed"]=True
 
-        self.outputFileDebugRun = os.path.join(self.path,"debugParallelRun.dat")
+
 
         self.overwriteForcedByUser = False
 
@@ -125,6 +156,12 @@ class RunParallelTrnsys():
         self.runParallel()
 
     def runConfig(self):
+        """
+        Runs the cases defined in the config file
+        Returns
+        -------
+
+        """
 
 
         if(self.inputs['runType']=="runFromCases"):
@@ -237,9 +274,9 @@ class RunParallelTrnsys():
             tests[i].moveFileFromSource()
 
             if(self.inputs['runCases']==True):
-                cmds.append(tests[i].getExecuteTrnsys(self.inputs))
+                self.cmds.append(tests[i].getExecuteTrnsys(self.inputs))
 
-        self.cmds = cmds
+        #self.cmds = cmds
 
     #def checkTempFolderForFinishedSimulation(self,basePath):
     #    for file in os.listdir(os.path.join(basePath,'temp')):
@@ -263,11 +300,6 @@ class RunParallelTrnsys():
             it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
 
         """
-        # ==============================================================================
-        # BUILDING OF TRNSYS DECK
-        # ==============================================================================
-
-
         #  I can create folders in another path to move them in the running folder and run them one by one
         #  path = "C:\Daten\OngoingProject\Ice-Ex\systemSimulations\\check\\"
 
@@ -368,7 +400,8 @@ class RunParallelTrnsys():
         tool = readConfig.ReadConfigTrnsys()
 
         self.lines = tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated,controlDataType=False)
-
+        if 'pathBaseSimulations' in self.inputs:
+            self.path = self.inputs['pathBaseSimulations']
         if(self.inputs["addResultsFolder"]=="None"):
             pass
         else:
@@ -380,11 +413,21 @@ class RunParallelTrnsys():
 
 
     def changeFile(self,source,end):
+        """
+        It uses the self-lines readed by readConfig and change the lines from source to end.
+        This is used to change a ddck file readed for another. A typical example is the weather data file
+        Parameters
+        ----------
+        source : str
+            string to be replaced in the config file in the self.lines field
+        end : str
+            str to replace the source in the config file in the self.lines field
+
+        Returns
+        -------
 
         """
-            It uses the self-lines readed by readConfig and change the lines from source to end.
-            This is used to change a ddck file readed for another. A typical example is the weather data file
-        """
+
         found=False
         for i in range(len(self.lines)):
             lineFilter = self.lines[i]
@@ -400,8 +443,8 @@ class RunParallelTrnsys():
     def changeDDckFile(self,source,end):
 
         """
-            It uses the  self.listDdck readed by readConfig and change the lines from source to end.
-            This is used to change a ddck file readed for another. A typical example is the weather data file
+        It uses the  self.listDdck readed by readConfig and change the lines from source to end.
+        This is used to change a ddck file readed for another. A typical example is the weather data file
         """
         found=False
         nCharacters=len(source)
@@ -421,6 +464,17 @@ class RunParallelTrnsys():
             warnings.warn("change File was not able to change %s by %s"%(source,end))
 
     def getConfig(self,pathDdck=None,pathDdck2=None):
+        """
+        TODO: remove arguments pathDdck,pathDdck2 (deprecated)
+        Parameters
+        ----------
+        pathDdck :
+        pathDdck2
+
+        Returns
+        -------
+
+        """
 
         self.pathDdck = pathDdck
         self.pathDdck2 = pathDdck2

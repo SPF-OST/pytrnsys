@@ -21,14 +21,23 @@ This class uses a list of ddck files to built a complete TRNSYS deck file
 
 class BuildTrnsysDeck():
     """
+
+    """
+    """
     Class used to built a deck file out of a list of ddck files
-    inputs :
-    - pathDeck : outlet path where we want to built the dck file
-    - nameDeck : the base name of the deck. This could be modified by the results of each simulation if variants are used in the cofing file
-    - nameList : the list of ddck files needed to built a deck
-    - pathList : the Base path of the ddck files
+    Parameters
+    ----------
+    _pathDeck : str
+        outlet path where we want to built the dck file
+    _nameDeck : str
+        the base name of the deck. This could be modified by the results of each simulation if variants are used in the cofing file
+    _nameList : str
+        the list of ddck files needed to built a deck
+    _pathList : str
+        the Base path of the ddck files
     """
     def __init__(self,_pathDeck,_nameDeck,_nameList,_pathList):
+
       
         self.pathDeck = _pathDeck
         self.nameDeck  = self.pathDeck + "\%s.dck" % _nameDeck
@@ -50,14 +59,13 @@ class BuildTrnsysDeck():
     def loadDeck(self,_path,_name):        
             
         nameOneDck = _path + "\%s.%s" % (_name,self.extOneSheetDeck)
-         
-#        print nameOneDck
+
         
         infile=open(nameOneDck,'r')            
         lines=infile.readlines()        
        
         
-        replaceChar = None #[',','\''] #This characters will be eliminated, so replaced by nothing 
+        replaceChar = None
 
         self.linesChanged = spfUtils.purgueLines(lines,self.skypChar,replaceChar,removeBlankLines=True)   
 
@@ -70,8 +78,6 @@ class BuildTrnsysDeck():
         return lines[0:3] #only returns the caption with the info of the file
 
 
-
-    #
     def readDeckListConfig(self):
         """
         It uses the list of ddck to built a deck file
@@ -106,9 +112,17 @@ class BuildTrnsysDeck():
 
     def readDeckList(self,doAutoUnitNumbering=False,dictPaths=False):
         """
-         Reads all ddck files form the nameList and creates a single string with all in self.deckText
-        :param self: nameList
-        :return: self.deckText
+
+        Parameters
+        ----------
+        doAutoUnitNumbering : bool
+            use the automatic renumbering of trnsys units, optional, default: False
+        dictPaths: dict
+            dictionary with keys equal to the old ddck path and values equal to the ones that should replace it
+
+
+        Returns
+        -------
 
         """
 
@@ -163,11 +177,17 @@ class BuildTrnsysDeck():
             self.deckText =  self.deckText + addedLines
         
     def writeDeck(self,addedLines=None):
-
         """
-         Created the ddck file out of the self.deckText string
-        :param self: deckText, self.nameDeck
-        :return: a dcck file created
+        Writes the deck stored in self.deckText in the file self.nameDeck
+
+        Parameters
+        ----------
+        addedLines : str
+            lines to be added at the beginning of the file
+
+        Returns
+        -------
+
         """
 
         tempName = "%s" % self.nameDeck
