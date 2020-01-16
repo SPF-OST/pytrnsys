@@ -280,15 +280,24 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
             time.sleep(0.05)
         
 def sortCommandList(cmds, keyWord):
+
     """
     function to put all commands that contain a keyWord string on top of a command list, so they will be evaluated first.
 
-    :param cmds: list with all commands to be evaluated
-    :param keyWord: string that acts as filter
-    :return: new list with all commands to be evaluated (with commands containing filter on top)
+    Parameters
+    ----------
+    cmds : list of strings
+        includes all commands to be evaluated
+
+    keyWord : string
+        acts as filter; commmands including this string will be evaluated first
+
+    Returns
+    -------
+    cmdsNew : list of strings
+        all commands to be evaluated in new order
     """
 
-    "function that sorts command list according to keyword, those will be evaluated first"
     cmdsNew = []
 
     for line in cmds:
