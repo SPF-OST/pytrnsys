@@ -6,6 +6,7 @@ import multiprocessing as mp
 import pytrnsys.rsim.runParallel as run
 import pytrnsys.utils.utilsSpf as utils
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
+import pytrnsys.psim.processTrnsysDf as processTrnsys
 import warnings
 import copy
 #we would need to pass the Class as inputs
@@ -195,9 +196,9 @@ class ProcessParallelTrnsys():
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated)
 
-    def getBaseClass(self,classProcessing,pathFolder,fileName):
+    def getBaseClass(self, classProcessing, pathFolder, fileName):
 
-        raise ValueError("This function needs to be defined for each processing case")
+       return processTrnsys.ProcessTrnsysDf(pathFolder, fileName)
 
     def process(self):
 
