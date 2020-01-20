@@ -51,7 +51,7 @@ class ProcessTrnsysDf():
         self.rootPath = os.getcwd()
 
         self.doc = latex.LatexReport(self.outputPath, self.fileName)
-
+        self.doc.getLatexNamesDict()
         self.plot = plot.PlotMatplotlib(language=language)
         self.plot.setPath(self.outputPath)
         
@@ -419,83 +419,10 @@ class ProcessTrnsysDf():
         self.doc.addTableMonthlyDf(var, names, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
         self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
-    def getListOfNiceLatexNames(self, legends):
-
-        legendOut = []
-        for name in legends:
-            legendOut.append(self.getNiceLatexNames(name))
-
-        return legendOut
 
     def getNiceLatexNames(self, name):
-
-        name = name.lower()
-        if (name == "qSysOut_DhwDemand".lower()):  # DHW demand
-            niceName = "$Q_{DHW}$"
-
-        elif (name == "qSysOut_BuiDemand".lower()):  # SH demand
-            niceName = "$Q_{SH}$"
-
-        elif (name == "qSysIn_BuiDemand".lower()):  # SC demand
-            niceName = "$Q_{SC}$"
-
-        elif (name == "qSysIn_Collector".lower()):  # Q solar
-            niceName = "$Q_{col}$"
-
-        elif (name == "elSysIn_Q_HpComp".lower()):  # Heat pump compressor
-            niceName = "$El_{Hp,comp}$"
-
-        elif (name == "elSysOut_PuCond".lower()):  # pump condenser
-            niceName = "$El_{pu}^{cond}$"
-
-        elif (name == "elSysOut_PuEvap".lower()):  # pump evaporator
-            niceName = "$El_{pu}^{evap}$"
-
-        elif (name == "elSysOut_PuSH".lower()):  # pump evaporator
-            niceName = "$El_{pu}^{SH}$"
-
-        elif (name == "qSysOut_TesLoss".lower()):  # losses TES
-            niceName = "$Q^{Tes}_{loss}$"
-
-        elif (name == "qSysOut_TesDhwLoss".lower()):  # losses TES DHW
-            niceName = "$Q^{TesDhw}_{loss}$"
-
-        elif (name == "qSysOut_TesShLoss".lower()):  # losses TES SH
-            niceName = "$Q^{TesSh}_{loss}$"
-
-        elif (name == "qSysOut_PipeLoss".lower()):  # losses pipes
-            niceName = "$Q^{pipe}_{loss}$"
-
-        elif (name == "elSysOut_HHDemand".lower()):  # Household Electricity demand
-            niceName = "$El_{HH}$"
-
-        elif (name == "elSysIn_PV".lower()):  # PV to the system
-            niceName = "$El_{PV}$"
-
-        elif (name == "elSysOut_InvLoss".lower()):  # Inverter losses
-            niceName = "$El^{inv}_{loss}$"
-
-        elif (name == "elSysOut_BatLoss".lower()):  # Batrtery losses
-            niceName = "$El^{bat}_{loss}$"
-
-        elif (name == "elSysIn_Grid".lower()):  # GRID to the system
-            niceName = "$El_{grid}$"
-
-        elif (name == "elSysOut_PvToGrid".lower()):  # Pv to GRID
-            niceName = "$El_{Pv2Grid}$"
-
-        elif (name == "elSysIn_Q_TesShAux".lower()):  # Auxiliar back up in Tes SH
-            niceName = "$El_{Aux}^{TesSh}$"
-
-        elif (name == "elSysIn_Q_TesAux".lower()):  # Auxiliar back up in Tes SH
-            niceName = "$El_{Aux}^{Tes}$"
-
-        elif (name == "elSysIn_Q_TesDhwAux".lower()):  # Auxiliar back up in Tes DHW
-            niceName = "$El_{Aux}^{TesDhw}$"
-
-        elif (name == "qSysIn_Ghx".lower()):  # Heat inputs grom GHX
-            niceName = "$Q_{GHX}$"
-
+        if name in self.doc.latexNames:
+            niceName = self.doc.latexNames[name]
         else:
             niceName = self.getCustomeNiceLatexNames(name)
             if(niceName==None):
