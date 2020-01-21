@@ -515,7 +515,10 @@ class RunParallelTrnsys():
                 if(splitLine[2]=="string"):
                     self.parameters[splitLine[1]]= splitLine[3]
                 else:
-                    self.parameters[splitLine[1]] =float(splitLine[2])
+                    if splitLine[2].isdigit():
+                        self.parameters[splitLine[1]] =float(splitLine[2])
+                    else:
+                        self.parameters[splitLine[1]] = splitLine[2]
 
             elif (splitLine[0] == "changeDDckFile"):
                 self.sourceFilesToChange.append(splitLine[1])
