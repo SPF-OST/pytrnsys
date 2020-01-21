@@ -12,6 +12,7 @@ import string, os
 import pytrnsys.utils.utilsSpf as utils
 import shutil
 import codecs
+import json
 
 class LatexReport():
     
@@ -35,17 +36,21 @@ class LatexReport():
         # to remove them after pdf creation if cleanMode=True
 
 
-        pathReport = os.path.join(os.path.dirname(__file__),'latex_doc')
+        self.pathReport = os.path.join(os.path.dirname(__file__),'latex_doc')
 
         if 'TEXINPUTS' in os.environ:
             texinputs = os.environ['TEXINPUTS']
-            if pathReport not in texinputs:
-                os.environ['TEXINPUTS']+=os.pathsep + pathReport
+            if self.pathReport not in texinputs:
+                os.environ['TEXINPUTS']+=os.pathsep + self.pathReport
         else:
-            os.environ['TEXINPUTS'] =pathReport
+            os.environ['TEXINPUTS'] =self.pathReport
         
         self.cleanMode=False
         self.plotsAdded = [] 
+        
+    def getLatexNamesDict(self,file='latexNames.json'):
+        with open(os.path.join(self.pathReport,file)) as js:
+            self.latexNames = json.load(js)
 
     def resetTexName(self,name):
 

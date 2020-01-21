@@ -15,25 +15,13 @@ Thus, this config file will grow as long as users believe some functionality is 
 
 The simulation specified in the :ref:`config-file <configFile>` can be started with the following python code::
 
+ 
    import pytrnsys.rsim.runParallelTrnsys as runTrnsys
-   
-   pathBase = "pathToTheConfigFile"
-   pathRun  = "pathWhereTheSimulationWillBeExecuted"
-   configFile = "yourConfigFile.config"
-   
-   nameDeck = "yourDeckName"
-   
-   runTool = runTrnsys.RunParallelTrnsys(pathRun, nameDeck)
-   
-   runTool.readConfig(pathBase, configFile)
-   
-   runTool.getConfig()
-   
-   runTool.runConfig()
-   
-   runTool.createDecksFromVariant()
-   
-   runTool.runParallel()
+   import os
+
+   pathConfig  = "pathToTheConfigFile"
+   configFile = "DualRun.config"
+   runTool = runTrnsys.RunParallelTrnsys(pathConfig,configFile=configFile)
 
 3. Example
 ----------------------
