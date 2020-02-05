@@ -13,6 +13,20 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
+from shutil import copy
+from pathlib import Path
+from_path = (Path(".") / "../README.md" ).resolve().__str__()
+copy(from_path, '.')
+import recommonmark
+from recommonmark.transform import AutoStructify
+
+github_doc_root = 'https://github.com/rtfd/recommonmark/tree/master/doc/'
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            #'url_resolver': lambda url: github_doc_root + url,
+            'auto_toc_tree_section': 'Contents',
+            }, True)
+    app.add_transform(AutoStructify)
 #from mock import Mock as MagicMock
  
 #class Mock(MagicMock):
@@ -38,7 +52,8 @@ author = 'Dani Carbonell, Mattia Battaglia, Jeremias Schmidli'
 extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.viewcode',
+	'recommonmark',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -61,3 +76,12 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+
+
+
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}

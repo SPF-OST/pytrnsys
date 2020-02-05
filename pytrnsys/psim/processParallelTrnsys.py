@@ -1,13 +1,4 @@
 #!/usr/bin/python
-"""
-Main class to process all TRNSYS results.
-We need to include in this class any processing Class
-customized for new projects
-Author : Daniel Carbonell
-Date   : 01-10-2018
-ToDo : remove processDataGshp and make it generic
-       getBaseClass should be defined outside this function so that this class is not changet at all
-"""
 
 import os
 import pytrnsys.psim.debugProcess as debugProcess
@@ -15,6 +6,7 @@ import multiprocessing as mp
 import pytrnsys.rsim.runParallel as run
 import pytrnsys.utils.utilsSpf as utils
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
+import pytrnsys.psim.processTrnsysDf as processTrnsys
 import warnings
 import copy
 #we would need to pass the Class as inputs
@@ -158,6 +150,15 @@ def processDataGeneral(casesInputs):
 
 
 class ProcessParallelTrnsys():
+    """
+    Main class to process all TRNSYS results.
+    We need to include in this class any processing Class
+    customized for new projects
+    Author : Daniel Carbonell
+    Date   : 01-10-2018
+    ToDo : remove processDataGshp and make it generic
+    getBaseClass should be defined outside this function so that this class is not changet at all
+    """
 
     def __init__(self):
 
@@ -195,9 +196,9 @@ class ProcessParallelTrnsys():
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated)
 
-    def getBaseClass(self,classProcessing,pathFolder,fileName):
+    def getBaseClass(self, classProcessing, pathFolder, fileName):
 
-        raise ValueError("This function needs to be defined for each processing case")
+       return processTrnsys.ProcessTrnsysDf(pathFolder, fileName)
 
     def process(self):
 

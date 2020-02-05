@@ -3,7 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. include:: ./source
 
 Welcome to pytrnsys's documentation!
 ====================================
@@ -11,8 +10,9 @@ Welcome to pytrnsys's documentation!
 .. toctree::
    :maxdepth: 2
 
+   General Information <README.md>
    guide/index
-   CodeReference
+   Code Reference <modules>
 
 
 Indices and tables

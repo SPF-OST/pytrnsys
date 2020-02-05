@@ -51,7 +51,7 @@ class ProcessTrnsysDf():
         self.rootPath = os.getcwd()
 
         self.doc = latex.LatexReport(self.outputPath, self.fileName)
-
+        self.doc.getLatexNamesDict()
         self.plot = plot.PlotMatplotlib(language=language)
         self.plot.setPath(self.outputPath)
         
@@ -170,7 +170,14 @@ class ProcessTrnsysDf():
 
     def addLatexContent(self):
 
-        raise ValueError("process needs to be defined in each particuar child class")
+        self.calculateDemands()
+        self.calculateElConsumption()
+        self.calculateSPFSystem()
+        self.addDemands()
+        self.addHeatBalance()
+        self.addElConsumption()
+        # self.addPlotAndLatexPV()
+        self.addSPFSystem()
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
 
@@ -412,83 +419,10 @@ class ProcessTrnsysDf():
         self.doc.addTableMonthlyDf(var, names, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
         self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
-    def getListOfNiceLatexNames(self, legends):
-
-        legendOut = []
-        for name in legends:
-            legendOut.append(self.getNiceLatexNames(name))
-
-        return legendOut
 
     def getNiceLatexNames(self, name):
-
-        name = name.lower()
-        if (name == "qSysOut_DhwDemand".lower()):  # DHW demand
-            niceName = "$Q_{DHW}$"
-
-        elif (name == "qSysOut_BuiDemand".lower()):  # SH demand
-            niceName = "$Q_{SH}$"
-
-        elif (name == "qSysIn_BuiDemand".lower()):  # SC demand
-            niceName = "$Q_{SC}$"
-
-        elif (name == "qSysIn_Collector".lower()):  # Q solar
-            niceName = "$Q_{col}$"
-
-        elif (name == "elSysIn_Q_HpComp".lower()):  # Heat pump compressor
-            niceName = "$El_{Hp,comp}$"
-
-        elif (name == "elSysOut_PuCond".lower()):  # pump condenser
-            niceName = "$El_{pu}^{cond}$"
-
-        elif (name == "elSysOut_PuEvap".lower()):  # pump evaporator
-            niceName = "$El_{pu}^{evap}$"
-
-        elif (name == "elSysOut_PuSH".lower()):  # pump evaporator
-            niceName = "$El_{pu}^{SH}$"
-
-        elif (name == "qSysOut_TesLoss".lower()):  # losses TES
-            niceName = "$Q^{Tes}_{loss}$"
-
-        elif (name == "qSysOut_TesDhwLoss".lower()):  # losses TES DHW
-            niceName = "$Q^{TesDhw}_{loss}$"
-
-        elif (name == "qSysOut_TesShLoss".lower()):  # losses TES SH
-            niceName = "$Q^{TesSh}_{loss}$"
-
-        elif (name == "qSysOut_PipeLoss".lower()):  # losses pipes
-            niceName = "$Q^{pipe}_{loss}$"
-
-        elif (name == "elSysOut_HHDemand".lower()):  # Household Electricity demand
-            niceName = "$El_{HH}$"
-
-        elif (name == "elSysIn_PV".lower()):  # PV to the system
-            niceName = "$El_{PV}$"
-
-        elif (name == "elSysOut_InvLoss".lower()):  # Inverter losses
-            niceName = "$El^{inv}_{loss}$"
-
-        elif (name == "elSysOut_BatLoss".lower()):  # Batrtery losses
-            niceName = "$El^{bat}_{loss}$"
-
-        elif (name == "elSysIn_Grid".lower()):  # GRID to the system
-            niceName = "$El_{grid}$"
-
-        elif (name == "elSysOut_PvToGrid".lower()):  # Pv to GRID
-            niceName = "$El_{Pv2Grid}$"
-
-        elif (name == "elSysIn_Q_TesShAux".lower()):  # Auxiliar back up in Tes SH
-            niceName = "$El_{Aux}^{TesSh}$"
-
-        elif (name == "elSysIn_Q_TesAux".lower()):  # Auxiliar back up in Tes SH
-            niceName = "$El_{Aux}^{Tes}$"
-
-        elif (name == "elSysIn_Q_TesDhwAux".lower()):  # Auxiliar back up in Tes DHW
-            niceName = "$El_{Aux}^{TesDhw}$"
-
-        elif (name == "qSysIn_Ghx".lower()):  # Heat inputs grom GHX
-            niceName = "$Q_{GHX}$"
-
+        if name in self.doc.latexNames:
+            niceName = self.doc.latexNames[name]
         else:
             niceName = self.getCustomeNiceLatexNames(name)
             if(niceName==None):
@@ -589,35 +523,41 @@ class ProcessTrnsysDf():
         Function uses results stringArray from config file to provide keys that will be saved
         :return:
         """
-        print("creating results.json file")
+        if 'results' in self.inputs:
+            print("creating results.json file")
 
-        self.resultsDict = {}
-        jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__}
-        for key in self.inputs['results']:
-            if type(jointDicts[key]) == num.ndarray:
-                value = list(jointDicts[key])
-            else:
-                value = jointDicts[key]
-            self.resultsDict[key] = value
+            self.resultsDict = {}
+            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__}
+            for key in self.inputs['results']:
+                if type(jointDicts[key]) == num.ndarray:
+                    value = list(jointDicts[key])
+                else:
+                    value = jointDicts[key]
+                self.resultsDict[key] = value
 
-        fileName = self.fileName+'-results.json'
-        fileNamePath = os.path.join(self.outputPath, fileName)
-        with open(fileNamePath, 'w') as fp:
-            json.dump(self.resultsDict, fp, indent = 2, separators=(',', ': '),sort_keys=True)
+            fileName = self.fileName+'-results.json'
+            fileNamePath = os.path.join(self.outputPath, fileName)
+            with open(fileNamePath, 'w') as fp:
+                json.dump(self.resultsDict, fp, indent = 2, separators=(',', ': '),sort_keys=True)
 
 
     def plot_as_emf(self,figure, **kwargs):
-        inkscape_path = kwargs.get('inkscape', "C://Program Files//Inkscape//inkscape.exe")
-        filepath = kwargs.get('filename', None)
-
-        if filepath is not None:
-            path, filename = os.path.split(filepath)
-            filename, extension = os.path.splitext(filename)
-
-            svg_filepath = os.path.join(path, filename + '.svg')
-            emf_filepath = os.path.join(path, filename + '.emf')
-
-            figure.savefig(svg_filepath, format='svg')
-
-            subprocess.call([inkscape_path, svg_filepath, '--export-emf', emf_filepath])
-            os.remove(svg_filepath)
+        if 'inkscape' in self.inputs:
+            try:
+                inkscape_path = kwargs.get('inkscape', self.inputs['inkscape'])
+                filepath = kwargs.get('filename', None)
+        
+                if filepath is not None:
+                    path, filename = os.path.split(filepath)
+                    filename, extension = os.path.splitext(filename)
+        
+                    svg_filepath = os.path.join(path, filename + '.svg')
+                    emf_filepath = os.path.join(path, filename + '.emf')
+        
+                    figure.savefig(svg_filepath, format='svg')
+        
+                    subprocess.call([inkscape_path, svg_filepath, '--export-emf', emf_filepath])
+                    os.remove(svg_filepath)
+            except:
+                raise ValueError('Inkscape path is not set correctly.')
+                
