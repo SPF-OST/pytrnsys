@@ -52,6 +52,7 @@ class RunParallelTrnsys():
         self.inputs["ignoreOnlinePlotter"] = False
         self.inputs["removePopUpWindow"] = False
 
+        self.inputs["checkDeck"] = True
         self.inputs["reduceCpu"] = 0
         self.inputs["combineAllCases"]   = True
         self.inputs["parseFileCreated"]  = True
@@ -280,7 +281,8 @@ class RunParallelTrnsys():
         deck.writeDeck(addedLines=deckExplanation)
         self.overwriteForcedByUser=deck.overwriteForcedByUser
 
-        deck.checkTrnsysDeck(deck.nameDeck)
+
+        deck.checkTrnsysDeck(deck.nameDeck,check=self.inputs["checkDeck"])
 
         if(self.inputs["generateUnitTypesUsed"]==True):
 

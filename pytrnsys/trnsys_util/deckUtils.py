@@ -78,8 +78,9 @@ def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
                 # if(unitAssigned==True):
 
         except:
-            raise ValueError('Logical ASSIGN number of the following ddck-line cannot be changed: '+line)
-
+            # raise ValueError('Logical ASSIGN number of the following ddck-line cannot be changed: '+line)
+            pass
+        
         try:
             if len(splitBlank)>3:
                 nUnit = "".join([c for c in splitBlank[1].replace(" ", "") if c in digits])
@@ -156,7 +157,7 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
         oldString = "UNIT %d" % (oldUnit)
         newString = "UNIT %s" % (newUnit)
 
-        if(newUnit==44):
+        if(oldUnit==32):
             pass
         else:
             pass

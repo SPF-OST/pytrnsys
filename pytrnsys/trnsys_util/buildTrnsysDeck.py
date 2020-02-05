@@ -210,13 +210,14 @@ class BuildTrnsysDeck():
         # self.myDeck.loadDeckWithoutComments()
         # self.linesDeckReaded = self.myDeck.linesReadedNoComments
 
-    def checkTrnsysDeck(self,nameDck):
+    def checkTrnsysDeck(self,nameDck,check=True):
 
         # self.readTrnsyDeck()
         # deckUtils.checkEquationsAndConstants(self.linesDeckReaded)
 
         lines=deckUtils.loadDeck(nameDck,eraseBeginComment=True,eliminateComments=True)
-        deckUtils.checkEquationsAndConstants(lines,self.nameDeck)
+        if(check):
+            deckUtils.checkEquationsAndConstants(lines,self.nameDeck)
 
         self.linesDeckReaded=lines
         # self.myDeck.checkEquationsAndConstants(self.deckText) #This does not need to read
