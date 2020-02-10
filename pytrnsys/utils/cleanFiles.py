@@ -184,9 +184,14 @@ class CleanFiles():
                      print("removedFile : %s" % removedFile)
                      os.remove(removedFile)
 
-    def copyFilesToNewFolder(self,dstFolder):
+    def copyFilesToNewFolder(self,dstFolder=None):
         sys.stdout.write("###########Copy files tool########\n")
         sys.stdout.flush()
+
+        FolderName = self.path.split('\\')[-1]
+        if dstFolder == None:
+            dstFolder = self.path + '-copy'
+            FolderNameNew = FolderName + '-copy'
 
         for root, dirs, files in os.walk(self.path):
 
@@ -218,10 +223,13 @@ class CleanFiles():
                     if (copy):
                         copiedFile = os.path.join(root, i)
                         # dstPath = self.path + copyFolderExtension + "\\" + root.split("\\")[-1] + "\\" + i
-                        if root == self.path:
-                            dstPath = dstFolder + "\\" + i
+                        if 'FolderNameNew' in locals():
+                            dstPath = copiedFile.replace(FolderName,FolderNameNew)
                         else:
-                            dstPath = dstFolder + "\\" + root.split("\\")[-1] + "\\" + i
+                            if root == self.path:
+                                dstPath = dstFolder + "\\" + i
+                            else:
+                                dstPath = dstFolder + "\\" + root.split("\\")[-1] + "\\" + i
 
                         print("copiedFile : %s" % copiedFile)
                         shutil.copyfile(copiedFile,dstPath)
