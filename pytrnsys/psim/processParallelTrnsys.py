@@ -106,6 +106,10 @@ def processDataGeneral(casesInputs):
 
 
     test.setInputs(inputs)
+    if "latexNames" in inputs:
+        test.setLatexNamesFile(inputs["latexNames"])
+    else:
+        test.setLatexNamesFile(None)
     test.setBuildingArea(inputs["buildingArea"])
     test.setTrnsysDllPath(inputs["dllTrnsysPath"])
 

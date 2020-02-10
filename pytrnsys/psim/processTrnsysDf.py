@@ -38,6 +38,7 @@ class ProcessTrnsysDf():
 
     def __init__(self, _path, _name,language='en'):
 
+
         self.fileName = _name
         self.outputPath = _path + "\%s" % self.fileName
         self.executingPath = _path
@@ -51,7 +52,6 @@ class ProcessTrnsysDf():
         self.rootPath = os.getcwd()
 
         self.doc = latex.LatexReport(self.outputPath, self.fileName)
-        self.doc.getLatexNamesDict()
         self.plot = plot.PlotMatplotlib(language=language)
         self.plot.setPath(self.outputPath)
         
@@ -83,6 +83,12 @@ class ProcessTrnsysDf():
 
     def setInputs(self,inputs):
         self.inputs=inputs
+
+    def setLatexNamesFile(self,file):
+        if file is not None:
+            self.doc.getLatexNamesDict(file=file)
+        else:
+            self.doc.getLatexNamesDict()
 
     # the idea is to read the deck and get important information fro processing.
     # area collector, volume ice storage, volume Tes, Area uncovered, nH1, nominal power heat pump, etc...
@@ -219,7 +225,7 @@ class ProcessTrnsysDf():
         self.qDemand = num.zeros(12)
 
         for i in range(len(self.qDemandVector)):
-            self.qDemand = self.qDemand + self.qDemandVector[i]
+            self.qDemand[:len(self.qDemandVector[i])] = self.qDemand[:len(self.qDemandVector[i])] + self.qDemandVector[i]
 
     def addDemands(self):
 
@@ -239,7 +245,7 @@ class ProcessTrnsysDf():
 
         self.SpfShpDis = num.zeros(13)
 
-        for i in range(len(self.qDemand)):
+        for i in range(len(self.elHeatSysTotal)):
             if (self.elHeatSysTotal[i] == 0):
                 self.SpfShpDis[i] = 0.
             else:
@@ -385,7 +391,8 @@ class ProcessTrnsysDf():
             found = False
 
             try:
-                if (name[0:9] == "elSysOut_" or name[0:10] == "elSysIn_Q_"):
+                #if (name[0:9] == "elSysOut_" or name[0:10] == "elSysIn_Q_"):
+                if (name[0:10] == "elSysIn_Q_"):
                     el = self.monDataDf[name].values
                     self.elHeatSysMatrix.append(el)
                     # self.elHeatSysTotal = self.elHeatSysTotal + el
