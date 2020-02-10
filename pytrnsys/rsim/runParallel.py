@@ -53,7 +53,7 @@ def getCpuHexadecimal(cpu):
     else:
         raise ValueError("CPU not existent:%d"%cpu)
         
-def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=10):
+def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=0.3):
     ''' Exec commands in parallel in multiple process 
     (as much as we have CPU)
     '''
