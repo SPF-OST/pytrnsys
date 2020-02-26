@@ -57,8 +57,12 @@ class ReadConfigTrnsys():
 
         lines = processFiles.purgueLines(lines, skypChar, None,removeBlankLines=True, removeBlankSpaces=False)
         lines = processFiles.purgueComments(lines, skypChar)
+
         if "calcMonthly" not in inputs:
             inputs["calcMonthly"]=[]
+
+        if "calcHourly" not in inputs:
+            inputs["calcHourly"]=[]
 
         if "calc" not in inputs:
             inputs["calc"]=[]
@@ -106,6 +110,8 @@ class ReadConfigTrnsys():
                 inputs["calcMonthly"].append(" ".join(splitLine[1:]))
             elif (splitLine[0]== "calc"):
                 inputs["calc"].append(" ".join(splitLine[1:]))
+            elif (splitLine[0] == "calcHourly"):
+                inputs["calcHourly"].append(" ".join(splitLine[1:]))
 
 
             else:

@@ -307,6 +307,9 @@ class ProcessTrnsysDf():
         for equation in self.inputs["calcMonthly"]:
             kwargs = {"local_dict":self.deckData}
             self.monDataDf.eval(equation,inplace=True,**kwargs)
+        for equation in self.inputs["calcHourly"]:
+            kwargs = {"local_dict": self.deckData}
+            self.houDataDf.eval(equation, inplace=True, **kwargs)
 
 
 
