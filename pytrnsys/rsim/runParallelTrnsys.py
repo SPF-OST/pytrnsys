@@ -174,7 +174,7 @@ class RunParallelTrnsys():
             if (self.changeDDckFilesUsed == True):
                 #It actually loops around the changed files and then execute the parameters variations for each
                 #so the definitons of two weathers will run all variations in two cities
-
+                nameBase = self.nameBase
                 for i in range(len(self.sourceFilesToChange)):
                     sourceFile = self.sourceFilesToChange[i]
                     for j in range(len(self.sinkFilesToChange[i])):
@@ -188,7 +188,9 @@ class RunParallelTrnsys():
                             self.path = os.path.join(self.path, addFolder)
                             if not os.path.isdir(self.path):
                                 os.mkdir(self.path)
+                        else:
 
+                            self.nameBase = nameBase+'-'+os.path.split(sourceFile)[-1]
                         self.buildTrnsysDeck()
                         self.createDecksFromVariant()
 
@@ -211,12 +213,13 @@ class RunParallelTrnsys():
         #         if (len(var) != sizeUsed):
         #             print "sizeUsed:%d var:%s size:%d" % (sizeUsed, var, len(var))
         #             raise ValueError("FATAL ERROR. variations must be of the same size if combineAllCases = True")
-
+        
         myDeckGenerator = createDeck.CreateTrnsysDeck(self.path, self.nameBase, variations)
+        
         myDeckGenerator.combineAllCases = self.inputs["combineAllCases"]
 
         # creates a list of decks with the appripiate name but nothing changed inside!!
-        if(self.variationsUsed):
+        if(self.variationsUsed or (self.changeDDckFilesUsed==True and self.foldersForDDckVariationUsed==False)):
             fileName = myDeckGenerator.generateDecks()
         else:
             fileName=[]

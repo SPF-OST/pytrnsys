@@ -248,6 +248,8 @@ class CreateTrnsysDeck():
                     parameterDict[nameVariationInDeck[nvar]] = valuesOfVariation
 
                 self.myListOfParameterDicts.append(parameterDict)
+        if not self.deckOutputs:
+            self.deckOutputs.append(self.case)
 
         return self.deckOutputs
 
