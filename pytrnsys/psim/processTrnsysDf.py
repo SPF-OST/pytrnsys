@@ -122,7 +122,7 @@ class ProcessTrnsysDf():
         self.hourlyUsed = True
         self.timeStepUsed = True
 
-        self.fileNameListToRead = False
+        self.fileNameListToRead = None
         self.loadMode = "complete"
 
         if 'firstMonth' in self.inputs.keys():
@@ -149,6 +149,8 @@ class ProcessTrnsysDf():
         self.deck = deckTrnsys.DeckTrnsys(self.outputPath,self.fileName)
         self.deck.loadDeck()
         self.deckData = self.deck.getAllDataFromDeck()
+
+        self.yearlySums = {value+'_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
 
 
         self.calcConfigEquations()
@@ -537,7 +539,7 @@ class ProcessTrnsysDf():
             print("creating results.json file")
 
             self.resultsDict = {}
-            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__}
+            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums}
             for key in self.inputs['results']:
                 if type(jointDicts[key]) == num.ndarray:
                     value = list(jointDicts[key])
