@@ -301,16 +301,16 @@ class ProcessTrnsysDf():
 
     def calcConfigEquations(self):
         for equation in self.inputs['calc']:
-            namespace = {**self.deckData,**self.__dict__}
+            namespace = {**self.deckData,**self.__dict__,**self.yearlySums}
             expression = equation.replace(' ','')
             exec(expression,globals(),namespace)
             self.deckData = namespace
             print(expression)
         for equation in self.inputs["calcMonthly"]:
-            kwargs = {"local_dict":self.deckData}
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
             self.monDataDf.eval(equation,inplace=True,**kwargs)
         for equation in self.inputs["calcHourly"]:
-            kwargs = {"local_dict": self.deckData}
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
             self.houDataDf.eval(equation, inplace=True, **kwargs)
 
 
