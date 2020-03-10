@@ -635,4 +635,4 @@ class RunParallelTrnsys():
 
         for j in range(len(self.variablesOutput)):
             for i in range(2, len(self.variablesOutput[j]), 1):
-                self.variablesOutput[j][i] = round(self.variablesOutput[j][i] * self.loadDemand, 2)
+                self.variablesOutput[j][i] = round(self.variablesOutput[j][i] * self.loadDemand, 3)
