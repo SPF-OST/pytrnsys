@@ -126,7 +126,7 @@ class ProcessTrnsysDf():
         self.hourlyUsed = True
         self.timeStepUsed = True
 
-        self.fileNameListToRead = False
+        self.fileNameListToRead = None
         self.loadMode = "complete"
 
         if 'firstMonth' in self.inputs.keys():
@@ -154,11 +154,12 @@ class ProcessTrnsysDf():
         self.deck.loadDeck()
         self.deckData = self.deck.getAllDataFromDeck()
 
-        self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
+        self.yearlySums = {value+'_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
+
 
         self.calcConfigEquations()
 
-        # self.addPlotConfigEquation()
+        self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
         print ("loadFiles completed using SimulationLoader")
 
@@ -304,16 +305,16 @@ class ProcessTrnsysDf():
 
     def calcConfigEquations(self):
         for equation in self.inputs['calc']:
-            namespace = {**self.deckData,**self.__dict__}
+            namespace = {**self.deckData,**self.__dict__,**self.yearlySums}
             expression = equation.replace(' ','')
             exec(expression,globals(),namespace)
             self.deckData = namespace
             print(expression)
         for equation in self.inputs["calcMonthly"]:
-            kwargs = {"local_dict":self.deckData}
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
             self.monDataDf.eval(equation,inplace=True,**kwargs)
         for equation in self.inputs["calcHourly"]:
-            kwargs = {"local_dict": self.deckData}
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
             self.houDataDf.eval(equation, inplace=True, **kwargs)
 
     def addPlotConfigEquation(self):
@@ -586,7 +587,7 @@ class ProcessTrnsysDf():
             print("creating results.json file")
 
             self.resultsDict = {}
-            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__}
+            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums}
             for key in self.inputs['results']:
                 if type(jointDicts[key]) == num.ndarray:
                     value = list(jointDicts[key])

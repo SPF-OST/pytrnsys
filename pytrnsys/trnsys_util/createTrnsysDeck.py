@@ -202,7 +202,7 @@ class CreateTrnsysDeck():
 
                     # If I write variation = ["","useCovered",0,1] then no value is printed
                     elif (len(self.variations[nvar][0]) > 0):
-                        if valuesOfVariationInFile - int(valuesOfVariationInFile) == 0:
+                        if float(valuesOfVariationInFile).is_integer():
                             variationsLine = variationsLine + "-%s%i" % (
                                 self.variations[nvar][0], int(valuesOfVariationInFile))
                         else:
@@ -248,6 +248,8 @@ class CreateTrnsysDeck():
                     parameterDict[nameVariationInDeck[nvar]] = valuesOfVariation
 
                 self.myListOfParameterDicts.append(parameterDict)
+        if not self.deckOutputs:
+            self.deckOutputs.append(self.case)
 
         return self.deckOutputs
 
