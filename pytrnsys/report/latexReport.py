@@ -51,6 +51,7 @@ class LatexReport():
     def getLatexNamesDict(self,file='latexNames.json'):
         with open(os.path.join(self.pathReport,file)) as js:
             self.latexNames = json.load(js)
+            self.latexNames = {key: '$'+value+'$' if not value[0]=='$' else value for (key,value) in self.latexNames.items()}
 
     def resetTexName(self,name):
 
