@@ -188,6 +188,7 @@ class ProcessTrnsysDf():
         self.addDemands()
         self.addHeatBalance()
         self.addElConsumption()
+        self.addTemperatureFreq()
         # self.addPlotAndLatexPV()
         self.addSPFSystem()
 
@@ -479,7 +480,25 @@ class ProcessTrnsysDf():
         self.doc.addTableMonthlyDf(var, names, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
         self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
+    def addTemperatureFreq(self, printData = False):
 
+        if "plotT" in self.inputs.keys():
+            nameFile = 'tempFreqDis'
+            name = self.inputs['plotT'][0]
+
+            # legend = self.legendsElConsumption
+            # inVar = self.elHeatSysMatrix
+            outVar = []
+            temperature = self.houDataDf[name].values
+            namePdf = self.plot.plotTemperatureFrequency(self.outputPath, nameFile, name, temperature)
+
+            caption = "Temperature Frequency Distribution"
+
+            self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+        else:
+            pass
+        
+        
     def getNiceLatexNames(self, name):
         if name in self.doc.latexNames:
             niceName = self.doc.latexNames[name]

@@ -67,6 +67,9 @@ class ReadConfigTrnsys():
         if "calc" not in inputs:
             inputs["calc"]=[]
 
+        if "plotT" not in inputs:
+            inputs["plotT"]=[]
+
         if (parseFileCreated):
             parsedFile = "%s.parse.dat" % configFile
             outfile = open(parsedFile, 'w')
@@ -112,7 +115,8 @@ class ReadConfigTrnsys():
                 inputs["calc"].append(" ".join(splitLine[1:]))
             elif (splitLine[0] == "calcHourly"):
                 inputs["calcHourly"].append(" ".join(splitLine[1:]))
-
+            elif (splitLine[0] == "plotT"):
+                inputs["plotT"].append(" ".join(splitLine[1:]))
 
             else:
                 if(controlDataType):
