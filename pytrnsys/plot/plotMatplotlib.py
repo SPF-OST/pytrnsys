@@ -868,7 +868,7 @@ class PlotMatplotlib():
 
         data = num.array(variables13)
         if printImb:
-            data = num.append(data, [num.sum(data[:,showMonths], axis=0)], axis=0)
+            data = num.append(data, [-num.sum(data[:,showMonths], axis=0)], axis=0)
 
         cumulated_data = self._get_cumulated_array(data, min=0)
         cumulated_data_neg = self._get_cumulated_array(data, max=0)

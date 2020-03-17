@@ -44,9 +44,6 @@ def readAllTypes(lines,sort=True):
     It also reads the files used and which units are used for them. IN order to be able to change automatically the unit numbers afterwards
     we need that each ASSIGN uses a variable for the unit, e.g. unitReadWeather and that this variable is used in the ddck file.
 
-    The problems of this function is that we can change a unit number of an already changed unit number.
-    For example we change 20 for 45 and the 45 is already in the file, so after we change 45 for 46, so we change all the [45, for [46,
-
     Parameters
     ----------
     lines : list of str
@@ -182,12 +179,8 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
         for i in range(len(lines)):
 
             mySplit = lines[i].split("!")
-            alreadyChanged = False
-            if (len(mySplit) > 1):
-                if (mySplit[1] == myAddText): #We check if already changed
-                    alreadyChanged = True
 
-            if(unitFromTypeChanged==False and alreadyChanged==False):
+            if(unitFromTypeChanged==False):
 
                 # newLine= lines[i].replace(oldString, newString)
                 newLine= ireplace(oldString, newString,lines[i])
@@ -209,28 +202,14 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
                 newString = "[%s," % (newUnit)
 
                 mySplit = lines[i].split("!")
-                alreadyChanged=False
-                #if (len(mySplit) > 1):
-                #    if(mySplit[1]==myAddText):
-                #        alreadyChanged=True
 
-                if(alreadyChanged==False): #If we ahev already changed we can't do it again
-                    # newLine = lines[i].replace(oldString, newString) Not working becasue it can change the comment and believe that it was a succesfull change
-                    newLine = mySplit[0].replace(oldString, newString)
-                    replaced=False
-                    if(newLine!=mySplit[0]):
-                        myNewSplit = newLine.split("!")
-                        # print ("replacement SUCCESS from %s to %s"%(oldString,newString))
-                        # lines[i] = newLine
-                        lineWithoutBreak = myNewSplit[0].replace("\n", "")
-                        lines[i] = lineWithoutBreak +" !" + myAddText
-                        # if(len(myNewSplit)>1):
-                        #     lines[i] = myNewSplit[0] + myAddText
-                        # else:
-                        #     lineWithoutBreak = newLine.replace("\n","")
-                        #     lines[i] = lineWithoutBreak + myAddText #remove of \n
-                        # lines[i] = newLine
-                        # pass
+                newLine = mySplit[0].replace(oldString, newString)
+                replaced=False
+                if(newLine!=mySplit[0]):
+                    myNewSplit = newLine.split("!")
+                    lineWithoutBreak = myNewSplit[0].replace("\n", "")
+                    lines[i] = lineWithoutBreak +" !" + myAddText
+
 
 def getTypeFromUnit(myUnit,linesReadedNoComments):
 

@@ -86,7 +86,7 @@ class SimulationLoader():
         else:
             raise ValueError('mode must be either "dataframe" or "array"')
 
-        if fileNameList is not None:
+        if fileNameList is None:
             fileNameList = os.listdir(self._path)
 
         for fileName in fileNameList:

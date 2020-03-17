@@ -28,6 +28,8 @@ import json
 import pytrnsys.plot.plotBokeh as pltB
 from string import ascii_letters, digits, whitespace
 import locale
+import re
+
 # from collections import OrderedDict
 
 
@@ -80,6 +82,8 @@ class ProcessTrnsysDf():
         self.unit = unit.UnitConverter()
         self.trnsysDllPath = False
 
+        plt.style.use('seaborn')
+
 
     def setInputs(self,inputs):
         self.inputs=inputs
@@ -122,7 +126,7 @@ class ProcessTrnsysDf():
         self.hourlyUsed = True
         self.timeStepUsed = True
 
-        self.fileNameListToRead = False
+        self.fileNameListToRead = None
         self.loadMode = "complete"
 
         if 'firstMonth' in self.inputs.keys():
@@ -149,6 +153,8 @@ class ProcessTrnsysDf():
         self.deck = deckTrnsys.DeckTrnsys(self.outputPath,self.fileName)
         self.deck.loadDeck()
         self.deckData = self.deck.getAllDataFromDeck()
+
+        self.yearlySums = {value+'_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
 
 
         self.calcConfigEquations()
@@ -299,17 +305,61 @@ class ProcessTrnsysDf():
 
     def calcConfigEquations(self):
         for equation in self.inputs['calc']:
-            namespace = {**self.deckData,**self.__dict__}
+            namespace = {**self.deckData,**self.__dict__,**self.yearlySums}
             expression = equation.replace(' ','')
             exec(expression,globals(),namespace)
             self.deckData = namespace
             print(expression)
         for equation in self.inputs["calcMonthly"]:
-            kwargs = {"local_dict":self.deckData}
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
             self.monDataDf.eval(equation,inplace=True,**kwargs)
         for equation in self.inputs["calcHourly"]:
-            kwargs = {"local_dict": self.deckData}
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
             self.houDataDf.eval(equation, inplace=True, **kwargs)
+
+    def addPlotConfigEquation(self):
+        for equation in self.inputs['calcMonthly']:
+
+            parameters = re.findall(r"[\w']+", equation)
+
+            # monplot = sns.barplot(x=self.monDataDf['Month'], y=self.monDataDf[parameters[0]], color="blue")
+            #
+            # fig = monplot.get_figure()
+            # fig.savefig(os.path.join(self.outputPath,('monthlyFigure' + parameters[0] + '.pdf')))
+            #
+            # for i in range(12):
+            #     # We only consider if the qSol is lower than the demand, the rest will be lost in the storage
+            #     qSolar = min(qCol[i], qDhw[i])
+            #     fSolar[i] = qSolar / qDhw[i]
+            #     sumCol = sumCol + qSolar
+            #
+            # self.monDataDf["fSolar"] = fSolar
+            #
+            # self.yearlyFsol = sumCol / sum(qDhw)
+            #
+            # yearlyFactor = self.yearlyFsol
+
+            nameFile = "Fsolar"
+            values = self.monDataDf[parameters[0]].values
+            averageValue = values.mean()
+
+            namePdf = self.plot.plotMonthlyDf(values, parameters[0], parameters[0], averageValue, self.myShortMonths,
+                                              useYearlyFactorAsValue=True, myTitle=None, printData=True)
+
+            caption = parameters[0]
+
+            self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+
+            nameFile = parameters[0]
+            legend = ["Month", parameters[0]]
+
+            # var = []
+            # var.append(fSolar)
+
+            # self.doc.addTableMonthlyDf(values, legend, ["", "-"], caption, nameFile, self.myShortMonths,
+            #                            sizeBox=15)
+
+
 
 
 
@@ -537,7 +587,7 @@ class ProcessTrnsysDf():
             print("creating results.json file")
 
             self.resultsDict = {}
-            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__}
+            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums}
             for key in self.inputs['results']:
                 if type(jointDicts[key]) == num.ndarray:
                     value = list(jointDicts[key])
