@@ -1610,3 +1610,21 @@ class PlotMatplotlib():
         return namePdf
 
         ##########################################HERE
+
+    def plotTemperatureFrequency(self, path, nameFile, name, temperature, printData=False,extension="pdf",sort=True,fontSize=10):
+
+
+        fig, ax = plt.subplots(1, 1)
+
+        ax.set_title(name)
+        ax.hist(temperature, bins=100)
+        plt.xlabel('Temperature [deg C]')
+        plt.ylabel('Frequency [-]')
+
+        namePdf = '%s.%s'%(nameFile,extension)
+        nameWithPath = os.path.join(path,namePdf)
+
+        plt.savefig(nameWithPath)
+
+        return namePdf
+
