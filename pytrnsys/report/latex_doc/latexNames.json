@@ -20,5 +20,6 @@
 "elSysIn_Q_TesShAux":"$El_{Aux}^{TesSh}$",
 "elSysIn_Q_TesAux":"$El_{Aux}^{Tes}$",
 "elSysIn_Q_TesDhwAux":"$El_{Aux}^{TesDhw}$",
-"qSysIn_Ghx":"$Q_{GHX}$"
+"qSysIn_Ghx":"$Q_{GHX}$",
+"qSysOut_DHDemand":"$Q_{DH}$"
 }

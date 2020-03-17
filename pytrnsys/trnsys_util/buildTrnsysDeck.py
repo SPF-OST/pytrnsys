@@ -285,7 +285,7 @@ class BuildTrnsysDeck():
         unitId=self.unitId+1
 
         lines = deckUtils.addEnergyBalanceMonthlyPrinter(unitId,eBalance)
-        self.deckText = self.deckText[:-4] + lines +self.deckText[-4:]
+        self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
         self.writeDeck() # Deck rewritten with added printer
 
 

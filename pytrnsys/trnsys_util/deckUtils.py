@@ -445,8 +445,11 @@ def readEnergyBalanceVariablesFromDeck(lines):
     for i in range(len(lines)):
 
         if(len(lines[i].split("qSysIn_"))>1 or len(lines[i].split("qSysOut_"))>1 or len(lines[i].split("elSysIn_"))>1 or len(lines[i].split("elSysOut_"))>1):
-            varBalance = lines[i].split("=")[0]
-            eBalance.append(varBalance.replace(" ",""))
+            myEqualSplit = lines[i].split("=")
+
+            if(len(myEqualSplit)>1): #Otherwise if we add one of this variables in a printer it will copy the whole printer line here.
+                varBalance = myEqualSplit[0]
+                eBalance.append(varBalance.replace(" ",""))
 
 
     return eBalance
