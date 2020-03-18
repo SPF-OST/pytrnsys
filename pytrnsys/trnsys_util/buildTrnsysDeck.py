@@ -9,11 +9,13 @@ import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deck
 import os
 import pytrnsys.trnsys_util.deckUtils as deckUtils
+import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
 import numpy as num
 # import Tkinter as tk
 import tkinter as tk
 # import Tkinter.messagebox as tkMessageBox
 from tkinter import messagebox as tkMessageBox
+from graphviz import Graph
 
 """
 This class uses a list of ddck files to built a complete TRNSYS deck file
@@ -128,6 +130,8 @@ class BuildTrnsysDeck():
 
         self.unitId=9 #I start at 10 becasue it seems thta UNIT 4 and 6 can't be used?
 
+        self.dependencies = {}
+        self.definitions = {}
         for i in range(len(self.nameList)):
             
             split = self.nameList[i].split("\\")
@@ -160,6 +164,13 @@ class BuildTrnsysDeck():
                 nameList = self.nameList[i]
                 
             firstThreeLines=self.loadDeck(pathList,nameList)
+
+            ddck = trnsysComponent.TrnsysComponent(pathList,nameList)
+            definedVariables, requiredVariables = ddck.getVariables()
+            if 'printer' not in nameList:
+                self.dependencies[nameList] = requiredVariables-definedVariables
+                self.definitions[nameList]=definedVariables
+
             self.linesChanged = deckUtils.changeAssignPath(self.linesChanged,'path$',dictPaths[os.path.join(pathList,nameList)])
             addedLines = firstThreeLines+self.linesChanged
             
@@ -175,6 +186,29 @@ class BuildTrnsysDeck():
 
             self.deckText.append(caption)
             self.deckText =  self.deckText + addedLines
+
+    def createDependencyGraph(self):
+        e = Graph('ER', filename='er.gv', node_attr={'color': 'lightblue2', 'style': 'filled'})
+        e.attr('node', shape='box')
+        variables_global = ['cpwat','rhowat','nix','tamb','dtsim','cpbri','rhobri','pi','stop','start']
+        for (key,value) in self.dependencies.items():
+            e.node(key)
+
+        for (key,value) in self.dependencies.items():
+            for (keyDef, valueDef) in self.definitions.items():
+                edgelLabel = ''
+                for dependency in value:
+                    if dependency in valueDef and dependency not in variables_global:
+                        edgelLabel+=dependency+'\n'
+                if edgelLabel!='':
+                    e.edge(key,keyDef,label=edgelLabel,min_len='30.00', style='bold')
+
+        e.attr(label=r'\n\nEntity Relation Diagram\ndrawn by NEATO')
+        e.attr(fontsize='1')
+
+        e.render('er.gv', view=False)
+
+
         
     def writeDeck(self,addedLines=None):
         """
