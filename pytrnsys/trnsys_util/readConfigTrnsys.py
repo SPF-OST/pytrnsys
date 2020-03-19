@@ -67,8 +67,6 @@ class ReadConfigTrnsys():
         if "calc" not in inputs:
             inputs["calc"]=[]
 
-        if "plotT" not in inputs:
-            inputs["plotT"]=[]
 
         if (parseFileCreated):
             parsedFile = "%s.parse.dat" % configFile
