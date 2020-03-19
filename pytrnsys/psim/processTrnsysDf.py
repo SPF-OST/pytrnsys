@@ -482,10 +482,8 @@ class ProcessTrnsysDf():
 
     def addTemperatureFreq(self, printData = False):
 
-        if "plotT" in self.inputs.keys():
-            nameFile = 'tempFreqDis'
-            name = self.inputs['plotT'][0]
-
+        for name in self.inputs['plotT']:
+            nameFile = 'tempFreqDis'+name
             # legend = self.legendsElConsumption
             # inVar = self.elHeatSysMatrix
             outVar = []
@@ -495,8 +493,6 @@ class ProcessTrnsysDf():
             caption = "Temperature Frequency Distribution"
 
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
-        else:
-            pass
         
         
     def getNiceLatexNames(self, name):

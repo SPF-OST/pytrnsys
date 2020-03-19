@@ -115,8 +115,6 @@ class ReadConfigTrnsys():
                 inputs["calc"].append(" ".join(splitLine[1:]))
             elif (splitLine[0] == "calcHourly"):
                 inputs["calcHourly"].append(" ".join(splitLine[1:]))
-            elif (splitLine[0] == "plotT"):
-                inputs["plotT"].append(" ".join(splitLine[1:]))
 
             else:
                 if(controlDataType):
