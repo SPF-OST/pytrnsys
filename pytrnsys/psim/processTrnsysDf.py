@@ -82,8 +82,6 @@ class ProcessTrnsysDf():
         self.unit = unit.UnitConverter()
         self.trnsysDllPath = False
 
-        plt.style.use('seaborn')
-
 
     def setInputs(self,inputs):
         self.inputs=inputs
@@ -93,6 +91,10 @@ class ProcessTrnsysDf():
             self.doc.getLatexNamesDict(file=file)
         else:
             self.doc.getLatexNamesDict()
+            
+    def setMatplotlibStyle(self,stylesheet):
+        self.plot = plot.PlotMatplotlib(language=self.plot.language,stylesheet=stylesheet)
+        self.plot.setPath(self.outputPath)
 
     # the idea is to read the deck and get important information fro processing.
     # area collector, volume ice storage, volume Tes, Area uncovered, nH1, nominal power heat pump, etc...
