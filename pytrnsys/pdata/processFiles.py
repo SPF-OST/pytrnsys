@@ -128,7 +128,7 @@ def purgueComments(lines,commentsChar):
             if fline!='\n':
                 #Replacing the , for nothing to convert 2,100.45 => 2100.45
                 # flines.append(string.replace(fline,",",""))
-                flines.append(fline.replace(",",""))
+                flines.append(fline)
 
 
     
