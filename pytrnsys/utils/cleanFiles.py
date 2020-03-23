@@ -153,7 +153,7 @@ class CleanFiles():
                    if(erase==i):
                      removedFolder = os.path.join(root,i)
                      print("removedFolder : %s" % removedFolder)
-                     shutil.rmtree(removedFolder)          
+                     shutil.rmtree(removedFolder)
 
            
     def removeFiles(self):                             
@@ -234,6 +234,47 @@ class CleanFiles():
                         print("copiedFile : %s" % copiedFile)
                         shutil.copyfile(copiedFile,dstPath)
         pass
+
+    def removeTempFolder(self):
+        for root, dirs, files in os.walk(self.path):
+
+            if 'temp' in root:
+
+                for i in files:
+                    copiedFile = os.path.join(root, i)
+                    dstPath = os.path.join(os.path.split(root)[0], i)
+
+                    shutil.move(copiedFile,dstPath)
+                    print("copiedFile : %s" % copiedFile)
+
+                shutil.rmtree(root)
+
+
+
+            # for dir in dirs:
+            #
+            #     if dir == 'temp':
+            #         for i in files:
+            #
+            #
+            #             copiedFile = os.path.join(root,dir, i)
+            #
+            #             dstPath = os.path.join(root,i)
+            #
+            #
+            #
+            #         # tempFolder = os.path.join(root,dir)
+            #         # os.remove(tempFolder)
+            #
+
+    def renameFiles(self, source, end):
+        for root, dirs, files in os.walk(self.path):
+            for file in files:
+                if file == source:
+                    sourcePath = os.path.join(root,file)
+                    endPath = os.path.join(root,end)
+                    os.rename(sourcePath,endPath)
+
                
 if __name__ == '__main__':
 
