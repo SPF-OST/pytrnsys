@@ -110,6 +110,8 @@ def processDataGeneral(casesInputs):
         test.setLatexNamesFile(inputs["latexNames"])
     else:
         test.setLatexNamesFile(None)
+    if "matplotlibStyle" in inputs:
+        test.setMatplotlibStyle(inputs["matplotlibStyle"])
     test.setBuildingArea(inputs["buildingArea"])
     test.setTrnsysDllPath(inputs["dllTrnsysPath"])
 
@@ -375,6 +377,7 @@ class ProcessParallelTrnsys():
 
         else:
             raise ValueError("Not Implemented yet")
+
 
         if(self.inputs["processParallel"]==True):
 

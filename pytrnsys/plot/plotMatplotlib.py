@@ -23,7 +23,10 @@ class PlotMatplotlib():
     def __init__(self,language='en',stylesheet="word.mplstyle"):
         self.language = language
         self.root = os.path.dirname(os.path.abspath(__file__))
-        self.stylesheet = os.path.join(self.root, r".\\stylesheets", stylesheet)
+        if stylesheet in plt.style.available:
+            self.stylesheet = stylesheet
+        else:
+            self.stylesheet = os.path.join(self.root, r".\\stylesheets", stylesheet)
         plt.style.use(self.stylesheet)
         self.initialize()
 
