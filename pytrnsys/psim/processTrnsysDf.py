@@ -191,6 +191,7 @@ class ProcessTrnsysDf():
         self.addHeatBalance()
         self.addElConsumption()
         self.addTemperatureFreq()
+        # self.addPlotConfigEquation()
         # self.addPlotAndLatexPV()
         self.addSPFSystem()
 
