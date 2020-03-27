@@ -21,5 +21,8 @@
 "elSysIn_Q_TesAux":"$El_{Aux}^{Tes}$",
 "elSysIn_Q_TesDhwAux":"$El_{Aux}^{TesDhw}$",
 "qSysIn_Ghx":"$Q_{GHX}$",
-"qSysOut_DHDemand":"$Q_{DH}$"
+"qSysOut_DHDemand":"$Q_{DH}$",
+"qSysIn_ElBackUp": "$Q_{El,aux}$",
+"qSysOut_Tes1Acum" : "$Q^{acum}_{Tes}$",
+"qSysOut_Tes1Loss" : "$Q^{loss}_{Tes}$"
 }

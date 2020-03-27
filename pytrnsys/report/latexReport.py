@@ -539,7 +539,7 @@ class LatexReport():
             line = "%s" % defMonths[n]
             lines = lines + line
             for i in range(len(var)):
-                line = "&%.1f" % var[i][n];
+                line = "&%.1f" % var[i][n]
                 lines = lines + line
             line = "\\\\ \n";
             lines = lines + line
