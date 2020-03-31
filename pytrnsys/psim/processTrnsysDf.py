@@ -144,7 +144,7 @@ class ProcessTrnsysDf():
 
         self.setLoaderParameters()
         locale.setlocale(locale.LC_ALL,'enn')
-        self.loader = SimulationLoader(self.outputPath + '//temp', fileNameList=self.fileNameListToRead,
+        self.loader = SimulationLoader(self.outputPath + '//temp', fileNameList=self.fileNameListToRead,sortMonths=True,
                                        mode=self.loadMode, monthlyUsed=self.monthlyUsed, hourlyUsed=self.hourlyUsed,
                                        timeStepUsed=self.timeStepUsed,firstMonth=self.firstMonth, year = self.yearReadedInMonthlyFile)
         # self.monData = self.loader.monData
@@ -169,6 +169,16 @@ class ProcessTrnsysDf():
 
         if "plotHourly" in self.inputs.keys():
             self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"])
+        else:
+            pass
+
+        if "plotQvsTconfigured" in self.inputs.keys():
+            monthsSplit = []
+            # plot QvsT with configured inputs...
+            InputListQvsT = self.inputs["plotQvsTconfigured"]
+            self.loadQvsTConfig(self.steDataDf, "plotQvsTconfigured", monthsSplit=monthsSplit, addDhwCirc=False,
+                                normalized=True, cut=False)
+
         else:
             pass
 
@@ -362,8 +372,92 @@ class ProcessTrnsysDf():
             # self.doc.addTableMonthlyDf(values, legend, ["", "-"], caption, nameFile, self.myShortMonths,
             #                            sizeBox=15)
 
+    def loadQvsTConfig(self, df, keyJson, year=False, useOnlyOneYear=False, monthsSplit=[], addDhwCirc=False, normalized=False,
+                 cut=False):
 
 
+        self.test = self.inputs["plotQvsTconfigured"]
+        #self.test2 = json.loads(self.test)
+        print(len(self.test))
+        dictTest = [0 for i in range(len(self.test))]
+
+        factor = 1.
+        tFlow = []
+        eCum = []
+        legend = []
+
+        try:
+            self.qDhwAuxTesTimeStep = df["qAuxStoreDHW_KW"]  # self.readTrnsysFiles.get("qAuxStoreDHW_KW", ifNotFoundEqualToZero=True)
+            eDhwAuxTes = self.qDhwAuxTesTimeStep * factor
+            self.qShAuxTesTimeStep = df["qAuxStoreSH_KW"]  # self.readTrnsysFiles.get("qAuxStoreSH_KW", ifNotFoundEqualToZero=True)
+            eShAuxTes = self.qShAuxTesTimeStep * factor
+        except:
+            eDhwAuxTes = num.zeros(len(eSh))
+            eShAuxTes = num.zeros(len(eSh))
+
+        if (normalized):
+            norm = max(num.cumsum(df["PRdIn_Kw"] * factor)) + max(num.cumsum(df["Pdhw_kW"] * factor))
+            # norm = max(num.cumsum(eSh))
+        else:
+            norm = 1.
+
+
+        for i in range (0,len(self.test)):
+            print("i",i)
+            print(self.test[i])
+            jsonDict = json.loads(self.test[i])
+
+
+            legend.append(jsonDict["legend"])
+            tFlow.append(df[jsonDict["T"]])
+            if (jsonDict["Q"] == "QPcmToHp"):
+                eCum.append(-df[jsonDict["Q"]] * factor / norm)
+            else:
+                eCum.append(df[jsonDict["Q"]]*factor/norm)
+
+
+
+        # df.columns = df.columns.str.lower()
+        # SPACE HEATING DEMAND
+
+          # self.readTrnsysFiles.timeStepUsed * self.unit.getkJToMWh()  # from kW to MWh
+
+
+        fileName = "QvsT"
+
+        self.plot.calcAndPrintQVersusT(fileName, tFlow, eCum, legend, printEvery=100, normalized=normalized, cut=cut)
+
+        namePdf = self.plot.gle.executeGLE(fileName + ".gle")
+
+        self.doc.addPlot(namePdf, "Cumulative energy flow as funciton of reference temperature", fileName, 12)
+
+        for mIndex in range(len(monthsSplit)):
+            timeStepInSeconds = self.readTrnsysFiles.timeStepUsed
+            month = monthsSplit[mIndex]
+            # Energy values in W*second
+            iBegin, iEnd = utils.getMonthlySliceFromUserDefinedTimeStep(tShFl, timeStepInSeconds, month,
+                                                                        firstHourInYear=self.firstConsideredTime)
+
+            fileName = "QvsT-month-%d" % month
+
+            tFlow = []
+            eCum = []
+            legend = []
+
+            for i in range(0, len(self.test)):
+                print("i", i)
+                print(self.test[i])
+                jsonDict = json.loads(self.test[i])
+
+                t_help = df[jsonDict["T"]]
+                e_help = df[jsonDict["Q"]] * factor
+
+                legend.append(jsonDict["legend"])
+                tFlow.append(t_help[iBegin:iEnd])
+                eCum.append(e_help[iBegin:iEnd])
+
+
+            self.plot.calcAndPrintQVersusT(fileName, tFlow, eCum, legend, printEvery=100)
 
 
 
@@ -373,6 +467,8 @@ class ProcessTrnsysDf():
         outVar = []
         legendsIn = []
         legendsOut = []
+
+
 
         # for name in self.monData.keys():
         for name in self.monDataDf.columns:
@@ -433,6 +529,8 @@ class ProcessTrnsysDf():
         self.doc.addTableMonthlyDf(var, names, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15,
                                    addLines=addLines)
         self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+    
+    
 
     def calculateElConsumption(self, printData=False):
 
