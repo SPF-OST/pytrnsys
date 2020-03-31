@@ -169,6 +169,15 @@ class ProcessTrnsysDf():
 
         if "plotHourly" in self.inputs.keys():
             self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"])
+
+        if "plotMonthly" in self.inputs.keys():
+        #
+            for plot in self.inputs["plotMonthly"]:
+                print("%s"%plot)
+
+            # namePdf = self.plot.plotMonthlyDf(fSolar, "$F_{solar}$", nameFile, self.yearlyFsol, self.myShortMonths,
+            #                                   useYearlyFactorAsValue=True, myTitle=None, printData=True)
+
         else:
             pass
 
@@ -201,6 +210,7 @@ class ProcessTrnsysDf():
         self.addHeatBalance()
         self.addElConsumption()
         self.addTemperatureFreq()
+        # self.addPlotConfigEquation()
         # self.addPlotAndLatexPV()
         self.addSPFSystem()
 
@@ -246,7 +256,21 @@ class ProcessTrnsysDf():
         for i in range(len(self.qDemandVector)):
             self.qDemand[:len(self.qDemandVector[i])] = self.qDemand[:len(self.qDemandVector[i])] + self.qDemandVector[i]
 
-    def addDemands(self):
+        # self.monDataDf["qDemand"]=self.qDemandDf
+        # self.deckData["qDemand_Tot"]=sum(self.qDemandDf)
+        #
+        # pass
+
+    def addDemands(self,unit="kWh"):
+
+        if(unit=="kWh"):
+            myUnit=1.
+        elif(unit=="MWh"):
+            myUnit = 1000.
+        elif(unit=="GWh"):
+            myUnit = 1e6
+        else:
+            raise ValueError("unit %s not considered"%unit)
 
         legend = ["Month"] + self.legendQ + ["Total"]
 
@@ -255,9 +279,15 @@ class ProcessTrnsysDf():
         addLines = False
 
         var = self.qDemandVector
-        var.append(self.qDemand)
+        for i in range(len(var)):
+            var[i]=var[i]/myUnit
+            
+        var.append(self.qDemand/myUnit)
 
-        self.doc.addTableMonthlyDf(var, legend, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15,
+        units = []
+        units.append(unit)
+
+        self.doc.addTableMonthlyDf(var, legend,units, caption, nameFile, self.myShortMonths, sizeBox=15,
                                    addLines=addLines)
 
     def calculateSPFSystem(self):
@@ -329,6 +359,7 @@ class ProcessTrnsysDf():
         for equation in self.inputs["calcHourly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
             self.houDataDf.eval(equation, inplace=True, **kwargs)
+
 
     def addPlotConfigEquation(self):
         for equation in self.inputs['calcMonthly']:
@@ -461,7 +492,16 @@ class ProcessTrnsysDf():
 
 
 
-    def addHeatBalance(self, printData=False):
+    def addHeatBalance(self, printData=False,unit="kWh"):
+
+        if(unit=="kWh"):
+            myUnit=1.
+        elif(unit=="MWh"):
+            myUnit = 1000.
+        elif(unit=="GWh"):
+            myUnit = 1e6
+        else:
+            raise ValueError("unit %s not considered"%unit)
 
         inVar = []
         outVar = []
@@ -478,13 +518,13 @@ class ProcessTrnsysDf():
             try:
                 if (name[0:7] == "qSysIn_" or name[0:10] == "elSysIn_Q_"):
                     # inVar.append(self.monData[name])
-                    inVar.append(self.monDataDf[name].values)
+                    inVar.append(self.monDataDf[name].values/myUnit)
                     legendsIn.append(self.getNiceLatexNames(name))
 
 
                 elif (name[0:8] == "qSysOut_"):
                     # outVar.append(self.monData[name])
-                    outVar.append(self.monDataDf[name].values)
+                    outVar.append(self.monDataDf[name].values/myUnit)
 
                     legendsOut.append(self.getNiceLatexNames(name))
             except:
@@ -499,7 +539,8 @@ class ProcessTrnsysDf():
         # firstMonthId = utils.getMonthNameIndex(self.monDataDf["Month"].index)
         # startMonth = firstMonthId
 
-        namePdf = self.plot.plotMonthlyBalanceDf(inVar, outVar, niceLegend, "Energy Flows", nameFile, "kWh",
+
+        namePdf = self.plot.plotMonthlyBalanceDf(inVar, outVar, niceLegend, "Energy Flows", nameFile, unit,
                                                  self.myShortMonths, yearlyFactor=10,
                                                  useYear=False, printData=printData)
 
@@ -513,7 +554,7 @@ class ProcessTrnsysDf():
 
         caption = "System Heat Balance"
 
-        totalDemand = sum(self.qDemand)
+        totalDemand = sum(self.qDemand)/myUnit
 
         imb = sum(var[len(var) - 1])
 
@@ -526,7 +567,7 @@ class ProcessTrnsysDf():
         line = "Imb & %.1f & %s \\\\ \n" % (100 * imb / totalDemand, symbol);
         addLines = addLines + line
 
-        self.doc.addTableMonthlyDf(var, names, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15,
+        self.doc.addTableMonthlyDf(var, names, unit, caption, nameFile, self.myShortMonths, sizeBox=15,
                                    addLines=addLines)
         self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
     
@@ -582,17 +623,18 @@ class ProcessTrnsysDf():
 
     def addTemperatureFreq(self, printData = False):
 
-        for name in self.inputs['plotT']:
-            nameFile = 'tempFreqDis'+name
-            # legend = self.legendsElConsumption
-            # inVar = self.elHeatSysMatrix
-            outVar = []
-            temperature = self.houDataDf[name].values
-            namePdf = self.plot.plotTemperatureFrequency(self.outputPath, nameFile, name, temperature)
+        if "plotT" in self.inputs.keys():
+            if (len(self.inputs['plotT']) > 0):
+                for name in self.inputs['plotT']:
+                    nameFile = 'tempFreqDis' + name
+                    # name = self.inputs['plotT'][0]
+                    outVar = []
+                    temperature = self.houDataDf[name].values
+                    namePdf = self.plot.plotTemperatureFrequency(self.outputPath, nameFile, name, temperature)
 
-            caption = "Temperature Frequency Distribution"
+                    caption = "Temperature Frequency Distribution"
 
-            self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+                    self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
         
         
     def getNiceLatexNames(self, name):

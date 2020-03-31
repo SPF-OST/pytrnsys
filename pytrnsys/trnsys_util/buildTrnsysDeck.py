@@ -15,7 +15,7 @@ import numpy as num
 import tkinter as tk
 # import Tkinter.messagebox as tkMessageBox
 from tkinter import messagebox as tkMessageBox
-#from graphviz import Graph
+# from graphviz import Graph
 
 """
 This class uses a list of ddck files to built a complete TRNSYS deck file
