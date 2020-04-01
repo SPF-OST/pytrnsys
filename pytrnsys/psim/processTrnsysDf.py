@@ -161,6 +161,7 @@ class ProcessTrnsysDf():
 
         self.calcConfigEquations()
 
+        self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
         print ("loadFiles completed using SimulationLoader")
@@ -417,14 +418,6 @@ class ProcessTrnsysDf():
         eCum = []
         legend = []
 
-        try:
-            self.qDhwAuxTesTimeStep = df["qAuxStoreDHW_KW"]  # self.readTrnsysFiles.get("qAuxStoreDHW_KW", ifNotFoundEqualToZero=True)
-            eDhwAuxTes = self.qDhwAuxTesTimeStep * factor
-            self.qShAuxTesTimeStep = df["qAuxStoreSH_KW"]  # self.readTrnsysFiles.get("qAuxStoreSH_KW", ifNotFoundEqualToZero=True)
-            eShAuxTes = self.qShAuxTesTimeStep * factor
-        except:
-            eDhwAuxTes = num.zeros(len(eSh))
-            eShAuxTes = num.zeros(len(eSh))
 
         if (normalized):
             norm = max(num.cumsum(df["PRdIn_Kw"] * factor)) + max(num.cumsum(df["Pdhw_kW"] * factor))

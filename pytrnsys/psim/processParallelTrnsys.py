@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import os
+import glob
+import json
 import pytrnsys.psim.debugProcess as debugProcess
 import multiprocessing as mp
 import pytrnsys.rsim.runParallel as run
@@ -9,6 +11,8 @@ import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.psim.processTrnsysDf as processTrnsys
 import warnings
 import copy
+import pytrnsys.report.latexReport as latex
+import matplotlib.pyplot as plt
 #we would need to pass the Class as inputs
 
 
@@ -405,6 +409,45 @@ class ProcessParallelTrnsys():
         else:
             for i in range(len(casesInputs)):
                 processDataGeneral(casesInputs[i])
+                
+        if 'comparePlot' in self.inputs.keys():
+            plotVariables =self.inputs['comparePlot']
+            if len(plotVariables)<2:
+                raise ValueError('You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
+            xAxisVariable = plotVariables[0]
+            yAxisVariable = plotVariables[1]
+            seriesVariable = ''
+            if len(plotVariables)==3:
+                seriesVariable = plotVariables[2]
+            plotXDict = {}
+            plotYDict = {}
+            for file in glob.glob(os.path.join(pathFolder,"**/*-results.json")):
+                print(file)
+                with open(file) as f_in:
+                    resultsDict=json.load(f_in)
+                if resultsDict[seriesVariable] not in plotXDict.keys():
+                    plotXDict[resultsDict[seriesVariable]]=[resultsDict[xAxisVariable]]
+                    plotYDict[resultsDict[seriesVariable]] =[resultsDict[yAxisVariable]]
+                else:
+                    plotXDict[resultsDict[seriesVariable]].append(resultsDict[xAxisVariable])
+                    plotYDict[resultsDict[seriesVariable]].append(resultsDict[yAxisVariable])
+
+            self.doc = latex.LatexReport('', '')
+            if 'latexNames' in self.inputs.keys():
+                self.doc.getLatexNamesDict(file=self.inputs['latexNames'])
+            else:
+                self.doc.getLatexNamesDict()
+                
+            fig1 = plt.figure(1)
+            ax1 = fig1.add_subplot(111)
+            for key in plotXDict.keys():
+                ax1.plot(plotXDict[key],plotYDict[key],'x-',label=key)
+            ax1.legend(title=self.doc.getNiceLatexNames(seriesVariable))
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
+            fig1.savefig(os.path.join(pathFolder,xAxisVariable+'_'+yAxisVariable+'_'+seriesVariable+'.png'))
+
+
 
 
     def changeFile(self,source,end):
