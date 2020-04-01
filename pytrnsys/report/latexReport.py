@@ -10,6 +10,7 @@ ToDo :
 
 import string, os
 import pytrnsys.utils.utilsSpf as utils
+from string import ascii_letters, digits, whitespace
 import shutil
 import codecs
 import json
@@ -52,6 +53,18 @@ class LatexReport():
         with open(os.path.join(self.pathReport,file)) as js:
             self.latexNames = json.load(js)
             self.latexNames = {key: '$'+value+'$' if not value[0]=='$' else value for (key,value) in self.latexNames.items()}
+    def getNiceLatexNames(self, name):
+        if name in self.latexNames:
+            niceName = self.latexNames[name]
+        else:
+            niceName = self.getCustomeNiceLatexNames(name)
+            if(niceName==None):
+                niceName = "$%s$" % "".join([c for c in name if c in ascii_letters+digits])
+
+        return niceName
+
+    def getCustomeNiceLatexNames(self,name):
+        return None
 
     def resetTexName(self,name):
 
