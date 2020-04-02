@@ -447,7 +447,7 @@ class ProcessParallelTrnsys():
         ax1 = fig1.add_subplot(111)
         for key in plotXDict.keys():
             index = num.argsort(plotXDict[key])
-            labelValue=float(key)
+            labelValue=round(float(key),2)
             ax1.plot(num.array(plotXDict[key])[index], num.array(plotYDict[key])[index], 'x-', label=f'{labelValue:.2f}')
         ax1.legend(title=self.doc.getNiceLatexNames(seriesVariable))
         ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
