@@ -278,8 +278,11 @@ class PlotGle():
             line = " data   myFile$ d%d = c%d,c%d \n"%(i+1,j,j+1) ; lines = lines +line
             j=j+2
     
-        for i in range(nVar):            
-            line = "d%d lstyle 1 line lwidth %f color %s key \"$%s$\"  \n"%(i+1,self.sizeLine,self.colorGLE[i],legends[i]) ; lines = lines +line
+        for i in range(nVar):
+            if legends[i].startswith('$'):
+                line = "d%d lstyle 1 line lwidth %f color %s key \"%s\"  \n" % (i + 1, self.sizeLine, self.colorGLE[i], legends[i]);lines = lines + line
+            else:
+                line = "d%d lstyle 1 line lwidth %f color %s key \"$%s$\"  \n"%(i+1,self.sizeLine,self.colorGLE[i],legends[i]) ; lines = lines +line
     
         line = " key pos tr hei 0.2 offset -1 0\n" ; lines = lines +line
         line = "end graph\n" ; lines = lines +line
