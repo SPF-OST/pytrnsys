@@ -156,8 +156,10 @@ class CostCalculation():
 
         label ="definitionTable"
         
-        self.doc.addTable(caption,sizeBox,names,units,label,lines,useFormula=True) 
-        
+        self.doc.addTable(caption,names,units,label,lines,useFormula=True)
+
+        # def addTable(self, _caption, _names, _units, _label, _linesResults, useFormula=False, addCaptionLines=False):
+
     def addTableCosts(self,doc,unit=1):
         
         symbol = "$\\%$"
