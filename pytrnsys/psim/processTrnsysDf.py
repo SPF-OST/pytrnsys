@@ -161,6 +161,7 @@ class ProcessTrnsysDf():
 
         self.calcConfigEquations()
 
+        self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
         print ("loadFiles completed using SimulationLoader")
