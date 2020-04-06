@@ -1628,6 +1628,6 @@ class PlotMatplotlib():
         nameWithPath = os.path.join(path,namePdf)
 
         plt.savefig(nameWithPath)
-
+        plt.close()
         return namePdf
 
