@@ -44,7 +44,7 @@ class RunParallelTrnsys():
 
     """
 
-    def __init__(self,pathConfig,name="TrnsysRun",configFile=None):
+    def __init__(self,pathConfig,name="pytrnsysRun",configFile=None):
 
 
         self.pathConfig = pathConfig
@@ -57,7 +57,9 @@ class RunParallelTrnsys():
             if 'nameRef' in self.inputs:
                 self.nameBase = self.inputs['nameRef']
             else:
-                self.nameBase = name
+                if name=="pytrnsysRun":
+                    self.nameBase = self.inputs['addResultsFolder']
+
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
             self.getConfig()
             self.runConfig()

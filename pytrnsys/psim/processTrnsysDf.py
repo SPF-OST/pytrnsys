@@ -186,12 +186,23 @@ class ProcessTrnsysDf():
         else:
             pass
 
+        # define QvsTDf here!
+
+
+
         if "plotQvsTconfigured" in self.inputs.keys():
+            filename = os.path.join(self.tempFolder, "QVsTh.hr")
+            if (os.path.isfile(filename)):
+                QvsTDf = self.houDataDf
+                print("hourlyUsed")
+            else:
+                QvsTDf = self.steDataDf
+                print("stepDfUsed")
+
             monthsSplit = []
             # plot QvsT with configured inputs...
             InputListQvsT = self.inputs["plotQvsTconfigured"]
-            self.loadQvsTConfig(self.steDataDf, "plotQvsTconfigured", monthsSplit=monthsSplit, addDhwCirc=False,
-                                normalized=True, cut=False)
+            self.loadQvsTConfig(QvsTDf, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False)
 
         else:
             pass
@@ -360,7 +371,11 @@ class ProcessTrnsysDf():
             print(expression)
         for equation in self.inputs["calcMonthly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
+            scalars = kwargs['local_dict'].keys()
+            for scalar in scalars:
+                equation = equation.replace(scalar,'@'+scalar)
             self.monDataDf.eval(equation,inplace=True,**kwargs)
+            self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         for equation in self.inputs["calcHourly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
             self.houDataDf.eval(equation, inplace=True, **kwargs)
@@ -408,7 +423,7 @@ class ProcessTrnsysDf():
             # self.doc.addTableMonthlyDf(values, legend, ["", "-"], caption, nameFile, self.myShortMonths,
             #                            sizeBox=15)
 
-    def loadQvsTConfig(self, df, year=False, useOnlyOneYear=False, monthsSplit=[], addDhwCirc=False, normalized=False,
+    def loadQvsTConfig(self, df, year=False, useOnlyOneYear=False, monthsSplit=[], normalized=False,
                  cut=False):
 
 
