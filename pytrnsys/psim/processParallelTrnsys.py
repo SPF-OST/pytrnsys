@@ -14,6 +14,7 @@ import copy
 import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import numpy as num
+import pytrnsys_spf.psim.costConfig as costConfig
 #we would need to pass the Class as inputs
 
 
@@ -411,6 +412,9 @@ class ProcessParallelTrnsys():
             for i in range(len(casesInputs)):
                 processDataGeneral(casesInputs[i])
                 
+        if 'cost' in self.inputs.keys():
+            self.calcCost()
+
         if 'comparePlot' in self.inputs.keys():
             self.plotComparison()
 
@@ -448,15 +452,13 @@ class ProcessParallelTrnsys():
         for key in plotXDict.keys():
             index = num.argsort(plotXDict[key])
             labelValue=round(float(key),2)
-            ax1.plot(num.array(plotXDict[key])[index], num.array(plotYDict[key])[index], 'x-', label=f'{labelValue:.2f}')
+            ax1.plot(num.array(plotXDict[key])[index], num.array(plotYDict[key])[index], 'x-', label='{labelValue:.2f}')
         ax1.legend(title=self.doc.getNiceLatexNames(seriesVariable))
         ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
         ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
         plt.tight_layout()
         fig1.savefig(os.path.join(pathFolder, xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '.png'))
         plt.close()
-
-
 
     def changeFile(self,source,end):
 
@@ -471,3 +473,31 @@ class ProcessParallelTrnsys():
 
         if(found==False):
             print ("changeFile was not able to change %s by %s"%(source,end))
+
+    def calcCost(self):
+
+        path = self.inputs['pathBase']
+
+        costPath = self.inputs['cost']
+
+        dictCost = costConfig.costConfig.readCostJson(costPath)
+
+        # for name in names:
+        # path = os.path.join(pathBase, name)
+
+        small = 15
+        cost = costConfig.costConfig()
+        cost.setFontsizes(small)
+
+        cost.setDefaultData(dictCost)
+        cost.readResults(path)
+
+        cost.process(dictCost)
+
+
+        # cost.plotLines(cost.pvAreaVec,"PvPeak [kW]",cost.annuityVec,"Annuity [Euro/kWh]",cost.batSizeVec,"Bat-Size [kWh]", "Annuity_vs_PvPeak", extension="pdf")
+        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.annuityVec,"Annuity [Euro/kWh]",cost.pvAreaVec,"PvPeak [kW]","Annuity_vs_Bat", extension="pdf")
+        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RselfSuffVec,"$R_{self,suff}$",cost.pvAreaVec,"PvPeak [kW]","RselfSuff_vs_Bat", extension="pdf")
+        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RpvGenVec,"$R_{pv,gen}$",cost.pvAreaVec,"PvPeak [kW]","RpvGen_vs_Bat", extension="pdf")
+
+        # cost.printDataFile()
