@@ -354,7 +354,7 @@ class CostCalculationVar(mycost.CostCalculation):
 #        line = "  & Using present value: &&& %2.2f & %s \\\\ \n" % (self.heatGenCostNpv*100.,hgcUnit);lines = lines + line
 
 
-        doc.addTable(caption,sizeBox,names,units,label,lines,useFormula=False)
+        doc.addTable(caption,names,units,label,lines,useFormula=False)
 
     def createLatex(self,fileName=False):
             

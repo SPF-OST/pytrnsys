@@ -404,40 +404,38 @@ class ProcessTrnsysDf():
             # self.doc.addTableMonthlyDf(values, legend, ["", "-"], caption, nameFile, self.myShortMonths,
             #                            sizeBox=15)
 
-    def loadQvsTConfig(self, df, keyJson, year=False, useOnlyOneYear=False, monthsSplit=[], addDhwCirc=False, normalized=False,
+    def loadQvsTConfig(self, df, year=False, useOnlyOneYear=False, monthsSplit=[], addDhwCirc=False, normalized=False,
                  cut=False):
 
 
-        self.test = self.inputs["plotQvsTconfigured"]
-        #self.test2 = json.loads(self.test)
-        print(len(self.test))
-        dictTest = [0 for i in range(len(self.test))]
+        self.QvsTInput = self.inputs["plotQvsTconfigured"]
+
 
         factor = 1.
         tFlow = []
         eCum = []
         legend = []
 
-
-        if (normalized):
-            norm = max(num.cumsum(df["PRdIn_Kw"] * factor)) + max(num.cumsum(df["Pdhw_kW"] * factor))
-            # norm = max(num.cumsum(eSh))
+        if "QvsTnormalized" in self.inputs.keys():
+            self.QvsTNorm = self.inputs["QvsTnormalized"]
+            norm = 0.
+            for i in range(0, len(self.QvsTNorm)):
+                norm = norm + max(num.cumsum(df[self.QvsTNorm[i]] * factor))
         else:
             norm = 1.
 
 
-        for i in range (0,len(self.test)):
-            print("i",i)
-            print(self.test[i])
-            jsonDict = json.loads(self.test[i])
+        for i in range (0,len(self.QvsTInput)):
 
-
-            legend.append(jsonDict["legend"])
-            tFlow.append(df[jsonDict["T"]])
-            if (jsonDict["Q"] == "QPcmToHp"):
-                eCum.append(-df[jsonDict["Q"]] * factor / norm)
+            #legend.append(jsonDict["legend"])
+            if i % 2 == 0:
+                eCum.append(abs(df[self.QvsTInput[i]]) * factor / norm)
+                name = self.QvsTInput[i]
+                legend.append(self.getNiceLatexNames(name))
             else:
-                eCum.append(df[jsonDict["Q"]]*factor/norm)
+                tFlow.append(df[self.QvsTInput[i]])
+
+
 
 
 
@@ -445,7 +443,8 @@ class ProcessTrnsysDf():
         # SPACE HEATING DEMAND
 
           # self.readTrnsysFiles.timeStepUsed * self.unit.getkJToMWh()  # from kW to MWh
-
+       # nameLatex = self.inputs["nameLatex"]
+       # test = self.doc.getLatexNamesDict(nameLatex)
 
         fileName = "QvsT"
 
@@ -469,16 +468,16 @@ class ProcessTrnsysDf():
             legend = []
 
             for i in range(0, len(self.test)):
-                print("i", i)
-                print(self.test[i])
-                jsonDict = json.loads(self.test[i])
 
-                t_help = df[jsonDict["T"]]
-                e_help = df[jsonDict["Q"]] * factor
 
-                legend.append(jsonDict["legend"])
-                tFlow.append(t_help[iBegin:iEnd])
-                eCum.append(e_help[iBegin:iEnd])
+                if i % 2 == 0:
+                    eCum.append(abs(df[self.QvsTInput[i]]) * factor / norm)
+                    name = self.QvsTInput[i]
+                    legend.append(self.getNiceLatexNames(name))
+                else:
+                    tFlow.append(df[self.QvsTInput[i]])
+
+          
 
 
             self.plot.calcAndPrintQVersusT(fileName, tFlow, eCum, legend, printEvery=100)
