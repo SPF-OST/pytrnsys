@@ -249,6 +249,17 @@ class CleanFiles():
 
                 shutil.rmtree(root)
 
+            elif 'gle' in root:
+
+                for i in files:
+                    copiedFile = os.path.join(root, i)
+                    dstPath = os.path.join(os.path.split(root)[0], i)
+
+                    shutil.move(copiedFile,dstPath)
+                    print("copiedFile : %s" % copiedFile)
+
+                shutil.rmtree(root)
+
 
 
             # for dir in dirs:
