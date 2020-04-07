@@ -367,7 +367,11 @@ class ProcessTrnsysDf():
             print(expression)
         for equation in self.inputs["calcMonthly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
+            scalars = kwargs['local_dict'].keys()
+            for scalar in scalars:
+                equation = equation.replace(scalar,'@'+scalar)
             self.monDataDf.eval(equation,inplace=True,**kwargs)
+            self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         for equation in self.inputs["calcHourly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
             self.houDataDf.eval(equation, inplace=True, **kwargs)
