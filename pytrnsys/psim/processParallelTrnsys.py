@@ -475,7 +475,7 @@ class ProcessParallelTrnsys():
 
                 labelValue=round(float(key),2)
                 if labelValue not in labelSet:
-                    label = f'{labelValue:.2f}'
+                    label = "{:.2f}".format(labelValue)
                     labelSet.add(labelValue)
                 else:
                     label = ''
