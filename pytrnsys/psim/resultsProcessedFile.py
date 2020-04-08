@@ -12,6 +12,7 @@ import shutil
 import string
 import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
+import json
 
 class ResultsProcessedFile():
     """
@@ -31,7 +32,7 @@ class ResultsProcessedFile():
             if (lines.split("\t")[0] == name):
                 return float(lines.split("\t")[1])
 
-    def readResultsData(self):
+    def readResultsData(self,resultType = 'dat'):
 
         fileName = []
         pathFolder = self.path
@@ -51,27 +52,35 @@ class ResultsProcessedFile():
 
             dictRes = {}
 
-            nameWithPath = os.path.join(pathFolder, "%s\\%s-results.dat" % (name, name))
-            resultFile = open(nameWithPath, 'r')
-            resultList = resultFile.readlines()
-            for lines in resultList:
-                split = lines.split("\t")
-                if(len(split)==2):
-                    try:
-                        dictRes[split[0]] = float(split[1][:-1])
-                    except:
-                        dictRes[split[0]] = split[1][:-1]
+            if resultType == 'dat':
+                nameWithPath = os.path.join(pathFolder, "%s\\%s-results.dat" % (name, name))
 
-                elif(len(split)>12):
-                    monthVal = split[1:12]
-                    dictRes[split[0]] = monthVal
-                else:
-                    try:
-                        dictRes[split[0]] = float(split[1])
-                    except:
-                        dictRes[split[0]] = split[1]
+                resultFile = open(nameWithPath, 'r')
+                resultList = resultFile.readlines()
+                for lines in resultList:
+                    split = lines.split("\t")
+                    if(len(split)==2):
+                        try:
+                            dictRes[split[0]] = float(split[1][:-1])
+                        except:
+                            dictRes[split[0]] = split[1][:-1]
 
-            resultFile.close()
+                    elif(len(split)>12):
+                        monthVal = split[1:12]
+                        dictRes[split[0]] = monthVal
+                    else:
+                        try:
+                            dictRes[split[0]] = float(split[1])
+                        except:
+                            dictRes[split[0]] = split[1]
+
+                resultFile.close()
+
+            elif resultType == 'json':
+                nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
+
+                with open(nameWithPath) as json_file:
+                    dictRes = json.load(json_file)
 
             self.results.append(dictRes)
 

@@ -29,6 +29,8 @@ import pytrnsys.plot.plotBokeh as pltB
 from string import ascii_letters, digits, whitespace
 import locale
 import re
+# import pytrnsys_spf.psim.costConfig as costConfig
+
 
 # from collections import OrderedDict
 
@@ -121,6 +123,8 @@ class ProcessTrnsysDf():
         self.process()
         self.doLatexPdf()
         self.addResultsFile()
+        # if "cost" in self.inputs.keys():
+        #     self.calcCost()
 
     def setLoaderParameters(self):
 
@@ -788,4 +792,32 @@ class ProcessTrnsysDf():
                     os.remove(svg_filepath)
             except:
                 raise ValueError('Inkscape path is not set correctly.')
-                
+
+    # def calcCost(self):
+    #
+    #     path = self.inputs['pathBase']
+    #
+    #     costPath = self.inputs['cost']
+    #
+    #     dictCost = costConfig.costConfig.readCostJson(costPath)
+    #
+    #     # for name in names:
+    #     # path = os.path.join(pathBase, name)
+    #
+    #     small = 15
+    #     cost = costConfig.costConfig()
+    #     cost.setFontsizes(small)
+    #
+    #     cost.setDefaultData(dictCost)
+    #     cost.readResults(path)
+    #
+    #     cost.process(dictCost)
+    #
+    #     cost.addCostToJson()
+    #
+    #     # cost.plotLines(cost.pvAreaVec,"PvPeak [kW]",cost.annuityVec,"Annuity [Euro/kWh]",cost.batSizeVec,"Bat-Size [kWh]", "Annuity_vs_PvPeak", extension="pdf")
+    #     # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.annuityVec,"Annuity [Euro/kWh]",cost.pvAreaVec,"PvPeak [kW]","Annuity_vs_Bat", extension="pdf")
+    #     # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RselfSuffVec,"$R_{self,suff}$",cost.pvAreaVec,"PvPeak [kW]","RselfSuff_vs_Bat", extension="pdf")
+    #     # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RpvGenVec,"$R_{pv,gen}$",cost.pvAreaVec,"PvPeak [kW]","RpvGen_vs_Bat", extension="pdf")
+    #
+    #     # cost.printDataFile()
