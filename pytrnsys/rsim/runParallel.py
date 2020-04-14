@@ -50,6 +50,12 @@ def getCpuHexadecimal(cpu):
     elif(cpu==6): return 20
     elif(cpu==7): return 40
     elif(cpu==8): return 80
+    elif (cpu == 9):
+        return 100
+    elif (cpu == 10):
+        return 200
+    elif (cpu == 11):
+        return 400
     else:
         raise ValueError("CPU not existent:%d"%cpu)
         
