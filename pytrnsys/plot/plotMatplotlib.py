@@ -906,7 +906,7 @@ class PlotMatplotlib():
             for b in bar:
                 allbar.append(b[0])
 
-            plot.legend(allbar, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+            lgd=plot.legend(allbar, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
             namePdf = '%s.%s' % (nameFile, self.extensionPlot)
             nameWithPath = '%s\%s' % (self.path, namePdf)
@@ -921,13 +921,13 @@ class PlotMatplotlib():
             if ylims is not None:
                 plt.ylim(ylims)
 
-            plt.savefig(nameWithPath)
+            plt.savefig(nameWithPath, bbox_extra_artists=(lgd,), bbox_inches='tight')
 
             if (plotEmf):
                 nameEmf = '%s.jpg' % nameFile
                 nameEmfWithPath = '%s\%s' % (self.path, nameEmf)
 
-                plt.savefig(nameEmfWithPath)
+                self._plot_as_emf(fig,filename=nameEmfWithPath)
 
             plt.close()
 
