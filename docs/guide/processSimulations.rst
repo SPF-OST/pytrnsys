@@ -1,7 +1,7 @@
-.. _runSimulations:
+.. _processSimulations:
 
 -------------------
-Running Simulations
+Processing Simulations
 -------------------
 
 The idea of the config files is to include general functionality without having to type python code for the user.
@@ -13,12 +13,15 @@ Thus, this config file will grow as long as users believe some functionality is 
 2. Python code
 ----------------------
 
-The simulation specified in the :ref:`config-file <configFile>` can be started with the following python code::
+The processing specified in the :ref:`config-file <configFile>` can be started with the following python code::
 
  
-   import pytrnsys.rsim.runParallelTrnsys as runTrnsys
-   import os
+	from pytrnsys.psim import processParallelTrnsys as pParallelTrnsys
 
-   pathConfig  = "pathToTheConfigFile"
-   configFile = "DualRun.config"
-   runTool = runTrnsys.RunParallelTrnsys(pathConfig,configFile=configFile)
+	if __name__ == '__main__':
+		pathBase = os.getcwd()
+
+		tool = pParallelTrnsys.ProcessParallelTrnsys()
+		tool.readConfig(pathBase,"process.config")
+		tool.process()
+

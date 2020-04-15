@@ -12,5 +12,6 @@ For more details checkout the :any:`reference <pytrnsys>`.
    :maxdepth: 3
 
    runSimulations
+   processSimulations
    configfile
    
