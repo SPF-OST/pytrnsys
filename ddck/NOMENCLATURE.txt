@@ -1,0 +1,101 @@
+
+dtSim !simulation time step
+TIME  ! hour of the simulation
+
+*********************
+****FLUID PROPERTIES
+*********************
+
+CPBRI     ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 °C Tyfocor LS
+RHOBRI   ! density Glycol [kg/m³]; Value for an average pipe temperature with 55 °C Tyfocor L
+CPWAT   ! spec. heat of Water [kJ/kgK] at 20 °C
+RHOWAT   ! density of Water  [kg/m³] at20 °C
+LAMWAT   ! heat conductivity W/(mK) 
+CPWAT_SI  ! J/(kgK)    
+CPBRI_SI  ! J/(kgK)    
+
+
+*******************
+****WEATHER DATA
+*******************
+
+tAmbDry       !Ambient temperature °C
+relHum  	  ! Relative humidity
+vWind         ! Wind velocity [m/s]
+dirWind       ! Wind direction, north = 0, east = 90°, etc. [°]
+pAmb_Pa       ! ambient pressure [Pa]
+AISZ    ! Solar zenith angle
+AISA    ! Solar azimuth angle
+IT_H    ! total irradiation on the horizontal, kJ/hm2
+IB_H    ! beam radiation on horizontal, kJ/hm2
+ID_H    ! sky diffuse radiation on horizontal, kJ/hm2
+AI_H    ! angle of incidence on the horizontal, °
+**surface-1
+IT_N      !NORTH 90° 
+AI_N      
+IB_N     
+**surface-2
+IT_S     !SOUTH 90°
+IB_S     
+ID_S      
+AI_S     
+**surface-3
+IT_E !EAST 90°
+IB_E  
+ID_E  
+AI_E 
+**surface-4
+IT_W    !WEST 90°
+IB_W     
+ID_W 
+AI_W     
+**surface-5
+IT_surfUser_1 
+IB_surfUser_1 
+ID_surfUser_1 
+IDS_surfUser_1
+IDG_surfUser_1
+AI_surfUser_1 
+**surface-6
+IT_surfUser_2 
+IB_surfUser_2 
+ID_surfUser_2 
+IDS_surfUser_2
+IDG_surfUser_2
+AI_surfUser_2 
+**surface7
+IT_surfUser_3 
+IB_surfUser_3 
+ID_surfUser_3 
+AI_surfUser_3 
+**surface7
+IT_surfUser_4 
+IB_surfUser_4 
+ID_surfUser_4 
+AI_surfUser_4 
+
+**pamb_kPa = pamb_Pa/1000     ! ambient pressure [kPa]
+**pamb_atm = pamb_kPa/101.325     ! Ambient pressure [atm]
+**pamb_bar = pamb_kPa/100     ! Ambient pressure [bar]
+**pamb_mbar = pamb_bar*1000    !mbar, Ambient pressure [mbar]
+
+Tsky      ! effective sky temperature (°C)    
+**dTsky = Tsky-Tamb     ! delta-T from sky to ambient (K)
+
+**tAmb_Met     
+**tAmbDewPoint 
+**RHamb_100    ! Relative humidity [0..100]
+tAmb         ! Psychrometrics:Dry bulb temperature
+TambAvg 
+**RHamb_1      
+Tcw          !  Temperature shift cold water, K . We avoid below 0 °C
+
+
+TcwAvg    
+**TURN = 0.0     
+**AA_N = 180.0 + TURN     
+**AA_S = TURN     
+**AA_E = 270.0      
+**AA_W = 90.0 + TURN     
+**groundRef = 0.2
+**slope90 = 90.0
