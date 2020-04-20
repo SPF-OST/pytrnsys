@@ -86,7 +86,11 @@ class LatexReport():
         self.email = _name    
     
     def setTitle(self,_name):
-        self.title = _name
+        if "_" in _name:
+            newName = _name.replace("_", "\_")
+        else:
+            newName = _name
+        self.title = newName
         
     def setSubTitle(self,_name):
         self.subTitle = _name
