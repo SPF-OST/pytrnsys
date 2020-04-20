@@ -458,14 +458,27 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
     """
         Adds a monthly printer in the deck using the energy balance variables.
         It also calulates the most common KPI such as monthly and yearly SPF
+        
+        Change JS: Calculate Energy Balance on monthly basis.
     """
 
     # size = len(self.qBalanceIn)+len(self.qBalanceOut)+len(self.elBalanceIn)+len(self.elBalanceOut)
+    
+    ImbalanceString = 'qImb = '
+    
+    for q in eBalance:
+        if 'qSysOut' in q:
+            ImbalanceString += ' - ' + q
+            
+        elif 'qSysIn' in q:
+            ImbalanceString += ' + ' + q
 
     lines = []
     line = "***************************************************************\n";lines.append(line)
     line = "**BEGIN Energy Balance printer automatically generated from DDck files\n";lines.append(line)
     line = "***************************************************************\n";lines.append(line)
+    line = "EQUATIONS 1\n";lines.append(line)
+    line = ImbalanceString + '\n';lines.append(line)
     line = "CONSTANTS 1\n";lines.append(line)
     line = "unitPrintEBal=%d\n"%unit;lines.append(line)
     line = "ASSIGN temp\ENERGY_BALANCE_MO.Prt unitPrintEBal\n";lines.append(line)
@@ -477,8 +490,8 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
     line = "-1 !4 -1: monthly integration\n";lines.append(line)
     line = "1  !5 number of outputs to avoid integration\n";lines.append(line)
     line = "1  !6 output number to avoid integration\n";lines.append(line)
-    line = "INPUTS %d\n"%(len(eBalance)+1);lines.append(line)
-    allvars = "TIME "+" ".join(eBalance)
+    line = "INPUTS %d\n"%(len(eBalance)+2);lines.append(line)
+    allvars = "TIME "+" ".join(eBalance) + ' qImb'
     line = "%s\n"%allvars;lines.append(line)
     line = "*******************************\n";lines.append(line)
     line = "%s\n"%allvars;lines.append(line)
