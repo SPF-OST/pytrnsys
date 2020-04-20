@@ -74,11 +74,12 @@ dtPrUser  = dtSim     ! timestep of user defined printer
 ***Generic Constants            ******
 **************************************
 
-CONSTANTS 4  
+CONSTANTS 5 
 versionDeck = 1 !can be changed from config file to adapt processes and so on
 PI   = 3.1415926     
 Zero = 0
 Nix  = 0
+notused  = 0
 
 ************************************** 
 ***Constant fluid properties    ******

@@ -47,9 +47,9 @@ actualMonth=[100,10]  !Starts at 1=January
 auxStoreDHWIsOn = GT([100,11],0.5) 
 auxStoreSHIsOn  = GT([100,12],0.5) 
 
-	*****************************************************************************
-	** BLOCK OUTPUTS (to check if something was blocked internally***************
-	*****************************************************************************
+*****************************************************************************
+** BLOCK OUTPUTS (to check if something was blocked internally***************
+*****************************************************************************
 
 BlockHpType = GT([100,13],0.5)     
 BlockSeriesType = GT([100,14],0.5)     
