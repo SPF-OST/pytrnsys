@@ -189,6 +189,8 @@ class ProcessTrnsysDf():
         if "plotQvsTconfigured" in self.inputs.keys():
             filename = os.path.join(self.tempFolder, "QVsTh.hr")
             if (os.path.isfile(filename)):
+
+           # if (self.houDataDf.contains(pattern)):
                 QvsTDf = self.houDataDf
                 print("hourlyUsed")
             else:
