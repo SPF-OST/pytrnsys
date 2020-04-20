@@ -1,0 +1,91 @@
+
+*******************************
+**BEGIN ground_temp.ddck 
+*******************************
+
+*****************************************
+** Contact person : Dani Carbonell    
+** Creation date  : 05.02.2019
+** Last changes   : 15.04.2020 DC 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Calculation of the ground temperature for ground pipe and building losses/gains.
+** TODO: we should make one type for ground temperatures only and the other for ground building losses.
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+***********************************
+** outputs to other ddck
+***********************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+***********************************
+** Dependencies with other ddck
+***********************************
+   	
+EQUATIONS 3
+myTambAvg = TambAvg ! Average ambient temperature over the year (°C)
+mydTambAmpl = dTambAmpl ! Amplitude of sine-curve that fits ambient temp. over the year (K)
+mytTambShift = tTambShift ! time shift for coldest average temp. according to sine-curve fit (h)
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS 3     
+Tgrd1 = [55,1]     
+Tgrd2 = [55,2]     
+Tgrd5 = [55,3]     
+
+***********************************
+*** TYPE 985 
+***********************************
+
+CONSTANTS 4     ! Ground Properties
+lamGrd = 2     ! Thermal ground conductivity (W/mK)
+RhoGrd = 2500     ! Density of the ground (kg/m3)
+CpGrd = 0.8     ! specific heat of the ground (kJ/kgK)
+Gt = 0.025     ! Geothermal gradient (K/m)
+     
+CONSTANTS 5     ! Inputs for Undisturbed Ground temperature calculation and ground coupling losses
+zGrd1 = 1     ! depth 1 for evaluation of undisturbed ground temperature (m)
+zGrd2 = 2     ! depth 2 for evaluation of undisturbed ground temperature (m)
+zGrd5 = 5     ! depth 3 for evaluation of undisturbed ground temperature (m)
+Psi = 0     ! Linear thermal transmittance associated with wall/floor junction (W/mK)
+dummy = 1  ! to avoid NAN     
+        
+UNIT 55 TYPE 985     ! Undisturbed Ground Temperature and Ground Coupling
+PARAMETERS 17     
+myTambAvg      ! 1: Average ambient temperature over the year (°C)
+mydTambAmpl     ! 2: amplitude of sine-curve that fits ambient temp. over the year (K)
+mytTambShift     ! 3: time shift for coldest average temp. according to sine-curve fit (h)
+lamGrd     ! 4: Thermal ground conductivity (W/mK)
+RhoGrd     ! 5: Density of the ground (kg/m3)
+CpGrd     ! 6: specific heat of the ground (kJ/kgK)
+Gt     ! 7: Geothermal gradient (K/m)
+zGrd1     ! 8: depth 1 for evaluation of undisturbed ground temperature (m)
+zGrd2     ! 9: depth 2 for evaluation of undisturbed ground temperature (m)
+zGrd5     ! 10: depth 3 for evaluation of undisturbed ground temperature (m)
+dummy!notUsed TiAvg      11: average inside temperature over the year (°C)
+dummy!notUsed dTi      12: amplitude of sine-curve that fits inside temp. over the year (K)
+dummy!notUsed lFl      13: lenght of building floor in contact with ground (m)
+dummy!notUsed bFl      14: width of building floor in contact with ground (m)
+dummy!notUsed w      15: width of sidewalls of floor (m)
+dummy!notUsed RGrTot      16: total thermal resistance of floor (Km2/W)
+dummy!notUsed Psi      17: Linear thermal transmittance associated with wall/floor junction (W/mK)
+*** No variables for this Type     
+     
+     

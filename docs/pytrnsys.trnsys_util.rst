@@ -60,6 +60,14 @@ pytrnsys.trnsys\_util.readTrnsysFiles module
    :undoc-members:
    :show-inheritance:
 
+pytrnsys.trnsys\_util.trnsysComponent module
+--------------------------------------------
+
+.. automodule:: pytrnsys.trnsys_util.trnsysComponent
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------
