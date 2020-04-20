@@ -22,6 +22,3 @@ The simulation specified in the :ref:`config-file <configFile>` can be started w
    pathConfig  = "pathToTheConfigFile"
    configFile = "DualRun.config"
    runTool = runTrnsys.RunParallelTrnsys(pathConfig,configFile=configFile)
-
-3. Example
-----------------------

@@ -1,0 +1,171 @@
+*******************************
+**BEGIN DHW.dck
+*******************************
+
+*****************************************
+** Domestic Hot Water section. V0
+** Last Changes: Dani Carbonell        
+** Date: 30.09.2016    
+******************************************
+  
+ASSIGN PATH$\ddck\demands\dhw\profiles\T44A38_DHW_load_year_V2.txt 21     ! water draw profile
+
+
+CONSTANTS 1
+scaleDHW = 1
+   
+EQUATIONS 2
+Pdhw_kW = MfrDww*(TdWW-Tcw)*CPWAT/3600                ! DHW-consumption power [kW]
+PdhwTheoretic_kW = MfrDww*(TdhwSet-Tcw)*CPWAT/3600    ! DHW-consumption power [kW]
+
+EQUATIONS 3     
+**TSDi = [21,1]                          ! temperature of DHW loop to heat store [°C]
+**MfrSD = [21,2]     ! mass flow of DHW loop to heat store [kg/hr]  
+TdWW = TPiDHWDemand ![22,1]     ! Warm water supply temperature from WW heat exchanger or mixing valve [°C]
+PelPuDHW_kW = 0     ! Electricity consumption of DHW pump! [kW]
+MfrDww = ABS(MfrPiDHWDemand) ! Mass flow on consumption side mixed down, kg/h 
+     
+EQUATIONS 1     !
+dtDHWdata = 1/30     ! timestep of DHW data-file
+**     !
+UNIT 16 TYPE 9     ! Data Reader Water DrawOff
+PARAMETERS 26     !
+6     ! 1 Mode
+2     ! 2 Header Lines to Skip
+5     ! 3 No. of values to read
+dtDHWdata    ! 4 Time interval of data
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+21           ! 9 Logical unit for input file
+-1           ! 10 Free format mode
+     
+EQUATIONS 4     
+** tDRdhw = [16,2]     ! hour of the day of this data reader JS: ERROR this doesn't work (doesn't give hour of the day, but is constantly increasing
+QDHWstd = [16,3]*3600     ! energy of this datareader  for this timestep [kWh] -> [kJ]
+MfrDHWreal = [16,4]     ! mass flow kg/h
+TdhwSet = GT(MfrDHWreal,0) * [16,5] + LE(MfrDHWreal,0) * 45     ! Set temperature for DHW, °C
+     
+EQUATIONS 6     
+TcwStd = 10     ! Standard cold water temperature (°C)
+QDHWloc = QDHWstd*(TdhwSet-Tcw)/(TdhwSet-TcwStd)     ! local average draw off energy [kJ]
+QDHWset = QDHWloc*(1+0.2*COS((time-ddTcwOffset*24)/8760*360))  ! local time dependent draw off energy [kJ]
+MfrDHWset = (QDHWset*scaleDHW)/dtDHWdata/(CpWat*(TdhwSet-Tcw)) ! mass flow of hot water draw off [kg/h]
+TdhwHxSet = TdhwSet+ 0.1               ! Setpoint for heat exchanger control (if present), °C
+PdhwIdeal_kW = QDHWset/dtDHWdata/3600  ! ideal draw off power, kW
+     
+    
+** CONSTANTS 1     
+** UaHxDHW = 19200     ! UA of dhw heat exchanger, SWEP Heat Exchanger B25Tx40  [kJ/hrK]
+**         
+** UNIT 23 TYPE 805     ! H X  -  D H W 
+** PARAMETERS 3     
+** CpWat     !1 CpHot sepcific heat of hot side fluid [kJ/kgK]
+** CpWat     !2 CpCold specific heat of cold side fluid [kJ/kgK]
+** 1400     !3 mMax   max allowed mass flow on primary side of hx [kg/h]
+** *     !4 mode
+** *     
+** INPUTS 5     
+** TPiDHW     !1 THW     Hot water inlet temperature   [C]
+** Tcw           !2 TCW     Cold water inlet temperature [C]
+** MfrDHWset     !3 mCold   mass flow on cold (secondary) side of HX [kg/h]
+** TdhwSet     !4 TD      Demanded hot water temperature [C]
+** UaHxDHW           !5 UAHX    overall heat transfer coefficient of the heat exchanger [kJ/hK]
+** *     
+** *** INITIAL INPUTS  ***     
+** 60 10 0 55  1000     
+** *     
+** *  Outputs     
+** * 1  THout  cold (primary side) outlet temparture back to store[C]     
+** * 2  MfrPri     mass flow on the primary side of the hx (Mdot_SH) [kg/h]     
+** * 3  TCout  hot (sedondary side) water outlet temperature (T_Frischwasser_hot) [C]     
+** * 4  MfrSec    mass flow on secondary side of HX [kg/h]     
+** * 5 Phx   heat transfer rate [kJ/hr]     
+** * 6  Eff    Effectiveness of heat exchanger [-]     
+     
+
+EQUATIONS 6     ! post calculations of DHW loop
+dTdhw = MAX(0,(TdhwSet-TdWW ))     ! missed temperature of warm water, K
+dTdhwStore = MAX(TdhwSet-T10Tes,0.)
+**TDHWBkp = TdWW +PSauxEl_kW/((Mfrdww+0.000000001)*CPWAT/3600)     
+TDHWBkp = TdWW
+dTdhwAux = MAX(0,(TdhwSet-TDHWBkp))     
+**PpenDHW_kW = 1.5*MfrDHWset*CPWAT*dTdhwAux/3600        ! Task 44 Penalty function of DHW from Task 44 [kW]
+PpenDHW_kW = 1.5*MfrDHWset*CPWAT*dTdhwStore/3600
+PhxDloss_kW = 0     ! losses of external DHW module, kW
+     
+
+UNIT 19 TYPE 65     ! Online Plotter DHW (Element OpDHW)
+PARAMETERS 12     
+10     ! 1 Nb. of left-axis variables
+10     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+300     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+10     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 20     
+TdhwSet TdWW Tcw  TSD1i  TSD1o  dTdhw MfrDww MfrPiTesDHWIn NIX MfrPiDHWDemand
+Pdhw_kW  PSD_kW  PpenDHW_kW  qAuxStoreDHW_KW  xFracMixDHW  xFracMixDHW auxStoreDHWIsOn T10Tes NIX  NIX
+**     
+TdhwSet TdWW Tcw  TSD1i  TSD1o  dTdhw MfrDww MfrPiTesDHWIn NIX MfrPiDHWDemand
+Pdhw_kW  PSD_kW  PpenDHW_kW  qAuxStoreDHW_KW  xFracMixDHW  xFracMixDHW auxStoreDHWIsOn T10Tes NIX  NIX
+**     
+LABELS  3     
+Temperatures     
+massFlow_and_Heat_transf     
+DHW     
+
+UNIT 20 TYPE 65     ! Online Plotter DHW (Element OpDHW)
+PARAMETERS 12     
+10     ! 1 Nb. of left-axis variables
+10     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+300     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+60     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 20     
+MfrMixDHW_A MfrMixDHW_B MfrMixDHW_C MfrPiTesDHWOut MfrPiDHWDemand NIX NIX NIX NIX NIX
+TPiTesDHWOut TPiDHWDemand  TMixDHW xFracMixDHW TroomStore TDHW TdhwSet dTdhw NIX NIX
+**     
+MfrMixDHW_A MfrMixDHW_B MfrMixDHW_C MfrPiTesDHWOut MfrPiDHWDemand NIX NIX NIX NIX NIX
+TPiTesDHWOut TPiDHWDemand  TMixDHW xFracMixDHW TroomStore TDHW TdhwSet dTdhw NIX NIX
+**     
+LABELS  3     
+Temperatures     
+massFlow
+DHW-Hyd
+
+
+ASSIGN    temp\DHW_MO.Prt      218     
+** ASSIGN    temp\Nothing_MO.Prt      -1     
+*     
+UNIT 218 Type 46     ! Printegrator Monthly Values for System
+PARAMETERS 6     
+218     ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+INPUTS 7     
+Time  Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW  PhxDloss_kW    PSD_kW         
+**  
+Time  Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW  PhxDloss_kW    PSD_kW         
+
+*******************************
+**END DHW.dck
+*******************************

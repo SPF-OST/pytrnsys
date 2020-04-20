@@ -72,7 +72,7 @@ class CostCalculationVar(mycost.CostCalculation):
 #                legends.append(self.group[i])
                 
 
-        self.nameCostPdf = self.plotCostShare(inVar,legends,"costShare"+"-"+self.fileName,sizeFont=30,plotJpg=True,writeFile=False)
+        self.nameCostPdf = self.plotCostShare(inVar,legends,"costShare"+"-"+self.fileName,sizeFont=30,plotJpg=False,writeFile=False)
         
         
         
@@ -118,7 +118,7 @@ class CostCalculationVar(mycost.CostCalculation):
         
 #        self.annuity        
         
-        self.nameCostAnnuityPdf = self.plotCostShare(inVar,legends,"costShareAnnuity"+"-"+self.fileName,plotSize=17,sizeFont=30,plotJpg=True,writeFile=False)
+        self.nameCostAnnuityPdf = self.plotCostShare(inVar,legends,"costShareAnnuity"+"-"+self.fileName,plotSize=17,sizeFont=30,plotJpg=False,writeFile=False)
 
 
     def addComponent(self,name,size,base,var,varUnit,group,lifeTime):

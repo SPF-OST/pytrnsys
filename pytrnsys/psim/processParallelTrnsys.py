@@ -14,6 +14,9 @@ import copy
 import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import numpy as num
+import pandas as pd
+import seaborn as sns
+import pytrnsys.utils.costConfig as costConfig
 #we would need to pass the Class as inputs
 
 
@@ -411,6 +414,9 @@ class ProcessParallelTrnsys():
             for i in range(len(casesInputs)):
                 processDataGeneral(casesInputs[i])
                 
+        if 'cost' in self.inputs.keys():
+            self.calcCost()
+
         if 'comparePlot' in self.inputs.keys():
             self.plotComparison()
 
@@ -423,19 +429,33 @@ class ProcessParallelTrnsys():
         xAxisVariable = plotVariables[0]
         yAxisVariable = plotVariables[1]
         seriesVariable = ''
-        if len(plotVariables) == 3:
+        if len(plotVariables) >= 3:
             seriesVariable = plotVariables[2]
+        if len(plotVariables) == 4:
+            chunkVariable = plotVariables[3]
         plotXDict = {}
         plotYDict = {}
+
+        seriesColors = {}
+        colorsCounter = 0
+        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
         for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
             with open(file) as f_in:
                 resultsDict = json.load(f_in)
-            if resultsDict[seriesVariable] not in plotXDict.keys():
-                plotXDict[resultsDict[seriesVariable]] = [resultsDict[xAxisVariable]]
-                plotYDict[resultsDict[seriesVariable]] = [resultsDict[yAxisVariable]]
+            if resultsDict[seriesVariable] not in seriesColors.keys():
+                seriesColors[resultsDict[seriesVariable]]=colors[colorsCounter]
+                colorsCounter+=1
+            if resultsDict[chunkVariable] not in plotXDict.keys():
+                plotXDict[resultsDict[chunkVariable]] = {}
+                plotYDict[resultsDict[chunkVariable]] = {}
+                plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[xAxisVariable]]
+                plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[yAxisVariable]]
+            elif resultsDict[seriesVariable] not in plotXDict[resultsDict[chunkVariable]].keys():
+                plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[xAxisVariable]]
+                plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[yAxisVariable]]
             else:
-                plotXDict[resultsDict[seriesVariable]].append(resultsDict[xAxisVariable])
-                plotYDict[resultsDict[seriesVariable]].append(resultsDict[yAxisVariable])
+                plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(resultsDict[xAxisVariable])
+                plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(resultsDict[yAxisVariable])
 
         self.doc = latex.LatexReport('', '')
         if 'latexNames' in self.inputs.keys():
@@ -445,18 +465,56 @@ class ProcessParallelTrnsys():
 
         fig1 = plt.figure(1)
         ax1 = fig1.add_subplot(111)
-        for key in plotXDict.keys():
-            index = num.argsort(plotXDict[key])
-            labelValue=round(float(key),2)
-            ax1.plot(num.array(plotXDict[key])[index], num.array(plotYDict[key])[index], 'x-', label=f'{labelValue:.2f}')
-        ax1.legend(title=self.doc.getNiceLatexNames(seriesVariable))
+        styles = ['x-','x--','x-.','x:','o-','o--','o-.','o:']
+
+        dummy_lines = []
+        chunkLabels = []
+        labelSet = set()
+        for chunk,style in zip(plotXDict.keys(),styles):
+            dummy_lines.append(ax1.plot([],[],style,c='black'))
+            chunkLabel = round(float(chunk), 2)
+            chunkLabels.append("{:.2f}".format(chunkLabel))
+            for key in plotXDict[chunk].keys():
+                index = num.argsort(plotXDict[chunk][key])
+
+                labelValue=round(float(key),2)
+                if labelValue not in labelSet:
+                    label = "{:.2f}".format(labelValue)
+                    labelSet.add(labelValue)
+                else:
+                    label = ''
+                ax1.plot(num.array(plotXDict[chunk][key])[index], num.array(plotYDict[chunk][key])[index], style,color=seriesColors[key], label=label)
+
+        legend2=plt.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable),loc=4)
+        ax1.legend(title=self.doc.getNiceLatexNames(seriesVariable), loc=1)
         ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
         ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
+        ax1.add_artist(legend2)
         plt.tight_layout()
-        fig1.savefig(os.path.join(pathFolder, xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '.png'))
+        fig1.savefig(os.path.join(pathFolder, xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable+'.png'))
         plt.close()
 
-
+    def plotComparisonSeaborn(self):
+        pathFolder = self.inputs["pathBase"]
+        plotVariables = self.inputs['comparePlot']
+        if len(plotVariables) < 2:
+            raise ValueError(
+                'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
+        elif len(plotVariables) == 2:
+            plotVariables.extend([None,None])
+        elif len(plotVariables) == 3:
+            plotVariables.append([None])
+        
+        df = pd.DataFrame(columns=plotVariables)
+        for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
+            with open(file) as f_in:
+                resultsDict = json.load(f_in)
+            plotDict = {k: ["{:.2f}".format(resultsDict[k])] for k in plotVariables}
+            df = df.append(pd.DataFrame.from_dict(plotDict))
+        snsPlot = sns.lineplot(x=plotVariables[0],y=plotVariables[1],hue=plotVariables[2],style=plotVariables[3],palette=None,markers=True,data=df)
+        fig = snsPlot.get_figure()
+        name = '_'.join(plotVariables)
+        fig.savefig(os.path.join(pathFolder, name+'.png'), dpi=500)
 
     def changeFile(self,source,end):
 
@@ -471,3 +529,31 @@ class ProcessParallelTrnsys():
 
         if(found==False):
             print ("changeFile was not able to change %s by %s"%(source,end))
+
+    def calcCost(self):
+
+        path = self.inputs['pathBase']
+
+        costPath = self.inputs['cost']
+
+        dictCost = costConfig.costConfig.readCostJson(costPath)
+
+        # for name in names:
+        # path = os.path.join(pathBase, name)
+
+        small = 15
+        cost = costConfig.costConfig()
+        cost.setFontsizes(small)
+
+        cost.setDefaultData(dictCost)
+        cost.readResults(path)
+
+        cost.process(dictCost)
+
+
+        # cost.plotLines(cost.pvAreaVec,"PvPeak [kW]",cost.annuityVec,"Annuity [Euro/kWh]",cost.batSizeVec,"Bat-Size [kWh]", "Annuity_vs_PvPeak", extension="pdf")
+        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.annuityVec,"Annuity [Euro/kWh]",cost.pvAreaVec,"PvPeak [kW]","Annuity_vs_Bat", extension="pdf")
+        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RselfSuffVec,"$R_{self,suff}$",cost.pvAreaVec,"PvPeak [kW]","RselfSuff_vs_Bat", extension="pdf")
+        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RpvGenVec,"$R_{pv,gen}$",cost.pvAreaVec,"PvPeak [kW]","RpvGen_vs_Bat", extension="pdf")
+
+        # cost.printDataFile()

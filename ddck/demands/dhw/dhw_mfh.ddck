@@ -1,0 +1,159 @@
+*******************************
+**BEGIN dhw_mfh.ddck 
+*******************************
+
+*****************************************
+** Contact person : Dani Carbonell (DC)
+** Creation date  : 30.09.2016
+** Last changes   : 03.2020 DC
+*****************************************
+
+***************************************************************************
+** Description: 
+** Domestic hot water profile for MFH
+** derived from LoadProfileGenerator 
+** see documentation in $$$$
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS 2
+TdWW = TPiDHWDemand ![22,1]     ! Warm water supply temperature from WW heat exchanger or mixing valve [°C]
+MfrDww = ABS(MfrPiDHWDemand) ! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+***********************************
+** outputs to other ddck
+***********************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+***********************************
+** Dependencies with other ddck
+***********************************
+  
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 1
+qSysOut_DhwDemand = Pdhw_kW
+
+*************************************************************************************************
+** Dependencies with other types
+*************************************************************************************************
+
+CONSTANTS 1
+TcwStd = TcwAvg   ! Standard cold water temperature (°C)   TcwAvg  from weatherData
+
+***********************************
+** outputs to other ddck
+***********************************
+EQUATIONS 1
+
+MfrDHWset = dtDhwCorrect*MfrDHWreal
+
+***********************************
+** Definition of DHW profile
+***********************************
+
+CONSTANTS 1
+unitReadDhw=21
+**ASSIGN PATH$\ddck\demands\dhw\profiles\DhwForMFH6appartments_2min_tset55.dat unitReadDhw     ! water draw profile
+ASSIGN PATH$\demands\dhw\profiles\DhwForMFH6appartments_2min_tset55.dat unitReadDhw     ! water draw profile
+
+CONSTANTS 2
+scaleDHW = 1
+dtDHWdata = 1/30.     ! timestep of DHW data-file
+   
+EQUATIONS 2
+Pdhw_kW = MfrDww*(TdWW-Tcw)*CPWAT/3600                ! DHW-consumption power [kW]
+PdhwTheoretic_kW = MfrDww*(TdhwSet-Tcw)*CPWAT/3600    ! DHW-consumption power [kW]
+
+CONSTANTS 1    
+PelPuDHW_kW = 0     ! Electricity consumption of DHW pump! [kW]
+     
+**
+UNIT 16 TYPE 9     ! Data Reader Water DrawOff
+PARAMETERS 26     !
+6     ! 1 Mode
+2     ! 2 Header Lines to Skip
+5     ! 3 No. of values to read
+dtDHWdata    ! 4 Time interval of data
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+unitReadDhw           ! 9 Logical unit for input file
+-1           ! 10 Free format mode
+     
+EQUATIONS 3     
+** tDRdhw = [16,2]      ! hour of the day of this data reader  JS: This was commented, because it doesn't work, tDRdhw is constantly increasing
+QDHWstd = [16,3]     ! energy of this datareader  for this time step [kWh] BE CAREFUL !!!
+MfrDHWreal = [16,4]  ! mass flow kg/h
+TdhwSetProfile = [16,5]     ! Set temperature for DHW, °C
+
+EQUATIONS 3
+dtDhwCorrect = (TdhwSet-TcwStd)/(TdhwSet-Tcw)
+TdhwHxSet = TdhwSet+ 0.1               ! Setpoint for heat exchanger control (if present), °C
+PdhwIdeal_kW = QDHWstd*dtDhwCorrect/dtDHWdata  ! ideal draw off power, kW
+        
+   
+
+EQUATIONS 5     ! post calculations of DHW loop
+dTdhwFlow = GT(MfrDHWset,0)*(TdhwSet-TdWW)     ! missed temperature of warm water, K
+**TDHWBkp = TdWW +PSauxEl_kW/((Mfrdww+0.000000001)*CPWAT/3600)     
+TDHWBkp = TdWW
+dTdhwAux = MAX(0,(TdhwSet-TDHWBkp))     
+**PpenDHW_kW = 1.5*MfrDHWset*CPWAT*dTdhwAux/3600        ! Task 44 Penalty function of DHW from Task 44 [kW]
+PpenDHW_kW = 1.5*MfrDHWset*CPWAT*dTdhwFlow/3600
+PhxDloss_kW = 0     ! losses of external DHW module, kW
+     
+**UNIT 19 TYPE 65     ! Online Plotter DHW (Element OpDHW)
+**PARAMETERS 12     
+**10     ! 1 Nb. of left-axis variables
+**10     ! 2 Nb. of right-axis variables
+**0     ! 3 Left axis minimum
+**300     ! 4 Left axis maximum
+**0     ! 5 Right axis minimum
+**10     ! 6 Right axis maximum
+**nPlotsPerSim     ! 7 Number of plots per simulation
+**12     ! 8 X-axis gridpoints
+**1     ! 9 Shut off Online w/o removing
+**-1     ! 10 Logical unit for output file
+**0     ! 11 Output file units
+**0     ! 12 Output file delimiter
+**INPUTS 20     
+**TdhwSet TdWW Tcw  TSD1i  TSD1o  dTdhwFlow TCircIn TCircOut MfrDww  MfrPiDHWDemand
+**Pdhw_kW  PSD_kW  PpenDHW_kW  qAuxStoreDHW_KW  xFracMixDHW  MfrDHWset auxStoreDHWIsOn MfrDww MfrPiMixDHW  PdhwIdeal_kW
+****     
+**TdhwSet TdWW Tcw  TSD1i  TSD1o  dTdhwFlow TCircIn TCircOut MfrDww  MfrPiDHWDemand
+**Pdhw_kW  PSD_kW  PpenDHW_kW  qAuxStoreDHW_KW  xFracMixDHW  MfrDHWset auxStoreDHWIsOn MfrDww MfrPiMixDHW  PdhwIdeal_kW
+****     
+**LABELS  3     
+**Temperatures     
+**massFlow_and_Heat_transf     
+**DHW     
+
+
+*******************************
+**END DHW-MFH.ddck
+*******************************

@@ -29,6 +29,8 @@ import pytrnsys.plot.plotBokeh as pltB
 from string import ascii_letters, digits, whitespace
 import locale
 import re
+# import pytrnsys_spf.psim.costConfig as costConfig
+
 
 # from collections import OrderedDict
 
@@ -121,6 +123,8 @@ class ProcessTrnsysDf():
         self.process()
         self.doLatexPdf()
         self.addResultsFile()
+        # if "cost" in self.inputs.keys():
+        #     self.calcCost()
 
     def setLoaderParameters(self):
 
@@ -157,11 +161,13 @@ class ProcessTrnsysDf():
         self.deckData = self.deck.getAllDataFromDeck()
 
         self.yearlySums = {value+'_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
+        self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
 
 
         self.calcConfigEquations()
 
         self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
+        self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
         self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
         print ("loadFiles completed using SimulationLoader")
@@ -362,16 +368,24 @@ class ProcessTrnsysDf():
 
     def calcConfigEquations(self):
         for equation in self.inputs['calc']:
-            namespace = {**self.deckData,**self.__dict__,**self.yearlySums}
+            namespace = {**self.deckData,**self.__dict__,**self.yearlySums,**self.yearlyMax}
             expression = equation.replace(' ','')
             exec(expression,globals(),namespace)
             self.deckData = namespace
             print(expression)
         for equation in self.inputs["calcMonthly"]:
-            kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
+            scalars = kwargs['local_dict'].keys()
+            splitEquation = equation.split('=')
+            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
+            parts = re.split(r'[*/+-]', parsedEquation.replace(r'(', '').replace(r')', ''))
+            for scalar in scalars:
+                if scalar in parts:
+                    equation = equation.replace(scalar,'@'+scalar)
             self.monDataDf.eval(equation,inplace=True,**kwargs)
+            self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         for equation in self.inputs["calcHourly"]:
-            kwargs = {"local_dict": {**self.deckData,**self.yearlySums}}
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
             self.houDataDf.eval(equation, inplace=True, **kwargs)
 
 
@@ -749,7 +763,7 @@ class ProcessTrnsysDf():
             print("creating results.json file")
 
             self.resultsDict = {}
-            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums}
+            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax}
             for key in self.inputs['results']:
                 if type(jointDicts[key]) == num.ndarray:
                     value = list(jointDicts[key])
@@ -782,4 +796,32 @@ class ProcessTrnsysDf():
                     os.remove(svg_filepath)
             except:
                 raise ValueError('Inkscape path is not set correctly.')
-                
+
+    # def calcCost(self):
+    #
+    #     path = self.inputs['pathBase']
+    #
+    #     costPath = self.inputs['cost']
+    #
+    #     dictCost = costConfig.costConfig.readCostJson(costPath)
+    #
+    #     # for name in names:
+    #     # path = os.path.join(pathBase, name)
+    #
+    #     small = 15
+    #     cost = costConfig.costConfig()
+    #     cost.setFontsizes(small)
+    #
+    #     cost.setDefaultData(dictCost)
+    #     cost.readResults(path)
+    #
+    #     cost.process(dictCost)
+    #
+    #     cost.addCostToJson()
+    #
+    #     # cost.plotLines(cost.pvAreaVec,"PvPeak [kW]",cost.annuityVec,"Annuity [Euro/kWh]",cost.batSizeVec,"Bat-Size [kWh]", "Annuity_vs_PvPeak", extension="pdf")
+    #     # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.annuityVec,"Annuity [Euro/kWh]",cost.pvAreaVec,"PvPeak [kW]","Annuity_vs_Bat", extension="pdf")
+    #     # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RselfSuffVec,"$R_{self,suff}$",cost.pvAreaVec,"PvPeak [kW]","RselfSuff_vs_Bat", extension="pdf")
+    #     # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RpvGenVec,"$R_{pv,gen}$",cost.pvAreaVec,"PvPeak [kW]","RpvGen_vs_Bat", extension="pdf")
+    #
+    #     # cost.printDataFile()
