@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as num
 import pandas as pd
 import seaborn as sns
-import pytrnsys_spf.psim.costConfig as costConfig
+import pytrnsys.utils.costConfig as costConfig
 #we would need to pass the Class as inputs
 
 
