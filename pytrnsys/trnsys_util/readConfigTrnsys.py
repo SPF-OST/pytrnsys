@@ -70,8 +70,6 @@ class ReadConfigTrnsys():
         if "calc" not in inputs:
             inputs["calc"]=[]
 
-        if "plotT" not in inputs:
-            inputs["plotT"]=[]
 
         if (parseFileCreated):
             parsedFile = "%s.parse.dat" % configFile
@@ -107,10 +105,19 @@ class ReadConfigTrnsys():
                 else:
                     inputs[splitLine[1]] = splitLine[2][1:-1] #I delete the "
             elif (splitLine[0] == "stringArray"):
-                inputs[splitLine[1]] = []
-                for i in range(len(splitLine)-2):
-                    strEl = splitLine[i+2][1:-1] #I delete the "
-                    inputs[splitLine[1]].append(strEl)
+                if splitLine[1]  not in inputs.keys():
+                    inputs[splitLine[1]] = []
+                    for i in range(len(splitLine)-2):
+                        strEl = splitLine[i+2][1:-1] #I delete the "
+                        inputs[splitLine[1]].append(strEl)
+                else:
+                    inputs[splitLine[1]] = [inputs[splitLine[1]]]
+                    newElement = []
+                    for i in range(len(splitLine)-2):
+                        strEl = splitLine[i+2][1:-1] #I delete the "
+                        newElement.append(strEl)
+                    inputs[splitLine[1]].append(newElement)
+                    
 
             elif (splitLine[0]== "calcMonthly"):
                 inputs["calcMonthly"].append(" ".join(splitLine[1:]))

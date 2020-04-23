@@ -192,7 +192,7 @@ class CreateTrnsysDeck():
                 for nvar in range(len(self.variations)):
 
                     valuesOfVariationInFile = self.variations[nvar][j]
-                    if '*' in valuesOfVariationInFile:
+                    if '*' in str(valuesOfVariationInFile):
                         valuesOfVariationInFile=valuesOfVariationInFile.replace('*','x')
                         variationsLine = variationsLine +self.variations[nvar][0]+ valuesOfVariationInFile
                     else:
