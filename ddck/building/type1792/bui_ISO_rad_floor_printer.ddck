@@ -67,12 +67,12 @@ unitPrinterBui ! 1: Logical unit number, -
 -1             ! 4: Printing & integrating interval, h. -1 for monthly integration
 1              ! 5: Number of inputs to avoid integration, -
 1              ! 6: Output number to avoid integration
-INPUTS 17
+INPUTS 18
 Time  PheatBui_kW  PRdIn_kW PBuiGrd_kW PBuiLight_kW PbuiGainPers_KW PBuiGainEq_KW PBuiSol_kW PBuiGains_KW  
-PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW NIX NIX QAcumRadiator PAcumBui_kW PBuiGainCircLoss_KW
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PcoolBui_kW NIX QAcumRadiator PAcumBui_kW PBuiGainCircLoss_KW dTsc
 ***************
 Time  PheatBui_kW  PRdIn_kW PBuiGrd_kW PBuiLight_kW PbuiGainPers_KW PBuiGainEq_KW PBuiSol_kW PBuiGains_KW  
-PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW NIX NIX QAcumRadiator PAcumBui_kW PBuiGainCircLoss_KW
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PcoolBui_kW NIX QAcumRadiator PAcumBui_kW PBuiGainCircLoss_KW dTsc
 
 
 **ASSIGN    temp\Bui_HO.Prt      217     
