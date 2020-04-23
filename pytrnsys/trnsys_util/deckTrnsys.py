@@ -454,6 +454,8 @@ class DeckTrnsys():
                         try:
                             finalValue = eval(value, self.deckVariables)
                             self.deckVariables[name] = float(finalValue)
+                            if len(parts)==2 and re.split(r'[*]',value)==2:
+                                self.deckVariables[name+'_factor']=float(parts[1])
                         except:
                             pass
         return self.deckVariables

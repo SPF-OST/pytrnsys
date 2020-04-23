@@ -20,11 +20,14 @@ def getCityFromConfig(lines):
     for line in lines:
         if "City" in line:
             cityLine = line
+            weatherFile = cityLine.split("City")[1]
+            city = weatherFile.split("_")[0]
             break
         else:
+            weatherFile = 'NoCity'
+            city = 'NoCity'
             pass
-    weatherFile = cityLine.split("City")[1]
-    city = weatherFile.split("_")[0]
+
 
     return weatherFile, city
 

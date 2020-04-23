@@ -192,22 +192,25 @@ class CreateTrnsysDeck():
                 for nvar in range(len(self.variations)):
 
                     valuesOfVariationInFile = self.variations[nvar][j]
+                    if '*' in valuesOfVariationInFile:
+                        valuesOfVariationInFile=valuesOfVariationInFile.replace('*','x')
+                        variationsLine = variationsLine +self.variations[nvar][0]+ valuesOfVariationInFile
+                    else:
+                        # If I write variation = ["","","GFX",...] then I add the name to the deck but no variation is used
+                        if (len(self.variations[nvar][0]) == 0 and len(self.variations[nvar][1]) == 0):
+                            if valuesOfVariationInFile - int(valuesOfVariationInFile) == 0:
+                                variationsLine = variationsLine + "-%i" % int(valuesOfVariationInFile)
+                            else:
+                                variationsLine = variationsLine + "-%.4f" % float(valuesOfVariationInFile)
 
-                    # If I write variation = ["","","GFX",...] then I add the name to the deck but no variation is used
-                    if (len(self.variations[nvar][0]) == 0 and len(self.variations[nvar][1]) == 0):
-                        if valuesOfVariationInFile - int(valuesOfVariationInFile) == 0:
-                            variationsLine = variationsLine + "-%i" % int(valuesOfVariationInFile)
-                        else:
-                            variationsLine = variationsLine + "-%.4f" % float(valuesOfVariationInFile)
-
-                    # If I write variation = ["","useCovered",0,1] then no value is printed
-                    elif (len(self.variations[nvar][0]) > 0):
-                        if float(valuesOfVariationInFile).is_integer():
-                            variationsLine = variationsLine + "-%s%i" % (
-                                self.variations[nvar][0], int(valuesOfVariationInFile))
-                        else:
-                            variationsLine = variationsLine + "-%s%.4f" % (
-                            self.variations[nvar][0], float(valuesOfVariationInFile))
+                        # If I write variation = ["","useCovered",0,1] then no value is printed
+                        elif (len(self.variations[nvar][0]) > 0):
+                            if float(valuesOfVariationInFile).is_integer():
+                                variationsLine = variationsLine + "-%s%i" % (
+                                    self.variations[nvar][0], int(valuesOfVariationInFile))
+                            else:
+                                variationsLine = variationsLine + "-%s%.4f" % (
+                                self.variations[nvar][0], float(valuesOfVariationInFile))
 
                 nameDeck = "%s%s" % (self.case, variationsLine)
 

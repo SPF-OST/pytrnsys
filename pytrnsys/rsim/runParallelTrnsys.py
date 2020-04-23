@@ -19,6 +19,8 @@ import shutil
 import sys
 import imp
 import warnings
+import json
+from copy import deepcopy
 
 # from sets import Set
 
@@ -161,6 +163,7 @@ class RunParallelTrnsys():
     def runConfig(self):
         """
         Runs the cases defined in the config file
+        
         Returns
         -------
 
@@ -178,11 +181,18 @@ class RunParallelTrnsys():
                 #It actually loops around the changed files and then execute the parameters variations for each
                 #so the definitons of two weathers will run all variations in two cities
                 nameBase = self.nameBase
+                self.unscaledVariables = deepcopy(self.variablesOutput)
                 for i in range(len(self.sourceFilesToChange)):
                     sourceFile = self.sourceFilesToChange[i]
                     for j in range(len(self.sinkFilesToChange[i])):
                         sinkFile = self.sinkFilesToChange[i][j]
                         self.changeDDckFile(sourceFile,sinkFile)
+                        if "scalingVariable" in self.inputs.keys() and "scalingReference" in self.inputs.keys():
+                            if 'changeScalingFile' in self.inputs.keys():
+                                self.scaleVariables(self.inputs['scalingReference'], self.inputs['changeScalingFile'][0], self.inputs['changeScalingFile'][j+1])
+                            else:
+                                self.scaleVariables(self.inputs['scalingReference'],sourceFile,sinkFile)
+
                         sourceFile=sinkFile #for each case the listddck will be changed to the new one, so we need to compare with the updated string
 
                         if (self.foldersForDDckVariationUsed == True):
@@ -192,8 +202,8 @@ class RunParallelTrnsys():
                             if not os.path.isdir(self.path):
                                 os.mkdir(self.path)
                         else:
-
                             self.nameBase = nameBase+'-'+os.path.split(sourceFile)[-1]
+
                         self.buildTrnsysDeck()
                         self.createDecksFromVariant()
 
@@ -311,8 +321,9 @@ class RunParallelTrnsys():
 
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck,self.pathDdck)
+        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck)
         deck.readDeckList(doAutoUnitNumbering=self.inputs['doAutoUnitNumbering'],dictPaths=self.dictDdckPaths)
+        deck.createDependencyGraph()
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
         deck.writeDeck(addedLines=deckExplanation)
@@ -335,8 +346,17 @@ class RunParallelTrnsys():
 
     def addParametricVariations(self,variations):
         """
-            it fills a variableOutput with a list of all variations to run
-            format <class 'list'>: [['Ac', 'AcollAp', 1.5, 2.0, 1.5, 2.0], ['Vice', 'VIceS', 0.3, 0.3, 0.4, 0.4]]
+        it fills a variableOutput with a list of all variations to run
+        format <class 'list'>: [['Ac', 'AcollAp', 1.5, 2.0, 1.5, 2.0], ['Vice', 'VIceS', 0.3, 0.3, 0.4, 0.4]]
+
+        Parameters
+        ----------
+        variations : list of list
+            list object containing the variations to be used.
+
+        Returns
+        -------
+
         """
 
         if(self.inputs["combineAllCases"]==True):
@@ -448,7 +468,6 @@ class RunParallelTrnsys():
             warnings.warn("change File was not able to change %s by %s"%(source,end))
 
     def changeDDckFile(self,source,end):
-
         """
         It uses the  self.listDdck readed by readConfig and change the lines from source to end.
         This is used to change a ddck file readed for another. A typical example is the weather data file
@@ -470,21 +489,18 @@ class RunParallelTrnsys():
             # print Warning("change File was not able to change %s by %s"%(source,end))
             warnings.warn("change File was not able to change %s by %s"%(source,end))
 
-    def getConfig(self,pathDdck=None,pathDdck2=None):
+    def getConfig(self):
         """
-        TODO: remove arguments pathDdck,pathDdck2 (deprecated)
+        Reads the config file.
+
         Parameters
         ----------
-        pathDdck :
-        pathDdck2
 
         Returns
         -------
 
         """
 
-        self.pathDdck = pathDdck
-        self.pathDdck2 = pathDdck2
 
         # The vector self.inputs used in python has been filled. Now other variables for Trnsys will be filled
 
@@ -588,10 +604,7 @@ class RunParallelTrnsys():
 
 
 
-        if(not(self.inputs["scaling"] in ["off",None,False,'False','None'])):
-            self.weatherFile,self.cityRef=readConfig.getCityFromConfig(self.lines)
-            self.setReferenceCase(self.inputs["pathRef"], self.inputs["nameRef"], self.weatherFile)
-            self.scaleVariables()
+
 
     def copyConfigFile(self,configPath,configName):
 
@@ -603,43 +616,28 @@ class RunParallelTrnsys():
         print("copied config file to: %s"% dstPath)
 
 
-    def setReferenceCase(self,pathRef,nameRefCase,cityRef):
-        self.pathRef = pathRef
-        self.nameRefCase = nameRefCase
-        self.cityRef = cityRef
+    def scaleVariables(self,reference,source,sink):
+        """
 
-    def getScalingFactor(self,pathRef,nameRefBase,scaling,case):
+        Parameters
+        ----------
+        reference : str
+            File path of the reference results file. Has to point to a json-File with the pytrnsys resuls file format
+        source : str
+            Substring to be replaced in reference
+        sink : str
+            String to replace the substrings in the reference
 
-        loadDemand = 0
-        if scaling == "toNormalDemand":
-            resultFile = open("%s\\%s-" % (pathRef, nameRefBase) + \
-                              case[:3] + "_dryN\\%s-" % (nameRefBase) + case[:3] + "_dryN-results.dat", "r")
-            loadDemand = float(resultFile.readlines()[10].split()[1]) / 1000.
-            resultFile.close()
+        Returns
+        -------
 
-        elif scaling == "toDemand":
-            resultFile = open("%s\\%s-" % (pathRef, nameRefBase) + \
-                              case + "\\%s-" % (nameRefBase) + case + "-results.dat", "r")
-            loadDemand = float(resultFile.readlines()[10].split()[1]) / 1000.
-            resultFile.close()
-        else:
-            loadDemand = 1.
+        """
+        resultFile = reference.replace(source, sink)
+        with open(resultFile) as f_in:
+            resultsDict = json.load(f_in)
 
-        return loadDemand
-
-    def calculateScalingFactor(self,scaling):
-
-        self.loadDemand = self.getScalingFactor(self.pathRef,self.nameRefCase,scaling,self.cityRef)
-
-    def scaleVariables(self,option=None):
-
-        ###############SCALING WHEN NEEDED########################
-        if option==None:
-            self.loadDemand = self.getScalingFactor(self.pathRef,self.nameRefCase,self.inputs["scaling"],self.cityRef)
-        else:
-            self.loadDemand = self.getScalingFactor(self.pathRef, self.nameRefCase, self.inputs["scaling"],
-                                                    self.inputs["addResultsFolder"]+"_"+option)
-
+        exec('scalingVariable=' + self.inputs['scalingVariable'], globals(), resultsDict)
+        loadDemand = resultsDict['scalingVariable']
         for j in range(len(self.variablesOutput)):
             for i in range(2, len(self.variablesOutput[j]), 1):
-                self.variablesOutput[j][i] = round(self.variablesOutput[j][i] * self.loadDemand, 3)
+                self.variablesOutput[j][i] = str(round(self.unscaledVariables[j][i], 3))+ "*" +str(round(loadDemand,3))

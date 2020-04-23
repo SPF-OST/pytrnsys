@@ -15,16 +15,14 @@ import numpy as num
 import tkinter as tk
 # import Tkinter.messagebox as tkMessageBox
 from tkinter import messagebox as tkMessageBox
-# from graphviz import Graph
+from graphviz import Graph
 
 """
 This class uses a list of ddck files to built a complete TRNSYS deck file
 """
 
 class BuildTrnsysDeck():
-    """
 
-    """
     """
     Class used to built a deck file out of a list of ddck files
     Parameters
@@ -38,7 +36,7 @@ class BuildTrnsysDeck():
     _pathList : str
         the Base path of the ddck files
     """
-    def __init__(self,_pathDeck,_nameDeck,_nameList,_pathList):
+    def __init__(self,_pathDeck,_nameDeck,_nameList):
 
       
         self.pathDeck = _pathDeck
@@ -46,7 +44,6 @@ class BuildTrnsysDeck():
         
         self.oneSheetList = []       
         self.nameList = _nameList
-        self.pathList = _pathList        
         self.deckText = []
 
         self.overwriteForcedByUser=False
@@ -80,37 +77,6 @@ class BuildTrnsysDeck():
         return lines[0:3] #only returns the caption with the info of the file
 
 
-    def readDeckListConfig(self):
-        """
-        It uses the list of ddck to built a deck file
-
-        """
-
-        for i in range(len(self.nameList)):
-
-            split = self.nameList[i].split()
-
-            if(self.nameList[i][1]==":"): #absolute path
-
-                nameList = split[-1]
-                pathList = split[:-1]
-
-            else:  # we use the generic path from GIT
-                pathList = self.pathList
-                nameList = self.nameList[i]
-
-            firstThreeLines = self.loadDeck(pathList, nameList)
-
-            addedLines = firstThreeLines + self.linesChanged
-
-            caption = " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n" % (
-            nameList, pathList)
-
-            self.deckText.append(caption)
-
-
-
-            self.deckText = self.deckText + addedLines
 
     def readDeckList(self,doAutoUnitNumbering=False,dictPaths=False):
         """
@@ -146,28 +112,12 @@ class BuildTrnsysDeck():
                         pathList =  pathVec[i]
                     else:
                         pathList =  pathList+"\\"+pathVec[i]
-
-            elif(split[0].lower() == "local"): #We use a local path. This needs to be checked !!!
-                pathVec = split[:-2] # Assuming last two names are the name group/type.ddck and the others are the path
-                pathList=""
-                for i in range(len(pathVec)):            
-                    if(i==0):
-                        pathList =  ".\\"+pathVec[i]
-                    else:    
-                        pathList =  pathList+"\\"+pathVec[i]
-                
-                nameVec = split[-2:]
-                nameList = nameVec[0]+"\\"+nameVec[1]
-                
-            else: #we use the generic path from GIT
-                pathList = self.pathList
-                nameList = self.nameList[i]
                 
             firstThreeLines=self.loadDeck(pathList,nameList)
 
             ddck = trnsysComponent.TrnsysComponent(pathList,nameList)
             definedVariables, requiredVariables = ddck.getVariables()
-            if 'printer' not in nameList:
+            if 'printer' not in nameList and 'Printer' not in nameList and 'Control' not in nameList and 'control' not in nameList and 'BigIceCoolingTwoStorages' not in nameList:
                 self.dependencies[nameList] = requiredVariables-definedVariables
                 self.definitions[nameList]=definedVariables
 
@@ -190,7 +140,7 @@ class BuildTrnsysDeck():
     def createDependencyGraph(self):
         e = Graph('ER', filename='er.gv', node_attr={'color': 'lightblue2', 'style': 'filled'})
         e.attr('node', shape='box')
-        variables_global = ['cpwat','rhowat','nix','tamb','dtsim','cpbri','rhobri','pi','stop','start']
+        variables_global = ['cpwat','rhowat','nix','tamb','dtsim','cpbri','rhobri','pi','stop','start','zero']
         for (key,value) in self.dependencies.items():
             e.node(key)
 
@@ -201,7 +151,7 @@ class BuildTrnsysDeck():
                     if dependency in valueDef and dependency not in variables_global:
                         edgelLabel+=dependency+'\n'
                 if edgelLabel!='':
-                    e.edge(key,keyDef,label=edgelLabel,min_len='30.00', style='bold')
+                    e.edge(key,keyDef,label=edgelLabel, style='bold')
 
         e.attr(label=r'\n\nEntity Relation Diagram\ndrawn by NEATO')
         e.attr(fontsize='1')
