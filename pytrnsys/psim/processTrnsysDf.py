@@ -117,6 +117,9 @@ class ProcessTrnsysDf():
 
         self.printDataForGle = printData
 
+    def process(self):
+        pass
+
     def loadAndProcess(self):
 
         self.loadFiles()
@@ -172,10 +175,10 @@ class ProcessTrnsysDf():
 
         print ("loadFiles completed using SimulationLoader")
 
-    def process(self):
+    def addQvsTPlot(self):
 
         if "plotHourly" in self.inputs.keys():
-            self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"])
+            self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"][0])
 
         if "plotMonthly" in self.inputs.keys():
         #
@@ -190,24 +193,17 @@ class ProcessTrnsysDf():
 
         # define QvsTDf here!
 
-
-
-        if "plotQvsTconfigured" in self.inputs.keys():
-            filename = os.path.join(self.tempFolder, "QVsTh.hr")
-            if (os.path.isfile(filename)):
-
-           # if (self.houDataDf.contains(pattern)):
-                QvsTDf = self.houDataDf
-                print("hourlyUsed")
-            else:
-                QvsTDf = self.steDataDf
-                print("stepDfUsed")
-
-            monthsSplit = []
-            # plot QvsT with configured inputs...
-            InputListQvsT = self.inputs["plotQvsTconfigured"]
-            self.loadQvsTConfig(QvsTDf, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False)
-
+        monthsSplit = []
+        if "plotHourlyQvsT" in self.inputs.keys():
+            InputListQvsT = self.inputs["plotHourlyQvsT"][0]
+            QvsTDf = self.houDataDf
+            print("hourlyUsed")
+            self.loadQvsTConfig(QvsTDf,InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False)
+        if "plotTimestepQvsT" in self.inputs.keys():
+            InputListQvsT = self.inputs["plotTimestepQvsT"][0]
+            QvsTDf = self.steDataDf
+            print("stepDfUsed")
+            self.loadQvsTConfig(QvsTDf,InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False)
         else:
             pass
 
@@ -233,6 +229,7 @@ class ProcessTrnsysDf():
         # self.addPlotConfigEquation()
         # self.addPlotAndLatexPV()
         self.addSPFSystem()
+        self.addQvsTPlot()
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
 
@@ -431,11 +428,11 @@ class ProcessTrnsysDf():
             # self.doc.addTableMonthlyDf(values, legend, ["", "-"], caption, nameFile, self.myShortMonths,
             #                            sizeBox=15)
 
-    def loadQvsTConfig(self, df, year=False, useOnlyOneYear=False, monthsSplit=[], normalized=False,
+    def loadQvsTConfig(self, df,inputs, year=False, useOnlyOneYear=False, monthsSplit=[], normalized=False,
                  cut=False):
 
 
-        self.QvsTInput = self.inputs["plotQvsTconfigured"]
+        self.QvsTInput = inputs
 
 
         factor = 1.
