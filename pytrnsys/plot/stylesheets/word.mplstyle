@@ -7,3 +7,4 @@ axes.grid.axis: y
 axes.grid: True
 axes.axisbelow : True
 figure.figsize : 6.4, 3.1
+legend.title_fontsize : x-small

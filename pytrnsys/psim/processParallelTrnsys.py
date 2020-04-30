@@ -422,77 +422,111 @@ class ProcessParallelTrnsys():
 
     def plotComparison(self):
         pathFolder = self.inputs["pathBase"]
-        plotVariables = self.inputs['comparePlot']
-        if len(plotVariables) < 2:
-            raise ValueError(
-                'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
-        xAxisVariable = plotVariables[0]
-        yAxisVariable = plotVariables[1]
-        seriesVariable = ''
-        if len(plotVariables) >= 3:
-            seriesVariable = plotVariables[2]
-        if len(plotVariables) == 4:
-            chunkVariable = plotVariables[3]
-        plotXDict = {}
-        plotYDict = {}
-
-        seriesColors = {}
-        colorsCounter = 0
-        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-        for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
-            with open(file) as f_in:
-                resultsDict = json.load(f_in)
-            if resultsDict[seriesVariable] not in seriesColors.keys():
-                seriesColors[resultsDict[seriesVariable]]=colors[colorsCounter]
-                colorsCounter+=1
-            if resultsDict[chunkVariable] not in plotXDict.keys():
-                plotXDict[resultsDict[chunkVariable]] = {}
-                plotYDict[resultsDict[chunkVariable]] = {}
-                plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[xAxisVariable]]
-                plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[yAxisVariable]]
-            elif resultsDict[seriesVariable] not in plotXDict[resultsDict[chunkVariable]].keys():
-                plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[xAxisVariable]]
-                plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[yAxisVariable]]
-            else:
-                plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(resultsDict[xAxisVariable])
-                plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(resultsDict[yAxisVariable])
-
-        self.doc = latex.LatexReport('', '')
-        if 'latexNames' in self.inputs.keys():
-            self.doc.getLatexNamesDict(file=self.inputs['latexNames'])
-        else:
-            self.doc.getLatexNamesDict()
-
-        fig1 = plt.figure(1)
-        ax1 = fig1.add_subplot(111)
-        styles = ['x-','x--','x-.','x:','o-','o--','o-.','o:']
-
-        dummy_lines = []
-        chunkLabels = []
-        labelSet = set()
-        for chunk,style in zip(plotXDict.keys(),styles):
-            dummy_lines.append(ax1.plot([],[],style,c='black'))
-            chunkLabel = round(float(chunk), 2)
-            chunkLabels.append("{:.2f}".format(chunkLabel))
-            for key in plotXDict[chunk].keys():
-                index = num.argsort(plotXDict[chunk][key])
-
-                labelValue=round(float(key),2)
-                if labelValue not in labelSet:
-                    label = "{:.2f}".format(labelValue)
-                    labelSet.add(labelValue)
+        for plotVariables in self.inputs['comparePlot']:
+            if len(plotVariables) < 2:
+                raise ValueError(
+                    'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
+            xAxisVariable = plotVariables[0]
+            yAxisVariable = plotVariables[1]
+            chunkVariable = ''
+            seriesVariable = ''
+            if len(plotVariables) >= 3:
+                seriesVariable = plotVariables[2]
+                chunkVariable = ''
+            if len(plotVariables) == 4:
+                chunkVariable = plotVariables[3]
+            plotXDict = {}
+            plotYDict = {}
+    
+            seriesColors = {}
+            colorsCounter = 0
+            colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+            for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
+                with open(file) as f_in:
+                    resultsDict = json.load(f_in)
+                    resultsDict['']=None
+                if resultsDict[seriesVariable] not in seriesColors.keys():
+                    seriesColors[resultsDict[seriesVariable]]=colors[colorsCounter]
+                    colorsCounter+=1
+                if resultsDict[chunkVariable] not in plotXDict.keys():
+                    plotXDict[resultsDict[chunkVariable]] = {}
+                    plotYDict[resultsDict[chunkVariable]] = {}
+                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[xAxisVariable]]
+                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[yAxisVariable]]
+                elif resultsDict[seriesVariable] not in plotXDict[resultsDict[chunkVariable]].keys():
+                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[xAxisVariable]]
+                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[yAxisVariable]]
                 else:
-                    label = ''
-                ax1.plot(num.array(plotXDict[chunk][key])[index], num.array(plotYDict[chunk][key])[index], style,color=seriesColors[key], label=label)
+                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(resultsDict[xAxisVariable])
+                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(resultsDict[yAxisVariable])
+    
+            self.doc = latex.LatexReport('', '')
+            if 'latexNames' in self.inputs.keys():
+                self.doc.getLatexNamesDict(file=self.inputs['latexNames'])
+            else:
+                self.doc.getLatexNamesDict()
+            if 'matplotlibStyle' in self.inputs.keys():
+                stylesheet = self.inputs['matplotlibStyle']
+            else:
+                stylesheet = 'word.mplstyle'
+            if stylesheet in plt.style.available:
+                self.stylesheet = stylesheet
+            else:
+                root = os.path.dirname(os.path.abspath(__file__))
+                self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
+            plt.style.use(self.stylesheet)
 
-        legend2=plt.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable),loc=4)
-        ax1.legend(title=self.doc.getNiceLatexNames(seriesVariable), loc=1)
-        ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
-        ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
-        ax1.add_artist(legend2)
-        plt.tight_layout()
-        fig1.savefig(os.path.join(pathFolder, xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable+'.png'))
-        plt.close()
+            fig1,ax1 = plt.subplots(constrained_layout=True)
+            styles = ['x-','x--','x-.','x:','o-','o--','o-.','o:']
+
+            dummy_lines = []
+            chunkLabels = []
+            labelSet = set()
+            for chunk,style in zip(plotXDict.keys(),styles):
+                dummy_lines.append(ax1.plot([],[],style,c='black'))
+                if chunk is not None:
+                    chunkLabel = round(float(chunk), 2)
+                    chunkLabels.append("{:.2f}".format(chunkLabel))
+                for key in plotXDict[chunk].keys():
+                    index = num.argsort(plotXDict[chunk][key])
+                    if key is not None:
+                        labelValue=round(float(key),2)
+                    if key is not None and labelValue not in labelSet:
+                        label = "{:.2f}".format(labelValue)
+                        labelSet.add(labelValue)
+                        ax1.plot(num.array(plotXDict[chunk][key])[index], num.array(plotYDict[chunk][key])[index],
+                                 style, color=seriesColors[key], label=label)
+                    else:
+                        ax1.plot(num.array(plotXDict[chunk][key])[index], num.array(plotYDict[chunk][key])[index],
+                                 style, color=seriesColors[key])
+           # box = ax1.get_position()
+            #ax1.set_position([box.x0, box.y0, box.width, box.height])
+
+            if chunkVariable is not '':
+                legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.2, 1.0), bbox_transform=ax1.transAxes)
+
+            else:
+                legend2 = None
+            if seriesVariable is not '':
+                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.1, 1.0), bbox_transform=ax1.transAxes)
+
+            else:
+                legend1 = None
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
+            #if chunkVariable is not '':
+            #
+            if legend2 is not None:
+                fig1.add_artist(legend2)
+            #fig1.canvas.draw()
+            #if legend2 is not None:
+            #    ax1.add_artist(legend2)
+            #    legend2.set_in_layout(True)
+            #if legend1 is not None:
+            #    legend1.set_in_layout(True)
+            fig1.savefig(os.path.join(pathFolder,
+                                      xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable + '.png'), bbox_inches='tight')
+            plt.close()
 
     def plotComparisonSeaborn(self):
         pathFolder = self.inputs["pathBase"]
@@ -509,7 +543,7 @@ class ProcessParallelTrnsys():
         for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
             with open(file) as f_in:
                 resultsDict = json.load(f_in)
-            plotDict = {k: ["{:.2f}".format(resultsDict[k])] for k in plotVariables}
+            plotDict = {k: [float("{:.2f}".format(resultsDict[k]))] for k in plotVariables}
             df = df.append(pd.DataFrame.from_dict(plotDict))
         snsPlot = sns.lineplot(x=plotVariables[0],y=plotVariables[1],hue=plotVariables[2],style=plotVariables[3],palette=None,markers=True,data=df)
         fig = snsPlot.get_figure()
