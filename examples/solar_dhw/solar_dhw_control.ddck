@@ -1,0 +1,124 @@
+***************************************************
+**Solar controller
+**************************************************
+
+*****************************************
+** Contact person : Jeremias Schmidli   
+** Creation date  : 28.04.2020 
+** Last changes   : 28.04.2020, MB 
+*****************************************
+
+***************************************************************************
+** Description: 
+** custom controlls for the solar dhw example system 
+** TODO:
+***************************************************************************
+
+
+***********************************
+** Control Temperatures
+***********************************
+
+EQUATIONS 7
+myTCollOut = TCollOut          !@dependencyDdck
+mySenTesSolarTop = Tsen4_Tes1 !@dependencyDdck
+mySenTesSolarBot = Tsen1_Tes1 !@dependencyDdck
+mySenTesAuxTop = Tsen8_Tes1 !@dependencyDdck
+mySenTesAuxBot = Tsen6_Tes1 !@dependencyDdck
+tSetAux = 55
+TdhwSet = 55
+
+***********************************
+** Begin TYPE AUXILIAR CONTROLLER
+***********************************
+
+CONSTANTS 2
+dtAuxOn = -3     ! Upper dead band coll. pump ON
+dtAuxOff = -7     ! Lower dead band coll. pump OFF
+
+UNIT 27 TYPE 2  
+PARAMETERS 2     
+5     ! 1 No. of oscillations
+98   ! 2 High limit cut-out
+INPUTS 6     
+tSetAux        ! Upper input temperature Th
+mySenTesAuxTop ! Lower input temperature Tl
+mySenTesAuxBot ! Monitoring temperature Tin
+auxOn          ! 70,1 Input control function
+dtAuxOn        ! Upper dead band dT
+dtAuxOff       ! Lower dead band dT
+0.0 20.0 0.0 0 dtAuxOn dtAuxOff      
+EQUATIONS 1  
+auxOn = [27,1]
+
+
+***********************************
+** Begin TYPE COLLECTOR CONTROLLER
+***********************************
+
+CONSTANTS 2
+dtColOn = 10    ! Upper dead band coll. pump ON
+dtColOff = 3    ! Lower dead band coll. pump OFF
+
+
+UNIT 28 TYPE 2  
+PARAMETERS 2     
+5     ! 1 No. of oscillations
+98   ! 2 High limit cut-out
+INPUTS 6     
+myTCollOut     ! Upper input temperature Th
+mySenTesSolarBot ! Lower input temperature Tl
+mySenTesSolarTop ! Monitoring temperature Tin
+puColOn        ! 70,1 Input control function
+dtColOn        ! Upper dead band dT
+dtColOff       ! Lower dead band dT
+0.0 20.0 0.0 0 dtColOn dtColOff      
+EQUATIONS 1  
+puColOn = [28,1]
+
+
+EQUATIONS 3
+*** Massflowrates
+MfrPuCol = puColOnRc*MfrCPriNom
+MfrWTapBottom = MfrDHWset
+MfrDhwDemand = ABS(MfrPiDhwDemand)
+
+CONSTANTS 1
+T_set_MixDhw=TdhwSetProfile
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiTesDhwOut
+TPiDhwMix
+MfrDhwDemand
+T_set_MixDhw
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixDhw
+EQUATIONS 1
+xFracMixDhw =  1.-[441,5] 
+
+
+***********************************
+** Begin TYPE Recall
+***********************************
+
+UNIT 18 TYPE 993 
+PARAMETERS 1     
+2   ! 1: number of variables to be remembered    
+INPUTS 2     
+auxOn puColOn     
+0.0  0.0  
+EQUATIONS 2    ! outputs of Input Value Recall
+auxOnRc = [18,1]      
+puColOnRc = [18,2]  
+
+
+*************
+**END Solar controller
+************
+
+
+
+

@@ -1,0 +1,42 @@
+*******************************
+**BEGIN ControlPlotter.ddck
+*******************************
+
+*****************************************
+** Contact person : Jeremias Schmidli   
+** Creation date  : 28.04.2020 
+** Last changes   : 28.04.2020, MB 
+*****************************************
+
+***************************************************************************
+** Description: 
+** custom online plotter for the control of the solar dhw system
+** TODO: 
+***************************************************************************
+
+UNIT 51 TYPE 65     ! Online Plotter DHW (Element OpDHW)
+PARAMETERS 12     
+10     ! 1 Nb. of left-axis variables
+10     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+100     ! 4 Left axis maximum
+-0.5     ! 5 Right axis minimum
+1.5  ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 20    
+mySenTesSolarTop mySenTesSolarBot mySenTesAuxTop mySenTesAuxBot nix nix myTCollOut THxSolar nix nix 
+nix  puColOn puColOnRc auxOn auxOnRc nix nix nix nix nix 
+**     
+mySenTesSolarTop mySenTesSolarBot mySenTesAuxTop mySenTesAuxBot nix nix myTCollOut THxSolar nix nix 
+nix  puColOn puColOnRc auxOn auxOnRc nix nix nix nix nix 
+**      
+LABELS  3     
+Temperatures  
+Boolean   
+Control
+
