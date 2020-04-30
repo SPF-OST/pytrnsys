@@ -107,16 +107,12 @@ class ReadConfigTrnsys():
             elif (splitLine[0] == "stringArray"):
                 if splitLine[1]  not in inputs.keys():
                     inputs[splitLine[1]] = []
-                    for i in range(len(splitLine)-2):
-                        strEl = splitLine[i+2][1:-1] #I delete the "
-                        inputs[splitLine[1]].append(strEl)
-                else:
-                    inputs[splitLine[1]] = [inputs[splitLine[1]]]
-                    newElement = []
-                    for i in range(len(splitLine)-2):
-                        strEl = splitLine[i+2][1:-1] #I delete the "
-                        newElement.append(strEl)
-                    inputs[splitLine[1]].append(newElement)
+
+                newElement = []
+                for i in range(len(splitLine)-2):
+                    strEl = splitLine[i+2][1:-1] #I delete the "
+                    newElement.append(strEl)
+                inputs[splitLine[1]].append(newElement)
                     
 
             elif (splitLine[0]== "calcMonthly"):

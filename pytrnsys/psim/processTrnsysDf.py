@@ -644,7 +644,7 @@ class ProcessTrnsysDf():
 
         if "plotT" in self.inputs.keys():
             if (len(self.inputs['plotT']) > 0):
-                for name in self.inputs['plotT']:
+                for name in self.inputs['plotT'][0]:
                     nameFile = 'tempFreqDis' + name
                     # name = self.inputs['plotT'][0]
                     outVar = []
@@ -764,7 +764,7 @@ class ProcessTrnsysDf():
 
             self.resultsDict = {}
             jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax}
-            for key in self.inputs['results']:
+            for key in self.inputs['results'][0]:
                 if type(jointDicts[key]) == num.ndarray:
                     value = list(jointDicts[key])
                 else:
