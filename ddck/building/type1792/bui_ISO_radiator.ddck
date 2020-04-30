@@ -1,0 +1,472 @@
+
+**************************************
+**BEGIN bui_ISO_MFB2019_rad_floor.ddck 
+**************************************
+    
+*****************************************
+** Contact person : Dani Carbonell   
+** Creation date  : 30.09.2016
+** Last changes   : 15.04.20 DC
+*****************************************
+
+***************************************************************************
+** Description: 
+** Building demands using the ISO model from the standard model.
+** The heat is delivered by a radiant floor model.
+** Parameters were fitted to fit the IDA-ICE results
+** Reference article is $$$
+** TODO: 
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS 1
+TRdFl = TPiRadIn    
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+EQUATIONS 1
+TRdRt = [42,1]  ! return temperature from space heat distribution system, °C
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+EQUATIONS 2
+qSysOut_BuiDemand = PheatBui_kW ! Total heat (without cooling) Heat to Building from Radiator: W --> kW  
+elSysOut_PuSH      = PelPuSh_kW  ! To be moved and generated automatically to hydraulic GUI export
+**qSysOut_FloorLoss = RadFloorLoss_kW
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+EQUATIONS 3
+myTrdSet = TrdSet
+myCoolingOn = CoolingOn
+myPBuiIntGain = PBuiIntGain !from internal gains calculation 
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS 1     
+T_Set_d       = MAX(TRdRt,myTrdSet)      ! TrdSet output from TYPE 888. Temperature set point for tempering valve used in hydraulic. 
+
+
+
+**EQUATIONS 1
+**CoolOn = GT(TroomRc,24)*NOT(BoHS)
+
+CONSTANTS 11
+frQRadToQd = 1.3    
+TIdCoolSet = 100     
+TIdHeatSet = 0     ! temperature for Ideal heating of building, > 10 disables floor heating system and internal gains by people and electrical devices, but not airchange heat recovery
+TroomSet   = 21.00     ! Setpoint for Room temperature, °C
+TroomSetCool   = 24.00     ! Setpoint for Room temperature for cooling, °C
+MfrBuiRdNom = PheatRadNom/(CPWAT*(TBuiFlNom-TBuiRtNom)) !PheatRadNom/(CPWAT*(TBuiFlNom-TBuiRtNom))     ! Nominal mass flow of heat distribution system [kg/h] !JS: Divide by factor of 4 to have more realistic values
+PheatRadNom = PheatBuiD*frQRadToQd 
+**ftemp = (60./((TBuiFlNom+TBuiRtNom)/2-TroomSet))^(m_Rd)        ! ftemp: faktor Qnominal -> Qnorm,real (DT=60 - 90/70/20) Radiator (c>=0.7), -
+**PRadBuidT60 = ftemp*PheatRadNom                       ! Heating Rate at 60 °C Radiator temperature, kJ/h
+pGainRad = 0.6     
+iGainRad = 0.05     
+ftemp = (60./((TBuiFlNom+TBuiRtNom)/2-TroomSet))**m_Rd        ! ftemp: faktor Qnominal -> Qnorm,real (DT=60 - 90/70/20) Radiator (c>=0.7), -
+PRadBuidT60 = ftemp*PheatRadNom                       ! Heating Rate at 60 �C Radiator temperature, kJ/h
+
+
+*******************************************************
+** Definition of radiator *
+*******************************************************
+CONSTANTS 1    ! Building
+CeffRad = 40000     ! Thermal Cap. of Radiator, kJ/K
+
+     
+UNIT 41 TYPE 320     ! PID Controller for Radiator mass flow (Idea: instead of thermostatic valves a PID controler is taken to reduce mass flow if the room temperature gets too high)
+PARAMETERS 7     
+3     ! 1 Temperature width of PID band
+pGainRad     ! 2 Proportional gain PID band
+iGainRad     ! 3 Integral gain PID band
+0     ! 4 Differential gain PID band
+0.5     ! 5 Proportional gain P-band
+0     ! 6 Saturation mode
+0     ! 7 Minimum value controller action in saturation mode
+INPUTS 3     
+TroomSet        !  Set temperature
+TroomRc         !  Building:    1- (air temperature of zone)  TAIR   1 ->Feedback room temperature
+0,0          !  Control inversion option 1: increasing, 2: decreasing action
+*** INITIAL INPUT VALUES     
+22 18 2      
+     
+EQUATIONS 2    
+PIDRadBuiMin = 0.15  !  0.05    !0.01     
+PIDRadBui = GT([41,1],PIDRadBuiMin)*BoHS*[41,1] ![41,1]*BoHS     
+** MfrBuiRd = NOT(BoAuxWWOn)*MfrBuiRdNom*PIDRadBui  ! DP: To make Sh-Aux possible if HP has not good source, Boolean NoHpSource added
+     
+EQUATIONS 1     ! Flow rate of the heating system
+gPuRadBui = GT(PIDRadBui,0)*[41,2]/MfrBuiRdNom     ! fraction of nominal mass flow rate, -
+
+ 
+UNIT 42 TYPE 3621     ! Radiator
+PARAMETERS 11     
+MfrBuiRdNom           !Nominal (maximal) mass flow rate of the radiator
+PRadBuidT60             !Nominal heating power
+TBuiFlNom     !Nominal flow temp
+TBuiRtNom     !Nominal return temp
+TambD     ! Design ambient
+m_Rd     !Radiator Exponent
+CeffRad             !Lumped radiaotr capacity [KJ/K]
+CPWAT            !specific heat water [KJ/KgK]
+0     ! Pipe capacity 
+10     !number of control volumes
+21     ! 12 Initial radiator temperature
+INPUTS 3     
+TRdFl     ! supply Temperature
+Troom     ! Building: star node temperature TSTAR
+PIDRadBui !myPIDKiGa     ! PID Controller T220:Mass flow control (0 <signal<1)
+*** INITIAL INPUT VALUES     
+50 10 0     
+*     
+     
+EQUATIONS 11    ! Mass flow rate and return temp. of Radiator / Building
+MfrBuiRd = BoHS*[42,2]     ! DP: To make Sh-Aux possible if HP has not good source, Boolean NoHpSource added
+** TRdRt = [42,1]     ! return temperature from space heat distribution system, �C
+PRdIn_kW = CPWat*MfrBuiRd*(TRdFl-TRdRt)/3600 ! [42,4]/3600     ! Power transferred to space heat distribution system, kW
+PheatBui = [42,3]       ! Heat to Building from Radiator: kJ/h 
+PheatBui_kW = PheatBui/3600      ! Heat to Building from Radiator: kJ/h --> kW
+MfrSh = MfrBuiRd     
+BoPumpShOn = GT(MfrSh,0.0001)     ! actual pressure-drop of space heat distribution in Pascal, Pa
+QAcumRadiator = [42,5]/3600     !Total Acumulated Heat in Radiator
+PheatBuiRad = PheatBui*0.3     !PBuiGains_kW=PheatBui_kW 
+PheatBuiConv = PheatBui*0.7     
+ImbRad=PRdIn_KW-PheatBui_KW-QAcumRadiator     
+RadInImb = [42,4]/3600-CPWat*MfrBuiRd*(TRdFl-TRDRt)/3600        
+** Attention! No mass flow dependency of the efficiency here due to thermostatic valves!     
+EQUATIONS 7     ! Electric pump power for space heat distribution
+MfrShNom = MfrBuiRdNom     ! nominal mass flow rate, kg/h
+dpShNom_bar = 0.25     ! pressure-drop of loop at nominal mass flow, bar     
+frMfrSh= MfrSh/MfrShNom     ! Flow rate fraction of nominal flow rate    
+dpSh_bar = (frMfrSh)^2*dpShNom_bar     ! pressure drop at actual mass flow rate, bar
+PflowSh_W = ((MfrShNom/3600)/RhoWat)*dpShNom_bar*100000     ! required power to drive the flow, W
+etaPuSh = 0.3-0.00*(1-frMfrSh)     ! pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+PelPuSh_kW = GT(MfrSh,1)*0.015     ! required pump electric power, kW
+    
+    
+EQUATIONS 2   
+TRoomLo  = LT(TroomRc,19.5)     ! Room Temperature is too low
+**dTShBkp = GT(MfrBuiRd,0.)*(Trdset - TRdFlMix)  ! > 0 lacking T (compared to T_set_d) when T of mixer outlet is to low <0 we have to mix
+**PElBkpSh_KW = qAuxStoreSH_KW + TRoomLo*MfrBuiRd*CPWAT*MAX(dTShBkp,0.)/3600. !*OR(HpIsBlockRc,NOT(HpIsOn)) 
+**PElBkpSh_KW = qAuxStoreSH_KW !*TRoomLo 
+PElBkpSh_KW = 0.
+**TRdFl = NOT(GT(PElBkpSh_KW,0))*TRdFlMix+GT(PelBkpSh_KW,0)*Trdset     ! "electric backup heater" (if heat pump has an error, TRdFl is increased to T_set_d to avoid penalties)
+**TRdFl = TRdFlMix
+
+UNIT 15 TYPE 816	 !Type816_Transient Value Averaging
+PARAMETERS 2
+1		! 1 NrV
+48		! 2 tav(X)
+INPUTS 1
+Tamb		! [equation] Va(X)
+Tamb 
+
+*** SHADING AS DEFINED IN IDA-ICE ACCORDING TO SIA-NORM AND BUILDING GEOMETRY (BALCONY etc.)
+UNIT 32 TYPE 2	! Building Shading Controller: Radiation Nord Side
+PARAMETERS 2	
+5	! 1 No. of oscillations
+5000	! 2 High limit cut-out
+INPUTS 6	
+IT_N	! Radiation:IT_H ->Upper input value
+0,0       	! Lower input value
+0,0       	! Monitoring value
+shadingControlN     	! Output control function ->Input control function
+0,0       	! Upper dead band
+0,0       	! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 720.0 540.0	
+**        200 W/m² a. 150 W/m² 	
+
+EQUATIONS 1
+shadingControlN=[32,1]
+
+UNIT 36 TYPE 2	! Building Shading Controller: Radiation South Side
+PARAMETERS 2	
+5	! 1 No. of oscillations
+5000	! 2 High limit cut-out
+INPUTS 6	
+IT_S	! Radiation:IT_H ->Upper input value
+0,0       	! Lower input value
+0,0       	! Monitoring value
+shadingControlS     	! Output control function ->Input control function
+0,0       	! Upper dead band
+0,0       	! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 720.0 540.0	
+
+EQUATIONS 1
+shadingControlS=[36,1]
+
+	
+UNIT 34 TYPE 2	! Building Shading Controller: Radiation East Side
+PARAMETERS 2	
+5	! 1 No. of oscillations
+5000	! 2 High limit cut-out
+INPUTS 6	
+IT_E	! Radiation:IT_H ->Upper input value
+0,0       	! Lower input value
+0,0       	! Monitoring value
+shadingControlE     	! Output control function ->Input control function
+0,0       	! Upper dead band
+0,0       	! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 720.0 540.0	
+EQUATIONS 1
+shadingControlE=[34,1]
+	
+	
+UNIT 35 TYPE 2	! Building Shading Controller: Radiation West Side
+PARAMETERS 2	
+5	! 1 No. of oscillations
+5000	! 2 High limit cut-out
+INPUTS 6	
+IT_W	! Radiation:IT_H ->Upper input value
+0,0       	! Lower input value
+0,0       	! Monitoring value
+shadingControlW     	! Output control function ->Input control function
+0,0       	! Upper dead band
+0,0       	! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 720.0 540.0	
+
+EQUATIONS 1	
+shadingControlW=[35,1]
+	
+UNIT 49 TYPE 2	! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	! 1 No. of oscillations
+95	! 2 High limit cut-out
+INPUTS 6	
+Troom	! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
+0,0      	! Lower input value
+0,0      	! Monitoring value
+shadingConTemp    	! Output control function ->Input control function 49,1
+0,0      	! Upper dead band
+0,0      	! Lower dead band
+*** INITIAL INPUT VALUES	
+20.1 0 0 0 21 20 	
+EQUATIONS 1	
+shadingConTemp=[49,1]
+	
+	
+
+EQUATIONS 4	! Variable Shading
+Fsh_N = shd_fix_N * (AND(shadingConTemp,shadingControlN)*win_g_shd+NOT(AND(shadingConTemp,shadingControlN))*win_g)	
+Fsh_S = shd_fix_S * (AND(shadingConTemp,shadingControlS)*win_g_shd+NOT(AND(shadingConTemp,shadingControlS))*win_g)	! Wird Fenster g-Value im Model berücksichtigt??? Entsprechend dann XX ausfüllen
+Fsh_E = shd_fix_E * (AND(shadingConTemp,shadingControlE)*win_g_shd+NOT(AND(shadingConTemp,shadingControlE))*win_g)	
+Fsh_W = shd_fix_W * (AND(shadingConTemp,shadingControlW)*win_g_shd+NOT(AND(shadingConTemp,shadingControlW))*win_g)	
+	
+	
+EQUATIONS 2	! Ventilation and Infiltration
+TairSup = ((Tamb+(Troom-Tamb)*etaHeatRec)*VfrVent+Tamb*(VfrInf+VfrWindow))/VfrAirExTot	! Temperature of the air coming into the building (infiltration and ventilation)
+Ua_vent = CPAIR * 1000 * (VfrAirExTot) *RHOAIR	! Thermal transmission coefficient due ventilation and infiltration [W/K]
+
+
+CONSTANTS 1
+UaBui = Htr_op
+
+
+
+CONSTANTS 14
+rhoAir = 1.002 ! kg/m3
+cpAir = 1.2041 ! kJ/kgK
+freeMode  = 1 ! 
+powerMode = 0 !
+heatEmmitter = 0
+his = 3.45	   ! Heat transfer coefficient between the air node Tair and the star node W/m2K
+hms = 9.1      ! Heat transfer coefficient between the mass-related node Tm and the star node W/m2K
+xat = 5.4      ! Ratio between the internal surfaces area and the floor area
+Nsurf = 4
+Cair = volBui*rhoAir*cpAir*1000 !3128 !J/K
+Tinitial = 21
+Tint_Hset = 21
+Tint_Cset = 26
+EpsilonWindow = 0.9
+
+EQUATIONS 5
+PGainISO = myPbuiIntGain   ! Internal Gains [kJ/h] 
+PlossInfr_N = 0!.67*10^-8*((TroomRc+273.15)^4-(Tamb+273.15)^4)*AsolN
+PlossInfr_S = 0!5.67*10^-8*((TroomRc+273.15)^4-(Tamb+273.15)^4)*AsolS
+PlossInfr_W = 0!5.67*10^-8*((TroomRc+273.15)^4-(Tamb+273.15)^4)*AsolW
+PlossInfr_E = 0!5.67*10^-8*((TroomRc+273.15)^4-(Tamb+273.15)^4)*AsolE
+
+** ISO MODEL
+UNIT 56 TYPE 5998	 !Type5998
+PARAMETERS 13
+Cm		! 1 J/K, thermal capacitance of zone (voir ISO 13790-2008 : 12.3)
+Am		! 2 m2, surface of the effective thermal mass  (voir ISO 13790-2008 : 12.2.2)
+AreaBui	! 3 m2, surface of the heated floor area (voir ISO 13790-2008 : 6.4)
+UaWin	! 4 W/K, window heat transfer coefficient (voir ISO 13790-2008 : ANNEXE A)
+his		! 5 W/m2K, Heat transfer coefficient between the inner air and the star-node / wall surface (3.45 W/m².K according to the standard)
+hms		! 6 W/m2K, heat transfer coefficient between the thermal capacity and the inner surface / star-node (9.1 W/m².K according to the standard)
+xat		! 7 ratio between the surface of the inner walls and the heated floor (4.5 according to the standard)
+Nsurf		! 8 Nsurf
+heatEmmitter		! 9 Heat emitter type
+freeMode		! 10 "True" : Calculation of the building temperatures given Phc_nd as an input [Temperatures in outputs 1 to 4 correspond then to this kind of model)
+powerMode		! 11 "AC"   : "True" = Calculation of the required power for heating or cooling the building according to set point temp. Tint_Hset and Tint_Cset (PAR(14) and PAR(15)) [Temperatures in outputs 1 to 4 correspond to this kind of model only if "Free" mode PAR(10) is <False>]
+Cair		! 12 C_air
+Tinitial
+**Tint_Hset
+**Tint_Cset
+INPUTS 23
+Tamb		! EQU_Weather:Tamb ->Text
+TairSup		! EQU_Weather:Tamb ->Tsup
+PheatBui		! kJ/h, heating power from heating system
+PGainISO		! kJ/h, internal heat gains (voir ISO 13790-2008 : 10.2)
+HveISO		! W/K, ventilation heat loss coefficient (voir ISO 13790-2008 : ANNEXE A)
+Htr_op		! [unconnected] W/K, overall heat transfer coefficient of outside walls and roof (voir ISO 13790-2008 : ANNEXE 
+**PlossInfr		! [unconnected] -
+0,0      !not used
+***SURFACE 1
+IT_N		! kJ/hm2, total solar irradiation on surface 
+Fsh_N		! non-shading factor for surface 1
+AsolN		! m2, effective reception area of surface 1 (voir ISO 13790-2008 : 11.3.3 et 11.3.4)
+PlossInfr_N	! kJ/h, long wave losses of surface 1  (voir ISO 13790-2008 : 11.3.5 et 11.4.6)
+******
+IT_S		! EQ_Radiation:IT_S_ISO ->Isol-2
+Fsh_S		! [equation] Fsh_ob-2
+AsolS		! [unconnected] Asol-2
+PlossInfr_S		! [unconnected] Ploss_GLO-2
+IT_E		! EQ_Radiation:IT_E_ISO ->Isol-3
+Fsh_E		! [equation] Fsh_ob-3
+AsolE		! [unconnected] Asol-3
+PlossInfr_E		! [unconnected] Ploss_GLO-3
+IT_W		! EQ_Radiation:IT_W_ISO ->Isol-4
+Fsh_W		! [equation] Fsh_ob-4
+AsolW		! [unconnected] Asol-4
+PlossInfr_W		! [unconnected] Ploss_GLO-4
+10 10 0 0 1 67.55 0 0 Fsh_N 1.43 20 0 Fsh_S 5.71 80 0 Fsh_E 1.9 27 0 Fsh_W 1.9 27 
+
+
+
+*** RESULTS SECTION
+EQUATIONS 10
+Troom = [56,1]
+TMass = [56,2]
+PBuiUAstatic_kW = [56,11]/3600
+PbuiVent_kW = [56,12]/3600
+PAcumBui_kW = [56,13]/3600
+**PheatNeed_kW = [56,10]/3600 ! heating needed. 
+PBuiSol_kW = [56,5]/3600
+PBuiGains_kW = ([56,6]+[56,7]+[56,8]-[56,5]+[56,9])/3600
+TroomStar = [56,3]
+TroomOp = [56,4]
+PBuiIntGain_kW = myPBuiIntGain/3600
+**PbuiIntGain = PbuiIntGain_kW*3600 ! JS: first calculate kW then convert to [kJ/h]
+
+
+UNIT 57 TYPE 993 !CHANGED DC     ! Input value recall (element RcB)
+PARAMETERS 1     
+2     ! 1: number of variables to be remembered
+INPUTS 2    
+Troom TRoomStar
+20 20
+     
+EQUATIONS 2    ! outputs of Input Value Recall
+TroomRc = [57,1]     ! exponent for penalty calculation    
+TRoomStarRc = [57,2]     
+
+
+EQUATIONS 7     ! penalty calculation for space haeting / cooling according to Task 26 and Task 32
+X = 2     ! exponent for penalty calculation
+NightPen = GT(MOD(time,24),23)+LT(MOD(time,24),6)        
+DayPen = Not(NightPen)       
+** dTsh = MAX(0,19.5-Troom)*DayPen+MAX(0,16-Troom)*NightPen      ! delta-T for room heating not met
+dTsh = MAX(0,19.5-Troom)*DayPen+MAX(0,19.5-Troom)*NightPen      ! delta-T for room heating not met JS: Change night penalty to 19.5 because we don't heat less during night
+PpenSH_kW = UaBui*(dTsh+(dTsh+1)^X-1)/1000.0     ! penalty function for room-temperature below 19.5°C [kW]
+dTsc = MAX(0,(Troom-TroomSetCool))     ! delta-T for room cooling not met
+PpenSC_kW = UaBui*(dTsc+(dTsc+1)^X-1)/1000.0     ! penalty function for room-temperatures above limits of DIN 1946-2 [kW]
+
+CONSTANTS 2 !The ISO model does not provide these ones
+PbuiInf_kW = 0
+PBuiGrd_kW  = 0
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!MONTHLY PRINTER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+CONSTANTS 1
+unitPrinterBui=123
+
+ASSIGN    temp\BUILDING_MO.Prt     unitPrinterBui
+
+UNIT 123 Type 46 ! Printegrator Monthly Values for System
+PARAMETERS 6    
+unitPrinterBui ! 1: Logical unit number, -
+-1             ! 2: Logical unit for monthly summaries, -
+1              ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1             ! 4: Printing & integrating interval, h. -1 for monthly integration
+1              ! 5: Number of inputs to avoid integration, -
+1              ! 6: Output number to avoid integration
+INPUTS 18
+Time  PheatBui_kW  PRdIn_kW PBuiGrd_kW PBuiLight_kW PbuiGainPers_KW PBuiGainEq_KW PBuiSol_kW PBuiGains_KW  
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW NIX NIX QAcumRadiator PAcumBui_kW PBuiGainCircLoss_KW dTsc
+***************
+Time  PheatBui_kW  PRdIn_kW PBuiGrd_kW PBuiLight_kW PbuiGainPers_KW PBuiGainEq_KW PBuiSol_kW PBuiGains_KW  
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW NIX NIX QAcumRadiator PAcumBui_kW PBuiGainCircLoss_KW dTsc
+ 
+ 
+ *******************************
+** hourly printer
+*******************************
+CONSTANTS 1
+unitPrintHouVar = 517
+
+ASSIGN temp\Building_HR.hr      unitPrintHouVar  
+UNIT 517 Type 46     ! Printegrator hourly Values for System
+PARAMETERS 5    
+unitPrintHouVar   ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+0     ! 5: Number of inputs to avoid integration, -
+ ! 6: Output number to avoid integration
+
+INPUTS 19
+Time Tamb  Troom  TRdFl TrdRt  Nix  Nix IT_S Nix  Nix  ImbRad 
+BoHS Nix PIDRadBui MfrBuiRd Nix PRdIn_KW Nix  PheatBui_kW
+***
+Time Tamb  Troom  TRdFl TrdRt  Nix  Nix IT_S Nix  Nix  ImbRad 
+BoHS Nix PIDRadBui MfrBuiRd Nix PRdIn_KW Nix  PheatBui_kW
+
+UNIT 59 TYPE 65     ! Online Plotter Building (element OpB)
+PARAMETERS 12     
+10     ! 1 Nb. of left-axis variables
+10     ! 2 Nb. of right-axis variables
+-5     ! 3 Left axis minimum
+40     ! 4 Left axis maximum
+-10     ! 5 Right axis minimum
+50     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+0     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 20     
+Tamb  Troom  TRdFl TrdRt  TroomStar  Fsh_S IT_S VfrWindow  TMass  ImbRad 
+BoHS NIX NIX  NIX NIX  PIDRadBui MfrBuiRd   NIX PRdIn_KW    NIX  
+*******
+Tamb  Troom  TRdFl TrdRt  TroomStar  Fsh_S IT_S VfrWindow  TMass  ImbRad 
+BoHS NIX NIX  NIX NIX  PIDRadBui MfrBuiRd   NIX PRdIn_KW    NIX  
+****
+LABELS  3     
+Temperatures     
+Power     
+Building
+	
+*******************************
+**END Building.dck
+*******************************

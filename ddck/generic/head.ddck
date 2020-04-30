@@ -80,7 +80,7 @@ PI   = 3.1415926
 Zero = 0
 Nix  = 0
 notused  = 0
-NPLotsPerSim = 18
+NPlotsPerSim = 18
 
 ************************************** 
 ***Constant fluid properties    ******

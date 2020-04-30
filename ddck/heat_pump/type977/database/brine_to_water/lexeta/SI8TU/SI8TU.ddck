@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SI8TU from LEXETA
+*********************************************
+** Heat pump data for SI8TU heat pump from LEXETA with Ref?
+** Data obtained from project KinderGArten
+** Author : Dani Carbonell
+*********************************************
+
+CONSTANTS 22
+TEvapMaxHp = 40
+sizeHpNom = 12.5
+MfrHpCondRef = 1400
+MfrHpEvapRef = 1930
+COPNom = 3.44 ! at B0W35
+TEvapMax = 35
+tCondMaxHp = 70
+CHPM_c1 = sizeHpRatio*9.71  
+CHPM_c2 = sizeHpRatio*71.01 
+CHPM_c3 = sizeHpRatio*-14.10
+CHPM_c4 = sizeHpRatio*-71.18
+CHPM_c5 = sizeHpRatio*176.75
+CHPM_c6 = sizeHpRatio*14.45 
+COP_c1 = 9.67   
+COP_c2 = 74.78  
+COP_c3 = -45.48 
+COP_c4 = -228.90
+COP_c5 = 134.32 
+COP_c6 = 69.78  
+TMinEvapTin = -8
+TMinEvapTout = TMinEvapTin - 3
+cpEvap = cpBri

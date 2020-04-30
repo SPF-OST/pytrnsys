@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SI-GEO-12-40.ddck
+*********************************************
+** Heat pump data for SI-GEO-12-40 heat pump
+** Data exported from Polysun at 03/12/19 16:02:12
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 44.2
+MfrHpCondRef = 7312
+MfrHpEvapRef = 7312
+COPNom = 4.292777
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*42.59070610
+CHPM_c2 = sizeHpRatio*513.31123568
+CHPM_c3 = sizeHpRatio*124.16267277
+CHPM_c4 = sizeHpRatio*-495.64839086
+CHPM_c5 = sizeHpRatio*185.10124010
+CHPM_c6 = sizeHpRatio*-635.89210045
+COP_c1 = 4.68567310
+COP_c2 = 66.19054288
+COP_c3 = 14.65991680
+COP_c4 = -188.30965080
+COP_c5 = 0.92342002
+COP_c6 = -122.66220076
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SI-GEO-12-40.ddck
+*********************************************

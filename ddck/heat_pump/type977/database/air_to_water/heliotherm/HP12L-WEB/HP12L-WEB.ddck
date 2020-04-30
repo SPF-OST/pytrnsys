@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN HP12L-WEB.ddck
+*********************************************
+** Heat pump data for HP12L-WEB heat pump
+** Data exported from Polysun at 02/26/19 13:28:57
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 12.4
+MfrHpCondRef = 2600
+MfrHpEvapRef = 6500
+COPNom = 4.188024
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*16.96519734
+CHPM_c2 = sizeHpRatio*90.14799978
+CHPM_c3 = sizeHpRatio*-29.43498064
+CHPM_c4 = sizeHpRatio*107.89222885
+CHPM_c5 = sizeHpRatio*232.02124851
+CHPM_c6 = sizeHpRatio*-8.90402966
+COP_c1 = 9.04522836
+COP_c2 = 55.74933329
+COP_c3 = -44.29827306
+COP_c4 = -179.61804536
+COP_c5 = 91.59176157
+COP_c6 = 50.89259816
+TMinEvapTin = -20.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END HP12L-WEB.ddck
+*********************************************

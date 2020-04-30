@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SINH-40TE.ddck
+*********************************************
+** Heat pump data for SINH-40TE heat pump
+** Data exported from Polysun at 03/12/19 16:05:09
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 33.5
+MfrHpCondRef = 5500
+MfrHpEvapRef = 5500
+COPNom = 4.037466
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*27.67395994
+CHPM_c2 = sizeHpRatio*298.65044378
+CHPM_c3 = sizeHpRatio*154.03914290
+CHPM_c4 = sizeHpRatio*121.84155731
+CHPM_c5 = sizeHpRatio*950.59702749
+CHPM_c6 = sizeHpRatio*-684.61501710
+COP_c1 = 4.61351231
+COP_c2 = 34.49891779
+COP_c3 = 9.37723434
+COP_c4 = -40.69866011
+COP_c5 = -29.81594900
+COP_c6 = -100.15290219
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SINH-40TE.ddck
+*********************************************

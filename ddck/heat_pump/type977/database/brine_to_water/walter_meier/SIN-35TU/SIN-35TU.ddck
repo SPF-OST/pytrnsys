@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SIN-35TU.ddck
+*********************************************
+** Heat pump data for SIN-35TU heat pump
+** Data exported from Polysun at 03/12/19 16:04:48
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 34.8
+MfrHpCondRef = 6100
+MfrHpEvapRef = 6100
+COPNom = 5.368675
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*35.06628957
+CHPM_c2 = sizeHpRatio*384.59212069
+CHPM_c3 = sizeHpRatio*65.50100617
+CHPM_c4 = sizeHpRatio*-627.80936365
+CHPM_c5 = sizeHpRatio*387.14755849
+CHPM_c6 = sizeHpRatio*-370.43306503
+COP_c1 = 75.22684604
+COP_c2 = 182.70378485
+COP_c3 = -980.56153203
+COP_c4 = -731.50714589
+COP_c5 = -2924.75571666
+COP_c6 = 3385.78785759
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SIN-35TU.ddck
+*********************************************

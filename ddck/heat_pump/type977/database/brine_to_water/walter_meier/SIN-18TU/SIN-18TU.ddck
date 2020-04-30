@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SIN-18TU.ddck
+*********************************************
+** Heat pump data for SIN-18TU heat pump
+** Data exported from Polysun at 03/12/19 16:07:55
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 17.4
+MfrHpCondRef = 3000
+MfrHpEvapRef = 3000
+COPNom = 4.639384
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*16.03051507
+CHPM_c2 = sizeHpRatio*168.62289389
+CHPM_c3 = sizeHpRatio*45.00633735
+CHPM_c4 = sizeHpRatio*-308.44618992
+CHPM_c5 = sizeHpRatio*272.94885368
+CHPM_c6 = sizeHpRatio*-198.80354484
+COP_c1 = 6.04499703
+COP_c2 = 51.59613924
+COP_c3 = 0.48629598
+COP_c4 = -192.85688960
+COP_c5 = -20.54475637
+COP_c6 = -84.73245304
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SIN-18TU.ddck
+*********************************************

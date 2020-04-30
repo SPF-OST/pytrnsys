@@ -58,13 +58,14 @@ EQUATIONS 4
 IT_Coll_kJhm2 = IT_surfUser_1  ! Incident total radiation on collector plane, kJ/hm2 
 IB_Coll_kJhm2 = IB_surfUser_1  ! incident beam radiation on collector plane, kJ/hm2
 ID_Coll_kJhm2 = ID_surfUser_1  ! diffuse and ground reflected irradiance on collector tilt
-AI_Coll = AI_surf_User1  ! incident angle on collector plane, °
+AI_Coll = AI_surfUser_1  ! incident angle on collector plane, °
 
-EQUATIONS 4
+EQUATIONS 5
 IT_Coll_kW = IT_Coll_kJhm2/3600     ! Incident total radiation on collector plane, kW/m2
 IB_Coll_kW = IB_Coll_kJhm2/3600     ! incident beam radiation on collector plane, kW/m2
 ID_Coll_kW = ID_Coll_kJhm2/3600     ! diffuse and ground reflected irradiance on collector tilt (kW/m2)
 IT_Coll_Wm2 = IT_surfUser_1/3.6
+IT_Coll_kWm2 = IT_surfUser_1/3600
 
 ***********************************
 ** Begin CONSTANTS
@@ -131,9 +132,9 @@ unitPrintSol ! 1: Logical unit number, -
 1            ! 5: Number of inputs to avoid integration, -
 1            ! 6: Output number to avoid integration
 INPUTS 4
-Time  Pcoll_kW  PColl_Wm2  IT_Coll_Wm2
+Time  Pcoll_kW  PColl_kWm2  IT_Coll_kWm2
 **
-Time  Pcoll_kW  PColl_Wm2  IT_Coll_Wm2
+Time  Pcoll_kW  PColl_kWm2  IT_Coll_kWm2
 
 ***********************************
 ** Hourly printer
@@ -145,15 +146,16 @@ unitHourlyCol = 33
 ASSIGN    temp\SOLAR_HR.Prt    unitHourlyCol     
 
 UNIT 34 TYPE 46     ! Printegrator Monthly Values for System
-PARAMETERS 6    
+PARAMETERS 7    
 unitHourlyCol ! 1: Logical unit number, -
 -1            ! 2: Logical unit for monthly summaries, -
 1             ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
 1             ! 4: Printing & integrating interval, h. -1 for monthly integration
-1             ! 5: Number of inputs to avoid integration, -
-1             ! 6: Output number to avoid integration
-INPUTS 7
-Time  Pcoll_kW  PColl_Wm2  IT_Coll_Wm2 TCollOut TCollIn MfrColl
+2             ! 5: Number of inputs to avoid integration, -
+4             ! 6: Output number to avoid integration
+5             ! 7: Output number to avoid integration
+INPUTS 6
+Pcoll_kW  PColl_kWm2  IT_Coll_kWm2 TCollOut TCollIn MfrColl
 **  
-Time  Pcoll_kW  PColl_Wm2  IT_Coll_Wm2 TCollOut TCollIn MfrColl
+Pcoll_kW  PColl_kWm2  IT_Coll_kWm2 TCollOut TCollIn MfrColl
 

@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SI-GEO-15-70.ddck
+*********************************************
+** Heat pump data for SI-GEO-15-70 heat pump
+** Data exported from Polysun at 03/12/19 16:02:14
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 59.1
+MfrHpCondRef = 9771
+MfrHpEvapRef = 9771
+COPNom = 4.324310
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*56.97907137
+CHPM_c2 = sizeHpRatio*685.26377475
+CHPM_c3 = sizeHpRatio*165.27853763
+CHPM_c4 = sizeHpRatio*-657.96202350
+CHPM_c5 = sizeHpRatio*244.41027846
+CHPM_c6 = sizeHpRatio*-848.16449834
+COP_c1 = 4.87632565
+COP_c2 = 64.32508409
+COP_c3 = 12.68843441
+COP_c4 = -176.46993582
+COP_c5 = -6.87519026
+COP_c6 = -117.58166615
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SI-GEO-15-70.ddck
+*********************************************

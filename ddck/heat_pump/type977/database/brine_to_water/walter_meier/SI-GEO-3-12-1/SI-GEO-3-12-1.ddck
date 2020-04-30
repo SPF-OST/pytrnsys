@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SI-GEO-3-12-1.ddck
+*********************************************
+** Heat pump data for SI-GEO-3-12-1 heat pump
+** Data exported from Polysun at 03/12/19 16:02:08
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 14.2
+MfrHpCondRef = 2344
+MfrHpEvapRef = 2344
+COPNom = 4.355691
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*13.68439639
+CHPM_c2 = sizeHpRatio*164.23747634
+CHPM_c3 = sizeHpRatio*39.52655521
+CHPM_c4 = sizeHpRatio*-156.78128795
+CHPM_c5 = sizeHpRatio*58.17710776
+CHPM_c6 = sizeHpRatio*-203.19091850
+COP_c1 = 5.06295195
+COP_c2 = 62.43430956
+COP_c3 = 10.76550895
+COP_c4 = -164.52548592
+COP_c5 = -14.43524391
+COP_c6 = -112.64517939
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SI-GEO-3-12-1.ddck
+*********************************************

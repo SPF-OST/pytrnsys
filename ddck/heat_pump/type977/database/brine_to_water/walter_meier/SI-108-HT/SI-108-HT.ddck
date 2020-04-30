@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SI-108-HT.ddck
+*********************************************
+** Heat pump data for SI-108-HT heat pump
+** Data exported from Polysun at 03/12/19 16:07:25
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 8.2
+MfrHpCondRef = 900
+MfrHpEvapRef = 900
+COPNom = 4.342596
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*11.59173251
+CHPM_c2 = sizeHpRatio*142.91008363
+CHPM_c3 = sizeHpRatio*-29.97810274
+CHPM_c4 = sizeHpRatio*-504.25442524
+CHPM_c5 = sizeHpRatio*502.20765613
+CHPM_c6 = sizeHpRatio*63.58908227
+COP_c1 = 10.34867079
+COP_c2 = 111.87608247
+COP_c3 = -59.71608650
+COP_c4 = -496.72115669
+COP_c5 = 502.64354662
+COP_c6 = 108.78164612
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SI-108-HT.ddck
+*********************************************
