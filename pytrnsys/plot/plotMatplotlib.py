@@ -1285,7 +1285,7 @@ class PlotMatplotlib():
         outfile.close()         
          
         self.gle.createGleQvsT(fileName,legends,normalized=normalized) #path not nedded becasue it is in the same folder
-
+        self.gle.executeGLE(fileName)
     #var[nvariables,nMonth] or var[nVariables], labels[nvariables]
     
     def plotPie(self,var,labels,myTitle,nameFile,printData=False,extension="pdf",sort=True,fontSize=10):
