@@ -142,8 +142,8 @@ slope90 = 90.0
 **********************************
 
 CONSTANTS 2
-myUnitWeatherData   = unitWeatherData   !from the specific weatherDataFile
-myFormatWeatherData = formatWeatherData   !formatWeatherData from the specific weatherDataFile
+myUnitWeatherData   = unitWeatherData   !from the specific weatherFile
+myFormatWeatherData = formatWeatherData   !formatWeatherData from the specific weatherFile
 
 *********************************
 ** Definition of surfaces
