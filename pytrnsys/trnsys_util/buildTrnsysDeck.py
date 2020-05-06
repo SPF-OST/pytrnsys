@@ -78,7 +78,7 @@ class BuildTrnsysDeck():
 
 
 
-    def readDeckList(self,doAutoUnitNumbering=False,dictPaths=False):
+    def readDeckList(self,pathConfig,doAutoUnitNumbering=False,dictPaths=False):
         """
 
         Parameters
@@ -107,11 +107,19 @@ class BuildTrnsysDeck():
                 nameList = split[-1]
                 pathVec = split[:-1]
                 pathList =""
-                for i in range(len(pathVec)):
-                    if(i==0):
-                        pathList =  pathVec[i]
+                for j in range(len(pathVec)):
+                    if(j==0):
+                        pathList =  pathVec[j]
                     else:
-                        pathList =  pathList+"\\"+pathVec[i]
+                        pathList =  pathList+"\\"+pathVec[j]
+            else:
+                
+                nameList = split[-1]
+                pathVec = split[:-1]
+                pathList = pathConfig
+                for j in range(len(pathVec)):
+                    pathList = pathList + "\\" + pathVec[j]
+                dictPaths[self.nameList[i]]=os.path.join(pathConfig,dictPaths[self.nameList[i]])
                 
             firstThreeLines=self.loadDeck(pathList,nameList)
 
@@ -121,7 +129,7 @@ class BuildTrnsysDeck():
                 self.dependencies[nameList] = requiredVariables-definedVariables
                 self.definitions[nameList]=definedVariables
 
-            self.linesChanged = deckUtils.changeAssignPath(self.linesChanged,'path$',dictPaths[os.path.join(pathList,nameList)])
+            self.linesChanged = deckUtils.changeAssignPath(self.linesChanged,'path$',dictPaths[os.path.join(self.nameList[i])])
             addedLines = firstThreeLines+self.linesChanged
             
             caption = " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"%(nameList,pathList)

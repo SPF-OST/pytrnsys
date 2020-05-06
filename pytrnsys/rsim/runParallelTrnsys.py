@@ -322,7 +322,7 @@ class RunParallelTrnsys():
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
         deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck)
-        deck.readDeckList(doAutoUnitNumbering=self.inputs['doAutoUnitNumbering'],dictPaths=self.dictDdckPaths)
+        deck.readDeckList(self.pathConfig,doAutoUnitNumbering=self.inputs['doAutoUnitNumbering'],dictPaths=self.dictDdckPaths)
         deck.createDependencyGraph()
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
