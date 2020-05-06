@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN HPP14L-K-BC.ddck
+*********************************************
+** Heat pump data for HPP14L-K-BC heat pump
+** Data exported from Polysun at 02/26/19 13:28:38
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 14.9
+MfrHpCondRef = 3200
+MfrHpEvapRef = 8000
+COPNom = 4.006308
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*15.43293225
+CHPM_c2 = sizeHpRatio*147.21428799
+CHPM_c3 = sizeHpRatio*38.86557830
+CHPM_c4 = sizeHpRatio*-56.90849588
+CHPM_c5 = sizeHpRatio*221.40441407
+CHPM_c6 = sizeHpRatio*-273.59492042
+COP_c1 = 8.01635206
+COP_c2 = 60.06896159
+COP_c3 = -32.97307726
+COP_c4 = -206.88868296
+COP_c5 = 58.34264200
+COP_c6 = 16.44166778
+TMinEvapTin = -20.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END HPP14L-K-BC.ddck
+*********************************************

@@ -47,8 +47,6 @@ qSysIn_Collector = PColl_kW
 EQUATIONS 1
 pumpColOn = puColOn
 
-
-
 CONSTANTS 2
 C_tilt = slopeSurfUser_1  ! @dependencyDdck Collector tilt angle / slope [°]
 C_azim = aziSurfUSer_1    ! @dependencyDdck Collector azimuth  (0:s, 90:w, 270: e) [°]

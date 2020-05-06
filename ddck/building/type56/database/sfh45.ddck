@@ -20,8 +20,10 @@ unitAssignBuilding = 56
 
 ASSIGN PATH$\building\type56\database\files\T44A38sfh045.bui unitAssignBuilding     ! Building def. file, -
 
-CONSTANTS 4     
+CONSTANTS 6     
 PheatBuiD = 12830  ! design heating rate for building an location [kJ/h]
 TBuiFlNom = 35     ! Design flow temp. heating syst. [�C]
 TBuiRtNom = 30     ! Design return temp. heating syst. [�C]
 Precond = NIX      ! Extracted mean ground preconditioning power
+AreaBui = 120
+TroomSetCool = 24

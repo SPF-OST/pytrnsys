@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SIN-50TU.ddck
+*********************************************
+** Heat pump data for SIN-50TU heat pump
+** Data exported from Polysun at 03/12/19 16:04:51
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 51.8
+MfrHpCondRef = 8800
+MfrHpEvapRef = 8800
+COPNom = 4.908829
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*45.71304303
+CHPM_c2 = sizeHpRatio*532.53131448
+CHPM_c3 = sizeHpRatio*214.62313446
+CHPM_c4 = sizeHpRatio*-680.34969369
+CHPM_c5 = sizeHpRatio*714.20006812
+CHPM_c6 = sizeHpRatio*-1087.54217179
+COP_c1 = 6.54428379
+COP_c2 = 62.67242063
+COP_c3 = 3.14906192
+COP_c4 = -165.28061506
+COP_c5 = 173.88253788
+COP_c6 = -115.21571367
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SIN-50TU.ddck
+*********************************************

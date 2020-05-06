@@ -38,11 +38,6 @@ qSysOut_DhwDemand = Pdhw_kW
 ** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
 *************************************************************************************************
 
-**********************************************
-** Dependencies with overall variables 
-**
-**Tcw from weatherData
-**********************************************
 CONSTANTS 1
 TDhwSupply = Tcw !TcwAvg   Standard cold water temperature (�C)   TcwAvg  from weatherData
 

@@ -9,7 +9,7 @@
 
 ***************************************************************************
 ** Description: 
-** HX with constant efficiency used for dhw external heat exchanger. Mass flow is controlled internally.
+** HX with constant efficiency used for dhw external heat exchanger. Mass flow is controlled internally and has to be used in the control for the pump.
 ** TODO:
 ***************************************************************************
 
@@ -31,6 +31,15 @@ MfrLoadDHWHXIn = ABS(MfrPiHxDhwSecIn)
 *************************************************************************************************
 EQUATIONS 1
 TDhwSetPoint = Tdhwset
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+EQUATIONS 2
+TsourceDHWHXOut = TSourceDHWHXIn-HTR_HXDHWHX/(MfrSrcDHWHXUsed*cpWat+0.0000000001)
+TLoadDHWHXOut = [500,7]		!Load side outlet temperature	C
+
 
 ***********************************
 ** outputs to other ddck
@@ -79,15 +88,14 @@ TSourceDHWHXIn
 EQUATIONS 1    ! outputs of Input Value Recall
 TSourceDHWHXInR = [18,1]      
 
-EQUATIONS 8
+EQUATIONS 6
 TsourceDHWHXOutT = [500,5]	!Source-side outlet temperature	C
 MfrSourceDHWHX = [500,6]		!Source side flow rate	kg/hr
-TLoadDHWHXOut = [500,7]		!Load side outlet temperature	C
 MrfLoadDHWHX = [500,8]		!Load side flow rate	kg/hr
 HTR_HXDHWHX = [500,10]		!Heat transfer rate	kJ/hr
 fractionOfBypass = [500,9]		!Overall heat transfer coefficient	kJ/hr.K
 QHXDHW_kW = HTR_HXDHWHX/3600
-TsourceDHWHXOut = TSourceDHWHXIn-HTR_HXDHWHX/(MfrSrcDHWHXUsed*cpWat+0.0000000001)
+
 
 UNIT 501 TYPE 65     ! Online Plotter HX
 PARAMETERS 12     

@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SINH-11TE.ddck
+*********************************************
+** Heat pump data for SINH-11TE heat pump
+** Data exported from Polysun at 03/12/19 16:05:05
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 10.7
+MfrHpCondRef = 1900
+MfrHpEvapRef = 1900
+COPNom = 4.405178
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*10.24652947
+CHPM_c2 = sizeHpRatio*90.91621951
+CHPM_c3 = sizeHpRatio*29.12071422
+CHPM_c4 = sizeHpRatio*31.55900893
+CHPM_c5 = sizeHpRatio*24.89221820
+CHPM_c6 = sizeHpRatio*-149.75596497
+COP_c1 = 5.08339532
+COP_c2 = 33.20641490
+COP_c3 = 10.67890439
+COP_c4 = 0.70041571
+COP_c5 = 94.67781913
+COP_c6 = -116.69779944
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SINH-11TE.ddck
+*********************************************

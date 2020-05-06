@@ -1,0 +1,24 @@
+* Type832 - IAM data file for optical mode Omode=4
+* Collector: SPF nr.910 DCA-58/20 ETC
+* IAM data (can include max 10 incident angles).
+* IA - Incident angle
+* IAML - Longtitudinal component of incident angle modifier
+* IAMT - Transversal component of incident angle modifier
+* First line: 
+* IA1	IA2	...	IAn
+* Subsequent lines: 
+* IAML1	IAMT1
+* IAML2	IAMT2
+* ...	...
+* IAMLn	IAMTn
+0	10	20	30	40	50	60	70	80	90
+1.00	1.00
+1.00	1.02
+1.00	1.06
+0.99	1.16
+0.98	1.31
+0.94	1.37
+0.87	1.33
+0.74	1.19
+0.48	0.62
+0.00	0.00

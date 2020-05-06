@@ -6,6 +6,6 @@
 /.idea/
 *gz
 *.orig
-
+**/.idea/
 
 docs/README.md

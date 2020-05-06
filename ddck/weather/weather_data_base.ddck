@@ -106,11 +106,10 @@ IT_H_Wm2 = IT_H_kW*100
 IB_H_Wm2 = IB_H_KW*100  
 **IB_S_Wm2 = IB_S_kW*100     ! Direct Irradiation on south plane in kW/m3
 
-EQUATIONS 4    ! pressure conversions
+EQUATIONS 3    ! pressure conversions
 pamb_kPa = pamb_Pa/1000     ! ambient pressure [kPa]
 pamb_atm = pamb_kPa/101.325     ! Ambient pressure [atm]
 pamb_bar = pamb_kPa/100     ! Ambient pressure [bar]
-pamb_mbar = pamb_bar*1000    !mbar, Ambient pressure [mbar]
 
 EQUATIONS 2     
 Tsky = [29,1]     ! effective sky temperature (°C)    
@@ -152,12 +151,12 @@ myFormatWeatherData = formatWeatherData   !formatWeatherData from the specific w
 CONSTANTS 8  ! Values to be filled up by GUI
 slopeSurfUser_1 = 45. ! Slope of surface-5
 aziSurfUser_1 = 0.    ! Azimuth of surface-5
-slopeSurfUser_2 = 35. ! Slope of surface-6
-aziSurfUser_2 = 0.    ! Azimuth of surface-6
-slopeSurfUser_3 = 20. ! Slope of surface-7
-aziSurfUser_3 = 180.    ! Azimuth of surface-7
+slopeSurfUser_2 = 10. ! Slope of surface-6
+aziSurfUser_2 = 110.    ! Azimuth of surface-6
+slopeSurfUser_3 = 10. ! Slope of surface-7
+aziSurfUser_3 = 70.    ! Azimuth of surface-7
 slopeSurfUser_4 = 10. ! Slope of surface-8
-aziSurfUser_4 = 0.    ! Azimuth of surface-8
+aziSurfUser_4 = 70.    ! Azimuth of surface-8
 
 
 ***************************************
@@ -273,33 +272,7 @@ Tamb IT_H_KW IB_H_kW
 ****
 Tamb IT_H_KW IB_H_kW
 
-
-***************************************
-** ONLINE PLOTTER
-**************************************
-
-**UNIT 50 TYPE 65     ! Online Plotter Weather data
-**PARAMETERS 12     
-**9     ! 1 Nb. of left-axis variables
-**0     ! 2 Nb. of right-axis variables
-**0     ! 3 Left axis minimum
-**1000     ! 4 Left axis maximum
-**0    ! 5 Right axis minimum
-**1000     ! 6 Right axis maximum
-**nPlotsPerSim     ! 7 Number of plots per simulation
-**12     ! 8 X-axis gridpoints
-**1     ! 9 Shut off Online w/o removing
-**-1     ! 10 Logical unit for output file
-**0     ! 11 Output file units
-**0     ! 12 Output file delimiter
-**INPUTS 9    
-**IT_H_Wm2 IT_S_Wm2 IT_N_Wm2 IT_E_Wm2 IT_W_Wm2  IT_surfUser_1_Wm2 IT_surfUser_2_Wm2 IT_surfUser_3_Wm2 IT_surfUser_4_Wm2
-****     
-**IT_H_Wm2 IT_S_Wm2 IT_N_Wm2 IT_E_Wm2 IT_W_Wm2  IT_surfUser_1_Wm2 IT_surfUser_2_Wm2 IT_surfUser_3_Wm2 IT_surfUser_4_Wm2
-**LABELS  3    
-**Irr_W/m2
-**None
-**WeatherData     
+   
 
 *******************************
 **END WeatherData.ddck

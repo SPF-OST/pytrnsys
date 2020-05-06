@@ -1,0 +1,32 @@
+*********************************************
+** BEGIN HP06L-K-BC.ddck
+*********************************************
+** Heat pump data for HP06L-K-BC heat pump
+** Data exported from Polysun at 02/26/19 13:28:30
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 6.4
+MfrHpCondRef = 1200
+MfrHpEvapRef = 3000
+COPNom = 4.009848
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*5.73181768
+CHPM_c2 = sizeHpRatio*60.95739932
+CHPM_c3 = sizeHpRatio*28.44504187
+CHPM_c4 = sizeHpRatio*9.59823870
+CHPM_c5 = sizeHpRatio*51.49090573
+CHPM_c6 = sizeHpRatio*-152.96542425
+COP_c1 = 8.40841243
+COP_c2 = 71.51958262
+COP_c3 = -36.21777645
+COP_c4 = -265.40693130
+COP_c5 = 66.68129559
+COP_c6 = 19.12016122
+TMinEvapTin = -20.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 75
+*********************************************
+** END HP06L-K-BC.ddck
+*********************************************

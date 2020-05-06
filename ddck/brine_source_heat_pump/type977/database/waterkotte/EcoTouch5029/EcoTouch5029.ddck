@@ -1,0 +1,43 @@
+*********************************************
+** BEGIN Eco Touch from WaterKotte
+*********************************************
+** Heat pump data for Eco Touch from WatterKotte with R410A
+** Data obtained from project Erlacker
+** Author : Mattia Battaglia
+*********************************************
+CONSTANTS 22
+TEvapMaxHp = 40
+sizeHpNom = 10.4
+MfrHpCondRef = 1800
+MfrHpEvapRef = 2600
+COPNom = 5.1 ! at B0W35
+TEvapMax = 35
+tCondMaxHp = 70
+CHPM_c1 = sizeHpRatio*11.8927	
+CHPM_c2 = sizeHpRatio*107.7005	
+CHPM_c3 = sizeHpRatio*-6.1272	
+CHPM_c4 = sizeHpRatio*-224.6454	
+CHPM_c5 = sizeHpRatio*227.8483	
+CHPM_c6 = sizeHpRatio*-20.3614	
+COP_c1 = 11.9231
+COP_c2 = 71.3890
+COP_c3 = -74.7792
+COP_c4 = -293.9530
+COP_c5 = 116.7458
+COP_c6 = 145.7772
+TMinEvapTin = -8
+TMinEvapTout = TMinEvapTin - 3
+cpEvap = cpBri
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

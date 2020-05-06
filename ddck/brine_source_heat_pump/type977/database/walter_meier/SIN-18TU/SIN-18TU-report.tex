@@ -1,0 +1,127 @@
+\documentclass[english]{SPFShortReport}
+\usepackage{subfigure}
+\usepackage{spfFigures}
+\usepackage{longtable}
+\usepackage{url}
+\usepackage{gensymb}
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\reportName{Type977 fitting for heat pump SIN-18TU}
+\reportSubName{Parametric Heat Pump calculation} 
+\reportDate{\today \hspace{0.1cm} at: \currenttime \hspace{0.1cm} h} 
+\author{Dani Carbonell}
+\address{dani.carbonell@spf.ch}
+\begin{document}
+\begin{table}[!ht]
+\begin{small}
+\caption{Fitted coefficients for the heat pump.}
+\begin{center}
+\resizebox{12cm}{!} 
+{
+\begin{tabular}{l | c c } 
+\hline
+\hline
+Coefficient &Description & \\ 
+ & &$[kW]$\\ 
+\hline
+$P_{Q_{1}}$ & \emph{$1^{st}$ condenser polynomial coefficient}  & 1.6031e+01    \\ 
+$P_{Q_{2}}$ & \emph{$2^{st}$ condenser polynomial coefficient}  & 1.6862e+02    \\ 
+$P_{Q_{3}}$ & \emph{$3^{st}$ condenser polynomial coefficient}  & 4.5006e+01    \\ 
+$P_{Q_{4}}$ & \emph{$4^{st}$ condenser polynomial coefficient}  & -3.0845e+02    \\ 
+$P_{Q_{5}}$ & \emph{$5^{st}$ condenser polynomial coefficient}  & 2.7295e+02    \\ 
+$P_{Q_{6}}$ & \emph{$6^{st}$ condenser polynomial coefficient}  & -1.9880e+02    \\ 
+\hline
+$P_{COP_{1}}$ & \emph{$1^{st}$ COP polynomial coefficient}  & 6.0450e+00    \\ 
+$P_{COP_{2}}$ & \emph{$2^{st}$ COP polynomial coefficient}  & 5.1596e+01    \\ 
+$P_{COP_{3}}$ & \emph{$3^{st}$ COP polynomial coefficient}  & 4.8630e-01    \\ 
+$P_{COP_{4}}$ & \emph{$4^{st}$ COP polynomial coefficient}  & -1.9286e+02    \\ 
+$P_{COP_{5}}$ & \emph{$5^{st}$ COP polynomial coefficient}  & -2.0545e+01    \\ 
+$P_{COP_{6}}$ & \emph{$6^{st}$ COP polynomial coefficient}  & -8.4732e+01    \\ 
+\hline
+$\dot m_{cond}$ & 3000.00 $[kg/h]$ \\ 
+$\dot m_{evap}$ & 3000.00 $[kg/h]$ \\ 
+\hline
+$COP_{nom}$ (A0W35)& 4.64 \\ 
+$Q_{cond,nom}$ (A0W35)& 17.39 $[kW]$\\ 
+$Q_{evap,nom}$ (A0W35)& 13.64 $[kW]$\\ 
+$W_{comp,nom}$ (A0W35)& 3.75 $[kW]$\\ 
+\hline
+ $RMS_{COP}$ & $4.63e-02$ \\ 
+ $RMS_{Q_{cond}}$ & $1.09e-01$ \\ 
+ $RMS_{W_{comp}}$ & $5.19e-02$ \\ 
+\hline
+Fit model & Average Temperature\\ 
+\hline
+\hline
+\end{tabular}
+}
+\label{CoefTable}
+\end{center}
+\end{small}
+\end{table}
+\begin{table}[!ht]
+\begin{small}
+\caption{Differences between experiments and fitted data for the heat pump.          $error=100 \cdot |\frac{Q_{exp}-Q_{num}}{Q_{exp}}|$ and $RMS = \sqrt { \sum{\frac{(Q_{exp}-Q_{num})^2}{n_p}} }$ where $n_p$ is the number of data points.}
+\begin{center}
+\resizebox{12cm}{!} 
+{
+\begin{tabular}{l | c c c c c c c c c c } 
+\hline
+\hline
+$T_{cond,out}$ &$T_{evap,in}$ &$COP$ &$COP_{exp}$ &error &$Q_{cond}$ &$Q_{cond,exp}$ &error &$W_{comp}$ &$W_{comp,exp}$ &error \\ 
+$^oC$ &$^oC$ &$[-]$ &$[-]$ &$[\%]$ &$[kW]$ &$[kW]$ &$[\%]$ &$[kW]$ &$[kW]$ &$[\%]$\\ 
+\hline
+35.00  & -5.00 & 4.16 & 4.10 & 1.5 & 15.44 & 15.40 & 0.3 & 3.72 & 3.76 & 1.18\\ 
+35.00  & 0.00 & 4.67 & 4.70 & 0.6 & 17.54 & 17.50 & 0.2 & 3.75 & 3.72 & 0.87\\ 
+35.00  & 5.00 & 5.19 & 5.22 & 0.5 & 19.80 & 19.90 & 0.5 & 3.81 & 3.81 & 0.01\\ 
+50.00  & -5.00 & 3.10 & 3.13 & 1.0 & 15.20 & 15.47 & 1.7 & 4.91 & 4.95 & 0.71\\ 
+50.00  & 0.00 & 3.43 & 3.34 & 2.5 & 17.05 & 16.83 & 1.3 & 4.97 & 5.03 & 1.20\\ 
+50.00  & 5.00 & 3.78 & 3.70 & 1.9 & 19.07 & 19.07 & 0.0 & 5.05 & 5.15 & 1.88\\ 
+45.00  & -5.00 & 3.50 & 3.55 & 1.2 & 15.40 & 15.43 & 0.2 & 4.40 & 4.35 & 1.03\\ 
+45.00  & 0.00 & 3.90 & 3.92 & 0.5 & 17.34 & 17.17 & 1.0 & 4.44 & 4.38 & 1.50\\ 
+45.00  & 5.00 & 4.31 & 4.35 & 0.9 & 19.44 & 19.48 & 0.2 & 4.51 & 4.48 & 0.70\\ 
+55.00  & 0.00 & 2.90 & 2.90 & 0.0 & 16.64 & 16.50 & 0.9 & 5.74 & 5.69 & 0.92\\ 
+55.00  & 5.00 & 3.19 & 3.21 & 0.6 & 18.59 & 18.65 & 0.3 & 5.83 & 5.82 & 0.30\\ 
+35.00  & 10.00 & 5.70 & 5.70 & 0.1 & 22.22 & 22.30 & 0.4 & 3.90 & 3.91 & 0.29\\ 
+35.00  & 15.00 & 6.20 & 6.17 & 0.5 & 24.80 & 24.70 & 0.4 & 4.00 & 4.00 & 0.13\\ 
+50.00  & 10.00 & 4.12 & 4.05 & 1.7 & 21.26 & 21.30 & 0.2 & 5.17 & 5.26 & 1.84\\ 
+50.00  & 15.00 & 4.45 & 4.38 & 1.6 & 23.60 & 23.53 & 0.3 & 5.31 & 5.38 & 1.28\\ 
+45.00  & 10.00 & 4.70 & 4.75 & 1.0 & 21.70 & 21.80 & 0.4 & 4.61 & 4.59 & 0.57\\ 
+45.00  & 15.00 & 5.09 & 5.14 & 0.9 & 24.12 & 24.12 & 0.0 & 4.74 & 4.69 & 0.95\\ 
+55.00  & 10.00 & 3.47 & 3.50 & 1.0 & 20.70 & 20.80 & 0.5 & 5.97 & 5.94 & 0.48\\ 
+55.00  & 15.00 & 3.74 & 3.78 & 1.2 & 22.97 & 22.95 & 0.1 & 6.14 & 6.07 & 1.27\\ 
+\hline 
+ Sum &  & &  & 19.2 &  &  & 8.9 & &  & 17.10\\ 
+\hline 
+ $RMS_{COP}$ & $4.63e-02$ \\ 
+ $RMS_{Q_{cond}}$ & $1.09e-01$ \\ 
+ $RMS_{W_{comp}}$ & $5.19e-02$ \\ 
+\hline
+\hline
+\end{tabular}
+}
+\label{ErrorsTable}
+\end{center}
+\end{small}
+\end{table}
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[width=1\textwidth]{C:/Daten/spfPackages/GIT/spfTrnsysFiles/HeatPump/BrineToWater/Walter Meier/SIN-18TU/SIN-18TU-Qcond.pdf}
+\caption{$Q_{cond}$ differences between experiments and fitted data}
+\label{QcongFig}
+\end{center}
+\end{figure}
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[width=1\textwidth]{C:/Daten/spfPackages/GIT/spfTrnsysFiles/HeatPump/BrineToWater/Walter Meier/SIN-18TU/SIN-18TU-Qcomp.pdf}
+\caption{$W_{comp}$ differences between experiments and fitted data}
+\label{QcompFig}
+\end{center}
+\end{figure}
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[width=1\textwidth]{C:/Daten/spfPackages/GIT/spfTrnsysFiles/HeatPump/BrineToWater/Walter Meier/SIN-18TU/SIN-18TU-COP.pdf}
+\caption{$COP$ differences between experiments and fitted data}
+\label{COPFig}
+\end{center}
+\end{figure}
+\end{document}

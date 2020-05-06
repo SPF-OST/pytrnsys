@@ -1,0 +1,28 @@
+*******************************
+**BEGIN fronius_symo_inverter.dck
+*******************************
+
+
+*****************************************
+** Contact person : Dani Carbonell    
+** Creation date  : 01.08.19
+** Last changes   : 05.05.2020 Mattia Battaglia
+*****************************************
+
+***************************************************************************
+** Description: 
+** inverter database ddck
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** None
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None
+CONSTANTS 1
+unitReadInvPv=124
+
+ASSIGN PATH$\pv\type194\database\140911_FRONIUS_SYMO_Inverter.dat unitReadInvPv

@@ -1,0 +1,159 @@
+Version 17 
+CONSTANTS 5
+dtSim = 1  
+I_N_T_E = 0.003    
+C_O_N_V_E = 0.001  
+START = 0     
+STOP = 15 
+**  Start time   End time   Time step     
+SIMULATION START STOP dtSim    
+TOLERANCES  I_N_T_E  C_O_N_V_E 
+LIMITS 30 3000 25    ! Max iterations   Max warnings   Max calls to a component before it will be traced
+DFQ 1      ! TRNSYS numerical integration solver method
+WIDTH 132  ! TRNSYS output file width, number of characters
+LIST       ! NOLIST statement
+**   Solver statement     
+SOLVER 0 1 1      ! Solver statement, Minimum relaxation factor, Maximum relaxation factor
+NAN_CHECK 0     ! Nan DEBUG statement
+OVERWRITE_CHECK 0     ! Overwrite DEBUG statement
+EQSOLVER 0     ! EQUATION SOLVER statement
+**     
+CONSTANTS 5     
+CPBRI = 3.8160        ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 °C Tyfocor LS
+RHOBRI = 1016.0     ! density Glycol [kg/m³]; Value for an average pipe temperature with 55 °C Tyfocor L
+CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 0C
+RHOWAT = 998.0      ! density of Water  [kg/m³] at20 0C
+CPAIR = 1.006      ! density of Water  [kg/m³] at20 0C
+**     
+EQUATIONS 2
+nColumns = 8
+nParemeterType9 = nColumns*4+2+4
+**
+UNIT 19 TYPE 9    
+PARAMETERS nParemeterType9     
+1     ! 1 Mode
+2     ! 2 Header Lines to Skip
+nColumns  ! 3 No. of values to read
+dtSim     ! 4 Time interval of data [h]
+-1    ! 5 Interpolate or not?-1
+1     ! 6 Multiplication factor-1
+0     ! 7 Addition factor-1
+0     ! 8 Average or instantaneous value-1
+-1    ! 5 Interpolate or not?-1
+1     ! 6 Multiplication factor-1
+0     ! 7 Addition factor-1
+0     ! 8 Average or instantaneous value-1
+-1    ! 5 Interpolate or not?-1
+1     ! 6 Multiplication factor-1
+0     ! 7 Addition factor-1
+0     ! 8 Average or instantaneous value-1
+-1    ! 5 Interpolate or not?-1
+1     ! 6 Multiplication factor-1
+0     ! 7 Addition factor-1
+0     ! 8 Average or instantaneous value-1
+-1    ! 5 Interpolate or not?-1
+1     ! 6 Multiplication factor-1
+0     ! 7 Addition factor-1
+0     ! 8 Average or instantaneous value-1
+-1    ! 5 Interpolate or not?-1
+1     ! 6 Multiplication factor-1
+0     ! 7 Addition factor-1
+0     ! 8 Average or instantaneous value-1
+-1    ! 5 Interpolate or not?-1
+1     ! 6 Multiplication factor-1
+0     ! 7 Addition factor-1
+0     ! 8 Average or instantaneous value-1
+-1    ! 5 Interpolate or not?-1
+1     ! 6 Multiplication factor-1
+0     ! 7 Addition factor-1
+0     ! 8 Average or instantaneous value-1
+155   ! 9 Logical unit for input file
+-1    ! 10 Free format mode
+ASSIGN    "LA_12TU-TRNSYS.dat"     155     
+** TinEvap tInCond QCondNum qEvapNum COPNum PElNum mFlowEvap mFlowCond  
+EQUATIONS 8
+TEvapIn = [19,1]     
+TCondIn = [19,2]
+QCondNum = [19,3] !kW
+QEvapNum = [19,4]
+COPNum = [19,5]
+PElNum = [19,6]
+MfrEvap = [19,7]      ! kg/h
+MfrCond = [19,8]
+EQUATIONS 5 
+frCond = 1
+frCOP  = 1
+tRoom  = 21
+gammaOn = 1    
+rHAir = 1    
+Unit 162 Type 977     ! Compression Heat Pump Model
+PARAMETERS 28     
+ 17.610377
+ 188.776449
+ -112.456846
+ -380.308231
+ -768.735351
+ 347.639662
+ -2.887370
+ 50.359984
+ 110.450052
+ -105.300131
+ -137.758690
+ -464.942679
+0     ! 13: tau_start, s
+0      !14 tau_stop
+-100     ! 15: tevapIce,oC
+1     ! 16: eta_defrost, -
+0     ! 17: ventilator electricity consumption, kW
+0     ! 18: controller electricity consumption, kW
+-10     ! 19: tevap,min, oC
+25     ! 20: tevap,max, oC
+0     ! 21: tcond,min, oC
+75     ! 22: tcond,max, oC
+CPBRI     ! 23: cp,evap, kJ/kgK
+CpWat     ! 24: cp,cond, kJ/kgK
+0     ! 25: tau_error, hr
+0    ! Moloss 0-3
+0    ! CTerm kJ/K 
+0    ! UaLoss kJ/K 
+INPUTS 9     
+TEvapIn     ! 1: tevap,in, oC
+MfrEvap     ! 2: Mfr,evap,in, kg/h
+TcondIn     ! 3: tcond,in, oC
+MfrCond     ! 4: Mfr,cond,in, kg/h
+gammaOn     ! 5: gamma_ON, -
+rHAir     ! 6: RH_air_in
+tRoom
+frCond  ! - factor for multiplication with Condensor heat output for modulating / inverter controlled heat pumps
+frCOP
+** INPUT INITIAL VALUES     
+TEvapIn MfrEvap TcondIn MfrCond gammaOn rHAir tRoom frCond frCOP    
+EQUATIONS 6     ! Heat pump outputs
+TCondOut = [162,3]     ! Temperature of the condenser (heat sink) outlet
+Wcp_kW = [162,5]     ! electricity consumption of compressor, kW
+Pel_kW = [162,6]     ! electricity consumption total, kW
+QCond_kW = [162,8]     ! Heat output condenser, kW
+TEvapOut = [162,1]       
+COP = QCond_kW/(Pel_kW+0.0000001)     
+EQUATIONS 3
+errorCOP   = ABS(COP-COPNum)
+errorQCond = ABS(QCond_kW-QCondNum)
+errorPEl   = ABS(Pel_kW-PelNum)
+ASSIGN "LA_12TU.Prt"  156     
+UNIT 99 TYPE 25     ! Timestep simulation results 
+PARAMETERS 10 
+dtSim     ! 1 Printing interval
+START     ! 2 Start time
+STOP    ! 3 Stop time
+156     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+1     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 13
+errorQCond errorCOP errorPEl QCond_kW QCondNum COP COPNum Pel_KW PelNum TEvapIn TEvapOut TCondOut TCondIn
+**
+errorQCond errorCOP errorPEl QCond_kW QCondNum COP COPNum Pel_KW PelNum TEvapIn TEvapOut TCondOut TCondIn
+END

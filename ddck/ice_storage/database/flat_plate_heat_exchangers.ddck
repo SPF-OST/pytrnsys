@@ -33,10 +33,10 @@ iceThickToDeIce=100 ! No de-ice is possible
 
 **************parameters for hx **************
 CONSTANTS 5        
-heightHx1 = 0.98 ! 1.9           ! HX characteristic height [m]
+heightHx1 = Tankheight ! 1.9           ! HX characteristic height [m]
 charThick= 9e-3   
-AHx1      = myHxArea
-LHx1      = AHx1/2.0/heightHx1 
+AHx1      = heightHx1*LHx1
+LHx1      = Tankwidth 
 dxWallHx = 6e-4     
 
 

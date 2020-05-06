@@ -1,0 +1,36 @@
+*******************************
+**BEGIN HeatPumpSIN6TU.dck
+*******************************
+    
+*****************************************
+** Heat pump data for SIN 6T heat pump model.
+** Data exported from Polysun data base
+** Author: Dani Carbonell        
+******************************************
+
+CONSTANTS 21
+TEvapMaxHp = 40
+sizeHpNom = 10.5    
+MfrHpCondRef = 1800     
+MfrHpEvapRef = 2000    
+COPNom   = 4.68         
+TEvapMax = 35 ! 70 
+tCondMaxHp = 75
+CHPM_c1= sizeHpRatio*14.13
+CHPM_c2= sizeHpRatio*56.25
+CHPM_c3= sizeHpRatio*-35.63
+CHPM_c4= sizeHpRatio*295 
+CHPM_c5= sizeHpRatio*-420
+CHPM_c6= sizeHpRatio*0  
+COP_c1=7.4
+COP_c2=37.25
+COP_c3=-29
+COP_c4=-37.5     
+COP_c5=-92.5
+COP_c6=0 
+TMinEvapTin  = -8 
+TMinEvapTout = TMinEvapTin-3   
+
+*******************************
+**END BW-HeatPump.dck
+*******************************

@@ -32,33 +32,15 @@ MfrDhw = ABS(MfrPiDHWDemand) ! Mass flow on consumption side mixed down, kg/h = 
 ***********************************
 
 ******************************************************************************************
-** outputs to energy balance in kWh and ABSOLUTE value
-** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
-******************************************************************************************
-
-***********************************
-** Dependencies with other ddck
-***********************************
-  
-
-***********************************
-** inputs from hydraulic solver
-***********************************
-
-***********************************
-** outputs to hydraulic solver
-***********************************
-
-******************************************************************************************
 ** outputs to energy balance in kWh
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
 EQUATIONS 1
 qSysOut_DhwDemand = Pdhw_kW
 
-*************************************************************************************************
-** Dependencies with other types
-*************************************************************************************************
+***********************************
+** Dependencies with other ddck
+***********************************
 
 CONSTANTS 1
 TcwStd = TcwAvg   ! Standard cold water temperature (°C)   TcwAvg  from weatherData

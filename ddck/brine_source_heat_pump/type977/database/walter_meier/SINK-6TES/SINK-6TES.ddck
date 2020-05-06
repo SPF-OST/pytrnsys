@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SINK-6TES.ddck
+*********************************************
+** Heat pump data for SINK-6TES heat pump
+** Data exported from Polysun at 03/12/19 16:05:13
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 4.9
+MfrHpCondRef = 700
+MfrHpEvapRef = 700
+COPNom = 3.284545
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*83.75060800
+CHPM_c2 = sizeHpRatio*-71.52152373
+CHPM_c3 = sizeHpRatio*-1084.22053225
+CHPM_c4 = sizeHpRatio*799.65247572
+CHPM_c5 = sizeHpRatio*107.99326010
+CHPM_c6 = sizeHpRatio*3555.79078947
+COP_c1 = 103.81316666
+COP_c2 = -88.26725869
+COP_c3 = -1375.02234352
+COP_c4 = 778.82436859
+COP_c5 = 62.67009089
+COP_c6 = 4457.91058271
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SINK-6TES.ddck
+*********************************************

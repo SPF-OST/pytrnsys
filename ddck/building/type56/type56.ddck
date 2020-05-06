@@ -1,0 +1,471 @@
+*******************************
+**BEGIN bui_task44_sfh45_rad_floor.ddck
+*******************************
+    
+*****************************************
+** Contact person : Dani Carbonell   
+** Creation date  : 30.09.2016
+** Last changes   : 28.04.2020, MB 
+*****************************************
+
+***************************************************************************
+** Description: 
+** building defined in IEA Task44 using the radiant floor model 977
+** TODO: 
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+ 
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here.
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+**********************************************
+EQUATIONS 2
+myPheatBuiRad = PheatBuiRad
+myPheatBuiConv = PheatBuiConv
+***********************************
+** outputs to other ddck
+***********************************
+EQUATIONS 1
+TroomRc = [57,1]
+
+
+
+
+         
+CONSTANTS 4
+Vbui = 389.45     ! air volume of the building [m3]
+TroomSet = 21.00     ! Setpoint for Room temperature, �C
+TIdCoolSet = 100     
+TIdHeatSet = 0     
+
+CONSTANTS 1
+UNITPErsScheme = 999
+
+ASSIGN PATH$\building\profiles\T44A38_person_scheme.txt unitPersScheme     ! Internal Load Profile
+**       
+UNIT 32 TYPE 2     ! Building Shading Controller: Radiation
+PARAMETERS 2     
+5     ! 1 No. of oscillations
+5000     ! 2 High limit cut-out
+INPUTS 6     
+IT_H           ! Radiation:IT_H ->Upper input value
+0,0            ! Lower input value
+0,0            ! Monitoring value
+shadingControlR          ! Output control function ->Input control function
+0,0            ! Upper dead band
+0,0            ! Lower dead band
+*** INITIAL INPUT VALUES     
+15 0 0 0 1080.0 720.0     
+**        300 W/m� a. 200 W/m�      
+**      37500 lux  a. 25000 lux      
+**  ->  daylight fraction of lighting ~2%      
+**        750 lux  a. 500 lux      
+EQUATIONS 1
+shadingControlR=[32,1] !Changed automatically
+
+UNIT 49 TYPE 2     ! Building Shading Controller: Temperature
+PARAMETERS 2     
+5     ! 1 No. of oscillations
+95     ! 2 High limit cut-out
+INPUTS 6     
+Troom    		! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
+0,0           	! Lower input value
+0,0           	! Monitoring value
+shadingControlT	! Output control function ->Input control function
+0,0           	! Upper dead band
+0,0           	! Lower dead band
+*** INITIAL INPUT VALUES     
+20 0 0 0 23.8 22.8      
+
+EQUATIONS 1
+shadingControlT=[49,1] !Changed automatically
+
+     
+UNIT 34 TYPE 14     ! Type14h: Shading Fraction Value [%] Results im percent from program "PARASOL", 45� gray venetian blind, Z�rich
+PARAMETERS 26     
+0     ! 1 Initial value of time
+11.3     ! 2 Initial value of function
+730 13.2  1460  17.2  2190  23.8  2920  28.0     
+3650  29.8  4380  28.7  5110  24.7  5840  19.0     
+6570  14.8  7300  14.7  8030  12.3  8760  11.3     
+*       
+EQUATIONS 1     ! Variable Shading
+i_SHD = [49,1]*[32,1]*((100.0-[34,1])/100.0)     
+     
+     
+UNIT 35 TYPE 9     ! Data reader Number of persons
+PARAMETERS 14     
+5     ! 1 Mode
+1     ! 2 Header Lines to Skip
+2     ! 3 No. of values to read
+1     ! 4 Time interval of data
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+unitPersScheme     ! 9 Logical unit for input file (vorher 17)
+-1     ! 10 Free format mode
+         
+EQUATIONS 2
+Npers = [35,2]     ! number of persons present in the building, -
+unitIgains = 38
+
+ASSIGN PATH$\building\profiles\T44A38_Igains.txt unitIgains
+
+UNIT 36 TYPE 9     ! Data reader internal gains
+PARAMETERS 14     
+5     ! 1 Mode
+1     ! 2 Header Lines to Skip
+2     ! 3 No. of values to read
+1     ! 4 Time interval of data
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+unitIgains     ! 9 Logical unit for input file (vorher 18)
+-1     ! 10 Free format mode     
+     
+EQUATIONS 1     ! Internal Gains
+PbuiGainEq = [36,2]*3.6     ! Internal Gains [kJ/h]
+    
+UNIT 37 TYPE 91     ! Air to air heat exchanger of building ventilation
+PARAMETERS 3     
+0.6     ! 1 HX effectiveness / ATMOS 175DC (www.paul-lueftung.de) 88% (orig) - changed to nes. 70% 
+1.0048     ! 2 Specific heat of hot side fluid - air
+1.0048     ! 3 Specific heat of cold side fluid - air
+INPUTS 4     
+Troom     ! Hot side inlet temperature
+MfrHxBuiAir          ! Hot side flow rate
+Tamb     ! Cold side inlet temperature
+MfrHxBuiAir          ! Cold side flow rate
+*** INITIAL INPUT VALUES     
+20.0 141.6 20.0 141.6      
+     
+EQUATIONS 4     ! air exchange between building and ambient
+i_vent = 0 ! LT(Nbui,1.5)*0.4     
+MfrHxBuiAir = i_vent*Vbui                                          ! relative air mass flow rate for the SFH, -
+BoHRSOn = LE(Tamb24,12)     ! mass flow rate of the building ventilation (passive or active), kg/h
+T_HRSi = BoHRSOn*[37,3]+NOT(BoHRSOn)*Tamb     ! temperature of the air entering the building, depending on heat recovery system (HRS) on or off, �C
+     
+UNIT 38 TYPE 2     ! Temperature Building Ventilation: if summer and night and troom > 24�C - higher vent.
+PARAMETERS 2     
+5     ! 1 No. of oscillations
+95     ! 2 High limit cut-out
+INPUTS 6     
+Troom     ! Building room temp. �C
+0,0            ! Lower input value
+0,0            ! Monitoring value
+BoWinTilt2          ! Output control function ->Input control function
+0,0            ! Upper dead band
+0,0            ! Lower dead band
+*** INITIAL INPUT VALUES     
+20 0 0 0 24 23      
+     
+EQUATIONS 2     
+BoWinTilt1 = NOT(GT(24*(time/24-int(time/24)),8)*LT(24*(time/24-int(time/24)),21))     ! Boolean indicating if time is between 9 p.m. and 8 a.m.)
+BoWinTilt2 = [38,1]     ! Boolean indicating room temp. above 24 / 1 K hysteresis (off below 23)
+     
+UNIT 39 TYPE 2     ! Building Window Infiltration Controller
+PARAMETERS 2     
+5     ! 1 No. of oscillations
+50     ! 2 High limit cut-out
+INPUTS 6     
+Troom     !  T_room    -> Upper input value
+Tamb     !  T_ambient -> Lower input value
+0,0          !  Monitoring value
+BoWinTilt3        !  Output control function ->Input control function
+0,0          !  Upper dead band
+0,0          !  Lower dead band
+*** INITIAL INPUT VALUES     
+20 0 0 0 2.0 1.0     
+     
+EQUATIONS 3     
+BoWinTilt3 = [39,1]     ! Boolean indicating that ambient temp. is 2 K below room (hysteresis 1 K)
+BoWinTilt = BoWinTilt1*BoWinTilt2*BoWinTilt3*GT(Tamb24,12)     ! Combined boolean values for window tilt (open) for increased air-exchange (without heat recovery)
+a_WIN = 10*BoWinTilt     ! aperture angle of windows, �
+     
+UNIT 40   TYPE 358     ! Tilted Window Infiltration (based on A. and R. Weber, EMPA)
+PARAMETERS 4     
+1     ! 1  Mode (not used)
+1     ! 2  number windows (max. 20)
+1     ! 3  height windows  1 [m]
+1     ! 4  width  windows  1 [m]
+     
+INPUTS 3     
+Tamb     !  1    ambient temperature         
+Troom     !  2    room temperature window 1  [�C]   
+a_WIN      !  3    aperture angle   window 1  [�]                 
+**   INPUT INITIAL VALUES     
+**    1    2    3    4    5    6    7     
+ 0    20   10      
+**-----------------------------------------     
+**  Out 1: Flow rate window 1 [m3/h]     
+**  Out 2: Flow rate window 2 [m3/h]     
+**  Out 3: Flow rate window 3 [m3/h] etc..     
+**     
+EQUATIONS 3     
+V_inf_win = 6*[40,1]     ! Combined natural air flow rate through all 6 windows
+i_inf_win = V_inf_win/Vbui     ! air change rate through windows relative to building air volume [1/h]
+i_inf = i_inf_win + 0.4     ! total air change rate: 0.4 is added if not passive house
+   
+     
+
+
+EQUATIONS 6     ! Inputs for building coupling to ground calculation
+lamGroundBui = 7.2     ! thermal conductivity of ground below building, kJ/hmK
+cpGroundBui = 0.8     ! cp of ground below building, kJ/kgK
+rhoGroundBui = 2500     ! density of ground below building, kg/m3
+zGr1 = 1     ! bottom of first ground layer, m
+zGr2 = 10     ! bottom of second ground layer, m
+Aground = 70     ! surface of ground-building contact, m2
+     
+     
+EQUATIONS 4     ! Ground Properties
+lamGrd = 2      ! Thermal ground conductivity (W/mK)
+RhoGrd = 2500   ! Density of the ground (kg/m3)
+CpGrd = 0.8     ! specific heat of the ground (kJ/kgK)
+Gt = 0.025      ! Geothermal gradient (K/m)
+     
+EQUATIONS 8     ! Inputs for Undisturbed Ground temperature calculation and ground coupling losses
+zGrd1 = 1     ! depth 1 for evaluation of undisturbed ground temperature (m)
+zGrd2 = 2     ! depth 2 for evaluation of undisturbed ground temperature (m)
+zGrd5 = 5     ! depth 3 for evaluation of undisturbed ground temperature (m)
+lFl = 10     ! lenght of building floor in contact with ground (m)
+bFl = 7     ! width of building floor in contact with ground (m)
+w = 0.4     ! width of sidewalls of floor (m)
+RGrTot = 1/UGrFloor     ! total thermal resistance of floor (Km2/W)
+Psi = 0     ! Linear thermal transmittance associated with wall/floor junction (W/mK)
+     
+EQUATIONS 3     ! Determine TiAvg and dTi for floor heating
+TiMax =20+  ((TBuiFlNom + TBuiRtNom)/2-20)/(20-TambD)*(20-(TambAvg-dTambAmpl))     ! Maximum floor temperature average in coldest time of the year (�C)
+TiAvg = LT(m_Rd,1.2)*(TiMax+20)/2+GT(m_Rd,1.2)*20     ! Average of floor temperature over the year (�C)
+dTi = LT(m_Rd,1.2)*(TiMax-TiAvg)+GT(m_Rd,1.2)*0     ! amplitude of floor temperature sine-curve (K)
+        
+UNIT 55 TYPE 985     ! Undisturbed Ground Temperature and Ground Coupling
+PARAMETERS 17     
+TambAvg      ! 1: Average ambient temperature over the year (�C)
+dTambAmpl     ! 2: amplitude of sine-curve that fits ambient temp. over the year (K)
+tTambShift     ! 3: time shift for coldest average temp. according to sine-curve fit (h)
+lamGrd     ! 4: Thermal ground conductivity (W/mK)
+RhoGrd     ! 5: Density of the ground (kg/m3)
+CpGrd     ! 6: specific heat of the ground (kJ/kgK)
+Gt     ! 7: Geothermal gradient (K/m)
+zGrd1     ! 8: depth 1 for evaluation of undisturbed ground temperature (m)
+zGrd2     ! 9: depth 2 for evaluation of undisturbed ground temperature (m)
+zGrd5     ! 10: depth 3 for evaluation of undisturbed ground temperature (m)
+TiAvg     ! 11: average inside temperature over the year (�C)
+dTi     ! 12: amplitude of sine-curve that fits inside temp. over the year (K)
+lFl     ! 13: lenght of building floor in contact with ground (m)
+bFl     ! 14: width of building floor in contact with ground (m)
+w     ! 15: width of sidewalls of floor (m)
+RGrTot     ! 16: total thermal resistance of floor (Km2/W)
+Psi     ! 17: Linear thermal transmittance associated with wall/floor junction (W/mK)
+*** No variables for this Type     
+     
+     
+EQUATIONS 13     
+Tgrd1 = [55,1]     
+Tgrd2 = [55,2]     
+Tgrd5 = [55,3]     
+PBuiGrd = [55,4]     ! positive values are gains from the ground, negative ones are losses [kJ/h]
+delGrd = [55,5]     
+dt = [55,6]     
+alpha = [55,7]     
+beta = [55,8]     
+Ploss1 = [55,9]     
+Ploss2 = [55,10]     
+Ploss3 = [55,11]     
+PBuiGrd_kW = PBuiGrd/3600     ! gains are positive, losses are negative [kW]
+dTi_out = dTi     
+     
+     
+EQUATIONS 1     
+Alpha_ext = 3.6*(4*vWind+4)     ! Building outside heat transfer coefficient (kJ/hm2K)
+     
+UNIT 56 TYPE 56
+PARAMETERS 3
+unitAssignBuilding
+1
+0.5
+INPUTS 37
+Tamb
+RHamb_100
+Tsky
+Tamb
+AISZ
+AISA
+IT_N      
+IT_S
+IT_E      
+IT_W      
+IT_surfUser_1 !IT_S60
+IT_surfUser_3 !IT_N20
+IB_N      
+IB_S
+IB_E      
+IB_W      
+IB_surfUser_1 !IB_S60
+IB_surfUser_3 !IB_N20
+AI_N      
+AI_S      
+AI_E      
+AI_W      
+AI_surfUser_1 !AI_S60
+AI_surfUser_3 !AI_N20
+0,0
+TIdHeatSet
+TIdCoolSet
+Npers
+PbuiGainEq
+myPheatBuiRad
+myPheatBuiConv     
+i_SHD     
+i_Inf
+i_vent
+T_HRSi    
+Alpha_ext
+PBuiGrd
+
+*** INITIAL INPUT VALUES
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 
+
+**  OutNr Label     Unit    ZNr Zone      Surface      OUTPUT DESCRIPTION
+**
+** |   1 | TAIR_ERDGE                | C          |   1 | ERDGE                |     | air temperature of zone                                                                                           | TAIR   1
+** |   2 | QSENS_ERDGE               | kJ/hr      |   1 | ERDGE                |     | sens. energy demand of zone, heating(-),         cooling(+)                                                                                           | QSENS  1
+** |   3 | QCSURF_ERDGE              | kJ/hr      |   1 | ERDGE                |     | total convection to air from all surf. inc. int.shading                                                                                           | QCSURF 1
+** |   4 | QINF_ERDGE                | kJ/hr      |   1 | ERDGE                |     | sens. infiltration energy gain of zone                                                                                           | QINF   1
+** |   5 | QVENT_ERDGE               | kJ/hr      |   1 | ERDGE                |     | sens. ventilation energy gain of zone                                                                                           | QVENT  1
+** |   6 | QCOUP_ERDGE               | kJ/hr      |   1 | ERDGE                |     | sens. coupling energy gain of zone                                                                                           | QCOUP  1
+** |   7 | QGCONV_ERDGE              | kJ/hr      |   1 | ERDGE                |     | internal convective gains of zone                                                                                           | QGCONV 1
+** |   8 | QGRAD_ERDGE               | kJ/hr      |   1 | ERDGE                |     | internal radiative gain                                                                                           | QGRAD  1
+** |   9 | RELHUM_ERDGE              | %          |   1 | ERDGE                |     | relativ humidity of zone air                                                                                           | RELHUM 1
+** |  10 | QSOLTR_ERDGE              | kJ/hr      |   1 | ERDGE                |     | total s-wave solar radiation through ext. windows of zone (but not kept 100 % in Zone)                                                                                           | QSOLTR 1
+** |  11 | TSTAR_ERDGE               | C          |   1 | ERDGE                |     | star node temperature                                                                                           | TSTAR  1
+** |  12 | TOP_ERDGE                 | C          |   1 | ERDGE                |     | operative room temperature                                                                                           | TOP    1
+** |  13 | QUA_ERDGE                 | kJ/hr      |   1 | ERDGE                |     | UA-transmission losses                                                                                           | QUA    1
+** |  14 | QHEAT_ERDGE               | kJ/hr      |   1 | ERDGE                |     | heating demand                                                                                           | QHEAT  1
+** |  15 | QCOOL_ERDGE               | kJ/hr      |   1 | ERDGE                |     | cooling demand                                                                                           | QCOOL  1
+** |  16 | QTWG_ERDGE                | kJ/hr      |   1 | ERDGE                |     | total wallgains on inside surfaces of zone                                                                                           | QTWG   1
+** |  17 | QTSKY_ERDGE               | kJ/hr      |   1 | ERDGE                |     | total rad. to sky of outside surfaces of zone                                                                                           | QTSKY  1
+** |  18 | DQAIR_ERDGE               | kJ/hr      |   1 | ERDGE                |     | change int. sens. energy of zone air since start                                                                                           | DQAIR  1
+** |  19 | QTSABS_ERDGE              | kJ/hr      |   1 | ERDGE                |     | total solar rad. absorbed at inside surfaces of zone                                                                                           | QTSABS 1
+     
+EQUATIONS 20
+ Troom = [56,1]
+ RHroom = [56,9]
+ PbuiSurfIns_kW =[56,3]/3600
+ PbuiInf_kW = [56,4]/3600
+ PbuiVent_kW = [56,5]/3600
+ PbuiCoupl_kW = [56,6]/3600
+ PBuiGainsConv_kW = [56,7]/3600
+ PBuiGainsRad_kW = [56,8]/3600
+ Rhbui = [56,9]
+ PBuiSol_kW = [56,10]/3600
+ PBuiGains_kW = PBuiGainsConv_kW + PBuiGainsRad_kW      
+ TroomStar = [56,11]
+ TroomOp = [56,12]
+ PBuiUAstatic_kW = [56,13]/3600
+ PBuiHeatDem_kW = [56,14]/3600
+ PBuiCoolDem_kW = [56,15]/3600
+ PBuiWallGain_kW = [56,16]/3600
+ PbuiTsky_kW = [56,17]/3600
+ PBuiDQair_kW = [56,18]/3600
+ PBuiSol2_kW = [56,19]/3600
+        
+CONSTANTS 1
+PAcumBui_kW  = 0 ! to be calculated		
+
+EQUATIONS 2     
+PBuiGainEq_kW = PbuiGainEq/3600     ! sensible gain of equipment in Building (kW)
+PBuiGainPers_kW = Npers*0.06     ! sensible gain of persons in Building (kW)
+     
+     
+UNIT 57 TYPE 993 !CHANGED DC     ! Input value recall (element RcB)
+PARAMETERS 1     
+2     ! 1: number of variables to be remembered
+INPUTS 2   
+Troom   TRoomStar      
+20 20 
+     
+EQUATIONS 1     ! outputs of Input Value Recall     ! exponent for penalty calculation
+TRoomStarRc = [57,2]     
+     
+EQUATIONS 7     ! penalty calculation for space haeting / cooling according to Task 26 and Task 32
+X = 2     ! exponent for penalty calculation
+NightPen = GT(MOD(time,24),23)+LT(MOD(time,24),6)   !GT(tDRdhw,23)+LT(tDRdhw,6)
+DayPen = Not(NightPen)       
+dTsh = MAX(0,19.5-Troom)*DayPen+MAX(0,16-Troom)*NightPen      ! delta-T for room heating not met
+PpenSH_kW = UaBui*(dTsh+(dTsh+1)^X-1)/1000.0     ! penalty function for room-temperature below 19.5�C [kW]
+dTsc = MAX(0,(Troom-MAX(25,26+(Tamb-29)/3)))     ! delta-T for room cooling not met
+PpenSC_kW = UaBui*(dTsc+(dTsc+1)^X-1)/1000.0     ! penalty function for room-temperatures above limits of DIN 1946-2 [kW]
+     
+** EQUATIONS 1
+
+** ImbShLoop_KW = PRDIn_KW + PSB_KW - PElBkpSh_KW - PPiAuxLossTot_kW     !PSB_KW <0 if out of the storage
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!MONTHLY PRINTER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+CONSTANTS 1
+unitPrinterBui=123
+
+ASSIGN    temp\BUILDING_MO.Prt     unitPrinterBui
+
+UNIT 123 Type 46 ! Printegrator Monthly Values for System
+PARAMETERS 6    
+unitPrinterBui ! 1: Logical unit number, -
+-1             ! 2: Logical unit for monthly summaries, -
+1              ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1             ! 4: Printing & integrating interval, h. -1 for monthly integration
+1              ! 5: Number of inputs to avoid integration, -
+1              ! 6: Output number to avoid integration
+INPUTS 8
+Time  PBuiSol_kW PBuiGains_KW  
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PAcumBui_kW dTsc
+***************
+Time  PBuiSol_kW PBuiGains_KW  
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PAcumBui_kW dTsc
+ 
+ 
+*******************************
+** hourly printer
+*******************************
+CONSTANTS 1
+unitPrintHouVar = 517
+
+ASSIGN temp\Building_HR.hr      unitPrintHouVar  
+UNIT 517 Type 46     ! Printegrator hourly Values for System
+PARAMETERS 5    
+unitPrintHouVar   ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+0     ! 5: Number of inputs to avoid integration, -
+ ! 6: Output number to avoid integration
+
+INPUTS 3
+Time Tamb  Troom  
+***
+Time Tamb  Troom 
+
+*******************************
+**END Building.dck
+*******************************

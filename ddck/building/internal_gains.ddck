@@ -23,24 +23,20 @@
 ** outputs to hydraulic solver
 ***********************************
 
-** which outputs will be used to connect the hydraulic slver
-** typically tOutType will be defined here to be used in the hydraulic ddck
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
 
-** Add here those variables that will go into the overall energy balance of the system
-** These values will be sued to automatically generate the energy balance
+EQUATIONS 3
+qSysOut_CiBuiSH = PBuiGainCircLoss_KW*HeatingSeasonOn
+qSysOut_CiBui = PBuiGainCircLoss_KW*Not(HeatingSeasonOn)
+qSysOut_CiLoss = CircLoss-qSysOut_CiBuiSH-qSysOut_CiBui
 
 ***********************************
 ** Dependencies with other ddck
 ***********************************
-
-** Re-assing here the variables necessary from other types
-** variableInternal = variableExternal
-** Exception: those from general variables
 
 EQUATIONS 3
 CircLoss = PPiCircLoss_kW
@@ -63,13 +59,6 @@ PbuiIntGain = scaleBuiSize*(PBuiLight_kW+PbuiGainPers_KW+PBuiGainEq_KW+PBuiGainC
 
 CONSTANTS 1
 factorCircToSh = 0.5 !How much of circulation losses go to SH
-
-*** INTERNAL GAINS AS DEFINED IN IDA-ICE, SHOULD BE REPLACED IN ORDER TO GET REALISTIC RESULTS!!!!!!
-
-EQUATIONS 3
-qSysOut_CiBuiSH = PBuiGainCircLoss_KW*HeatingSeasonOn
-qSysOut_CiBui = PBuiGainCircLoss_KW*Not(HeatingSeasonOn)
-qSysOut_CiLoss = CircLoss-qSysOut_CiBuiSH-qSysOut_CiBui
 
 ***********************************
 ** Begin TYPE

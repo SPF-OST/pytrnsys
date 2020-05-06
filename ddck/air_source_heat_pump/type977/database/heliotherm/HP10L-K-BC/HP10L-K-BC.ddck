@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN HP10L-K-BC.ddck
+*********************************************
+** Heat pump data for HP10L-K-BC heat pump
+** Data exported from Polysun at 02/26/19 13:28:34
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 9.8
+MfrHpCondRef = 2100
+MfrHpEvapRef = 5250
+COPNom = 4.049720
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*9.58517850
+CHPM_c2 = sizeHpRatio*80.31284290
+CHPM_c3 = sizeHpRatio*31.51488051
+CHPM_c4 = sizeHpRatio*16.00471057
+CHPM_c5 = sizeHpRatio*19.77466876
+CHPM_c6 = sizeHpRatio*-196.06896409
+COP_c1 = 7.80285240
+COP_c2 = 60.90908263
+COP_c3 = -29.49687095
+COP_c4 = -215.37633803
+COP_c5 = 60.64308054
+COP_c6 = 5.24977049
+TMinEvapTin = -20.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END HP10L-K-BC.ddck
+*********************************************

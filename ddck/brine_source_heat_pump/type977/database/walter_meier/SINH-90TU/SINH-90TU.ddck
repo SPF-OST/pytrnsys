@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SINH-90TU.ddck
+*********************************************
+** Heat pump data for SINH-90TU heat pump
+** Data exported from Polysun at 03/12/19 16:05:11
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 87.9
+MfrHpCondRef = 15500
+MfrHpEvapRef = 15500
+COPNom = 4.220114
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*93.59761438
+CHPM_c2 = sizeHpRatio*890.26596584
+CHPM_c3 = sizeHpRatio*84.20693870
+CHPM_c4 = sizeHpRatio*-209.14707691
+CHPM_c5 = sizeHpRatio*-108.49723126
+CHPM_c6 = sizeHpRatio*-547.72652109
+COP_c1 = 5.20386965
+COP_c2 = 47.78183611
+COP_c3 = 4.23600879
+COP_c4 = -109.90706304
+COP_c5 = -110.72732299
+COP_c6 = -81.99997047
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SINH-90TU.ddck
+*********************************************

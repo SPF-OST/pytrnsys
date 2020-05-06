@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN HP12L-M-BC.ddck
+*********************************************
+** Heat pump data for HP12L-M-BC heat pump
+** Data exported from Polysun at 02/26/19 13:28:53
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 16.5
+MfrHpCondRef = 3100
+MfrHpEvapRef = 7750
+COPNom = 4.222949
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*20.44366158
+CHPM_c2 = sizeHpRatio*150.38211331
+CHPM_c3 = sizeHpRatio*-3.34553382
+CHPM_c4 = sizeHpRatio*-84.00764199
+CHPM_c5 = sizeHpRatio*243.47607669
+CHPM_c6 = sizeHpRatio*-157.89727632
+COP_c1 = 9.70892563
+COP_c2 = 56.15384763
+COP_c3 = -53.04883409
+COP_c4 = -188.08588038
+COP_c5 = 75.28340500
+COP_c6 = 79.72940720
+TMinEvapTin = -20.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END HP12L-M-BC.ddck
+*********************************************

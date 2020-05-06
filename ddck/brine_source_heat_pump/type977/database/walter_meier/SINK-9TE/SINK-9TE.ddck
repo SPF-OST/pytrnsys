@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SINK-9TE.ddck
+*********************************************
+** Heat pump data for SINK-9TE heat pump
+** Data exported from Polysun at 03/12/19 16:07:32
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 8.9
+MfrHpCondRef = 1600
+MfrHpEvapRef = 1600
+COPNom = 4.233361
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*9.57915713
+CHPM_c2 = sizeHpRatio*66.93510078
+CHPM_c3 = sizeHpRatio*6.44011841
+CHPM_c4 = sizeHpRatio*77.28233454
+CHPM_c5 = sizeHpRatio*-9.85674906
+CHPM_c6 = sizeHpRatio*-52.97783273
+COP_c1 = 5.33503135
+COP_c2 = 51.64718754
+COP_c3 = 4.02268772
+COP_c4 = -105.41263333
+COP_c5 = 40.39630234
+COP_c6 = -86.58576931
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SINK-9TE.ddck
+*********************************************
