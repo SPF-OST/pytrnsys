@@ -441,6 +441,9 @@ class DeckTrnsys():
                 try:
                     if '[' not in value:
                         self.deckVariables[name] = eval(value,self.deckVariables)
+                        parts = re.split(r'[*/+-]', value.replace(r'(', '').replace(r')', ''))
+                        if len(parts) == 2 and len(re.split(r'[*]', value)) == 2:
+                            self.deckVariables[name + '_factor'] = float(parts[0])
                     else:
                         float(value)
                 except:
@@ -454,8 +457,6 @@ class DeckTrnsys():
                         try:
                             finalValue = eval(value, self.deckVariables)
                             self.deckVariables[name] = float(finalValue)
-                            if len(parts)==2 and re.split(r'[*]',value)==2:
-                                self.deckVariables[name+'_factor']=float(parts[1])
                         except:
                             pass
         return self.deckVariables

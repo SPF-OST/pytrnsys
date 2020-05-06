@@ -465,13 +465,15 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
     # size = len(self.qBalanceIn)+len(self.qBalanceOut)+len(self.elBalanceIn)+len(self.elBalanceOut)
     
     ImbalanceString = 'qImb = '
-    
+
     for q in eBalance:
         if 'qSysOut' in q:
             ImbalanceString += ' - ' + q
-            
+
         elif 'qSysIn' in q:
             ImbalanceString += ' + ' + q
+    if ImbalanceString=='qImb = ':
+        ImbalanceString += '0'
 
     lines = []
     line = "***************************************************************\n";lines.append(line)
