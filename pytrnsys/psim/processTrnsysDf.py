@@ -57,6 +57,7 @@ class ProcessTrnsysDf():
 
         self.doc = latex.LatexReport(self.outputPath, self.fileName)
         self.plot = plot.PlotMatplotlib(language=language)
+
         self.plot.setPath(self.outputPath)
         
         self.pltB = pltB.PlotBokeh()
@@ -123,6 +124,7 @@ class ProcessTrnsysDf():
     def loadAndProcess(self):
 
         self.loadFiles()
+        self.loadDll()
         self.process()
         self.doLatexPdf()
         self.addResultsFile()
@@ -162,6 +164,10 @@ class ProcessTrnsysDf():
         self.deck = deckTrnsys.DeckTrnsys(self.outputPath,self.fileName)
         self.deck.loadDeck()
         self.deckData = self.deck.getAllDataFromDeck()
+        try:
+            self.nYearsSimulated = (self.deckData['STOP']-self.deckData['START'])/8760
+        except:
+            print('START or STOP variable called differentely. Number of simulated years not calculated and printed. Mabe check for upper lower case issues.')
 
         self.yearlySums = {value+'_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
@@ -728,6 +734,79 @@ class ProcessTrnsysDf():
 
                 nameFile = name
                 legend = ["Month", name]
+                
+    def addCustomBalance(self):
+        if "monthlyBalance" in self.inputs.keys():
+            for variables in self.inputs['monthlyBalance']:
+                legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
+                inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
+                nameFile  = '_'.join(variables)
+                titlePlot = 'Balance' + ' '.join([self.getNiceLatexNames(name) for name in variables])
+                namePdf = self.plot.plotMonthlyBalanceDf(inVar,[],legend, "Energy", nameFile, 'kWh',
+                                                     self.myShortMonths, yearlyFactor=10,
+                                                     useYear=False, printData=False)
+                caption = titlePlot
+                tableNames = ["Month"] + legend + ["Total"]
+                var = inVar
+                var.append(sum(inVar))
+                self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
+                self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+
+    def addCustomStackedBar(self):
+        if "monthlyStackedBar" in self.inputs.keys():
+            for variables in self.inputs['monthlyStackedBar']:
+                legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
+                inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
+                nameFile  = '_'.join(variables)
+                titlePlot = 'Balance' + ' '.join([self.getNiceLatexNames(name) for name in variables])
+                namePdf = self.plot.plotMonthlyBalanceDf(inVar,[],legend, "Energy", nameFile, 'kWh',
+                                                     self.myShortMonths, yearlyFactor=10,
+                                                     useYear=False, printData=False,printImb=False)
+                caption = titlePlot
+                tableNames = ["Month"] + legend
+                self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
+                self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+
+    def addCaseDefinition(self,):
+
+        caption = "General data"
+        names = ["", "", "", ""]
+        units = None
+        symbol = "\%"
+
+        lines = ""
+        jointDicts = {**self.deckData, **self.__dict__, **self.yearlySums,
+                      **self.yearlyMax}
+        if 'caseDefinition' in self.inputs.keys():
+            for variable in self.inputs['caseDefinition'][0]:
+                line = self.getNiceLatexNames(variable)+' & %2.1f& &  \\\\ \n' % (jointDicts[variable])
+                lines = lines + line
+
+
+        try:
+            line = "Simulation Time & %.1f (min/year) & \\\\ \n" % (self.calcTime / self.nYearsSimulated)
+            lines = lines + line
+        except:
+            pass
+        try:
+            ite = self.nItProblems.split("(")
+            line = "$nIte_{erro}$ & %s & (%s) \\\\ \n" % (ite[0], ite[1].split(")")[0])
+            lines = lines + line
+            for i in range(len(self.iteErrorMonth)):
+                line = "& %s & %d \\\\ \n" % (utils.getMonthKey(i + 1), self.iteErrorMonth[i])
+                lines = lines + line
+
+        #            line = "$nIte_{er,month}$ & %s \\\\ \n" % (self.iteErrorMonth) ; lines = lines + line
+        except:
+            pass
+
+        line = "\\hline \\\\ \n"
+        lines = lines + line
+
+        label = "definitionTable"
+        sizeBox = 14
+        self.doc.addTable(caption, names, units, label, lines, useFormula=True)
+                
 
 
     def addTemperatureFreq(self, printData = False):
@@ -879,39 +958,30 @@ class ProcessTrnsysDf():
         
                     svg_filepath = os.path.join(path, filename + '.svg')
                     emf_filepath = os.path.join(path, filename + '.emf')
-        
                     figure.savefig(svg_filepath, format='svg')
-        
                     subprocess.call([inkscape_path, svg_filepath, '--export-emf', emf_filepath])
                     os.remove(svg_filepath)
             except:
                 raise ValueError('Inkscape path is not set correctly.')
 
-    # def calcCost(self):
-    #
-    #     path = self.inputs['pathBase']
-    #
-    #     costPath = self.inputs['cost']
-    #
-    #     dictCost = costConfig.costConfig.readCostJson(costPath)
-    #
-    #     # for name in names:
-    #     # path = os.path.join(pathBase, name)
-    #
-    #     small = 15
-    #     cost = costConfig.costConfig()
-    #     cost.setFontsizes(small)
-    #
-    #     cost.setDefaultData(dictCost)
-    #     cost.readResults(path)
-    #
-    #     cost.process(dictCost)
-    #
-    #     cost.addCostToJson()
-    #
-    #     # cost.plotLines(cost.pvAreaVec,"PvPeak [kW]",cost.annuityVec,"Annuity [Euro/kWh]",cost.batSizeVec,"Bat-Size [kWh]", "Annuity_vs_PvPeak", extension="pdf")
-    #     # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.annuityVec,"Annuity [Euro/kWh]",cost.pvAreaVec,"PvPeak [kW]","Annuity_vs_Bat", extension="pdf")
-    #     # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RselfSuffVec,"$R_{self,suff}$",cost.pvAreaVec,"PvPeak [kW]","RselfSuff_vs_Bat", extension="pdf")
-    #     # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RpvGenVec,"$R_{pv,gen}$",cost.pvAreaVec,"PvPeak [kW]","RpvGen_vs_Bat", extension="pdf")
-    #
-    #     # cost.printDataFile()
+    def addImages(self):
+        if 'addImage' in self.inputs.keys():
+            for image in self.inputs['addImage'][0]:
+                if os.path.exists(image):
+                    name = os.path.basename(image)
+                    caption = self.getNiceLatexNames(name)
+                    label = "scheme"
+                    line = "\\begin{figure}[!ht]\n"
+                    self.doc.lines = self.doc.lines + line
+                    line = "\\begin{center}\n"
+                    self.doc.lines = self.doc.lines + line
+                    line = "\\includegraphics[width=1\\textwidth]{%s}\n" % (image.replace(r"\\",r"\\\\"))
+                    self.doc.lines = self.doc.lines + line
+                    line = "\\caption{%s}\n" % caption
+                    self.doc.lines = self.doc.lines + line
+                    line = "\\label{%s}\n" % label
+                    self.doc.lines = self.doc.lines + line
+                    line = "\\end{center}\n"
+                    self.doc.lines = self.doc.lines + line
+                    line = "\\end{figure}\n"
+                    self.doc.lines = self.doc.lines + line
