@@ -224,14 +224,15 @@ class ProcessTrnsysDf():
         self.executeLatexFile()
 
     def addLatexContent(self):
-
+        self.addCaseDefinition()
         self.calculateDemands()
+        self.addHeatBalance()
         self.calculateElHeatConsumption()
         self.addSPFSystem()
         self.addDemands()
-        self.addHeatBalance()
         self.addElBalance()
         self.addElConsumption()
+        self.addCustomBalance()
         self.addTemperatureFreq()
         self.addQvsTPlot()
 
@@ -319,7 +320,7 @@ class ProcessTrnsysDf():
 
 
     def addSPFSystem(self, printData=False):
-        if max(self.qDemand)>0 and self.elHeatSysTotal!=0:
+        if max(self.qDemand)>0 and sum(self.elHeatSysTotal)!=0:
             self.SpfShpDis = num.zeros(13)
 
             for i in range(len(self.elHeatSysTotal)):
@@ -534,18 +535,19 @@ class ProcessTrnsysDf():
             found = False
 
             try:
-                if (name[0:8] == "elSysIn_"):
+                if (name[0:9] == "elSysOut_" or name[0:10] =='elSysIn_Q_'):
+                    # outVar.append(self.monData[name])
+                    outVar.append(self.monDataDf[name].values / myUnit)
+
+                    legendsOut.append(self.getNiceLatexNames(name))
+                elif (name[0:8] == "elSysIn_"):
                     # inVar.append(self.monData[name])
                     inVar.append(self.monDataDf[name].values / myUnit)
                     legendsIn.append(self.getNiceLatexNames(name))
 
 
 
-                elif (name[0:9] == "elSysOut_"):
-                    # outVar.append(self.monData[name])
-                    outVar.append(self.monDataDf[name].values / myUnit)
 
-                    legendsOut.append(self.getNiceLatexNames(name))
             except:
                 pass
 
@@ -614,7 +616,7 @@ class ProcessTrnsysDf():
             found = False
 
             try:
-                if (name[0:7] == "qSysIn_" or name[0:10] == "elSysIn_Q_"):
+                if (name[0:7] == "qSysIn_" or name[0:10] == "elSysOut_Q_" or name[0:10] == "elSysIn_Q_"):
                     # inVar.append(self.monData[name])
                     inVar.append(self.monDataDf[name].values/myUnit)
                     legendsIn.append(self.getNiceLatexNames(name))
