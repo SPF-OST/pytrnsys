@@ -246,7 +246,10 @@ class ProcessParallelTrnsys():
                         print ("file :%s already processed" % name)
 
                     else:
-                        newPath = os.path.join(pathFolder,os.path.join(*list(Path(relPath).parts[:-1])))
+                        if len(Path(relPath).parts)>1:
+                            newPath = os.path.join(pathFolder,os.path.join(*list(Path(relPath).parts[:-1])))
+                        else:
+                            newPath = pathFolder
                         baseClass = self.getBaseClass(self.inputs["classProcessing"],newPath,name)
 
                         print ("file :%s will be processed" % name)

@@ -454,7 +454,7 @@ class ProcessTrnsysDf():
             self.QvsTNorm = self.inputs["QvsTnormalized"]
             norm = 0.
             for i in range(0, len(self.QvsTNorm)):
-                norm = norm + max(num.cumsum(df[self.QvsTNorm[i]] * factor))
+                norm = norm + max(num.cumsum(df[self.QvsTNorm[i]].values * factor))
         else:
             norm = 1.
 
@@ -463,7 +463,7 @@ class ProcessTrnsysDf():
 
             #legend.append(jsonDict["legend"])
             if i % 2 == 0:
-                eCum.append(abs(df[self.QvsTInput[i]]) * factor / norm)
+                eCum.append(abs(df[self.QvsTInput[i]].values) * factor / norm)
                 name = self.QvsTInput[i]
                 legend.append(self.getNiceLatexNames(name))
             else:
@@ -511,9 +511,6 @@ class ProcessTrnsysDf():
                 else:
                     tFlow.append(df[self.QvsTInput[i]])
 
-          
-
-
             self.plot.calcAndPrintQVersusT(fileName, tFlow, eCum, legend, printEvery=100)
 
     def addElBalance(self, printData=False,unit="kWh"):
@@ -545,20 +542,12 @@ class ProcessTrnsysDf():
                     inVar.append(self.monDataDf[name].values / myUnit)
                     legendsIn.append(self.getNiceLatexNames(name))
 
-
-
-
             except:
                 pass
 
         nameFile = 'ElMonthly'
 
         niceLegend = legendsIn + legendsOut
-
-        # firstMonthId = self.monDataDf["Month"].index[0]
-
-        # firstMonthId = utils.getMonthNameIndex(self.monDataDf["Month"].index)
-        # startMonth = firstMonthId
 
         if len(inVar) > 0 or len(outVar) > 0:
             namePdf = self.plot.plotMonthlyBalanceDf(inVar, outVar, niceLegend, "Energy Flows", nameFile, unit,
@@ -635,10 +624,6 @@ class ProcessTrnsysDf():
 
         niceLegend = legendsIn + legendsOut
 
-        # firstMonthId = self.monDataDf["Month"].index[0]
-
-        # firstMonthId = utils.getMonthNameIndex(self.monDataDf["Month"].index)
-        # startMonth = firstMonthId
 
         if len(inVar)>0 or len(outVar)>0:
             namePdf = self.plot.plotMonthlyBalanceDf(inVar, outVar, niceLegend, "Energy Flows", nameFile, unit,
@@ -784,23 +769,16 @@ class ProcessTrnsysDf():
                 line = self.getNiceLatexNames(variable)+' & %2.1f& &  \\\\ \n' % (jointDicts[variable])
                 lines = lines + line
 
+        line = "Simulation Time & %.1f (min/year) & \\\\ \n" % (self.calcTime / self.nYearsSimulated)
+        lines = lines + line
 
-        try:
-            line = "Simulation Time & %.1f (min/year) & \\\\ \n" % (self.calcTime / self.nYearsSimulated)
+        ite = self.nItProblems.split("(")
+        line = "$nIte_{erro}$ & %s & (%s) \\\\ \n" % (ite[0], ite[1].split(")")[0])
+        lines = lines + line
+        for i in range(len(self.iteErrorMonth)):
+            line = "& %s & %d \\\\ \n" % (utils.getMonthKey(i + 1), self.iteErrorMonth[i])
             lines = lines + line
-        except:
-            pass
-        try:
-            ite = self.nItProblems.split("(")
-            line = "$nIte_{erro}$ & %s & (%s) \\\\ \n" % (ite[0], ite[1].split(")")[0])
-            lines = lines + line
-            for i in range(len(self.iteErrorMonth)):
-                line = "& %s & %d \\\\ \n" % (utils.getMonthKey(i + 1), self.iteErrorMonth[i])
-                lines = lines + line
 
-        #            line = "$nIte_{er,month}$ & %s \\\\ \n" % (self.iteErrorMonth) ; lines = lines + line
-        except:
-            pass
 
         line = "\\hline \\\\ \n"
         lines = lines + line
