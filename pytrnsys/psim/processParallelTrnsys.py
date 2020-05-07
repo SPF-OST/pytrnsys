@@ -17,6 +17,7 @@ import numpy as num
 import pandas as pd
 import seaborn as sns
 import pytrnsys.utils.costConfig as costConfig
+from pathlib import Path
 #we would need to pass the Class as inputs
 
 
@@ -226,25 +227,27 @@ class ProcessParallelTrnsys():
         if (self.inputs["typeOfProcess"] == "completeFolder"):
 
             pathFolder = self.inputs["pathBase"]
-            fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
-
-            for name in fileName:
-
+            files =glob.glob(os.path.join(pathFolder, "**/*.lst"), recursive=True)
+            fileName = [Path(name).parts[-2] for name in files]
+            relPaths = [os.path.relpath(os.path.dirname(file),pathFolder) for file in files]
+            for relPath in relPaths:
+                name = Path(relPath).parts[-1]
                 folderUsed = True
                 for i in range(len(self.filteredfolder)):
                     if (name == self.filteredfolder[i]):
                         folderUsed=False
                 if(folderUsed):
-                    nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
+                    nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (relPath, name))
 
                     if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
                         print ("file :%s already processed" % name)
 
-                    elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (name, name))) and  self.inputs["forceProcess"] == False:
+                    elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (relPath, name))) and  self.inputs["forceProcess"] == False:
                         print ("file :%s already processed" % name)
 
                     else:
-                        baseClass = self.getBaseClass(self.inputs["classProcessing"],pathFolder,name)
+                        newPath = os.path.join(pathFolder,os.path.join(*list(Path(relPath).parts[:-1])))
+                        baseClass = self.getBaseClass(self.inputs["classProcessing"],newPath,name)
 
                         print ("file :%s will be processed" % name)
                         # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
