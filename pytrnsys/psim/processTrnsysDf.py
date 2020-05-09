@@ -224,6 +224,7 @@ class ProcessTrnsysDf():
         self.executeLatexFile()
 
     def addLatexContent(self):
+        self.addImages()
         self.addCaseDefinition()
         self.calculateDemands()
         self.addHeatBalance()
@@ -949,6 +950,7 @@ class ProcessTrnsysDf():
             for image in self.inputs['addImage'][0]:
                 if os.path.exists(image):
                     name = os.path.basename(image)
+                    image = image.replace(os.path.sep,'//')
                     caption = self.getNiceLatexNames(name)
                     label = "scheme"
                     line = "\\begin{figure}[!ht]\n"
