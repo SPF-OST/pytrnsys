@@ -191,7 +191,7 @@ class ProcessParallelTrnsys():
         self.inputs["yearReadedInMonthlyFile"] = -1
         self.inputs["process"] = True
         self.inputs["firstMonthUsed"] = 6     # 0=January 1=February 7=August
-        self.inputs["reduceCpu"] = 0
+        self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder" # "casesDefined"
         self.inputs["forceProcess"]  =  True #even if results file exist it proceess the results, otherwise it checks if it exists
         self.inputs["pathBase"] = False
@@ -202,6 +202,7 @@ class ProcessParallelTrnsys():
         self.inputs["dllTrnsysPath"] = False
         self.inputs["classProcessing"] = False
         self.inputs["latexExePath"] = "Unknown"
+
 
     def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
@@ -509,12 +510,12 @@ class ProcessParallelTrnsys():
             #ax1.set_position([box.x0, box.y0, box.width, box.height])
 
             if chunkVariable is not '':
-                legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.2, 1.0), bbox_transform=ax1.transAxes)
+                legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.4, 1.0), bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
             if seriesVariable is not '':
-                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.1, 1.0), bbox_transform=ax1.transAxes)
+                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.2, 1.0), bbox_transform=ax1.transAxes)
 
             else:
                 legend1 = None

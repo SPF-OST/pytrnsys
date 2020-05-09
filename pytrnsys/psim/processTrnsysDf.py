@@ -728,7 +728,7 @@ class ProcessTrnsysDf():
                 legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
                 inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
                 nameFile  = '_'.join(variables)
-                titlePlot = 'Balance' + ' '.join([self.getNiceLatexNames(name) for name in variables])
+                titlePlot = 'Balance'
                 namePdf = self.plot.plotMonthlyBalanceDf(inVar,[],legend, "Energy", nameFile, 'kWh',
                                                      self.myShortMonths, yearlyFactor=10,
                                                      useYear=False, printData=False)
@@ -745,7 +745,7 @@ class ProcessTrnsysDf():
                 legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
                 inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
                 nameFile  = '_'.join(variables)
-                titlePlot = 'Balance' + ' '.join([self.getNiceLatexNames(name) for name in variables])
+                titlePlot = 'Balance'
                 namePdf = self.plot.plotMonthlyBalanceDf(inVar,[],legend, "Energy", nameFile, 'kWh',
                                                      self.myShortMonths, yearlyFactor=10,
                                                      useYear=False, printData=False,printImb=False)
@@ -771,12 +771,12 @@ class ProcessTrnsysDf():
 
         line = "Simulation Time & %.1f (min/year) & \\\\ \n" % (self.calcTime / self.nYearsSimulated)
         lines = lines + line
-
-        ite = self.nItProblems.split("(")
-        line = "$nIte_{erro}$ & %s & (%s) \\\\ \n" % (ite[0], ite[1].split(")")[0])
-        lines = lines + line
-        for i in range(len(self.iteErrorMonth)):
-            line = "& %s & %d \\\\ \n" % (utils.getMonthKey(i + 1), self.iteErrorMonth[i])
+        if self.nItProblems==0:
+            line = "$nIte_{erro}$ & %s & (%s) \\\\ \n" % (0, 0)
+            lines = lines + line
+        else:
+            ite = self.nItProblems.split("(")
+            line = "$nIte_{erro}$ & %s & (%s) \\\\ \n" % (ite[0], ite[1].split(")")[0])
             lines = lines + line
 
 
