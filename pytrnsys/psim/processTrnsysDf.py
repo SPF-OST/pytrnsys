@@ -236,6 +236,7 @@ class ProcessTrnsysDf():
         self.addCustomBalance()
         self.addTemperatureFreq()
         self.addQvsTPlot()
+        self.saveHourlyToCsv()
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
 
@@ -321,7 +322,7 @@ class ProcessTrnsysDf():
 
 
     def addSPFSystem(self, printData=False):
-        if max(self.qDemand)>0 and sum(self.elHeatSysTotal)!=0:
+        if max(self.qDemand)>0 and not isinstance(self.elHeatSysTotal,int):
             self.SpfShpDis = num.zeros(13)
 
             for i in range(len(self.elHeatSysTotal)):
@@ -503,7 +504,6 @@ class ProcessTrnsysDf():
             legend = []
 
             for i in range(0, len(self.test)):
-
 
                 if i % 2 == 0:
                     eCum.append(abs(df[self.QvsTInput[i]]) * factor / norm)
@@ -925,6 +925,19 @@ class ProcessTrnsysDf():
             fileNamePath = os.path.join(self.outputPath, fileName)
             with open(fileNamePath, 'w') as fp:
                 json.dump(self.resultsDict, fp, indent = 2, separators=(',', ': '),sort_keys=True)
+
+
+    def saveHourlyToCsv(self):
+        """
+        Saves hourly printer values to csv files. config file key is stringArray "hourlyToCsv" nameOfFile [variables,...]
+        Returns
+        -------
+        """
+        if 'hourlyToCsv' in self.inputs:
+            for stringArray in self.inputs['hourlyToCsv']:
+                pathFile = os.path.join(self.outputPath,stringArray[0]+'.csv')
+                self.houDataDf[stringArray[1:]].to_csv(pathFile,sep=';')
+
 
 
     def plot_as_emf(self,figure, **kwargs):
