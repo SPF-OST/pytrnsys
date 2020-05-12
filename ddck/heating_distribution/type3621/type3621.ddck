@@ -207,7 +207,7 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 -1     ! 10 Logical unit for output file
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
-INPUTS 11     
+INPUTS 9     
 Tamb  myTroomRc  TRdFl TrdRt  
 BoHS  PIDRadBui MfrBuiRd   PRdIn_KW   ImbRad
 *******
