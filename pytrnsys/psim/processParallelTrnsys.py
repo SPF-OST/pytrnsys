@@ -455,17 +455,30 @@ class ProcessParallelTrnsys():
                 if resultsDict[seriesVariable] not in seriesColors.keys():
                     seriesColors[resultsDict[seriesVariable]]=colors[colorsCounter]
                     colorsCounter+=1
+
+                if '[' not in xAxisVariable:
+                    xAxis = resultsDict[xAxisVariable]
+                else:
+                    name,index = str(xAxisVariable).split('[')
+                    index = int(index.replace(']',''))
+                    xAxis = resultsDict[name][index]
+                if '[' not in yAxisVariable:
+                    yAxis = resultsDict[yAxisVariable]
+                else:
+                    name,index = str(yAxisVariable).split('[')
+                    index = int(index.replace(']',''))
+                    yAxis = resultsDict[name][index]
                 if resultsDict[chunkVariable] not in plotXDict.keys():
                     plotXDict[resultsDict[chunkVariable]] = {}
                     plotYDict[resultsDict[chunkVariable]] = {}
-                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[xAxisVariable]]
-                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[yAxisVariable]]
+                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [xAxis]
+                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
                 elif resultsDict[seriesVariable] not in plotXDict[resultsDict[chunkVariable]].keys():
-                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[xAxisVariable]]
-                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [resultsDict[yAxisVariable]]
+                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [xAxis]
+                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
                 else:
-                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(resultsDict[xAxisVariable])
-                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(resultsDict[yAxisVariable])
+                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(xAxis)
+                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(yAxis)
     
             self.doc = latex.LatexReport('', '')
             if 'latexNames' in self.inputs.keys():
