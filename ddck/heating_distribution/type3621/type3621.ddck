@@ -12,7 +12,7 @@
 ***************************************************************************
 ** Description: 
 ** Building demands using the ISO model from the standard model.
-** The heat is delivered by a radiant floor model.
+** The heat is delivered by a radiant floor model. !JS: isn't it radiator? TODO: to be checked
 ** Parameters were fitted to fit the IDA-ICE results
 ** Reference article is $$$
 ** TODO: 

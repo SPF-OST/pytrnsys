@@ -311,10 +311,10 @@ nPlotsPerSim ! 7 Number of plots per simulation
 0     ! 12 Output file delimiter
 INPUTS 20     
 ThpEvapIn THpEvapOut THpCondIn THpCondOut myHpIsOn HpIsBlock Nix Nix  Nix Nix
-MfrEvapIn MfrCondIn PauxEvap_kW PauxCond_kW   frCond dtEvap dtCond Nix Nix Nix
+MfrEvapIn MfrCondIn PauxEvap_kW PauxCond_kW   frCond dtEvap dtCond PAuxLossStart_kW Nix Nix
 **
 ThpEvapIn THpEvapOut THpCondIn THpCondOut myHpIsOn HpIsBlock Nix Nix  Nix Nix
-MfrEvapIn MfrCondIn PauxEvap_kW PauxCond_kW   frCond dtEvap dtCond Nix Nix Nix
+MfrEvapIn MfrCondIn PauxEvap_kW PauxCond_kW   frCond dtEvap dtCond PAuxLossStart_kW Nix Nix
 LABELS  3     
 Temperatures     
 massFlow_and_Heat_transf     
