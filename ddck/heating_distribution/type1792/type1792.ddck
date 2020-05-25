@@ -63,7 +63,7 @@ T_Set_d       = MAX(TRdRt,myTrdSet)      ! TrdSet output from TYPE 888. Temperat
 
 
 CONSTANTS 4    
-MfrBuiRdNom = 20*nParallelPipe !PheatRadNom/(CPWAT*(TBuiFlNom-TBuiRtNom))     ! Nominal mass flow of heat distribution system [kg/h] !JS: Divide by factor of 4 to have more realistic values
+MfrBuiRdNom = 200*nParallelPipe !20*nParallelPipe !PheatRadNom/(CPWAT*(TBuiFlNom-TBuiRtNom))     ! Nominal mass flow of heat distribution system [kg/h] !JS: Divide by factor of 4 to have more realistic values
 PheatRadNom = MfrBuiRdNom*CPWAT*(TBuiFlNom-TBuiRtNom)
 pGainRad = 0.6     
 iGainRad = 0.05     
@@ -131,7 +131,7 @@ MfrBuiRd  = MfrBuiHeatRd + MfrBuiCoolRd
 CONSTANTS 17
 AFloor     =  myAreaBui ! m2 !JS it is 120, was added on config level
 dxBetweenTubes = 0.144
-LFloorPipe = 50 ! 50 m/pipe  
+LFloorPipe = 200 ! 50 m/pipe
 LFloorPipeTotal = 7*AFloor!6.95*AFloor !
 dFloorPipe      = 0.015 
 nParallelPipe   = LFloorPipeTotal/LFloorPipe+1 ! usually distance 10-15 cm

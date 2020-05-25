@@ -1,5 +1,5 @@
 *******************************
-**BEGIN type451.ddck 
+**BEGIN type951.ddck
 *******************************
     
 *****************************************
@@ -125,7 +125,7 @@ nParType951 = 38+nAxial
 CONSTANTS 1
 unitGhxGfunc = 85
 
-ASSIGN PATH$\ground_heat_exchanger\type451\database\g_functions\2x2_5m.txt unitGhxGfunc
+ASSIGN PATH$\ground_heat_exchanger\type951\database\g_functions\2x2_5m.txt unitGhxGfunc
 
 ***********************************
 ** Begin TYPE 
