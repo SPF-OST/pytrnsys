@@ -78,7 +78,7 @@ class BuildTrnsysDeck():
 
 
 
-    def readDeckList(self,pathConfig,doAutoUnitNumbering=False,dictPaths=False):
+    def readDeckList(self,pathConfig,doAutoUnitNumbering=False,dictPaths=False,replaceLineList = []):
         """
 
         Parameters
@@ -129,6 +129,7 @@ class BuildTrnsysDeck():
                 self.dependencies[nameList] = requiredVariables-definedVariables
                 self.definitions[nameList]=definedVariables
 
+            self.replaceLines(replaceLineList)
             self.linesChanged = deckUtils.changeAssignPath(self.linesChanged,'path$',dictPaths[os.path.join(self.nameList[i])])
             addedLines = firstThreeLines+self.linesChanged
             
@@ -279,5 +280,26 @@ class BuildTrnsysDeck():
         lines = deckUtils.addEnergyBalanceMonthlyPrinter(unitId,eBalance)
         self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
         self.writeDeck() # Deck rewritten with added printer
+
+    def replaceLines(self,replaceList):
+        """
+        Replaces a deck lines with different lines
+        Parameters
+        ----------
+        replaceList: list of tuples with two strings (oldLine, newLine)
+
+        Returns
+        -------
+
+        """
+        for tuple in replaceList:
+            oldLine = tuple[0]
+            newLine = tuple[1]
+            for index, line in enumerate(self.linesChanged):
+                if oldLine in line:
+                    self.linesChanged[index] = newLine +'\n'
+                    changedLine = oldLine
+
+
 
 

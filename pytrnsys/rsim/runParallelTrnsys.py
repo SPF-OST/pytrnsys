@@ -323,7 +323,7 @@ class RunParallelTrnsys():
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
         deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck)
-        deck.readDeckList(self.pathConfig,doAutoUnitNumbering=self.inputs['doAutoUnitNumbering'],dictPaths=self.dictDdckPaths)
+        deck.readDeckList(self.pathConfig,doAutoUnitNumbering=self.inputs['doAutoUnitNumbering'],dictPaths=self.dictDdckPaths, replaceLineList = self.replaceLines)
         #deck.createDependencyGraph()
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
@@ -517,6 +517,7 @@ class RunParallelTrnsys():
         self.sourceFilesToChange = []
         self.sinkFilesToChange = []
         self.foldersForDDckVariation = []
+        self.replaceLines = []
 
         for line in self.lines:
 
@@ -543,6 +544,16 @@ class RunParallelTrnsys():
                         self.parameters[splitLine[1]] =float(splitLine[2])
                     else:
                         self.parameters[splitLine[1]] = splitLine[2]
+
+            elif (splitLine[0] == "replace"):
+                
+                splitString = line.split('$"')
+                
+                oldString = splitString[1].split('"')[0]
+                newString = splitString[2].split('"')[0]
+
+                self.replaceLines.append((oldString,newString))
+
 
             elif (splitLine[0] == "changeDDckFile"):
                 self.sourceFilesToChange.append(splitLine[1])
