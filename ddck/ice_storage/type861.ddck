@@ -266,17 +266,9 @@ TsensorPcm4 = [130,44]
 TsensorPcm5 = [130,45]     
 TsensorPcmControl = MAX(TsensorPcm1,TsensorPcm5) ! used to decide if solar heat can be used for regeneration. Depending on direction of flow (up-down) should be changed
   
-EQUATIONS 10     
-TPCM1 = [130,46]     ! Node Temperature
+EQUATIONS 1     
 TPCM2 = [130,47]     ! Node Temperature
-TPCM3 = [130,48]     ! Node Temperature
-TPCM4 = [130,49]     ! Node Temperature
-TPCM5 = [130,50]     ! Node Temperature
-TPCM6 = [130,51]     ! Node Temperature
-TPCM7 = [130,52]     ! Node Temperature
-TPCM8 = [130,53]     ! Node Temperature
-TPCM9 = [130,54]     ! Node Temperature
-TPCM10 = [130,55]     ! Node Temperature
+
      
 EQUATIONS 23    ! Outputs PCM
 TAvgPCM = [130,1]     ! Average storage temperature [�C]
