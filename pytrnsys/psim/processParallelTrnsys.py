@@ -15,7 +15,7 @@ import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import numpy as num
 import pandas as pd
-import seaborn as sns
+#import seaborn as sns
 import pytrnsys.utils.costConfig as costConfig
 from pathlib import Path
 #we would need to pass the Class as inputs
@@ -519,7 +519,8 @@ class ProcessParallelTrnsys():
                     else:
                         ax1.plot(num.array(plotXDict[chunk][key])[index], num.array(plotYDict[chunk][key])[index],
                                  style, color=seriesColors[key])
-           # box = ax1.get_position()
+
+            # box = ax1.get_position()
             #ax1.set_position([box.x0, box.y0, box.width, box.height])
 
             if chunkVariable is not '':
