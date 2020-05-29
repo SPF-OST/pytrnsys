@@ -192,7 +192,7 @@ class ProcessTrnsysDf():
                 key = self.inputs["plotMonthly"][i]
                 nameFile = key[0]
                 # namePdf=self.plot.plotMonthlyDf(self.monDataDf[key].values, key[0], nameFile,1,self.myShortMonths,myTitle=None, printData=True)
-                namePdf=self.plot.plotMonthlyDf(self.monDataDf[key].values, key[0], nameFile,10.,self.myShortMonths,myTitle=None, printData=True)
+                namePdf=self.plot.plotMonthlyDf(self.monDataDf[key].values, key[0], nameFile,10.,self.myShortMonths,myTitle=None, printData=self.printDataForGle)
 
                 print ("%s monthly plot"%namePdf)
 
@@ -346,7 +346,6 @@ class ProcessTrnsysDf():
             el = num.append(el, sum(self.elHeatSysTotal))
 
             var.append(el)
-
             var.append(self.SpfShpDis)
 
             nameFile = "SPF_SHP"
