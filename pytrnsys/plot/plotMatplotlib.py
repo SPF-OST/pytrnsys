@@ -298,9 +298,10 @@ class PlotMatplotlib():
                     outfile.close()
 
                     legends = []
-                    legends.append(myLabel)
+                    legends.append("$%s$"%myLabel)
 
-                #            self.gle.getBarPlot(nameFile,nameWithPath,myLabel,xnames=monthSequence)
+                    self.gle.getBarPlot(nameFile,nameWithPath,legends,xnames=monthSequence)
+
                 #            self.gle.getBarBalancePlot(nameFile,nameWithPath,myLabel,1,0,xnames=monthSequence)
 
             return namePdf

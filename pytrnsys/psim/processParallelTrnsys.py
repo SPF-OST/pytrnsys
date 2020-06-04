@@ -15,7 +15,7 @@ import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import numpy as num
 import pandas as pd
-import seaborn as sns
+#import seaborn as sns
 import pytrnsys.utils.costConfig as costConfig
 from pathlib import Path
 import pytrnsys.plot.plotMatplotlib as plot
@@ -506,6 +506,7 @@ class ProcessParallelTrnsys():
             dummy_lines = []
             chunkLabels = []
             labelSet = set()
+            lines = ""
             for chunk,style in zip(plotXDict.keys(),styles):
                 dummy_lines.append(ax1.plot([],[],style,c='black'))
                 if chunk is not None:
@@ -513,6 +514,11 @@ class ProcessParallelTrnsys():
                     chunkLabels.append("{:.2f}".format(chunkLabel))
                 for key in plotXDict[chunk].keys():
                     index = num.argsort(plotXDict[chunk][key])
+                    myX = num.array(plotXDict[chunk][key])[index]
+                    myY = num.array(plotYDict[chunk][key])[index]
+
+                    mySize = len(myX)
+
                     if key is not None and not isinstance(key,str):
                         labelValue=round(float(key),2)
                     elif key is not None:
@@ -523,12 +529,31 @@ class ProcessParallelTrnsys():
                         else:
                             label = labelValue
                         labelSet.add(labelValue)
-                        ax1.plot(num.array(plotXDict[chunk][key])[index], num.array(plotYDict[chunk][key])[index],
+                        ax1.plot(myX, myY,
                                  style, color=seriesColors[key], label=label)
                     else:
-                        ax1.plot(num.array(plotXDict[chunk][key])[index], num.array(plotYDict[chunk][key])[index],
+                        ax1.plot(myX, myY,
                                  style, color=seriesColors[key])
-           # box = ax1.get_position()
+
+                    # for i in range(len(myX)):
+                    #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
+            lines="!%s\t"%seriesVariable
+            for chunk, style in zip(plotXDict.keys(), styles):
+                for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                    line="%s\t"%key;lines=lines+line
+                line = "\n";lines = lines + line
+
+            for i in range(mySize):
+                for chunk, style in zip(plotXDict.keys(), styles):
+
+                    for key in plotXDict[chunk].keys(): #the varables that appear in the legend
+                        index = num.argsort(plotXDict[chunk][key])
+                        myX = num.array(plotXDict[chunk][key])[index]
+                        myY = num.array(plotYDict[chunk][key])[index]
+                        line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]); lines = lines + line
+                line = "\n"; lines = lines + line
+
+            # box = ax1.get_position()
             #ax1.set_position([box.x0, box.y0, box.width, box.height])
 
             if chunkVariable is not '':
@@ -553,9 +578,15 @@ class ProcessParallelTrnsys():
             #    legend2.set_in_layout(True)
             #if legend1 is not None:
             #    legend1.set_in_layout(True)
-            fig1.savefig(os.path.join(pathFolder,
-                                      xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable + '.png'), bbox_inches='tight')
+            fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable
+            fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
             plt.close()
+
+            if(self.inputs["setPrintDataForGle"]):
+                outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
+                outfile.writelines(lines)
+                outfile.close()
+                # self.plot.gle.getEasyPlot(self, nameGleFile, fileNameData, legends, useSameStyle=True):
 
     def plotMonthlyBarComparison(self):
         pathFolder = self.inputs["pathBase"]
