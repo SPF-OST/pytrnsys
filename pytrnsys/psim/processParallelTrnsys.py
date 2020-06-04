@@ -18,6 +18,7 @@ import pandas as pd
 import seaborn as sns
 import pytrnsys.utils.costConfig as costConfig
 from pathlib import Path
+import pytrnsys.plot.plotMatplotlib as plot
 #we would need to pass the Class as inputs
 
 
@@ -426,6 +427,9 @@ class ProcessParallelTrnsys():
 
         if 'comparePlot' in self.inputs.keys():
             self.plotComparison()
+            
+        if 'compareMonthlyBarsPlot' in self.inputs.keys():
+            self.plotMonthlyBarComparison()
 
     def plotComparison(self):
         pathFolder = self.inputs["pathBase"]
@@ -509,10 +513,15 @@ class ProcessParallelTrnsys():
                     chunkLabels.append("{:.2f}".format(chunkLabel))
                 for key in plotXDict[chunk].keys():
                     index = num.argsort(plotXDict[chunk][key])
-                    if key is not None:
+                    if key is not None and not isinstance(key,str):
                         labelValue=round(float(key),2)
+                    elif key is not None:
+                        labelValue = key
                     if key is not None and labelValue not in labelSet:
-                        label = "{:.2f}".format(labelValue)
+                        if not isinstance(labelValue,str):
+                            label = "{:.2f}".format(labelValue)
+                        else:
+                            label = labelValue
                         labelSet.add(labelValue)
                         ax1.plot(num.array(plotXDict[chunk][key])[index], num.array(plotYDict[chunk][key])[index],
                                  style, color=seriesColors[key], label=label)
@@ -547,6 +556,28 @@ class ProcessParallelTrnsys():
             fig1.savefig(os.path.join(pathFolder,
                                       xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable + '.png'), bbox_inches='tight')
             plt.close()
+
+    def plotMonthlyBarComparison(self):
+        pathFolder = self.inputs["pathBase"]
+        for plotVariables in self.inputs['compareMonthlyBarsPlot']:
+            seriesVariable = plotVariables[1]
+            valueVariable = plotVariables[0]
+            legend = []
+            inVar = []
+            for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
+                with open(file) as f_in:
+                    resultsDict = json.load(f_in)
+                    resultsDict['']=None
+                legend.append(resultsDict[seriesVariable])
+                inVar.append(num.array(resultsDict[valueVariable]))
+            nameFile = '_'.join(plotVariables)
+            titlePlot = 'Balance'
+            self.plot = plot.PlotMatplotlib(language='en')
+            self.plot.setPath(pathFolder)
+            self.myShortMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+            namePdf = self.plot.plotMonthlyNBar(inVar, legend, self.doc.getNiceLatexNames(valueVariable), nameFile, 10, self.myShortMonths,useYear=True)
+            
+
 
     def plotComparisonSeaborn(self):
         pathFolder = self.inputs["pathBase"]

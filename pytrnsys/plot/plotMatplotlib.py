@@ -405,7 +405,7 @@ class PlotMatplotlib():
         
         return namePdf
 
-    def plotMonthlyNBar(self, var1, legends, myLabel, nameFile, yearlyFactor, startMonth=1, myTitle=None,
+    def plotMonthlyNBar(self, inVar, legends, myLabel, nameFile, yearlyFactor, defMonths, useYear=False, myTitle=None,
                         plotEmf=False, showMonths=False, ylim=False):
         """
                 Plot Monthly Values of N different data series
@@ -441,49 +441,49 @@ class PlotMatplotlib():
 
                 """
 
-
-        N = len(var1)
-        if (showMonths == False):
-            numberOfMonths = 13
-            showMonths = [i for i in range(13)]
+        move = 0
+        if (yearlyFactor == 1):
+            yearTag = "Year"
         else:
-            numberOfMonths = len(showMonths)
-        width = 0.5/N  # the width of the bars
-        ind = num.arange(numberOfMonths)  # the x locations for the groups
+            yearTag = "Year/%d" % yearlyFactor
 
-        with plt.style.context(self.stylesheet):
-            fig = plt.figure()
+        monthSequence = defMonths.copy()
+        variables = inVar.copy()
 
-            plot = fig.add_subplot(111)
+        if (useYear == True):
 
-        # More processing is necessary if we want to have the yearly value at the 13 position as in Task44A38
-        if (startMonth != 1):
-            if (len(var1) == 13):
-                yearly = var1[12]
+            nMonth = 13
+            var13 = []
+            monthSequence.append(yearTag)
 
-            var1 = utils.reorganizeMonthlyFile(var1, startMonth)
+            for i in range(len(variables)):
+                var13.append(utils.addYearlyValue(variables[i], yearlyFactor=yearlyFactor))
 
-            if (len(var1) == 13):
-                var1[12] = yearly
-
-            if (len(var2) == 13):
-                yearly = var2[12]
-
-            var2 = utils.reorganizeMonthlyFile(var2, startMonth)
-
-            if (len(var2) == 13):
-                var2[12] = yearly
-        var13_1 = []
-        for values in var1:
-            if (len(values) == 12):
-                var13_1.append(utils.addYearlyValue(values, yearlyFactor=yearlyFactor))
+            if (showMonths == False):
+                showMonths = [i for i in range(13)]
+                nMonth = 13
             else:
-                var13_1.append(values)
+                nMonth = len(showMonths)
+        else:
+            nMonth = 12
+            var13 = variables
+            if (showMonths == False):
+                showMonths = [i for i in range(12)]
+            else:
+                nMonth = len(showMonths)
 
         bars=[]
-        for i,values in enumerate(var1):
+        fig = plt.figure()
+        plot = fig.add_subplot(111)
+        ind = num.arange(len(showMonths))  # the x locations for the groups
+        if showMonths:
+            numberOfMonths = len(showMonths)
+        else:
+            showMonths = 12
+        width = 0.5/(len(inVar)-1)  # the width of the bars
+        for i,values in enumerate(inVar):
 
-            bar = plot.bar(ind - 0.25+i * width+width/2, [var13_1[i][j] for j in showMonths], width)
+            bar = plot.bar(ind - 0.25+i * width+width/2, [var13[i][j] for j in showMonths], width)
             bars.append(bar)
 
         plot.set_ylabel(myLabel)
@@ -491,7 +491,7 @@ class PlotMatplotlib():
         box = plot.get_position()
         plot.set_position([box.x0, box.y0+box.height*0.05, box.width * 0.7 / 12 * numberOfMonths, box.height])
 
-        plot.legend(bars, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        plot.legend(bars, legends, prop={'size': 6}, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
         plot.tick_params(axis='y')
         if ylim:
             plot.set_ylim(ylims)
@@ -513,8 +513,6 @@ class PlotMatplotlib():
             else:
                 yearTag = "Jahr/%d" % yearlyFactor
 
-        monthSequence = utils.getMonthNameSequence(startMonth, language=self.language)
-        monthSequence.append(yearTag)
 
         plot.set_xticklabels([monthSequence[i] for i in showMonths], rotation='45')
 
@@ -1621,7 +1619,7 @@ class PlotMatplotlib():
 
         ax.set_title(name)
         ax.hist(temperature, bins=100)
-        plt.xlabel('Temperature [deg C]')
+        #plt.xlabel('Temperature [deg C]')
         plt.ylabel('Frequency [-]')
 
         namePdf = '%s.%s'%(nameFile,extension)
