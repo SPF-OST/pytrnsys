@@ -69,9 +69,8 @@ nYearsPre  = 5
 Wprecond   = 52*nYearsPre*1*PrecondON  
 Pprecond   = PrecondON * QDemandPre    
 
-CONSTANTS 17
+CONSTANTS 16
 calcBTR  = 4 ! 1: calculate R1 and R2 internally 2: R1 input; R2 calculated internally 3: Rb input; R1=f(Rb), R2 calculated internally  4: Ra, Rb input; R1=f(Ra), R2=f(Ra,Rb) calculated internally
-calcRand = 2 ! 1: old Randaussen approach of EWS. If nBorehole>1 the MfrGHX/Nbore, 2: Lamarche-g-Functions, 3: read-in g-function
 R1RbRa = 0.1     !  mK/W R1 for calBTR = 2, Rb for calcBTR = 3, Ra for calcBTR = 4, unused for calcBTR = 1
 Rb     = 0.35     ! mK/W Rb for calcBTR = 4, otherwise unused
 nYearsPrinted=1     ! nYearsPrintedGFunction
@@ -88,11 +87,10 @@ lambdaBrine = 1.6164  ! 18: lambda of the brine, kJ/hmK
 muBrine = 0.00000646     ! 19: kinematic viscosity of the brine, m2/sec
 dTSoilAir = 1     ! delta-T between soil-surface and air, K
 
-CONSTANTS 4
+CONSTANTS 2
 lBorePerkW = 15
 lGhxProbes= lBorePerkW*sizeHpUsed   ! 9: length of heat exchanger probe (Sondenlänge), m
-dghxProbes = 0.032  ! 10: inner diameter of the pipes, m
-nGhxProbes = 4
+
 
 CONSTANTS 21
 nRadial = 6      ! 24: Nb. Of radial layers
@@ -118,14 +116,6 @@ rhoGroundLayer5   = rhoGround      !39: Ground density, axial layer-5
 lambdaGroundLayer5= lambdaGround   !40: Ground thermal conductivity, axial layer-5
 nParType951 = 38+nAxial
 
-***********************************
-** g-function loading
-***********************************
-
-CONSTANTS 1
-unitGhxGfunc = 85
-
-ASSIGN PATH$\ground_heat_exchanger\type951\database\g_functions\2x2_5m.txt unitGhxGfunc
 
 ***********************************
 ** Begin TYPE 
