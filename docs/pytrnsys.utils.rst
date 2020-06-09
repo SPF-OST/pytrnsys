@@ -28,6 +28,14 @@ pytrnsys.utils.costCalculationVar module
    :undoc-members:
    :show-inheritance:
 
+pytrnsys.utils.costConfig module
+--------------------------------
+
+.. automodule:: pytrnsys.utils.costConfig
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pytrnsys.utils.unitConverter module
 -----------------------------------
 

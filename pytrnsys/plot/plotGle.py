@@ -123,7 +123,7 @@ class PlotGle():
         
 #        j = num.arange(len(legends))
 #        jRev = num.flip(j,0)        
-        line = "xaxis min %f max %f\n"%(xmin,xmax);lines=lines+line
+        line = "xaxis min %f max %f angle 45\n"%(xmin,xmax);lines=lines+line
         if(xnames==None):
             line = "xnames \"Jan\" \"Feb\" \"Mar\" \"Apr\" \"May\" \"Jun\" \"Jul\" \"Aug\" \"Sep\" \"Oct\" \"Nov\" \"Dec\" \"Year/10\" \n";lines=lines+line
         else:

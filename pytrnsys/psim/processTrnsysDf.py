@@ -188,14 +188,13 @@ class ProcessTrnsysDf():
 
         if "plotMonthly" in self.inputs.keys():
         #
-            for plot in self.inputs["plotMonthly"]:
-                print("%s"%plot)
+            for i in range(len(self.inputs["plotMonthly"])):
+                key = self.inputs["plotMonthly"][i]
+                nameFile = key[0]
+                # namePdf=self.plot.plotMonthlyDf(self.monDataDf[key].values, key[0], nameFile,1,self.myShortMonths,myTitle=None, printData=True)
+                namePdf=self.plot.plotMonthlyDf(self.monDataDf[key].values, key[0], nameFile,10.,self.myShortMonths,myTitle=None, printData=self.printDataForGle)
 
-            # namePdf = self.plot.plotMonthlyDf(fSolar, "$F_{solar}$", nameFile, self.yearlyFsol, self.myShortMonths,
-            #                                   useYearlyFactorAsValue=True, myTitle=None, printData=True)
-
-        else:
-            pass
+                print ("%s monthly plot"%namePdf)
 
         # define QvsTDf here!
 
@@ -265,7 +264,7 @@ class ProcessTrnsysDf():
             if (len(name) > 9 and name[0:9] == "elSysOut_"):
 
                 if (name[-6:] == "Demand"):
-                    self.elDemandVector.append(self.monDataDf[name])
+                    self.elDemandVector.append(self.monDataDf[name]) #Why not .values ??
                     self.legendEl.append(self.getNiceLatexNames(name))
 
             elif (len(name) > 8 and name[0:8] == "qSysOut_"):
@@ -347,7 +346,6 @@ class ProcessTrnsysDf():
             el = num.append(el, sum(self.elHeatSysTotal))
 
             var.append(el)
-
             var.append(self.SpfShpDis)
 
             nameFile = "SPF_SHP"
@@ -759,8 +757,26 @@ class ProcessTrnsysDf():
                                                      useYear=False, printData=False,printImb=False)
                 caption = titlePlot
                 tableNames = ["Month"] + legend
+                var = inVar
+                var.append(sum(inVar))
                 self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
                 self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+                
+    def addCustomNBar(self):
+        if "monthlyBars" in self.inputs.keys():
+            for variables in self.inputs['monthlyBars']:
+                legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
+                inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
+                nameFile  = '_'.join(variables)
+                titlePlot = 'Balance'
+                namePdf = self.plot.plotMonthlyNBar(inVar, legend, "", nameFile, 10,self.myShortMonths)
+                caption = titlePlot
+                tableNames = ["Month"] + legend
+                var = inVar
+                var.append(sum(inVar))
+                self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
+                self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+            
 
     def addCaseDefinition(self,):
 
@@ -918,9 +934,11 @@ class ProcessTrnsysDf():
         """
         if 'results' in self.inputs:
             print("creating results.json file")
-
-            self.resultsDict = {}
-            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax}
+            if '-' in self.fileName:
+                self.resultsDict = {'Name':self.fileName.split('-')[1]}
+            else:
+                self.resultsDict = {}
+            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax,**self.maximumMonth,**self.minimumMonth}
             for key in self.inputs['results'][0]:
                 if type(jointDicts[key]) == num.ndarray:
                     value = list(jointDicts[key])
