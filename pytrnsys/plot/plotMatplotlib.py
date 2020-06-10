@@ -454,7 +454,7 @@ class PlotMatplotlib():
             showMonths = [i for i in range(13)]
         else:
             numberOfMonths = len(showMonths)
-        width = 0.5/N  # the width of the bars
+        width = 0.8/N  # the width of the bars
         ind = num.arange(numberOfMonths)  # the x locations for the groups
 
         fig = plt.figure(1)
