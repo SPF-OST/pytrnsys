@@ -1,0 +1,313 @@
+*******************************			
+**BEGIN ground_coupled_ice_storage.ddck			
+*******************************			
+    			
+*****************************************
+** Contact person : D. Carbonell   
+** Creation date  : 23.04.2018  
+** Last changes   : 30.04.20, MB 
+*****************************************				
+			
+***********************************			
+** To be used with ice_storage_base.ddck			
+***********************************			
+			
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************		
+**VIceS = 			
+**Tankheight = 			
+ 			
+***********************************			
+** Generic variables			
+***********************************			
+CONSTANTS 18        			
+TX1  = 10     			
+TX2  = 6     			
+TX3  = 20     			
+TY1  = 10     			
+TY2  = 10     			
+TY3  = 5     			
+nZonesX = 3     			
+nZonesY = 3     			
+RTank = (VIceS/(PI*Tankheight))^0.5     			
+deepTankFromSurface = 1.3     			
+QGroundWater = 0     			
+nMaterials = 3     			
+nParType709    = 55 + nMaterials*4 + nZonesX*nZonesY + 4*(nZonesX+nZonesY)     			
+nInputsType709 = 14 + nCv     			
+cilCoord = 1 			
+albedo     = 0.25     			
+emissivity = 0.85     			
+HTank = Tankheight     			
+			
+CONSTANTS 19   			
+modelForInitialTime = 1      ! 0=begin temperature defined, 1=analytical soluation 1D (to run all year and obtain initial state), 2=file 			
+lambdaGround = 1.6     			
+rhoGround = 1400			
+cpGround = 1100  !    KiGa was 3300 - why such a big difference?			
+lambdaSand=1.6			
+rhoSand=  1900   ! KiGa was 3300 - why different?			
+cpSand=1300  			
+thickSand = 0.1			
+TGroundIni = 10     			
+unitTIni = 129     			
+xZone1 = RTank     			
+xZone2 = thickSand     			
+xZone3 = 16.     			
+yZone1 = 2    !  for KiGa 20. In Neubau changed to 2			
+yZone2 = Tankheight     			
+yZone3 = deepTankFromSurface     			
+totalYZone = yzone1 + yZone2 + yZone3     			
+alphaMesh = 1.5      !0 regular, >1 concentration factor			
+totalXZone = xZone1 + xZone2 + xZone3  			
+   			
+CONSTANTS 20     			
+*****SENSORS *****************     			
+**BOTTOM     			
+sensorX4 = 0.     			
+sensorY4 = totalYZone - 3.65 - 0.02     			
+sensorX3 = 0.     			
+sensorY3 = sensorY4 - 0.32     			
+sensorX2 = 0.     			
+sensorY2 = sensorY3 - 0.67     			
+sensorX1 = 0.     			
+sensorY1 = sensorY2 - 0.67     			
+**TOP     			
+sensorX5 = 0.55     			
+sensorY5 = totalYZone-0.8     			
+sensorX6 = 0.55     			
+sensorY6 = totalYZone-0.5     			
+sensorX7 = 0.55     			
+sensorY7 = totalYZone-0.25     			
+**SIDES     			
+sensorX8  = RTank+0.2     			
+sensorY8  = totalYZone-2.6     			
+sensorX9  = sensorX8+2.0     			
+sensorY9  = totalYZone-1.8     			
+sensorX10 = sensorX9+2.0     			
+sensorY10 = totalYZone-2.1     			
+          			
+CONSTANTS 19     			
+oneMonth = 24*30     			
+tAmplitud = 8.75     			
+nMonthWithMaxTamb = 7     			
+SimLength1Y = GT(START,0)      			
+startDay = NOT(SimLength1Y)+SimLength1Y*START/24      			
+saveTime1  = oneMonth + 8760     			
+saveTime2  = oneMonth*2  + 8760     			
+saveTime3  = oneMonth*3  + 8760     			
+saveTime4  = oneMonth*4  + 8760     			
+saveTime5  = oneMonth*5  + 8760     			
+saveTime6  = oneMonth*6  + 8760     			
+saveTime7  = oneMonth*7  + 8760     			
+saveTime8  = oneMonth*8  + 8760     			
+saveTime9  = oneMonth*9  + 8760     			
+saveTime10 = oneMonth*10  + 8760     			
+saveTime11 = oneMonth*11  + 8760     			
+saveTime12 = STOP     			
+printData = 1     			
+unitSaveData = unitTIni     			
+			
+EQUATIONS 13    			
+QIrradKW = qTopBoco*totalXZone*(1-albedo)/1000   			
+qPcmBocoBot= QLossPCMBot      !W/m2 of ground 2d model 0.5 becasue we only solve half 			
+qPcmBocoTop= QLossPCMTop     			
+qPcmBocoCv1= QLossPCM1     			
+qPcmBocoCv2= QLossPCM2     			
+qPcmBocoCv3= QLossPCM3     			
+qPcmBocoCv4= QLossPCM4     			
+qPcmBocoCv5=QLossPCM5     			
+qPcmBocoCv6= QLossPCM6     			
+qPcmBocoCv7= QLossPCM7     			
+qPcmBocoCv8= QLossPCM8     			
+qPcmBocoCv9= QLossPCM9     			
+qPcmBocoCv10=QLossPCM10     			
+     			
+CONSTANTS 13     			
+**Boco left     			
+leftBoco = 1       !(0=temperature,1=flux Newman Boco,2=U, 3= ground surface model ( qIrr*(1-albedo)-sigma*epsilon(Tg^4-Tsky^4)-UA*(Tg-Tsky) ) with UA = UTopBoco )			
+tLeftBoco = 0.     			
+qLeftBoco  = 0 !W/m2 (in Cv positive)     			
+ULeftBoco = 0.     			
+**Boco right     			
+rightBoco = 1  !2     			
+tRightBoco = 0.      			
+qRightBoco = 0.     			
+URightBoco = 0.     			
+**Boco bot     			
+botBoco  =0     			
+**tBotBoco =tAmbAvg     			
+qBotBoco =0        !W/m2			
+UBotBoco =0.     			
+**Boco top     			
+topBoco  =3     			
+**tTopBoco =tAmb          ! tSky			
+**qTopBoco =IT_H/3.6      ! kJ/hm2 --> W/m2 			
+UTopBoco = 20      ! W/m2			
+			
+EQUATIONS 3			
+tBotBoco =tAmbAvg     			
+tTopBoco =tAmb          ! tSky			
+qTopBoco =IT_H/3.6			
+			
+**ASSIGN    TGroundIni.dat  unitTIni     			
+			
+			
+			
+			
+			
+			
+			
+			
+UNIT 305 TYPE 709    			
+PARAMETERS nParType709	! number of Cv in fluid		
+nCv    			
+nZonesX			
+nZonesY	! number of TX		
+xZone1 TX1   alphaMesh 2	! number of TX		
+xZone2 TX2    alphaMesh 0 	! number of TX		
+xZone3 TX3  alphaMesh 1 	! number of TY		
+yZone1 TY1  2 2			
+yZone2 TY2 1 0			
+yZone3 TY3 1 0			
+cilCoord			
+nMaterials			
+*********definition of materials***************			
+1 lambdaGround cpGround rhoGround 			
+2 -1 -1 -1			
+3 lambdaSand cpSand rhoSand			
+*********definition of zones***********			
+1 1 1			
+2 3 1			
+1 1 1			
+************************			
+*Boco left mode (0=temperature,1=flux Newman Boco,2=U)			
+leftBoco 			
+*Boco right			
+rightBoco 			
+*Boco top			
+topBoco 			
+*Boco bot			
+botBoco 			
+****meteo data			
+modelForInitialTime 			
+TGroundIni 			
+unitTIni 			
+tAmbAvg   			
+tAmplitud 			
+nMonthWithMaxTamb			
+startDay			
+albedo			
+emissivity			
+******average ground properties for intial ground profile			
+lambdaGround 			
+cpGround 			
+rhoGround 			
+*****saving results			
+printData			
+unitSaveData			
+saveTime1			
+saveTime2			
+saveTime3			
+saveTime4			
+saveTime5			
+saveTime6			
+saveTime7			
+saveTime8			
+saveTime9			
+saveTime10			
+saveTime11			
+saveTime12			
+******sensors			
+sensorX1 sensorY1			
+sensorX2 sensorY2			
+sensorX3 sensorY3			
+sensorX4 sensorY4			
+sensorX5 sensorY5			
+sensorX6 sensorY6			
+sensorX7 sensorY7			
+sensorX8 sensorY8			
+sensorX9 sensorY9			
+sensorX10 sensorY10			
+INPUTS nInputsType709			
+tLeftBoco qLeftBoco ULeftBoco			
+tRightBoco qRightBoco URightBoco			
+tTopBoco qTopBoco UTopBoco			
+tBotBoco qBotBoco UBotBoco			
+qPcmBocoBot 			
+qPcmBocoCv1 qPcmBocoCv2 qPcmBocoCv3 qPcmBocoCv4 qPcmBocoCv5			
+qPcmBocoCv6 qPcmBocoCv7 qPcmBocoCv8 qPcmBocoCv9 qPcmBocoCv10			
+qPcmBocoTop			
+*** INITIAL INPUT VALUES     			
+tLeftBoco qLeftBoco ULeftBoco			
+tRightBoco qRightBoco URightBoco			
+tTopBoco qTopBoco UTopBoco			
+tBotBoco qBotBoco UBotBoco			
+qPcmBocoBot 			
+qPcmBocoCv1 qPcmBocoCv2 qPcmBocoCv3 qPcmBocoCv4 qPcmBocoCv5			
+qPcmBocoCv6 qPcmBocoCv7 qPcmBocoCv8 qPcmBocoCv9 qPcmBocoCv10			
+qPcmBocoTop			
+			
+			
+			
+			
+			
+     			
+EQUATIONS 19     ! do not remove this line, it marks the start/end of a constants or equations block			
+qEGroundKW = [305,5]/1000			
+qWGroundKW = [305,6]/1000			
+qNGroundKW = [305,7]/1000 			
+qSGroundKW = [305,8]/1000 			
+qVGroundKW = [305,9]/1000 			
+qAcumGroundKW = [305,10]/1000 			
+qImbGroundKW = [305,11]/1000 			
+*************************     			
+TGBot = [305,12]      			
+TG1 = [305,13]			
+TG2 = [305,14]			
+TG3 = [305,15]			
+TG4 = [305,16]			
+TG5 = [305,17]			
+TG6 = [305,18]			
+TG7 = [305,19]			
+TG8 = [305,20]			
+TG9 = [305,21]			
+TG10 = [305,22]			
+TGTop = [305,23]     !			
+***********************     			
+EQUATIONS 10   ! do not remove this line, it marks the start/end of a constants or equations block			
+TSENSOR1 = [305,24]			
+TSENSOR2 = [305,25]			
+TSENSOR3 = [305,26]			
+TSENSOR4 = [305,27]			
+TSENSOR5 = [305,28]			
+TSENSOR6 = [305,29]			
+TSENSOR7 = [305,30]			
+TSENSOR8 = [305,31]			
+TSENSOR9 = [305,32]			
+TSENSOR10 = [305,33]			
+			
+**************************			
+** Online plotters			
+*******************************			
+   			
+ASSIGN    temp\Ground_MO.Prt      222			
+			
+UNIT 222 Type 46     ! Printegrator Monthly Values for System			
+PARAMETERS 5     			
+222   ! 1: Logical unit number, -			
+-1    ! 2: Logical unit for monthly summaries, -			
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations			
+-1    ! 4: Printing & integrating interval, h. -1 for monthly integration			
+0     ! 5: Number of inputs to avoid integration, -			
+INPUTS 7     			
+qEGroundKW  qWGroundKW  qNGroundKW  qSGroundKW  qVGroundKW  qAcumGroundKW  qImbGroundKW                           			
+*******     			
+qEGroundKW  qWGroundKW  qNGroundKW  qSGroundKW  qVGroundKW  qAcumGroundKW  qImbGroundKW 			
+			
+*********************************			
+**END GroundCoupledIceStorage.dck			
+*********************************			

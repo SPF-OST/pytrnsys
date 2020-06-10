@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SI-242.ddck
+*********************************************
+** Heat pump data for SI-242 heat pump
+** Data exported from Polysun at 03/12/19 16:07:22
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 45.4
+MfrHpCondRef = 5400
+MfrHpEvapRef = 5400
+COPNom = 4.274940
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*86.78969565
+CHPM_c2 = sizeHpRatio*939.17226569
+CHPM_c3 = sizeHpRatio*-466.78215330
+CHPM_c4 = sizeHpRatio*-4448.61932147
+CHPM_c5 = sizeHpRatio*3344.02534093
+CHPM_c6 = sizeHpRatio*1244.52693576
+COP_c1 = 2.30578534
+COP_c2 = 132.36212135
+COP_c3 = 59.44026540
+COP_c4 = -676.73178236
+COP_c5 = 271.35101064
+COP_c6 = -328.56495532
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SI-242.ddck
+*********************************************

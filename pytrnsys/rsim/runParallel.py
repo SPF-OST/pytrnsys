@@ -50,10 +50,16 @@ def getCpuHexadecimal(cpu):
     elif(cpu==6): return 20
     elif(cpu==7): return 40
     elif(cpu==8): return 80
+    elif (cpu == 9):
+        return 100
+    elif (cpu == 10):
+        return 200
+    elif (cpu == 11):
+        return 400
     else:
         raise ValueError("CPU not existent:%d"%cpu)
         
-def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=10):
+def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=0.3):
     ''' Exec commands in parallel in multiple process 
     (as much as we have CPU)
     '''
@@ -279,5 +285,32 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
         else:
             time.sleep(0.05)
         
-       
+def sortCommandList(cmds, keyWord):
+
+    """
+    function to put all commands that contain a keyWord string on top of a command list, so they will be evaluated first.
+
+    Parameters
+    ----------
+    cmds : list of strings
+        includes all commands to be evaluated
+
+    keyWord : string
+        acts as filter; commmands including this string will be evaluated first
+
+    Returns
+    -------
+    cmdsNew : list of strings
+        all commands to be evaluated in new order
+    """
+
+    cmdsNew = []
+
+    for line in cmds:
+        if keyWord in line:
+            cmdsNew.insert(0, line)
+        else:
+            cmdsNew.append(line)
+
+    return cmdsNew
 

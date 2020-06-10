@@ -1,0 +1,55 @@
+*************************************************
+**BEGIN flat_plate_heat_exchanger.ddck
+*************************************************
+    
+*****************************************
+** Contact person : D. Carbonell   
+** Creation date  : 05.10.2018   
+** Last changes   : 30.04.20, MB 
+*****************************************
+
+***********************************
+** Hx related variables. Flat plate heat exchanger
+***********************************
+
+CONSTANTS 15
+hxGeometry = 0 ! flat plate     
+numberOfCvHx=10
+yBetweenHx = 0.10 ! 10 cm between tubes or hx
+nRealHx = NHx1
+myHxArea = 3.42 
+NHx1 = INT(Lstore/yBetweenHx) ! Number of parallel hx
+lambdaHx = 15.27 ! 0.23-2.5   
+addedCap = 0         
+**HxIceIn  = heightHx1/Tankheight     
+**HXIceOut = 0.01    inverted
+HxIceOut  = heightHx1/Tankheight     
+HXIceIn = 0.01    
+heightIceHX =  HxIceIn
+thicknessHx1 = 0.0090     ! Heat exchanger characteristic thickness [m]     
+useCorrugated = 1
+orderHx1=1     
+iceThickToDeIce=100 ! No de-ice is possible
+
+**************parameters for hx **************
+CONSTANTS 5        
+heightHx1 = Tankheight ! 1.9           ! HX characteristic height [m]
+charThick= 9e-3   
+AHx1      = heightHx1*LHx1
+LHx1      = Tankwidth 
+dxWallHx = 6e-4     
+
+
+CONSTANTS 6
+x1Type861 = yBetweenHx
+x2Type861 = notused
+hxType861par3 = heightHx1 !height 
+hxType861par4 = charThick !width
+hxType861par5 = LHx1      !length 
+hxType861par6 = dxWallHx
+     
+     
+     
+     
+
+     

@@ -1,0 +1,48 @@
+*******************************			
+**BEGIN cellar_coupled_ice_storage.ddck			
+*******************************			
+    			
+*****************************************
+** Contact person : D. Carbonell   
+** Creation date  : 23.04.2018  
+** Last changes   : 30.04.20, MB 
+*****************************************				
+			
+***********************************			
+** To be used with ice_storage_base.ddck			
+***********************************			
+			
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************		
+	
+ 			
+
+CONSTANTS 7     ! do not remove this line, it marks the start/end of a constants or equations block
+qEGroundKW =0      
+qWGroundKW =0      
+qNGroundKW =0     
+qSGroundKW =0     
+qVGroundKW =0     
+qAcumGroundKW =0     
+qImbGroundKW =0 
+         
+EQUATIONS 12
+TGBot = TRoomStore     
+TG1   = TRoomStore     
+TG2   = TRoomStore     
+TG3   = TRoomStore     
+TG4   = TRoomStore     
+TG5   = TRoomStore     
+TG6   = TRoomStore     
+TG7   = TRoomStore     
+TG8   = TRoomStore     
+TG9   = TRoomStore     
+TG10  = TRoomStore     
+TGTop = TRoomStore     
+
+*******************************
+**BEGIN CellarIceCouled.dck
+*******************************

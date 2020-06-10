@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN HP08L-M-WEB.ddck
+*********************************************
+** Heat pump data for HP08L-M-WEB heat pump
+** Data exported from Polysun at 02/26/19 13:28:40
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 11.3
+MfrHpCondRef = 2900
+MfrHpEvapRef = 7250
+COPNom = 4.242280
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*13.10520725
+CHPM_c2 = sizeHpRatio*108.26821046
+CHPM_c3 = sizeHpRatio*7.62723462
+CHPM_c4 = sizeHpRatio*-84.26501889
+CHPM_c5 = sizeHpRatio*192.68685526
+CHPM_c6 = sizeHpRatio*-127.13728101
+COP_c1 = 10.16619989
+COP_c2 = 58.83247172
+COP_c3 = -59.00621178
+COP_c4 = -204.36295107
+COP_c5 = 78.24401583
+COP_c6 = 99.32578169
+TMinEvapTin = -20.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END HP08L-M-WEB.ddck
+*********************************************

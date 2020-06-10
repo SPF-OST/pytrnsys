@@ -1,0 +1,29 @@
+*******************************
+**BEGIN sfh45.ddck
+*******************************
+    
+*****************************************
+** Contact person : Mattia Battaglia  
+** Creation date  : 29.04.2020
+** Last changes   : 29.04.2020, MB 
+*****************************************
+
+***************************************************************************
+** Description: 
+** parametrization of SFH45 building defined in IEA Task44. To be used together with bui_task44_rad_floor.ddck or bui_task44_radiator.ddck
+** TODO: 
+***************************************************************************
+CONSTANTS 3
+UaBui = 168     ! Heat loss rate, W/K
+UGrFloor = 0.183     ! U-Value of Ground floor, W/m2K
+unitAssignBuilding = 56
+
+ASSIGN PATH$\building\type56\database\files\T44A38sfh045.bui unitAssignBuilding     ! Building def. file, -
+
+CONSTANTS 6     
+PheatBuiD = 12830  ! design heating rate for building an location [kJ/h]
+TBuiFlNom = 35     ! Design flow temp. heating syst. [�C]
+TBuiRtNom = 30     ! Design return temp. heating syst. [�C]
+Precond = NIX      ! Extracted mean ground preconditioning power
+AreaBui = 120
+TroomSetCool = 24

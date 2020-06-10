@@ -1,0 +1,33 @@
+*********************************************
+** BEGIN HP25L-M-WEB-.ddck
+*********************************************
+** Heat pump data for HP25L-M-WEB- heat pump
+** Data exported from Polysun at 02/26/19 11:03:05
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 22
+TEvapMaxHp = 80
+sizeHpNom = 25.2
+MfrHpCondRef = 4500
+MfrHpEvapRef = 11250
+COPNom = 4.116099
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*25.03338734
+CHPM_c2 = sizeHpRatio*225.22446991
+CHPM_c3 = sizeHpRatio*73.84314382
+CHPM_c4 = sizeHpRatio*-84.93637619
+CHPM_c5 = sizeHpRatio*319.16954210
+CHPM_c6 = sizeHpRatio*-468.65648654
+COP_c1 = 9.68075722
+COP_c2 = 53.60720011
+COP_c3 = -55.04117537
+COP_c4 = -176.80565699
+COP_c5 = 70.31134047
+COP_c6 = 90.16709862
+TMinEvapTin = -8
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 75
+CpEvap = 1.004
+*********************************************
+** END HP25L-M-WEB-.ddck
+*********************************************

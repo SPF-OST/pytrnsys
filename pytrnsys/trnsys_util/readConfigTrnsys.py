@@ -20,11 +20,14 @@ def getCityFromConfig(lines):
     for line in lines:
         if "City" in line:
             cityLine = line
+            weatherFile = cityLine.split("City")[1]
+            city = weatherFile.split("_")[0]
             break
         else:
+            weatherFile = 'NoCity'
+            city = 'NoCity'
             pass
-    weatherFile = cityLine.split("City")[1]
-    city = weatherFile.split("_")[0]
+
 
     return weatherFile, city
 
@@ -57,11 +60,16 @@ class ReadConfigTrnsys():
 
         lines = processFiles.purgueLines(lines, skypChar, None,removeBlankLines=True, removeBlankSpaces=False)
         lines = processFiles.purgueComments(lines, skypChar)
+
         if "calcMonthly" not in inputs:
             inputs["calcMonthly"]=[]
 
+        if "calcHourly" not in inputs:
+            inputs["calcHourly"]=[]
+
         if "calc" not in inputs:
             inputs["calc"]=[]
+
 
         if (parseFileCreated):
             parsedFile = "%s.parse.dat" % configFile
@@ -97,16 +105,22 @@ class ReadConfigTrnsys():
                 else:
                     inputs[splitLine[1]] = splitLine[2][1:-1] #I delete the "
             elif (splitLine[0] == "stringArray"):
-                inputs[splitLine[1]] = []
+                if splitLine[1]  not in inputs.keys():
+                    inputs[splitLine[1]] = []
+
+                newElement = []
                 for i in range(len(splitLine)-2):
                     strEl = splitLine[i+2][1:-1] #I delete the "
-                    inputs[splitLine[1]].append(strEl)
+                    newElement.append(strEl)
+                inputs[splitLine[1]].append(newElement)
+                    
 
             elif (splitLine[0]== "calcMonthly"):
                 inputs["calcMonthly"].append(" ".join(splitLine[1:]))
             elif (splitLine[0]== "calc"):
                 inputs["calc"].append(" ".join(splitLine[1:]))
-
+            elif (splitLine[0] == "calcHourly"):
+                inputs["calcHourly"].append(" ".join(splitLine[1:]))
 
             else:
                 if(controlDataType):

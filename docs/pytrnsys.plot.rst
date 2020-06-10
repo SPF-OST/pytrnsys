@@ -12,6 +12,14 @@ pytrnsys.plot.downSizeForPlotting module
    :undoc-members:
    :show-inheritance:
 
+pytrnsys.plot.plotBokeh module
+------------------------------
+
+.. automodule:: pytrnsys.plot.plotBokeh
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pytrnsys.plot.plotGle module
 ----------------------------
 

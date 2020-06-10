@@ -1,0 +1,99 @@
+*******************************
+**BEGIN Const_eff_HX.ddck
+*******************************
+    
+*****************************************
+** Contact person : Mattia Battaglia
+** Creation date  : 12.19   
+** Last changes   : 04.2020 MB
+*****************************************
+
+***********************************
+** HX with constant efficiency used for external dhw hex. In this model the mass flow is controlled elsewhere.
+***********************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS 4
+TSourceDHWHXIn = TPiHxDhwIn
+MfrSourceDHWHXIn = ABS(MfrPuDHW)
+TLoadDHWHXIn = TPiHxDhwSecIn
+MfrLoadDHWHXIn = ABS(MfrPiHxDhwSecIn)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+EQUATIONS 2
+TsourceDHWHXOut = [500,5]	!Source-side outlet temperature	C
+TLoadDHWHXOut = [500,7]		!Load side outlet temperature	C
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+
+
+
+CONSTANTS 1
+HX_efficiencyDHWHX = 1
+
+
+
+UNIT 500 TYPE 652
+PARAMETERS 4
+1		! 1 Effectiveness of Heat Exchanger
+cpwat		! 2 Specific Heat of Hot-Side Fluid
+cpwat		! 3 Specific Heat of Cold-Side Fluid
+1000		! 4 Number of Possible Steps
+INPUTS 6
+TSourceDHWHXIn		! [unconnected] Hot-Side Inlet Temperature
+MfrSourceDHWHXIn		! [unconnected] Hot-Side Flowrate
+TLoadDHWHXIn		! [unconnected] Cold-Side Inlet Temperature
+MfrLoadDHWHXIn		! [unconnected] Cold-Side Flowrate
+Tdhwset		! [unconnected] Cold-Side Set Temperature
+0,0		! [unconnected] Modulation Control
+*** INITIAL INPUT VALUES
+20.0 0.0 10.0 0.0 14.0 0 
+
+
+EQUATIONS 5
+MfrSourceDHWHX = [500,6]		!Source side flow rate	kg/hr
+MrfLoadDHWHX = [500,8]		!Load side flow rate	kg/hr
+HTR_HXDHWHX = [500,10]		!Heat transfer rate	kJ/hr
+fractionOfBypass = [500,9]		!Overall heat transfer coefficient	kJ/hr.K
+QHXDHW_kW = HTR_HXDHWHX/3600
+
+UNIT 501 TYPE 65     ! Online Plotter HX
+PARAMETERS 12     
+3     ! 1 Nb. of left-axis variables
+4     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+6000     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+60     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+-1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 7    
+MfrSourceDHWHXIn	MfrLoadDHWHXIn QHXDHW_kW  TSourceDHWHXIn TLoadDHWHXIn TsourceDHWHXOut TLoadDHWHXOut 
+MfrSourceDHWHXIn	MfrLoadDHWHXIn QHXDHW_kW  TSourceDHWHXIn TLoadDHWHXIn TsourceDHWHXOut TLoadDHWHXOut 
+LABELS  3     
+MassFlows
+Temperatures     
+HX
+
+
+
+*******************************
+**END Const_eff_HX.ddck
+*******************************

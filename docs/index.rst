@@ -3,16 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. include:: ./source
 
 Welcome to pytrnsys's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    guide/index
-   CodeReference
+   guide/config_file
+   guide/tutorial
+   Code Reference <modules>
 
 
 Indices and tables

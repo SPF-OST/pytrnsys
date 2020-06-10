@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SI-GEO-5-22.ddck
+*********************************************
+** Heat pump data for SI-GEO-5-22 heat pump
+** Data exported from Polysun at 03/12/19 16:02:10
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 25.7
+MfrHpCondRef = 4246
+MfrHpEvapRef = 4246
+COPNom = 4.418692
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*24.84547070
+CHPM_c2 = sizeHpRatio*297.02856643
+CHPM_c3 = sizeHpRatio*70.93356815
+CHPM_c4 = sizeHpRatio*-281.10422116
+CHPM_c5 = sizeHpRatio*102.92136562
+CHPM_c6 = sizeHpRatio*-366.22414557
+COP_c1 = 5.45079317
+COP_c2 = 58.70891263
+COP_c3 = 6.72958934
+COP_c4 = -140.94017976
+COP_c5 = -29.67182991
+COP_c6 = -102.17488963
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SI-GEO-5-22.ddck
+*********************************************

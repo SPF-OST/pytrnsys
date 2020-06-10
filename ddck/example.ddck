@@ -1,0 +1,67 @@
+*******************************
+**BEGIN example.ddck 
+*******************************
+    
+*****************************************
+** Contact person : author   
+** Creation date  : date
+** Last changes   : date, name 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Overall description of the ddck file
+** TODO: Any improvements needed
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+** tIn from hydraulic 
+** mIn from hydraulic
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+** which outputs will be used to connect the hydraulic slver
+** typically tOutType will be defined here to be used in the hydraulic ddck
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+** Add here those variables that will go into the overall energy balance of the system
+** These values will be sued to automatically generate the energy balance
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+** Re-assing here the variables necessary from other types
+** variableInternal = variableExternal
+** Exception: those from general variables
+
+***********************************
+** outputs to other ddck
+***********************************
+
+** Add here the outputs of the TYPE or TYPES that will be used in other types
+** Exception: those for printers and so on dont need to be here.
+
+***********************************
+** Begin CONSTANTS
+***********************************
+
+***********************************
+** Begin TYPE
+***********************************
+
+
+***********************************
+** Monthly printer
+***********************************
+
+** only if all variables are defined locally in the ddck

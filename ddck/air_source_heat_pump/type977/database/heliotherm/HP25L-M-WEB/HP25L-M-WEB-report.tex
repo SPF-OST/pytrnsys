@@ -1,0 +1,126 @@
+\documentclass[english]{SPFShortReport}
+\usepackage{subfigure}
+\usepackage{spfFigures}
+\usepackage{longtable}
+\usepackage{url}
+\usepackage{gensymb}
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\reportName{Type977 fitting for heat pump HP25L-M-WEB-}
+\reportSubName{Parametric Heat Pump calculation} 
+\reportDate{\today \hspace{0.1cm} at: \currenttime \hspace{0.1cm} h} 
+\author{Dani Carbonell}
+\address{dani.carbonell@spf.ch}
+\begin{document}
+\begin{table}[!ht]
+\begin{small}
+\caption{Fitted coefficients for the heat pump.}
+\begin{center}
+\resizebox{12cm}{!} 
+{
+\begin{tabular}{l | c c } 
+\hline
+\hline
+Coefficient &Description & \\ 
+ & &$[kW]$\\ 
+\hline
+$P_{Q_{1}}$ & \emph{$1^{st}$ condenser polynomial coefficient}  & 2.5033e+01    \\ 
+$P_{Q_{2}}$ & \emph{$2^{st}$ condenser polynomial coefficient}  & 2.2522e+02    \\ 
+$P_{Q_{3}}$ & \emph{$3^{st}$ condenser polynomial coefficient}  & 7.3843e+01    \\ 
+$P_{Q_{4}}$ & \emph{$4^{st}$ condenser polynomial coefficient}  & -8.4936e+01    \\ 
+$P_{Q_{5}}$ & \emph{$5^{st}$ condenser polynomial coefficient}  & 3.1917e+02    \\ 
+$P_{Q_{6}}$ & \emph{$6^{st}$ condenser polynomial coefficient}  & -4.6866e+02    \\ 
+\hline
+$P_{COP_{1}}$ & \emph{$1^{st}$ COP polynomial coefficient}  & 9.6808e+00    \\ 
+$P_{COP_{2}}$ & \emph{$2^{st}$ COP polynomial coefficient}  & 5.3607e+01    \\ 
+$P_{COP_{3}}$ & \emph{$3^{st}$ COP polynomial coefficient}  & -5.5041e+01    \\ 
+$P_{COP_{4}}$ & \emph{$4^{st}$ COP polynomial coefficient}  & -1.7681e+02    \\ 
+$P_{COP_{5}}$ & \emph{$5^{st}$ COP polynomial coefficient}  & 7.0311e+01    \\ 
+$P_{COP_{6}}$ & \emph{$6^{st}$ COP polynomial coefficient}  & 9.0167e+01    \\ 
+\hline
+$\dot m_{cond}$ & 4500.00 $[kg/h]$ \\ 
+$\dot m_{evap}$ & 11250.00 $[kg/h]$ \\ 
+\hline
+$COP_{nom}$ (A0W35)& 4.12 \\ 
+$Q_{cond,nom}$ (A0W35)& 25.24 $[kW]$\\ 
+$Q_{evap,nom}$ (A0W35)& 19.11 $[kW]$\\ 
+$W_{comp,nom}$ (A0W35)& 6.13 $[kW]$\\ 
+\hline
+ $RMS_{COP}$ & $1.09e-01$ \\ 
+ $RMS_{Q_{cond}}$ & $8.78e-01$ \\ 
+ $RMS_{W_{comp}}$ & $1.30e-01$ \\ 
+\hline
+Fit model & Average Temperature\\ 
+\hline
+\hline
+\end{tabular}
+}
+\label{CoefTable}
+\end{center}
+\end{small}
+\end{table}
+\begin{table}[!ht]
+\begin{small}
+\caption{Differences between experiments and fitted data for the heat pump.          $error=100 \cdot |\frac{Q_{exp}-Q_{num}}{Q_{exp}}|$ and $RMS = \sqrt { \sum{\frac{(Q_{exp}-Q_{num})^2}{n_p}} }$ where $n_p$ is the number of data points.}
+\begin{center}
+\resizebox{12cm}{!} 
+{
+\begin{tabular}{l | c c c c c c c c c c } 
+\hline
+\hline
+$T_{cond,out}$ &$T_{evap,in}$ &$COP$ &$COP_{exp}$ &error &$Q_{cond}$ &$Q_{cond,exp}$ &error &$W_{comp}$ &$W_{comp,exp}$ &error \\ 
+$^oC$ &$^oC$ &$[-]$ &$[-]$ &$[\%]$ &$[kW]$ &$[kW]$ &$[\%]$ &$[kW]$ &$[kW]$ &$[\%]$\\ 
+\hline
+35.00  & 20.00 & 6.68 & 6.73 & 0.7 & 40.54 & 40.16 & 0.9 & 6.07 & 5.97 & 1.65\\ 
+35.00  & 10.00 & 5.32 & 5.33 & 0.2 & 32.57 & 33.10 & 1.6 & 6.12 & 6.21 & 1.41\\ 
+35.00  & 7.00 & 4.96 & 5.07 & 2.3 & 30.31 & 31.60 & 4.1 & 6.11 & 6.23 & 1.86\\ 
+35.00  & 2.00 & 4.30 & 4.08 & 5.3 & 26.60 & 25.22 & 5.5 & 6.19 & 6.18 & 0.15\\ 
+35.00  & -7.00 & 3.35 & 3.25 & 3.0 & 20.42 & 19.61 & 4.1 & 6.09 & 6.03 & 1.08\\ 
+35.00  & -15.00 & 2.64 & 2.76 & 4.4 & 15.39 & 16.05 & 4.1 & 5.82 & 5.81 & 0.25\\ 
+45.00  & 7.00 & 3.77 & 3.91 & 3.6 & 28.63 & 29.68 & 3.5 & 7.60 & 7.60 & 0.05\\ 
+45.00  & 2.00 & 3.24 & 3.14 & 3.0 & 24.86 & 23.64 & 5.2 & 7.68 & 7.52 & 2.12\\ 
+45.00  & -7.00 & 2.49 & 2.45 & 1.7 & 18.68 & 18.01 & 3.7 & 7.50 & 7.35 & 2.02\\ 
+45.00  & -15.00 & 1.96 & 2.02 & 3.1 & 13.66 & 14.48 & 5.6 & 6.98 & 7.17 & 2.64\\ 
+50.00  & 20.00 & 4.55 & 4.38 & 3.8 & 37.54 & 36.85 & 1.9 & 8.25 & 8.41 & 1.85\\ 
+50.00  & 15.00 & 4.04 & 4.12 & 1.8 & 33.56 & 34.69 & 3.3 & 8.30 & 8.42 & 1.45\\ 
+50.00  & 7.00 & 3.26 & 3.38 & 3.7 & 27.34 & 28.28 & 3.3 & 8.39 & 8.36 & 0.36\\ 
+50.00  & 2.00 & 2.80 & 2.73 & 2.3 & 23.55 & 22.61 & 4.2 & 8.42 & 8.27 & 1.79\\ 
+50.00  & -7.00 & 2.15 & 2.10 & 2.4 & 17.36 & 17.02 & 2.0 & 8.07 & 8.10 & 0.38\\ 
+55.00  & 20.00 & 3.96 & 3.91 & 1.2 & 35.95 & 35.26 & 2.0 & 9.08 & 9.01 & 0.80\\ 
+55.00  & 7.00 & 2.81 & 2.98 & 5.7 & 25.74 & 26.70 & 3.6 & 9.15 & 8.96 & 2.18\\ 
+55.00  & -7.00 & 1.86 & 1.77 & 5.0 & 15.69 & 15.43 & 1.7 & 8.42 & 8.70 & 3.21\\ 
+\hline 
+ Sum &  & &  & 53.0 &  &  & 60.2 & &  & 25.23\\ 
+\hline 
+ $RMS_{COP}$ & $1.09e-01$ \\ 
+ $RMS_{Q_{cond}}$ & $8.78e-01$ \\ 
+ $RMS_{W_{comp}}$ & $1.30e-01$ \\ 
+\hline
+\hline
+\end{tabular}
+}
+\label{ErrorsTable}
+\end{center}
+\end{small}
+\end{table}
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[width=1\textwidth]{C:/Daten/OngoingProject/TRNSYS-Polysun/HeatPumpFit/AirToWater/Heliotherm/HP25L-M-WEB-/HP25L-M-WEB--Qcond.pdf}
+\caption{$Q_{cond}$ differences between experiments and fitted data}
+\label{QcongFig}
+\end{center}
+\end{figure}
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[width=1\textwidth]{C:/Daten/OngoingProject/TRNSYS-Polysun/HeatPumpFit/AirToWater/Heliotherm/HP25L-M-WEB-/HP25L-M-WEB--Qcomp.pdf}
+\caption{$W_{comp}$ differences between experiments and fitted data}
+\label{QcompFig}
+\end{center}
+\end{figure}
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[width=1\textwidth]{C:/Daten/OngoingProject/TRNSYS-Polysun/HeatPumpFit/AirToWater/Heliotherm/HP25L-M-WEB-/HP25L-M-WEB--COP.pdf}
+\caption{$COP$ differences between experiments and fitted data}
+\label{COPFig}
+\end{center}
+\end{figure}
+\end{document}

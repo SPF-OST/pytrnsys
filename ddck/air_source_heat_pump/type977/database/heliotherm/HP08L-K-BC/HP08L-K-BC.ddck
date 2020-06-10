@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN HP08L-K-BC.ddck
+*********************************************
+** Heat pump data for HP08L-K-BC heat pump
+** Data exported from Polysun at 02/26/19 13:28:32
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 7.8
+MfrHpCondRef = 1600
+MfrHpEvapRef = 4000
+COPNom = 4.043650
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*7.10807114
+CHPM_c2 = sizeHpRatio*64.04865707
+CHPM_c3 = sizeHpRatio*31.44548152
+CHPM_c4 = sizeHpRatio*16.81395261
+CHPM_c5 = sizeHpRatio*57.80788804
+CHPM_c6 = sizeHpRatio*-171.93387137
+COP_c1 = 7.77953348
+COP_c2 = 61.52341688
+COP_c3 = -29.18409268
+COP_c4 = -219.83453734
+COP_c5 = 60.71519813
+COP_c6 = 3.89320379
+TMinEvapTin = -20.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END HP08L-K-BC.ddck
+*********************************************

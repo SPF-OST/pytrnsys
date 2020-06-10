@@ -1,0 +1,32 @@
+******************************
+**BEGIN Type1_Constants_ARIS2504.ddck
+*******************************
+    
+*****************************************
+** Solar Thermal Data for covered collector. 
+** Medium Performing Collector ARIS2504
+** Version : v0.0
+** Last Changes: Jeremias Schmidli	    
+** Date: 10.03.2020
+******************************************
+
+CONSTANTS 11
+ 
+Eta0= 0.791     ! Eta0 (a0) of collector (zero heat loss efficiency)
+a1 = 4.47*3.6    ! linear heat loss coefficient of collector [kJ/hm^2K] ![W/m2K]*3.6
+a2 = 0.0069*3.6   ! quadratic heat loss coefficient of collector [kJ/hm^2K^2] ![W/m2K2]*3.6
+
+AbsorberArea = 2.278 !m2
+TotArea = 2.516 !m2
+
+nSeries = 1
+efficiencyMode = 1 
+testedMfr = 180/AbsorberArea !l/hm2
+
+GroundReflectance = 0.2
+
+FirstOrderIAM = 0.162
+SecondOrderIAM = 0
+*******************************
+**END Type1_Constants_Test.ddck
+*******************************

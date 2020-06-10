@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN HP10L-WEB.ddck
+*********************************************
+** Heat pump data for HP10L-WEB heat pump
+** Data exported from Polysun at 02/26/19 13:28:55
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 9.9
+MfrHpCondRef = 2100
+MfrHpEvapRef = 5250
+COPNom = 4.209672
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*13.92825882
+CHPM_c2 = sizeHpRatio*70.10889159
+CHPM_c3 = sizeHpRatio*-28.28625674
+CHPM_c4 = sizeHpRatio*79.39692813
+CHPM_c5 = sizeHpRatio*143.14939724
+CHPM_c6 = sizeHpRatio*7.07175361
+COP_c1 = 9.50841775
+COP_c2 = 57.05016950
+COP_c3 = -50.74823208
+COP_c4 = -192.63833292
+COP_c5 = 89.93589639
+COP_c6 = 73.76183217
+TMinEvapTin = -20.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END HP10L-WEB.ddck
+*********************************************

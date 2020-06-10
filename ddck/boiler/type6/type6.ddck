@@ -1,0 +1,151 @@
+*******************************
+**BEGIN Type6.ddck 
+*******************************
+
+*****************************************
+** Contact person : Mattia Battaglia    
+** Creation date  : 10.01.2010
+** Last changes   : 05.2020 Mattia Battaglia
+*****************************************
+
+***************************************************************************
+** Description: 
+** Simple Boiler model 
+***************************************************************************
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS 2
+TBoilerIn = TPiAuxIn
+MfrBoilerIn = ABS(MfrPiAuxIn
+
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS 1
+TBoilerOut = TBOut
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 1
+qSysIn_Boiler = PBoiler_kW 
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+EQUATIONS 2
+BoilerOn = auxOnRc
+mytRoomStore = tRoomStore
+
+
+
+***********************************
+** Beginning TYPE
+***********************************
+
+CONSTANTS 2
+PBoilerNom=3600*10
+MflowBoilerNom = 3000
+
+UNIT 219 TYPE 6
+PARAMETERS 4
+PBoilerNom 		! 1 Rated Capacity   kJ/h
+CPWAT 			! 2 Fluid Specific Heat   kJ/kgK 
+0 		! Loss UA value
+1		! Efficiency
+INPUTS 5
+TBoilerIn  		! 1 Inlet Fluid Temperature   C
+MfrBoilerIn		! 2 Inlet Fluid Flow Rate   kg/h
+BoilerOn 	! 3 Input Control Signal   (between 0 and 1)
+tSetBoiler        		! 4 Setpoint Temperature   C
+mytRoomStore        		! 5 Boiler Efficiency   Fraction
+**** INITIAL INPUT VALUES
+50 0.0 0.0 95 0.78
+
+
+***********************************
+** Outputs 
+***********************************
+
+EQUATIONS 6
+TBout 	= [219,1]   ! Outlet Fluid Temperature
+MfrBout = [219,2]	! Outlet Fluid Flow Rate 
+PBoilerIn_kW 	= [219,3]/3600   ! Fluid Energy 
+PBoilerLoss_kW 	= [219,4]/3600  	! Losses to Surroundings 
+Pout = [219,5] 	! Exhaust Energy
+PBoiler_kW = Pout/3600
+
+
+
+UNIT 89 TYPE 65     ! Online Plotter Auxiliary (Element Hp)
+PARAMETERS 12     
+3    ! 1 Nb. of left-axis variables
+5    ! 2 Nb. of right-axis variables
+-10   ! 3 Left axis minimum
+100    ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+50   ! 6 Right axis maximum
+nPlotsPerSim ! 7 Number of plots per simulation
+12    ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1    ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 8
+TBoilerIn TBoilerOut tSetBoiler PBoiler_kW  PBoilerIn_kW  PBoilerLoss_kW MfrBoilerIn  BoilerOn
+**
+TBoilerIn TBoilerOut tSetBoiler PBoiler_kW  PBoilerIn_kW  PBoilerLoss_kW MfrBoilerIn BoilerOn 
+LABELS  3     
+Temperatures     
+Power     
+Boiler   
+
+***********************************
+** Monthly printer
+***********************************
+
+CONSTANTS 1
+unitPrintBoiler = 31
+
+ASSIGN temp\Boiler_MO.Prt unitPrintBoiler 
+
+UNIT 32 TYPE 46      
+PARAMETERS 6   
+unitPrintBoiler ! 1: Logical unit number, -
+-1           ! 2: Logical unit for monthly summaries, -
+1            ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1           ! 4: Printing & integrating interval, h. -1 for monthly integration
+1            ! 5: Number of inputs to avoid integration, -
+1            ! 6: Output number to avoid integration
+INPUTS 4
+Time  PBoiler_kW  PBoilerIn_kW  PBoilerLoss_kW
+**
+Time  PBoiler_kW  PBoilerIn_kW  PBoilerLoss_kW
+
+***********************************
+** Hourly printer
+***********************************
+
+CONSTANTS 1
+unitPrintBoilerHr = 33
+
+ASSIGN    temp\Boiler_HR.Prt    unitPrintBoilerHr     
+
+UNIT 34 TYPE 46     ! Printegrator Monthly Values for System
+PARAMETERS 8   
+unitPrintBoilerHr ! 1: Logical unit number, -
+-1            ! 2: Logical unit for monthly summaries, -
+1             ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1             ! 4: Printing & integrating interval, h. -1 for monthly integration
+3             ! 5: Number of inputs to avoid integration, -
+1             ! 6: Output number to avoid integration
+5             ! 7: Output number to avoid integration
+6             ! 8: Output number to avoid integration
+INPUTS 6
+Time  PBoiler_kW  PBoilerIn_kW  PBoilerLoss_kW TBoilerIn TBoilerOut
+**
+Time  PBoiler_kW  PBoilerIn_kW  PBoilerLoss_kW TBoilerIn TBoilerOut

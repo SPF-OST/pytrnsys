@@ -123,7 +123,7 @@ class PlotGle():
         
 #        j = num.arange(len(legends))
 #        jRev = num.flip(j,0)        
-        line = "xaxis min %f max %f\n"%(xmin,xmax);lines=lines+line
+        line = "xaxis min %f max %f angle 45\n"%(xmin,xmax);lines=lines+line
         if(xnames==None):
             line = "xnames \"Jan\" \"Feb\" \"Mar\" \"Apr\" \"May\" \"Jun\" \"Jul\" \"Aug\" \"Sep\" \"Oct\" \"Nov\" \"Dec\" \"Year/10\" \n";lines=lines+line
         else:
@@ -278,8 +278,11 @@ class PlotGle():
             line = " data   myFile$ d%d = c%d,c%d \n"%(i+1,j,j+1) ; lines = lines +line
             j=j+2
     
-        for i in range(nVar):            
-            line = "d%d lstyle 1 line lwidth %f color %s key \"$%s$\"  \n"%(i+1,self.sizeLine,self.colorGLE[i],legends[i]) ; lines = lines +line
+        for i in range(nVar):
+            if legends[i].startswith('$'):
+                line = "d%d lstyle 1 line lwidth %f color %s key \"%s\"  \n" % (i + 1, self.sizeLine, self.colorGLE[i], legends[i]);lines = lines + line
+            else:
+                line = "d%d lstyle 1 line lwidth %f color %s key \"$%s$\"  \n"%(i+1,self.sizeLine,self.colorGLE[i],legends[i]) ; lines = lines +line
     
         line = " key pos tr hei 0.2 offset -1 0\n" ; lines = lines +line
         line = "end graph\n" ; lines = lines +line
@@ -293,9 +296,10 @@ class PlotGle():
     def executeGLE(self,fileName):
                 
         gleExe ='"%s"'% os.getenv("GLE_EXE")
-        
-        cmd = "%s -vb 0 -d pdf %s\%s" % (gleExe,self.path,fileName)                      
-        
+        if os.path.exists(gleExe):
+            cmd = "%s -vb 0 -d pdf %s\%s" % (gleExe,self.path,fileName)
+        else:
+            cmd = "%s -vb 0 -d pdf %s\%s" % ('gle.exe',self.path,fileName)
         print (cmd)
         
         os.system(cmd)   

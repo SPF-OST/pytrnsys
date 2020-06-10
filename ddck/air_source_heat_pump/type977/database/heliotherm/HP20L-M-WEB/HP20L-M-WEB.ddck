@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN HP20L-M-WEB.ddck
+*********************************************
+** Heat pump data for HP20L-M-WEB heat pump
+** Data exported from Polysun at 02/26/19 13:28:45
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 20.9
+MfrHpCondRef = 4100
+MfrHpEvapRef = 10250
+COPNom = 4.164048
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*27.39635519
+CHPM_c2 = sizeHpRatio*175.14684752
+CHPM_c3 = sizeHpRatio*-27.27679578
+CHPM_c4 = sizeHpRatio*-45.30190725
+CHPM_c5 = sizeHpRatio*419.26627363
+CHPM_c6 = sizeHpRatio*-125.88726221
+COP_c1 = 9.87751825
+COP_c2 = 55.27993362
+COP_c3 = -56.79344154
+COP_c4 = -185.73530255
+COP_c5 = 73.38374205
+COP_c6 = 94.75884936
+TMinEvapTin = -20.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END HP20L-M-WEB.ddck
+*********************************************

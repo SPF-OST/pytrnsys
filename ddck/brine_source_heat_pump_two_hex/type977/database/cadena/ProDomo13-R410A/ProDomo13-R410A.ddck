@@ -1,0 +1,43 @@
+*********************************************
+** BEGIN WWHp-ProDomo13 from CADENA SA
+*********************************************
+** Heat pump data for ProDomo13 heat pump from CADENA with R410A
+** Data obtained from project WaWaCad
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 22
+TEvapMaxHp = 40
+sizeHpNom = 12.5
+MfrHpCondRef = 3000
+MfrHpEvapRef = 2800
+COPNom = 4.68 ! at B0W35
+TEvapMax = 35
+tCondMaxHp = 70
+CHPM_c1 = sizeHpRatio*14.867741
+CHPM_c2 = sizeHpRatio*127.470232
+CHPM_c3 = sizeHpRatio*-13.745162
+CHPM_c4 = sizeHpRatio*-216.501237
+CHPM_c5 = sizeHpRatio*392.541582
+CHPM_c6 = sizeHpRatio*-7.987489
+COP_c1 = 12.410844
+COP_c2 = 61.890885
+COP_c3 = -83.489595
+COP_c4 = -233.308680
+COP_c5 = 103.074518
+COP_c6 = 177.030077
+TMinEvapTin = -8
+TMinEvapTout = TMinEvapTin - 3
+cpEvap = cpBri
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

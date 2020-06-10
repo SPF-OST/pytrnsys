@@ -1,22 +1,24 @@
 #!/usr/bin/python
-"""
-Main class to process all TRNSYS results.
-We need to include in this class any processing Class
-customized for new projects
-Author : Daniel Carbonell
-Date   : 01-10-2018
-ToDo : remove processDataGshp and make it generic
-       getBaseClass should be defined outside this function so that this class is not changet at all
-"""
 
 import os
+import glob
+import json
 import pytrnsys.psim.debugProcess as debugProcess
 import multiprocessing as mp
 import pytrnsys.rsim.runParallel as run
 import pytrnsys.utils.utilsSpf as utils
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
+import pytrnsys.psim.processTrnsysDf as processTrnsys
 import warnings
 import copy
+import pytrnsys.report.latexReport as latex
+import matplotlib.pyplot as plt
+import numpy as num
+import pandas as pd
+#import seaborn as sns
+import pytrnsys.utils.costConfig as costConfig
+from pathlib import Path
+import pytrnsys.plot.plotMatplotlib as plot
 #we would need to pass the Class as inputs
 
 
@@ -114,6 +116,12 @@ def processDataGeneral(casesInputs):
 
 
     test.setInputs(inputs)
+    if "latexNames" in inputs:
+        test.setLatexNamesFile(inputs["latexNames"])
+    else:
+        test.setLatexNamesFile(None)
+    if "matplotlibStyle" in inputs:
+        test.setMatplotlibStyle(inputs["matplotlibStyle"])
     test.setBuildingArea(inputs["buildingArea"])
     test.setTrnsysDllPath(inputs["dllTrnsysPath"])
 
@@ -158,6 +166,15 @@ def processDataGeneral(casesInputs):
 
 
 class ProcessParallelTrnsys():
+    """
+    Main class to process all TRNSYS results.
+    We need to include in this class any processing Class
+    customized for new projects
+    Author : Daniel Carbonell
+    Date   : 01-10-2018
+    ToDo : remove processDataGshp and make it generic
+    getBaseClass should be defined outside this function so that this class is not changet at all
+    """
 
     def __init__(self):
 
@@ -175,7 +192,7 @@ class ProcessParallelTrnsys():
         self.inputs["yearReadedInMonthlyFile"] = -1
         self.inputs["process"] = True
         self.inputs["firstMonthUsed"] = 6     # 0=January 1=February 7=August
-        self.inputs["reduceCpu"] = 0
+        self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder" # "casesDefined"
         self.inputs["forceProcess"]  =  True #even if results file exist it proceess the results, otherwise it checks if it exists
         self.inputs["pathBase"] = False
@@ -187,6 +204,7 @@ class ProcessParallelTrnsys():
         self.inputs["classProcessing"] = False
         self.inputs["latexExePath"] = "Unknown"
 
+
     def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
 
@@ -195,9 +213,9 @@ class ProcessParallelTrnsys():
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated)
 
-    def getBaseClass(self,classProcessing,pathFolder,fileName):
+    def getBaseClass(self, classProcessing, pathFolder, fileName):
 
-        raise ValueError("This function needs to be defined for each processing case")
+       return processTrnsys.ProcessTrnsysDf(pathFolder, fileName)
 
     def process(self):
 
@@ -211,25 +229,30 @@ class ProcessParallelTrnsys():
         if (self.inputs["typeOfProcess"] == "completeFolder"):
 
             pathFolder = self.inputs["pathBase"]
-            fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
-
-            for name in fileName:
-
+            files =glob.glob(os.path.join(pathFolder, "**/*.lst"), recursive=True)
+            fileName = [Path(name).parts[-2] for name in files]
+            relPaths = [os.path.relpath(os.path.dirname(file),pathFolder) for file in files]
+            for relPath in relPaths:
+                name = Path(relPath).parts[-1]
                 folderUsed = True
                 for i in range(len(self.filteredfolder)):
                     if (name == self.filteredfolder[i]):
                         folderUsed=False
                 if(folderUsed):
-                    nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
+                    nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (relPath, name))
 
                     if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
                         print ("file :%s already processed" % name)
 
-                    elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (name, name))) and  self.inputs["forceProcess"] == False:
+                    elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (relPath, name))) and  self.inputs["forceProcess"] == False:
                         print ("file :%s already processed" % name)
 
                     else:
-                        baseClass = self.getBaseClass(self.inputs["classProcessing"],pathFolder,name)
+                        if len(Path(relPath).parts)>1:
+                            newPath = os.path.join(pathFolder,os.path.join(*list(Path(relPath).parts[:-1])))
+                        else:
+                            newPath = pathFolder
+                        baseClass = self.getBaseClass(self.inputs["classProcessing"],newPath,name)
 
                         print ("file :%s will be processed" % name)
                         # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
@@ -371,6 +394,7 @@ class ProcessParallelTrnsys():
         else:
             raise ValueError("Not Implemented yet")
 
+
         if(self.inputs["processParallel"]==True):
 
             debug = debugProcess.DebugProcess(pathFolder, "FileProcessed.dat", fileName)
@@ -397,7 +421,216 @@ class ProcessParallelTrnsys():
         else:
             for i in range(len(casesInputs)):
                 processDataGeneral(casesInputs[i])
+                
+        if 'cost' in self.inputs.keys():
+            self.calcCost()
 
+        if 'comparePlot' in self.inputs.keys():
+            self.plotComparison()
+            
+        if 'compareMonthlyBarsPlot' in self.inputs.keys():
+            self.plotMonthlyBarComparison()
+
+    def plotComparison(self):
+        pathFolder = self.inputs["pathBase"]
+        for plotVariables in self.inputs['comparePlot']:
+            if len(plotVariables) < 2:
+                raise ValueError(
+                    'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
+            xAxisVariable = plotVariables[0]
+            yAxisVariable = plotVariables[1]
+            chunkVariable = ''
+            seriesVariable = ''
+            if len(plotVariables) >= 3:
+                seriesVariable = plotVariables[2]
+                chunkVariable = ''
+            if len(plotVariables) == 4:
+                chunkVariable = plotVariables[3]
+            plotXDict = {}
+            plotYDict = {}
+    
+            seriesColors = {}
+            colorsCounter = 0
+            colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+            for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
+                with open(file) as f_in:
+                    resultsDict = json.load(f_in)
+                    resultsDict['']=None
+                if resultsDict[seriesVariable] not in seriesColors.keys():
+                    seriesColors[resultsDict[seriesVariable]]=colors[colorsCounter]
+                    colorsCounter+=1
+
+                if '[' not in xAxisVariable:
+                    xAxis = resultsDict[xAxisVariable]
+                else:
+                    name,index = str(xAxisVariable).split('[')
+                    index = int(index.replace(']',''))
+                    xAxis = resultsDict[name][index]
+                if '[' not in yAxisVariable:
+                    yAxis = resultsDict[yAxisVariable]
+                else:
+                    name,index = str(yAxisVariable).split('[')
+                    index = int(index.replace(']',''))
+                    yAxis = resultsDict[name][index]
+                if resultsDict[chunkVariable] not in plotXDict.keys():
+                    plotXDict[resultsDict[chunkVariable]] = {}
+                    plotYDict[resultsDict[chunkVariable]] = {}
+                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [xAxis]
+                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
+                elif resultsDict[seriesVariable] not in plotXDict[resultsDict[chunkVariable]].keys():
+                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [xAxis]
+                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
+                else:
+                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(xAxis)
+                    plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(yAxis)
+    
+            self.doc = latex.LatexReport('', '')
+            if 'latexNames' in self.inputs.keys():
+                self.doc.getLatexNamesDict(file=self.inputs['latexNames'])
+            else:
+                self.doc.getLatexNamesDict()
+            if 'matplotlibStyle' in self.inputs.keys():
+                stylesheet = self.inputs['matplotlibStyle']
+            else:
+                stylesheet = 'word.mplstyle'
+            if stylesheet in plt.style.available:
+                self.stylesheet = stylesheet
+            else:
+                root = os.path.dirname(os.path.abspath(__file__))
+                self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
+            plt.style.use(self.stylesheet)
+
+            fig1,ax1 = plt.subplots(constrained_layout=True)
+            styles = ['x-','x--','x-.','x:','o-','o--','o-.','o:']
+
+            dummy_lines = []
+            chunkLabels = []
+            labelSet = set()
+            lines = ""
+            for chunk,style in zip(plotXDict.keys(),styles):
+                dummy_lines.append(ax1.plot([],[],style,c='black'))
+                if chunk is not None:
+                    chunkLabel = round(float(chunk), 2)
+                    chunkLabels.append("{:.2f}".format(chunkLabel))
+                for key in plotXDict[chunk].keys():
+                    index = num.argsort(plotXDict[chunk][key])
+                    myX = num.array(plotXDict[chunk][key])[index]
+                    myY = num.array(plotYDict[chunk][key])[index]
+
+                    mySize = len(myX)
+
+                    if key is not None and not isinstance(key,str):
+                        labelValue=round(float(key),2)
+                    elif key is not None:
+                        labelValue = key
+                    if key is not None and labelValue not in labelSet:
+                        if not isinstance(labelValue,str):
+                            label = "{:.2f}".format(labelValue)
+                        else:
+                            label = labelValue
+                        labelSet.add(labelValue)
+                        ax1.plot(myX, myY,
+                                 style, color=seriesColors[key], label=label)
+                    else:
+                        ax1.plot(myX, myY,
+                                 style, color=seriesColors[key])
+
+                    # for i in range(len(myX)):
+                    #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
+            lines="!%s\t"%seriesVariable
+            for chunk, style in zip(plotXDict.keys(), styles):
+                for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                    line="%s\t"%key;lines=lines+line
+                line = "\n";lines = lines + line
+
+            for i in range(mySize):
+                for chunk, style in zip(plotXDict.keys(), styles):
+
+                    for key in plotXDict[chunk].keys(): #the varables that appear in the legend
+                        index = num.argsort(plotXDict[chunk][key])
+                        myX = num.array(plotXDict[chunk][key])[index]
+                        myY = num.array(plotYDict[chunk][key])[index]
+                        line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]); lines = lines + line
+                line = "\n"; lines = lines + line
+
+            # box = ax1.get_position()
+            #ax1.set_position([box.x0, box.y0, box.width, box.height])
+
+            if chunkVariable is not '':
+                legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.4, 1.0), bbox_transform=ax1.transAxes)
+
+            else:
+                legend2 = None
+            if seriesVariable is not '':
+                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.2, 1.0), bbox_transform=ax1.transAxes)
+
+            else:
+                legend1 = None
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
+            #if chunkVariable is not '':
+            #
+            if legend2 is not None:
+                fig1.add_artist(legend2)
+            #fig1.canvas.draw()
+            #if legend2 is not None:
+            #    ax1.add_artist(legend2)
+            #    legend2.set_in_layout(True)
+            #if legend1 is not None:
+            #    legend1.set_in_layout(True)
+            fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable
+            fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
+            plt.close()
+
+            if(self.inputs["setPrintDataForGle"]):
+                outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
+                outfile.writelines(lines)
+                outfile.close()
+                # self.plot.gle.getEasyPlot(self, nameGleFile, fileNameData, legends, useSameStyle=True):
+
+    def plotMonthlyBarComparison(self):
+        pathFolder = self.inputs["pathBase"]
+        for plotVariables in self.inputs['compareMonthlyBarsPlot']:
+            seriesVariable = plotVariables[1]
+            valueVariable = plotVariables[0]
+            legend = []
+            inVar = []
+            for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
+                with open(file) as f_in:
+                    resultsDict = json.load(f_in)
+                    resultsDict['']=None
+                legend.append(resultsDict[seriesVariable])
+                inVar.append(num.array(resultsDict[valueVariable]))
+            nameFile = '_'.join(plotVariables)
+            titlePlot = 'Balance'
+            self.plot = plot.PlotMatplotlib(language='en')
+            self.plot.setPath(pathFolder)
+            self.myShortMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+            namePdf = self.plot.plotMonthlyNBar(inVar, legend, self.doc.getNiceLatexNames(valueVariable), nameFile, 10, self.myShortMonths,useYear=True)
+            
+
+
+    def plotComparisonSeaborn(self):
+        pathFolder = self.inputs["pathBase"]
+        plotVariables = self.inputs['comparePlot']
+        if len(plotVariables) < 2:
+            raise ValueError(
+                'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
+        elif len(plotVariables) == 2:
+            plotVariables.extend([None,None])
+        elif len(plotVariables) == 3:
+            plotVariables.append([None])
+        
+        df = pd.DataFrame(columns=plotVariables)
+        for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
+            with open(file) as f_in:
+                resultsDict = json.load(f_in)
+            plotDict = {k: [float("{:.2f}".format(resultsDict[k]))] for k in plotVariables}
+            df = df.append(pd.DataFrame.from_dict(plotDict))
+        snsPlot = sns.lineplot(x=plotVariables[0],y=plotVariables[1],hue=plotVariables[2],style=plotVariables[3],palette=None,markers=True,data=df)
+        fig = snsPlot.get_figure()
+        name = '_'.join(plotVariables)
+        fig.savefig(os.path.join(pathFolder, name+'.png'), dpi=500)
 
     def changeFile(self,source,end):
 
@@ -412,3 +645,31 @@ class ProcessParallelTrnsys():
 
         if(found==False):
             print ("changeFile was not able to change %s by %s"%(source,end))
+
+    def calcCost(self):
+
+        path = self.inputs['pathBase']
+
+        costPath = self.inputs['cost']
+
+        dictCost = costConfig.costConfig.readCostJson(costPath)
+
+        # for name in names:
+        # path = os.path.join(pathBase, name)
+
+        small = 15
+        cost = costConfig.costConfig()
+        cost.setFontsizes(small)
+
+        cost.setDefaultData(dictCost)
+        cost.readResults(path)
+
+        cost.process(dictCost)
+
+
+        # cost.plotLines(cost.pvAreaVec,"PvPeak [kW]",cost.annuityVec,"Annuity [Euro/kWh]",cost.batSizeVec,"Bat-Size [kWh]", "Annuity_vs_PvPeak", extension="pdf")
+        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.annuityVec,"Annuity [Euro/kWh]",cost.pvAreaVec,"PvPeak [kW]","Annuity_vs_Bat", extension="pdf")
+        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RselfSuffVec,"$R_{self,suff}$",cost.pvAreaVec,"PvPeak [kW]","RselfSuff_vs_Bat", extension="pdf")
+        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RpvGenVec,"$R_{pv,gen}$",cost.pvAreaVec,"PvPeak [kW]","RpvGen_vs_Bat", extension="pdf")
+
+        # cost.printDataFile()

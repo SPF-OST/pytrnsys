@@ -10,8 +10,10 @@ ToDo :
 
 import string, os
 import pytrnsys.utils.utilsSpf as utils
+from string import ascii_letters, digits, whitespace
 import shutil
 import codecs
+import json
 
 class LatexReport():
     
@@ -35,17 +37,34 @@ class LatexReport():
         # to remove them after pdf creation if cleanMode=True
 
 
-        pathReport = os.path.join(os.path.dirname(__file__),'latex_doc')
+        self.pathReport = os.path.join(os.path.dirname(__file__),'latex_doc')
 
         if 'TEXINPUTS' in os.environ:
             texinputs = os.environ['TEXINPUTS']
-            if pathReport not in texinputs:
-                os.environ['TEXINPUTS']+=os.pathsep + pathReport
+            if self.pathReport not in texinputs:
+                os.environ['TEXINPUTS']+=os.pathsep + self.pathReport
         else:
-            os.environ['TEXINPUTS'] =pathReport
+            os.environ['TEXINPUTS'] =self.pathReport
         
         self.cleanMode=False
         self.plotsAdded = [] 
+        
+    def getLatexNamesDict(self,file='latexNames.json'):
+        with open(os.path.join(self.pathReport,file)) as js:
+            self.latexNames = json.load(js)
+            self.latexNames = {key: '$'+value+'$' if not value[0]=='$' else value for (key,value) in self.latexNames.items()}
+    def getNiceLatexNames(self, name):
+        if name in self.latexNames:
+            niceName = self.latexNames[name]
+        else:
+            niceName = self.getCustomeNiceLatexNames(name)
+            if(niceName==None):
+                niceName = "$%s$" % "".join([c for c in name if c in ascii_letters+digits])
+
+        return niceName
+
+    def getCustomeNiceLatexNames(self,name):
+        return None
 
     def resetTexName(self,name):
 
@@ -67,7 +86,11 @@ class LatexReport():
         self.email = _name    
     
     def setTitle(self,_name):
-        self.title = _name
+        if "_" in _name:
+            newName = _name.replace("_", "\_")
+        else:
+            newName = _name
+        self.title = newName
         
     def setSubTitle(self,_name):
         self.subTitle = _name
@@ -533,7 +556,7 @@ class LatexReport():
             line = "%s" % defMonths[n]
             lines = lines + line
             for i in range(len(var)):
-                line = "&%.1f" % var[i][n];
+                line = "&%.1f" % var[i][n]
                 lines = lines + line
             line = "\\\\ \n";
             lines = lines + line

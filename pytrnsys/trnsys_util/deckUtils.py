@@ -37,19 +37,31 @@ def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesU
     return unitId
 
 
-def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
+def readAllTypes(lines,sort=True):
 
     """
-        It reads all types and units from a a list of lines readed from a deck file.
-        It also reads the files used and which units are used for them. IN order to be able to change automatically the unit numbers afterwards
-        we need that each ASSIGN uses a variable for the unit, e.g. unitReadWeather and that this variable is used in the ddck file.
+    It reads all types and units from a a list of lines readed from a deck file.
+    It also reads the files used and which units are used for them. IN order to be able to change automatically the unit numbers afterwards
+    we need that each ASSIGN uses a variable for the unit, e.g. unitReadWeather and that this variable is used in the ddck file.
 
-        The problems of this function is that we can change a unit number of an already changed unit number.
-        For example we change 20 for 45 and the 45 is already in the file, so after we change 45 for 46, so we change all the [45, for [46,
+    Parameters
+    ----------
+    lines : list of str
+        list containing lines of the file to be used
+    sort : bool
+        Sort the unit numbers, optional, default: True
 
-        returns:
-        --------
-        TrnsysUnitsSorted,TrnsysTypesSorted,filesUsedInDdck,filesUnitUsedInDdck
+    Returns
+    -------
+    TrnsysUnitsSorted : list of int
+        list of all trnsys units used in ddck
+    TrnsysTypesSorted : list of int
+        list of all trnsys type numbers used in ddck
+    filesUsedInDdck : list of str
+        list of all file paths used in ddck in ASSIGN statements
+    filesUnitUsedInDdck : list of int
+        list of all files units used in ddck
+
     """
     TrnsysTypes = []
     TrnsysUnits = []
@@ -78,8 +90,9 @@ def readAllTypes(lines,sort=True):  # lines should be self.linesChanged
                 # if(unitAssigned==True):
 
         except:
-            raise ValueError('Logical ASSIGN number of the following ddck-line cannot be changed: '+line)
-
+            # raise ValueError('Logical ASSIGN number of the following ddck-line cannot be changed: '+line)
+            pass
+        
         try:
             if len(splitBlank)>3:
                 nUnit = "".join([c for c in splitBlank[1].replace(" ", "") if c in digits])
@@ -156,7 +169,7 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
         oldString = "UNIT %d" % (oldUnit)
         newString = "UNIT %s" % (newUnit)
 
-        if(newUnit==44):
+        if(oldUnit==32):
             pass
         else:
             pass
@@ -166,12 +179,8 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
         for i in range(len(lines)):
 
             mySplit = lines[i].split("!")
-            alreadyChanged = False
-            if (len(mySplit) > 1):
-                if (mySplit[1] == myAddText): #We check if already changed
-                    alreadyChanged = True
 
-            if(unitFromTypeChanged==False and alreadyChanged==False):
+            if(unitFromTypeChanged==False):
 
                 # newLine= lines[i].replace(oldString, newString)
                 newLine= ireplace(oldString, newString,lines[i])
@@ -193,28 +202,14 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
                 newString = "[%s," % (newUnit)
 
                 mySplit = lines[i].split("!")
-                alreadyChanged=False
-                #if (len(mySplit) > 1):
-                #    if(mySplit[1]==myAddText):
-                #        alreadyChanged=True
 
-                if(alreadyChanged==False): #If we ahev already changed we can't do it again
-                    # newLine = lines[i].replace(oldString, newString) Not working becasue it can change the comment and believe that it was a succesfull change
-                    newLine = mySplit[0].replace(oldString, newString)
-                    replaced=False
-                    if(newLine!=mySplit[0]):
-                        myNewSplit = newLine.split("!")
-                        # print ("replacement SUCCESS from %s to %s"%(oldString,newString))
-                        # lines[i] = newLine
-                        lineWithoutBreak = myNewSplit[0].replace("\n", "")
-                        lines[i] = lineWithoutBreak +" !" + myAddText
-                        # if(len(myNewSplit)>1):
-                        #     lines[i] = myNewSplit[0] + myAddText
-                        # else:
-                        #     lineWithoutBreak = newLine.replace("\n","")
-                        #     lines[i] = lineWithoutBreak + myAddText #remove of \n
-                        # lines[i] = newLine
-                        # pass
+                newLine = mySplit[0].replace(oldString, newString)
+                replaced=False
+                if(newLine!=mySplit[0]):
+                    myNewSplit = newLine.split("!")
+                    lineWithoutBreak = myNewSplit[0].replace("\n", "")
+                    lines[i] = lineWithoutBreak +" !" + myAddText
+
 
 def getTypeFromUnit(myUnit,linesReadedNoComments):
 
@@ -425,17 +420,24 @@ def getTypeName(typeNum):
         return "Unknown"
 
 def readEnergyBalanceVariablesFromDeck(lines):
-    """Reading all the variables defined in the deck that follow the energy balance standard.
-       This function reads from self.linesChanged filled in the loadDeck function.
-       The standard nomenclature of energy balance variables are:
-       elSysIn_ for electricity given into the system
-       elSysOut_ for electricity going out of the system
-       qSysIn_ for heat given into the system
-       qSysOut_ for heat going out of the system
+    """
+    Reading all the variables defined in the deck that follow the energy balance standard.
+    This function reads from self.linesChanged filled in the loadDeck function.
+    The standard nomenclature of energy balance variables are:
+    elSysIn\_ for electricity given into the system
+    elSysOut\_ for electricity going out of the system
+    qSysIn\_ for heat given into the system
+    qSysOut\_ for heat going out of the system
 
-       Return
-       ------
-       eBalance:  a list with all energy balance terms
+    Parameters
+    ----------
+    lines : list of str
+        lines of the deck-file to be modified
+
+    Return
+    ------
+    eBalance:  list of str
+        a list with all energy balance terms
     """
 
 
@@ -443,8 +445,11 @@ def readEnergyBalanceVariablesFromDeck(lines):
     for i in range(len(lines)):
 
         if(len(lines[i].split("qSysIn_"))>1 or len(lines[i].split("qSysOut_"))>1 or len(lines[i].split("elSysIn_"))>1 or len(lines[i].split("elSysOut_"))>1):
-            varBalance = lines[i].split("=")[0]
-            eBalance.append(varBalance.replace(" ",""))
+            myEqualSplit = lines[i].split("=")
+
+            if(len(myEqualSplit)>1): #Otherwise if we add one of this variables in a printer it will copy the whole printer line here.
+                varBalance = myEqualSplit[0]
+                eBalance.append(varBalance.replace(" ",""))
 
 
     return eBalance
@@ -453,14 +458,29 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
     """
         Adds a monthly printer in the deck using the energy balance variables.
         It also calulates the most common KPI such as monthly and yearly SPF
+        
+        Change JS: Calculate Energy Balance on monthly basis.
     """
 
     # size = len(self.qBalanceIn)+len(self.qBalanceOut)+len(self.elBalanceIn)+len(self.elBalanceOut)
+    
+    ImbalanceString = 'qImb = '
+
+    for q in eBalance:
+        if 'qSysOut' in q:
+            ImbalanceString += ' - ' + q
+
+        elif 'qSysIn' in q:
+            ImbalanceString += ' + ' + q
+    if ImbalanceString=='qImb = ':
+        ImbalanceString += '0'
 
     lines = []
     line = "***************************************************************\n";lines.append(line)
     line = "**BEGIN Energy Balance printer automatically generated from DDck files\n";lines.append(line)
     line = "***************************************************************\n";lines.append(line)
+    line = "EQUATIONS 1\n";lines.append(line)
+    line = ImbalanceString + '\n';lines.append(line)
     line = "CONSTANTS 1\n";lines.append(line)
     line = "unitPrintEBal=%d\n"%unit;lines.append(line)
     line = "ASSIGN temp\ENERGY_BALANCE_MO.Prt unitPrintEBal\n";lines.append(line)
@@ -472,8 +492,8 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
     line = "-1 !4 -1: monthly integration\n";lines.append(line)
     line = "1  !5 number of outputs to avoid integration\n";lines.append(line)
     line = "1  !6 output number to avoid integration\n";lines.append(line)
-    line = "INPUTS %d\n"%(len(eBalance)+1);lines.append(line)
-    allvars = "TIME "+" ".join(eBalance)
+    line = "INPUTS %d\n"%(len(eBalance)+2);lines.append(line)
+    allvars = "TIME "+" ".join(eBalance) + ' qImb'
     line = "%s\n"%allvars;lines.append(line)
     line = "*******************************\n";lines.append(line)
     line = "%s\n"%allvars;lines.append(line)
@@ -487,7 +507,7 @@ def changeAssignPath(lines,key, rootPath):
 
     Parameters
     ----------
-    lines : obj:list obj: of obj:str
+    lines : list of str
         List containing all the lines of the dck file
     key : str
         key that will be replaced by the path

@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN SIN-30TE.ddck
+*********************************************
+** Heat pump data for SIN-30TE heat pump
+** Data exported from Polysun at 03/12/19 16:04:46
+** Author : Dani Carbonell
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 30.2
+MfrHpCondRef = 5000
+MfrHpEvapRef = 5000
+COPNom = 4.285341
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*27.87810537
+CHPM_c2 = sizeHpRatio*297.31327223
+CHPM_c3 = sizeHpRatio*92.12754739
+CHPM_c4 = sizeHpRatio*-452.57426989
+CHPM_c5 = sizeHpRatio*408.30485341
+CHPM_c6 = sizeHpRatio*-454.70830705
+COP_c1 = 5.92685631
+COP_c2 = 54.67943872
+COP_c3 = -2.81694552
+COP_c4 = -209.92185978
+COP_c5 = -2.04391457
+COP_c6 = -73.06229213
+TMinEvapTin = -8.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 65.000000*********************************************
+** END SIN-30TE.ddck
+*********************************************

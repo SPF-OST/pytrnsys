@@ -1,0 +1,31 @@
+******************************
+**BEGIN Type1_Constants_Test.ddck
+*******************************
+    
+*****************************************
+** Solar Thermal Data for covered collector. 
+** Version : v0.0
+** Last Changes: Jeremias Schmidli	    
+** Date: 10.03.2020
+******************************************
+
+CONSTANTS 12
+ 
+Eta0= 0.8     ! Eta0 (a0) of collector (zero heat loss efficiency)
+a1 = 3.5*3.6    ! linear heat loss coefficient of collector [kJ/hm^2K] ![W/m2K]*3.6
+a2 = 0.015*3.6   ! quadratic heat loss coefficient of collector [kJ/hm^2K^2] ![W/m2K2]*3.6
+
+Eta0old = 0.853   ! intercept efficiency 
+a1Old = 8.784   ! efficiency slope kJ/hm^2K
+a2Old = 0.0144  ! efficiency curvature kJ/hm^2K^2
+
+nSeries = 1 !5
+efficiencyMode = 1 
+testedMfr = 50
+GroundReflectance = 0.2
+
+FirstOrderIAM = 0.11
+SecondOrderIAM = 0.003
+*******************************
+**END Type1_Constants_Test.ddck
+*******************************

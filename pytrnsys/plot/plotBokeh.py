@@ -35,11 +35,12 @@ class PlotBokeh():
 
         
     def createBokehPlot(self,df,path,fileName,inputKeys,showPlot=False):
+
         try:
             timeArray = df["TIME"]*3600*1000
         except:
             timeArray = df.index.values
-
+            
         #prepare sort indices:
         temperatures = []
         energyflows = []

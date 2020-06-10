@@ -83,10 +83,12 @@ class DeckTrnsys():
 
     def loadDeck(self,useDeckName=False,eraseBeginComment=True,eliminateComments=True,useDeckOutputPath=False):
         """
-        It reads the deck  removing files starting with ***.
-        Attributes
+        It reads the deck  removing files starting with \*\*\*.
+
+        Return
         ----------
-            linesDeck : :list of lines from the read deck.
+        linesDeck : list of str
+            list containing the lines of the deck from the read deck.
         """
 
         if(useDeckName==False):
@@ -439,6 +441,9 @@ class DeckTrnsys():
                 try:
                     if '[' not in value:
                         self.deckVariables[name] = eval(value,self.deckVariables)
+                        parts = re.split(r'[*/+-]', value.replace(r'(', '').replace(r')', ''))
+                        if len(parts) == 2 and len(re.split(r'[*]', value)) == 2:
+                            self.deckVariables[name + '_factor'] = float(parts[0])
                     else:
                         float(value)
                 except:

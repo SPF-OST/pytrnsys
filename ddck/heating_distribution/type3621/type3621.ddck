@@ -1,0 +1,224 @@
+
+**************************************
+**BEGIN bui_ISO_MFB2019_rad_floor.ddck 
+**************************************
+    
+*****************************************
+** Contact person : Dani Carbonell   
+** Creation date  : 30.09.2016
+** Last changes   : 15.04.20 DC
+*****************************************
+
+***************************************************************************
+** Description: 
+** Building demands using the ISO model from the standard model.
+** The heat is delivered by a radiant floor model. !JS: isn't it radiator? TODO: to be checked
+** Parameters were fitted to fit the IDA-ICE results
+** Reference article is $$$
+** TODO: 
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS 1
+TRdFl = TPiRadIn    
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+EQUATIONS 1
+TRdRt = [42,1]  ! return temperature from space heat distribution system, °C
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+EQUATIONS 2
+qSysOut_BuiDemand = PheatBui_kW ! Total heat (without cooling) Heat to Building from Radiator: W --> kW  
+elSysOut_PuSH      = PelPuSh_kW  ! To be moved and generated automatically to hydraulic GUI export
+**qSysOut_FloorLoss = RadFloorLoss_kW
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+EQUATIONS 4
+myTrdSet = TrdSet
+myCoolingOn = CoolingOn
+myTroomRc = TroomRc
+myTroomSet = TroomSet
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS 1     
+T_Set_d       = MAX(TRdRt,myTrdSet)      ! TrdSet output from TYPE 888. Temperature set point for tempering valve used in hydraulic. 
+
+
+
+
+CONSTANTS 7
+frQRadToQd = 1.3    
+MfrBuiRdNom = PheatRadNom/(CPWAT*(TBuiFlNom-TBuiRtNom)) !PheatRadNom/(CPWAT*(TBuiFlNom-TBuiRtNom))     ! Nominal mass flow of heat distribution system [kg/h] !JS: Divide by factor of 4 to have more realistic values
+PheatRadNom = PheatBuiD*frQRadToQd 
+pGainRad = 0.6     
+iGainRad = 0.05     
+ftemp = (60./((TBuiFlNom+TBuiRtNom)/2-myTroomSet))**m_Rd        ! ftemp: faktor Qnominal -> Qnorm,real (DT=60 - 90/70/20) Radiator (c>=0.7), -
+PRadBuidT60 = ftemp*PheatRadNom                       ! Heating Rate at 60 �C Radiator temperature, kJ/h
+
+
+*******************************************************
+** Definition of radiator *
+*******************************************************
+CONSTANTS 1    ! Building
+CeffRad = 40000     ! Thermal Cap. of Radiator, kJ/K
+
+     
+UNIT 41 TYPE 320     ! PID Controller for Radiator mass flow (Idea: instead of thermostatic valves a PID controler is taken to reduce mass flow if the room temperature gets too high)
+PARAMETERS 7     
+3     ! 1 Temperature width of PID band
+pGainRad     ! 2 Proportional gain PID band
+iGainRad     ! 3 Integral gain PID band
+0     ! 4 Differential gain PID band
+0.5     ! 5 Proportional gain P-band
+0     ! 6 Saturation mode
+0     ! 7 Minimum value controller action in saturation mode
+INPUTS 3     
+myTroomSet        !  Set temperature
+myTroomRc         !  Building:    1- (air temperature of zone)  TAIR   1 ->Feedback room temperature
+0,0          !  Control inversion option 1: increasing, 2: decreasing action
+*** INITIAL INPUT VALUES     
+22 18 2      
+     
+EQUATIONS 2    
+PIDRadBuiMin = 0.15  !  0.05    !0.01     
+PIDRadBui = GT([41,1],PIDRadBuiMin)*BoHS*[41,1] ![41,1]*BoHS     
+** MfrBuiRd = NOT(BoAuxWWOn)*MfrBuiRdNom*PIDRadBui  ! DP: To make Sh-Aux possible if HP has not good source, Boolean NoHpSource added
+     
+EQUATIONS 1     ! Flow rate of the heating system
+gPuRadBui = GT(PIDRadBui,0)*[41,2]/MfrBuiRdNom     ! fraction of nominal mass flow rate, -
+
+ 
+UNIT 42 TYPE 3621     ! Radiator
+PARAMETERS 11     
+MfrBuiRdNom           !Nominal (maximal) mass flow rate of the radiator
+PRadBuidT60             !Nominal heating power
+TBuiFlNom     !Nominal flow temp
+TBuiRtNom     !Nominal return temp
+TambD     ! Design ambient
+m_Rd     !Radiator Exponent
+CeffRad             !Lumped radiaotr capacity [KJ/K]
+CPWAT            !specific heat water [KJ/KgK]
+0     ! Pipe capacity 
+10     !number of control volumes
+21     ! 12 Initial radiator temperature
+INPUTS 3     
+TRdFl     ! supply Temperature
+Troom     ! Building: star node temperature TSTAR
+PIDRadBui !myPIDKiGa     ! PID Controller T220:Mass flow control (0 <signal<1)
+*** INITIAL INPUT VALUES     
+50 10 0     
+*     
+     
+EQUATIONS 11    ! Mass flow rate and return temp. of Radiator / Building
+MfrBuiRd = BoHS*[42,2]     ! DP: To make Sh-Aux possible if HP has not good source, Boolean NoHpSource added
+** TRdRt = [42,1]     ! return temperature from space heat distribution system, �C
+PRdIn_kW = CPWat*MfrBuiRd*(TRdFl-TRdRt)/3600 ! [42,4]/3600     ! Power transferred to space heat distribution system, kW
+PheatBui = [42,3]       ! Heat to Building from Radiator: kJ/h 
+PheatBui_kW = PheatBui/3600      ! Heat to Building from Radiator: kJ/h --> kW
+MfrSh = MfrBuiRd     
+BoPumpShOn = GT(MfrSh,0.0001)     ! actual pressure-drop of space heat distribution in Pascal, Pa
+QAcumRadiator = [42,5]/3600     !Total Acumulated Heat in Radiator
+PheatBuiRad = PheatBui*0.3     !PBuiGains_kW=PheatBui_kW 
+PheatBuiConv = PheatBui*0.7     
+ImbRad=PRdIn_KW-PheatBui_KW-QAcumRadiator     
+RadInImb = [42,4]/3600-CPWat*MfrBuiRd*(TRdFl-TRDRt)/3600        
+** Attention! No mass flow dependency of the efficiency here due to thermostatic valves!     
+EQUATIONS 7     ! Electric pump power for space heat distribution
+MfrShNom = MfrBuiRdNom     ! nominal mass flow rate, kg/h
+dpShNom_bar = 0.25     ! pressure-drop of loop at nominal mass flow, bar     
+frMfrSh= MfrSh/MfrShNom     ! Flow rate fraction of nominal flow rate    
+dpSh_bar = (frMfrSh)^2*dpShNom_bar     ! pressure drop at actual mass flow rate, bar
+PflowSh_W = ((MfrShNom/3600)/RhoWat)*dpShNom_bar*100000     ! required power to drive the flow, W
+etaPuSh = 0.3-0.00*(1-frMfrSh)     ! pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+PelPuSh_kW = GT(MfrSh,1)*0.015     ! required pump electric power, kW
+    
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!MONTHLY PRINTER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+CONSTANTS 1
+unitPrinterHeat=123
+
+ASSIGN    temp\HEATING_DISTR_MO.Prt     unitPrinterHeat
+
+UNIT 123 Type 46 ! Printegrator Monthly Values for System
+PARAMETERS 6    
+unitPrinterHeat ! 1: Logical unit number, -
+-1             ! 2: Logical unit for monthly summaries, -
+1              ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1             ! 4: Printing & integrating interval, h. -1 for monthly integration
+1              ! 5: Number of inputs to avoid integration, -
+1              ! 6: Output number to avoid integration
+INPUTS 4
+Time  PheatBui_kW  PRdIn_kW  QAcumRadiator
+***************
+Time  PheatBui_kW  PRdIn_kW  QAcumRadiator
+
+*******************************
+** hourly printer
+*******************************
+CONSTANTS 1
+unitPrinterHeatHr = 517
+
+ASSIGN temp\HEATING_DISTR_HR.hr      unitPrinterHeatHr  
+UNIT 517 Type 46     ! Printegrator hourly Values for System
+PARAMETERS 6    
+unitPrinterHeatHr   ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1 ! 6: Output number to avoid integration
+
+INPUTS 7
+Time TRdFl TrdRt ImbRad 
+MfrBuiRd PRdIn_KW  PheatBui_kW
+***
+Time TRdFl TrdRt ImbRad 
+MfrBuiRd PRdIn_KW  PheatBui_kW
+	
+	
+UNIT 59 TYPE 65     ! Online Plotter Building (element OpB)
+PARAMETERS 12     
+4     ! 1 Nb. of left-axis variables
+5     ! 2 Nb. of right-axis variables
+-5     ! 3 Left axis minimum
+60     ! 4 Left axis maximum
+-10     ! 5 Right axis minimum
+50     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+0     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 9     
+Tamb  myTroomRc  TRdFl TrdRt  
+BoHS  PIDRadBui MfrBuiRd   PRdIn_KW   ImbRad
+*******
+Tamb  myTroomRc  TRdFl TrdRt  
+BoHS  PIDRadBui MfrBuiRd   PRdIn_KW  ImbRad
+****
+LABELS  3     
+Temperatures     
+Power     
+Building
+
+*******************************
+**END Building.dck
+*******************************
