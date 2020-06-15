@@ -264,7 +264,7 @@ class PlotGround():
             for c in axes.collections:
                 c.set_edgecolor("face")
             plot.set_ylabel('Tiefe [m]')
-            plot.set_xlabel('Distanz zu Gebäudemitte [m]')
+            plot.set_xlabel('Distanz zur Gebäudemitte [m]')
             plot.tick_params(axis='both', which='major')
             plot.tick_params(axis='both', which='minor')
 
@@ -292,7 +292,7 @@ class PlotGround():
     def _plot_as_emf(self, figure, **kwargs):
 
 
-        inkscape_path = kwargs.get('inkscape', "C://Program Files//Inkscape//inkscape.exe")
+        inkscape_path = kwargs.get('inkscape', "C://Inkscape//inkscape.exe")
         filepath = kwargs.get('filename', None)
 
         if filepath is not None:

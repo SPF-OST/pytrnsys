@@ -11,8 +11,11 @@ Welcome to pytrnsys's documentation!
    :maxdepth: 4
 
    guide/index
-   guide/config_file
    guide/tutorial
+   guide/config_file
+   guide/example_systems
+   guide/ddck_repository
+   guide/developers_guide
    Code Reference <modules>
 
 

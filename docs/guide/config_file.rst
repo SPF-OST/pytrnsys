@@ -95,27 +95,27 @@ default values are mandatory.
 
 Generic
 ^^^^^^^^
+.. glossary::
+    ``ignoreOnlinePlotter`` (bool, default False)
+        If set to True, the TRNSYS online plotters are commented out in all the dck-files. No online plotters
+        are shown during the simulation run. The TRNSYS progress bar windos is still displayed.
 
-``ignoreOnlinePlotter`` (bool, default False)
-    If set to True, the TRNSYS online plotters are commented out in all the dck-files. No online plotters
-    are shown during the simulation run. The TRNSYS progress bar windos is still displayed.
+    ``removePopUpWindow`` (bool, default False)
+        Online plotters as well as the progress bar window are suppressed during the simulations.
+        (TRNSYS hidden mode)
 
-``removePopUpWindow`` (bool, default False)
-    Online plotters as well as the progress bar window are suppressed during the simulations.
-    (TRNSYS hidden mode)
+    ``checkDeck`` (bool, default True)
+        If set to True, during merging the ddck-files, the specified and given amount of Equations and Parameters in
+        each block are checked for inconsistencies.
 
-``checkDeck`` (bool, default True)
-    If set to True, during merging the ddck-files, the specified and given amount of Equations and Parameters in
-    each block are checked for inconsistencies.
+    ``parseFileCreated`` (bool, default True)
+        Saves the paresed dck-file that can be used to locate the line where ``checkDeck`` found errors.
 
-``parseFileCreated`` (bool, default True)
-    Saves the paresed dck-file that can be used to locate the line where ``checkDeck`` found errors.
+    ``runCases`` (bool, default True)
+        If set to False, the dck-files are created and saved in the normal structure but not executed.
 
-``runCases`` (bool, default True)
-    If set to False, the dck-files are created and saved in the normal structure but not executed.
-
-``reduceCpu`` (int, default 0)
-    Number of CPUs that are not used in the parallel simulation runs.
+    ``reduceCpu`` (int, default 0)
+        Number of CPUs that are not used in the parallel simulation runs.
 
 
 Automatic Work Bool
@@ -167,8 +167,7 @@ Example
 Here is an example of a run-config file.
 It is taken from the example project solar_dhw (``run_solar_dhw.config``)::
 
-    ############# GENERIC##############################
-
+    ######### Generic ########################
     bool ignoreOnlinePlotter  True
     int reduceCpu  4
     bool parseFileCreated True
@@ -378,8 +377,110 @@ Results file
 For further custom processing of the simulation results, required scalar and monthly values
 can be saved to a results json-file.
 
+Parameters
+----------
+There are different general parameters in the processing configuration file that allow to change
+different settings
+
+Generic
+^^^^^^^^
+
+``processParallel`` (bool, default True)
+    If set to True, pytrnsys will process the simulation sub-folders in parallel. The amount of parallel
+    processes will be the total amount of CPUs minus ``reduceCpu``.
+
+``processQvsT`` (bool, default True)
+    Flag to disable the QvsT processing. Since this is computationally very expensive it can be useful to
+    disable the QvsT plots if not needed.
+
+``cleanModeLatex`` (bool, default False)
+    If set to True, all plot files will be deleted after they are collected in the results pdf-file. If set
+    to False, they will remain in the simulation subfolder.
+
+``forceProcess`` (bool, default True)
+    If set to False, allready processed folders will not be processed again.
+
+``setPrintDataForGle`` (bool, default True)
+    Print the Data of the plots for further use in GLE plots.
+
+``saveImages`` (int, default 0)
+    Number of CPUs that are not used in the parallel simulation runs.
+
+
+Time selection
+^^^^^^^^^^^^^^
+
+Pytrnsys is designed to process one full year. If more than a year is simulated, the months that are used for
+processing have to be specified.
+
+``yearReadedInMonthlyFile`` (int, default -1)
+    Year of the simulation that is used for processing. 0 is the first year, 1 the second year and so on.
+    If the value is set to -1 pytrnsys will use the last 12 months of the simulation for processing.
+
+``firstMonthUsed`` ([0,1,2,3,..,11], default 6)
+    Month in the chosen year where the 12-month processing period begins. If the vlaue is e.g. 6 July to June
+    will be analysed.
+
+Paths
+^^^^^
+
+``latexNames`` (string)
+    Path to the latexNames json-file. Can either be an absolute path or a path relative to the configuration
+    file. If not specified, the default latexName json-File of pytrnsys is used.
+
+``pathBase`` (string)
+    Path of the folder to be processed. If not specified, the current working directory is used instead.
+
 Example
 -------
+The following processing-configuration file is part of the solar domestic hot water example system::
+
+    ######### Generic ########################
+    bool processParallel False
+    bool processQvsT True
+    bool cleanModeLatex False
+    bool forceProcess  True
+    bool setPrintDataForGle True
+    bool printData True
+    bool saveImages True
+    int reduceCpu 1
+
+    ######### Time selection ########################
+    int yearReadedInMonthlyFile -1
+    int firstMonthUsed 6     # 0=January 1=February 6=July 7=August
+
+    ############# PATHS ##############################
+    string latexNames ".\latexNames.json"
+    string pathBase "C:\Daten\OngoingProject\pytrnsysTest\SolarDHW_newProfile"
+
+    ############# CALCULATIONS ##############################
+
+    calcMonthly fSolarMonthly = Pcoll_kW/Pdhw_kW
+    calc fSolar = Pcoll_kW_Tot/Pdhw_kW_Tot
+
+    calcMonthly solarEffMonthly = PColl_kWm2/IT_Coll_kWm2
+    calc solarEff = PColl_kWm2_Tot/IT_Coll_kWm2_Tot
+
+    ############# CUSTOM PLOTS ##############################
+    stringArray monthlyBars "elSysIn_Q_ElRot"  "qSysIn_Collector" "qSysOut_DhwDemand"
+    stringArray monthlyBars "solarEffMonthly"
+    stringArray monthlyBalance "elSysIn_Q_ElRot"  "qSysIn_Collector" "-qSysOut_DhwDemand"
+    stringArray monthlyStackedBar "elSysIn_Q_ElRot" "qSysIn_Collector" "-qSysOut_DhwDemand"
+
+    stringArray plotHourly "Pcoll_kW" "Pdhw_kW" "TCollIn" "TCollOut"  # "effColl" # values to be plotted (hourly)
+    stringArray plotHourlyQvsT "Pdhw_kW"  "Tdhw" "Pcoll_kW" "TCollOut"
+
+    stringArray comparePlot "AcollAp" "fSolar" "volPerM2Col"
+    stringArray comparePlot "AcollAp" "fSolar" "volPerM2Col"
+    stringArray comparePlot "AcollAp" "Pdhw_kW_Tot" "volPerM2Col"
+
+
+    ############# RESULTS FILES ##############################
+    stringArray hourlyToCsv "CollectorPower" "IT_Coll_kWm2" "PColl_kWm2"
+    stringArray results  "AcollAp"  "Vol_Tes1"   "fSolar"  "volPerM2Col"  "Pdhw_kW_Tot" # values to be printed to json
+
+
+
 
 
 

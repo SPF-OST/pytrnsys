@@ -36,6 +36,14 @@ pytrnsys.utils.costConfig module
    :undoc-members:
    :show-inheritance:
 
+pytrnsys.utils.loadExamplesAndDdcks module
+------------------------------------------
+
+.. automodule:: pytrnsys.utils.loadExamplesAndDdcks
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pytrnsys.utils.unitConverter module
 -----------------------------------
 
