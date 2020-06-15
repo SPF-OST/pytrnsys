@@ -20,7 +20,7 @@ import os, subprocess
 class PlotMatplotlib():
     """Plot TRNSYS Results with Matplotlib"""
     
-    def __init__(self,language='en',stylesheet="word.mplstyle"):
+    def __init__(self,language='en',stylesheet="word.mplstyle",extensionPlot='pdf'):
         self.language = language
         self.root = os.path.dirname(os.path.abspath(__file__))
         if stylesheet in plt.style.available:
@@ -28,16 +28,10 @@ class PlotMatplotlib():
         else:
             self.stylesheet = os.path.join(self.root, r".\\stylesheets", stylesheet)
         plt.style.use(self.stylesheet)
-        self.initialize()
-
+        self.extensionPlot = extensionPlot
+        self.yearlyFactor = 10
         self.setDefaultColors()
 
-
-    def initialize(self):
-
-        self.extensionPlot="pdf"
-
-        self.yearlyFactor = 10
 
 
     def setDefaultColors(self):
@@ -167,12 +161,11 @@ class PlotMatplotlib():
 
             plt.savefig(nameWithPath)
 
-            if(plotEmf):
+            if (plotEmf):
+                nameEmf = '%s.emf' % nameFile
+                nameEmfWithPath = '%s\%s' % (self.path, nameEmf)
 
-                nameEmf = '%s.jpg'%nameFile
-                nameEmfWithPath = '%s\%s' % (self.path,nameEmf)
-
-                plt.savefig(nameEmfWithPath)
+                self._plot_as_emf(plt, filename=nameEmfWithPath)
 
             plt.close()
 
@@ -265,7 +258,7 @@ class PlotMatplotlib():
 
                 plot.set_xticklabels(monthSequence, rotation='45')
 
-                namePdf = '%s.pdf' % nameFile
+                namePdf = '%s.%s' % (nameFile, self.extensionPlot)
                 nameWithPath = '%s\%s' % (self.path, namePdf)
 
                 print ("plotMonthlyDf name:%s" % nameWithPath)
@@ -275,10 +268,10 @@ class PlotMatplotlib():
                 plt.savefig(nameWithPath)
 
                 if (plotEmf):
-                    nameEmf = '%s.jpg' % nameFile
+                    nameEmf = '%s.emf' % nameFile
                     nameEmfWithPath = '%s\%s' % (self.path, nameEmf)
 
-                    plt.savefig(nameEmfWithPath)
+                    self._plot_as_emf(plt, filename=nameEmfWithPath)
 
                 plt.close()
 
@@ -481,7 +474,7 @@ class PlotMatplotlib():
             numberOfMonths = len(showMonths)
         else:
             showMonths = 12
-        width = 0.5/(len(inVar)-1)  # the width of the bars
+        width = 0.5/(len(inVar))  # the width of the bars
         for i,values in enumerate(inVar):
 
             bar = plot.bar(ind - 0.25+i * width+width/2, [var13[i][j] for j in showMonths], width)
@@ -490,18 +483,15 @@ class PlotMatplotlib():
         plot.set_ylabel(myLabel)
 
         box = plot.get_position()
-        plot.set_position([box.x0, box.y0+box.height*0.05, box.width * 0.7 / 12 * numberOfMonths, box.height])
+        plot.set_position([box.x0, box.y0+box.height*0.05, box.width * 0.8 / 12 * numberOfMonths, box.height])
 
-        plot.legend(bars, legends, prop={'size': 6}, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        plot.legend(bars, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
         plot.tick_params(axis='y')
-        if ylim:
-            plot.set_ylim(ylims)
+
         if (myTitle != None):
             plot.set_title(myTitle)
 
         plot.set_xticks(ind)
-
-        plot.axes.grid(which='major', axis='y')
 
         if self.language == 'en':
             if (yearlyFactor == 1):
@@ -923,7 +913,7 @@ class PlotMatplotlib():
             plt.savefig(nameWithPath, bbox_extra_artists=(lgd,), bbox_inches='tight')
 
             if (plotEmf):
-                nameEmf = '%s.jpg' % nameFile
+                nameEmf = '%s.png' % nameFile
                 nameEmfWithPath = '%s\%s' % (self.path, nameEmf)
 
                 self._plot_as_emf(fig,filename=nameEmfWithPath)
@@ -1003,7 +993,7 @@ class PlotMatplotlib():
 #        plot.set_xticks(ind)
 #        plot.set_xticklabels(('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep','Oct', 'Nov', 'Dec','Year/10'),fontsize=20)                       
                 
-        namePdf = '%s.pdf'%nameFile
+        namePdf = '%s.%s' % (nameFile, self.extensionPlot)
         nameWithPath = '%s\%s' % (self.path,namePdf)
 
         plt.xlim([-0.5,365])
@@ -1057,7 +1047,7 @@ class PlotMatplotlib():
             
         else:
                   
-            namePdf = '%s.pdf'%nameFile
+            namePdf = '%s.%s' % (nameFile, self.extensionPlot)
             nameWithPath = '%s\%s' % (self.path,namePdf)
     
             
@@ -1137,7 +1127,7 @@ class PlotMatplotlib():
 
         else:
 
-            namePdf = '%s.pdf' % nameFile
+            namePdf = '%s.%s' % (nameFile, self.extensionPlot)
             nameWithPath = '%s\%s' % (self.path, namePdf)
 
             plt.savefig(nameWithPath)
@@ -1215,7 +1205,7 @@ class PlotMatplotlib():
             
         else:
                   
-            namePdf = '%s.pdf'%nameFile
+            namePdf = '%s.%s' % (nameFile, self.extensionPlot)
             nameWithPath = '%s\%s' % (self.path,namePdf)
     
             print ("plotDynamic: Save plot name:%s"%nameWithPath)
@@ -1526,7 +1516,7 @@ class PlotMatplotlib():
 
         plot.axes.grid(which='major', axis='y')
 
-        namePdf = '%s.pdf'%nameFile
+        namePdf = '%s.%s' % (nameFile, self.extensionPlot)
         nameWithPath = '%s\%s' % (self.path,namePdf)
 
         print ("PlotMonthlyBalance name:%s"%nameWithPath)
@@ -1534,14 +1524,13 @@ class PlotMatplotlib():
         plt.xlim([-0.5,1.5])        
         
         plt.savefig(nameWithPath)
-        
-        if(plotEmf):
-            
-            nameEmf = '%s.jpg'%nameFile
-            nameEmfWithPath = '%s\%s' % (self.path,nameEmf)
-        
-            plt.savefig(nameEmfWithPath)
-            
+
+        if (plotEmf):
+            nameEmf = '%s.emf' % nameFile
+            nameEmfWithPath = '%s\%s' % (self.path, nameEmf)
+
+            self._plot_as_emf(plt, filename=nameEmfWithPath)
+
         plt.close()
         
         if(printData==True):

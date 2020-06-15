@@ -56,7 +56,7 @@ class ProcessTrnsysDf():
         self.rootPath = os.getcwd()
 
         self.doc = latex.LatexReport(self.outputPath, self.fileName)
-        self.plot = plot.PlotMatplotlib(language=language)
+        self.plot = plot.PlotMatplotlib(language=language,extensionPlot=self.inputs['figureFormat'])
 
         self.plot.setPath(self.outputPath)
         
@@ -233,6 +233,8 @@ class ProcessTrnsysDf():
         self.addElBalance()
         self.addElConsumption()
         self.addCustomBalance()
+        self.addCustomStackedBar()
+        self.addCustomNBar()
         self.addTemperatureFreq()
         self.addQvsTPlot()
         self.saveHourlyToCsv()
@@ -357,7 +359,7 @@ class ProcessTrnsysDf():
             yearlyFactor = 10.
 
             namePdf = self.plot.plotMonthlyDf(self.SpfShpDis, "$SPF_{SHP}$", nameFile, yearlyFactor, self.myShortMonths,
-                                              myTitle=None, printData=printData)
+                                              myTitle=None, printData=self.printDataForGle)
 
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
@@ -369,7 +371,7 @@ class ProcessTrnsysDf():
             nameFile = "SPF_SHP_weighted"
 
             namePdf = self.plot.plotMonthlyDf(self.SPFShpWeighted, "$\widetilde{SPF_{SHP}}$", nameFile, yearlyFactor, self.myShortMonths,
-                                              myTitle=None, printData=printData)
+                                              myTitle=None, printData=self.printDataForGle)
 
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
@@ -430,7 +432,7 @@ class ProcessTrnsysDf():
             averageValue = values.mean()
 
             namePdf = self.plot.plotMonthlyDf(values, parameters[0], parameters[0], averageValue, self.myShortMonths,
-                                              useYearlyFactorAsValue=True, myTitle=None, printData=True)
+                                              useYearlyFactorAsValue=True, myTitle=None, printData=self.printDataForGle,plotEmf=self.inputs['plotEmf'])
 
             caption = parameters[0]
 
@@ -519,7 +521,7 @@ class ProcessTrnsysDf():
 
             self.plot.calcAndPrintQVersusT(fileName, tFlow, eCum, legend, printEvery=100)
 
-    def addElBalance(self, printData=False,unit="kWh"):
+    def addElBalance(self,unit="kWh"):
         if (unit == "kWh"):
             myUnit = 1.
         elif (unit == "MWh"):
@@ -558,7 +560,7 @@ class ProcessTrnsysDf():
         if len(inVar) > 0 or len(outVar) > 0:
             namePdf = self.plot.plotMonthlyBalanceDf(inVar, outVar, niceLegend, "Energy Flows", nameFile, unit,
                                                      self.myShortMonths, yearlyFactor=10,
-                                                     useYear=False, printData=printData)
+                                                     useYear=False, printData=self.printDataForGle,plotEmf=self.inputs['plotEmf'])
 
             for i in range(len(outVar)):
                 outVar[i] = -outVar[i]
@@ -634,7 +636,7 @@ class ProcessTrnsysDf():
         if len(inVar)>0 or len(outVar)>0:
             namePdf = self.plot.plotMonthlyBalanceDf(inVar, outVar, niceLegend, "Energy Flows", nameFile, unit,
                                                      self.myShortMonths, yearlyFactor=10,
-                                                     useYear=False, printData=printData)
+                                                     useYear=False, printData=self.printDataForGle,plotEmf=self.inputs['plotEmf'])
 
             for i in range(len(outVar)):
                 outVar[i] = -outVar[i]
@@ -665,7 +667,7 @@ class ProcessTrnsysDf():
     
     
 
-    def calculateElHeatConsumption(self, printData=False):
+    def calculateElHeatConsumption(self):
 
         inVar = []
         outVar = []
@@ -688,7 +690,7 @@ class ProcessTrnsysDf():
 
         self.elHeatSysTotal = sum(self.elHeatSysMatrix)
 
-    def addElConsumption(self, printData=False):
+    def addElConsumption(self):
 
         nameFile = 'elHeatSysMonthly'
 
@@ -699,7 +701,7 @@ class ProcessTrnsysDf():
         if len(inVar)>0:
             namePdf = self.plot.plotMonthlyBalanceDf(inVar, outVar, legend, "El heat system", nameFile, "kWh",
                                                      self.myShortMonths, yearlyFactor=10,
-                                                     useYear=False, printImb=False, printData=printData)
+                                                     useYear=False, printImb=False, printData=self.printDataForGle,plotEmf=self.inputs['plotEmf'])
 
             var = inVar
             self.elHeatSysTotal = sum(inVar)
@@ -720,7 +722,7 @@ class ProcessTrnsysDf():
 
                 namePdf = self.plot.plotMonthlyDf(values, name, name, averageValue,
                                                   self.myShortMonths,
-                                                  useYearlyFactorAsValue=True, myTitle=None, printData=True)
+                                                  useYearlyFactorAsValue=True, myTitle=None, printData=self.printDataForGle,plotEmf=self.inputs['plotEmf'])
 
                 caption = name
                 self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
@@ -733,11 +735,11 @@ class ProcessTrnsysDf():
             for variables in self.inputs['monthlyBalance']:
                 legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
                 inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
-                nameFile  = '_'.join(variables)
+                nameFile  = 'Balance'+'_'.join(variables)
                 titlePlot = 'Balance'
                 namePdf = self.plot.plotMonthlyBalanceDf(inVar,[],legend, "Energy", nameFile, 'kWh',
                                                      self.myShortMonths, yearlyFactor=10,
-                                                     useYear=False, printData=False)
+                                                     useYear=False, printData=self.printDataForGle,plotEmf=self.inputs['plotEmf'])
                 caption = titlePlot
                 tableNames = ["Month"] + legend + ["Total"]
                 var = inVar
@@ -750,11 +752,11 @@ class ProcessTrnsysDf():
             for variables in self.inputs['monthlyStackedBar']:
                 legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
                 inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
-                nameFile  = '_'.join(variables)
+                nameFile  = 'StackedBar'+'_'.join(variables)
                 titlePlot = 'Balance'
                 namePdf = self.plot.plotMonthlyBalanceDf(inVar,[],legend, "Energy", nameFile, 'kWh',
                                                      self.myShortMonths, yearlyFactor=10,
-                                                     useYear=False, printData=False,printImb=False)
+                                                     useYear=False, printData=self.printDataForGle,printImb=False,plotEmf=self.inputs['plotEmf'])
                 caption = titlePlot
                 tableNames = ["Month"] + legend
                 var = inVar
@@ -767,9 +769,9 @@ class ProcessTrnsysDf():
             for variables in self.inputs['monthlyBars']:
                 legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
                 inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
-                nameFile  = '_'.join(variables)
+                nameFile  = 'NBar'+'_'.join(variables)
                 titlePlot = 'Balance'
-                namePdf = self.plot.plotMonthlyNBar(inVar, legend, "", nameFile, 10,self.myShortMonths)
+                namePdf = self.plot.plotMonthlyNBar(inVar, legend, "", nameFile, 10,self.myShortMonths,plotEmf=self.inputs['plotEmf'])
                 caption = titlePlot
                 tableNames = ["Month"] + legend
                 var = inVar

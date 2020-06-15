@@ -19,6 +19,9 @@ import pandas as pd
 import pytrnsys.utils.costConfig as costConfig
 from pathlib import Path
 import pytrnsys.plot.plotMatplotlib as plot
+import sys
+import pkg_resources
+import pytrnsys_examples
 #we would need to pass the Class as inputs
 
 
@@ -116,8 +119,8 @@ def processDataGeneral(casesInputs):
 
 
     test.setInputs(inputs)
-    if "latexNames" in inputs:
-        test.setLatexNamesFile(inputs["latexNames"])
+    if 'latexNames' in inputs.keys():
+        test.setLatexNamesFile(inputs['latexNames'])
     else:
         test.setLatexNamesFile(None)
     if "matplotlibStyle" in inputs:
@@ -165,6 +168,8 @@ def processDataGeneral(casesInputs):
     return " Finished: " + fileName
 
 
+
+
 class ProcessParallelTrnsys():
     """
     Main class to process all TRNSYS results.
@@ -195,7 +200,7 @@ class ProcessParallelTrnsys():
         self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder" # "casesDefined"
         self.inputs["forceProcess"]  =  True #even if results file exist it proceess the results, otherwise it checks if it exists
-        self.inputs["pathBase"] = False
+        self.inputs["pathBase"] = os.getcwd()
         self.inputs["setPrintDataForGle"] = True
         self.inputs['firstConsideredTime'] = None #Be carefull here. Thsi will not be proprly filtered
         self.inputs["buildingArea"] = 1072.
@@ -203,15 +208,20 @@ class ProcessParallelTrnsys():
         self.inputs["dllTrnsysPath"] = False
         self.inputs["classProcessing"] = False
         self.inputs["latexExePath"] = "Unknown"
+        self.inputs["figureFormat"] = 'pdf'
 
 
     def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
 
     def readConfig(self,path,name,parseFileCreated=False):
-
+        self.configPath = path
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated)
+        if 'latexNames' in self.inputs.keys():
+            if ':' not in self.inputs['latexNames']:
+                self.inputs['latexNames'] = os.path.join(self.configPath, self.inputs['latexNames'])
+
 
     def getBaseClass(self, classProcessing, pathFolder, fileName):
 
@@ -486,7 +496,11 @@ class ProcessParallelTrnsys():
     
             self.doc = latex.LatexReport('', '')
             if 'latexNames' in self.inputs.keys():
-                self.doc.getLatexNamesDict(file=self.inputs['latexNames'])
+                if ':' in self.inputs['latexNames']:
+                    latexNameFullPath = self.inputs['latexNames']
+                else:
+                    latexNameFullPath = os.path.join(self.configPath,self.inputs['latexNames'])
+                self.doc.getLatexNamesDict(file=latexNameFullPath)
             else:
                 self.doc.getLatexNamesDict()
             if 'matplotlibStyle' in self.inputs.keys():
@@ -543,14 +557,14 @@ class ProcessParallelTrnsys():
                     line="%s\t"%key;lines=lines+line
                 line = "\n";lines = lines + line
 
-            for i in range(mySize):
+            for X,Y in zip(myX,myY):
                 for chunk, style in zip(plotXDict.keys(), styles):
 
                     for key in plotXDict[chunk].keys(): #the varables that appear in the legend
                         index = num.argsort(plotXDict[chunk][key])
                         myX = num.array(plotXDict[chunk][key])[index]
                         myY = num.array(plotYDict[chunk][key])[index]
-                        line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]); lines = lines + line
+                        line = "%8.4f\t%8.4f\t" % (X, Y); lines = lines + line
                 line = "\n"; lines = lines + line
 
             # box = ax1.get_position()
@@ -673,3 +687,20 @@ class ProcessParallelTrnsys():
         # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RpvGenVec,"$R_{pv,gen}$",cost.pvAreaVec,"PvPeak [kW]","RpvGen_vs_Bat", extension="pdf")
 
         # cost.printDataFile()
+
+def process():
+   pathBase = ''
+   template = pkg_resources.resource_filename('pytrnsys_examples', 'solar_dhw/process_solar_dhw.config')
+   if len(sys.argv)>1:
+       pathBase,configFile = os.path.split(sys.argv[1])
+   else:
+       pathBase,configFile = os.path.split(template)
+
+   if ':' not in pathBase:
+       pathBase = os.path.join(os.getcwd(),pathBase)
+   tool = ProcessParallelTrnsys()
+   tool.readConfig(pathBase, configFile)
+   tool.process()
+
+if __name__ == '__main__':
+    process()
