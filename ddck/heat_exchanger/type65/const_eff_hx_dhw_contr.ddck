@@ -60,7 +60,7 @@ MinMfrSrcDHWHx = 70
 
 UNIT 500 TYPE 652
 PARAMETERS 4
-1		! 1 Effectiveness of Heat Exchanger
+HX_efficiencyDHWHX		! 1 Effectiveness of Heat Exchanger
 cpwat		! 2 Specific Heat of Hot-Side Fluid
 cpwat		! 3 Specific Heat of Cold-Side Fluid
 1000		! 4 Number of Possible Steps
@@ -107,7 +107,7 @@ PARAMETERS 12
 60     ! 6 Right axis maximum
 nPlotsPerSim     ! 7 Number of plots per simulation
 12     ! 8 X-axis gridpoints
--1     ! 9 Shut off Online w/o removing
+1     ! 9 Shut off Online w/o removing
 -1     ! 10 Logical unit for output file
 0     ! 11 Output file units
 0     ! 12 Output file delimiter

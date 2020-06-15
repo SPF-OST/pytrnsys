@@ -52,7 +52,7 @@ ASolarZenith = AISZ !
 **COLLECTOR DATA
 ***************************
 
-CONSTANTS 7
+CONSTANTS 8
 slopePvRoof = slopeSurfUser_2
 PvRoof_azim = aziSurfUser_2
 
@@ -62,6 +62,7 @@ areaOneModuleRoof = 1.079  ! m2  , Ref.: data sheet Eternit
 numModPvRoof = AreaPvRoof / areaOneModuleRoof
 NPanelPara = 3
 NPanelSeries = numModPvRoof / NPanelPara
+PowerPeakPV_kWp = numModPvRoof*43.6*5.51/1000*NInverters
 
 ***************************************
 ** Weather Data calculation
