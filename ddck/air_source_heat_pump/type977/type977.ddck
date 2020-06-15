@@ -128,10 +128,10 @@ relaxMfrPD = 1
 MfrPD = MfrPDNew*relaxMFrPD + (1-relaxMFrPD)*MfrPDRc     
    
 
-CONSTANTS 6
+CONSTANTS 5
 tauWPstart = 10
 tauWPstop = 20
-TWPEvapIce = -100
+** TWPEvapIce = -100 !JS: This was moved to the individual HP ddck, make sure it is included there with a reasonable value.
 EtaDefrost = 0.4
 PelWPVen = 0
 PelAuxCtr_kW = 0
