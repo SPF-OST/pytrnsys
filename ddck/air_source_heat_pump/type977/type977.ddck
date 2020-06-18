@@ -35,8 +35,10 @@ THpCondOut = [162,3]     ! Temperature of the condenser (heat sink) outlet
 ** outputs to energy balance in kWh
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
-EQUATIONS 2
+EQUATIONS 3
 elSysIn_Q_HpComp  = PelAuxComp_kW 
+!elSysIn_Q_HpBkp  =  PelAuxTot_kW - PelAuxComp_kW -> these are equal to each other, so elSysIn_Q_HpBkp is 0
+qSysOut_HpLoss = PAuxDefrost_kW + PAuxLossStart_kW
 qSysIn_PauxEvap = PauxEvap_kW
 
 
@@ -128,11 +130,11 @@ relaxMfrPD = 1
 MfrPD = MfrPDNew*relaxMFrPD + (1-relaxMFrPD)*MfrPDRc     
    
 
-CONSTANTS 5
+CONSTANTS 6
 tauWPstart = 10
 tauWPstop = 20
-** TWPEvapIce = -100 !JS: This was moved to the individual HP ddck, make sure it is included there with a reasonable value.
-EtaDefrost = 0.4
+TWPEvapIce = 7 !JS: 7 seems to give somewhat realistic results. the dCOP distribution is different from type 401, needs to be checked further...
+EtaDefrost = 0.3 ! JS: was 0.4 before, dCOP was too small, so this efficiency was decreased
 PelWPVen = 0
 PelAuxCtr_kW = 0
 
