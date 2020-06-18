@@ -531,7 +531,10 @@ class RunParallelTrnsys():
                     elif (i<=2):
                         variation.append(splitLine[i])
                     else:
-                        variation.append(float(splitLine[i]))
+                        try:
+                            variation.append(float(splitLine[i]))
+                        except:
+                            variation.append(splitLine[i])
 
                 self.variation.append(variation)
 
