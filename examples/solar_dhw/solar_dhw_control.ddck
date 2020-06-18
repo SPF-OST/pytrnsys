@@ -19,12 +19,11 @@
 ** Control Temperatures
 ***********************************
 
-EQUATIONS 7
+EQUATIONS 6
 myTCollOut = TCollOut          !@dependencyDdck
 mySenTesSolarTop = Tsen4_Tes1 !@dependencyDdck
 mySenTesSolarBot = Tsen1_Tes1 !@dependencyDdck
-mySenTesAuxTop = Tsen8_Tes1 !@dependencyDdck
-mySenTesAuxBot = Tsen6_Tes1 !@dependencyDdck
+mySenTesAux = Tsen8_Tes1 !@dependencyDdck
 tSetAux = 55
 TdhwSet = 55
 
@@ -36,17 +35,17 @@ CONSTANTS 2
 dtAuxOn = -3     ! Upper dead band coll. pump ON
 dtAuxOff = -7     ! Lower dead band coll. pump OFF
 
-UNIT 27 TYPE 2  
+UNIT 27 TYPE 2  ! Tset - UDB < Tmonitored < Tset - LDB
 PARAMETERS 2     
 5     ! 1 No. of oscillations
 98   ! 2 High limit cut-out
 INPUTS 6     
-tSetAux        ! Upper input temperature Th
-mySenTesAuxTop ! Lower input temperature Tl
-mySenTesAuxBot ! Monitoring temperature Tin
+tSetAux        ! Setpoint temperature, Tset
+mySenTesAux ! Temperature to watch, Tmonitored
+mySenTesAux ! High limit monitoring temperature
 auxOn          ! 70,1 Input control function
-dtAuxOn        ! Upper dead band dT
-dtAuxOff       ! Lower dead band dT
+dtAuxOn        ! Turn on temperature difference, Upper dead band, UDB dT
+dtAuxOff       ! Turn off temperature difference, Lower dead band dT, LDB
 0.0 20.0 0.0 0 dtAuxOn dtAuxOff      
 EQUATIONS 1  
 auxOn = [27,1]

@@ -29,10 +29,10 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 20    
-mySenTesSolarTop mySenTesSolarBot mySenTesAuxTop mySenTesAuxBot nix nix myTCollOut THxSolar nix nix 
+mySenTesSolarTop mySenTesSolarBot mySenTesAux nix nix nix myTCollOut THxSolar nix nix 
 nix  puColOn puColOnRc auxOn auxOnRc nix nix nix nix nix 
 **     
-mySenTesSolarTop mySenTesSolarBot mySenTesAuxTop mySenTesAuxBot nix nix myTCollOut THxSolar nix nix 
+mySenTesSolarTop mySenTesSolarBot mySenTesAux nix nix nix myTCollOut THxSolar nix nix 
 nix  puColOn puColOnRc auxOn auxOnRc nix nix nix nix nix 
 **      
 LABELS  3     
