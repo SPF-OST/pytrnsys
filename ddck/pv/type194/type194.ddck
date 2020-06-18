@@ -52,17 +52,16 @@ ASolarZenith = AISZ !
 **COLLECTOR DATA
 ***************************
 
-CONSTANTS 8
+CONSTANTS 9
 slopePvRoof = slopeSurfUser_2
 PvRoof_azim = aziSurfUser_2
-
-** AreaPvRoof = 94.95   !m2
 AreaPvRoof = 74.451   !m2
-areaOneModuleRoof = 1.079  ! m2  , Ref.: data sheet Eternit
 numModPvRoof = AreaPvRoof / areaOneModuleRoof
-NPanelPara = 3
-NPanelSeries = numModPvRoof / NPanelPara
-PowerPeakPV_kWp = numModPvRoof*43.6*5.51/1000*NInverters
+NPanelPara = 2
+NPanelSeries = 15
+NPanelsPerInverter = NPanelPara*NPanelSeries
+NInverters = numModPvRoof/NPanelsPerInverter
+PowerPeakPV_kWp = numModPvRoof*PvURefMpp*PvIRefMpp/1000*NInverters
 
 ***************************************
 ** Weather Data calculation
@@ -86,35 +85,36 @@ IT_PV_Wm2 = IT_surfUser_2/3.6
 
 
 
+
 UNIT 154 TYPE 194	! PV + Inverter E	 SUNSKIN ROOF-MODUL ETERNIT
 PARAMETERS 29
 2		! 1 Mode
-9.2		! 2 Module short-circuit current at reference conditions
-26.8		! 3 Module open-circuit voltage at reference conditions
-298.15		! 4 Reference temperature
-1000		! 5 Reference insolation
-21.9		! 6 Module voltage at max power point and reference conditions
-8.7		! 7 Module current at max power point and reference conditions
-0.0046		! 8 Temperature coeficient of Isc at (ref. cond)
--0.08308		! 9 Temperature coeficient of Voc (ref. cond.)   
-40		! 10 Number of cells wired in series
+PvIsc		! 2 Module short-circuit current at reference conditions
+PvVos		! 3 Module open-circuit voltage at reference conditions
+PvRefTemp		! 4 Reference temperature
+PvRefInsulation		! 5 Reference insolation
+PvURefMpp		! 6 Module voltage at max power point and reference conditions
+PvIRefMpp		! 7 Module current at max power point and reference conditions
+PvCoeffIsc		! 8 Temperature coeficient of Isc at (ref. cond)
+PvCoeffVoc		! 9 Temperature coeficient of Voc (ref. cond.)   
+PvCellsInSeries		! 10 Number of cells wired in series
 NPanelSeries ! 11 Number of modules in series
 NPanelPara		! 12 Number of modules in parallel
-308.2		! 13 Module temperature at NOCT
-293.15		! 14 Ambient temperature at NOCT
-800		! 15 Insolation at NOCT
+PvTempNoct		! 13 Module temperature at NOCT
+PvTambNoct		! 14 Ambient temperature at NOCT
+PvInsNoct		! 15 Insolation at NOCT
 areaOneModuleRoof	! 16 Module area
 0.95		! 17 tau-alpha product for normal incidence   okay
 1.12		! 18 Semiconductor bandgap 
-1.11		! 19 Value of parameter "a" at reference conditions
-9.202		! 20 Value of parameter I_L at reference conditions
-0.000000000298		! 21 Value of parametre I_0 at reference conditions
-0.1855		! 22 Module series resistance
-859.6		! 23 Shunt resistance at reference conditions
+PvARef		! 19 Value of parameter "a" at reference conditions
+PvILRef		! 20 Value of parameter I_L at reference conditions
+PvI0Ref		! 21 Value of parametre I_0 at reference conditions
+PvModuleRs		! 22 Module series resistance
+PvShuntRs		! 23 Shunt resistance at reference conditions
 0.008		! 24 Extinction coefficient-thickness product of cover
-12500		! 25 Maximum inverter power
-1000		! 26 Maximium inverter voltage
-200		! 27 Minimum inverter voltage
+PvMaxPInv		! 25 Maximum inverter power
+PvMaxVInv		! 26 Maximium inverter voltage
+PvMinVInv		! 27 Minimum inverter voltage
 1		! 28 Night tare
 unitReadInvPv		! 29 Logical unit number for inverter data
 INPUTS 10
@@ -133,10 +133,11 @@ vWind	    	! Wind speed
 *** External files
 
 
+
 EQUATIONS 12   !, Output of PV collector
 ** PelOperating_kW = [154,3]/1000  	! We assume an mpp tracker, so this output is not used	- this corresponds to power at operating point, only meaningful if op is defined (Load Voltage, Input 3)
-PelMaxPower_kW = [154,4]/1000   	! this corresponds to power at mpp after inverter (AC)
-PelArrayMPP_kW = [154,16]/1000  	! this corresponds to power at mpp before inverter (DC)
+PelMaxPower_kW = [154,4]*NInverters/1000   	! this corresponds to power at mpp after inverter (AC)
+PelArrayMPP_kW = [154,16]*NInverters/1000  	! this corresponds to power at mpp before inverter (DC)
 ** PelArray_kW = [154,20]/1000	    ! We assume an mpp tracker, so this output is not used	- this corresponds to power at operating point, only meaningful if op is defined (Load Voltage, Input 3)
 ** VelOp = [154,1] 					! We assume an mpp tracker, so this output is not used
 VelMp = [154,6]  					! Voltage at MPP (including inverter effects)
@@ -151,6 +152,29 @@ inverterEffDCAC_mp = [154,13]		! Inverter efficiency at mpp
 inverterEffDCAC = MAX(inverterEffDCAC_mp,0.000000001) ! Prevent division by 0
 ** inverterEffDCAC_op = [154,17]	! We assume an mpp tracker, so this output is not used
 PvInverterLoss_kW = PelPVDC_kW-PelPVAC_kW
+
+*******************************
+**Monthly printer
+*******************************
+
+CONSTANTS 1
+unitPrinterPV=308
+
+ASSIGN    temp\PV_MO.Prt      unitPrinterPV
+
+UNIT 308 Type 46    !, Printegrator Monthly Values for Electricity
+PARAMETERS 6
+unitPrinterPV  !, 1, Logical unit number, -
+-1   !, 2, Logical unit for monthly summaries, -
+1    !, 3, Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1   !, 4, Printing & integrating interval, h. -1 for monthly integration
+1    !, 5, Number of inputs to avoid integration, -
+1    !, 6, Output number to avoid integration
+INPUTS 6
+Time IT_PV_kW IT_H_kW PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
+*******
+Time IT_PV_kW IT_H_kW PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
+
 
 UNIT 155 TYPE 65     ! Online Plotter Collector (Element OpC)
 PARAMETERS 12     

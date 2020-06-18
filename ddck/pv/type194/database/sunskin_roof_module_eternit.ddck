@@ -1,0 +1,30 @@
+******************************
+**BEGIN sunskin_roof_module_eternit.ddck
+*******************************
+    
+*****************************************
+** Data for pv module type 194 sunskin roof module eternit. 
+** Version : v0.0
+** Last Changes: Mattia Battaglia	    
+** Date: 18.06.2020
+******************************************
+
+CONSTANTS 18 
+PvIsc = 9.2 ! Module short-circuit current at reference conditions
+PvVos = 26.8 ! Module open-circuit voltage at reference conditions
+PvRefTemp = 298.15 ! Reference temperature
+PvRefInsulation = 1000 ! Reference insolation
+PvURefMpp = 21.9 ! Module voltage at max power point and reference conditions
+PvIRefMpp = 8.7 ! Module current at max power point and reference conditions
+PvCoeffIsc = 0.0046 ! 8 Temperature coeficient of Isc at (ref. cond)
+PvCoeffVoc = -0.08308 ! Temperature coeficient of Voc (ref. cond.)  
+PvCellsInSeries = 40 ! Number of cells wired in series
+areaOneModuleRoof = 1.079  ! m2  , Ref.: data sheet Eternit
+PvARef = 1.11 ! Value of parameter "a" at reference conditions (from Type194 plugin)
+PvILRef = 9.202 ! Value of parameter I_L at reference conditions (from Type194 plugin)
+PvI0Ref = 0.000000000298 !  Value of parametre I_0 at reference conditions (from Type194 plugin)
+PvModuleRs = 0.1855 ! Module series resistance (from Type194 plugin)
+PvShuntRs = 859.6 ! Shunt resistance at reference conditions (from Type194 plugin)
+PvTempNoct = 308.2 ! Module temperature at NOCT
+PvTambNoct = 293.15 ! Ambient temperature at NOCT
+PvInsNoct = 800 ! Insolation at NOCT

@@ -25,4 +25,9 @@
 CONSTANTS 1
 unitReadInvPv=124
 
+CONSTANTS 3
+PvMaxPInv = 12500
+PvMaxVInv = 1000
+PvMinVInv = 200
+
 ASSIGN PATH$\pv\type194\database\140911_FRONIUS_SYMO_Inverter.dat unitReadInvPv
