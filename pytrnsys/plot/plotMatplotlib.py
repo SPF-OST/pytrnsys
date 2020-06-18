@@ -1274,6 +1274,14 @@ class PlotMatplotlib():
                             line = "- - "; lines = lines+line
 
                 line = "\n"; lines = lines+line
+            elif(i==nTimeStep-1):
+                line = "%d " % (i); lines = lines + line
+                for j in range(nVar):
+                        if(cumEnerVec[j][i]<=0.99*cumEnerVec[j][nTimeStep-1] or cut==False): # cut at 99%
+                            line = "%f %f " % (tSortVec[j][i],cumEnerVec[j][i]); lines = lines+line
+                        else:
+                            line = "- - "; lines = lines+line
+
                 
         myFileName = self.path + "//" + fileName + ".dat"
         

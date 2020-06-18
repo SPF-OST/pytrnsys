@@ -938,7 +938,7 @@ class ProcessTrnsysDf():
                 self.resultsDict = {'Name':self.fileName.split('-')[1]}
             else:
                 self.resultsDict = {}
-            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax,**self.maximumMonth,**self.minimumMonth}
+            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax} #,**self.maximumMonth,**self.minimumMonth}
             for key in self.inputs['results'][0]:
                 if type(jointDicts[key]) == num.ndarray:
                     value = list(jointDicts[key])
