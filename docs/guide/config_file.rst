@@ -5,14 +5,14 @@ The pytrnsys configuration files
 
 Pytrnsys runs and processes TRNSYS simulations based on configurations files. The general idea behind is to provide
 a fast and easily accessible way to define, run and analyse both single simulations as well as parametric studies.
-There are distinct configuration files for running and processing. Both are described in the following sections bur follow
+There are distinct configuration files for running and processing. Both are described in the following sections but follow
 the same syntax and format.
 
 
 Configuration file format
 *************************
 
-The configuration file does not require a header and should contain different keyword commands on single lines.
+The configuration file does not require a header. It should contain different keyword commands on single lines.
 Comments start with ``#`` characters. End of line comments are possbile.
 
 There config file supports the following basic types:
@@ -28,7 +28,7 @@ Parameters that are used to specifiy the run can be defined by::
 
     keyword parameter_name value
 
-In the case of and integere this would for example be::
+In the case of an integer this would for example be::
 
     int reduceCpu  4
 
@@ -46,33 +46,33 @@ Ddck section
 ------------
 
 The core of the run configuration file is the ddck section. In this part of the configuration
-file the different modular ddck files that should be used in the simulation are specified.
-Pytrnsys offers its own ddck repository in the seperate package pytrnsys-ddck that is installed
-along the main package and used in the example projects of pytrnsys-examples. In the ddck section
-of the config file, the different ddcks that should me merged to the simulation's main dck-file
+file, the different modular ddck files that should be used in the simulation are specified.
+Pytrnsys offers its own ddck repository in the seperate package pytrnsys_ddck that is installed
+together the main package and used in the example projects of pytrnsys_examples. In the ddck section
+of the config file, the different ddcks that should me merged to the simulation's main dck file
 are specified according to the following syntax::
 
     ROOTPATH1$ pathtoddck1\ddck1
     ROOTPATH1$ pathtoddck2\ddck2
     ROOTPATH2$ pathtoddck3\ddck3
 
-The root of the ddck repository used has to be defined elsewhere in the configuration file::
+The root of the ddck repositories used has to be defined elsewhere in the configuration file::
 
     string ROOTPATH1$ "pathToTheRepository1Root"
     string ROOTPATH2$ "pathToTheRepository2Root"
 
-An example can be found in the example section below. The path to the repository root can either be
+An example can be found in the example section below. The path to the repository root can be either
 absolute or relative. If a relativ path is detected, pytrnsys will interpret it as relative to
 the configuration file location.
 
 Parameter variation section
 ---------------------------
 
-A second core feature of pytrnsys is activated in the run-configuration file in a parameter
-variation section. Pytrnsys allows to modify TRNSYS simulation parameters in the configuration
-file either statically or with variations that result in parametric runs. A static parameter change
+A second core feature of pytrnsys is activated in the run configuration file in a parameter
+variation section. Pytrnsys allows either to modify TRNSYS simulation parameters in the configuration
+file statically or with variations that result in parametric runs. A static parameter change
 that can affect TRNSYS variables that are defined in EQUATIONS or in CONSTANTS blocks of the dck file
-is initiated by::
+are initiated by::
 
     deck trnsysVariableName value
 
@@ -84,7 +84,14 @@ Both keywords can be used multiple times. If multiple variations are used, they 
 depending on the parameter ``combineAllCases``. If this parameter is set to True all variations
 are combined pairwise. So if n values are given for variation 1 and m values are in variation 2
 the total amount of simulations executed will be (m x n). If ``combineAllCases`` is set to false,
-the amount of values of all variations has to be equal and the are combined according to their order.
+the amount of values of all variations has to be equal and they are combined according to their order.
+
+.. _ref-changeDDckFile:
+
+In addition to a single euqation or constant line in the dck, pytrnsys offers the possibility to
+loop through different ddck files during a parametric study. A parametric study on ddck files can be defined by::
+
+    changeDDckFile originalDdck ddckVariation1 ddckVariation2 ddckVariation3 ...
 
 
 Parameters
@@ -95,42 +102,47 @@ default values are mandatory.
 
 Generic
 ^^^^^^^^
-.. glossary::
-    ``ignoreOnlinePlotter`` (bool, default False)
-        If set to True, the TRNSYS online plotters are commented out in all the dck-files. No online plotters
-        are shown during the simulation run. The TRNSYS progress bar windos is still displayed.
 
-    ``removePopUpWindow`` (bool, default False)
-        Online plotters as well as the progress bar window are suppressed during the simulations.
-        (TRNSYS hidden mode)
+``ignoreOnlinePlotter`` (bool, default False)
+    If set to True, the TRNSYS online plotters are commented out in all the dck-files. No online plotters
+    are shown during the simulation run. The TRNSYS progress bar windos is still displayed.
 
-    ``checkDeck`` (bool, default True)
-        If set to True, during merging the ddck-files, the specified and given amount of Equations and Parameters in
-        each block are checked for inconsistencies.
+``removePopUpWindow`` (bool, default False)
+    Online plotters as well as the progress bar window are suppressed during the simulations.
+    (TRNSYS hidden mode)
 
-    ``parseFileCreated`` (bool, default True)
-        Saves the paresed dck-file that can be used to locate the line where ``checkDeck`` found errors.
+``checkDeck`` (bool, default True)
+    If set to True, during merging the ddck-files, the specified and given amount of Equations and Parameters in
+    each block are checked for inconsistencies.
 
-    ``runCases`` (bool, default True)
-        If set to False, the dck-files are created and saved in the normal structure but not executed.
+``parseFileCreated`` (bool, default True)
+    Saves the paresed dck-file that can be used to locate the line where ``checkDeck`` found errors.
 
-    ``reduceCpu`` (int, default 0)
-        Number of CPUs that are not used in the parallel simulation runs.
+``runCases`` (bool, default True)
+    If set to False, the dck-files are created and saved in the normal structure but not executed.
+
+``reduceCpu`` (int, default 0)
+    Number of CPUs that are not used in the parallel simulation runs.
 
 
 Automatic Work Bool
 ^^^^^^^^^^^^^^^^^^^
+.. _doAutoUnitNumbering:
 
 ``doAutoUnitNumbering`` (bool, default True)
     If set to True, the units of the merged dck-file are renumbered to avoid dublicates. This parameter
-    should almost always be set to the default True.
+    should usually be set to the default True.
+
+.. _generateUnitTypesUsed:
 
 ``generateUnitTypesUsed`` (bool, default True)
     if set to True, a file called ``UnitType.info`` containing the TRNSYS-Type numbers used is saved in the main run-folder.
 
+.. _addAutomaticEnergyBalance:
+
 ``addAutomaticEnergyBalance`` (bool, default True)
-    If set to True, an automatic energy balance printer is created in the dck-file. For more information
-    see (autmoatic energy balance section!!!!!!)
+    If set to True, an automatic energy balance printer is created in the dck file. For more information
+    see :ref:`ref-defaultPlotting`.
 
 Paths
 ^^^^^
@@ -144,15 +156,31 @@ Paths
     It overrules the normal behavior of executing the simulations in the command line
     working directory.
 
+.. _ref-addResultsFolder:
+
 ``addResultsFolder`` (string or False, default False)
     If specified as a string, a new folder for the simulations is created with this name.
 
 Scaling
 ^^^^^^^
 
+.. _ref-scaling:
+
 ``scaling`` (("False","toDemand"), default False)
     If set to "toDemand" the parameter scaling functionality is activated. Please refer to
-    (Scaling section!!!!!!!!!!!) for more details.
+    :ref:`scaling tutorial <ref-scalingTutorial>` for more details.
+
+.. _ref-scalingReference:
+
+``scalingReference`` (string)
+   Path to the scaling results. Please refer to
+   :ref:`scaling tutorial <ref-scalingTutorial>` for more details.
+
+.. _ref-scalingVariable:
+
+``scalingVariable`` (string)
+   Variable that is taken from the results json file for scaling. Please refer to
+   :ref:`scaling tutorial <ref-scalingTutorial>` for more details.
 
 ``nameRef`` (string)
     Base name of the dck-file created. Default base name is "pytrnsysRun".
@@ -164,7 +192,7 @@ Scaling
 
 Example
 -------
-Here is an example of a run-config file.
+Here is an example of a run configuration file.
 It is taken from the example project solar_dhw (``run_solar_dhw.config``)::
 
     ######### Generic ########################
@@ -183,7 +211,7 @@ It is taken from the example project solar_dhw (``run_solar_dhw.config``)::
     #############PATHS################################
 
     string trnsysExePath "C:\Trnsys17\Exe\TRNExe.exe"
-    string addResultsFolder "SolarDHW_newProfile"
+    string addResultsFolder "solar_dhw"
     string PYTRNSYS$ "..\..\pytrnsys_ddck\"
     string LOCAL$ ".\"
 
@@ -228,7 +256,7 @@ Process configuration file
 Pytrnsys processing modules automatically reads in the simulation results of the pytrnsys runs
 and - by default - calculates energy balances as well as collects some of the most important
 information of the simulation like iteration problems and system performance factors in a results
-PDF-file. The process configuration file allows to configure the processing. In addition
+pdf file. The process configuration file allows to configure the processing. In addition
 further calculations with the simulation results and additional plots can be defined.
 
 Calculations
@@ -293,6 +321,9 @@ found in the example below::
 
 Plotting
 --------
+
+.. _ref-defaultPlotting:
+
 Default plotting
 ^^^^^^^^^^^^^^^^
 By default the processing creates a pdf with the following content:
@@ -371,6 +402,22 @@ be added to the result pdf-file:
       :alt: SP
 
 
+.. _ref-plotHourlyQvsT:
+
+``plotHourlyQvsT`` (stringArray)
+    Adds a cumulative plot that contains a line for each heat temperature pair given in the string array.
+    Used to show at what temperature levels the heat us released or consumed in different system componenets.
+    Uses hourly printer files.
+
+.. _ref-plotTimestepQvsT:
+
+``plotTimestepQvsT`` (stringArray)
+    Adds a cumulative plot that contains a line for each heat temperature pair given in the string array.
+    Used to show at what temperature levels the heat us released or consumed in different system componenets.
+    Uses timestep printer files.
+
+
+
 Results file
 ------------
 
@@ -400,11 +447,21 @@ Generic
 ``forceProcess`` (bool, default True)
     If set to False, allready processed folders will not be processed again.
 
+.. _ref-setPrintDataForGle:
+
 ``setPrintDataForGle`` (bool, default True)
     Print the Data of the plots for further use in GLE plots.
 
-``saveImages`` (int, default 0)
-    Number of CPUs that are not used in the parallel simulation runs.
+.. _ref-figureFormat:
+
+``figureFormat`` (string, default 'pdf')
+    Format in which the plots of the processing will be saved. All formats that are supported by `matplotlib.pyplot.savefig <https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.savefig.html>`
+    are supported
+
+.. _ref-plotEmf:
+
+``plotEmf`` (bool, default False)
+    If set to true, all plots will be exported in the emf format. Requires Inkscape.
 
 
 Time selection
@@ -430,6 +487,11 @@ Paths
 
 ``pathBase`` (string)
     Path of the folder to be processed. If not specified, the current working directory is used instead.
+
+.. _ref-inkscape:
+
+``inkscape`` (string)
+    Path of the Inkspace executable. Required for using `plotEmf <ref-plotEmf>`.
 
 Example
 -------
