@@ -155,7 +155,35 @@ Tdhw Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW
 **  
 Tdhw Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW
 
+***********************************
+** Online Plotter
+***********************************
 
+UNIT 20 TYPE 65     ! Online Plotter DHW (Element OpDHW)
+PARAMETERS 12     
+1     ! 1 Nb. of left-axis variables
+1     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+300     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+60     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 2    
+MfrDhw  
+Tdhw 
+**     
+MfrDhw  
+Tdhw 
+**     
+LABELS  3     
+massFlow
+Temperatures     
+DHW-Hyd
 
 *******************************
 **END DHW-MFH.ddck
