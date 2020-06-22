@@ -1,0 +1,10 @@
+{
+"elSysOut_HHDemand":"$El_{HH}$",
+"elSysIn_PV":"$El_{PV}$",
+"elSysOut_InvLoss":"$El^{inv}_{loss}$",
+"elSysOut_BatLoss":"$El^{bat}_{loss}$",
+"elSysIn_Grid":"$El_{grid}$",
+"elSysOut_PvToGrid":"$El_{Pv2Grid}$",
+"ownConsumptionRate":"$\\eta_{own,cons}$ [-]",
+"CapBatMaxT0_kWh": "$C_{bat}$ [kWh]"
+}

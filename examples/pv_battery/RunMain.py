@@ -1,5 +1,6 @@
 import pytrnsys.rsim.runParallelTrnsys as runTrnsys
+import os
 
-pathConfig  = "pathToTheConfigFile"
-configFile = "DualRun.config"
+pathConfig  = os.getcwd()
+configFile = "run_pv_battery.config"
 runTool = runTrnsys.RunParallelTrnsys(pathConfig,configFile=configFile)

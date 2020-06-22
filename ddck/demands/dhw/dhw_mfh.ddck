@@ -156,8 +156,9 @@ Tdhw Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW
 Tdhw Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW
 
 ***********************************
-** Online Plotter
+** Online plotter
 ***********************************
+
 
 UNIT 20 TYPE 65     ! Online Plotter DHW (Element OpDHW)
 PARAMETERS 12     

@@ -60,7 +60,7 @@ MinMfrSrcDHWHx = 70
 
 UNIT 500 TYPE 652
 PARAMETERS 4
-1		! 1 Effectiveness of Heat Exchanger
+HX_efficiencyDHWHX		! 1 Effectiveness of Heat Exchanger
 cpwat		! 2 Specific Heat of Hot-Side Fluid
 cpwat		! 3 Specific Heat of Cold-Side Fluid
 1000		! 4 Number of Possible Steps

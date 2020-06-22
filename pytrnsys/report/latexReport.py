@@ -50,7 +50,11 @@ class LatexReport():
         self.plotsAdded = [] 
         
     def getLatexNamesDict(self,file='latexNames.json'):
-        with open(os.path.join(self.pathReport,file)) as js:
+        if file=='latexNames.json':
+            latexFileFullPath = os.path.join(self.pathReport, file)
+        else:
+            latexFileFullPath = file
+        with open(latexFileFullPath) as js:
             self.latexNames = json.load(js)
             self.latexNames = {key: '$'+value+'$' if not value[0]=='$' else value for (key,value) in self.latexNames.items()}
     def getNiceLatexNames(self, name):

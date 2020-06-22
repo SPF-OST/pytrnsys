@@ -99,7 +99,7 @@ IT_Coll_kJhm2
 IT_H
 ID_Coll_kJhm2
 0,0
-AI_Coll !Flo check ! JS: This was defined wrong before (C_azim, even though it is incident angle input)
+AI_Coll !Flo check ! JS: This was defined wrong before (C_azim, even though it is incident angle input). Now it should be correct.
 C_tilt !Flo check  ! JS: This should be correct
 *** INITIAL INPUT VALUES
 20 0 10 0 0 0 GroundReflectance 45 0 

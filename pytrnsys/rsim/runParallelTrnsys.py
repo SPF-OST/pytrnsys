@@ -21,6 +21,9 @@ import imp
 import warnings
 import json
 from copy import deepcopy
+import sys
+import pkg_resources
+import pytrnsys_examples
 
 # from sets import Set
 
@@ -53,7 +56,7 @@ class RunParallelTrnsys():
 
         self.defaultInputs()
         self.cmds = []
-        self.path = self.pathConfig
+        self.path = os.getcwd()
         if configFile is not None:
             self.readConfig(self.pathConfig,configFile)
             if 'nameRef' in self.inputs:
@@ -415,8 +418,9 @@ class RunParallelTrnsys():
         for line in self.lines:
             logfile.write(line+'\n')
         logfile.close()
-        mainFile = sys.argv[0]
-        shutil.copy(mainFile,os.path.join(self.path,'runMainFile.py'))
+
+        #mainFile = sys.argv[0]
+        #shutil.copy(mainFile,os.path.join(self.path,'runMainFile.py'))
 
 
     def readConfig(self,path,name,parseFileCreated=False):
@@ -531,7 +535,10 @@ class RunParallelTrnsys():
                     elif (i<=2):
                         variation.append(splitLine[i])
                     else:
-                        variation.append(float(splitLine[i]))
+                        try:
+                            variation.append(float(splitLine[i]))
+                        except:
+                            variation.append(splitLine[i])
 
                 self.variation.append(variation)
 
@@ -653,3 +660,17 @@ class RunParallelTrnsys():
         for j in range(len(self.variablesOutput)):
             for i in range(2, len(self.variablesOutput[j]), 1):
                 self.variablesOutput[j][i] = str(round(self.unscaledVariables[j][i], 3))+ "*" +str(round(loadDemand,3))
+
+def run():
+   pathBase = ''
+   template = pkg_resources.resource_filename('pytrnsys_examples', 'solar_dhw/run_solar_dhw.config')
+   if len(sys.argv)>1:
+       pathBase,configFile = os.path.split(sys.argv[1])
+   else:
+       pathBase,configFile = os.path.split(template)
+   if ':' not in pathBase:
+       pathBase = os.path.join(os.getcwd(),pathBase)
+   RunParallelTrnsys(pathBase, configFile=configFile)
+
+if __name__ == '__main__':
+    run()

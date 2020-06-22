@@ -15,8 +15,8 @@ import sys
 sys.path.insert(0, os.path.abspath('../'))
 from shutil import copy
 from pathlib import Path
-from_path = (Path(".") / "../README.md" ).resolve().__str__()
-copy(from_path, '.')
+#from_path = (Path(".") / "../README.md" ).resolve().__str__()
+#copy(from_path, '.')
 import recommonmark
 from recommonmark.transform import AutoStructify
 

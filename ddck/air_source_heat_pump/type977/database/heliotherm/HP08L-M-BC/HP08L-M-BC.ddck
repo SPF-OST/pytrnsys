@@ -6,7 +6,7 @@
 ** Author : Dani Carbonell
 *********************************************
 CONSTANTS 22
-TEvapMaxHp = 80
+TEvapMaxHp = TEvapMax ! It was 80 before. Not clear where the 80 comes from, according to DP, this temperature is unrealistic
 sizeHpNom = 11.3
 MfrHpCondRef = 2900
 MfrHpEvapRef = 7250
@@ -28,7 +28,6 @@ TMinEvapTin = -20.000000
 TMinEvapTout = TMinEvapTin - 3
 TCondMaxHp = 65.000000
 CpEvap = 1.004
-
 *********************************************
 ** END HP08L-M-BC.ddck
 *********************************************

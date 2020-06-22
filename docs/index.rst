@@ -8,10 +8,14 @@ Welcome to pytrnsys's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
-   General Information <README.md>
    guide/index
+   guide/tutorial
+   guide/config_file
+   guide/example_systems
+   guide/ddck_repository
+   guide/developers_guide
    Code Reference <modules>
 
 
