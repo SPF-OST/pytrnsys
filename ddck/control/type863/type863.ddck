@@ -68,7 +68,7 @@ CONSTANTS 9
 BlockOff = 0
 BlockOn  = 1     
 TtesForcePriorWs = 10   
-TmaxSensibleTes = 90    
+TmaxSensibleTes = Tmax_Tes1   
 TmaxIceTes      = 30
 tempColAboveHpLimit = 3   
 nBeginCsPriority = 11 !DC-CLEAN check what it does internally, we should erase this 
