@@ -21,7 +21,10 @@ from pathlib import Path
 import pytrnsys.plot.plotMatplotlib as plot
 import sys
 import pkg_resources
-import pytrnsys_examples
+try:
+    import pytrnsys_examples
+except ImportError:
+    pass
 #we would need to pass the Class as inputs
 
 

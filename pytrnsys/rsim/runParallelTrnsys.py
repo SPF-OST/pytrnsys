@@ -23,7 +23,10 @@ import json
 from copy import deepcopy
 import sys
 import pkg_resources
-import pytrnsys_examples
+try:
+    import pytrnsys_examples
+except ImportError:
+    pass
 
 # from sets import Set
 
