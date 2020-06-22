@@ -56,7 +56,7 @@ class ProcessTrnsysDf():
         self.rootPath = os.getcwd()
 
         self.doc = latex.LatexReport(self.outputPath, self.fileName)
-        self.plot = plot.PlotMatplotlib(language=language,extensionPlot=self.inputs['figureFormat'])
+        self.plot = plot.PlotMatplotlib(language=language)
 
         self.plot.setPath(self.outputPath)
         
@@ -88,6 +88,7 @@ class ProcessTrnsysDf():
 
     def setInputs(self,inputs):
         self.inputs=inputs
+        self.plot.setExtensionPlot(self.inputs['figureFormat'])
 
     def setLatexNamesFile(self,file):
         if file is not None:

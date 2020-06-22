@@ -32,6 +32,9 @@ class PlotMatplotlib():
         self.yearlyFactor = 10
         self.setDefaultColors()
 
+    def setExtensionPlot(self,extension):
+        self.extensionPlot = extension
+
 
 
     def setDefaultColors(self):
