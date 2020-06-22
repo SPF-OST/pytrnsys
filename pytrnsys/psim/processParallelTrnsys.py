@@ -212,6 +212,7 @@ class ProcessParallelTrnsys():
         self.inputs["classProcessing"] = False
         self.inputs["latexExePath"] = "Unknown"
         self.inputs["figureFormat"] = 'pdf'
+        self.inputs["plotEmf"] = False
 
 
     def setFilteredFolders(self,foldersNotUsed):
