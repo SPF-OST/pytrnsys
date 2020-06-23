@@ -302,11 +302,12 @@ TPiTesDhwIn= [460,1]
 PPiTesDhwIn_kW= [460,3]/3600 !kW
 MfrPiTesDhwIn= MfrPiTesDhwIn_A
 
-CONSTANTS 3
+CONSTANTS 4
 ** Fluid Loop : defaultGroup
 di_loop_0=0.015
 L_loop_0=5
-U_loop_0=1  ! set to 0 for debugging
+U_loop_0=10  ! set to 0 for debugging
+U_loop_low = 1 !For ww pipe, in order to provide heat at desired temperature even if it is only tapping 1 timestep
 
 
 EQUATIONS 24
@@ -329,7 +330,7 @@ UPiColIn=U_loop_0
 *** PiDhwDemand
 diPiDhwDemand=di_loop_0
 LPiDhwDemand=2 ! Set to 2 because it took a long time until hot water was available at outlet
-UPiDhwDemand=U_loop_0
+UPiDhwDemand=U_loop_low
 *** PiTesToCol
 diPiTesToCol=di_loop_0
 LPiTesToCol=L_loop_0
@@ -344,8 +345,8 @@ LPiTesDhwIn=L_loop_0
 UPiTesDhwIn=U_loop_0
 *** PiTesDhwOut
 diPiTesDhwOut=di_loop_0
-LPiTesDhwOut=L_loop_0
-UPiTesDhwOut=U_loop_0
+LPiTesDhwOut=2 ! Set to 2 because it took a long time until hot water was available at outlet
+UPiTesDhwOut=U_loop_low
 
 
 EQUATIONS 2
