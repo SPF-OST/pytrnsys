@@ -83,7 +83,7 @@ class CostCalculationVar(mycost.CostCalculation):
         self.rate = rate
         self.analysPeriod = analysPeriod
         self.costElecFix = costElecFix
-        self.costElecKwh = costEleckWh
+        self.costEleckWh = costEleckWh
        
         self.increaseElecCost = increaseElecCost
        
@@ -185,7 +185,8 @@ class CostCalculationVar(mycost.CostCalculation):
         #electricity 
         #===================================================
        
-        self.costElecTotalY = self.costElecFix+self.costElecKwh*self.elDemandTotal  
+        self.costElecTotalY = self.costElecFix+self.costEleckWh*self.elDemandTotal
+
         
         if(self.rate==self.increaseElecCost): 
             self.npvFacElec = self.analysPeriod/(1.+self.rate) #DC It was lifeTime but now its different from each other
@@ -248,7 +249,9 @@ class CostCalculationVar(mycost.CostCalculation):
         self.anToInvCost = sum(self.costAnn)
 
         self.anElec = self.annuityFac*self.npvElec
-        self.anMaint = self.annuityFac*self.npvMaintenance
+        # self.anMaint = self.annuityFac*self.npvMaintenance
+        self.anMaint = self.anToInvCost*self.MaintenanceRate
+
         self.anResVal = (-1.)*self.annuityFac*self.npvResVal
 
         self.anYearlyComp = num.zeros(self.nYearlyComp)
@@ -334,7 +337,7 @@ class CostCalculationVar(mycost.CostCalculation):
         
         line = "Annuity & Annuity (yearly costs over lifetime)  &&& & %2.0f% s  \\\\ \n" % (self.annuity,costUnit);lines = lines + line 
         line = " & Share of Investment & &&& %2.0f%s (%2.0f%s) \\\\ \n" % (self.anToInvCost,costUnit,self.anToInvCost*100./self.annuity,symbol);lines = lines + line 
-        line = " & Share of Electricity  & %.0f+%.2f/kWh & %2.0f kWh&  & %2.0f%s (%2.0f%s)\\\\ \n" % (self.costElecFix,self.costElecKwh,self.elDemandTotal,self.anElec,costUnit,self.anElec*100./self.annuity,symbol);lines = lines + line
+        line = " & Share of Electricity  & %.0f+%.2f/kWh & %2.0f kWh&  & %2.0f%s (%2.0f%s)\\\\ \n" % (self.costElecFix,self.costEleckWh,self.elDemandTotal,self.anElec,costUnit,self.anElec*100./self.annuity,symbol);lines = lines + line
         line = " & Share of Maintenance & &&& %2.0f%s (%2.0f%s)\\\\ \n" % (self.anMaint,costUnit,self.anMaint*100./self.annuity,symbol);lines = lines + line        
         for i in range(len(self.yearlyComp)):
             line = " & Share of %s & %.0f+%.2f/%s & %.0f  %s & & %2.0f%s (%2.0f%s)\\\\ \n" % (self.yearlyComp[i],self.yearlyCompBaseCost[i],self.yearlyCompVarCost[i],self.yearlyCompVarUnit[i],\

@@ -29,7 +29,7 @@ class costConfig(costClass.CostCalculationVar):
         self.rate               = dictCost["DefaultData"]["rate"]
         self.analysPeriod       = dictCost["DefaultData"]["analysPeriod"]
         self.costElecFix        = dictCost["DefaultData"]["costElecFix"]
-        self.costElecKwh        = dictCost["DefaultData"]["costElecKwh"]
+        self.costEleckWh        = dictCost["DefaultData"]["costEleckWh"]
         self.increaseElecCost   = dictCost["DefaultData"]["increaseElecCost"]
         self.MaintenanceRate    = dictCost["DefaultData"]["MaintenanceRate"]
         self.costResidual       = dictCost["DefaultData"]["costResidual"]

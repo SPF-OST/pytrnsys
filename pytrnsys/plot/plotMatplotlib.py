@@ -255,7 +255,7 @@ class PlotMatplotlib():
 
                 plot.set_xticks(ind)
 
-                if (yearlyFactor == 1 or useYearlyFactorAsValue == True):
+                if (yearlyFactor == 1 or useYearlyFactorAsValue == True or len(var) == 13):
                     yearTag = "Year"
                 else:
                     yearTag = "Year/%d" % yearlyFactor
@@ -298,7 +298,8 @@ class PlotMatplotlib():
                     outfile.close()
 
                     legends = []
-                    legends.append("$%s$"%myLabel)
+                    # legends.append("$%s$"%myLabel)
+                    legends.append("%s"%myLabel)
 
                     self.gle.getBarPlot(nameFile,nameWithPath,legends,xnames=monthSequence)
 

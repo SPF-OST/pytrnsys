@@ -320,7 +320,7 @@ class ProcessTrnsysDf():
                                    addLines=addLines)
 
 
-    def addSPFSystem(self, printData=False):
+    def addSPFSystem(self, printData=True):
         if max(self.qDemand)>0 and not isinstance(self.elHeatSysTotal,int):
             self.SpfShpDis = num.zeros(13)
 

@@ -272,31 +272,22 @@ class ProcessParallelTrnsys():
 
             fileName.append(name)
 
-            folderUsed = True
-            for i in range(len(self.filteredfolder)):
-                if (name == self.filteredfolder[i]):
-                    folderUsed = False
-            if (folderUsed):
-                nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
-
-                if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                    print ("file :%s already processed" % name)
-                else:
-                    print ("file :%s will be processed" % name)
-                    
-
-                    baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder,self.inputs["fileName"])
-
-
-                    # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"], self.inputs["maxMinAvoided"],
-                    #                 self.inputs["yearReadedInMonthlyFile"], \
-                    #                 self.inputs["cleanModeLatex"], self.inputs["firstMonthUsed"],
-                    #                 self.inputs["processQvsT"], self.inputs["firstMonthUsed"],
-                    #                 self.inputs["buildingArea"], \
-                    #                 self.inputs["dllTrnsysPath"], self.inputs["setPrintDataForGle"],
-                    #                 self.inputs["firstConsideredTime"]))
-
-                    casesInputs.append((baseClass,pathFolder, name, self.inputs))
+            # folderUsed = True #DC Why this is here ? casesDefined are the ones defined in the config.
+            # for i in range(len(self.filteredfolder)):
+            #     if (name == self.filteredfolder[i]):
+            #         folderUsed = False
+            # if (folderUsed):
+            #     nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
+            #
+            #     if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
+            #         print ("file :%s already processed" % name)
+            #     else:
+            #         print ("file :%s will be processed" % name)
+            #
+            #
+            #         baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder,self.inputs["fileName"])
+            #
+            #         casesInputs.append((baseClass,pathFolder, name, self.inputs))
 
         elif self.inputs["typeOfProcess"] == "citiesFolder":
 
