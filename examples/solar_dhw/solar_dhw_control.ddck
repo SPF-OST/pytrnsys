@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : Jeremias Schmidli   
 ** Creation date  : 28.04.2020 
-** Last changes   : 28.04.2020, MB 
+** Last changes   : 22.06.2020, JS, change tSetAux to 50 and TdhwSet to 45 
 *****************************************
 
 ***************************************************************************
@@ -19,14 +19,13 @@
 ** Control Temperatures
 ***********************************
 
-EQUATIONS 7
+EQUATIONS 6
 myTCollOut = TCollOut          !@dependencyDdck
-mySenTesSolarTop = Tsen4_Tes1 !@dependencyDdck
+mySenTesSolarTop = Tsen9_Tes1 !@dependencyDdck
 mySenTesSolarBot = Tsen1_Tes1 !@dependencyDdck
-mySenTesAuxTop = Tsen8_Tes1 !@dependencyDdck
-mySenTesAuxBot = Tsen6_Tes1 !@dependencyDdck
-tSetAux = 55
-TdhwSet = 55
+mySenTesAux = Tsen8_Tes1 !@dependencyDdck
+tSetAux = 50
+TdhwSet = 45
 
 ***********************************
 ** Begin TYPE AUXILIAR CONTROLLER
@@ -36,17 +35,17 @@ CONSTANTS 2
 dtAuxOn = -3     ! Upper dead band coll. pump ON
 dtAuxOff = -7     ! Lower dead band coll. pump OFF
 
-UNIT 27 TYPE 2  
+UNIT 27 TYPE 2  ! Tset - UDB < Tmonitored < Tset - LDB
 PARAMETERS 2     
 5     ! 1 No. of oscillations
 98   ! 2 High limit cut-out
 INPUTS 6     
-tSetAux        ! Upper input temperature Th
-mySenTesAuxTop ! Lower input temperature Tl
-mySenTesAuxBot ! Monitoring temperature Tin
+tSetAux        ! Setpoint temperature, Tset
+mySenTesAux ! Temperature to watch, Tmonitored
+mySenTesAux ! High limit monitoring temperature
 auxOn          ! 70,1 Input control function
-dtAuxOn        ! Upper dead band dT
-dtAuxOff       ! Lower dead band dT
+dtAuxOn        ! Turn on temperature difference, Upper dead band, UDB dT
+dtAuxOff       ! Turn off temperature difference, Lower dead band dT, LDB
 0.0 20.0 0.0 0 dtAuxOn dtAuxOff      
 EQUATIONS 1  
 auxOn = [27,1]
@@ -57,7 +56,7 @@ auxOn = [27,1]
 ***********************************
 
 CONSTANTS 2
-dtColOn = 10    ! Upper dead band coll. pump ON
+dtColOn = 7    ! Upper dead band coll. pump ON, JS: was 10 before, yield is higher with 7, to be improved
 dtColOff = 3    ! Lower dead band coll. pump OFF
 
 
@@ -74,7 +73,7 @@ dtColOn        ! Upper dead band dT
 dtColOff       ! Lower dead band dT
 0.0 20.0 0.0 0 dtColOn dtColOff      
 EQUATIONS 1  
-puColOn = [28,1]
+puColOn = [28,1]*LT(myTcollOut,120)
 
 
 EQUATIONS 3

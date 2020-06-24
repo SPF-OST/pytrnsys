@@ -99,7 +99,7 @@ IT_Coll_kJhm2
 IT_H
 ID_Coll_kJhm2
 0,0
-AI_Coll !Flo check ! JS: This was defined wrong before (C_azim, even though it is incident angle input)
+AI_Coll !Flo check ! JS: This was defined wrong before (C_azim, even though it is incident angle input). Now it should be correct.
 C_tilt !Flo check  ! JS: This should be correct
 *** INITIAL INPUT VALUES
 20 0 10 0 0 0 GroundReflectance 45 0 
@@ -157,3 +157,30 @@ Pcoll_kW  PColl_kWm2  IT_Coll_kWm2 TCollOut TCollIn MfrColl
 **  
 Pcoll_kW  PColl_kWm2  IT_Coll_kWm2 TCollOut TCollIn MfrColl
 
+***********************************
+** Online Plotter
+***********************************
+
+UNIT 103 TYPE 65      !Changed automatically
+PARAMETERS 12     
+4     ! 1 Nb. of left-axis variables
+2     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+10     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+100  ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 6    
+Pcoll_kW  PColl_kWm2  IT_Coll_kWm2  MfrColl
+TCollOut TCollIn
+Pcoll_kW  PColl_kWm2  IT_Coll_kWm2  MfrColl
+TCollOut TCollIn
+LABELS  3     
+Power_and_Mfr 
+Temperatures   
+Collector

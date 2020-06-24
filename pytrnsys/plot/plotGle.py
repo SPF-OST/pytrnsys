@@ -265,7 +265,7 @@ class PlotGle():
 
         line = "xtitle \"$T$ [$^oC$]\" \n" ; lines = lines +line 
     
-        line = "xaxis min -10 max 100.0 dticks 20.0\n" ; lines = lines +line
+        # line = "xaxis min -10 max 100.0 dticks 20.0\n" ; lines = lines +line
         line = "!yaxis min 0 max 35.0 dticks 5.0\n" ; lines = lines +line
         line = "ylabels on\n" ; lines = lines +line
         line = "yticks color grey20\n" ; lines = lines +line

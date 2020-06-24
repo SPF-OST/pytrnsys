@@ -14,7 +14,7 @@ CONSTANTS 11
  
 Eta0= 0.857     ! Eta0 (a0) of collector (zero heat loss efficiency)
 a1 = 4.16*3.6    ! linear heat loss coefficient of collector [kJ/hm^2K] ![W/m2K]*3.6
-a2 = 0.089*3.6   ! quadratic heat loss coefficient of collector [kJ/hm^2K^2] ![W/m2K2]*3.6
+a2 = 0.0089*3.6   ! quadratic heat loss coefficient of collector [kJ/hm^2K^2] ![W/m2K2]*3.6
 
 AbsorberArea = 2.435 !m2
 TotArea = 2.768 !m2

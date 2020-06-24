@@ -205,12 +205,17 @@ class CreateTrnsysDeck():
 
                         # If I write variation = ["","useCovered",0,1] then no value is printed
                         elif (len(self.variations[nvar][0]) > 0):
-                            if float(valuesOfVariationInFile).is_integer():
-                                variationsLine = variationsLine + "-%s%i" % (
-                                    self.variations[nvar][0], int(valuesOfVariationInFile))
-                            else:
-                                variationsLine = variationsLine + "-%s%.4f" % (
-                                self.variations[nvar][0], float(valuesOfVariationInFile))
+                            try:
+                                if float(valuesOfVariationInFile).is_integer():
+                                    variationsLine = variationsLine + "-%s%i" % (
+                                        self.variations[nvar][0], int(valuesOfVariationInFile))
+                                else:
+                                    variationsLine = variationsLine + "-%s%.4f" % (
+                                        self.variations[nvar][0], float(valuesOfVariationInFile))
+                            except:
+                                variationsLine = variationsLine + "-%s%s" % (
+                                    self.variations[nvar][0], valuesOfVariationInFile)
+
 
                 nameDeck = "%s%s" % (self.case, variationsLine)
 

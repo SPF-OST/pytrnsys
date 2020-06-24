@@ -1,12 +1,9 @@
 from pytrnsys.psim import processParallelTrnsys as pParallelTrnsys
 
+pathBase = os.getcwd()
 
-if __name__ == '__main__':
-
-    pathBase = os.getcwd()
-
-    tool = pParallelTrnsys.ProcessParallelTrnsys()
-    tool.readConfig(pathBase,"process.config")
-    tool.process()
+tool = pParallelTrnsys.ProcessParallelTrnsys()
+tool.readConfig(pathBase,"process_pv_battery.config")
+tool.process()
 
 
