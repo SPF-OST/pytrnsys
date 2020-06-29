@@ -170,7 +170,7 @@ EQUATIONS 8     ! Collector ON-Signal and mass flow
 MfrCPri = pumpColOn*MfrPD       !MfrCPri = MfrPD*pumpColOn; !old = MfrCPri = MfrPD*(BoCnoOn+ ProHt12+ProHt2)+MfrCPriNom*ProDfWs
 MfrCTot = MfrCPriNom*pumpColOn  !old = MfrCTot = MfrCPriNom*(BoCnoOn+ProDfWs+ ProHt12+ProHt2)
 MfrPDNew=[157,1]     
-relaxMfrPD = 1     
+relaxMfrPD = 0    
 MfrPD=MfrPDNew*relaxMFrPD + (1-relaxMFrPD)*MfrPDRc     
 SetpPD=[157,2]     
 DevPD=[157,3]     
