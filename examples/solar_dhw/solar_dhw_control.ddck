@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : Jeremias Schmidli   
 ** Creation date  : 28.04.2020 
-** Last changes   : 28.04.2020, MB 
+** Last changes   : 22.06.2020, JS, change tSetAux to 50 and TdhwSet to 45 
 *****************************************
 
 ***************************************************************************
@@ -21,11 +21,11 @@
 
 EQUATIONS 6
 myTCollOut = TCollOut          !@dependencyDdck
-mySenTesSolarTop = Tsen4_Tes1 !@dependencyDdck
+mySenTesSolarTop = Tsen9_Tes1 !@dependencyDdck
 mySenTesSolarBot = Tsen1_Tes1 !@dependencyDdck
 mySenTesAux = Tsen8_Tes1 !@dependencyDdck
-tSetAux = 55
-TdhwSet = 55
+tSetAux = 50
+TdhwSet = 45
 
 ***********************************
 ** Begin TYPE AUXILIAR CONTROLLER
@@ -56,7 +56,7 @@ auxOn = [27,1]
 ***********************************
 
 CONSTANTS 2
-dtColOn = 10    ! Upper dead band coll. pump ON
+dtColOn = 7    ! Upper dead band coll. pump ON, JS: was 10 before, yield is higher with 7, to be improved
 dtColOff = 3    ! Lower dead band coll. pump OFF
 
 
@@ -73,7 +73,7 @@ dtColOn        ! Upper dead band dT
 dtColOff       ! Lower dead band dT
 0.0 20.0 0.0 0 dtColOn dtColOff      
 EQUATIONS 1  
-puColOn = [28,1]
+puColOn = [28,1]*LT(myTcollOut,120)
 
 
 EQUATIONS 3

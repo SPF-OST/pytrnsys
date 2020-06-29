@@ -44,7 +44,7 @@ TDhwSupply = Tcw !TcwAvg   Standard cold water temperature (�C)   TcwAvg  from
 CONSTANTS 1
 unitReadDhw=15
 
-ASSIGN PATH$\demands\dhw\profiles\T44A38_DHW_load_year_V2.txt unitReadDhw      ! water draw profile
+ASSIGN PATH$\demands\dhw\profiles\T44A38_DHW_load_year_V3.txt unitReadDhw      ! water draw profile JS: Changed from V2 to V3, V3 has always the same temperature
 ** ASSIGN PATH$\DemandsDHW\Profiles\DhwForMFH6appartments_2min_tset45.dat unitReadDhw     ! water draw profile
 
 CONSTANTS 2

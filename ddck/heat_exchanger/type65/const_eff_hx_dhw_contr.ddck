@@ -116,7 +116,7 @@ QHXDHW_kW = HTR_HXDHWHX/3600
 
 UNIT 502 TYPE 65     ! Online Plotter HX
 PARAMETERS 12     
-4     ! 1 Nb. of left-axis variables
+5     ! 1 Nb. of left-axis variables
 5     ! 2 Nb. of right-axis variables
 0     ! 3 Left axis minimum
 6000     ! 4 Left axis maximum
@@ -128,9 +128,9 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 -1     ! 10 Logical unit for output file
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
-INPUTS 9    
-MfrSourceDHWHXIn	MfrLoadDHWHXIn HTR_HXDHWHX MfrSrcDHWHXUsed  TSourceDHWHXIn TLoadDHWHXIn TsourceDHWHXOut TsourceDHWHXOutT TLoadDHWHXOut 
-MfrSourceDHWHXIn	MfrLoadDHWHXIn HTR_HXDHWHX MfrSrcDHWHXUsed  TSourceDHWHXIn TLoadDHWHXIn TsourceDHWHXOut TsourceDHWHXOutT TLoadDHWHXOut 
+INPUTS 10    
+MfrSourceDHWHXIn MfrPuCirc MfrLoadDHWHXIn HTR_HXDHWHX MfrSrcDHWHXUsed  TSourceDHWHXIn TLoadDHWHXIn TsourceDHWHXOut TsourceDHWHXOutT TLoadDHWHXOut 
+MfrSourceDHWHXIn MfrPuCirc MfrLoadDHWHXIn HTR_HXDHWHX MfrSrcDHWHXUsed  TSourceDHWHXIn TLoadDHWHXIn TsourceDHWHXOut TsourceDHWHXOutT TLoadDHWHXOut 
 LABELS  3     
 MassFlows
 Temperatures     
