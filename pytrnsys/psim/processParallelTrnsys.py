@@ -552,14 +552,26 @@ class ProcessParallelTrnsys():
                     line="%s\t"%key;lines=lines+line
                 line = "\n";lines = lines + line
 
-            for X,Y in zip(myX,myY):
+            # for X,Y in zip(myX,myY):
+            #     for chunk, style in zip(plotXDict.keys(), styles):
+            #
+            #         for key in plotXDict[chunk].keys(): #the varables that appear in the legend
+            #             index = num.argsort(plotXDict[chunk][key])
+            #             myX = num.array(plotXDict[chunk][key])[index]
+            #             myY = num.array(plotYDict[chunk][key])[index]
+            #             line = "%8.4f\t%8.4f\t" % (X, Y); lines = lines + line
+
+            # for X, Y in zip(myX, myY):
+            for i in range(mySize):
                 for chunk, style in zip(plotXDict.keys(), styles):
 
-                    for key in plotXDict[chunk].keys(): #the varables that appear in the legend
+                    for key in plotXDict[chunk].keys():  # the varables that appear in the legend
                         index = num.argsort(plotXDict[chunk][key])
                         myX = num.array(plotXDict[chunk][key])[index]
                         myY = num.array(plotYDict[chunk][key])[index]
-                        line = "%8.4f\t%8.4f\t" % (X, Y); lines = lines + line
+                        line = "%8.4f\t%8.4f\t" % (myX[i],myY[i]);
+                        lines = lines + line
+
                 line = "\n"; lines = lines + line
 
             # box = ax1.get_position()

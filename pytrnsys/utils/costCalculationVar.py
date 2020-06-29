@@ -157,8 +157,6 @@ class CostCalculationVar(mycost.CostCalculation):
         self.lifeTimeResVal = lifeTimeRes
 
 
-
-
     def calculate(self):
                       
          #results

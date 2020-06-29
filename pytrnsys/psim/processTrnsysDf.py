@@ -364,7 +364,9 @@ class ProcessTrnsysDf():
 
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
-            self.SPFShpWeighted = num.zeros(12)
+            self.SPFShpWeighted = num.zeros(13)
+
+            self.SPFShpWeighted[12] = self.yearSpfShpDis
 
             for i in range(len(self.qDemand)):
                 self.SPFShpWeighted[i]=self.SpfShpDis[i]*self.qDemand[i]/sum(self.qDemand)
