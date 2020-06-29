@@ -19,7 +19,7 @@
 
 EQUATIONS 4
 TSourceDHWHXIn = TPiHxDhwIn
-MfrSourceDHWHXIn = ABS(MfrPuDHW)
+MfrSourceDHWHXIn = ABS(MfrPiHxDhwIn)
 TLoadDHWHXIn = TPiHxDhwSecIn
 MfrLoadDHWHXIn = ABS(MfrPiHxDhwSecIn)
 
@@ -37,8 +37,8 @@ TDhwSetPoint = Tdhwset
 ***********************************
 
 EQUATIONS 2
-TsourceDHWHXOut = TSourceDHWHXIn-HTR_HXDHWHX/(MfrSrcDHWHXUsed*cpWat+0.0000000001)
-TLoadDHWHXOut = [500,7]		!Load side outlet temperature	C
+TsourceDHWHXOut = TsourceDHWHXOutT !TSourceDHWHXIn-HTR_HXDHWHX/(MfrSourceDHWHXIn*cpWat+0.0000000000000000001)
+TLoadDHWHXOut = [501,7]		!Load side outlet temperature	C
 
 
 ***********************************
@@ -74,6 +74,22 @@ TDhwSetPoint		! [unconnected] Cold-Side Set Temperature
 *** INITIAL INPUT VALUES
 20.0 0.0 10.0 0.0 14.0 0 
 
+UNIT 501 TYPE 652
+PARAMETERS 4
+HX_efficiencyDHWHX		! 1 Effectiveness of Heat Exchanger
+cpwat		! 2 Specific Heat of Hot-Side Fluid
+cpwat		! 3 Specific Heat of Cold-Side Fluid
+1000		! 4 Number of Possible Steps
+INPUTS 6
+TSourceDHWHXIn		! [unconnected] Hot-Side Inlet Temperature
+MfrSourceDHWHXIn		! [unconnected] Hot-Side Flowrate
+TLoadDHWHXIn		! [unconnected] Cold-Side Inlet Temperature
+MfrLoadDHWHXIn		! [unconnected] Cold-Side Flowrate
+TDhwSetPoint		! [unconnected] Cold-Side Set Temperature
+0,0		! [unconnected] Modulation Control
+*** INITIAL INPUT VALUES
+20.0 0.0 10.0 0.0 14.0 0 
+
 
 ***********************************
 ** Begin TYPE Recall
@@ -81,23 +97,24 @@ TDhwSetPoint		! [unconnected] Cold-Side Set Temperature
 
 UNIT 18 TYPE 993 
 PARAMETERS 1     
-1   ! 1: number of variables to be remembered    
-INPUTS 1     
-TSourceDHWHXIn
-0.0 
-EQUATIONS 1    ! outputs of Input Value Recall
+2   ! 1: number of variables to be remembered    
+INPUTS 2     
+TSourceDHWHXIn MfrSrcDHWHXUsed
+0.0 0.0 
+EQUATIONS 2    ! outputs of Input Value Recall
 TSourceDHWHXInR = [18,1]      
+MfrSrcDHWHXURc = MfrSrcDHWHXUsed
 
 EQUATIONS 6
-TsourceDHWHXOutT = [500,5]	!Source-side outlet temperature	C
-MfrSourceDHWHX = [500,6]		!Source side flow rate	kg/hr
-MrfLoadDHWHX = [500,8]		!Load side flow rate	kg/hr
-HTR_HXDHWHX = [500,10]		!Heat transfer rate	kJ/hr
+TsourceDHWHXOutT = [501,5]	!Source-side outlet temperature	C
+MfrSourceDHWHX = [501,6]		!Source side flow rate	kg/hr
+MrfLoadDHWHX = [501,8]		!Load side flow rate	kg/hr
+HTR_HXDHWHX = [501,10]		!Heat transfer rate	kJ/hr
 fractionOfBypass = [500,9]		!Overall heat transfer coefficient	kJ/hr.K
 QHXDHW_kW = HTR_HXDHWHX/3600
 
 
-UNIT 501 TYPE 65     ! Online Plotter HX
+UNIT 502 TYPE 65     ! Online Plotter HX
 PARAMETERS 12     
 4     ! 1 Nb. of left-axis variables
 5     ! 2 Nb. of right-axis variables

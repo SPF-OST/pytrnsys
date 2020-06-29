@@ -51,8 +51,8 @@ TSetSh  = [2,7]
 
 CONSTANTS 12
 tavgTamb = 96  ! time for averaging of outdoor temperature for the evaluation of heating season or no heating season, h
-offsetDhw = 6  ! Usually we had it at 7.5 . This means the heat pump would need to reach TdhwSet+7.5 !!
-onsetDhw  = 2 !
+offsetDhw = 0  ! Usually we had it at 7.5 . This means the heat pump would need to reach TdhwSet+7.5 !!
+onsetDhw  = 0 !
 TwwStAuxOFF = tDhwSet+offsetDhw  ! Stop heating DHW if TStoreUp > TWWStAuxOFF
 TwwStAuxON  = tDhwSet+onsetDhw   ! Start heating DHW if TStoreDhwBot < TwwStAuxON
 dt_rh_on = 0     ! start heating the store if the sh-store temp is below the flow temperature of the heating season + this value, K
@@ -120,8 +120,8 @@ MoScTww     ! 25 MoScTww:
 MoScTrh     ! 26 MoScTrh: 
 INPUTS 14     
 Tamb24      ! 1: Tamb ->TambHS is used for determination of heating season
-TTesDhwAuxOff    ! 2: TwwStUp: upper Store temperature measurement for Warm water
-TTesDhwAuxOn    ! 3: TwwStLo: lower store temperature measurement for Warm water
+TTesDhwAuxOn    ! 2: TwwStUp: upper Store temperature measurement for Warm water
+TTesDhwAuxOff    ! 3: TwwStLo: lower store temperature measurement for Warm water
 TwwStAuxON  ! 4: TwwON: temperature of store (upper) below which auxiliary is on for WW-Mode
 TwwStauxOff ! 5: TwwOFF: temperature of store (lower) above which auxiliary is off for WW-Mode
 TsensorTesSh    ! 6: TrhStUp:upper temperature measured for room heating (on)
@@ -148,6 +148,31 @@ Tamb     ! T_ambient
 21     
 EQUATIONS 1     
 Tamb24 = [4,1]      ! 24h average of Tamb, �C
+
+UNIT 89 TYPE 65     ! Online Plotter Control (Element Hp)
+PARAMETERS 12     
+10    ! 1 Nb. of left-axis variables
+10    ! 2 Nb. of right-axis variables
+-10   ! 3 Left axis minimum
+70    ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+2   ! 6 Right axis maximum
+nPlotsPerSim ! 7 Number of plots per simulation
+12    ! 8 X-axis gridpoints
+-1     ! 9 Shut off Online w/o removing
+-1    ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 20     
+TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn Nix Nix  Nix Nix
+HpForDHWIsNeeded HpForSHIsNeeded BoHs Nix Nix Nix  Nix Nix Nix Nix
+**
+TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn Nix Nix  Nix Nix
+HpForDHWIsNeeded HpForSHIsNeeded BoHs Nix Nix Nix  Nix Nix Nix Nix
+LABELS  3     
+Temperatures     
+Boolean     
+Control    
 
 *******************************
 **END Control-Cooling-888.ddck
