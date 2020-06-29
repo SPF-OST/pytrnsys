@@ -78,7 +78,7 @@ pytrnsys methodology
         - Our method of processing TRNSYS simulations is based on our method to build a TRNSYS deck, so to fully use all functionalities you will need to change your own deck to have a similar structure as the one we have. For example the results are always stored in a temp subfolder and to do the automatic energy balance you need to provide the data with specific namings convention. However, still many functionality can be theoretically done if you don't follow our method and style, but we never checked this, so you might find issues there.
 
 
-This package is not intendet to substitute your skilly in TRNSYS, but if you have them it will make your life easier and for those that don't known TRNSYS it will make the introduction also easier, or at least this is our hope.
+This package is not intendet to substitute your skills in TRNSYS, but if you have them it will make your life easier.  For those that don't known TRNSYS yet it will make the introduction easier, or at least this is our hope.
 
 Load the example projects and the TRNSYS files
 ----------------------------------------------
