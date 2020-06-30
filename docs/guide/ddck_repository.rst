@@ -5,7 +5,7 @@ Ddck repository
 
 Pytrnsys enhances system simulations by making use of component modularization. This is done by seperating the dck file
 part in which a single components of an energy system simulation is defined into ddck files. In a pytrnsys run, these
-ddck files will then be merged together in order to bild the full system ddck. Pytrnsys comes with a default repository
+ddck files will then be merged together in order to build the full system ddck. Pytrnsys comes with a default repository
 of ddck files that is installed alongside the main package.
 
 Repository content
@@ -110,13 +110,13 @@ they are easily accessible to be connected to the hydraulics file::
     ** outputs to hydraulic solver
     ***********************************
 
-    ** which outputs will be used to connect the hydraulic slver
+    ** which outputs will be used to connect the hydraulic solver
     ** typically tOutType will be defined here to be used in the hydraulic ddck
 
 Outputs to the energy balance
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 In the processing, pytrnsys automatically computes the systems heat and electricity energy balance.
-All variables that should be colected for the energy balance have to be specified in this section according to
+All variables that should be collected for the energy balance have to be specified in this section according to
 the right nomenclature::
 
     ******************************************************************************************
@@ -125,7 +125,7 @@ the right nomenclature::
     ******************************************************************************************
 
     ** Add here those variables that will go into the overall energy balance of the system
-    ** These values will be sued to automatically generate the energy balance
+    ** These values will be used to automatically generate the energy balance
 
 Dependencies with other ddck files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

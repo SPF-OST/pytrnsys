@@ -50,6 +50,36 @@ Once the simulations are finished the simulation results can be processed using 
 The most important files created by the processing are a results pdf-file in each subfolder
 of the parametric runs as well as comparison plots in the main folder.
 
+The phylosophy of pytrnsys
+--------------------------
+
+Pytrnsys provides a python framework for TRNSYS along with a working methodology. This means that the workflow of using TRNSYS with pytrnsys is different compared to using a standard methods such as Studio.
+The main purpose of pytrnsys is to facilitate the life of the user allowing to use most of the funcionality of the python package without having to know python in detail. For that we use config files with some scripting funcionality that is described along this documentation.
+The proposed methodology works at three different level:
+
+pytrnsys methodology
+    - Build a TRNSYS deck
+        - The idea is to use a modular approach stacking files with an extension *.ddck together to form a single dck TRNSYS file.
+        - The ddck files are structured in a way that can be reused/modified easily to adpat to new cases. These files should be uploaded to GIT repositories if sharing/reusing is foreseen.
+        - Our core idea to build a TRNSYS deck is to use a flow sovler and an hydraulic ddck file which is custom to each case. A TRNSYS flow solver is an own-developed TYPE that gives the mass flow of all pipes and elements given the mass flows of pumps and positon of 3-way controlled valves for each time step.
+        - This hydraulic file also includes all TYPEs for the hydraulic elements such as pipes and tee-pieces. Thus, when connecting to all elements such as solar collectors the mass flow and temperature of the pipe that enters the collector which has a specific format name can be used directly. That is, connection between elements is very easy and can be done in a fully automatic way.
+        - At SPF we have a TRNSYS Graphical User Interface (GUI) under development. One of the funcionalities of the GUI is to export the hydraulic set-up such that can be used directly with the flow solver. For examples the hydraulic files you will find in the examples are exported from our GUI. However, the GUI is not public available at the moment.
+        - Althought it is theroretically possible to use the TYPE flow solver without a GUI it is very tedious to do so. This means that wihout the GUI the flow solver might not help you.
+        - If you are interested in the TRNSYS GUI you can contact danil.carbonell@pf.ch. Currently this GUI is being shared with institutes in the framework of research projects. Until we can' offer this GUI in a more "professional" version, a collaboration within a project might be the easiest way to get access to it. We are not a software development company and we don't get the GUI developments paid at all, thus we need to improve it and extend it within research projects.
+        - If you don't have the GUI you can still work with the pyrtnsys without any problem. However, you will need to know/connect the inputs (mass flow and temperature) for each component like in normal TRNSYS. Our GUI and flow solver makes this almost fully automatic. This is the only limitation of the open source version. All the rest can be used 100%.
+    - Run a TRNSYS deck
+        - Once a TRNSYS deck has been generated with the method described above, by your own method or by Studio you can execute this deck with a lot on nice functionalities. For example you can easily run parametric studies in parallel and modifiy the deck file using a configuration file.
+    - Process a TRNSYS simulation
+        - One the simulations are done you can easily process all results including several results from parametric studies using a config file where the main processing calculations can be done.
+        - Some automatic processing is always done. For example the energy demand and the energy balance of the systmem is calculated automatically provided a proper syntaxis is used in the TRNSYS deck.
+        - The custom-made processing can be easily added. To fully use our processing functionality you need a working latex environment.
+        - The processing functionality includes monthly and hourly calculations, file with results and different types of automatic plots.
+        - Basically all functionality we see it's of use in general we add it into the config file. Other more project specific processing we do at python level. You will see how to do this at the developer's guide section.
+        - Our method of processing TRNSYS simulations is based on our method to build a TRNSYS deck, so to fully use all functionalities you will need to change your own deck to have a similar structure as the one we have. For example the results are always stored in a temp subfolder and to do the automatic energy balance you need to provide the data with specific namings convention. However, still many functionality can be theoretically done if you don't follow our method and style, but we never checked this, so you might find issues there.
+
+
+This package is not intendet to substitute your skills in TRNSYS, but if you have them it will make your life easier.  For those that don't known TRNSYS yet it will make the introduction easier, or at least this is our hope.
+
 Load the example projects and the TRNSYS files
 ----------------------------------------------
 .. _trnsys-load:
@@ -101,10 +131,8 @@ Or directly read through all the options of the configuration files and play aro
 
 About
 -----
-This code was not initially developed with the intention to be shared with others,
-but after realizing that it could help the community to have a better workflow with TRNSYS
-we decided to share it. Currently this code is in testing phase under the European project
-TRI-HP with Grant Agreement No. 81488.
+This code was not initially developed with the intention to be shared with others outside our institute SPF,
+but after realizing that it could help the community to have a better workflow with TRNSYS, we decided to share it.
 
 Developers
 ^^^^^^^^^^
@@ -116,13 +144,13 @@ Developers
 
 
 
-Aknowledgements
+Acknowledgments
 ^^^^^^^^^^^^^^^
 
 A first version of this package was first created in 2013 and since then it has evolved considerably.
 We would like to thank the Swiss Federal Office Of Energy (SFOE)
-who supported many projects related to simulations of renewable energy systems where this code has been developed. We would also like to thank the European Union’s Horizon 2020 research and innovation programme
-We also would like to tank the EU Commission for the funding received in TRI-HP under the Grant Agreement No.  81488.
-This project allowed to decicate efforts in sharing the code with the consortium and to make the code usable for the others.
+who supported many projects related to simulations of renewable energy systems where this code has been developed.
+We would also like to thank the European Union’s Horizon 2020 research and innovation programme for the funding received in TRI-HP under the Grant Agreement No.  81488.
+This project allowed to dedicate efforts in sharing the code with the consortium and to make the code usable for the others.
    
 

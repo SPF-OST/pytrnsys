@@ -37,7 +37,7 @@ class ResultsProcessedFile():
         fileName = []
         pathFolder = self.path
 
-        self.fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
+        self.fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name) and name[0]!="."] #to avoid looking at hiden folders
 
         for name in self.fileName:
             for i in range(len(self.filteredfolder)):

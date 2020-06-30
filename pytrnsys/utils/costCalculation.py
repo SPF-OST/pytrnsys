@@ -54,7 +54,7 @@ class CostCalculation():
         self.rate = rate
         self.analysPeriod = analysPeriod
         self.costElecFix = costElecFix
-        self.costElecKwh = costEleckWh
+        self.costEleckWh = costEleckWh
        
 #        self.lifeTime = lifeTime
         self.increaseElecCost = increaseElecCost
@@ -150,7 +150,7 @@ class CostCalculation():
         line = "\\hline \\\\ \n" ; lines = lines + line
 #        lines = ""
         line = "Electricity & Fix costs: %2.0f  $Fr.$ $per$ $year$ \\\\ \n" % (self.costElecFix);lines = lines + line        
-        line = " & Variable costs:  %2.2f $Fr.$ $per$ $kWh$ \\\\ \n" % (self.costElecKwh);lines = lines + line     
+        line = " & Variable costs:  %2.2f $Fr.$ $per$ $kWh$ \\\\ \n" % (self.costEleckWh);lines = lines + line
         line = "Increase of electricity costs & %2.1f %s $per$ $year$ \\\\ \n" % (self.increaseElecCost*100.,perc);lines = lines + line
         line = "Electricity costs year 1 & %2.0f Fr. in year 1 \\\\ \n" % (self.costElecTotalY);lines = lines + line
 
