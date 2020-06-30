@@ -159,7 +159,7 @@ TProPID     ! 1: process variable
 TCollSet    ! 2: setpoint
 Nix     ! 3: freeze manipulated variable (1) or let act (0)
 Nix     ! 4: Manual (1) or automatic (0) manipulated variable
-MfrPD     ! 5: manual manipulated variable
+MfrPDNew     ! 5: manual manipulated variable
 *** INITIAL INPUT VALUES     
 0.0   0.0   0.0   0.0    0.0     
 *** OUTUPUTS     
@@ -167,7 +167,7 @@ MfrPD     ! 5: manual manipulated variable
       
 EQUATIONS 8     ! Collector ON-Signal and mass flow
 **DfOrHt = GT(ProDfWs+ProDfAux+ProHt12+ProHt2+DfColOn,0.5)          
-MfrCPri = pumpColOn*MfrPD       !MfrCPri = MfrPD*pumpColOn; !old = MfrCPri = MfrPD*(BoCnoOn+ ProHt12+ProHt2)+MfrCPriNom*ProDfWs
+MfrCPri = pumpColOn*MfrPDRc       !MfrCPri = MfrPD*pumpColOn; !old = MfrCPri = MfrPD*(BoCnoOn+ ProHt12+ProHt2)+MfrCPriNom*ProDfWs
 MfrCTot = MfrCPriNom*pumpColOn  !old = MfrCTot = MfrCPriNom*(BoCnoOn+ProDfWs+ ProHt12+ProHt2)
 MfrPDNew=[157,1]     
 relaxMfrPD = 0    
@@ -179,19 +179,20 @@ TProPID= TCollOut ! TpiColOutInUsed
      
 UNIT 71 TYPE 993     ! Input value recall (element RcC)
 PARAMETERS 1     
-5     ! 1: number of variables to be remembered
+6     ! 1: number of variables to be remembered
 **     
-INPUTS 5
-TCollOut   BoCst  MfrPD   TCollIn    parRatio !QImbPri_kW_Int
-20     0.0   1.0     20   0 
+INPUTS 6
+TCollOut   BoCst  MfrPDNew   TCollIn    parRatio MfrColl !QImbPri_kW_Int
+20     0.0   1.0     20   0 0
          
-EQUATIONS 5               ! Recalled values for collector control
+EQUATIONS 6               ! Recalled values for collector control
 TCollOutRc = [71,1]     ! recalled value of collector outlet temperature, °C
 BoCstRc = [71,2]     ! recalled Boolean for collector stagnation, 1/0
 MfrPDRc = [71,3]     
 TCollInRc = [71,4]     ! recalled value of collector outlet temperature, °C
 **QImbPri_kW_IntRc = [71,5]
-parRatioRc = [71,5]     
+parRatioRc = [71,5]    
+MfrCollRc = [71,6] 
 
 CONSTANTS 3     
 MoFrost = 1     ! 0 = no condensation gains

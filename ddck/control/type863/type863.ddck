@@ -121,7 +121,7 @@ waitingTimeForceWs
 isTempUsedToSwitch 
 itForceWs_UpDeadBand  
 INPUTS 5
-MfrColl
+MfrCollRc
 tCollInRc   ! DC
 tcollOutRc  ! DC 
 TCollectorOn
@@ -285,17 +285,18 @@ timeDfWs
 
 UNIT 903 TYPE 993     ! Input value recall (element RcB)
 PARAMETERS 1     
-5   ! 1: number of variables to be remembered    
-INPUTS 5     
+6   ! 1: number of variables to be remembered    
+INPUTS 6     
 **  1      2      3      4      5      6      7      8      9      10      
-TPCM2 TPiHPEvapOut vIceRatio TsensorTesSh TPiHpEvapIn      
-0.0  0.0 1 0 0  0    
-EQUATIONS 5    ! outputs of Input Value Recall
+TPCM2 TPiHPEvapOut vIceRatio TsensorTesSh TPiHpEvapIn   tCollExpected   
+0.0  0.0 1 0 0  0    0
+EQUATIONS 6    ! outputs of Input Value Recall
 TPCM2Rc = [903,1]     !
 TPiHPEvapOutRc = [903,2]     !
 vIceRatioRc = [903,3]     !this
 TsensorTesShRc = [903,4]     
 TPiHpEvapInRc = [903,5]     !this
+tCollExpectedRc = [903,5]
 
 UNIT 126 TYPE 993     ! Input value recall (element RcB)
 PARAMETERS 1     

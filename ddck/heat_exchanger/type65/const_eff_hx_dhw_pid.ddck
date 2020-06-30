@@ -1,0 +1,127 @@
+*******************************
+**BEGIN Const_eff_HX.ddck
+*******************************
+    
+*****************************************
+** Contact person : Mattia Battaglia
+** Creation date  : 12.19   
+** Last changes   : 04.2020 MB
+*****************************************
+
+***********************************
+** HX with constant efficiency used for cooling loop
+** source corresponds to building, load to Ice Storage loop.
+***********************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS 4
+TSourceDHWHXIn = TPiHxDhwIn
+MfrSourceDHWHXIn = ABS(MfrPiHxDhwIn)
+TLoadDHWHXIn = TPiHxDhwSecIn
+MfrLoadDHWHXIn = ABS(MfrPiHxDhwSecIn)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+EQUATIONS 2
+TsourceDHWHXOut = [500,1] 	!Source-side outlet temperature	C
+TLoadDHWHXOut = [500,3] 		!Load side outlet temperature	C
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+EQUATIONS 1
+TDhwSetPoint = Tdhwset
+*******************************************************
+** PID controller for mass flow in space heating loop *
+*******************************************************
+
+CONSTANTS 4    
+MaxMfrSrcDHWHX = 7000
+MinMfrSrcDHWHx = 70
+pGaindhw = 1     
+iGaindhw = 0.05  
+
+UNIT 41 TYPE 23
+PARAMETERS 2
+1		! 1 mode
+200		! 2 Maximum number of oscillations
+INPUTS 13
+TDhwSetPoint		! [unconnected] Setpoint
+TLoadDHWHXOut		! [unconnected] Controlled variable
+0,0		! [unconnected] On / Off signal
+0,0		! [unconnected] Minimum control signal
+0,0		! [unconnected] Maximum control signal
+0,0		! [unconnected] Threshold for non-zero output
+0,0		! [unconnected] Gain constant
+0,0		! [unconnected] Integral time
+0,0		! [unconnected] Derivative time
+0,0		! [unconnected] Tracking time for anti-windup
+0,0		! [unconnected] Fraction of ySet for proportional effect
+0,0		! [unconnected] Fraction of ySet for derivative effect
+0,0		! [unconnected] High-frequency limit on derivative
+*** INITIAL INPUT VALUES
+0 0 1 0 MaxMfrSrcDHWHX 0 pGaindhw 0.05 0 -1 1 1 10 
+     
+EQUATIONS 1    
+MfrSrcDHWHXUsed = [41,1]
+
+
+CONSTANTS 1
+HX_efficiencydhw = 1
+
+UNIT 500 TYPE 91 		! Heat Exchanger with Constant Effectiveness
+PARAMETERS 3
+HX_efficiencydhw			!1: HX Efficiency [-]
+CPBRI					!2: Specific heat of source side fluid [kJ/kgK]
+CPWAT     				 !3: Specific heat of load side fluid [kJ/kgK]
+INPUTS 4
+TSourceDHWHXIn				!Source side inlet temperature	C
+MfrSourceDHWHXIn				!Source side flow rate	kg/hr
+TLoadDHWHXIn					!Load side inlet temperature	C
+MfrLoadDHWHXIn				!Load side flow rate	kg/hr
+TSourceDHWHXIn MfrSourceDHWHXIn TLoadDHWHXIn MfrLoadDHWHXIn
+
+EQUATIONS 3
+MfrSourceDHWHX = [500,2]		!Source side flow rate	kg/hr
+MrfLoadDHWHX = [500,4]		!Load side flow rate	kg/hr
+HTR_HXDHWHX = [500,5]		!Heat transfer rate	kJ/hr
+! OHTC_HX = [500,6]		!Overall heat transfer coefficient	kJ/hr.K
+
+UNIT 501 TYPE 65     ! Online Plotter HX
+PARAMETERS 12     
+3     ! 1 Nb. of left-axis variables
+4     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+6000     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+60     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 7    
+MfrSourceDHWHXIn	MfrLoadDHWHXIn HTR_HXDHWHX TSourceDHWHXIn TLoadDHWHXIn TsourceDHWHXOut TLoadDHWHXOut 
+MfrSourceDHWHXIn	MfrLoadDHWHXIn HTR_HXDHWHX TSourceDHWHXIn TLoadDHWHXIn TsourceDHWHXOut TLoadDHWHXOut 
+LABELS  3     
+MassFlows
+Temperatures     
+HXDhw
+
+
+
+*******************************
+**END Const_eff_HX.ddck
+*******************************
