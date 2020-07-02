@@ -67,10 +67,10 @@ example folders such that tha changes will not be tracked by GIT.
 
 Create your own processing class
 --------------------------------
-Pytrnsys provides a large number of possibilites to process and plot results
+Pytrnsys provides a large number of possibilities to process and plot results
 with the processing configuration file. But sometimes this is not enough!
 If you would like to add your own Python code to the processing you can create
-you own processing class that inherits from the class pytrnsys.psim.processTrnsysDf.
+your own processing class that inherits from the class pytrnsys.psim.processTrnsysDf.
 
 .. code-block:: python
 
@@ -89,7 +89,7 @@ you own processing class that inherits from the class pytrnsys.psim.processTrnsy
         def customCalculations()
             self.myCalculation
 
-This class can then be saved in you preferred location. In order to use the custom processing
+This class can then be saved in your preferred location. In order to use the custom processing
 class the pytrnsys.rsim.runParallelTrnsys class has to be modified such that it instantiates
 the new class. This can be done by replacing the run script in the following way.
 
@@ -114,13 +114,13 @@ the new class. This can be done by replacing the run script in the following way
         tool.readConfig(pathConfig,configFile)
         tool.process()
 
-General guidlines for developers
+General guidelines for developers
 --------------------------------
 Pytrnsys is open source and developers are invited to submit their own contributions.
 If you would like to develop for pytrnsys, we are interested in who you are. We are happy
 about a short message by mail. Please discuss new ideas first in the issue board. You are
 invited to work on the issues and create a pull request when finished. When working on the code,
-please consider the following style guidlines:
+please consider the following style guidelines:
 
 - we use the UpperCamelCase convention for Class names and the lowerCamelCase convention for everything else
 

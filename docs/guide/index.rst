@@ -147,10 +147,8 @@ Developers
 Acknowledgments
 ^^^^^^^^^^^^^^^
 
-A first version of this package was first created in 2013 and since then it has evolved considerably.
-We would like to thank the Swiss Federal Office Of Energy (SFOE)
-who supported many projects related to simulations of renewable energy systems where this code has been developed.
-We would also like to thank the European Union’s Horizon 2020 research and innovation programme for the funding received in TRI-HP under the Grant Agreement No.  81488.
-This project allowed to dedicate efforts in sharing the code with the consortium and to make the code usable for the others.
-   
-
+A first version of this package was created in 2013 and since then it has evolved considerably.
+We would like to thank the Swiss Federal Office Of Energy (SFOE) who supported many projects related to simulations of
+renewable energy systems where this code has been developed. We would also like to thank the European Union’s Horizon
+2020 research and innovation programme for the funding received in TRI-HP under the Grant Agreement No. 81488. This
+project allowed to dedicate efforts in sharing the code with the consortium and to make the code usable for the others.
