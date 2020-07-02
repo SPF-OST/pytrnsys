@@ -50,7 +50,7 @@ Once the simulations are finished the simulation results can be processed using 
 The most important files created by the processing are a results pdf-file in each subfolder
 of the parametric runs as well as comparison plots in the main folder.
 
-The phylosophy of pytrnsys
+The philosophy of pytrnsys
 --------------------------
 
 Pytrnsys provides a python framework for TRNSYS along with a working methodology. This means that the workflow of using TRNSYS with pytrnsys is different compared to using a standard methods such as Studio.

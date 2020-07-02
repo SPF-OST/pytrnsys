@@ -6,8 +6,23 @@ Developer's guide
 Get the source code from github
 -------------------------------
 
-Pytrnsys is available as open source code under the MIT license. You can fork the source
-code at (toBeFilledInWhenPublic) or by the following command::
+Pytrnsys is available as open source code under the MIT license. If you want to run
+pytrnsys from source, it is recommended to use a designated virtual environment. Make sure that in your python environment
+the following dependencies are installed:
+
+- numpy
+- scipy
+- pandas
+- matplotlib
+- seaborn
+
+If you would like to contribute to pytrnsys and the documentation, you also need the following python packages:
+
+- sphinx
+- recommonmark
+- sphinx_rtd_theme
+
+You can fork the source code at (toBeFilledInWhenPublic) or by the following command::
 
     git clone (toBeFilledInWhenPublic)
 
@@ -31,6 +46,7 @@ You can run pytrnsys with the following minimal code example
     configFile = "run_solar_dhw.config"
     runTool = runTrnsys.RunParallelTrnsys(pathConfig,configFile=configFile)
 
+The "pathToTHeConfigFile" should be replaced with the full path to the folder examples/solar_dhw in your local repository.
 This script replaces the **pytrnsys-run** command and starts a pytrnsys run with the given
 configuration file. Similarly the processing can be started with the following minimal example
 
@@ -43,6 +59,10 @@ configuration file. Similarly the processing can be started with the following m
     tool = pParallelTrnsys.ProcessParallelTrnsys()
     tool.readConfig(pathConfig,configFile)
     tool.process()
+
+
+If you would like to continue to modify the config file as described in the :ref:`tutorial <tutorial>`, make a local copy of the
+example folders such that tha changes will not be tracked by GIT.
 
 Create your own processing class
 --------------------------------
