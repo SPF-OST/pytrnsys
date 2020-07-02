@@ -15,6 +15,7 @@ the following dependencies are installed:
 - pandas
 - matplotlib
 - seaborn
+- bokeh
 
 If you would like to contribute to pytrnsys and the documentation, you also need the following python packages:
 
@@ -115,7 +116,7 @@ the new class. This can be done by replacing the run script in the following way
 
 General guidlines for developers
 --------------------------------
-Pytrnsys is open source and developers are invited to submit thier own contributions.
+Pytrnsys is open source and developers are invited to submit their own contributions.
 If you would like to develop for pytrnsys, we are interested in who you are. We are happy
 about a short message by mail. Please discuss new ideas first in the issue board. You are
 invited to work on the issues and create a pull request when finished. When working on the code,
