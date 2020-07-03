@@ -174,9 +174,9 @@ class ExecuteTrnsys():
 
         try:
             shutil.copy(fileSource,fileEnd)      
-            print ("\ncopy file %s to %s\n" % (name,fileEnd))
+            logger.debug("copy file %s to %s" % (name,fileEnd))
         except:
-            print ("\nFAIL to copy the file %s to %s\n" % (name,fileEnd))
+            logger.warning("FAIL to copy the file %s to %s" % (name,fileEnd))
         
     def copyFolderFrom(self,sourcePath,name):
         
@@ -185,9 +185,9 @@ class ExecuteTrnsys():
                 
         try:
             shutil.copytree(folderSource,folderEnd)      
-            print ("copy folder %s to %s" % (name,folderEnd))
+            logger.debug("copy folder %s to %s" % (name,folderEnd))
         except:
-            print ("FAIL to copy the folder %s from %s to %s" % (name,folderSource,folderEnd))
+            logger.warning("FAIL to copy the folder %s from %s to %s" % (name,folderSource,folderEnd))
 
 
             

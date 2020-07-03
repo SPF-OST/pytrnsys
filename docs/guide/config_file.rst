@@ -124,6 +124,9 @@ Generic
 ``reduceCpu`` (int, default 0)
     Number of CPUs that are not used in the parallel simulation runs.
 
+``outputLevel`` (string, default "INFO")
+    Output message level according to the logging package. (Options are "DEBUG", "INFO", "WARNING", "ERROR", and
+    "CRITICAL".)
 
 Automatic Work Bool
 ^^^^^^^^^^^^^^^^^^^

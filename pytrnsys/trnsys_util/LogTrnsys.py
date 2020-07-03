@@ -6,6 +6,8 @@ import string,shutil
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.utils.utilsSpf as utils
 import numpy as num
+import logging
+logger = logging.getLogger('root')
 
 class LogTrnsys():
 
@@ -39,7 +41,7 @@ class LogTrnsys():
         
     def loadLog(self):        
 
-        print ("nameLog:%s" % self.nameLog)
+        logger.debug("nameLog:%s" % self.nameLog)
 
         try:
             infile=open(self.nameLog,'r')
@@ -88,14 +90,14 @@ class LogTrnsys():
                 try:    
                   
                    self.numberOfFailedIt = split[1].replace("%","\%")               
-                   print (self.numberOfFailedIt)
+                   logger.debug(self.numberOfFailedIt)
 
                 except:
                     pass
                                 
         except:
             self.numberOfFailedIt = -99
-            print ("LOG FILE NOT FOUND")
+            logger.warning("LOG FILE NOT FOUND")
             
         return None
 
@@ -136,7 +138,7 @@ class LogTrnsys():
                     pass
                                 
         except:
-            print ("LOG FILE NOT FOUND")
+            logger.warning("LOG FILE NOT FOUND")
 
         return iteMonth
 
@@ -155,7 +157,7 @@ class LogTrnsys():
 
         nameItProblem = self.path + nameFile
 
-        print ("It problems printed in %s"%nameItProblem)
+        logger.warning("It problems printed in %s"%nameItProblem)
 
         infile=open(nameItProblem,'w')
         lines=infile.writelines(lines)

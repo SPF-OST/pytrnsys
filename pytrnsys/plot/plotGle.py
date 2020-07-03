@@ -163,7 +163,7 @@ class PlotGle():
         if(len(legends) != (sizeIn+sizeOut)):
             lines = "!This case will not work because size of legend:%d is different from sizeIn:%d + sizeOut%d\n"%(len(legends),sizeIn,sizeOut)
             lines = lines+"!The last values on the negative side that correspond to some from the positive will not be printed automatically.\n !The rest should be correct\n"
-            print  (lines)
+            logger.debug(lines)
             
         lines = lines+self.getFigCaption()
         lines = lines+self.getCaptionGraph()
@@ -302,7 +302,7 @@ class PlotGle():
             cmd = "%s -vb 0 -d pdf %s\%s" % (gleExe,self.path,fileName)
         else:
             cmd = "%s -vb 0 -d pdf %s\%s" % ('gle.exe',self.path,fileName)
-        print (cmd)
+        logger.debug(cmd)
         
         os.system(cmd)   
 
@@ -349,10 +349,10 @@ class PlotGle():
                     myName = splitEquality[0].replace(" ","")
                     value  = splitEquality[1].replace(" ","")                 
                         
-                    print ("myName:%s value:%s"%(myName,value))
+                    logger.debug("myName:%s value:%s"%(myName,value))
                     
                     for key in parametersDict.iterkeys(): 
-                        print ("key:%s- myName:%s-"%(key,myName))
+                        logger.debug("key:%s- myName:%s-"%(key,myName))
                         
                         if(key==myName):  
                                                                  
