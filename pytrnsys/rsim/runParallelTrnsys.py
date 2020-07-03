@@ -18,11 +18,11 @@ import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 import shutil
 import sys
 import imp
-import warnings
 import json
 from copy import deepcopy
 import sys
 import pkg_resources
+import pytrnsys.utils.log as log
 try:
     import pytrnsys_examples
 except ImportError:
@@ -62,6 +62,7 @@ class RunParallelTrnsys():
         self.path = os.getcwd()
         if configFile is not None:
             self.readConfig(self.pathConfig,configFile)
+            self.logger = log.setup_custom_logger('root',self.inputs['outputLevel'])
             if 'nameRef' in self.inputs:
                 self.nameBase = self.inputs['nameRef']
             else:
@@ -109,7 +110,7 @@ class RunParallelTrnsys():
         self.inputs["generateUnitTypesUsed"]=True
         self.inputs["runCases"] = True
         self.inputs["runType"] = "runFromConfig"
-
+        self.inputs["outputLevel"] = "INFO"
 
 
         self.overwriteForcedByUser = False
@@ -252,7 +253,7 @@ class RunParallelTrnsys():
 
         for i in range(len(fileName)):
 
-            print ("name to run :%s" % fileName[i])
+            self.logger.debug("name to run :%s" % fileName[i])
 
             #        if useLocationStructure:
             #            variablePath = os.path.join(path,location) #assign subfolder for path
@@ -472,8 +473,7 @@ class RunParallelTrnsys():
                 found=True
 
         if(found==False):
-            # print Warning("change File was not able to change %s by %s"%(source,end))
-            warnings.warn("change File was not able to change %s by %s"%(source,end))
+            self.logger.warning("change File was not able to change %s by %s"%(source,end))
 
     def changeDDckFile(self,source,end):
         """
@@ -494,8 +494,7 @@ class RunParallelTrnsys():
                 found=True
 
         if(found==False):
-            # print Warning("change File was not able to change %s by %s"%(source,end))
-            warnings.warn("change File was not able to change %s by %s"%(source,end))
+            self.logger.warning("change File was not able to change %s by %s"%(source,end))
 
     def getConfig(self):
         """

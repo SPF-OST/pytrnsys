@@ -4,6 +4,8 @@
 import sys, os, time
 import subprocess
 from subprocess import Popen #, list2cmdline
+import logging
+logger = logging.getLogger('root')
 
 #from __future__ import print_function 
 
@@ -150,17 +152,17 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
         return p.poll() is not None
     
     def success(p):
-        print ("SUCCESS :%s"%p.poll())
+        logger.info("SUCCESS :%s"%p.poll())
         
         return p.returncode == 0
     def fail():
-        print ("PARALLEL RUN HAS FAILED")
+        logger.warning("PARALLEL RUN HAS FAILED")
         sys.exit(1)
 
     processes = []
     
     if(len(processes)>maxNumberOfCPU):
-        print ("WARNING : runParallel. You are triying tu run %d processes and only have %d CPU\n" % (len(processes),maxNumberOfCPU))
+        logger.warning("You are triying tu run %d processes and only have %d CPU\n" % (len(processes),maxNumberOfCPU))
         
 #    while True:
         

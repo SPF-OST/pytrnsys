@@ -10,6 +10,8 @@ import string,shutil
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
 import pytrnsys.trnsys_util.deckUtils as deckUtils
+import logging
+logger = logging.getLogger('root')
 
 class ExecuteTrnsys():
     """
@@ -156,14 +158,14 @@ class ExecuteTrnsys():
         fileSource = os.path.join(self.path,name)
         fileEnd    = os.path.join(self.pathOutput,name)
 
-        print ('Path %s'%self.path)
-        print ('PathOutput %s'%self.pathOutput)
+        logger.debug('Path %s'%self.path)
+        logger.debug('PathOutput %s'%self.pathOutput)
 
         try:
             shutil.move(fileSource,fileEnd)      
-            print ("\nmove file %s to %s\n" % (name,fileEnd))
+            logger.debug("move file %s to %s" % (name,fileEnd))
         except:
-            print ("\nFAIL to move the file %s to %s" % (name,fileEnd))
+            logger.warning("FAIL to move the file %s to %s" % (name,fileEnd))
 
     def copyFileFromSource(self,name):
         
@@ -212,7 +214,7 @@ class ExecuteTrnsys():
         
 #        myCmd ='"%s"'%cmd #for blank spaces in paths
         
-        print ("getExecuteTrnsys cmd:%s"%cmd)
+        logger.debug("getExecuteTrnsys cmd:%s"%cmd)
         
 #        os.system(myCmd)         
         
@@ -234,12 +236,12 @@ class ExecuteTrnsys():
     def cleanAndCreateResultsTempFolder(self):
       
        try:
-           print ("removing temp : %s " % self.tempFolderEnd)
+           logger.debug("removing temp : %s " % self.tempFolderEnd)
            shutil.rmtree(self.tempFolderEnd)
            os.makedirs(self.tempFolderEnd)
            
        except:
-           print ("creating temp : %s " % self.tempFolderEnd)
+           logger.debug("creating temp : %s " % self.tempFolderEnd)
            os.makedirs(self.tempFolderEnd)
            pass
 

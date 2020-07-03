@@ -1,5 +1,5 @@
 import pytrnsys.rsim.runParallelTrnsys as runTrnsys
 
-pathConfig  = "pathToTheConfigFile"
-configFile = "DualRun.config"
+pathConfig  = "solar_dhw"
+configFile = "run_solar_dhw.config"
 runTool = runTrnsys.RunParallelTrnsys(pathConfig,configFile=configFile)

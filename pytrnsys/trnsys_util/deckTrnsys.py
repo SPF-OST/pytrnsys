@@ -10,7 +10,8 @@ import os
 import string,shutil
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 import re
-import numpy as num
+import logging
+logger = logging.getLogger('root')
 
 class DeckTrnsys():
     """
@@ -39,7 +40,7 @@ class DeckTrnsys():
         except:
             self.myCommonTrnsysFolder=None
                  
-            print ("Warning. TRNSYS_DATA_FOLDER not defined as a enviromental variable.")
+            logger.debug("TRNSYS_DATA_FOLDER not defined as an enviromental variable.")
 
         self.packageNameTrnsysFiles="None"
 
@@ -98,10 +99,10 @@ class DeckTrnsys():
             else:
                 nameDck = self.nameDck
 
-            print ("DECK TRNSYS::LOAD DECK nameDeck:%s" % (self.nameDck))
+            logger.debug("DECK TRNSYS::LOAD DECK nameDeck:%s" % (self.nameDck))
 
         else:
-            print ("DECK TRNSYS::LOAD DECK nameDeck:%s USEDECKNAME:%s" % (self.nameDck,useDeckName))
+            logger.debug("DECK TRNSYS::LOAD DECK nameDeck:%s USEDECKNAME:%s" % (self.nameDck,useDeckName))
 
             # self.nameDck = useDeckName
             # self.nameDckPathOutput = useDeckName
@@ -138,7 +139,7 @@ class DeckTrnsys():
                         if splitPath[j] in inputsDict.keys():
                             name = os.path.join(*splitPath[j+1:]) #* sot joining the vector, j+1 becasue we dont need spfTrnsysFiles,already in the path my commonTrnsysFolder
                             if inputsDict:
-                                print("Warning: Using " + str(splitPath[
+                                logger.warning("Using " + str(splitPath[
                                                                   j]) + "specified in the config file (deprecated). Root of the ddck library should be indicated as PATH$")
 
                                 if len(splitBlank)>2:
@@ -146,7 +147,7 @@ class DeckTrnsys():
                                 else:
                                     lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(inputsDict[splitPath[j]], name))
                             else:
-                                print("Warning: Common Trnsys Folder from config file not used. Use TRNSYS_DATA_FOLDER enviroment variable instead (deprecated)")
+                                logger.warning("Common Trnsys Folder from config file not used. Use TRNSYS_DATA_FOLDER enviroment variable instead (deprecated)")
                                 if len(splitBlank)>2:
                                     lineChanged = "ASSIGN \"%s\" %s \n" % (os.path.join(inputsDict[splitPath[j]], name), splitBlank[2])
                                 else:
@@ -285,7 +286,7 @@ class DeckTrnsys():
 
 #         print "linesDeck"
 #         print self.linesDeck
-         print ("Change Parameters deckTrnsys Class")
+         logger.debug("Change Parameters deckTrnsys Class")
 #         print _parameters
          
          if(_parameters != None):
@@ -402,7 +403,7 @@ class DeckTrnsys():
                          if(key.lower()==myName.lower()): #avoid case sensitive
 #                                                     
                              myNewLine = "%s=%s ! value changed from original by executeTrnsys.py\n" % (key,self.parameters[key])
-                             print ("NEW LINE %s" % myNewLine)
+                             logger.debug("NEW LINE %s" % myNewLine)
 #                             
                              lines[i] = myNewLine
                                                                             
@@ -412,10 +413,10 @@ class DeckTrnsys():
                 
                 
                              
-             print ('OUPUT AT %s' % self.nameDck)
-                 
-             outfile=open(self.nameDck,'w') 
-            
+             logger.info('variation deck file at %s' % self.nameDck)
+
+             outfile=open(self.nameDck,'w')
+
              outfile.writelines(lines)
              outfile.close() 
 

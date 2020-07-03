@@ -4,8 +4,8 @@ Date   : 14.12.2012
 """
 
 
-import string
-
+import logging
+logger = logging.getLogger('root')
 
 # skypChar  = ['*','!'] Eliminated the lines with those characters 
 # To not use it we can say [] or None
@@ -68,19 +68,6 @@ def purgueLines(lines,skypChar,replaceChar,skypedLines=0,removeBlankLines=False,
                         fline = fline.replace(r,"")
                 flines.append(fline)
 
-
-#    if(removeBlankLines):
-#
-#        for n in range(len(flines)): 
-#            
-#            print flines[n]
-#            flines[n].replace(" ","")
-#            print "after replace"
-#            print flines[n]   
-                
-
-
-#    print " end of Purgue Lines"
     return flines    
     
 def purgueComments(lines,commentsChar):
@@ -131,8 +118,8 @@ def purgueComments(lines,commentsChar):
                 flines.append(fline)
 
 
-    
-        print ("end of Purgue Lines")
+
+        logger.debug("end of Purgue Lines")
 
         return flines
         

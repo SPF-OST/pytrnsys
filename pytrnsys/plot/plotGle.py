@@ -11,6 +11,8 @@ ToDo :
 import os
 import numpy as num
 import pytrnsys.report.latexReport as latex
+import logging
+logger = logging.getLogger('root')
 
 class PlotGle():  
         
@@ -355,7 +357,7 @@ class PlotGle():
                         if(key==myName):  
                                                                  
                             myNewLine = "%s=%s ! value changed from original by plotGle.py\n" % (key,parametersDict[key])
-                            print ("NEW LINE %s" % myNewLine)
+                            logger.debug("NEW LINE %s" % myNewLine)
                                        
                             lines[i] = myNewLine        
                 except:
