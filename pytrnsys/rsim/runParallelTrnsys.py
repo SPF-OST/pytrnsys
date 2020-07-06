@@ -634,7 +634,7 @@ class RunParallelTrnsys():
         # dstPath = os.path.join(self.inputs["pathRef"],self.inputs["addResultsFolder"],configName)
         dstPath = os.path.join(configPath,self.inputs["addResultsFolder"],configName)
         shutil.copyfile(configFile, dstPath)
-        print("copied config file to: %s"% dstPath)
+        self.logger.debug("copied config file to: %s"% dstPath)
 
 
     def scaleVariables(self,reference,source,sink):

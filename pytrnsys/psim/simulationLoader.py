@@ -143,8 +143,6 @@ class SimulationLoader():
                 dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.monData = {**self.monData, **dict}
 
-                print (self.monData.keys())
-
         elif (fileType == _ResultsFileType.HOURLY and self._hourlyUsed==True):
             file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26).rename(columns=lambda x: x.strip())
             file.set_index('Period', inplace=True, drop=False)
