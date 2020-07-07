@@ -16,6 +16,8 @@ import shutil
 import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import pytrnsys.psim.resultsProcessedFile as results
+import logging
+logger = logging.getLogger('root')
 
 class checkSimulationDataClass(results.ResultsProcessedFile):
 
@@ -54,7 +56,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
                             k += 1
                 if k != 1:
                     failedCases.append(case + "\n")
-                    print(case + " failed, number of Fatal errors = " +str(k-1))
+                    logger.warning(case + " failed, number of Fatal errors = " +str(k-1))
 
 
                 else:
@@ -90,7 +92,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
             dst = dstFolder
             shutil.move(src, dst)
 
-            print("moved failed cases from " + self.path + " to " + dstFolder)
+            logger.debug("moved failed cases from " + self.path + " to " + dstFolder)
 
 
     def checkNumberOfMonthsSimulated(self):

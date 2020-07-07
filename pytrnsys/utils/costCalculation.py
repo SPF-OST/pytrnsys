@@ -15,6 +15,8 @@ import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import matplotlib
 import matplotlib as mpl
+import logging
+logger = logging.getLogger('root')
 
 class CostCalculation():
     
@@ -43,14 +45,14 @@ class CostCalculation():
         self.outputPath = path
         self.fileName   = fileName
 
-        print("path:%s name:%s" %(self.outputPath,self.fileName))
+        logger.debug("path:%s name:%s" %(self.outputPath,self.fileName))
         self.doc = latex.LatexReport(self.outputPath,self.fileName)               
 
 
     def setGeneralInputs(self,rate,analysPeriod,costElecFix,costEleckWh,increaseElecCost,lifeTime):
         
         
-        print("===================SET GENERAL INPUTS========================")
+        logger.info("===================SET GENERAL INPUTS========================")
         self.rate = rate
         self.analysPeriod = analysPeriod
         self.costElecFix = costElecFix
@@ -59,7 +61,7 @@ class CostCalculation():
 #        self.lifeTime = lifeTime
         self.increaseElecCost = increaseElecCost
        
-        print("rate:%f analysisPeriod:%f"%(self.rate,self.analysPeriod))
+        logger.debug("rate:%f analysisPeriod:%f"%(self.rate,self.analysPeriod))
         
     def setSystemInputs(self,qDemand,elDemand,totalInvestCost,MaintenanceRate,costResidual,lifeTimeRes):
     
@@ -101,7 +103,7 @@ class CostCalculation():
         self.npvElec = self.costElecTotalY*self.npvFacElec
         self.npvMaintenance = self.MaintenanceRate*self.totalInvestCost*self.npvFac
 
-        print(self.costElecTotalY,self.npvElec,self.npvMaintenance)
+        logger.debug(self.costElecTotalY,self.npvElec,self.npvMaintenance)
 #        raise ValueError("")
 
         self.discountFromEnd = (1+self.rate)**(-1.*self.analysPeriod)        
@@ -112,13 +114,13 @@ class CostCalculation():
                  
         self.npvSystem = self.totalInvestCost+self.npvElec+self.npvMaintenance-self.npvResVal
         
-        print("npvSystem:%f totalInvestCost :%f npvElec :%f npvMaintenance:%f npvResVal:%f"%(self.npvSystem,self.totalInvestCost,self.npvElec,self.npvMaintenance,self.npvResVal))
+        logger.debug("npvSystem:%f totalInvestCost :%f npvElec :%f npvMaintenance:%f npvResVal:%f"%(self.npvSystem,self.totalInvestCost,self.npvElec,self.npvMaintenance,self.npvResVal))
 
         self.annuityFac = self.getAnnuity(self.rate,self.analysPeriod)
         
         self.annuity = self.annuityFac*self.npvSystem  # Fr.
         
-        print("annuity:%f annuityFac:%f npvSystem:%f"%(self.annuity,self.annuityFac,self.npvSystem))
+        logger.debug("annuity:%f annuityFac:%f npvSystem:%f"%(self.annuity,self.annuityFac,self.npvSystem))
 
 
         self.anToInvCost = self.annuityFac*self.totalInvestCost
@@ -126,13 +128,13 @@ class CostCalculation():
         self.anMaint = self.annuityFac*self.npvMaintenance
         self.anResVal = (-1.)*self.annuityFac*self.npvResVal
         
-        print(" TEST %f %f   "% (self.npvFacElec,self.annuityFac))
+        logger.debug(" TEST %f %f   "% (self.npvFacElec,self.annuityFac))
         
         self.heatGenCost = self.annuity/self.qDemand  # Fr./kWh    
         self.heatGenCostNpv = self.npvSystem/self.qDemand/self.analysPeriod        
 
-        print("NPV Factor:%f  AnnuityFac:%f  "% (self.npvFac,self.annuityFac))
-        print("Heat Generation Cost Annuity:%f NPV:%f"%(self.heatGenCost,self.heatGenCostNpv))
+        logger.info("NPV Factor:%f  AnnuityFac:%f  "% (self.npvFac,self.annuityFac))
+        logger.info("Heat Generation Cost Annuity:%f NPV:%f"%(self.heatGenCost,self.heatGenCostNpv))
         
     def addTableEconomicAssumptions(self):
         
@@ -259,7 +261,7 @@ class CostCalculation():
             nameJpg = '%s.jpg'%nameFile 
 
             nameJpgWithPath = '%s\%s' % (self.outputPath,nameJpg)
-            print("Plot printed as %s"%nameJpgWithPath)
+            logger.info("Plot printed as %s"%nameJpgWithPath)
             
             plt.savefig(nameJpgWithPath)
             
@@ -283,7 +285,7 @@ class CostCalculation():
             nameDat = '%s.dat'%nameFile 
             nameDatWithPath = '%s\%s' % (self.outputPath,nameDat)
 
-            print("PRINT FILE COST SHARE : %s"%nameDatWithPath)
+            logger.info("PRINT FILE COST SHARE : %s"%nameDatWithPath)
             outfile=open(nameDatWithPath,'w')
             outfile.writelines(lines)
             outfile.close()

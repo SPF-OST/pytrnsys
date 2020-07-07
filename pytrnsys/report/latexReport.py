@@ -14,6 +14,7 @@ from string import ascii_letters, digits, whitespace
 import shutil
 import codecs
 import json
+import subprocess
 import logging
 logger = logging.getLogger('root')
 
@@ -145,8 +146,14 @@ class LatexReport():
 
 #        print cmd
         myCmd ='"%s"'%cmd #for blank spaces in paths
-        os.system(myCmd)  
-        
+
+        subprocessOutput = subprocess.run(cmd, capture_output=True)
+        errorMessage = subprocessOutput.stderr.decode("utf-8")
+        outputMessage = subprocessOutput.stdout.decode("utf-8")
+        if errorMessage != '':
+            logger.warning(errorMessage)
+        logger.debug(outputMessage)
+
         if(runTwice): #necessary to generate table of contents
             os.system(myCmd)
 

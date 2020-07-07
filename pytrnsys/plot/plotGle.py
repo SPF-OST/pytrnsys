@@ -11,6 +11,7 @@ ToDo :
 import os
 import numpy as num
 import pytrnsys.report.latexReport as latex
+import subprocess
 import logging
 logger = logging.getLogger('root')
 
@@ -303,8 +304,13 @@ class PlotGle():
         else:
             cmd = "%s -vb 0 -d pdf %s\%s" % ('gle.exe',self.path,fileName)
         logger.debug(cmd)
-        
-        os.system(cmd)   
+
+        subprocessOutput = subprocess.run(cmd, shell=True, capture_output=True)
+        errorMessage = subprocessOutput.stderr.decode("utf-8")
+        outputMessage = subprocessOutput.stdout.decode("utf-8")
+        if errorMessage != '':
+            logger.warning(errorMessage)
+        logger.debug(outputMessage)
 
         namePdf = fileName.split(".")[0]+".pdf"
         

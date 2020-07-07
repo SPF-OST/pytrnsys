@@ -17,6 +17,8 @@ import string
 import pytrnsys.utils.utilsSpf as utils
 import math
 import os
+import logging
+logger = logging.getLogger('root')
 
 
 class PlotGround():
@@ -38,7 +40,7 @@ class PlotGround():
 
         nameWithPath = "%s\%s" % (self.outputPath, name)
 
-        print(nameWithPath)
+        logger.debug(nameWithPath)
 
         infile = open(nameWithPath, 'r')
 
@@ -112,7 +114,7 @@ class PlotGround():
 
         nameGroundWithPath = "%s\%s" % (self.outputPath, self.nameWithExtension)
 
-        print(nameGroundWithPath)
+        logger.debug(nameGroundWithPath)
 
         infile = open(nameGroundWithPath, 'r')
 

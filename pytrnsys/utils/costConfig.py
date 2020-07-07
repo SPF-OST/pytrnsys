@@ -13,6 +13,8 @@ import pytrnsys.psim.resultsProcessedFile as results
 import matplotlib.pyplot as plt
 import os
 import json
+import logging
+logger = logging.getLogger('root')
 
 class costConfig(costClass.CostCalculationVar):
 
@@ -159,7 +161,6 @@ class costConfig(costClass.CostCalculationVar):
             # batList.append(self.batkWh)
             self.resultsVecDict.append(caseDict)
             # else:
-            #     print("Results for :%s not valid. N Simulaiton months:%d"%(fileName,self.resClass.results[i].get("numberOfMonthSimulated")))
             resultJsonPath = os.path.join(outputPath,self.fileName + '-results.json')
             self.addCostToJson(resultJsonPath, self.resClass.results[i], caseDict)
         # self.batList = list(batList)
@@ -184,7 +185,7 @@ class costConfig(costClass.CostCalculationVar):
             fileName = "cost-batkWh%.0f" % bat
             myFileName = self.resClass.path + "\\%s.dat" % fileName
 
-            print("%s file created" % myFileName)
+            logger.debug("%s file created" % myFileName)
 
             outfile = open(myFileName, 'w')
             outfile.writelines(lines)
@@ -346,11 +347,11 @@ class costConfig(costClass.CostCalculationVar):
     @staticmethod
     def addCostToJson(jsonPath, resultsDict, costResultsDict):
 
-        print("updating results.json file")
+        logger.debug("updating results.json file")
 
         newResultsDict = {**resultsDict, **costResultsDict}
 
         with open(jsonPath, 'w') as fp:
             json.dump(newResultsDict, fp, indent = 2, separators=(',', ': '),sort_keys=True)
 
-        print("results.json file was updated with cost data")
+        logger.info("results.json file was updated with cost data")

@@ -167,5 +167,3 @@ class PlotBokeh():
         
         # p = gridplot([[s1],[s2],[s3],[s4]])
         # show(p)
-        
-        # print(df)

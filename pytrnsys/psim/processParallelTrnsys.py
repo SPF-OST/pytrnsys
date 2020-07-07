@@ -45,7 +45,6 @@ def processDataGeneralDeprecated(casesInputs):
     (baseClass,locationPath, fileName, avoidUser, maxMinAvoided, yearReadedInMonthlyFile, cleanModeLatex, firstMonthUsed,\
       processQvsT,firstMonthUsed,buildingArea,dllTrnsysPath,setPrintDataForGle,firstConsideredTime) = casesInputs
 
-    print("starting processing of: %s"% fileName)
     #    locationPath = inputs.pop(0)
     #    fileName,avoidUser,maxMinAvoided,yearReadedInMonthlyFile,cleanModeLatex,firstMonthUsed,processQvsT
 
@@ -83,7 +82,6 @@ def processDataGeneralDeprecated(casesInputs):
             newEnding = "-Year%i" % yearReadedInMonthlyFile + ending
             try:
                 os.rename(renameFile + ending, renameFile + newEnding)
-                print("renamed %s"%newEnding)
             except:
                 warnings.warn(
                     "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
@@ -110,7 +108,6 @@ def processDataGeneral(casesInputs):
 
     (baseClass,locationPath, fileName, inputs) = casesInputs
 
-    print("starting processing of: %s"% fileName)
     #    locationPath = inputs.pop(0)
     #    fileName,avoidUser,maxMinAvoided,yearReadedInMonthlyFile,cleanModeLatex,firstMonthUsed,processQvsT
 
