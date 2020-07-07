@@ -62,7 +62,7 @@ class RunParallelTrnsys():
         self.path = os.getcwd()
         if configFile is not None:
             self.readConfig(self.pathConfig,configFile)
-            self.logger = log.setup_custom_logger('root',self.inputs['outputLevel'])
+
             if 'nameRef' in self.inputs:
                 self.nameBase = self.inputs['nameRef']
             else:
@@ -436,9 +436,10 @@ class RunParallelTrnsys():
         tool = readConfig.ReadConfigTrnsys()
 
         self.lines = tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated,controlDataType=False)
+        self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
         if 'pathBaseSimulations' in self.inputs:
             self.path = self.inputs['pathBaseSimulations']
-        if(self.inputs["addResultsFolder"]=="None"):
+        if(self.inputs["addResultsFolder"]==False):
             pass
         else:
             self.path = os.path.join(self.path, self.inputs["addResultsFolder"])
