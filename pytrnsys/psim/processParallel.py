@@ -158,8 +158,9 @@ def processParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=1):
     
     def success(p):
         logger.info("SUCCESS :%s"%p.poll())
-        
+
         return p.returncode == 0
+
     def fail():
         logger.warning("PARALLEL RUN HAS FAILED")
         sys.exit(1)

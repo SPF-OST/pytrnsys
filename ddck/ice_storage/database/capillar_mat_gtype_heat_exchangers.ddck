@@ -1,0 +1,64 @@
+*************************************************
+**BEGIN flat_plate_heat_exchanger.ddck
+*************************************************
+    
+*****************************************
+** Contact person : D. Carbonell   
+** Creation date  : 05.10.2018   
+** Last changes   : 30.04.20, MB 
+*****************************************
+
+***********************************
+** Hx related variables. Flat plate heat exchanger
+***********************************
+EQUATIONS 4
+nUsedPipes   =  INT(Tankwidth/xBetweenPipes) ! 48 (before 96 but was wrong) S-type, 64 G-type
+nRealHx      =  INT(Lstore/yBetweenHx/uTubeTrue)
+uTubeTrue    =  1
+xBetweenPipes = 0.03
+
+
+
+CONSTANTS 17
+nUsedHxPerHx = 1
+hxGeometry = 1 ! coils    
+numberOfCvHx=10
+yBetweenHx = 0.10 ! 10 cm between tubes or hx
+headerPipe = 0.247306174
+grossHxArea = Tankwidth*Tankheight
+myHxArea = grossHxArea-headerPipe 
+AHx   = Ahx1*NHx1
+Ahx1  = lHx*PI*dOutHx     
+NHx1 = nRealHx*nUsedPipes ! Number of parallel hx
+addedCap = 0         
+HxIceOut  = heightHx1/Tankheight     
+HXIceIn = 0.01    
+heightIceHX =  HxIceOut
+useCorrugated = 1
+orderHx1=1     
+iceThickToDeIce=100 ! No de-ice is possible
+
+**************parameters for hx **************
+CONSTANTS 8        
+heightHx1 = Tankheight ! 1.9           ! HX characteristic height [m]
+charThick= 9e-3   
+LHx1      = Tankwidth 
+dxWallHx = 6e-4     
+dOutHx= 4.25e-3   ! 25 Heat exchanger characteristic thickness                  [m]
+dInHx = 2.75e-3   ! 26 Heat exchanger wall thickness                            [m]
+lHx   =  Tankheight
+lambdaHx = 0.33 ! 0.23-2.5
+
+CONSTANTS 6
+x1Type861 = xBetweenPipes
+x2Type861 = yBetweenHx
+hxType861par3 = dInHx !height 
+hxType861par4 = dOutHx !width
+hxType861par5 = lHx      !length 
+hxType861par6 = addedCap
+     
+     
+     
+     
+
+     
