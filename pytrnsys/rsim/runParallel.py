@@ -6,6 +6,7 @@ import subprocess
 from subprocess import Popen #, list2cmdline
 import logging
 logger = logging.getLogger('root')
+import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
 
 #from __future__ import print_function 
 
@@ -152,9 +153,26 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
         return p.poll() is not None
     
     def success(p):
-        logger.info("SUCCESS :%s"%p.poll())
-        
+
+        fullDckFilePath = p.args.split(" ")[-2]
+        (logFilePath,dckFileName) = os.path.split(fullDckFilePath)
+        logFileName = os.path.splitext(dckFileName)[0]
+        logInstance = LogTrnsys.LogTrnsys(logFilePath,logFileName)
+
+        if logInstance.logFatalErrors():
+            logger.error("======================================")
+            logger.error("First fatal error message in log file:")
+            logger.error("======================================")
+            errorList = logInstance.logFatalErrors()
+            for line in errorList:
+                logger.error(line.replace("\n",""))
+        else:
+            logger.info("No fatal errors during simulation")
+            logger.warning("Number of warnings during simulation: %s" %logInstance.checkWarnings())
+            logger.info("Simulation of %s successful" %dckFileName)
+
         return p.returncode == 0
+
     def fail():
         logger.warning("PARALLEL RUN HAS FAILED")
         sys.exit(1)
@@ -192,6 +210,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
             # if process is finished, assign new command:
             
             if p:
+
                 if done(p):
                     
                     if success(p):
