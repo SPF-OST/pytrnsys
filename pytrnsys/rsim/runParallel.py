@@ -153,11 +153,12 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
         return p.poll() is not None
     
     def success(p):
+
         fullDckFilePath = p.args.split(" ")[-2]
         (logFilePath,dckFileName) = os.path.split(fullDckFilePath)
         logFileName = os.path.splitext(dckFileName)[0]
         logInstance = LogTrnsys.LogTrnsys(logFilePath,logFileName)
-        numberWarnings = logInstance.checkWarnings()
+
         if logInstance.logFatalErrors():
             logger.error("======================================")
             logger.error("First fatal error message in log file:")
@@ -167,7 +168,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                 logger.error(line.replace("\n",""))
         else:
             logger.info("No fatal errors during simulation")
-            logger.warning("Number of warnings during simulation: %s" %numberWarnings)
+            logger.warning("Number of warnings during simulation: %s" %logInstance.checkWarnings())
             logger.info("Simulation of %s successful" %dckFileName)
 
         return p.returncode == 0
