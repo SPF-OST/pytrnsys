@@ -32,5 +32,5 @@ setuptools.setup(
     pytrnsys-process = pytrnsys.psim.processParallelTrnsys:process
     pytrnsys-load = pytrnsys.utils.loadExamplesAndDdcks:load
     """,
-    python_requires='>=3.5',
+    python_requires='>=3.5'
 )
