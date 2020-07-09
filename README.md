@@ -32,12 +32,7 @@ This project allowed to decicate efforts in sharing the code with the consortium
     - in conda enviroment you can 
 - CoolProp package is nedded if physical properties of fluids need to be used, otherwise it's not mandatory
 - We recommend to install anaconda with default installation packages
-- Choose the python editor you like, such as PyCharm, Spyder or alike. This readme file is automatically processed by PyCharm
-in a html visual style   
-
-```
- https://www.anaconda.com/distribution/
-```
+- Choose the python editor you like, such as PyCharm, Spyder or alike. This readme file is automatically processed by PyCharm in a html visual style   
 
 ## Installation of LaTeX for reporting
 - For all processing cases, a pdf made with LaTeX will be generated.

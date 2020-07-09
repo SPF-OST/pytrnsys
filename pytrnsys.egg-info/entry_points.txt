@@ -1,0 +1,7 @@
+
+    [console_scripts]
+    pytrnsys-dll = pytrnsys.utils.copyDllFiles:dllCopy
+    pytrnsys-run = pytrnsys.rsim.runParallelTrnsys:run
+    pytrnsys-process = pytrnsys.psim.processParallelTrnsys:process
+    pytrnsys-load = pytrnsys.utils.loadExamplesAndDdcks:load
+    
