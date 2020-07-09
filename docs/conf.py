@@ -21,6 +21,10 @@ import recommonmark
 from recommonmark.transform import AutoStructify
 
 autodoc_mock_imports = ['numpy']
+autodoc_mock_imports = ['scipy']
+autodoc_mock_imports = ['pandas']
+autodoc_mock_imports = ['matplotlib']
+autodoc_mock_imports = ['seaborn']
 
 github_doc_root = 'https://github.com/rtfd/recommonmark/tree/master/doc/'
 def setup(app):
