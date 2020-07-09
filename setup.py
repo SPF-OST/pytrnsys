@@ -5,18 +5,10 @@ import os
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-examples_data_files = []
-directories = glob('pytrnsys-examples/**/', recursive=True)
-directories.extend(glob('ddck/**/', recursive=True))
-print(directories)
-for directory in directories:
-    files = glob(directory+'*.*')
-    examples_data_files.append((os.path.join('pytrnsys-files',os.path.dirname(directory)), files))
-
 setuptools.setup(
     name="pytrnsys", # Replace with your own username
     version="0.1",
-    author="Dani Carbonell, Mattia Battaglia, Jeremias Schmidli",
+    author="Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Martin Neugebauer",
     author_email="dani.carbonell@spf.ch",
     description="pytrnsys simulation framework",
     long_description=long_description,
@@ -34,6 +26,7 @@ setuptools.setup(
     ],
 	entry_points="""
     [console_scripts]
+    pytrnsys-dll = pytrnsys.utils.copyDllFiles:dllCopy
     pytrnsys-run = pytrnsys.rsim.runParallelTrnsys:run
     pytrnsys-process = pytrnsys.psim.processParallelTrnsys:process
     pytrnsys-load = pytrnsys.utils.loadExamplesAndDdcks:load

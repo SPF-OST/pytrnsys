@@ -666,11 +666,12 @@ class RunParallelTrnsys():
 
 def run():
    pathBase = ''
-   template = pkg_resources.resource_filename('pytrnsys_examples', 'solar_dhw/run_solar_dhw.config')
+
    if len(sys.argv)>1:
        pathBase,configFile = os.path.split(sys.argv[1])
    else:
-       pathBase,configFile = os.path.split(template)
+       configFileFullPath = pkg_resources.resource_filename('pytrnsys_examples', 'solar_dhw/run_solar_dhw.config')
+       pathBase,configFile = os.path.split(configFileFullPath)
    if ':' not in pathBase:
        pathBase = os.path.join(os.getcwd(),pathBase)
    RunParallelTrnsys(pathBase, configFile=configFile)

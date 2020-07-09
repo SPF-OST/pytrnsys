@@ -18,6 +18,13 @@ Up to now, only TRNSYS17 is fully supported in all the example projects. In orde
 - TRNSYS17 is installed.
 - A working LaTeX distribution. We recommend MiKTex due to its included package management system.
 
+TRNSYS17 should be installed under
+
+    C:/Trnsys17
+
+If the path to your TRNSYS17 installation is different from that you will need to manually copy dll-files (see below)
+and adjust the TRNSYS-path in the config-file.
+
 Additional optional prerequisites are:
 
 - Automated plotting is done by matplotlib. `GLE <http://glx.sourceforge.net/>`_  is needed to create Q-vs-T plots using the commands :ref:`plotHourlyQvsT <ref-plotHourlyQvsT>` or :ref:`plotTimestepQvsT <ref-plotTimestepQvsT>`
@@ -28,12 +35,25 @@ The pytrnsys package is available for python>3.5 through pip::
 
 	pip install pytrnsys
 
-Along the main pytrnsys-package two additional packages will be installed.
-The package pytrnsys-examples contains different example projects that can
-be used out of the box to investigate different parametrizations of the represented systems.
-Up to now, the example projects contain a solar thermal system for domestic hot water preparation and a pv battery system.
+Along the main pytrnsys-package two additional packages will be installed. The package pytrnsys_examples contains
+different example projects that can be used out of the box to investigate different parametrizations of the represented
+systems. Up to now, the example projects contain a solar thermal system for domestic hot water preparation and a pv
+battery system. The other package pytrnsys_ddck contains the ddck-repository.
 
-After the installation, you can test the setup by executing one of the example projects.
+Before you can run the example, you need to copy dll-files to your TRNSYS17-installation. This is done by executing
+
+    pytrnsys-dll
+
+If the path of your TRNSYS17-installation is different from the one specified above you need to manually copy all
+dll-files from
+
+    ptrnsys_ddck/dlls
+
+to
+
+    Trnsys17/UserLib/ReleaseDLLs
+
+You can now test the setup by executing one of the example projects.
 The default solar domestic hot water system can be run by executing::
 
 	pytrnsys-run
