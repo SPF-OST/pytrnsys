@@ -16,5 +16,7 @@ def dllCopy():
                 dllDestinationFile = os.path.join(dllDestinationDirectory, dllSourceDirectoryFile)
                 copy2(dllSourceFile, dllDestinationFile)
 
+        print("Copying of dll-files was successful.")
+
     else:
         raise ValueError("Cannot copy dll-files: %s does not exist." %dllDestinationDirectory)

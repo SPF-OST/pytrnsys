@@ -6,14 +6,16 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pytrnsys", # Replace with your own username
+    name = "pytrnsys",
+    packages = ["pytrnsys"]
     version="0.1",
     author="Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Martin Neugebauer",
     author_email="dani.carbonell@spf.ch",
     description="pytrnsys simulation framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/dcarbonellsanchez/pytrnsys",
+    download_url = "https://github.com/dcarbonellsanchez/pytrnsys/archive/0.1.tar.gz"
     packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={'pytrnsys_examples': ['./*.*','./**/*.*','./**/**/*.*'],

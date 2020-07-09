@@ -18,7 +18,7 @@ Up to now, only TRNSYS17 is fully supported in all the example projects. In orde
 - TRNSYS17 is installed.
 - A working LaTeX distribution. We recommend MiKTex due to its included package management system.
 
-TRNSYS17 should be installed under
+TRNSYS17 should be installed under::
 
     C:/Trnsys17
 
@@ -40,12 +40,12 @@ different example projects that can be used out of the box to investigate differ
 systems. Up to now, the example projects contain a solar thermal system for domestic hot water preparation and a pv
 battery system. The other package pytrnsys_ddck contains the ddck-repository.
 
-Before you can run the example, you need to copy dll-files to your TRNSYS17-installation. This is done by executing
+Before you can run the example, you need to copy dll-files to your TRNSYS17-installation. This is done by executing::
 
     pytrnsys-dll
 
 If the path of your TRNSYS17-installation is different from the one specified above you need to manually copy all
-dll-files from
+dll-files from::
 
     ptrnsys_ddck/dlls
 
