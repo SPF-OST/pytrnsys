@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name = "pytrnsys",
-    packages = ["pytrnsys"],
+    packages=setuptools.find_packages(),
     version="0.1",
     author="Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Martin Neugebauer",
     author_email="dani.carbonell@spf.ch",
@@ -16,7 +16,6 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/dcarbonellsanchez/pytrnsys",
     download_url = "https://github.com/dcarbonellsanchez/pytrnsys/archive/0.1.tar.gz",
-    packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={'pytrnsys_examples': ['./*.*','./**/*.*','./**/**/*.*'],
                   'pytrnsys_ddck': ['./*.*','./**/*.*','./**/**/*.*','./**/**/**/*.*','./**/**/**/**/*.*','./**/**/**/**/**/*.*'],
