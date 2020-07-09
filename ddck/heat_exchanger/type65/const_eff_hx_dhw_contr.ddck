@@ -41,6 +41,8 @@ TsourceDHWHXOut = TsourceDHWHXOutT !TSourceDHWHXIn-HTR_HXDHWHX/(MfrSourceDHWHXIn
 TLoadDHWHXOut = [501,7]		!Load side outlet temperature	C
 
 
+
+
 ***********************************
 ** outputs to other ddck
 ***********************************
@@ -54,8 +56,8 @@ MfrSrcDHWHXUsed = MAX(MaxMfrSrcDHWHX*(1-fractionOfBypass)-MinMfrSrcDHWHx,0)+MinM
 
 CONSTANTS 3
 HX_efficiencyDHWHX = 1
-MaxMfrSrcDHWHX = 700
-MinMfrSrcDHWHx = 70
+MaxMfrSrcDHWHX = 700*scaleDHW
+MinMfrSrcDHWHx = 70*scaleDHW
 
 
 UNIT 500 TYPE 652
@@ -124,7 +126,7 @@ PARAMETERS 12
 60     ! 6 Right axis maximum
 nPlotsPerSim     ! 7 Number of plots per simulation
 12     ! 8 X-axis gridpoints
-1     ! 9 Shut off Online w/o removing
+-1     ! 9 Shut off Online w/o removing
 -1     ! 10 Logical unit for output file
 0     ! 11 Output file units
 0     ! 12 Output file delimiter

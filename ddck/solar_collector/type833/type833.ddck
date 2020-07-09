@@ -296,7 +296,7 @@ PelPVT_kW = 0 !electricity from PVT when used
 
 **ELECTRICITY
 EQUATIONS 1
- PelPuC_kW = PelPuCPri_kW + PelPuCSec_kW     ! total collector loop pumping el. consumption (primary and secondary, kW
+ PelPuC_kW = PelPuCPri_kW !+ PelPuCSec_kW     ! total collector loop pumping el. consumption (primary and secondary, kW
 
 EQUATIONS 14     ! Electric pump power primary collector loop
 MfrCPriNom = MfrCPriSpec*AcollAp              ! nominal mass flow rate, kg/h
@@ -316,22 +316,21 @@ PelPuCTot_kW = (PflowCTot_W/1000)/etaPuCTot     ! required pump electric power, 
 
 
 ** Electric pump power secondary collector loop  
-EQUATIONS 7     
-MfrCsecNom = MfrCPriSpec*AcollAp                      ! nominal mass flow rate, kg/h
-dpCsecNom_bar = 0.1     ! pressure-drop of loop at nominal mass flow, bar
-frMfrCsec= MfrCsec/MfrCsecNom     ! Flow rate fraction of nominal flow rate
-dpCsec_bar = (frMfrCsec)^2*dpCsecNom_bar     ! pressure drop at actual mass flow rate, bar
-PflowCsec_W = ((MfrCsec/3600)/RhoBRI)*dpCsec_bar*100000     ! required power to drive the flow, W
-etaPuCsec = 0.12-0.00*(1-frMfrCsec)     ! pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
-PelPuCsec_kW = (PflowCsec_W/1000)/etaPuCsec     ! required pump electric power, kW
+** EQUATIONS 7     
+** MfrCsecNom = MfrCPriSpec*AcollAp                      ! nominal mass flow rate, kg/h
+** dpCsecNom_bar = 0.1     ! pressure-drop of loop at nominal mass flow, bar
+** frMfrCsec= MfrCsec/MfrCsecNom     ! Flow rate fraction of nominal flow rate
+** dpCsec_bar = (frMfrCsec)^2*dpCsecNom_bar     ! pressure drop at actual mass flow rate, bar
+** PflowCsec_W = ((MfrCsec/3600)/RhoBRI)*dpCsec_bar*100000     ! required power to drive the flow, W
+** etaPuCsec = 0.12-0.00*(1-frMfrCsec)     ! pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+** PelPuCsec_kW = (PflowCsec_W/1000)/etaPuCsec     ! required pump electric power, kW
     
   
-EQUATIONS 13   ! Converted values for outputs
+EQUATIONS 12   ! Converted values for outputs
 P_IRRAD_kW = IT_Coll_kW*AcollAp              ! solar radiation on total collector field [kW]
 **P_IRRAD_kW = P_IRRAD_COV_KW + P_IRRAD_UNC_KW     
 PColl_kW = (Pcoll)/3600  !kW CHECK THIS !!!!!!!   
 PColl_kWm2 = PColl_kW/(AcollAp+1e-30)   
-PColl_Wm2  = PColl_kWm2*1000   
 PCollCondens_kW = pCollCondens*AcollAp/1000     ! This is a part of PCollHeatGainUc!!
 PCollHeatGain_kW = specHeatGain*AcollAp/1000     ! It's almost the same like PCollUc_kW
 PRad_kW = pRadGain*AcollAp/1000     ! Not the same like P_Irrad_Unc_kW! This is with long wave radiation from the environment

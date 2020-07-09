@@ -39,7 +39,7 @@ IT_H = Max([30,12],0) ! total irradiation on the horizontal, kJ/hm2
 IB_H = Max([30,13],0) ! beam radiation on horizontal, kJ/hm2
 ID_H = [30,14]        ! sky diffuse radiation on horizontal, kJ/hm2
 AI_H = [30,16]        ! angle of incidence on the horizontal, °
-EQUATIONS 39
+EQUATIONS 27
 **surface-1
 IT_N = [30,18]     !NORTH 90° 
 AI_N = [30,22]     
@@ -74,23 +74,23 @@ IDS_surfUser_2 = [30,50]
 IDG_surfUser_2 = [30,51] 
 AI_surfUser_2 = [30,52]     
 **surface7
-IT_surfUser_3 = [30,54]     
-IB_surfUser_3 = [30,55]  
-ID_surfUser_3 = [30,56] +[30,57]  
-IDS_surfUser_3 = [30,56] 
-IDG_surfUser_3 = [30,57]  
-AI_surfUser_3 = [30,58]
-**surface7
-IT_surfUser_4 = [30,60]     
-IB_surfUser_4 = [30,61]  
-ID_surfUser_4 = [30,62] +[30,63]
-IDS_surfUser_4 = [30,62] 
-IDG_surfUser_4 = [30,63]     
-AI_surfUser_4 = [30,64]
+** IT_surfUser_3 = [30,54]     
+** IB_surfUser_3 = [30,55]  
+** ID_surfUser_3 = [30,56] +[30,57]  
+** IDS_surfUser_3 = [30,56] 
+** IDG_surfUser_3 = [30,57]  
+** AI_surfUser_3 = [30,58]
+** **surface7
+** IT_surfUser_4 = [30,60]     
+** IB_surfUser_4 = [30,61]  
+** ID_surfUser_4 = [30,62] +[30,63]
+** IDS_surfUser_4 = [30,62] 
+** IDG_surfUser_4 = [30,63]     
+** AI_surfUser_4 = [30,64]
 
-EQUATIONS 8
-IT_surfUser_4_Wm2 = IT_surfUser_4/3.6
-IT_surfUser_3_Wm2 = IT_surfUser_3/3.6
+EQUATIONS 6
+** IT_surfUser_4_Wm2 = IT_surfUser_4/3.6
+** IT_surfUser_3_Wm2 = IT_surfUser_3/3.6
 IT_surfUser_2_Wm2 = IT_surfUser_2/3.6
 IT_surfUser_1_Wm2 = IT_surfUser_1/3.6
 
