@@ -517,8 +517,12 @@ class ProcessParallelTrnsys():
             for chunk,style in zip(plotXDict.keys(),styles):
                 dummy_lines.append(ax1.plot([],[],style,c='black'))
                 if chunk is not None:
-                    chunkLabel = round(float(chunk), 2)
-                    chunkLabels.append("{:.2f}".format(chunkLabel))
+                    if not isinstance(chunk,str):
+                        chunkLabel = round(float(chunk), 2)
+                        chunkLabels.append("{:.2f}".format(chunkLabel))
+                    else:
+                        chunkLabels.append(chunk)
+
                 for key in plotXDict[chunk].keys():
                     index = num.argsort(plotXDict[chunk][key])
                     myX = num.array(plotXDict[chunk][key])[index]
@@ -576,7 +580,7 @@ class ProcessParallelTrnsys():
             #ax1.set_position([box.x0, box.y0, box.width, box.height])
 
             if chunkVariable is not '':
-                legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.4, 1.0), bbox_transform=ax1.transAxes)
+                legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0), bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None

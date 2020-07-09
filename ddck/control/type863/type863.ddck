@@ -69,7 +69,7 @@ BlockOff = 0
 BlockOn  = 1     
 TtesForcePriorWs = 10   
 TmaxSensibleTes = Tmax_Tes1   
-TmaxIceTes      = 30
+TmaxIceTes      = 50
 tempColAboveHpLimit = 3   
 nBeginCsPriority = 11 !DC-CLEAN check what it does internally, we should erase this 
 nEndCsPriority   = 2  
@@ -319,14 +319,14 @@ CoolingOnRc = [126,8]
 ** PROGRAMM COUNTERS **********
 *******************************
 
-EQUATIONS 7   !  Programm Start Counter 
-ProHpStarts = (GT(ProHp,0.5)*LT(ProHpRc,0.5))/dtSim     
-ProSeriesStarts = (GT(ProSeries,0.5)*LT(ProSeriesRc,0.5))/dtSim     
-ProWsStarts = (GT(ProWs,0.5)*LT(ProWsRc,0.5))/dtSim     
-ProCsStarts = (GT(ProCs,0.5)*LT(ProCsRc,0.5))/dtSim     
-ProParStarts = (GT(ProPar,0.5)*LT(ProParRc,0.5))/dtSim   
-ProDfColStarts = (GT(ProDfCol,0.5)*LT(ProDfColRc,0.5))/dtSim   
-ProDfWsStarts = (GT(ProDfWs,0.5)*LT(ProDfWsRc,0.5))/dtSim   
+** EQUATIONS 7   !  Programm Start Counter 
+** ProHpStarts = (GT(ProHp,0.5)*LT(ProHpRc,0.5))/dtSim     
+** ProSeriesStarts = (GT(ProSeries,0.5)*LT(ProSeriesRc,0.5))/dtSim     
+** ProWsStarts = (GT(ProWs,0.5)*LT(ProWsRc,0.5))/dtSim     
+** ProCsStarts = (GT(ProCs,0.5)*LT(ProCsRc,0.5))/dtSim     
+** ProParStarts = (GT(ProPar,0.5)*LT(ProParRc,0.5))/dtSim   
+** ProDfColStarts = (GT(ProDfCol,0.5)*LT(ProDfColRc,0.5))/dtSim   
+** ProDfWsStarts = (GT(ProDfWs,0.5)*LT(ProDfWsRc,0.5))/dtSim   
 
 *******************************
 ** Online plotters************

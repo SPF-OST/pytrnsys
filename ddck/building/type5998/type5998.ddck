@@ -290,10 +290,10 @@ unitPrinterBui ! 1: Logical unit number, -
 1              ! 5: Number of inputs to avoid integration, -
 1              ! 6: Output number to avoid integration
 INPUTS 8
-Time  PBuiSol_kW PBuiGains_KW  
+Time  PBuiSol_kW PBuiGains_KW PpenSH_kW  
 PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PAcumBui_kW dTsc
 ***************
-Time  PBuiSol_kW PBuiGains_KW  
+Time  PBuiSol_kW PBuiGains_KW PpenSH_kW 
 PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PAcumBui_kW dTsc
  
  
@@ -313,10 +313,10 @@ unitPrintHouVar   ! 1: Logical unit number, -
 1     ! 5: Number of inputs to avoid integration, -
 1 ! 6: Output number to avoid integration
 
-INPUTS 3
-Time Tamb  Troom  
+INPUTS 4
+Time Tamb Tamb24  Troom  
 ***
-Time Tamb  Troom 
+Time Tamb Tamb24  Troom 
 	
 *******************************
 **END Building.dck

@@ -45,15 +45,15 @@ CONSTANTS 12
 Cm = 814754369.89*scaleBuilding ! J/K Internal capacity of the building J/K, 165000*(floor surface), "moyen" / mittlere therm. Kapazität
 Am = 5446*scaleBuilding      ! m2 effective mass area, 2.5*(floor surface), "moyen" / mittlere therm. Kapazität
 UaWin = 61.9429*scaleBuilding    ! Thermal transmission coefficient of doors, windows, curtains walls and glazed walls W/K
-HveISO = Ua_vent ! ventilation heat loss coefficient 300 ; m3/day *day/s * kg/m3 * J/kg K = W/K
+HveISO = Ua_vent*scaleBuilding ! ventilation heat loss coefficient 300 ; m3/day *day/s * kg/m3 * J/kg K = W/K
 Htr_op = 532.2429*scaleBuilding ! W/K, UA value of walls 
-PGainPer = 1440	! Maximale Wärmeeintrag durch Personen [W]
-PGainEquip = 7649.2	! Maximaler Wärmeeintrag durch Geräte [W]
+PGainPer = 1440*scaleBuilding	! Maximale Wärmeeintrag durch Personen [W]
+PGainEquip = 7649.2*scaleBuilding	! Maximaler Wärmeeintrag durch Geräte [W]
 PGainLight = 0!  7649.2*0.75	Maximaler Wärmeeintrag durch Beleuchtung [W]
 ScaleVfrWindow = 0.6667
 ScaleVfrVent = 0.6542
 VfrInf = 0	! Infiltration  [m3/s]
-VfrVent = 0.33*ScaleVfrVent	! Ventilation  [m3/s]
+VfrVent = 0.33*ScaleVfrVent*scaleBuilding	! Ventilation  [m3/s]
 
 CONSTANTS 6
 *******Scaled values***********

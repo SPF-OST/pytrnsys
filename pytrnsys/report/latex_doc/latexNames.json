@@ -27,5 +27,7 @@
 "qSysOut_DHDemand":"$Q_{DH}$",
 "qSysIn_ElBackUp": "$Q_{El,aux}$",
 "qSysOut_Tes1Acum" : "$Q^{acum}_{Tes}$",
-"qSysOut_Tes1Loss" : "$Q^{loss}_{Tes}$"
+"qSysOut_Tes1Loss" : "$Q^{loss}_{Tes}$",
+"PpenSH_kW" : "$P^{penalty}_{SH}$",
+"PpenDHW_kW" : "$P^{penalty}_{DHW}$"
 }
