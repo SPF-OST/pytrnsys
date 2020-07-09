@@ -471,7 +471,7 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
         if 'qSysOut' in q:
             ImbalanceString += ' - ' + q
 
-        elif 'qSysIn' in q:
+        elif 'qSysIn' in q or 'elSysIn_Q' in q:
             ImbalanceString += ' + ' + q
     if ImbalanceString=='qImb = ':
         ImbalanceString += '0'

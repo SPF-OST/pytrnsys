@@ -800,6 +800,14 @@ class ProcessTrnsysDf():
                 line = self.getNiceLatexNames(variable)+' & %2.1f& &  \\\\ \n' % (jointDicts[variable])
                 lines = lines + line
 
+        if 'PpenDHW_kW_Tot' in self.yearlySums:
+            line = self.getNiceLatexNames('PpenDHW_kW') + ' & %2.1f& &  \\\\ \n' % (self.yearlySums['PpenDHW_kW_Tot'])
+            lines = lines + line
+
+        if 'PpenSH_kW_Tot' in self.yearlySums:
+            line = self.getNiceLatexNames('PpenSH_kW') + ' & %2.1f& &  \\\\ \n' % (self.yearlySums['PpenSH_kW_Tot'])
+            lines = lines + line
+
         line = "Simulation Time & %.1f (min/year) & \\\\ \n" % (self.calcTime / self.nYearsSimulated)
         lines = lines + line
         if self.nItProblems==0:

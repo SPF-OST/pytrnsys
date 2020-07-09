@@ -20,7 +20,7 @@
 ***********************************
 
 EQUATIONS 2
-Tdhw = TPiDHWDemand ![22,1]     ! Warm water supply temperature from WW heat exchanger or mixing valve [°C]
+Tdhw = TPiDHWDemand ![22,1]     ! Warm water supply temperature from WW heat exchanger or mixing valve [ï¿½C]
 MfrDhw = ABS(MfrPiDHWDemand) ! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
 
 ***********************************
@@ -43,7 +43,7 @@ qSysOut_DhwDemand = Pdhw_kW
 ***********************************
 
 CONSTANTS 1
-TcwStd = TcwAvg   ! Standard cold water temperature (°C)   TcwAvg  from weatherData
+TcwStd = TcwAvg   ! Standard cold water temperature (ï¿½C)   TcwAvg  from weatherData
 
 ***********************************
 ** outputs to other ddck
@@ -89,13 +89,13 @@ unitReadDhw           ! 9 Logical unit for input file
      
 EQUATIONS 3     
 ** tDRdhw = [16,2]      ! hour of the day of this data reader  JS: This was commented, because it doesn't work, tDRdhw is constantly increasing
-QDHWstd = [16,3]     ! energy of this datareader  for this time step [kWh] BE CAREFUL !!!
-MfrDHWreal = [16,4]  ! mass flow kg/h
-TdhwSetProfile = [16,5]     ! Set temperature for DHW, °C
+QDHWstd = [16,3]*scaleDHW     ! energy of this datareader  for this time step [kWh] BE CAREFUL !!!
+MfrDHWreal = [16,4]*scaleDHW  ! mass flow kg/h
+TdhwSetProfile = [16,5]     ! Set temperature for DHW, ï¿½C
 
 EQUATIONS 3
 dtDhwCorrect = (TdhwSet-TcwStd)/(TdhwSet-Tcw)
-TdhwHxSet = TdhwSet+ 0.1               ! Setpoint for heat exchanger control (if present), °C
+TdhwHxSet = TdhwSet+ 0.1               ! Setpoint for heat exchanger control (if present), ï¿½C
 PdhwIdeal_kW = QDHWstd*dtDhwCorrect/dtDHWdata  ! ideal draw off power, kW
         
    
