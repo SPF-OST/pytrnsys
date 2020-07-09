@@ -20,6 +20,8 @@ from pathlib import Path
 import recommonmark
 from recommonmark.transform import AutoStructify
 
+autodoc_mock_imports = ['numpy']
+
 github_doc_root = 'https://github.com/rtfd/recommonmark/tree/master/doc/'
 def setup(app):
     app.add_config_value('recommonmark_config', {

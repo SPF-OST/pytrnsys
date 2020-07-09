@@ -1,12 +1,12 @@
 Metadata-Version: 2.1
 Name: pytrnsys
-Version: 0.1
+Version: 0.2.1
 Summary: pytrnsys simulation framework
 Home-page: https://github.com/dcarbonellsanchez/pytrnsys
 Author: Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Martin Neugebauer
-Author-email: dani.carbonell@spf.ch
+Author-email: martin.neugebauer@spf.ch
 License: UNKNOWN
-Download-URL: https://github.com/dcarbonellsanchez/pytrnsys/archive/0.1.tar.gz
+Download-URL: https://github.com/dcarbonellsanchez/pytrnsys/archive/0.2.1.tar.gz
 Description: The pytrnsys package provides a complete framework to run and process, plot and report
         TRNSYS simulations. It is designed to give researchers a fast,
         fully automatized and easily reproducible way to execute and share TRNSYS simulations by the use of a single short

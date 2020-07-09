@@ -11,14 +11,14 @@ with open("README.rst", "r") as fh:
 setuptools.setup(
     name = "pytrnsys",
     packages=setuptools.find_packages(),
-    version="0.1",
+    version="0.2.1",
     author="Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Martin Neugebauer",
     author_email="martin.neugebauer@spf.ch",
     description="pytrnsys simulation framework",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/dcarbonellsanchez/pytrnsys",
-    download_url = "https://github.com/dcarbonellsanchez/pytrnsys/archive/0.1.tar.gz",
+    download_url = "https://github.com/dcarbonellsanchez/pytrnsys/archive/0.2.1.tar.gz",
     include_package_data=True,
     install_requires=[
         'numpy',

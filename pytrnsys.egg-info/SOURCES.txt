@@ -7,6 +7,7 @@ pytrnsys.egg-info/PKG-INFO
 pytrnsys.egg-info/SOURCES.txt
 pytrnsys.egg-info/dependency_links.txt
 pytrnsys.egg-info/entry_points.txt
+pytrnsys.egg-info/requires.txt
 pytrnsys.egg-info/top_level.txt
 pytrnsys/pdata/__init__.py
 pytrnsys/pdata/loadBase.py
