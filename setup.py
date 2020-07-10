@@ -5,9 +5,6 @@ import os
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
-#with open("docs\guide\index.rst", "r") as fh:
-#    long_description = fh.read()
-
 setuptools.setup(
     name = "pytrnsys",
     packages=setuptools.find_packages(),
@@ -17,14 +14,18 @@ setuptools.setup(
     description="pytrnsys simulation framework",
     long_description=long_description,
     long_description_content_type="text/x-rst",
-    url="https://github.com/dcarbonellsanchez/pytrnsys",
+    #url="https://github.com/dcarbonellsanchez/pytrnsys",
+    project_urls={
+        "Documentation": "https://pytrnsys.readthedocs.io",
+        "Source Code": "https://github.com/dcarbonellsanchez/pytrnsys",
+    },
     download_url = "https://github.com/dcarbonellsanchez/pytrnsys/archive/0.2.1.tar.gz",
     include_package_data=True,
     install_requires=[
         'numpy',
         'scipy',
         'pandas',
-        'maplotlib',
+        'matplotlib',
         'seaborn'
     ],
     package_data={'pytrnsys_examples': ['./*.*','./**/*.*','./**/**/*.*'],
