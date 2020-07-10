@@ -63,7 +63,8 @@ solar collector areas that aims to determine the solar fraction of the domestic 
 run on multiple cores in parallel using the total amount of cores of your machine minus 4. The simulations will be executed in
 a new folder called solar_dhw_simulaions that will be created in the current working directory.
 
-Once the simulations are finished the simulation results can be processed using the following command::
+Once the simulations are finished the simulation results can be processed using the following command inside the newly
+created simulation folder solar_dhw::
 
 	pytrnsys-process
 	
