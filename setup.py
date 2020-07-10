@@ -19,7 +19,7 @@ setuptools.setup(
     #     "Documentation": "https://pytrnsys.readthedocs.io",
     #     "Source Code": "https://github.com/dcarbonellsanchez/pytrnsys",
     # },
-    download_url = "https://github.com/dcarbonellsanchez/pytrnsys/archive/0.2.2.tar.gz",
+    download_url = "https://github.com/dcarbonellsanchez/pytrnsys/archive/0.2.3.tar.gz",
     include_package_data=True,
     install_requires=[
         'numpy',
