@@ -161,6 +161,7 @@ Developers
 - Mattia Battaglia : SPF Institute for Solar Technology, Rapperswil, Switzerland.
 - Jeremias Schmidli : SPF Institute for Solar Technology, Rapperswil, Switzerland.
 - Maike Schubert : SPF Institute for Solar Technology, Rapperswil, Switzerland.
+- Martin Neugebauer : SPF Institute for Solar Technology, Rapperswil, Switzerland.
 
 
 

@@ -115,7 +115,7 @@ the new class. This can be done by replacing the run script in the following way
         tool.process()
 
 General guidelines for developers
---------------------------------
+---------------------------------
 Pytrnsys is open source and developers are invited to submit their own contributions.
 If you would like to develop for pytrnsys, we are interested in who you are. We are happy
 about a short message by mail. Please discuss new ideas first in the issue board. You are

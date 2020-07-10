@@ -47,8 +47,8 @@ def setup(app):
 # -- Project information -----------------------------------------------------
 
 project = 'pytrnsys'
-copyright = '2019, Dani Carbonell, Mattia Battaglia, Jeremias Schmidli'
-author = 'Dani Carbonell, Mattia Battaglia, Jeremias Schmidli'
+copyright = '2019, Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Maike Schubert, Martin Neugebauer'
+author = 'Dani Carbonell, Mattia Battaglia, Jeremias Schmidli \n Maike Schubert, Martin Neugebauer'
 
 
 # -- General configuration ---------------------------------------------------

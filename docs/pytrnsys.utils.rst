@@ -44,6 +44,14 @@ pytrnsys.utils.loadExamplesAndDdcks module
    :undoc-members:
    :show-inheritance:
 
+pytrnsys.utils.log module
+-------------------------
+
+.. automodule:: pytrnsys.utils.log
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pytrnsys.utils.unitConverter module
 -----------------------------------
 
