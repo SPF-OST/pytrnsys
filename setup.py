@@ -26,7 +26,8 @@ setuptools.setup(
         'scipy',
         'pandas',
         'matplotlib',
-        'seaborn'
+        'seaborn',
+        'bokeh'
     ],
     package_data={'pytrnsys_examples': ['./*.*','./**/*.*','./**/**/*.*'],
                   'pytrnsys_ddck': ['./*.*','./**/*.*','./**/**/*.*','./**/**/**/*.*','./**/**/**/**/*.*','./**/**/**/**/**/*.*'],

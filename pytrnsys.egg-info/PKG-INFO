@@ -6,7 +6,7 @@ Home-page: https://pytrnsys.readthedocs.io
 Author: Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Martin Neugebauer
 Author-email: martin.neugebauer@spf.ch
 License: UNKNOWN
-Download-URL: https://github.com/dcarbonellsanchez/pytrnsys/archive/0.2.2.tar.gz
+Download-URL: https://github.com/dcarbonellsanchez/pytrnsys/archive/0.2.3.tar.gz
 Description: The pytrnsys package provides a complete framework to run, process, plot, and report
         TRNSYS simulations. It is designed to give researchers a fast,
         fully automatized, and easily reproducible way to execute and share TRNSYS simulations by the use of a single short
