@@ -1,0 +1,28 @@
+*******************************
+**BEGIN City.dck
+*******************************
+
+*****************************************
+** Weather data section. V0
+** Last Changes: Jeremias Schmidli
+** Date: 18.03.2019    
+******************************************
+
+** Normal Building Simulation     
+** City Name = SMA, CH     
+CONSTANTS 9     
+NrCity = 7     ! number of the city dataset, -
+Lat = 47.38     ! Latitude, °
+TambD = -13.2    ! ambient design temperature of heating system, °C
+TambAvg = 9.99    ! average outdoor temperature, °C
+dTambAmpl = 9.3     ! amplitude of outside temperature, K
+tTambShift = 488     ! Offset of outside air temperature minimum , h
+ddTcwOffset = 40     ! time shift of minimum cold water temperature, d
+altid = 556     
+formatWeatherData = 1! 1 = user format, 2 = Standard weather file in the TMY2 format
+ASSIGN C:\Daten\spfPackages\GIT\spfTrnsysFiles\weatherData\MeteoSwiss\SMA\SMA_hourlyMean.99 31
+
+
+*******************************
+**END City.dck
+*******************************
