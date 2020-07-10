@@ -16,6 +16,8 @@ import pytrnsys.utils.utilsSpf as utils
 import time
 import pytrnsys.plot.plotGle as gle
 import os, subprocess
+import logging
+logger = logging.getLogger('root')
 
 class PlotMatplotlib():
     """Plot TRNSYS Results with Matplotlib"""
@@ -158,7 +160,7 @@ class PlotMatplotlib():
             namePdf = '%s.pdf'%nameFile
             nameWithPath = '%s\%s' % (self.path,namePdf)
 
-            print ("plotMonthly name:%s"%nameWithPath)
+            logger.debug("plotMonthly name:%s"%nameWithPath)
 
             plt.xlim([-0.5,12.5])
 
@@ -264,7 +266,7 @@ class PlotMatplotlib():
                 namePdf = '%s.%s' % (nameFile, self.extensionPlot)
                 nameWithPath = '%s\%s' % (self.path, namePdf)
 
-                print ("plotMonthlyDf name:%s" % nameWithPath)
+                logger.debug("plotMonthlyDf name:%s" % nameWithPath)
 
                 plt.xlim([-0.5, 12.5])
 
@@ -387,7 +389,7 @@ class PlotMatplotlib():
             namePdf = '%s.%s'%(nameFile,self.extensionPlot)
             nameWithPath = '%s\%s' % (self.path,namePdf)
 
-            print ("plotMonthly name:%s"%nameWithPath)
+            logger.debug("plotMonthly name:%s"%nameWithPath)
 
             plt.xlim([-0.5,N+1.5])
 
@@ -514,7 +516,7 @@ class PlotMatplotlib():
         namePdf = '%s.%s' % (nameFile, self.extensionPlot)
         nameWithPath = '%s\%s' % (self.path, namePdf)
 
-        print("plotMonthly name:%s" % nameWithPath)
+        logger.debug("plotMonthly name:%s" % nameWithPath)
 
         plt.xlim([-0.5, numberOfMonths + 1.5])
 
@@ -549,7 +551,7 @@ class PlotMatplotlib():
                 subprocess.call([inkscape_path, svg_filepath, '--export-emf', emf_filepath])
                 os.remove(svg_filepath)
         except:
-            print('EMF not created, please install inkscape')
+            logger.warning('EMF not created, please install inkscape')
     
     def plotMonthlyBalance(self,inVar,outVar,legends,myLabel,nameFile,unit=False,startMonth=1,printImb=True,yearlyFactor=1,useYear=False,plotEmf=False,printData=False,showMonths=False,ylims=False):
         """
@@ -729,7 +731,7 @@ class PlotMatplotlib():
             namePdf = '%s.%s'%(nameFile,self.extensionPlot)
             nameWithPath = '%s\%s' % (self.path,namePdf)
 
-            print ("PlotMonthlyBalance name:%s"%nameWithPath)
+            logger.debug("PlotMonthlyBalance name:%s"%nameWithPath)
 
             if(useYear==True):
                 plot.set_xlim([-0.5,13.5])
@@ -904,7 +906,7 @@ class PlotMatplotlib():
             namePdf = '%s.%s' % (nameFile, self.extensionPlot)
             nameWithPath = '%s\%s' % (self.path, namePdf)
 
-            print("PlotMonthlyBalance name:%s" % nameWithPath)
+            logger.debug("PlotMonthlyBalance name:%s" % nameWithPath)
 
             if (useYear == True):
                 plt.xlim([-0.5, 13.5])
@@ -1212,7 +1214,7 @@ class PlotMatplotlib():
             namePdf = '%s.%s' % (nameFile, self.extensionPlot)
             nameWithPath = '%s\%s' % (self.path,namePdf)
     
-            print ("plotDynamic: Save plot name:%s"%nameWithPath)
+            logger.debug("plotDynamic: Save plot name:%s"%nameWithPath)
             
             plt.savefig(nameWithPath)
             
@@ -1240,7 +1242,7 @@ class PlotMatplotlib():
         cumEnerVec = []
         
         for i in range(nVar):
-            print ("calcAndPrintQVersusT var:%s "%legends[i])
+            logger.info("calcAndPrintQVersusT var:%s "%legends[i])
             tSort,cumE = utils.calcQvsT(tFlow[i],eFlow[i])
             tSortVec.append(tSort)
             cumEnerVec.append(cumE)
@@ -1279,7 +1281,7 @@ class PlotMatplotlib():
                 
         myFileName = self.path + "//" + fileName + ".dat"
         
-        print ("File created :%s"%myFileName)
+        logger.debug("File created :%s"%myFileName)
         
         outfile=open(myFileName,'w')    
         outfile.writelines(lines)
@@ -1531,7 +1533,7 @@ class PlotMatplotlib():
         namePdf = '%s.%s' % (nameFile, self.extensionPlot)
         nameWithPath = '%s\%s' % (self.path,namePdf)
 
-        print ("PlotMonthlyBalance name:%s"%nameWithPath)
+        logger.debug("PlotMonthlyBalance name:%s"%nameWithPath)
         
         plt.xlim([-0.5,1.5])        
         

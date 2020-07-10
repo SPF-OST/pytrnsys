@@ -18,11 +18,11 @@ import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 import shutil
 import sys
 import imp
-import warnings
 import json
 from copy import deepcopy
 import sys
 import pkg_resources
+import pytrnsys.utils.log as log
 try:
     import pytrnsys_examples
 except ImportError:
@@ -62,6 +62,7 @@ class RunParallelTrnsys():
         self.path = os.getcwd()
         if configFile is not None:
             self.readConfig(self.pathConfig,configFile)
+
             if 'nameRef' in self.inputs:
                 self.nameBase = self.inputs['nameRef']
             else:
@@ -109,7 +110,7 @@ class RunParallelTrnsys():
         self.inputs["generateUnitTypesUsed"]=True
         self.inputs["runCases"] = True
         self.inputs["runType"] = "runFromConfig"
-
+        self.inputs["outputLevel"] = "INFO"
 
 
         self.overwriteForcedByUser = False
@@ -252,7 +253,7 @@ class RunParallelTrnsys():
 
         for i in range(len(fileName)):
 
-            print ("name to run :%s" % fileName[i])
+            self.logger.debug("name to run :%s" % fileName[i])
 
             #        if useLocationStructure:
             #            variablePath = os.path.join(path,location) #assign subfolder for path
@@ -435,9 +436,10 @@ class RunParallelTrnsys():
         tool = readConfig.ReadConfigTrnsys()
 
         self.lines = tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated,controlDataType=False)
+        self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
         if 'pathBaseSimulations' in self.inputs:
             self.path = self.inputs['pathBaseSimulations']
-        if(self.inputs["addResultsFolder"]=="None"):
+        if(self.inputs["addResultsFolder"]==False):
             pass
         else:
             self.path = os.path.join(self.path, self.inputs["addResultsFolder"])
@@ -472,8 +474,7 @@ class RunParallelTrnsys():
                 found=True
 
         if(found==False):
-            # print Warning("change File was not able to change %s by %s"%(source,end))
-            warnings.warn("change File was not able to change %s by %s"%(source,end))
+            self.logger.warning("change File was not able to change %s by %s"%(source,end))
 
     def changeDDckFile(self,source,end):
         """
@@ -494,8 +495,7 @@ class RunParallelTrnsys():
                 found=True
 
         if(found==False):
-            # print Warning("change File was not able to change %s by %s"%(source,end))
-            warnings.warn("change File was not able to change %s by %s"%(source,end))
+            self.logger.warning("change File was not able to change %s by %s"%(source,end))
 
     def getConfig(self):
         """
@@ -635,7 +635,7 @@ class RunParallelTrnsys():
         # dstPath = os.path.join(self.inputs["pathRef"],self.inputs["addResultsFolder"],configName)
         dstPath = os.path.join(configPath,self.inputs["addResultsFolder"],configName)
         shutil.copyfile(configFile, dstPath)
-        print("copied config file to: %s"% dstPath)
+        self.logger.debug("copied config file to: %s"% dstPath)
 
 
     def scaleVariables(self,reference,source,sink):
@@ -666,11 +666,12 @@ class RunParallelTrnsys():
 
 def run():
    pathBase = ''
-   template = pkg_resources.resource_filename('pytrnsys_examples', 'solar_dhw/run_solar_dhw.config')
+
    if len(sys.argv)>1:
        pathBase,configFile = os.path.split(sys.argv[1])
    else:
-       pathBase,configFile = os.path.split(template)
+       configFileFullPath = pkg_resources.resource_filename('pytrnsys_examples', 'solar_dhw/run_solar_dhw.config')
+       pathBase,configFile = os.path.split(configFileFullPath)
    if ':' not in pathBase:
        pathBase = os.path.join(os.getcwd(),pathBase)
    RunParallelTrnsys(pathBase, configFile=configFile)

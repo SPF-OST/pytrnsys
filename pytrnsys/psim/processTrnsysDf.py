@@ -29,6 +29,8 @@ import pytrnsys.plot.plotBokeh as pltB
 from string import ascii_letters, digits, whitespace
 import locale
 import re
+import logging
+logger = logging.getLogger('root')
 # import pytrnsys_spf.psim.costConfig as costConfig
 
 
@@ -168,7 +170,7 @@ class ProcessTrnsysDf():
         try:
             self.nYearsSimulated = (self.deckData['STOP']-self.deckData['START'])/8760
         except:
-            print('START or STOP variable called differentely. Number of simulated years not calculated and printed. Mabe check for upper lower case issues.')
+            logger.warning('START or STOP variable called differentely. Number of simulated years not calculated and printed. Mabe check for upper lower case issues.')
 
         self.yearlySums = {value+'_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
@@ -180,7 +182,7 @@ class ProcessTrnsysDf():
         self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
         self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
-        print ("loadFiles completed using SimulationLoader")
+        logger.info("loadFiles completed using SimulationLoader")
 
     def addQvsTPlot(self):
 
@@ -195,7 +197,7 @@ class ProcessTrnsysDf():
                 # namePdf=self.plot.plotMonthlyDf(self.monDataDf[key].values, key[0], nameFile,1,self.myShortMonths,myTitle=None, printData=True)
                 namePdf=self.plot.plotMonthlyDf(self.monDataDf[key].values, key[0], nameFile,10.,self.myShortMonths,myTitle=None, printData=self.printDataForGle)
 
-                print ("%s monthly plot"%namePdf)
+                logger.debug("%s monthly plot"%namePdf)
 
         # define QvsTDf here!
 
@@ -203,12 +205,12 @@ class ProcessTrnsysDf():
         if "plotHourlyQvsT" in self.inputs.keys():
             InputListQvsT = self.inputs["plotHourlyQvsT"][0]
             QvsTDf = self.houDataDf
-            print("hourlyUsed")
+            logger.debug("hourlyUsed")
             self.loadQvsTConfig(QvsTDf,InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False)
         if "plotTimestepQvsT" in self.inputs.keys():
             InputListQvsT = self.inputs["plotTimestepQvsT"][0]
             QvsTDf = self.steDataDf
-            print("stepDfUsed")
+            logger.debug("stepDfUsed")
             self.loadQvsTConfig(QvsTDf,InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False)
         else:
             pass
@@ -384,7 +386,7 @@ class ProcessTrnsysDf():
             expression = equation.replace(' ','')
             exec(expression,globals(),namespace)
             self.deckData = namespace
-            print(expression)
+            logger.debug(expression)
         for equation in self.inputs["calcMonthly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
             scalars = kwargs['local_dict'].keys()
@@ -798,6 +800,14 @@ class ProcessTrnsysDf():
                 line = self.getNiceLatexNames(variable)+' & %2.1f& &  \\\\ \n' % (jointDicts[variable])
                 lines = lines + line
 
+        if 'PpenDHW_kW_Tot' in self.yearlySums:
+            line = self.getNiceLatexNames('PpenDHW_kW') + ' & %2.1f& &  \\\\ \n' % (self.yearlySums['PpenDHW_kW_Tot'])
+            lines = lines + line
+
+        if 'PpenSH_kW_Tot' in self.yearlySums:
+            line = self.getNiceLatexNames('PpenSH_kW') + ' & %2.1f& &  \\\\ \n' % (self.yearlySums['PpenSH_kW_Tot'])
+            lines = lines + line
+
         line = "Simulation Time & %.1f (min/year) & \\\\ \n" % (self.calcTime / self.nYearsSimulated)
         lines = lines + line
         if self.nItProblems==0:
@@ -867,7 +877,7 @@ class ProcessTrnsysDf():
 
             namesDll = []
             myset = set(self.readTrnsysFiles.TrnsysTypes)  # get the unique names (all repeated ones are excluded)
-            print (myset)
+            logger.info(myset)
 
             for number in myset:
                 nameType = "type%s" % number
@@ -877,7 +887,7 @@ class ProcessTrnsysDf():
 
             self.buildingModel = None
             for dll in self.dllVersions:
-                print (dll)
+                logger.debug(dll)
                 if (dll[0:6] == "type56"):
                     self.buildingModel = "Type56"
                 elif (dll[0:8] == "type5998"):
@@ -893,14 +903,14 @@ class ProcessTrnsysDf():
             else:
                 trnsysExe = os.getenv(self.trnsysVersion)
 
-            print (trnsysExe)
+            logger.debug(trnsysExe)
 
             mySplit = trnsysExe.split("Exe")
             self.trnsysDllPath = mySplit[0] + "\\UserLib\\ReleaseDLLs"
         else:
             pass
 
-        print ("Dll path:%s" % self.trnsysDllPath)
+        logger.debug("Dll path:%s" % self.trnsysDllPath)
 
         listDll = os.listdir(self.trnsysDllPath)
 
@@ -913,10 +923,10 @@ class ProcessTrnsysDf():
                     if (dll.count(name) == 1 and nameFound == False):
                         nameFound = True
                         dllVersion.append(dll)
-                        print ("FOUND %s %s" % (dll, name))
+                        logger.debug("FOUND %s %s" % (dll, name))
                         break
 
-        print (dllVersion)
+        logger.debug(dllVersion)
         #        raise ValueError()
 
         return dllVersion
@@ -938,7 +948,7 @@ class ProcessTrnsysDf():
         :return:
         """
         if 'results' in self.inputs:
-            print("creating results.json file")
+            logger.info("creating results.json file")
             if '-' in self.fileName:
                 self.resultsDict = {'Name':self.fileName.split('-')[1]}
             else:

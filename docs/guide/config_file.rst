@@ -3,9 +3,9 @@
 The pytrnsys configuration files
 ================================
 
-Pytrnsys runs and processes TRNSYS simulations based on configurations files. The general idea behind is to provide
-a fast and easily accessible way to define, run and analyse both single simulations as well as parametric studies.
-There are distinct configuration files for running and processing. Both are described in the following sections but follow
+Pytrnsys runs and processes TRNSYS simulations based on configuration files. The general idea behind this is to provide
+a fast and easily accessible way to define, run and analyse both single simulations as well as parametric studies. There
+are distinct configuration files for running and processing. Both are described in the subsequent sections but follow
 the same syntax and format.
 
 
@@ -15,7 +15,7 @@ Configuration file format
 The configuration file does not require a header. It should contain different keyword commands on single lines.
 Comments start with ``#`` characters. End of line comments are possbile.
 
-There config file supports the following basic types:
+The config file supports the following basic types:
 
 ==========================  ===================================
 *bool*                      with True/False as possible value
@@ -47,9 +47,9 @@ Ddck section
 
 The core of the run configuration file is the ddck section. In this part of the configuration
 file, the different modular ddck files that should be used in the simulation are specified.
-Pytrnsys offers its own ddck repository in the seperate package pytrnsys_ddck that is installed
-together the main package and used in the example projects of pytrnsys_examples. In the ddck section
-of the config file, the different ddcks that should me merged to the simulation's main dck file
+Pytrnsys offers its own ddck repository in the separate package pytrnsys_ddck that is installed
+together with the main package and used in the example projects of pytrnsys_examples. In the ddck section
+of the config file, the different ddcks that should be merged to the simulation's main dck file
 are specified according to the following syntax::
 
     ROOTPATH1$ pathtoddck1\ddck1
@@ -62,7 +62,7 @@ The root of the ddck repositories used has to be defined elsewhere in the config
     string ROOTPATH2$ "pathToTheRepository2Root"
 
 An example can be found in the example section below. The path to the repository root can be either
-absolute or relative. If a relativ path is detected, pytrnsys will interpret it as relative to
+absolute or relative. If a relative path is detected, pytrnsys will interpret it as relative to
 the configuration file location.
 
 Parameter variation section
@@ -88,7 +88,7 @@ the amount of values of all variations has to be equal and they are combined acc
 
 .. _ref-changeDDckFile:
 
-In addition to a single euqation or constant line in the dck, pytrnsys offers the possibility to
+In addition to a single equation or constant line in the dck, pytrnsys offers the possibility to
 loop through different ddck files during a parametric study. A parametric study on ddck files can be defined by::
 
     changeDDckFile originalDdck ddckVariation1 ddckVariation2 ddckVariation3 ...
@@ -105,7 +105,7 @@ Generic
 
 ``ignoreOnlinePlotter`` (bool, default False)
     If set to True, the TRNSYS online plotters are commented out in all the dck-files. No online plotters
-    are shown during the simulation run. The TRNSYS progress bar windos is still displayed.
+    are shown during the simulation run. The TRNSYS progress bar window is still displayed.
 
 ``removePopUpWindow`` (bool, default False)
     Online plotters as well as the progress bar window are suppressed during the simulations.
@@ -116,7 +116,7 @@ Generic
     each block are checked for inconsistencies.
 
 ``parseFileCreated`` (bool, default True)
-    Saves the paresed dck-file that can be used to locate the line where ``checkDeck`` found errors.
+    Saves the parsed dck-file that can be used to locate the line where ``checkDeck`` found errors.
 
 ``runCases`` (bool, default True)
     If set to False, the dck-files are created and saved in the normal structure but not executed.
@@ -124,19 +124,22 @@ Generic
 ``reduceCpu`` (int, default 0)
     Number of CPUs that are not used in the parallel simulation runs.
 
+``outputLevel`` (string, default "INFO")
+    Output message level according to the logging package. (Options are "DEBUG", "INFO", "WARNING", "ERROR", and
+    "CRITICAL".)
 
 Automatic Work Bool
 ^^^^^^^^^^^^^^^^^^^
 .. _doAutoUnitNumbering:
 
 ``doAutoUnitNumbering`` (bool, default True)
-    If set to True, the units of the merged dck-file are renumbered to avoid dublicates. This parameter
+    If set to True, the units of the merged dck-file are renumbered to avoid duplicates. This parameter
     should usually be set to the default True.
 
 .. _generateUnitTypesUsed:
 
 ``generateUnitTypesUsed`` (bool, default True)
-    if set to True, a file called ``UnitType.info`` containing the TRNSYS-Type numbers used is saved in the main run-folder.
+    If set to True, a file called ``UnitType.info`` containing the TRNSYS-Type numbers used is saved in the main run-folder.
 
 .. _addAutomaticEnergyBalance:
 
@@ -281,7 +284,7 @@ It is recommended to dublicate the internal TRNSYS name in the header of the pri
 
     While TRNSYS is not case sensitive, Python is. So be careful about upper and lower cases
     during post processing. If the string in the configuration file does not match the header
-    of ther printer file or the TRNSYS name of the static parameter in the dck-file,
+    of the printer file or the TRNSYS name of the static parameter in the dck-file,
     pytrnsys will not be able to find the value and throw a key-error.
 
 By default, pytrnsys also calculates the following values:
@@ -303,7 +306,7 @@ some variables could be both in an hourly as well as a monthly printer. The foll
 are available:
 
 ``calc``
-    Calculates a new scalar value out of scalar other scalar values such as static TRNSYS parameters
+    Calculates a new scalar value out of other scalar values such as static TRNSYS parameters
     or yearly sums or hourly maxima.
 
 ``calcMonthly``
@@ -312,7 +315,7 @@ are available:
 ``calcHourly``
     Calculates new hourly values (array with length 8760) out of other hourly values or scalar values.
 
-A caluclations section could be of the following structure. A full working example can be
+A calculations section could be of the following structure. A full working example can be
 found in the example below::
 
     calc alpha = foo_Tot/bar_Max
@@ -330,8 +333,8 @@ By default the processing creates a pdf with the following content:
 
 1.  A table displaying the total simulation time and the number of iteration errors.
 
-2.  A table with the monthly heat balance. The values are also shown in a plot the in the case
-    of the solar domestic hot water example system looks like this:
+2.  A table with the monthly heat balance. The values are also shown in a plot, in the case
+    of the solar domestic hot water example system this looks like the following:
 
 .. image:: ./resources/HeatMonthly.png
       :width: 400
@@ -406,14 +409,14 @@ be added to the result pdf-file:
 
 ``plotHourlyQvsT`` (stringArray)
     Adds a cumulative plot that contains a line for each heat temperature pair given in the string array.
-    Used to show at what temperature levels the heat us released or consumed in different system componenets.
+    Used to show at what temperature levels the heat is released or consumed in different system components.
     Uses hourly printer files.
 
 .. _ref-plotTimestepQvsT:
 
 ``plotTimestepQvsT`` (stringArray)
     Adds a cumulative plot that contains a line for each heat temperature pair given in the string array.
-    Used to show at what temperature levels the heat us released or consumed in different system componenets.
+    Used to show at what temperature levels the heat is released or consumed in different system componenets.
     Uses timestep printer files.
 
 
@@ -475,7 +478,7 @@ processing have to be specified.
     If the value is set to -1 pytrnsys will use the last 12 months of the simulation for processing.
 
 ``firstMonthUsed`` ([0,1,2,3,..,11], default 6)
-    Month in the chosen year where the 12-month processing period begins. If the vlaue is e.g. 6 July to June
+    Month in the chosen year where the 12-month processing period begins. If the value is e.g. 6 July to June
     will be analysed.
 
 Paths

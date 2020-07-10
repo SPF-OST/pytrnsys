@@ -16,6 +16,8 @@ import tkinter as tk
 # import Tkinter.messagebox as tkMessageBox
 from tkinter import messagebox as tkMessageBox
 #from graphviz import Graph
+import logging
+logger = logging.getLogger('root')
 
 """
 This class uses a list of ddck files to built a complete TRNSYS deck file
@@ -137,7 +139,7 @@ class BuildTrnsysDeck():
 
             if(doAutoUnitNumbering):
                 (unit,types,fileAssign,fileAssignUnit)=deckUtils.readAllTypes(addedLines)
-                print ("Replacemenet of Units of file:%s"%nameList)
+                logger.debug("Replacemenet of Units of file:%s"%nameList)
                 self.unitId = deckUtils.replaceAllUnits(addedLines,self.unitId,unit,fileAssignUnit,fileAssign)
 
                 unitModifiedLines = [line.replace('£','') for line in addedLines]
@@ -145,6 +147,7 @@ class BuildTrnsysDeck():
 
             self.deckText.append(caption)
             self.deckText =  self.deckText + addedLines
+        logger.info("Replacemenet of Units done")
 
     def createDependencyGraph(self):
         e = Graph('ER', filename='er.gv', node_attr={'color': 'lightblue2', 'style': 'filled'})
@@ -264,7 +267,7 @@ class BuildTrnsysDeck():
 
         nameFile = os.path.join(self.pathDeck, name)
 
-        print ("Type file :%s created" % nameFile)
+        logger.info("Type file :%s created" % nameFile)
         outfile = open(nameFile, 'w')
         outfile.writelines(lines)
 

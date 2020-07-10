@@ -6,7 +6,8 @@ Created on Thu Aug 08 07:57:08 2013
 """
 
 import os, shutil
-import string
+import logging
+logger = logging.getLogger('root')
 
 class CreateTrnsysDeck():
     
@@ -17,7 +18,7 @@ class CreateTrnsysDeck():
         self.originalDeckName = os.path.join(self.path ,self.originalName +'.dck')
         self.variations = _variations                
         
-        print ("name:%s path:%s deckName:%s\n"% (self.originalName,self.path,self.originalDeckName))
+        logger.debug("name:%s path:%s deckName:%s\n"% (self.originalName,self.path,self.originalDeckName))
         
         self.case = _name #.split('-')
         
@@ -147,10 +148,10 @@ class CreateTrnsysDeck():
 
                             if(variationString[:2]=="00"):
                                 valuesOfVariation = "0."+ variationString[2:]
-                                print ("Comma found valueFile=%s valueUsed=%s" % (variationString,valuesOfVariation))
+                                logger.debug("Comma found valueFile=%s valueUsed=%s" % (variationString,valuesOfVariation))
                             else:
                                 valuesOfVariation = variationString
-                                print ("Comma NOT found valueFile=%s valueUsed=%s" % (variationString,valuesOfVariation))
+                                logger.debug("Comma NOT found valueFile=%s valueUsed=%s" % (variationString,valuesOfVariation))
 
                             parameterDict[nameVariationInDeck[nvar]]= valuesOfVariation
 
@@ -247,15 +248,16 @@ class CreateTrnsysDeck():
 
                     if (variationString[:2] == "00"):
                         valuesOfVariation = "0." + variationString[2:]
-                        print ("Comma found valueFile=%s valueUsed=%s" % (variationString, valuesOfVariation))
+                        logger.debug("Comma found valueFile=%s valueUsed=%s" % (variationString, valuesOfVariation))
                     else:
                         valuesOfVariation = variationString
-                        print ("Comma NOT found valueFile=%s valueUsed=%s" % (
+                        logger.debug("Comma NOT found valueFile=%s valueUsed=%s" % (
                         variationString, valuesOfVariation))
 
                     parameterDict[nameVariationInDeck[nvar]] = valuesOfVariation
 
                 self.myListOfParameterDicts.append(parameterDict)
+                logger.info("Parametric variation generated with the following values" + str(parameterDict))
         if not self.deckOutputs:
             self.deckOutputs.append(self.case)
 

@@ -22,6 +22,8 @@ import pytrnsys.utils.unitConverter as unit
 import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
 from pytrnsys.psim.simulationLoader import SimulationLoader
 import pandas as pd
+import logging
+logger = logging.getLogger('root')
 
 class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 
@@ -97,7 +99,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
                     written = True
                 except:
                     time.sleep(0.1)
-                    print("Summary File Used By Other Process! Wait...")
+                    logger.warning("Summary File Used By Other Process! Wait...")
         else:
             file = open(self.summaryFile, 'w')
             file.write('\t'.join(map(str,list(self.resultsDict.keys())))+'\n')
@@ -157,7 +159,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
 
-        print ("loadFiles completed using SimulationLoader")
+        logger.info("loadFiles completed using SimulationLoader")
 
     def process(self):
 
@@ -486,7 +488,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 
             namesDll = []
             myset = set(self.readTrnsysFiles.TrnsysTypes)  # get the unique names (all repeated ones are excluded)
-            print (myset)
+            logger.info(myset)
 
             for number in myset:
                 nameType = "type%s" % number
@@ -496,7 +498,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 
             self.buildingModel = None
             for dll in self.dllVersions:
-                print (dll)
+                logger.debug(dll)
                 if (dll[0:6] == "type56"):
                     self.buildingModel = "Type56"
                 elif (dll[0:8] == "type5998"):
@@ -512,14 +514,14 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             else:
                 trnsysExe  = os.getenv(self.trnsysVersion)
 
-            print (trnsysExe)
+            logger.debug(trnsysExe)
 
             mySplit = trnsysExe.split("Exe")
             self.trnsysDllPath = mySplit[0] + "\\UserLib\\ReleaseDLLs"
         else:
             pass
 
-        print ("Dll path:%s" % self.trnsysDllPath)
+        logger.debug("Dll path:%s" % self.trnsysDllPath)
         
         listDll= os.listdir(self.trnsysDllPath)
         
@@ -532,10 +534,10 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
                     if(dll.count(name)==1 and nameFound==False):
                         nameFound = True
                         dllVersion.append(dll)    
-                        print ("FOUND %s %s" % (dll,name))
+                        logger.debug("FOUND %s %s" % (dll,name))
                         break
              
-        print (dllVersion)
+        logger.debug(dllVersion)
 #        raise ValueError()
         
         return dllVersion
@@ -572,7 +574,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
              for i in range(self.numberOfMonthsSimulated):
                  self.qSolarToTes[i] = self.qSolarToSystem[i] - self.qLossPipeSolarLoop[i]                            
          else:
-             print ("Serial system and qSolartoTes must be readed from Storage data")
+             logger.warning("Serial system and qSolartoTes must be readed from Storage data")
 
     def loadWeatherData(self,_name):
            
@@ -604,7 +606,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
       
         if(abs(sum(self.qTesFromHp) - (sum(self.qTesDhwFromHp)+sum(self.qTesShFromHp))>1)):
             
-           print ("Something goes wrong QTesFromHp:%f QTesFromHPDhwSh:%f "%(sum(self.qTesFromHp),sum(self.qTesDhwFromHp)+sum(self.qTesShFromHp)))
+           logger.warning("Something goes wrong QTesFromHp:%f QTesFromHPDhwSh:%f "%(sum(self.qTesFromHp),sum(self.qTesDhwFromHp)+sum(self.qTesShFromHp)))
 
         self.qOutFromTes = num.zeros(12)
 
@@ -676,7 +678,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.readTrnsysFiles.readHourlyBuildingFile(_name)                  
         self.buildingDataLoaded =True
                                       
-        print ("READING HORLY DATA FROM BUILDING TYPE 56")
+        logger.info("READING HOURLY DATA FROM BUILDING TYPE 56")
        
 
 #['TIME', 'REL_BAL_ENERGY', '1_B4_QBAL=-', '1_B4_DQAIRdT+', '1_B4_QHEAT-', '1_B4_QCOOL+', '1_B4_QINF+', '1_B4_QVENT+', '1B4_QCOUP+', '1_B4_QTRANS+', '1_B4_QGINT+', '1_B4_QWGAIN+', '1_B4_QSOL+', '1_B4_QSOLAIR+']
@@ -717,10 +719,10 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
                 
         yearlyHeatDemand = sum(self.qBuiSolarGains)+sum(self.qBuiGains)+sum(self.qBuiTransLosses)+sum(self.qBuiInfLosses)+sum(self.qBuiVentLosses)
         
-        print ("YEARLY DEMAND IN BUILDING :%f kWh"% yearlyHeatDemand)
+        logger.info("YEARLY DEMAND IN BUILDING :%f kWh"% yearlyHeatDemand)
         
         for i in range(12):
-            print ("month:%d GAIN solar:%f int(rad+conv):%f LOSS Inf:%f Trns:%f Vent:%f"% (i+1,self.qBuiSolarGains[i],self.qBuiGains[i],self.qBuiInfLosses[i],self.qBuiTransLosses[i],self.qBuiVentLosses[i]))
+            logger.info("month:%d GAIN solar:%f int(rad+conv):%f LOSS Inf:%f Trns:%f Vent:%f"% (i+1,self.qBuiSolarGains[i],self.qBuiGains[i],self.qBuiInfLosses[i],self.qBuiTransLosses[i],self.qBuiVentLosses[i]))
 
     def loadDHW(self,_name):
         
@@ -861,7 +863,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             #This includes then the PiAuxRt pipe losses
             self.qHpToTesSh  = self.qHpInShMode - self.qHpToSh
             
-            print ("QHpInSHMode:%f QHpToTesSH:%f QHpToSHLoop:%f"%(sum(self.qHpInShMode),sum(self.qHpToTesSh),sum(self.qHpToSh)))
+            logger.info("QHpInSHMode:%f QHpToTesSH:%f QHpToSHLoop:%f"%(sum(self.qHpInShMode),sum(self.qHpToTesSh),sum(self.qHpToSh)))
 
         self.qHpToTesDhw = self.qHpInDhwMode
         self.qHpToTes    = self.qHpToTesSh+self.qHpToTesDhw

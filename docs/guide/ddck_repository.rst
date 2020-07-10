@@ -3,9 +3,9 @@
 Ddck repository
 ===============
 
-Pytrnsys enhances system simulations by making use of component modularization. This is done by seperating the dck file
-part in which a single components of an energy system simulation is defined into ddck files. In a pytrnsys run, these
-ddck files will then be merged together in order to build the full system ddck. Pytrnsys comes with a default repository
+Pytrnsys enhances system simulations by making use of component modularization. This is done by separating the dck file
+to single components of an energy system simulation, which are defined by ddck files. In a pytrnsys run, these ddck
+files will then be merged together in order to build the full system dck. Pytrnsys comes with a default repository
 of ddck files that is installed alongside the main package.
 
 Repository content
@@ -36,8 +36,8 @@ The repository contains the following subfolders::
     +-- NOMENCLATURE.txt
 
 Each subfolder represents one component, that is supported by default in the pytrnsys GUI. A lot of
-the components - but not all of the - are used in the pytrnsys example systems. Each component
-subfolder has the following structre. Not all folders and files are present in all components::
+the components - but not all of them - are used in the pytrnsys example systems. Each component
+subfolder has the following structure. Not all folders and files are present in all components::
 
     pytrnsys_ddck
     +-- component subfolder
@@ -53,10 +53,10 @@ subfolder has the following structre. Not all folders and files are present in a
 Some components can be represented by different TRNSYS types. Usually a more basic one of the
 standard library and a advanced custom model that allow for detailed parametrization. Each TRNSYS type
 is represented by its own subfolder in the component folder. In the type subfolder, the main
-ddck of the type is stored. This ddck contains both the TRNSYS type parameter and input section
-the type output section as well as some equations for parameter and input scaling or output
+ddck of the type is stored. This ddck contains both the TRNSYS type parameter and input section,
+the type output section, as well as some equations for parameter and input scaling or output
 processing. The parametrization of the model is outsourced in the database folder where a specific
-version - for example parameters of a specifica collector curve - can be specified.
+version - for example parameters of a specific collector curve - can be specified.
 
 Ddck file structure
 -------------------

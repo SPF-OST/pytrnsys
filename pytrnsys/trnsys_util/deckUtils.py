@@ -4,7 +4,8 @@ import pytrnsys.pdata.processFiles as spfUtils
 import os
 import re
 from string import digits
-
+import logging
+logger = logging.getLogger('root')
 
 def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesUsedInDdck):
 
@@ -31,7 +32,7 @@ def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesU
                     unitId = unitId + 1
 
                     linesRead[j] = "%s = %d\n " %(filesUnitUsedInDdck[i] ,unitId)
-                    print ("StringUnit from file %s changed from %s to %d" %
+                    logger.debug("StringUnit from file %s changed from %s to %d" %
                     (filesUsedInDdck[i], splitEqual[1][:-1], unitId))
 
     return unitId
@@ -187,14 +188,14 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
 
                 if(newLine!=lines[i]):
                     unitFromTypeChanged=True
-                    print ("replacement SUCCESS from %s to %s"%(oldString,newString))
+                    logger.debug("replacement SUCCESS from %s to %s"%(oldString,newString))
                     splitLine = newLine.split("!")
                     splitLineNoBreak = splitLine[0].replace("\n","")
                     lines[i]=splitLineNoBreak+" !"+myAddText
 
 
         if (unitFromTypeChanged == False):
-            print ("replacement FAILURE from %s to %s" % (oldUnit, newUnit))
+            logger.warning("replacement FAILURE from %s to %s" % (oldUnit, newUnit))
         else:
             for i in range(len(lines)):
 
@@ -470,7 +471,7 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
         if 'qSysOut' in q:
             ImbalanceString += ' - ' + q
 
-        elif 'qSysIn' in q:
+        elif 'qSysIn' in q or 'elSysIn_Q' in q:
             ImbalanceString += ' + ' + q
     if ImbalanceString=='qImb = ':
         ImbalanceString += '0'

@@ -5,9 +5,9 @@ Tutorial
 
 If you correctly installed pytrnsys and were able to use the two commands **pytrnsys-run**
 and **pytrnsys-process** you most likely already simulated and processed your first system with pytrnsys.
-But for sure you would like to adapt the example system two your weather data and to your
+But for sure you would like to adapt the example system to your weather data and to your
 demand profile, excecute other parametric studies, use different system sizing, analyse other
-simulation results etc. In this tutorial, you learn how to do all this and much more. We will work with the
+simulation results etc.. In this tutorial, you learn how to do all this and much more. We will work with the
 solar domestic hot water example system that looks like this:
 
 .. image:: ./resources/solar_dhw_diagram.png
@@ -59,7 +59,7 @@ the simulation results defined in the TRNSYS printers will be stored.
 
 The finished simulation results can be processed by running **pytrnsys-process** inside the base simulation folder
 solar_dhw. The processing will add various files to the folder structure. Single simulation plots and results
-will be placed in the subfolders while comparison plots and comparison data will be added to the simlation base folder.
+will be placed in the subfolders while comparison plots and comparison data will be added to the simulation base folder.
 
 As in all pytrnsys projects, a heat balance will be produced for the solar domestic hot water example system.
 The heat balance plot of the unchanged example system looks like
@@ -92,13 +92,13 @@ In the runconfiguration file run_solar_dhw.config, we can see that there are alr
 
 It is recommended to always have the START and STOP variable exposed in the configuration file since they define
 the simulated timespan and are of high importance. In addition, the variable sizeAux is changed to a value of 3.
-This variable defines the power in kW of the auxiliary heater inside the thermal storage. We can chose now any other
+This variable defines the power in kW of the auxiliary heater inside the thermal storage. We can choose now any other
 variable in one of the used ddck files that we would like to change. Let us say we would like to change the slope of the
-thermal collector. In order to identify the relevant parameter we have to open the ddck of the used solar collector model
-/solar_collector/type1.ddck. In there we see that the collector surface definition is a dependency of another ddck
-by looking at the dependency list we see that the definition of the user surface 1 that is used for the collector
-is in the file /weather/weather_data_base.ddck. Inside we see that the variable we have to modify is **slopeSurfUser_1**.
-Therefore, in the configfile we can add the following line to simulate a facade collector with slope 90::
+thermal collector. In order to identify the relevant parameter we have to open the ddck of the used solar collector
+model /solar_collector/type1/type1.ddck. In there we see that the collector surface tilt definition **C_tilt** is a
+dependency of another ddck, in particular the variable **slopeSurfUser_1**. Looking at the solar_dhw.dck file we see
+that the definition of **slopeSurfUser_1** is done in the file /weather/weather_data_base.ddck. Therefore, in the
+configfile we can add the following line to simulate a facade collector with slope 90::
 
     deck slopeSurfUser_1 90
 
@@ -287,17 +287,17 @@ that corresponds to the first argument of the ``changeDDckFiles`` line. For each
 the path in ``scalingReference``. When the folder with the scaling values is onmodified, pytrnsys should
 be able to find the correct values for each variation.
 
-Finally, we should pytrnsys also tell which value in the results file it should use. We can do this
+Finally, we should also tell pytrnsys which value in the results file it should use. We can do this
 by adding the following line::
 
     string scalingVariable "Pdhw_kW_Tot/1000"
 
-As you can see we can also add arithmetic operations to the value. As en example, here the value is converrted
+As you can see we can also add arithmetic operations to the value. As an example, here the value is converted
 from kW to MW.
 
 We are now ready to define our parametric study using relative sizing of parameters. As soon as the scaling is
 set to **"toDemand"**, pytrnsys will always multiply the values given in the ``variation`` statement
-with the scaling variable. So we can now size our collector area with relative to the domestic hot water demand.
+with the scaling variable. So we can now size our collector area relative to the domestic hot water demand.
 A realistic sizing would be to have about 1.5 m\ :sup:`2`\MWh so we add slight variations as::
 
     variation Ac AcollAp 1 1.5 2
@@ -321,7 +321,7 @@ Create your own ddck files
 --------------------------
 
 You already learned how to replace a ddck file with another one that is available in the ddck repository. Pytrnsys also
-allows you to create your onw custom ddck files and include them into your project. In this chapter, we will go through
+allows you to create your own custom ddck files and include them into your project. In this chapter, we will go through
 the process of creating and including a new domestic hot water profile ddck that we can use in the simulation of the
 solar domestic hot water system.
 
@@ -346,7 +346,7 @@ Get access to the pytrnsys GUI
 
 Pytrnsys is still under development by the SPF Institute for Solar Technology. Therefore, up to this point
 the pytrnsys GUI is not available for the public. If you would like to use pytrnsys
-to create you own new system hydraulics pleas contact dani.carbonell@spf.ch.
+to create you own new system hydraulics please contact dani.carbonell@spf.ch.
 
 
 

@@ -1,0 +1,65 @@
+*******************************
+**BEGIN mfb30.ddck
+*******************************
+    
+*****************************************
+** Contact person : Mattia Battaglia  
+** Creation date  : 29.04.2020
+** Last changes   : 29.04.2020, MB 
+*****************************************
+
+***************************************************************************
+** Description: 
+** parametrization of SPF MFB30 building. To be used together with bui_ISO_rad_floor.ddck or bui_ISO_radiator.ddck
+** TODO: 
+***************************************************************************
+
+***********************************
+** Generic variables
+***********************************
+
+CONSTANTS 5   
+scaleBuilding = 1
+**PheatBuiD = 12830*scaleBuilding  ! design heating rate for building an location [kJ/h]
+TBuiFlNom = 30 ! 35     ! Design flow temp. heating syst. [°C]
+TBuiRtNom = 25 ! 30     ! Design return temp. heating syst. [°C]
+Precond = NIX      ! Extracted mean ground preconditioning power
+PheatBuiD = 15*3600
+
+EQUATIONS 6	! Shading Factor (Blinds, other Buildings etc.)
+win_g = 0.5835	! g-value windows
+win_g_shd = 0.063	! g-value of the window when shaded with blinds
+shd_fix_N = 0.89	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
+shd_fix_S = 0.43	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
+shd_fix_E = 0.86	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
+shd_fix_W = 0.82	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
+	
+EQUATIONS 3	
+etaHeatRec = 0.8*LT(Tamb24,18)	! Heatrecovery efficiency of the ventilation system
+VfrAirExTot = VfrInf + VfrVent + VfrWindow	! Air exchange of the building [m3/s]
+VfrWindow = AND(GT(MOD(time,8760),2160),LT(MOD(time,8760),6552))*OR(GT(MOD(time,24),20),LT(MOD(time,24),7))*4.2*(ABS((Troom-Tamb))/((Troom+Tamb)/2+273))^(0.5)*ScaleVfrWindow	! Infiltration due window opening [m3/s] (Readout Textfile!)
+
+
+CONSTANTS 12
+********Fitted parameters***********
+Cm = 814754369.89*scaleBuilding ! J/K Internal capacity of the building J/K, 165000*(floor surface), "moyen" / mittlere therm. Kapazität
+Am = 5446*scaleBuilding      ! m2 effective mass area, 2.5*(floor surface), "moyen" / mittlere therm. Kapazität
+UaWin = 61.9429*scaleBuilding    ! Thermal transmission coefficient of doors, windows, curtains walls and glazed walls W/K
+HveISO = Ua_vent*scaleBuilding ! ventilation heat loss coefficient 300 ; m3/day *day/s * kg/m3 * J/kg K = W/K
+Htr_op = 532.2429*scaleBuilding ! W/K, UA value of walls 
+PGainPer = 1440*scaleBuilding	! Maximale Wärmeeintrag durch Personen [W]
+PGainEquip = 7649.2*scaleBuilding	! Maximaler Wärmeeintrag durch Geräte [W]
+PGainLight = 0!  7649.2*0.75	Maximaler Wärmeeintrag durch Beleuchtung [W]
+ScaleVfrWindow = 0.6667
+ScaleVfrVent = 0.6542
+VfrInf = 0	! Infiltration  [m3/s]
+VfrVent = 0.33*ScaleVfrVent*scaleBuilding	! Ventilation  [m3/s]
+
+CONSTANTS 6
+*******Scaled values***********
+AreaBui = 1205*scaleBuilding ! Conditioned floor area m2
+volBui = 2902*scaleBuilding  ! m2
+AsolN = 54.21*scaleBuilding  ! effective reception areas of the windows of the north
+AsolS = 172.53*scaleBuilding
+AsolE = 43.81*scaleBuilding
+AsolW = 26.32*scaleBuilding

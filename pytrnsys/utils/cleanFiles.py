@@ -12,6 +12,8 @@ ToDo :
 
 import os,sys
 import shutil
+import logging
+logger = logging.getLogger('root')
 
 class CleanFiles():
     
@@ -91,7 +93,7 @@ class CleanFiles():
     def ignore_notToBeCopied(self, dir, files):
         ignoreFiles = []
         for f in files:
-            print(f)
+            logger.debug(f)
             if os.path.isfile(os.path.join(dir, f)):
                 # if not f in self.filesToBeCopied:
                 # return f
@@ -130,7 +132,7 @@ class CleanFiles():
         #     os.mkdir(dst + "\\" + folder)
 
         shutil.copytree(self.path, dst, ignore=self.ig_f)
-        print("copytree")
+        logger.debug("copytree")
         return self.folderNames
 
     def copyTree(self,dst):
@@ -152,7 +154,7 @@ class CleanFiles():
 #                   print i
                    if(erase==i):
                      removedFolder = os.path.join(root,i)
-                     print("removedFolder : %s" % removedFolder)
+                     logger.info("removedFolder : %s" % removedFolder)
                      shutil.rmtree(removedFolder)
 
            
@@ -181,7 +183,7 @@ class CleanFiles():
                            
                    if(remove):
                      removedFile = os.path.join(root,i)
-                     print("removedFile : %s" % removedFile)
+                     logger.info("removedFile : %s" % removedFile)
                      os.remove(removedFile)
 
     def copyFilesToNewFolder(self,dstFolder=None):
@@ -231,7 +233,7 @@ class CleanFiles():
                             else:
                                 dstPath = dstFolder + "\\" + root.split("\\")[-1] + "\\" + i
 
-                        print("copiedFile : %s" % copiedFile)
+                        logger.debug("copiedFile : %s" % copiedFile)
                         shutil.copyfile(copiedFile,dstPath)
         pass
 
@@ -245,7 +247,7 @@ class CleanFiles():
                     dstPath = os.path.join(os.path.split(root)[0], i)
 
                     shutil.move(copiedFile,dstPath)
-                    print("copiedFile : %s" % copiedFile)
+                    logger.debug("copiedFile : %s" % copiedFile)
 
                 shutil.rmtree(root)
 
@@ -256,7 +258,7 @@ class CleanFiles():
                     dstPath = os.path.join(os.path.split(root)[0], i)
 
                     shutil.move(copiedFile,dstPath)
-                    print("copiedFile : %s" % copiedFile)
+                    logger.debug("copiedFile : %s" % copiedFile)
 
                 shutil.rmtree(root)
 

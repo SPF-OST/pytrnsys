@@ -14,6 +14,9 @@ from string import ascii_letters, digits, whitespace
 import shutil
 import codecs
 import json
+import subprocess
+import logging
+logger = logging.getLogger('root')
 
 class LatexReport():
     
@@ -104,7 +107,7 @@ class LatexReport():
         for plotName in self.plotsAdded:
             pdfWithPath = "%s\\%s" % (self.outputPath,plotName)
             
-            print ("Cleaning Latex Mode file %s"% pdfWithPath)
+            logger.info("Cleaning Latex Mode file %s"% pdfWithPath)
             os.remove(pdfWithPath)
             
             
@@ -120,9 +123,9 @@ class LatexReport():
             
             try:
                 shutil.copy(logFile,logFileEnd)      
-                print ("copy file %s to %s" % (logFile,logFileEnd))
+                logger.debug("copy file %s to %s" % (logFile,logFileEnd))
             except:
-                print ("FAIL to copy the file %s to %s" % (logFile,logFileEnd))
+                logger.warning("FAIL to copy the file %s to %s" % (logFile,logFileEnd))
 
         if pathLatexExe==False:
             latexExe = os.getenv("LATEX_EXE")
@@ -143,8 +146,14 @@ class LatexReport():
 
 #        print cmd
         myCmd ='"%s"'%cmd #for blank spaces in paths
-        os.system(myCmd)  
-        
+
+        subprocessOutput = subprocess.run(cmd, capture_output=True)
+        errorMessage = subprocessOutput.stderr.decode("utf-8")
+        outputMessage = subprocessOutput.stdout.decode("utf-8")
+        if errorMessage != '':
+            logger.warning(errorMessage)
+        logger.debug(outputMessage)
+
         if(runTwice): #necessary to generate table of contents
             os.system(myCmd)
 
@@ -155,13 +164,13 @@ class LatexReport():
         try:
             os.remove(name)        
         except:
-            print (name + " could not be removed, maybe there was a problem with the Latex File...")
+            logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
             
         name='%s\%s.aux' % (self.outputPath,self.fileName)
         try:
             os.remove(name)        
         except:
-            print (name + " could not be removed, maybe there was a problem with the Latex File...")
+            logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
 
         
         if LatexPackage=="texify":
@@ -169,16 +178,16 @@ class LatexReport():
             try:
                 os.remove(name)        
             except:
-                print (name + " could not be removed, maybe there was a problem with the Latex File...")
+                logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
             
         if os.path.isfile(self.outputPath + "\\" + self.fileName + ".pdf"):
-           print ("Latex File created sucessfully")
+           logger.info("Latex File created sucessfully")
         else:
             raise ValueError('PDF was not generated, or not saved in the right directory')
           
         
         if(self.cleanMode):
-            print ("Eraising plots because cleanMode is True")
+            logger.info("Eraising plots because cleanMode is True")
             self.cleanFiles()
         
     def addBeginDocument(self):                              
@@ -334,7 +343,7 @@ class LatexReport():
                     else:
                         line = "%s &" % _units[i]; self.lines = self.lines + line
             else:
-                print ("Units size differ from names, so we use the first one for all")
+                logger.warning("Units size differ from names, so we use the first one for all")
 
                 for i in range(len(_names)):
                     if(i==0):
@@ -460,7 +469,7 @@ class LatexReport():
                         line = "%s &" % _units[i];
                         self.lines = self.lines + line
             else:
-                print ("Units size differ from names, so we use the first one for all")
+                logger.warning("Units size differ from names, so we use the first one for all")
 
                 for i in range(len(_names)):
                     if (i == 0):

@@ -11,6 +11,9 @@ ToDo :
 import os
 import numpy as num
 import pytrnsys.report.latexReport as latex
+import subprocess
+import logging
+logger = logging.getLogger('root')
 
 class PlotGle():  
         
@@ -161,7 +164,7 @@ class PlotGle():
         if(len(legends) != (sizeIn+sizeOut)):
             lines = "!This case will not work because size of legend:%d is different from sizeIn:%d + sizeOut%d\n"%(len(legends),sizeIn,sizeOut)
             lines = lines+"!The last values on the negative side that correspond to some from the positive will not be printed automatically.\n !The rest should be correct\n"
-            print  (lines)
+            logger.debug(lines)
             
         lines = lines+self.getFigCaption()
         lines = lines+self.getCaptionGraph()
@@ -191,12 +194,12 @@ class PlotGle():
         line = "!positive values\n";lines=lines+line
             
         for i in range(sizeIn-1,-1,-1):
-            line = "\tbar d%d fill %s !%s\n"%(i+1,self.colorGLE[i],legends[i]);lines=lines+line
+            line = "\tbar d%d fill %s !%s\n"%(i+1,self.colorGLE[i%17],legends[i]);lines=lines+line
 
         line = "!negative values\n";lines=lines+line
 
         for i in range(len(legends)-1,sizeIn-1,-1):
-            line = "\tbar d%d fill %s ! %s\n"%(i+1,self.colorGLE[i],legends[i]);lines=lines+line
+            line = "\tbar d%d fill %s ! %s\n"%(i+1,self.colorGLE[i%17],legends[i]);lines=lines+line
 
 
         for i in range(len(legends)):            
@@ -296,16 +299,18 @@ class PlotGle():
     def executeGLE(self,fileName):
                 
         gleExe ='"%s"'% os.getenv("GLE_EXE")
-        try:
-            cmd = "%s -vb 0 -d pdf %s\%s" % (gleExe, self.path, fileName)
-        except:
-            if os.path.exists(gleExe):
-                cmd = "%s -vb 0 -d pdf %s\%s" % (gleExe,self.path,fileName)
-            else:
-                cmd = "%s -vb 0 -d pdf %s\%s" % ('gle.exe',self.path,fileName)
-        print (cmd)
-        
-        os.system(cmd)   
+        if os.path.exists(gleExe):
+            cmd = "%s -vb 0 -d pdf %s\%s" % (gleExe,self.path,fileName)
+        else:
+            cmd = "%s -vb 0 -d pdf %s\%s" % ('gle.exe',self.path,fileName)
+        logger.debug(cmd)
+
+        subprocessOutput = subprocess.run(cmd, shell=True, capture_output=True)
+        errorMessage = subprocessOutput.stderr.decode("utf-8")
+        outputMessage = subprocessOutput.stdout.decode("utf-8")
+        if errorMessage != '':
+            logger.warning(errorMessage)
+        logger.debug(outputMessage)
 
         namePdf = fileName.split(".")[0]+".pdf"
         
@@ -350,15 +355,15 @@ class PlotGle():
                     myName = splitEquality[0].replace(" ","")
                     value  = splitEquality[1].replace(" ","")                 
                         
-                    print ("myName:%s value:%s"%(myName,value))
+                    logger.debug("myName:%s value:%s"%(myName,value))
                     
                     for key in parametersDict.iterkeys(): 
-                        print ("key:%s- myName:%s-"%(key,myName))
+                        logger.debug("key:%s- myName:%s-"%(key,myName))
                         
                         if(key==myName):  
                                                                  
                             myNewLine = "%s=%s ! value changed from original by plotGle.py\n" % (key,parametersDict[key])
-                            print ("NEW LINE %s" % myNewLine)
+                            logger.debug("NEW LINE %s" % myNewLine)
                                        
                             lines[i] = myNewLine        
                 except:

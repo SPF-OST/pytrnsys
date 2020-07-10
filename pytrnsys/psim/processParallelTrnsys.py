@@ -26,7 +26,7 @@ try:
 except ImportError:
     pass
 #we would need to pass the Class as inputs
-
+import pytrnsys.utils.log as log
 
 def processDataGeneralDeprecated(casesInputs):
     """
@@ -45,7 +45,6 @@ def processDataGeneralDeprecated(casesInputs):
     (baseClass,locationPath, fileName, avoidUser, maxMinAvoided, yearReadedInMonthlyFile, cleanModeLatex, firstMonthUsed,\
       processQvsT,firstMonthUsed,buildingArea,dllTrnsysPath,setPrintDataForGle,firstConsideredTime) = casesInputs
 
-    print ("starting processing of: %s"% fileName)
     #    locationPath = inputs.pop(0)
     #    fileName,avoidUser,maxMinAvoided,yearReadedInMonthlyFile,cleanModeLatex,firstMonthUsed,processQvsT
 
@@ -83,7 +82,6 @@ def processDataGeneralDeprecated(casesInputs):
             newEnding = "-Year%i" % yearReadedInMonthlyFile + ending
             try:
                 os.rename(renameFile + ending, renameFile + newEnding)
-                print("renamed %s"%newEnding)
             except:
                 warnings.warn(
                     "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
@@ -110,7 +108,6 @@ def processDataGeneral(casesInputs):
 
     (baseClass,locationPath, fileName, inputs) = casesInputs
 
-    print ("starting processing of: %s"% fileName)
     #    locationPath = inputs.pop(0)
     #    fileName,avoidUser,maxMinAvoided,yearReadedInMonthlyFile,cleanModeLatex,firstMonthUsed,processQvsT
 
@@ -213,7 +210,7 @@ class ProcessParallelTrnsys():
         self.inputs["latexExePath"] = "Unknown"
         self.inputs["figureFormat"] = 'pdf'
         self.inputs["plotEmf"] = False
-
+        self.inputs["outputLevel"] = "INFO"
 
     def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
@@ -222,6 +219,7 @@ class ProcessParallelTrnsys():
         self.configPath = path
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated)
+        self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
         if 'latexNames' in self.inputs.keys():
             if ':' not in self.inputs['latexNames']:
                 self.inputs['latexNames'] = os.path.join(self.configPath, self.inputs['latexNames'])
@@ -256,10 +254,10 @@ class ProcessParallelTrnsys():
                     nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (relPath, name))
 
                     if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                        print ("file :%s already processed" % name)
+                        self.logger.debug("file :%s already processed" % name)
 
                     elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (relPath, name))) and  self.inputs["forceProcess"] == False:
-                        print ("file :%s already processed" % name)
+                        self.logger.debug("file :%s already processed" % name)
 
                     else:
                         if len(Path(relPath).parts)>1:
@@ -268,7 +266,7 @@ class ProcessParallelTrnsys():
                             newPath = pathFolder
                         baseClass = self.getBaseClass(self.inputs["classProcessing"],newPath,name)
 
-                        print ("file :%s will be processed" % name)
+                        self.logger.debug("file :%s will be processed" % name)
                         # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
                         #                     self.inputs["cleanModeLatex"],self.inputs["firstMonthUsed"],self.inputs["processQvsT"],self.inputs["firstMonthUsed"],self.inputs["buildingArea"],\
                         #                     self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
@@ -320,15 +318,15 @@ class ProcessParallelTrnsys():
                         nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
 
                         if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                            print ("file :%s already processed" % name)
+                            self.logger.debug("file :%s already processed" % name)
 
                         elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (name, name))) and self.inputs["forceProcess"] == False:
-                            print ("file :%s already processed" % name)
+                            self.logger.debug("file :%s already processed" % name)
 
                         else:
                             baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)
 
-                            print ("file :%s will be processed" % name)
+                            self.logger.debug("file :%s will be processed" % name)
 
 
                             if ("hourly" in name or "hourlyOld" in name) and not "Mean" in name:
@@ -365,16 +363,16 @@ class ProcessParallelTrnsys():
                                 nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
 
                                 if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                                    print("file :%s already processed" % name)
+                                    self.logger.debug("file :%s already processed" % name)
 
                                 elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (name, name))) and \
                                         self.inputs["forceProcess"] == False:
-                                    print("file :%s already processed" % name)
+                                    self.logger.debug("file :%s already processed" % name)
 
                                 else:
                                     baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)
 
-                                    print("file :%s will be processed" % name)
+                                    self.logger.debug("file :%s will be processed" % name)
 
                                     if ("hourly" in name or "hourlyOld" in name) and not "Mean" in name:
                                         inputs = []
@@ -519,8 +517,12 @@ class ProcessParallelTrnsys():
             for chunk,style in zip(plotXDict.keys(),styles):
                 dummy_lines.append(ax1.plot([],[],style,c='black'))
                 if chunk is not None:
-                    chunkLabel = round(float(chunk), 2)
-                    chunkLabels.append("{:.2f}".format(chunkLabel))
+                    if not isinstance(chunk,str):
+                        chunkLabel = round(float(chunk), 2)
+                        chunkLabels.append("{:.2f}".format(chunkLabel))
+                    else:
+                        chunkLabels.append(chunk)
+
                 for key in plotXDict[chunk].keys():
                     index = num.argsort(plotXDict[chunk][key])
                     myX = num.array(plotXDict[chunk][key])[index]
@@ -581,7 +583,7 @@ class ProcessParallelTrnsys():
             #ax1.set_position([box.x0, box.y0, box.width, box.height])
 
             if chunkVariable is not '':
-                legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.4, 1.0), bbox_transform=ax1.transAxes)
+                legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0), bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
@@ -668,7 +670,7 @@ class ProcessParallelTrnsys():
                 found=True
 
         if(found==False):
-            print ("changeFile was not able to change %s by %s"%(source,end))
+            self.logger.warning("changeFile was not able to change %s by %s"%(source,end))
 
     def calcCost(self):
 

@@ -6,6 +6,8 @@ import string,shutil
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.utils.utilsSpf as utils
 import numpy as num
+import logging
+logger = logging.getLogger('root')
 
 class LogTrnsys():
 
@@ -36,10 +38,11 @@ class LogTrnsys():
   
         self.eliminateComments = False
         self.numberOfFailedIt = 0
+        self.loadLog()
         
     def loadLog(self):        
 
-        print ("nameLog:%s" % self.nameLog)
+        logger.debug("nameLog:%s" % self.nameLog)
 
         try:
             infile=open(self.nameLog,'r')
@@ -57,12 +60,12 @@ class LogTrnsys():
             self.numberOfFailedIt = 0
 
     def getCalculationTime(self):
-            
-            
+
+
         sentence="Total TRNSYS Calculation Time"
         
-        #I increase the number of back lines to read becasue if we add the time for each type it is writen after the calclation time
-        for i in range(len(self.lines)-1,len(self.lines)-500,-1):
+        #I increase the number of back lines to read becasue if we add the time for each type it is writen after the calculation time
+        for i in range(len(self.lines)):
 
             split =  self.lines[i].split(":")
 
@@ -74,6 +77,66 @@ class LogTrnsys():
             except:
                 pass
             
+        return -99
+
+    def checkFatalErrors(self):
+
+
+        sentence = "Total Fatal Errors"
+
+        for i in range(len(self.lines)):
+
+            split = self.lines[i].split(":")
+
+            try:
+                if (split[0].strip() == sentence):
+                    nNumberOfFatalErrors = split[1].strip()
+                    numberOfFatalErrors = int(nNumberOfFatalErrors.split()[0])
+                    return numberOfFatalErrors
+            except:
+                pass
+
+        return -99
+
+    def logFatalErrors(self):
+
+
+        sentence = "*** Fatal Error at time"
+
+        for i in range(len(self.lines)):
+
+            split = self.lines[i].split(":")
+
+            try:
+                if (split[0].strip() == sentence):
+                    return self.lines[i:i+5]
+
+
+                    #nNumberOfFatalErrors = split[1].strip()
+                    #numberOfFatalErrors = int(nNumberOfFatalErrors.split()[0])
+                    #return numberOfFatalErrors
+            except:
+                pass
+
+        return False
+
+    def checkWarnings(self):
+
+
+        sentence = "Total Warnings"
+
+        for i in range(len(self.lines) - 1, len(self.lines) - 500, -1):
+
+            split = self.lines[i].split(":")
+
+            try:
+                if (split[0].strip() == sentence):
+                    nNumberOfWarnings = split[1].strip()
+                    numberOfWarnings = int(nNumberOfWarnings.split()[0])
+                    return numberOfWarnings
+            except:
+                pass
+
         return -99
                 
     def getMyDataFromLog(self):
@@ -88,14 +151,14 @@ class LogTrnsys():
                 try:    
                   
                    self.numberOfFailedIt = split[1].replace("%","\%")               
-                   print (self.numberOfFailedIt)
+                   logger.debug(self.numberOfFailedIt)
 
                 except:
                     pass
                                 
         except:
             self.numberOfFailedIt = -99
-            print ("LOG FILE NOT FOUND")
+            logger.warning("LOG FILE NOT FOUND")
             
         return None
 
@@ -136,7 +199,7 @@ class LogTrnsys():
                     pass
                                 
         except:
-            print ("LOG FILE NOT FOUND")
+            logger.warning("LOG FILE NOT FOUND")
 
         return iteMonth
 
@@ -155,7 +218,7 @@ class LogTrnsys():
 
         nameItProblem = self.path + nameFile
 
-        print ("It problems printed in %s"%nameItProblem)
+        logger.warning("It problems printed in %s"%nameItProblem)
 
         infile=open(nameItProblem,'w')
         lines=infile.writelines(lines)
