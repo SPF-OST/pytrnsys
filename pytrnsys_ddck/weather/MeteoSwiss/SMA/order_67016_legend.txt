@@ -1,0 +1,53 @@
+Bundesamt für Meteorologie und Klimatologie, MeteoSchweiz
+Operation Center 1
+Postfach 257
+8058 Zürich-Flughafen
+
+stn yyyyMMddHHmm
+
+stn Stationskürzel
+y   Jahr
+M   Monat
+d   Tag
+H   Stunde
+m   Minute
+
+Zeitangaben in UTC: 00:40 UTC = 02:40 Sommerzeit
+                              = 01:40 Winterzeit
+
+Zeitbezug bei Stundenwerten, sofern in der Parameterbeschreibung nicht anders vermerkt: HH  = (HH-1):01 - HH:00
+Beispiel: 13 = beinhaltet Messperiode von 12:01 bis 13:00 
+
+Fehlende Messwerte sind gekenntzeichnet mit '-'
+
+Qualitätsinformationen: Die Legende zu den Qualitätsinformationen ist zu finden unter: https://gate.meteoswiss.ch/idaweb/text/datenqualitaet_legende_de.pdf
+
+ 
+
+
+
+
+Stationen
+---------
+stn       Name                                 Parameter        Datenquelle                                        Länge/Breite             Koordinaten [km] Höhe ü. M. [m]
+SMA       Zürich / Fluntern                    gre000h0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    prestah0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    tre200h0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    ure200h0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+
+Parameter
+---------
+          Einheit                              Beschreibung
+gre000h0  W/m²                                 Globalstrahlung; Stundenmittel
+qgre000h0 Code                                 Plausibilitätsinformation für gre000h0
+mgre000h0 Code                                 Mutationsinformation für gre000h0
+prestah0  hPa                                  Luftdruck auf Stationshöhe (QFE); Stundenmittel
+qprestah0 Code                                 Plausibilitätsinformation für prestah0
+mprestah0 Code                                 Mutationsinformation für prestah0
+tre200h0  °C                                   Lufttemperatur 2 m über Boden; Stundenmittel
+qtre200h0 Code                                 Plausibilitätsinformation für tre200h0
+mtre200h0 Code                                 Mutationsinformation für tre200h0
+ure200h0  %                                    Relative Luftfeuchtigkeit 2 m über Boden; Stundenmittel
+qure200h0 Code                                 Plausibilitätsinformation für ure200h0
+mure200h0 Code                                 Mutationsinformation für ure200h0
+
