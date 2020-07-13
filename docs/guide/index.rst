@@ -1,17 +1,10 @@
 .. _getting-started:
 
-Welcome to the pytrnsys documentation!
-======================================
-
-The pytrnsys package provides a complete framework to run and process, plot and report 
-TRNSYS simulations. It is designed to give researchers a fast,
-fully automatized and easily reproducible way to execute and share TRNSYS simulations by the use of a single short
-configuration file. In addition, a large variety of commands is accessible
-to post-process simulation results in one shot.
-For more details checkout the :any:`reference <pytrnsys>`.
-
 Getting Started
----------------
+===============
+
+Installation
+------------
 
 Up to now, only TRNSYS17 is fully supported in all the example projects. In order to use pytrnsys, you need the following prerequisites on your machine:
 
@@ -49,7 +42,7 @@ dll-files from::
 
     ptrnsys_ddck/dlls
 
-to
+to::
 
     Trnsys17/UserLib/ReleaseDLLs
 
@@ -149,28 +142,3 @@ Or directly read through all the options of the configuration files and play aro
 .. toctree::
     :maxdepth: 3
    config_file
-
-About
------
-This code was not initially developed with the intention to be shared with others outside our institute SPF,
-but after realizing that it could help the community to have a better workflow with TRNSYS, we decided to share it.
-
-Developers
-^^^^^^^^^^
-
-- Daniel Carbonell : SPF Institute for Solar Technology, Rapperswil, Switzerland.
-- Mattia Battaglia : SPF Institute for Solar Technology, Rapperswil, Switzerland.
-- Jeremias Schmidli : SPF Institute for Solar Technology, Rapperswil, Switzerland.
-- Maike Schubert : SPF Institute for Solar Technology, Rapperswil, Switzerland.
-- Martin Neugebauer : SPF Institute for Solar Technology, Rapperswil, Switzerland.
-
-
-
-Acknowledgments
-^^^^^^^^^^^^^^^
-
-A first version of this package was created in 2013 and since then it has evolved considerably.
-We would like to thank the Swiss Federal Office Of Energy (SFOE) who supported many projects related to simulations of
-renewable energy systems where this code has been developed. We would also like to thank the European Union’s Horizon
-2020 research and innovation programme for the funding received in TRI-HP under the Grant Agreement No. 81488. This
-project allowed to dedicate efforts in sharing the code with the consortium and to make the code usable for the others.

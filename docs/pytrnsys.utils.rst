@@ -12,6 +12,14 @@ pytrnsys.utils.cleanFiles module
    :undoc-members:
    :show-inheritance:
 
+pytrnsys.utils.copyDllFiles module
+----------------------------------
+
+.. automodule:: pytrnsys.utils.copyDllFiles
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pytrnsys.utils.costCalculation module
 -------------------------------------
 
