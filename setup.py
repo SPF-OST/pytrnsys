@@ -8,7 +8,7 @@ with open("README.rst", "r") as fh:
 setuptools.setup(
     name = "pytrnsys",
     packages=setuptools.find_packages(),
-    version="0.2.4",
+    version="0.3",
     author="Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Martin Neugebauer",
     author_email="martin.neugebauer@spf.ch",
     description="pytrnsys simulation framework",
@@ -19,7 +19,7 @@ setuptools.setup(
     #     "Documentation": "https://pytrnsys.readthedocs.io",
     #     "Source Code": "https://github.com/dcarbonellsanchez/pytrnsys",
     # },
-    download_url = "https://github.com/dcarbonellsanchez/pytrnsys/archive/0.2.4.tar.gz",
+    download_url = "https://github.com/dcarbonellsanchez/pytrnsys/archive/0.3.tar.gz",
     include_package_data=True,
     install_requires=[
         'numpy',
