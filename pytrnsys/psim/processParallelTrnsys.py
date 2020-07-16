@@ -156,6 +156,8 @@ def processDataGeneral(casesInputs):
         for ending in fileEndingsDefault:
             newEnding = "-Year%i" % inputs["yearReadedInMonthlyFile"] + ending
             try:
+                if os.path.isfile(renameFile + newEnding):
+                    os.remove(renameFile + newEnding)
                 os.rename(renameFile + ending, renameFile + newEnding)
                 os.remove(renameFile + ending)
             except:

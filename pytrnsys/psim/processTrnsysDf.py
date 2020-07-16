@@ -172,10 +172,28 @@ class ProcessTrnsysDf():
         except:
             logger.warning('START or STOP variable called differentely. Number of simulated years not calculated and printed. Mabe check for upper lower case issues.')
 
+        if 'loadExternalData' in self.inputs.keys() and 'loadExternalDataMask' in self.inputs.keys():
+            m = re.search(self.inputs['loadExternalDataMask'],self.fileName)
+            fileToLoad = self.inputs['loadExternalData']
+            try:
+                stringToBeInserted = m.group(1)
+                fileToLoad = fileToLoad.replace('*',stringToBeInserted)
+            except:
+                pass
+            with open(fileToLoad) as f_in:
+                resultsDict = json.load(f_in)
+            for key,value in resultsDict.items():
+                if isinstance(value,list):
+                    self.monDataDf[key+'_Ext'] = pd.Series(num.array(value),index = range(1,13,1))
+                else:
+                    self.deckData[key+'_Ext'] = value
+
         self.yearlySums = {value+'_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
 
 
+        for column in self.monDataDf.columns:
+            self.monDataDf['Cum_'+column]=self.monDataDf[column].cumsum()
         self.calcConfigEquations()
 
         self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
@@ -397,6 +415,7 @@ class ProcessTrnsysDf():
                 if scalar in parts:
                     equation = equation.replace(scalar,'@'+scalar)
             self.monDataDf.eval(equation,inplace=True,**kwargs)
+            self.monDataDf['Cum_' + value] = self.monDataDf[value].cumsum()
             self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         for equation in self.inputs["calcHourly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
@@ -408,6 +427,7 @@ class ProcessTrnsysDf():
                 if scalar in parts:
                     equation = equation.replace(scalar,'@'+scalar)
             self.houDataDf.eval(equation, inplace=True, **kwargs)
+            self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
 
 
     def addPlotConfigEquation(self):

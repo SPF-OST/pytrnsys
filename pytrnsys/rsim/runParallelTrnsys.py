@@ -191,6 +191,7 @@ class RunParallelTrnsys():
                 nameBase = self.nameBase
                 self.unscaledVariables = deepcopy(self.variablesOutput)
                 for i in range(len(self.sourceFilesToChange)):
+                    originalSourceFile = self.sourceFilesToChange[i]
                     sourceFile = self.sourceFilesToChange[i]
                     for j in range(len(self.sinkFilesToChange[i])):
                         sinkFile = self.sinkFilesToChange[i][j]
@@ -199,7 +200,7 @@ class RunParallelTrnsys():
                             if 'changeScalingFile' in self.inputs.keys():
                                 self.scaleVariables(self.inputs['scalingReference'], self.inputs['changeScalingFile'][0], self.inputs['changeScalingFile'][j+1])
                             else:
-                                self.scaleVariables(self.inputs['scalingReference'],sourceFile,sinkFile)
+                                self.scaleVariables(self.inputs['scalingReference'],originalSourceFile,sinkFile)
 
                         sourceFile=sinkFile #for each case the listddck will be changed to the new one, so we need to compare with the updated string
 
@@ -210,7 +211,7 @@ class RunParallelTrnsys():
                             if not os.path.isdir(self.path):
                                 os.mkdir(self.path)
                         else:
-                            self.nameBase = nameBase+'-'+os.path.split(sourceFile)[-1]
+                            self.nameBase = nameBase+'-'+os.path.split(sinkFile)[-1]
 
                         self.buildTrnsysDeck()
                         self.createDecksFromVariant()
