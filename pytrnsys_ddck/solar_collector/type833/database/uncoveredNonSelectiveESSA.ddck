@@ -39,12 +39,13 @@ MoCond = 1
 MoCond_fc = 1     
 cIr_2 = 0.730764
 
-CONSTANTS 4
+CONSTANTS 5
 
 ColHeightBrutto = 0.865     ! Bruttoheight collector [m]
 ColWithBrutto = 2.37     ! Bruttowith collector [m]
 ColHeightAper = 0.845     ! Aperturheight collecltor [m]
 ColWithAper = 2.35     ! Aperturwith collector [m]
+ColAperArea = ColHeightAper*ColWithAper
 
 CONSTANTS 4    
 alphaColl = 0.95     ! Absorption

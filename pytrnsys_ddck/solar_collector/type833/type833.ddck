@@ -19,7 +19,7 @@
 ***********************************
 
 EQUATIONS 2     
-TCollIn = TPiColIn   !  °C
+TCollIn = TPiColIn   !  ï¿½C
 MfrColl = ABS(MfrPiColIn) ! MfrColl_B   ! because its the other way around  
 
 ***********************************
@@ -57,8 +57,8 @@ AcollAp = NumberOfColl*ColAperArea  ! Total Collector aperture area [m2]
 **COLLECTOR DATA
 ***************************
 CONSTANTS 3
-C_tilt = slopeSurfUser_1  ! Collector tilt angle / slope [°]
-C_azim = aziSurfUser_1    ! Collector azimuth  (0:s, 90:w, 270: e) [°]
+C_tilt = slopeSurfUser_1  ! Collector tilt angle / slope [ï¿½]
+C_azim = aziSurfUser_1    ! Collector azimuth  (0:s, 90:w, 270: e) [ï¿½]
 NumberOfColl = 10    ! Number of total collectors
 
 ***************************************
@@ -70,7 +70,7 @@ EQUATIONS 4
 IT_Coll_kJhm2 = IT_SurfUser_1  ! Incident total radiation on collector plane, kJ/hm2 
 IB_Coll_kJhm2 = IB_SurfUser_1  ! incident beam radiation on collector plane, kJ/hm2
 ID_Coll_kJhm2 = ID_SurfUser_1  ! diffuse and ground reflected irradiance on collector tilt
-AI_Coll = AI_SurfUser_1  ! incident angle on collector plane, °
+AI_Coll = AI_SurfUser_1  ! incident angle on collector plane, ï¿½
 
 EQUATIONS 5
 IT_Coll_kW = IT_Coll_kJhm2/3600     ! Incident total radiation on collector plane, kW/m2
@@ -110,7 +110,7 @@ MfrCSec = 0     ! mass flow in secondary solar circuit [kg/h]
 MfrCPriMin = 0.4*MfrCPriNom     ! minimum mass flow rate
 
 **EQUATIONS 1     
-**TambPiC = 0.5*tAmb+0.5*tRoom     ! average  collector pipe surrounding temperature, °C
+**TambPiC = 0.5*tAmb+0.5*tRoom     ! average  collector pipe surrounding temperature, ï¿½C
      
 *********************************** Collector loop control ********************************************************************     
      
@@ -165,15 +165,12 @@ MfrPDNew     ! 5: manual manipulated variable
 *** OUTUPUTS     
 ** 1: manipulated variable, 2: current setpoint, 3: current deviation      
       
-EQUATIONS 8     ! Collector ON-Signal and mass flow
+EQUATIONS 5     ! Collector ON-Signal and mass flow
 **DfOrHt = GT(ProDfWs+ProDfAux+ProHt12+ProHt2+DfColOn,0.5)          
 MfrCPri = pumpColOn*MfrPDRc       !MfrCPri = MfrPD*pumpColOn; !old = MfrCPri = MfrPD*(BoCnoOn+ ProHt12+ProHt2)+MfrCPriNom*ProDfWs
 MfrCTot = MfrCPriNom*pumpColOn  !old = MfrCTot = MfrCPriNom*(BoCnoOn+ProDfWs+ ProHt12+ProHt2)
-MfrPDNew=[157,1]     
-relaxMfrPD = 0    
-MfrPD=MfrPDNew*relaxMFrPD + (1-relaxMFrPD)*MfrPDRc     
-SetpPD=[157,2]     
-DevPD=[157,3]     
+MfrPDNew=[157,1]        
+MfrPD=MfrPDRc              
 TProPID= TCollOut ! TpiColOutInUsed   
     
      
@@ -186,10 +183,10 @@ TCollOut   BoCst  MfrPDNew   TCollIn    parRatio MfrColl !QImbPri_kW_Int
 20     0.0   1.0     20   0 0
          
 EQUATIONS 6               ! Recalled values for collector control
-TCollOutRc = [71,1]     ! recalled value of collector outlet temperature, °C
+TCollOutRc = [71,1]     ! recalled value of collector outlet temperature, ï¿½C
 BoCstRc = [71,2]     ! recalled Boolean for collector stagnation, 1/0
 MfrPDRc = [71,3]     
-TCollInRc = [71,4]     ! recalled value of collector outlet temperature, °C
+TCollInRc = [71,4]     ! recalled value of collector outlet temperature, ï¿½C
 **QImbPri_kW_IntRc = [71,5]
 parRatioRc = [71,5]    
 MfrCollRc = [71,6] 
@@ -237,7 +234,7 @@ C_azim     ! 22 Cazi - Collector azimuth; 999 if transversal and longitudinal an
 MoCond     ! 24 MoCond - Mode for condensation gain calculation: 0 = no cond. gains, 1 = method of Perers, 2 = method of Bertram
 cCondPerers     ! 25 cCond - additional coefficient for condensation gains - method of Perers, idally = 0.916
 UvalueAbs_Fluid     ! 26 u-value of the absorber or material between fluid and surface of the absorber to ambient boundary for condesation gain calculation according to Bertram
-BoFrostGains     ! 27 MoFrost - mode for calculation of frost gains. 0 = no calculation of condensation or frost gains below Tamb = 0°C, 1 = calculation of frost gains
+BoFrostGains     ! 27 MoFrost - mode for calculation of frost gains. 0 = no calculation of condensation or frost gains below Tamb = 0ï¿½C, 1 = calculation of frost gains
 NIX     ! 28 frei
 NIX     ! 29 frei
 NIX     ! 30 frei
@@ -280,8 +277,8 @@ EQUATIONS 12     ! Collector Outputs
 MfrCout = [74,2]     ! Massflow out of collector
 Pcoll = [74,3]     ! kJ/h: Power of collector outlet
 pRadGain = [74,5]     ! Radiative energy gain per m2 [W/m2]
-iamBeamRad = [74,6]     ! No flow absorber temperature, °C
-Tabs = [74,4]     ! Mean absorber temperature, °C
+iamBeamRad = [74,6]     ! No flow absorber temperature, ï¿½C
+Tabs = [74,4]     ! Mean absorber temperature, ï¿½C
 iaTrans = [74,7]     
 iaLong = [74,8]     
 specHeatGain= [74,9]     ! W/m2

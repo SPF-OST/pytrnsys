@@ -40,7 +40,7 @@ TroomSetCool   = 24.00     ! Setpoint for Room temperature for cooling, °C
 dTCool = 1
 
 EQUATIONS 1
-CoolingNeeded = OR(AND(GE(Troom,TroomSetCool-dTCool),CoolingNeededRc),GE(Troom,TroomSetCool)) !Deadband
+CoolingNeeded = OR(AND(GE(TroomRc,TroomSetCool-dTCool),CoolingNeededRc),GE(TroomRc,TroomSetCool)) !Deadband
 
 
 
