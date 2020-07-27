@@ -36,10 +36,10 @@ TRdRt = [42,1]  ! return temperature from space heat distribution system, °C
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
 
-EQUATIONS 2
-qSysOut_BuiDemand = PheatBui_kW ! Total heat (without cooling) Heat to Building from Radiator: W --> kW
-qSysIn_BuiDemand  = PcoolBui_kW !   
-!elSysOut_PuSH      = PelPuSh_kW  ! To be moved and generated automatically to hydraulic GUI export
+EQUATIONS 3
+qSysOut_BuiDemand 	= PheatBui_kW ! Total heat (without cooling) Heat to Building from Radiator: W --> kW
+qSysIn_BuiDemand  	= PcoolBui_kW !   
+elSysOut_PuShDemand	= PelPuSh_kW  ! To be moved and generated automatically to hydraulic GUI export JS: uncommented, because if it's calculated it should be included here...
 
 ***********************************
 ** Dependencies with other ddck

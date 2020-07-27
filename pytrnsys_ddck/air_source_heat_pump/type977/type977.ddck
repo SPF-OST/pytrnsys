@@ -36,7 +36,7 @@ THpCondOut = [162,3]     ! Temperature of the condenser (heat sink) outlet
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
 EQUATIONS 3
-elSysIn_Q_HpComp  = PelAuxComp_kW 
+elSysIn_Q_HpCompD  = PelAuxComp_kW 
 !elSysIn_Q_HpBkp  =  PelAuxTot_kW - PelAuxComp_kW -> these are equal to each other, so elSysIn_Q_HpBkp is 0
 qSysOut_HpLoss = PAuxDefrost_kW + PAuxLossStart_kW
 qSysIn_PauxEvap = PauxEvap_kW

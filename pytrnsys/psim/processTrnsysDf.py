@@ -284,15 +284,15 @@ class ProcessTrnsysDf():
 
         for name in self.monDataDf.columns:
 
-            if (len(name) > 9 and name[0:9] == "elSysOut_"):
+            if (len(name) > 9 and ((name[0:9] == "elSysOut_") or (name[0:9] == "elSysIn_Q"))):
 
-                if (name[-6:] == "Demand"):
+                if (name[-6:] == "Demand") or (name[-1] == "D"):
                     self.elDemandVector.append(self.monDataDf[name]) #Why not .values ??
                     self.legendEl.append(self.getNiceLatexNames(name))
 
             elif (len(name) > 8 and name[0:8] == "qSysOut_"):
 
-                if (name[-6:] == "Demand"):
+                if (name[-6:] == "Demand") or (name[-1] == "D"):
                     self.qDemandVector.append(self.monDataDf[name].values)
                     self.qDemandDf = self.qDemandDf + self.monDataDf[name]
                     self.legendQ.append(self.getNiceLatexNames(name))
@@ -605,7 +605,7 @@ class ProcessTrnsysDf():
             symbol = "\%"
             line = "\\hline \\\\ \n";
             addLines = addLines + line
-            line = "$Q_D$ & %.2f & MWh \\\\ \n" % (totalDemand / 1000.);
+            line = "$El_D$ & %.2f & MWh \\\\ \n" % (totalDemand / 1000.);
             addLines = addLines + line
             line = "Imb & %.1f & %s \\\\ \n" % (100 * imb / totalDemand, symbol);
             addLines = addLines + line
