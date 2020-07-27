@@ -431,10 +431,16 @@ class ProcessParallelTrnsys():
             self.calcCost()
 
         if 'comparePlot' in self.inputs.keys():
+            print("yes1")
             self.plotComparison()
             
         if 'compareMonthlyBarsPlot' in self.inputs.keys():
             self.plotMonthlyBarComparison()
+
+
+        if 'printBoxPlotGLEData' in self.inputs.keys():
+            print("yes")
+            self.printBoxPlotGLEData()
 
     def plotComparison(self):
         pathFolder = self.inputs["pathBase"]
@@ -615,6 +621,53 @@ class ProcessParallelTrnsys():
                 outfile.writelines(lines)
                 outfile.close()
                 # self.plot.gle.getEasyPlot(self, nameGleFile, fileNameData, legends, useSameStyle=True):
+
+    def printBoxPlotGLEData(self):
+        pathFolder = self.inputs["pathBase"]
+        for SPFload in self.inputs['printBoxPlotGLEData']:
+            SPF = SPFload[0]
+
+        #SPF = plotVariables[0]
+            #SPFload = []
+            SPFValues = []
+
+            for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
+                with open(file) as f_in:
+                    resultsDict = json.load(f_in)
+                #resultsDict[''] = None
+                     #name, index = str(SPF).split('[')
+                    #index = int(index.replace(']', ''))
+
+                    SPFValue=resultsDict[SPF]
+                    SPFValues.append(SPFValue)
+
+
+        SPFV = num.array(SPFValues)
+
+        SPFQ25 = num.quantile(SPFV, 0.25)
+        SPFQ50 = num.quantile(SPFV, 0.5)
+        SPFQ75 = num.quantile(SPFV, 0.75)
+        SPFAv = num.average(SPFV)
+        SPFMin = num.min(SPFV)
+        SPFMax = num.max(SPFV)
+
+
+
+
+
+
+       # line = "\n";
+        #lines = lines + line
+
+        lines = "%8.4f\t%8.4f\t%8.4f\t%8.4f\t%8.4f\t%8.4f\t" % (SPFAv, SPFMin, SPFQ25, SPFQ50, SPFQ75, SPFMax)
+        outfileName = "yearSpfShpDisgle"
+
+        outfile = open(os.path.join(pathFolder, outfileName + '.dat'), 'w')
+        outfile.writelines(lines)
+        outfile.close()
+
+
+
 
     def plotMonthlyBarComparison(self):
         pathFolder = self.inputs["pathBase"]
