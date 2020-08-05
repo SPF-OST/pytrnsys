@@ -102,6 +102,11 @@ class ProcessTrnsysDf():
         self.plot = plot.PlotMatplotlib(language=self.plot.language,stylesheet=stylesheet)
         self.plot.setPath(self.outputPath)
 
+    def setFontsize(self,stylesheet):
+        self.plot = plot.PlotMatplotlib(language=self.plot.language,stylesheet=stylesheet)
+        # self.plot.ytick.labelsize: 8
+        self.plot.setPath(self.outputPath)
+
     # the idea is to read the deck and get important information fro processing.
     # area collector, volume ice storage, volume Tes, Area uncovered, nH1, nominal power heat pump, etc...
     def setBuildingArea(self, area):
@@ -415,6 +420,7 @@ class ProcessTrnsysDf():
                 if scalar in parts:
                     equation = equation.replace(scalar,'@'+scalar)
             self.monDataDf.eval(equation,inplace=True,**kwargs)
+            value = splitEquation[0].strip()
             self.monDataDf['Cum_' + value] = self.monDataDf[value].cumsum()
             self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         for equation in self.inputs["calcHourly"]:

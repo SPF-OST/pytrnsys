@@ -113,6 +113,9 @@ class ReadConfigTrnsys():
                     strEl = splitLine[i+2][1:-1] #I delete the "
                     newElement.append(strEl)
                 inputs[splitLine[1]].append(newElement)
+
+                # if len(inputs[splitLine[1]])==1:
+                #     inputs[splitLine[1]]=inputs[splitLine[1]][0]
                     
 
             elif (splitLine[0]== "calcMonthly"):

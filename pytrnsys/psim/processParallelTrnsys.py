@@ -123,8 +123,13 @@ def processDataGeneral(casesInputs):
         test.setLatexNamesFile(inputs['latexNames'])
     else:
         test.setLatexNamesFile(None)
+
     if "matplotlibStyle" in inputs:
         test.setMatplotlibStyle(inputs["matplotlibStyle"])
+
+    if "setFontsize" in inputs:
+        test.setFontsize(inputs["setFontsize"])
+
     test.setBuildingArea(inputs["buildingArea"])
     test.setTrnsysDllPath(inputs["dllTrnsysPath"])
 
@@ -348,13 +353,13 @@ class ProcessParallelTrnsys():
 
         elif self.inputs["typeOfProcess"] == "config":
 
-            for city in self.inputs["cities"]:
+            for city in self.inputs["cities"][0]:
                 pathFolder = os.path.join(self.inputs["pathBase"], city)
                 fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
 
                 for name in fileName:
 
-                    for type in self.inputs['fileTypes']:
+                    for type in self.inputs['fileTypes'][0]:
                         if type in name:
 
                             folderUsed = True
@@ -425,8 +430,10 @@ class ProcessParallelTrnsys():
             debug.finish()
         else:
             for i in range(len(casesInputs)):
-                processDataGeneral(casesInputs[i])
-                
+                try:
+                    processDataGeneral(casesInputs[i])
+                except:
+                    print('WARNING: the following case failed: ' + casesInputs[i][2])
         if 'cost' in self.inputs.keys():
             self.calcCost()
 
