@@ -382,20 +382,25 @@ class ProcessParallelTrnsys():
                                     self.logger.debug("file :%s will be processed" % name)
 
                                     if ("hourly" in name or "hourlyOld" in name) and not "Mean" in name:
-                                        inputs = []
-                                        if self.inputs["yearReadedInMonthlyFile"] == -1:
-                                            for i in range(self.inputs["numberOfYearsInHourlyFile"]):
-                                                inputs.append(copy.deepcopy(self.inputs))
-                                                inputs[i]['yearReadedInMonthlyFile'] = i
-                                                casesInputs.append((baseClass, pathFolder, name, inputs[i]))
+                                        if self.inputs["forceHourlyYear"]:
+                                            casesInputs.append((baseClass, pathFolder, name, self.inputs))
                                         else:
-                                            for i in range(self.inputs["numberOfYearsInHourlyFile"]):
-                                                inputs.append(copy.deepcopy(self.inputs))
-                                                inputs[i]['yearReadedInMonthlyFile'] = self.inputs[
-                                                                                           "yearReadedInMonthlyFile"] + i
-                                                casesInputs.append((baseClass, pathFolder, name, inputs[i]))
-                                    else:
+                                            inputs = []
+                                            if self.inputs["yearReadedInMonthlyFile"] == -1:
+                                                for i in range(self.inputs["numberOfYearsInHourlyFile"]):
+                                                    inputs.append(copy.deepcopy(self.inputs))
+                                                    inputs[i]['yearReadedInMonthlyFile'] = i
+                                                    casesInputs.append((baseClass, pathFolder, name, inputs[i]))
+                                            else:
+                                                for i in range(self.inputs["numberOfYearsInHourlyFile"]):
+                                                    inputs.append(copy.deepcopy(self.inputs))
+                                                    inputs[i]['yearReadedInMonthlyFile'] = self.inputs[
+                                                                                               "yearReadedInMonthlyFile"] + i
+                                                    casesInputs.append((baseClass, pathFolder, name, inputs[i]))
+                                    elif "hourlyMean" in name and type=='hourlyMean':
                                         casesInputs.append((baseClass, pathFolder, name, self.inputs))
+                                    else:
+                                        pass
                         else:
                             pass
 
@@ -430,10 +435,11 @@ class ProcessParallelTrnsys():
             debug.finish()
         else:
             for i in range(len(casesInputs)):
-                try:
-                    processDataGeneral(casesInputs[i])
-                except:
-                    print('WARNING: the following case failed: ' + casesInputs[i][2])
+                processDataGeneral(casesInputs[i])
+                # try:
+                #     processDataGeneral(casesInputs[i])
+                # except:
+                #     print('WARNING: the following case failed: ' + casesInputs[i][2])
         if 'cost' in self.inputs.keys():
             self.calcCost()
 
