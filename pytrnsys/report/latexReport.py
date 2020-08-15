@@ -144,7 +144,6 @@ class LatexReport():
         else:
             raise ValueError('The specified LatexPackage \"%s\" is not implemented yet or does not exist.'%LatexPackage)
 
-#        print cmd
         myCmd ='"%s"'%cmd #for blank spaces in paths
 
         subprocessOutput = subprocess.run(cmd, capture_output=True)

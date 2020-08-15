@@ -134,7 +134,14 @@ class ProcessTrnsysDf():
         self.loadFiles()
         self.loadDll()
         self.process()
-        self.doLatexPdf()
+
+        self.addBokehPlot()
+        self.addQvsTPlot()
+
+        if(self.inputs['createLatexPdf']==True):
+            self.doLatexPdf()
+
+        self.saveHourlyToCsv()
         self.addResultsFile()
         # if "cost" in self.inputs.keys():
         #     self.calcCost()
@@ -157,22 +164,30 @@ class ProcessTrnsysDf():
         else:
             self.yearReadedInMonthlyFile = -1
 
+        self.resultsPath = self.outputPath + '//temp'
+
+    def definedResultsFileToRead(self,_outputPath,_fileNameListToRead):
+        self.resultsPath = _outputPath
+        self.fileNameListToRead = _fileNameListToRead
+
     def loadFiles(self):
 
         self.setLoaderParameters()
         locale.setlocale(locale.LC_ALL,'enn')
         if 'footerPresent' in self.inputs.keys():
-            self.loader = SimulationLoader(self.outputPath + '//temp', fileNameList=self.fileNameListToRead,sortMonths=True,
+            self.loader = SimulationLoader(self.resultsPath, fileNameList=self.fileNameListToRead,sortMonths=True,
                                            mode=self.loadMode, monthlyUsed=self.monthlyUsed, hourlyUsed=self.hourlyUsed,
                                            timeStepUsed=self.timeStepUsed,firstMonth=self.firstMonth, year = self.yearReadedInMonthlyFile, footerPresent=self.inputs['footerPresent'])
         else:
-            self.loader = SimulationLoader(self.outputPath + '//temp', fileNameList=self.fileNameListToRead,sortMonths=True,
+            self.loader = SimulationLoader(self.resultsPath, fileNameList=self.fileNameListToRead,sortMonths=True,
                                            mode=self.loadMode, monthlyUsed=self.monthlyUsed, hourlyUsed=self.hourlyUsed,
                                            timeStepUsed=self.timeStepUsed,firstMonth=self.firstMonth, year = self.yearReadedInMonthlyFile)
         # self.monData = self.loader.monData
         self.monDataDf = self.loader.monDataDf
         self.houDataDf = self.loader.houDataDf
         self.steDataDf = self.loader.steDataDf
+        self.myShortMonths = self.loader.myShortMonths
+
 
         self.deck = deckTrnsys.DeckTrnsys(self.outputPath,self.fileName)
         self.deck.loadDeck()
@@ -200,22 +215,34 @@ class ProcessTrnsysDf():
 
         self.yearlySums = {value+'_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
-
+        self.cumSumEnd = {}
 
         for column in self.monDataDf.columns:
             self.monDataDf['Cum_'+column]=self.monDataDf[column].cumsum()
+
         self.calcConfigEquations()
+
+        #This recalculated all, we should only recalculated what was done in caclConfigEquations. DC or it is so fast we don't care ?
 
         self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
-        self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
+        # self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
         logger.info("loadFiles completed using SimulationLoader")
 
-    def addQvsTPlot(self):
+    def addBokehPlot(self):
 
         if "plotHourly" in self.inputs.keys():
             self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"][0])
+
+        if "plotTimeStep" in self.inputs.keys():
+            self.pltB.createBokehPlot(self.steDataDf, self.outputPath,self.fileName,self.inputs["plotTimeStep"][0])
+
+
+    def addQvsTPlot(self):
+
+        # if "plotHourly" in self.inputs.keys():
+        #     self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"][0])
 
         if "plotMonthly" in self.inputs.keys():
         #
@@ -263,12 +290,13 @@ class ProcessTrnsysDf():
         self.addDemands()
         self.addElBalance()
         self.addElConsumption()
+
         self.addCustomBalance()
         self.addCustomStackedBar()
         self.addCustomNBar()
         self.addTemperatureFreq()
-        self.addQvsTPlot()
-        self.saveHourlyToCsv()
+        # self.addQvsTPlot()
+        # self.saveHourlyToCsv()
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
 
@@ -409,12 +437,14 @@ class ProcessTrnsysDf():
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def calcConfigEquations(self):
+
         for equation in self.inputs['calc']:
             namespace = {**self.deckData,**self.__dict__,**self.yearlySums,**self.yearlyMax}
             expression = equation.replace(' ','')
             exec(expression,globals(),namespace)
             self.deckData = namespace
             logger.debug(expression)
+
         for equation in self.inputs["calcMonthly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
             scalars = kwargs['local_dict'].keys()
@@ -428,6 +458,7 @@ class ProcessTrnsysDf():
             value = splitEquation[0].strip()
             self.monDataDf['Cum_' + value] = self.monDataDf[value].cumsum()
             self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
+
         for equation in self.inputs["calcHourly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
             scalars = kwargs['local_dict'].keys()
@@ -439,7 +470,60 @@ class ProcessTrnsysDf():
                     equation = equation.replace(scalar,'@'+scalar)
             self.houDataDf.eval(equation, inplace=True, **kwargs)
             self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
+            self.cumSumEnd = {value + '_End': self.houDataDf[value][-1] for value in self.houDataDf.columns}
 
+        for equation in self.inputs["calcCumSumHourly"]:
+            for value in equation:
+                for key in self.houDataDf.columns:
+                    if(key==value):
+                        self.houDataDf['cumsum_' + value] = self.houDataDf[value].cumsum()
+                        myValue = 'cumsum_' + value
+                        self.cumSumEnd = {myValue + '_End': self.houDataDf[myValue][-1]}
+
+        for equation in self.inputs["calcHourlyTest"]:
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
+            scalars = kwargs['local_dict'].keys()
+            splitEquation = equation.split('=')
+            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
+            parts = re.split(r'[*/+-]', parsedEquation.replace(r'(', '').replace(r')', ''))
+            for scalar in scalars:
+                if scalar in parts:
+                    equation = equation.replace(scalar,'@'+scalar)
+            self.houDataDf.eval(equation, inplace=True, **kwargs)
+            value = splitEquation[0]
+            # self.yearlyMax = {value + '_Ma': self.houDataDf[value].max()}
+            self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
+            self.cumSumEnd = {value + '_End': self.houDataDf[value][-1] for value in self.houDataDf.columns}
+
+        for equation in self.inputs["calcTimeStep"]:
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
+            scalars = kwargs['local_dict'].keys()
+            splitEquation = equation.split('=')
+            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
+            parts = re.split(r'[*/+-]', parsedEquation.replace(r'(', '').replace(r')', ''))
+            for scalar in scalars:
+                if scalar in parts:
+                    equation = equation.replace(scalar,'@'+scalar)
+            self.steDataDf.eval(equation, inplace=True, **kwargs) #by doing so we add also the key into the dictionary steDataDf
+            self.yearlyMax = {value + '_Max': self.steDataDf[value].max() for value in self.steDataDf.columns}
+
+        for equation in self.inputs["calcCumSumTimeStep"]:
+            for value in equation:
+                for key in self.steDataDf.columns:
+                    if(key==value):
+                        self.steDataDf['cumsum_' + value] = self.steDataDf[value].cumsum()
+
+        for equation in self.inputs["calcTimeStepTest"]: #dirty trick to be able to use it also after calcCumSumTimeStep DC
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
+            scalars = kwargs['local_dict'].keys()
+            splitEquation = equation.split('=')
+            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
+            parts = re.split(r'[*/+-]', parsedEquation.replace(r'(', '').replace(r')', ''))
+            for scalar in scalars:
+                if scalar in parts:
+                    equation = equation.replace(scalar,'@'+scalar)
+            self.steDataDf.eval(equation, inplace=True, **kwargs)
+            self.yearlyMax = {value + '_Max': self.steDataDf[value].max() for value in self.steDataDf.columns}
 
     def addPlotConfigEquation(self):
         for equation in self.inputs['calcMonthly']:
@@ -825,7 +909,7 @@ class ProcessTrnsysDf():
 
         lines = ""
         jointDicts = {**self.deckData, **self.__dict__, **self.yearlySums,
-                      **self.yearlyMax}
+                      **self.yearlyMax,**self.cumSumEnd}
         if 'caseDefinition' in self.inputs.keys():
             for variable in self.inputs['caseDefinition'][0]:
                 line = self.getNiceLatexNames(variable)+' & %2.1f& &  \\\\ \n' % (jointDicts[variable])
@@ -984,7 +1068,7 @@ class ProcessTrnsysDf():
                 self.resultsDict = {'Name':self.fileName.split('-')[1]}
             else:
                 self.resultsDict = {}
-            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax} #,**self.maximumMonth,**self.minimumMonth}
+            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax,**self.cumSumEnd} #,**self.maximumMonth,**self.minimumMonth}
             for key in self.inputs['results'][0]:
                 if type(jointDicts[key]) == num.ndarray:
                     value = list(jointDicts[key])

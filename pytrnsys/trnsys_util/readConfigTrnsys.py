@@ -70,6 +70,20 @@ class ReadConfigTrnsys():
         if "calc" not in inputs:
             inputs["calc"]=[]
 
+        if "calcCumSumHourly" not in inputs:
+            inputs["calcCumSumHourly"]=[]
+
+        if "calcHourlyTest" not in inputs: #dirty trick to calculate after calcCumSumHourly DC
+            inputs["calcHourlyTest"]=[]
+
+        if "calcTimeStep" not in inputs:
+            inputs["calcTimeStep"]=[]
+
+        if "calcTimeStepTest" not in inputs:
+            inputs["calcTimeStepTest"]=[]
+
+        if "calcCumSumTimeStep" not in inputs:
+            inputs["calcCumSumTimeStep"]=[]
 
         if (parseFileCreated):
             parsedFile = "%s.parse.dat" % configFile
@@ -124,6 +138,27 @@ class ReadConfigTrnsys():
                 inputs["calc"].append(" ".join(splitLine[1:]))
             elif (splitLine[0] == "calcHourly"):
                 inputs["calcHourly"].append(" ".join(splitLine[1:]))
+            elif (splitLine[0] == "calcHourlyTest"):
+                inputs["calcHourlyTest"].append(" ".join(splitLine[1:]))
+            elif (splitLine[0] == "calcTimeStep"):
+                inputs["calcTimeStep"].append(" ".join(splitLine[1:]))
+            elif (splitLine[0] == "calcTimeStepTest"): #dirty trick to have it after the calcCumSumTimeStep DC
+                inputs["calcTimeStepTest"].append(" ".join(splitLine[1:]))
+
+            # elif (splitLine[0] == "calcHourlyTest"):
+            #     inputs["calcHourlyTest"].append(" ".join(splitLine[1:]))
+
+            elif (splitLine[0] == "calcCumSumHourly"):
+                if(len(splitLine)==2):
+                    inputs["calcCumSumHourly"].append(splitLine[1])
+                else:
+                    inputs["calcCumSumHourly"].append(splitLine[1:])
+
+            elif (splitLine[0] == "calcCumSumTimeStep"):
+                if(len(splitLine)==2):
+                    inputs["calcCumSumTimeStep"].append(splitLine[1])
+                else:
+                    inputs["calcCumSumTimeStep"].append(splitLine[1:])
 
             else:
                 if(controlDataType):

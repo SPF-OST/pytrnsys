@@ -99,9 +99,14 @@ class PlotBokeh():
                 plotsDict[key]['fig'] = figure(plot_width=800,x_range=plotsDict[keysList[0]]['fig'].x_range, plot_height=250, x_axis_type="datetime", tools=TOOLS)
             for column in plotsDict[key]['columns']:
                 plotsDict[key]['fig'].line(timeArray, df[column], color=next(colors), alpha = 0.5, legend_label = column)
+                # plotsDict[key]['fig'].line(timeArray, df[column], color=next(colors), alpha = 0.5)
+
             plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(months=["%b"])
             plotsDict[key]['fig'].yaxis.axis_label = plotsDict[key]['ylabel']
-            plotsDict[key]['fig'].legend.location = 'top_left'
+
+            plotsDict[key]['fig'].add_layout(plotsDict[key]['fig'].legend[0],'right')
+            #plotsDict[key]['fig'].legend.location = 'top_left'
+
             plotsDict[key]['fig'].legend.click_policy = "hide"
             plotsDict[key]['fig'].legend.label_text_font_size = "10pt"
             plots.append([plotsDict[key]['fig']])

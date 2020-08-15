@@ -6,7 +6,7 @@ import pandas as pd
 import os
 from datetime import datetime, timedelta
 import numpy as num
-
+import pytrnsys.utils.utilsSpf as utils
 
 class SimulationLoader():
     """Loads TRNSYS printer files.
@@ -109,6 +109,8 @@ class SimulationLoader():
         fileType = self._fileSniffer(pathFile)
         nRows = self._fileLen(pathFile)
 
+        self.myShortMonths = None
+
         if (fileType == _ResultsFileType.MONTHLY and self._monthlyUsed==True):
 
             if footerPresent:
@@ -147,6 +149,8 @@ class SimulationLoader():
                 cols_to_use = [item for item in file.columns[:-1] if item not in set(self.monData.keys())]
                 dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.monData = {**self.monData, **dict}
+
+            self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
         elif (fileType == _ResultsFileType.HOURLY and self._hourlyUsed==True):
             if footerPresent:
@@ -198,7 +202,7 @@ class SimulationLoader():
                 dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.steData = {**self.steData, **dict}
 
-    def _fileSniffer(self, file):
+    def _fileSniffer(self, file): #detects which kind of file to we need to read
         with open(file) as f:
             for i in range(3):
                 if 'Month' in f.readline():

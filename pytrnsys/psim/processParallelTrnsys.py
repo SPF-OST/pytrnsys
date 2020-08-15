@@ -218,6 +218,7 @@ class ProcessParallelTrnsys():
         self.inputs["figureFormat"] = 'pdf'
         self.inputs["plotEmf"] = False
         self.inputs["outputLevel"] = "INFO"
+        self.inputs['createLatexPdf'] = True
 
     def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
@@ -289,8 +290,10 @@ class ProcessParallelTrnsys():
             #        pathFolder = os.path.join(self.inputs["pathBase"],city)
             name = self.inputs["fileName"]
             pathFolder = self.inputs["pathBase"]
+            baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name) #DC This was missing
+            casesInputs.append((baseClass, pathFolder, name, self.inputs)) #DC This was missing
 
-            fileName.append(name)
+            # fileName.append(name)
 
             # folderUsed = True #DC Why this is here ? casesDefined are the ones defined in the config.
             # for i in range(len(self.filteredfolder)):
