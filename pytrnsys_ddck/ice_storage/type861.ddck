@@ -97,7 +97,7 @@ TSubcool = -0.5     ! Temperature at which water starts to freeze on the Hx surf
 TiceIni = 30
 TiniPCM=GT(ratioIceBegin,0)*0+NOT(GT(ratioIceBegin,0))*TiceIni !Tground     !TiniPCM=TGround  
 ratioIceBegin= 0 ! 0.5     
-iceBlockIni=ratioIceBegin*VIceS*rhoIce      !iceBlockIni=0.15*VIceS*rhoIce 
+iceBlockIni=ratioIceBegin*VIceS*RHOWAT      !iceBlockIni=0.15*VIceS*rhoIce 
 
 ***********************************
 ** physical properties ****************
