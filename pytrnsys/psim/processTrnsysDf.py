@@ -30,6 +30,7 @@ from string import ascii_letters, digits, whitespace
 import locale
 import re
 import logging
+from datetime import datetime, timedelta
 logger = logging.getLogger('root')
 # import pytrnsys_spf.psim.costConfig as costConfig
 
@@ -87,6 +88,10 @@ class ProcessTrnsysDf():
         self.unit = unit.UnitConverter()
         self.trnsysDllPath = False
 
+        self.deckData = {}
+        self.yearlySums = {}
+        self.yearlyMax = {}
+        self.cumSumEnd = {}
 
     def setInputs(self,inputs):
         self.inputs=inputs
@@ -129,7 +134,87 @@ class ProcessTrnsysDf():
     def process(self):
         pass
 
-    def loadAndProcess(self):
+    def loadAndProcessGeneric(self):
+
+        self.houDataDf = pd.DataFrame()
+        self.monDataDf = pd.DataFrame()
+        self.dayDataDf = pd.DataFrame()
+
+        fileNameList = None
+
+        if fileNameList is None or not fileNameList:
+            fileNameList = os.listdir(self.outputPath)
+
+        for fileName in fileNameList:
+            file = fileName #+".csv"
+            path = os.path.join(self.outputPath,file)
+            if('_Monats' in fileName):
+                self.loadMonthlyFile(path)
+            elif("_Stunden" in fileName):
+                self.loadHourlyFile(path)
+            elif("_Tage" in fileName):
+                self.loadDailyFile(path)
+
+        self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
+        self.cumSumEnd = {}
+
+        self.calcConfigEquations()
+
+        self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
+
+        self.addBokehPlot()
+        self.addCustomBalance()
+        self.addCustomStackedBar()
+        self.addCustomNBar()
+        self.addTemperatureFreq()
+
+        self.saveHourlyToCsv()
+        self.addResultsFile()
+
+    def loadHourlyFile(self,pathFile):
+
+        file = pd.read_csv(pathFile, header=0, delimiter=';').rename(columns=lambda x: x.strip())
+
+        file.set_index('Time', inplace=True, drop=False)
+        period = pd.to_datetime(file['Time'],format="%d.%m.%Y %H:%M")
+
+        file["Time"] = period
+        file.set_index('Time', inplace=True)
+        cols_to_use = [item for item in file.columns if item not in set(self.houDataDf.columns)]
+        self.houDataDf = pd.merge(self.houDataDf, file[cols_to_use], left_index=True, right_index=True, how='outer')
+
+    def loadDailyFile(self,pathFile):
+
+        file = pd.read_csv(pathFile, header=0, delimiter=';').rename(columns=lambda x: x.strip())
+
+        file.set_index('Time', inplace=True, drop=False)
+        period = pd.to_datetime(file['Time'],format="%d.%m.%Y")
+        file["Time"] = period
+        file.set_index('Time', inplace=True)
+        cols_to_use = [item for item in file.columns if item not in set(self.dayDataDf.columns)]
+        self.dayDataDf = pd.merge(self.dayDataDf, file[cols_to_use], left_index=True, right_index=True, how='outer')
+
+    def loadMonthlyFile(self,pathFile):
+
+        file = pd.read_csv(pathFile, header=0, delimiter=';') #.rename(columns=lambda x: x.strip())
+
+        file['Number'] = file.index + pd.to_datetime(file['Month'][0].strip(), format='%B').month
+        file.set_index('Number', inplace=True)
+        #file['Datetime'] = pd.to_datetime(file['Month'].str.strip(), format='%B')
+
+        # file['Time'] = file.index + pd.to_datetime(file['Time'][0].strip(), format='%B').month
+        # file["Time"] = period
+        # file.set_index('Time', inplace=True)
+        cols_to_use = [item for item in file.columns if item not in set(self.monDataDf.columns)]
+        self.monDataDf = pd.merge(self.monDataDf, file[cols_to_use], left_index=True, right_index=True, how='outer')
+
+        self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
+
+    def loadAndProcessTrnsys(self):
+
+        #self.inputs['fileOutputPath'] = "C:\Daten\OngoingProject\BigIce\PassiveCoolingFlatPlate\BigIce-MFH-TestPassiveCoolTest\temp"
+        #self.inputs['listOfFiles'] = ["PCMOut.Plt"]
+        #self.definedResultsFileToRead(self.inputs['fileOutputPath'],self.inputs['listOfFiles'])
 
         self.loadFiles()
         self.loadDll()
@@ -215,7 +300,7 @@ class ProcessTrnsysDf():
 
         self.yearlySums = {value+'_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
-        self.cumSumEnd = {}
+
 
         for column in self.monDataDf.columns:
             self.monDataDf['Cum_'+column]=self.monDataDf[column].cumsum()
@@ -233,10 +318,16 @@ class ProcessTrnsysDf():
     def addBokehPlot(self):
 
         if "plotHourly" in self.inputs.keys():
-            self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"][0])
+            for varToPlot in self.inputs["plotHourly"]:
+                self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName+"hourly",varToPlot)
+
+        if "plotDaily" in self.inputs.keys():
+            for varToPlot in self.inputs["plotDaily"]:
+                self.pltB.createBokehPlot(self.dayDataDf, self.outputPath,self.fileName+"daily",self.inputs["plotDaily"][0])
 
         if "plotTimeStep" in self.inputs.keys():
-            self.pltB.createBokehPlot(self.steDataDf, self.outputPath,self.fileName,self.inputs["plotTimeStep"][0])
+            for varToPlot in self.inputs["plotTimeStep"]:
+                self.pltB.createBokehPlot(self.steDataDf, self.outputPath,self.fileName+"timeStep",self.inputs["plotTimeStep"][0])
 
 
     def addQvsTPlot(self):
@@ -458,6 +549,19 @@ class ProcessTrnsysDf():
             value = splitEquation[0].strip()
             self.monDataDf['Cum_' + value] = self.monDataDf[value].cumsum()
             self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
+
+        for equation in self.inputs["calcDaily"]:
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
+            scalars = kwargs['local_dict'].keys()
+            splitEquation = equation.split('=')
+            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
+            parts = re.split(r'[*/+-]', parsedEquation.replace(r'(', '').replace(r')', ''))
+            for scalar in scalars:
+                if scalar in parts:
+                    equation = equation.replace(scalar,'@'+scalar)
+            self.dayDataDf.eval(equation, inplace=True, **kwargs)
+            self.yearlyMax = {value + '_Max': self.dayDataDf[value].max() for value in self.dayDataDf.columns}
+            self.cumSumEnd = {value + '_End': self.dayDataDf[value][-1] for value in self.dayDataDf.columns}
 
         for equation in self.inputs["calcHourly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
@@ -852,10 +956,22 @@ class ProcessTrnsysDf():
                 
     def addCustomBalance(self):
         if "monthlyBalance" in self.inputs.keys():
-            for variables in self.inputs['monthlyBalance']:
-                legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
-                inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
-                nameFile  = 'Balance'+'_'.join(variables)
+            for i in range(len(self.inputs['monthlyBalance'])):
+                namePlot = self.inputs['monthlyBalance'][i][0]
+
+                legend=[]
+                inVar=[]
+                for variable in self.inputs['monthlyBalance'][i]:
+                    # legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
+                    # inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
+                    #First name is now the name of the plot
+                    # legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables[1:] ]
+                    # inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables[1:]]
+                    if(variable != namePlot):
+                        legend.append(self.getNiceLatexNames(variable)) #if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables[1:] ]
+                        inVar.append(self.monDataDf[variable].values) # if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables[1:]]
+
+                nameFile  = namePlot #'Balance'+'_'.join(variables)
                 titlePlot = 'Balance'
                 namePdf = self.plot.plotMonthlyBalanceDf(inVar,[],legend, "Energy", nameFile, 'kWh',
                                                      self.myShortMonths, yearlyFactor=10,

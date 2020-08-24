@@ -28,69 +28,6 @@ except ImportError:
 #we would need to pass the Class as inputs
 import pytrnsys.utils.log as log
 
-def processDataGeneralDeprecated(casesInputs):
-    """
-    processes all the specified cases
-
-    Parameters
-    ----------
-    casesInputs: list of str
-        list of strings with all cases to run
-
-    Returns
-    -------
-
-    """
-
-    (baseClass,locationPath, fileName, avoidUser, maxMinAvoided, yearReadedInMonthlyFile, cleanModeLatex, firstMonthUsed,\
-      processQvsT,firstMonthUsed,buildingArea,dllTrnsysPath,setPrintDataForGle,firstConsideredTime) = casesInputs
-
-    #    locationPath = inputs.pop(0)
-    #    fileName,avoidUser,maxMinAvoided,yearReadedInMonthlyFile,cleanModeLatex,firstMonthUsed,processQvsT
-
-    test = baseClass
-
-    test.setBuildingArea(buildingArea)
-    test.setTrnsysDllPath(dllTrnsysPath)
-
-    # test.setTrnsysVersion("TRNSYS17_EXE")
-
-    test.setPrintDataForGle(setPrintDataForGle)
-
-    test.avoidUserDefinedCalculation = avoidUser
-    test.maxMinAvoided = maxMinAvoided
-    test.yearReadedInMonthylFile = yearReadedInMonthlyFile
-    test.cleanModeLatex = cleanModeLatex
-    test.firstConsideredTime = firstConsideredTime
-
-    myFirstMonthLong = utils.getMonthLongName(firstMonthUsed + 1)  # starts at 1
-    test.firstMonth = myFirstMonthLong
-    test.firstMonthIndex = 0  # firstMonthUsed
-
-    doProcess = True
-
-    if (doProcess):
-        test.loadAndProcess()
-
-    # rename files if multiple years are available:
-    if yearReadedInMonthlyFile != -1:
-        renameFile = os.path.join(locationPath, fileName, fileName)
-
-        fileEndingsDefault = ["-results.json", "-report.pdf"]
-
-        for ending in fileEndingsDefault:
-            newEnding = "-Year%i" % yearReadedInMonthlyFile + ending
-            try:
-                os.rename(renameFile + ending, renameFile + newEnding)
-            except:
-                warnings.warn(
-                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
-                                renameFile + newEnding))
-
-
-    del test  # time.sleep(5)
-
-    return " Finished: " + fileName
 
 def processDataGeneral(casesInputs):
     """
@@ -140,6 +77,7 @@ def processDataGeneral(casesInputs):
     # test.avoidUserDefinedCalculation = inputs["avoidUser"]
     # test.maxMinAvoided = inputs["maxMinAvoided"]
     test.yearReadedInMonthylFile = inputs["yearReadedInMonthlyFile"]
+
     test.cleanModeLatex = inputs["cleanModeLatex"]
     # test.firstConsideredTime = firstConsideredTime
 
@@ -149,8 +87,10 @@ def processDataGeneral(casesInputs):
 
     doProcess = True
 
-    if (doProcess):
-        test.loadAndProcess()
+    if(inputs['isTrnsys']):
+        test.loadAndProcessTrnsys()
+    else:
+        test.loadAndProcessGeneric()
 
     # rename files if multiple years are available:
     if inputs["yearReadedInMonthlyFile"] != -1:
@@ -196,6 +136,7 @@ class ProcessParallelTrnsys():
     def defaultInputs(self):
 
         self.inputs = {}
+        self.inputs["isTrnsys"] = True
         self.inputs["processParallel"] = True
         self.inputs["avoidUser"]    = False
         self.inputs["processQvsT"]  = True

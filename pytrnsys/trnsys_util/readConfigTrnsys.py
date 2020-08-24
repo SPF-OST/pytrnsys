@@ -67,6 +67,9 @@ class ReadConfigTrnsys():
         if "calcHourly" not in inputs:
             inputs["calcHourly"]=[]
 
+        if "calcDaily" not in inputs:
+            inputs["calcDaily"]=[]
+
         if "calc" not in inputs:
             inputs["calc"]=[]
 
@@ -138,6 +141,8 @@ class ReadConfigTrnsys():
                 inputs["calc"].append(" ".join(splitLine[1:]))
             elif (splitLine[0] == "calcHourly"):
                 inputs["calcHourly"].append(" ".join(splitLine[1:]))
+            elif (splitLine[0] == "calcDaily"):
+                inputs["calcDaily"].append(" ".join(splitLine[1:]))
             elif (splitLine[0] == "calcHourlyTest"):
                 inputs["calcHourlyTest"].append(" ".join(splitLine[1:]))
             elif (splitLine[0] == "calcTimeStep"):

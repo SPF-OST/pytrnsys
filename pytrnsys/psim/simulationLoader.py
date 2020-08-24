@@ -224,6 +224,15 @@ class SimulationLoader():
                 pass
         return i + 1
 
+    def loadHourlyFile(self, file):
+
+        file = pd.read_csv(pathFile, header=1, delimiter=';', nrows=nRows - 1).rename(columns=lambda x: x.strip())
+        file.set_index('Time', inplace=True, drop=False)
+        period = datetime(2018, 1, 1) + pd.to_timedelta(file['Time'], unit='h')
+        file["Time"]  = period
+        file.set_index('Time', inplace=True)
+        cols_to_use = [item for item in file.columns[:-1] if item not in set(self.houDataDf.columns)]
+        self.houDataDf = pd.merge(self.houDataDf, file[cols_to_use], left_index=True, right_index=True, how='outer')
 
 class _ResultsFileType(Enum):
     MONTHLY = 1
