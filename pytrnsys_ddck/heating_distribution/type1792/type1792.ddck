@@ -57,9 +57,11 @@ myTroomSet = TroomSet
 ** outputs to other ddck
 ***********************************
 
-EQUATIONS 1     
+EQUATIONS 2     
 T_Set_d       = MAX(TRdRt,myTrdSet)      ! TrdSet output from TYPE 888. Temperature set point for tempering valve used in hydraulic. 
-
+PheatBui    = [42,3]*3.6      ! Heat to Building from Radiator: W -> kJ/h
+EQUATIONS 1
+MfrBuiRd  = MfrBuiHeatRd + MfrBuiCoolRd
 
 
 CONSTANTS 4    
@@ -118,11 +120,6 @@ PIDRaCooldBui = MIN(MAX([44,1],PIDRadCoolBuiMin),1) ! DC, JEREMIAS you had [41,1
 MfrBuiCoolRd  = MfrBuiRdNom*myCoolingOn  ! JS: cooling no longer uses PID, but instead a deadband
 MfrBuiHeatRd  = MfrBuiRdNom*NOT(myCoolingOn)*PIDRadBui
 
-
-
-
-EQUATIONS 1
-MfrBuiRd  = MfrBuiHeatRd + MfrBuiCoolRd
 
 *******************************************************
 ** Definition of radiant floor *
@@ -229,10 +226,9 @@ UBelowFloor   ! room field temperature below if bocoDown=1, if bocoDown=0 UA bet
 *** INITIAL INPUT VALUES     
 35 MfrBuiRdNom 21 21 21 21 -1 0
 
-EQUATIONS 20
+EQUATIONS 19
 mFlowPerRadFloorTube = [42,2] 
 PRdIn_kW    = [42,4]/1000 ! heat injected by fluid to floor W -> kW
-PheatBui    = [42,3]*3.6      ! Heat to Building from Radiator: W -> kJ/h
 **PheatBui_kW = MAX([42,3]/1000,0)      ! Heat to Building from Radiator: W --> kW
 PtotBui_kW = [42,3]/1000      ! Heat to Building from Radiator: W --> kW
 PheatBui_kW = PRdIn_kW*GT(PRdIn_kW,0)  ! total heat (without cooling)  Heat to Building from Radiator: W --> kW
