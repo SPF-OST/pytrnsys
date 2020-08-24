@@ -28,69 +28,6 @@ except ImportError:
 #we would need to pass the Class as inputs
 import pytrnsys.utils.log as log
 
-def processDataGeneralDeprecated(casesInputs):
-    """
-    processes all the specified cases
-
-    Parameters
-    ----------
-    casesInputs: list of str
-        list of strings with all cases to run
-
-    Returns
-    -------
-
-    """
-
-    (baseClass,locationPath, fileName, avoidUser, maxMinAvoided, yearReadedInMonthlyFile, cleanModeLatex, firstMonthUsed,\
-      processQvsT,firstMonthUsed,buildingArea,dllTrnsysPath,setPrintDataForGle,firstConsideredTime) = casesInputs
-
-    #    locationPath = inputs.pop(0)
-    #    fileName,avoidUser,maxMinAvoided,yearReadedInMonthlyFile,cleanModeLatex,firstMonthUsed,processQvsT
-
-    test = baseClass
-
-    test.setBuildingArea(buildingArea)
-    test.setTrnsysDllPath(dllTrnsysPath)
-
-    # test.setTrnsysVersion("TRNSYS17_EXE")
-
-    test.setPrintDataForGle(setPrintDataForGle)
-
-    test.avoidUserDefinedCalculation = avoidUser
-    test.maxMinAvoided = maxMinAvoided
-    test.yearReadedInMonthylFile = yearReadedInMonthlyFile
-    test.cleanModeLatex = cleanModeLatex
-    test.firstConsideredTime = firstConsideredTime
-
-    myFirstMonthLong = utils.getMonthLongName(firstMonthUsed + 1)  # starts at 1
-    test.firstMonth = myFirstMonthLong
-    test.firstMonthIndex = 0  # firstMonthUsed
-
-    doProcess = True
-
-    if (doProcess):
-        test.loadAndProcess()
-
-    # rename files if multiple years are available:
-    if yearReadedInMonthlyFile != -1:
-        renameFile = os.path.join(locationPath, fileName, fileName)
-
-        fileEndingsDefault = ["-results.json", "-report.pdf"]
-
-        for ending in fileEndingsDefault:
-            newEnding = "-Year%i" % yearReadedInMonthlyFile + ending
-            try:
-                os.rename(renameFile + ending, renameFile + newEnding)
-            except:
-                warnings.warn(
-                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
-                                renameFile + newEnding))
-
-
-    del test  # time.sleep(5)
-
-    return " Finished: " + fileName
 
 def processDataGeneral(casesInputs):
     """
@@ -123,8 +60,13 @@ def processDataGeneral(casesInputs):
         test.setLatexNamesFile(inputs['latexNames'])
     else:
         test.setLatexNamesFile(None)
+
     if "matplotlibStyle" in inputs:
         test.setMatplotlibStyle(inputs["matplotlibStyle"])
+
+    if "setFontsize" in inputs:
+        test.setFontsize(inputs["setFontsize"])
+
     test.setBuildingArea(inputs["buildingArea"])
     test.setTrnsysDllPath(inputs["dllTrnsysPath"])
 
@@ -135,6 +77,7 @@ def processDataGeneral(casesInputs):
     # test.avoidUserDefinedCalculation = inputs["avoidUser"]
     # test.maxMinAvoided = inputs["maxMinAvoided"]
     test.yearReadedInMonthylFile = inputs["yearReadedInMonthlyFile"]
+
     test.cleanModeLatex = inputs["cleanModeLatex"]
     # test.firstConsideredTime = firstConsideredTime
 
@@ -144,8 +87,10 @@ def processDataGeneral(casesInputs):
 
     doProcess = True
 
-    if (doProcess):
-        test.loadAndProcess()
+    if(inputs['isTrnsys']):
+        test.loadAndProcessTrnsys()
+    else:
+        test.loadAndProcessGeneric()
 
     # rename files if multiple years are available:
     if inputs["yearReadedInMonthlyFile"] != -1:
@@ -191,6 +136,7 @@ class ProcessParallelTrnsys():
     def defaultInputs(self):
 
         self.inputs = {}
+        self.inputs["isTrnsys"] = True
         self.inputs["processParallel"] = True
         self.inputs["avoidUser"]    = False
         self.inputs["processQvsT"]  = True
@@ -213,6 +159,7 @@ class ProcessParallelTrnsys():
         self.inputs["figureFormat"] = 'pdf'
         self.inputs["plotEmf"] = False
         self.inputs["outputLevel"] = "INFO"
+        self.inputs['createLatexPdf'] = True
 
     def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
@@ -284,8 +231,10 @@ class ProcessParallelTrnsys():
             #        pathFolder = os.path.join(self.inputs["pathBase"],city)
             name = self.inputs["fileName"]
             pathFolder = self.inputs["pathBase"]
+            baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name) #DC This was missing
+            casesInputs.append((baseClass, pathFolder, name, self.inputs)) #DC This was missing
 
-            fileName.append(name)
+            # fileName.append(name)
 
             # folderUsed = True #DC Why this is here ? casesDefined are the ones defined in the config.
             # for i in range(len(self.filteredfolder)):
@@ -348,13 +297,13 @@ class ProcessParallelTrnsys():
 
         elif self.inputs["typeOfProcess"] == "config":
 
-            for city in self.inputs["cities"]:
+            for city in self.inputs["cities"][0]:
                 pathFolder = os.path.join(self.inputs["pathBase"], city)
                 fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
 
                 for name in fileName:
 
-                    for type in self.inputs['fileTypes']:
+                    for type in self.inputs['fileTypes'][0]:
                         if type in name:
 
                             folderUsed = True
@@ -377,20 +326,25 @@ class ProcessParallelTrnsys():
                                     self.logger.debug("file :%s will be processed" % name)
 
                                     if ("hourly" in name or "hourlyOld" in name) and not "Mean" in name:
-                                        inputs = []
-                                        if self.inputs["yearReadedInMonthlyFile"] == -1:
-                                            for i in range(self.inputs["numberOfYearsInHourlyFile"]):
-                                                inputs.append(copy.deepcopy(self.inputs))
-                                                inputs[i]['yearReadedInMonthlyFile'] = i
-                                                casesInputs.append((baseClass, pathFolder, name, inputs[i]))
+                                        if self.inputs["forceHourlyYear"]:
+                                            casesInputs.append((baseClass, pathFolder, name, self.inputs))
                                         else:
-                                            for i in range(self.inputs["numberOfYearsInHourlyFile"]):
-                                                inputs.append(copy.deepcopy(self.inputs))
-                                                inputs[i]['yearReadedInMonthlyFile'] = self.inputs[
-                                                                                           "yearReadedInMonthlyFile"] + i
-                                                casesInputs.append((baseClass, pathFolder, name, inputs[i]))
-                                    else:
+                                            inputs = []
+                                            if self.inputs["yearReadedInMonthlyFile"] == -1:
+                                                for i in range(self.inputs["numberOfYearsInHourlyFile"]):
+                                                    inputs.append(copy.deepcopy(self.inputs))
+                                                    inputs[i]['yearReadedInMonthlyFile'] = i
+                                                    casesInputs.append((baseClass, pathFolder, name, inputs[i]))
+                                            else:
+                                                for i in range(self.inputs["numberOfYearsInHourlyFile"]):
+                                                    inputs.append(copy.deepcopy(self.inputs))
+                                                    inputs[i]['yearReadedInMonthlyFile'] = self.inputs[
+                                                                                               "yearReadedInMonthlyFile"] + i
+                                                    casesInputs.append((baseClass, pathFolder, name, inputs[i]))
+                                    elif "hourlyMean" in name and type=='hourlyMean':
                                         casesInputs.append((baseClass, pathFolder, name, self.inputs))
+                                    else:
+                                        pass
                         else:
                             pass
 
@@ -426,7 +380,10 @@ class ProcessParallelTrnsys():
         else:
             for i in range(len(casesInputs)):
                 processDataGeneral(casesInputs[i])
-                
+                # try:
+                #     processDataGeneral(casesInputs[i])
+                # except:
+                #     print('WARNING: the following case failed: ' + casesInputs[i][2])
         if 'cost' in self.inputs.keys():
             self.calcCost()
 

@@ -61,28 +61,28 @@ MrfLoad = [500,4]		!Load side flow rate	kg/hr
 HTR_HX = [500,5]		!Heat transfer rate	kJ/hr
 OHTC_HX = [500,6]		!Overall heat transfer coefficient	kJ/hr.K
 
-UNIT 501 TYPE 65     ! Online Plotter HX
-PARAMETERS 12     
-2     ! 1 Nb. of left-axis variables
-4     ! 2 Nb. of right-axis variables
-0     ! 3 Left axis minimum
-6000     ! 4 Left axis maximum
-0     ! 5 Right axis minimum
-60     ! 6 Right axis maximum
-nPlotsPerSim     ! 7 Number of plots per simulation
-12     ! 8 X-axis gridpoints
-1     ! 9 Shut off Online w/o removing
--1     ! 10 Logical unit for output file
-0     ! 11 Output file units
-0     ! 12 Output file delimiter
-INPUTS 6    
-MfrSourceIn	MfrLoadIn TSourceIn TLoadIn TsourceOut CoolingOn
-MfrSourceIn	MfrLoadIn TSourceIn TLoadIn TsourceOut CoolingOn
-LABELS  3     
-MassFlows
-Temperatures     
-HX
-
+!UNIT 501 TYPE 65     ! Online Plotter HX
+!PARAMETERS 12
+!2     ! 1 Nb. of left-axis variables
+!4     ! 2 Nb. of right-axis variables
+!0     ! 3 Left axis minimum
+!6000     ! 4 Left axis maximum
+!0     ! 5 Right axis minimum
+!60     ! 6 Right axis maximum
+!nPlotsPerSim     ! 7 Number of plots per simulation
+!12     ! 8 X-axis gridpoints
+!1     ! 9 Shut off Online w/o removing
+!-1     ! 10 Logical unit for output file
+!0     ! 11 Output file units
+!0     ! 12 Output file delimiter
+!INPUTS 6
+!MfrSourceIn	MfrLoadIn TSourceIn TLoadIn TsourceOut CoolingOn
+!MfrSourceIn	MfrLoadIn TSourceIn TLoadIn TsourceOut CoolingOn
+!LABELS  3
+!MassFlows
+!Temperatures
+!HX
+!
 
 
 *******************************

@@ -6,7 +6,7 @@ import pandas as pd
 import os
 from datetime import datetime, timedelta
 import numpy as num
-
+import pytrnsys.utils.utilsSpf as utils
 
 class SimulationLoader():
     """Loads TRNSYS printer files.
@@ -46,7 +46,7 @@ class SimulationLoader():
     steDataDf : :obj:`pandas.DataFrame`
         Dataframe containingt the values printed in timesteps
     """
-    def __init__(self, path, fileNameList=None, mode='complete',fullYear =True,firstMonth='January',year=-1, sortMonths=False,monthlyUsed=True,hourlyUsed=True,timeStepUsed=True):
+    def __init__(self, path, fileNameList=None, mode='complete',fullYear =True,firstMonth='January',year=-1, sortMonths=False,monthlyUsed=True,hourlyUsed=True,timeStepUsed=True, footerPresent=True):
 
         self._path = path
         self._mode = mode
@@ -90,9 +90,9 @@ class SimulationLoader():
             fileNameList = os.listdir(self._path)
 
         for fileName in fileNameList:
-            self.loadFile(fileName)
+            self.loadFile(fileName, footerPresent)
 
-    def loadFile(self, file):
+    def loadFile(self, file, footerPresent = True):
         """
         Loads file into the field variables
 
@@ -109,9 +109,16 @@ class SimulationLoader():
         fileType = self._fileSniffer(pathFile)
         nRows = self._fileLen(pathFile)
 
+        self.myShortMonths = None
+
         if (fileType == _ResultsFileType.MONTHLY and self._monthlyUsed==True):
-            file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26, mangle_dupe_cols=True).rename(
-                columns=lambda x: x.strip())
+
+            if footerPresent:
+                file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26, mangle_dupe_cols=True).rename(
+                    columns=lambda x: x.strip())
+            else:
+                file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 1, mangle_dupe_cols=True).rename(
+                    columns=lambda x: x.strip())
             file = file[file.columns[:-1]]
             file['Number'] = file.index+pd.to_datetime(file['Month'][0].strip(), format='%B').month
             file.set_index('Number', inplace=True)
@@ -143,8 +150,14 @@ class SimulationLoader():
                 dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.monData = {**self.monData, **dict}
 
+            self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
+
         elif (fileType == _ResultsFileType.HOURLY and self._hourlyUsed==True):
-            file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26).rename(columns=lambda x: x.strip())
+            if footerPresent:
+                file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 26).rename(columns=lambda x: x.strip())
+            else:
+                file = pd.read_csv(pathFile, header=1, delimiter='\t', nrows=nRows - 1).rename(columns=lambda x: x.strip())
+
             file.set_index('Period', inplace=True, drop=False)
 
             if self._fullYear:
@@ -162,7 +175,8 @@ class SimulationLoader():
                     except:
                         raise ValueError(pathFile+' is not in the right Format to read hours '+str(firstHourNumber)+' to '+str(firstHourNumber+8760))
 
-            file["Period"] = datetime(2018, 1, 1) + pd.to_timedelta(file['Period'], unit='h')
+            period = datetime(2018, 1, 1) + pd.to_timedelta(file['Period'], unit='h')
+            file["Period"]  = period
             file.set_index('Period', inplace=True)
             
             if self._mode == 'dataframe' or self._mode == 'complete':
@@ -188,7 +202,7 @@ class SimulationLoader():
                 dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.steData = {**self.steData, **dict}
 
-    def _fileSniffer(self, file):
+    def _fileSniffer(self, file): #detects which kind of file to we need to read
         with open(file) as f:
             for i in range(3):
                 if 'Month' in f.readline():
@@ -210,6 +224,15 @@ class SimulationLoader():
                 pass
         return i + 1
 
+    def loadHourlyFile(self, file):
+
+        file = pd.read_csv(pathFile, header=1, delimiter=';', nrows=nRows - 1).rename(columns=lambda x: x.strip())
+        file.set_index('Time', inplace=True, drop=False)
+        period = datetime(2018, 1, 1) + pd.to_timedelta(file['Time'], unit='h')
+        file["Time"]  = period
+        file.set_index('Time', inplace=True)
+        cols_to_use = [item for item in file.columns[:-1] if item not in set(self.houDataDf.columns)]
+        self.houDataDf = pd.merge(self.houDataDf, file[cols_to_use], left_index=True, right_index=True, how='outer')
 
 class _ResultsFileType(Enum):
     MONTHLY = 1

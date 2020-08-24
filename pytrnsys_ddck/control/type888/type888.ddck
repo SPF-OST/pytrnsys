@@ -26,6 +26,8 @@
 ** outputs to energy balance in kWh and ABSOLUTE value
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
+EQUATIONS 1
+elSysOut_CtrlDemand  = PelContr_kW 
 
 ***********************************
 ** Dependencies with other ddck

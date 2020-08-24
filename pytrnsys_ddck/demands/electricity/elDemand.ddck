@@ -6,6 +6,7 @@
 ** Contact person : Rober Haberl   
 ** Creation date  : 11.09.2018
 ** Last changes   : 15.04.20, Dani Carbonell 
+**					06.08.20, JS: change profile to mfh30
 *****************************************
 
 ***************************************************************************
@@ -47,44 +48,64 @@ elSysOut_HHDemand = PelHH_kW
 EQUATIONS 1
 PelHH_kW = frPelHH*PelHhDr_kW    !kW, um Faktor fr korrigierter HH-Strom
 
-***********************************
+*********************************
 ** DATA READER
-***********************************
+*********************************
 
-UNIT 75 TYPE 9    !, Data Reader Household Electricity
-PARAMETERS 10
-6    !-, 1, Mode
-0    !-, 2, Header Lines to Skip
-1    !-, 3, No. of values to read
-dtSim    !h, 4, Time interval of data
--1  30  0  0    !----, 5-8, Interpolate (+) or not (-)? 6: Multiplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
-unitReadEl_1    !-, 9, Logical unit for input file
--1    !-, 10, Free format mode
+** UNIT 75 TYPE 9    !, Data Reader Household Electricity
+** PARAMETERS 10
+** 6    !-, 1, Mode
+** 0    !-, 2, Header Lines to Skip
+** 1    !-, 3, No. of values to read
+** dtSim    !h, 4, Time interval of data
+** -1  30  0  0    !----, 5-8, Interpolate (+) or not (-)? 6: Multiplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+** unitReadEl_1    !-, 9, Logical unit for input file
+** -1    !-, 10, Free format mode
 
-***********************************
+*********************************
 ** DATA READER
-***********************************
+*********************************
 
-CONSTANTS 2
-unitReadEl_1=18
-unitReadEl_2=19
+** CONSTANTS 2
+** unitReadEl_1=18
+** unitReadEl_2=19
 
 
-ASSIGN  PATH$\demands\electricity\profiles\Familie-2Kinder-1Arbeiter-1Zuhause\Haushaltsstrom_4Pers_Normal.txt unitReadEl_1
-ASSIGN  PATH$\demands\electricity\profiles\House430HT06withCHR53\H430.txt unitReadEl_2
+** ASSIGN  PATH$\demands\electricity\profiles\Familie-2Kinder-1Arbeiter-1Zuhause\Haushaltsstrom_4Pers_Normal.txt unitReadEl_1
+** ASSIGN  PATH$\demands\electricity\profiles\House430HT06withCHR53\H430.txt unitReadEl_2
 
-UNIT 76 TYPE 9    !, Data Reader Household Electricity
+** UNIT 76 TYPE 9    !, Data Reader Household Electricity
+** PARAMETERS 10
+** 6    !-, 1, Mode
+** 0    !-, 2, Header Lines to Skip
+** 1    !-, 3, No. of values to read
+** dtSim    !h, 4, Time interval of data
+** -1  30  0  0    !----, 5-8, Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+** unitReadEl_2    !-, 9, Logical unit for input file
+** -1    !-, 10, Free format mode
+
+*********************************
+** DATA READER
+*********************************
+
+CONSTANTS 1
+unitReadEl_3=20
+
+
+ASSIGN  PATH$\demands\electricity\profiles\MFH30\20191107_MFH_30_electricity_profile_2min.txt unitReadEl_3
+
+UNIT 77 TYPE 9    !, Data Reader Household Electricity
 PARAMETERS 10
 6    !-, 1, Mode
 0    !-, 2, Header Lines to Skip
 1    !-, 3, No. of values to read
 dtSim    !h, 4, Time interval of data
 -1  30  0  0    !----, 5-8, Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
-unitReadEl_2    !-, 9, Logical unit for input file
+unitReadEl_3    !-, 9, Logical unit for input file
 -1    !-, 10, Free format mode
 
 EQUATIONS 2    !, Output of PVT HH el. Data reader
-PelHhDr_kW = [75,1]+[76,1]    !kW,  Totaler el. Konsum des Haushaltes gemäss Data Reader [kW]
+PelHhDr_kW = [77,1] ![75,1]+[76,1]    !kW,  Totaler el. Konsum des Haushaltes gemäss Data Reader [kW]
 frPelHH = 1.0    !-, Korrekturfaktor für HH-Strom
 
 
