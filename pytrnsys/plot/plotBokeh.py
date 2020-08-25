@@ -31,10 +31,19 @@ class PlotBokeh():
     """
     def __init__(self):
 
-        pass
+        self.counter=0
+        self.fileNameUsed = []
 
         
-    def createBokehPlot(self,df,path,fileName,inputKeys,showPlot=False):
+    def createBokehPlot(self,df,path,fileName,inputKeys,showPlot=False,sortPlots=False):
+
+        if(fileName in self.fileNameUsed):
+            self.counter+=1
+            useCounter=True
+        else:
+            self.fileNameUsed.append(fileName)
+            useCounter=False
+
 
         try:
             timeArray = df["TIME"]*3600*1000
@@ -50,23 +59,28 @@ class PlotBokeh():
 
         plotsDict = {}
 
-        #sort indices:
-        for key in inputKeys:
-            if key[0].lower() == 't':
-                temperatures.append(key)
-                plotsDict['temperatures']={'ylabel':'Temperature [deg C]','columns':temperatures}
-            elif key[0].lower() in ['q','p']:
-                energyflows.append(key)
-                plotsDict['energyflows'] = {'ylabel':'Energyflow [kW]','columns':energyflows}
-            elif key[0].lower() in ['m']:
-                massflows.append(key)
-                plotsDict['massflows'] = {'ylabel':'Massflow [kg/h]','columns':massflows}
-            elif key[0].lower() in ['v']:
-                iceFraction.append(key)
-                plotsDict['iceFraction'] = {'ylabel':'Ice Fraction [%]','columns':iceFraction}
-            else:
+        if(sortPlots):
+            #sort indices:
+            for key in inputKeys:
+                if key[0].lower() == 't':
+                    temperatures.append(key)
+                    plotsDict['temperatures']={'ylabel':'Temperature [deg C]','columns':temperatures}
+                elif key[0].lower() in ['q','p']:
+                    energyflows.append(key)
+                    plotsDict['energyflows'] = {'ylabel':'Energyflow [kW]','columns':energyflows}
+                elif key[0].lower() in ['m']:
+                    massflows.append(key)
+                    plotsDict['massflows'] = {'ylabel':'Massflow [kg/h]','columns':massflows}
+                elif key[0].lower() in ['v']:
+                    iceFraction.append(key)
+                    plotsDict['iceFraction'] = {'ylabel':'Ice Fraction [%]','columns':iceFraction}
+                else:
+                    various.append(key)
+                    plotsDict['various'] = {'ylabel':'various','columns':various}
+        else:
+            for key in inputKeys:
                 various.append(key)
-                plotsDict['various'] = {'ylabel':'various','columns':various}
+                plotsDict['various'] = {'ylabel': 'various', 'columns': various}
 
         #count how many plots to make:
         plotCount=len(plotsDict)
@@ -79,7 +93,11 @@ class PlotBokeh():
                     formatters={
                         'DateTime': 'datetime'
                     })
-        output_file(os.path.join(path,fileName +"-plots.html"))
+        if(useCounter):
+            output_file(os.path.join(path,fileName +"-plots-id%d.html"%self.counter))
+        else:
+            output_file(os.path.join(path,fileName +"-plots.html"))
+
         # TOOLS = ['box_select,box_zoom,reset,xpan,xwheel_zoom','hover','save']
         TOOLS = ['box_zoom','reset','pan','wheel_zoom','hover','save']
         
@@ -99,9 +117,14 @@ class PlotBokeh():
                 plotsDict[key]['fig'] = figure(plot_width=800,x_range=plotsDict[keysList[0]]['fig'].x_range, plot_height=250, x_axis_type="datetime", tools=TOOLS)
             for column in plotsDict[key]['columns']:
                 plotsDict[key]['fig'].line(timeArray, df[column], color=next(colors), alpha = 0.5, legend_label = column)
+                # plotsDict[key]['fig'].line(timeArray, df[column], color=next(colors), alpha = 0.5)
+
             plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(months=["%b"])
             plotsDict[key]['fig'].yaxis.axis_label = plotsDict[key]['ylabel']
-            plotsDict[key]['fig'].legend.location = 'top_left'
+
+            plotsDict[key]['fig'].add_layout(plotsDict[key]['fig'].legend[0],'right')
+            #plotsDict[key]['fig'].legend.location = 'top_left'
+
             plotsDict[key]['fig'].legend.click_policy = "hide"
             plotsDict[key]['fig'].legend.label_text_font_size = "10pt"
             plots.append([plotsDict[key]['fig']])

@@ -97,7 +97,7 @@ TSubcool = -0.5     ! Temperature at which water starts to freeze on the Hx surf
 TiceIni = 30
 TiniPCM=GT(ratioIceBegin,0)*0+NOT(GT(ratioIceBegin,0))*TiceIni !Tground     !TiniPCM=TGround  
 ratioIceBegin= 0 ! 0.5     
-iceBlockIni=ratioIceBegin*VIceS*rhoIce      !iceBlockIni=0.15*VIceS*rhoIce 
+iceBlockIni=ratioIceBegin*VIceS*RHOWAT      !iceBlockIni=0.15*VIceS*rhoIce 
 
 ***********************************
 ** physical properties ****************
@@ -145,7 +145,7 @@ nIceHeat=0.25 ! value changed from original by executeTrnsys.py
 CIceCool=0.55 ! value changed from original by executeTrnsys.py
 nIceCool=0.25 ! value changed from original by executeTrnsys.py
 nEnhanceNu=1.0 ! value changed from original by executeTrnsys.py
-verboseLevel = 0
+verboseLevel = 3
 
 UNIT 130 TYPE 861     ! PCM TES
 PARAMETERS nParType861     
@@ -277,7 +277,7 @@ sumQAcumkW = [130,3]/1000.     ! [W]
 sumQLosskW = [130,4]/1000.     ! Loss  Power [W]
 sumQMeltkW = [130,5]/1000.     
 sumQIcekW = [130,6]/1000.     
-ImbalancekW = [130,7]/1000.     
+ImbalancekW = [130,7]/1000.  !imbalance = sumQHx - qAcumStore - sumQLoss  - qFused + sumQIce   
 MassIceFloating = [130,8]     ! Mass Ice floating [kg]
 iceThick = [130,9]     ! Ice Thickness Sum  [m]
 MassIce = [130,10]     ! Mass Ice [kg]
@@ -411,7 +411,7 @@ PARAMETERS 12
 15     ! 6 Right axis maximum
 nPlotsPerSim     ! 7 Number of plots per simulation
 12     ! 8 X-axis gridpoints
--1     ! 9 Shut off Online w/o removing
+0     ! 9 Shut off Online w/o removing
 -1     ! 10 Logical unit for output file
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
