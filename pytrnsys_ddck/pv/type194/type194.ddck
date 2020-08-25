@@ -61,7 +61,7 @@ NPanelPara = 2
 NPanelSeries = 15
 NPanelsPerInverter = NPanelPara*NPanelSeries
 NInverters = numModPvRoof/NPanelsPerInverter
-PowerPeakPV_kWp = numModPvRoof*PvURefMpp*PvIRefMpp/1000*NInverters
+PowerPeakPV_kWp = numModPvRoof*PvURefMpp*PvIRefMpp/1000
 
 ***************************************
 ** Weather Data calculation

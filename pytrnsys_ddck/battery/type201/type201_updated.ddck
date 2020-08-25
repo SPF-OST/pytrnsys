@@ -1,0 +1,254 @@
+*******************************
+**BEGIN battery.ddck
+*******************************
+    
+	
+*****************************************
+** Electrical battery data section. 
+** Author : Robert Haberl (RH)
+** History: 
+**** DC adapted to TriHp
+**** DC first version in ddck format 25.02.2019
+******************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** None
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 4
+elSysOut_BatLoss   = PelBatLoss_kW
+elSysIn_Grid = PelFromGrid_kW
+elSysOut_PvToGrid  = PvToGrid_kW
+elSysOut_InvLoss = PelLossesDCAC
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+**PelPVAC_kW,FCellToBat_kW,PelFuelCellToBui_kW
+EQUATIONS 1
+myPelSystem_kW = (PelAuxTot_kW+PelContr_kW+PelPuSH_kW+PelPuDHW_kW+qAuxStoreDHW_KW+qAuxStoreSH_KW)
+
+
+**********************************************
+** Dependencies with overall variables 
+** Tamb HT cpWat
+** 
+**********************************************
+**None
+
+
+EQUATIONS 5    ! Stromverbrauch und Stromnetzbilanz THIS WILL BE ELIMINATED           ! System electricity consumption [kW]
+PelHeatSys_kW = myPelSystem_kW
+PelUsedTotal_kW = PelHeatSys_kW + PelHH_kW    !kW, Total konsumierter Strom des GebÃ¤udes [kW]
+PelUsedTotal_W = PelUsedTotal_kW*1000    !kW, Total konsumierter Strom des GebÃ¤udes [kW]
+PelPVAC_W = PelPVAC_kW*1000*NOT(batteryOff)
+batteryOff = 0
+
+
+EQUATIONS 48
+P_PV = 120				! 1 P_PV: Nominal power of the PV array
+E_BAT = 48				! 2 E_BAT: Mean capacity of the battery
+P_PV2AC_DC = 120		! 3 P_PV2AC_DC: DC nominal power of the PV inverter
+P_PV2AC_AC = 120		! 4 P_PV2AC_AC: AC nominal power of the PV inverter
+P_AC2BAT = 32			! 5 P_AC2BAT: AC nominal power of the battery inverter during charging
+P_BAT2AC = 32			! 6 P_BAT2AC: AC nominal power of the battery inverter during discharging
+P_BAT_in = 32		! 7 P_BAT_in: DC nominal power of the battery
+PV2AC_a = 6.9647		! 8 PV2AC_a: Coefficients of the loss funtion pv2ac
+PV2AC_b = 21.3401		! 9 PV2AC_b:
+PV2AC_c = 3.5214		! 10 PV2AC_c:
+AC2BAT_a = 54.593		! 11 AC2BAT_a: Coefficients of the loss function ac2bat
+AC2BAT_b = 23.014		! 12 AC2BAT_b:
+AC2BAT_c = 4.781		! 13 AC2BAT_c:
+BAT2AC_a = 33.197		! 14 BAT2AC_a: Coefficients of the loss function bat2ac
+BAT2AC_b = 11.901		! 15 BAT2AC_b:
+BAT2AC_c = 7.636		! 16 BAT2AC_c:
+P_BMS = 5				! 17 P_BMS: BMS-power during charing discharging
+BAT_a = 7.1659			! 18 BAT_a: Coefficients of the battery loss function
+BAT_b = 26.6636			! 19 BAT_b
+BAT_c = 0.3004			! 20 BAT_c
+CM_mod = 1				! 21 CM_mod: Charing scheme during final stage 1=constant power, 2=constant voltage
+CM_SOE_a = 0.85			! 22 CM_SOE_a: Start SOE for the start of the final stage
+CM_SOE_b = 1			! 23 CM_SOE_b: Start SOE for the start of the 2nd final stage only CM_mod0=1
+CM_soe_c = 1			! 24 CM_soe_c: Start SOE for the start of the 3rd final stage only CM_mod0=1
+CM_a = 0.4				! 25 CM_a: Prozentual AC-
+CM_b = 0.4				! 26 CM_b
+CM_c = 0.4				! 27 CM_c
+SOE_h1 = 0.95			! 28 SOE_h1
+SOE_h2 = -0.05			! 29 SOE_h2
+AC2BAT_abw_a = 156.287		! 30 AC2BAT_abw_a
+AC2BAT_abw_b = 46.078		! 31 AC2BAT_abw_b
+BatPar32 = 10.990		! 32 AC2BAT_abw_c
+AC2BAT_abw_c = -71.680		! 33 BAT2AC_abw_a
+BAT2AC_abw_b = -13.563		! 34 BAT2AC_abw_b
+BAT2AC_abw_c = -11.377		! 35 BAT2AC_abw_c
+PL_PVWR = 1				! 36 PL_PVWR
+PL_BWR_DC_SOE0 = 11			! 37 PL_BWR_DC_SOE0
+PL_BWR_DC_SOE1 = 11		! 38 PL_BWR_DC_SOE1
+PL_BWR_AC_SOE0 = 2		! 39 PL_BWR_AC_SOE0
+PL_BWR_AC_SOE1 = 2		! 40 PL_BWR_AC_SOE1
+PL_BMS = 5				! 41 PL_BMS
+P_PERI = 2				! 42 P_PERI
+pvmod = 3			! 43 pvmod
+dtSimSeconds = dtSim*3600		! 44 dt
+E_BATorig = 3.7			! 45 E_BATorig
+WR_nenn = 5				! 46 WR_nenn
+wrmod = 0				! 47 wrmod
+bsmod = 1				! 48 bsmod
+
+
+UNIT 22 TYPE 201	 Battery
+*$UNIT_NAME Battery
+*$MODEL .\NonStandardTypes\Type201.tmf
+*$POSITION 214 374
+*$LAYER Main # 
+PARAMETERS 48
+P_PV 				! 1 P_PV
+E_BAT 				! 2 E_BAT
+P_PV2AC_DC 		! 3 P_PV2AC_DC
+P_PV2AC_AC 		! 4 P_PV2AC_AC
+P_AC2BAT 		! 5 P_AC2BAT
+P_BAT2AC 			! 6 P_BAT2AC
+P_BAT_in 		! 7 P_BAT_in
+PV2AC_a 		! 8 PV2AC_a
+PV2AC_b 		! 9 PV2AC_b
+PV2AC_c 			! 10 PV2AC_c
+AC2BAT_a			! 11 AC2BAT_a
+AC2BAT_b			! 12 AC2BAT_b
+AC2BAT_c			! 13 AC2BAT_c
+BAT2AC_a			! 14 BAT2AC_a
+BAT2AC_b			! 15 BAT2AC_b
+BAT2AC_c			! 16 BAT2AC_c
+P_BMS  				!17 P_BMS
+BAT_a  				! 18 BAT_a
+BAT_b 				! 19 BAT_b
+BAT_c  			! 20 BAT_c
+CM_mod  			!21 CM_mod
+CM_SOE_a 			! 22 CM_SOE_a
+CM_SOE_b 				! 23 CM_SOE_b
+CM_soe_c 				! 24 CM_soe_c
+CM_a 					! 25 CM_a
+CM_b 					! 26 CM_b
+CM_c 					! 27 CM_c
+SOE_h1 				! 28 SOE_h1
+SOE_h2 				! 29 SOE_h2
+AC2BAT_abw_a 		! 30 AC2BAT_abw_a
+AC2BAT_abw_b 		! 31 AC2BAT_abw_b
+BatPar32 			! 32 AC2BAT_abw_c
+AC2BAT_abw_c 		! 33 BAT2AC_abw_a
+BAT2AC_abw_b 		! 34 BAT2AC_abw_b
+BAT2AC_abw_c 		! 35 BAT2AC_abw_c
+PL_PVWR 				! 36 PL_PVWR
+PL_BWR_DC_SOE0 		! 37 PL_BWR_DC_SOE0
+PL_BWR_DC_SOE1 			! 38 PL_BWR_DC_SOE1
+PL_BWR_AC_SOE0			! 39 PL_BWR_AC_SOE0
+PL_BWR_AC_SOE1			! 40 PL_BWR_AC_SOE1
+PL_BMS 				! 41 PL_BMS
+P_PERI 				! 42 P_PERI
+pvmod 				! 43 pvmod
+dtSimSeconds 	! 44 dt
+E_BATorig 				! 45 E_BATorig
+WR_nenn 					! 46 WR_nenn
+wrmod 					! 47 wrmod
+bsmod 					! 48 bs
+INPUTS 3
+PelPVAC_W		! Bat Calc:PV_Bat_In ->PV-Power
+PelUsedTotal_W		! Bat Calc:PLast ->Load
+0,0		! [unconnected] Pbs_in 
+*** INITIAL INPUT VALUES
+0 0 0 
+
+EQUATIONS 10
+PPVS = [22,1]
+PPV = [22,2]
+PBS = [22,3]
+PBAT = [22,4]
+PPERI = [22,5]
+soe = [22,6]
+h1 = [22,7]
+h2 = [22,8]
+PG = [22,9]
+PD = [22,10]
+
+
+EQUATIONS 10
+
+** Detect if battery is full or empty
+** what is this 0.25 ????
+BoBatFull = GE(soe,1)  !0/1, Batterie ist Full
+BoBatEmpty = LE(soe,0)    !0/1, Batterie ist Empty
+PvToHH_kW      = PelPVAC_kW-PvToBat_kW-PvToGrid_kW
+
+** I use the AC as control to know how much I can bring with DC = AC/inverterLoss
+PvToBatDC_kW   = PBAT/1000
+PvToBat_kW     = -LT(PBS,0)*PBS/1000
+PvExcess_kW    = (PD-PBS)/1000
+PvToGrid_kW = GT(PG,0)*PG/1000
+** El from Battery to system. No efficiency to discharge? Yes but if used here then we always need the grid, what we need to do is to decrease the SOC
+PelFromBat_kW  = GT(PBS,0)/1000
+PelFromGrid_kW = -LT(PG,0)*PG/1000
+** Loss calculations
+PelBatLoss_kW     = (ABS(PBS-PBAT)+PPERI)/1000  ! PelBatWRLoss_kW + PelBatTimeLoss_kW   ! kW
+
+
+
+
+UNIT 29 TYPE 65	 System
+PARAMETERS 12
+10		! 1 Nb. of left-axis variables
+3		! 2 Nb. of right-axis variables
+-5000		! 3 Left axis minimum
+5000.0		! 4 Left axis maximum
+-5		! 5 Right axis minimum
+5		! 6 Right axis maximum
+nPlotsPerSim		! 7 Number of plots per simulation
+12		! 8 X-axis gridpoints
+1		! 9 Shut off Online w/o removing
+-1		! 10 Logical unit for output file
+0		! 11 Output file units
+0		! 12 Output file delimiter
+INPUTS 13
+PelPVAC_kW PvToHH_kW PD PvToGrid_kW PvExcess_kW PvToBat_kW PvToBatDC_kW PelFromBat_kW PelFromGrid_kW PG
+soe BoBatFull BoBatEmpty
+***
+PelPVAC_kW PvToHH_kW PD PvToGrid_kW PvExcess_kW PvToBat_kW PvToBatDC_kW PelFromBat_kW PelFromGrid_kW PG
+soe BoBatFull BoBatEmpty
+
+LABELS  3
+Power
+-
+Batteries
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!MONTHLY PRINTER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+CONSTANTS 1
+unitPrinterBat=123
+
+ASSIGN    temp\BUILDING_MO.Prt     unitPrinterBat
+
+UNIT 123 Type 46 ! Printegrator Monthly Values for System
+PARAMETERS 6    
+unitPrinterBat ! 1: Logical unit number, -
+-1             ! 2: Logical unit for monthly summaries, -
+1              ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1             ! 4: Printing & integrating interval, h. -1 for monthly integration
+1              ! 5: Number of inputs to avoid integration, -
+1              ! 6: Output number to avoid integration
+INPUTS 10
+Time  PelPVAC_kW PvToHH_kW PD PvToGrid_kW PvExcess_kW PvToBat_kW PvToBatDC_kW PelFromBat_kW PelFromGrid_kW
+***************
+Time  PelPVAC_kW PvToHH_kW PD PvToGrid_kW PvExcess_kW PvToBat_kW PvToBatDC_kW PelFromBat_kW PelFromGrid_kW
