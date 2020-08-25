@@ -12,6 +12,8 @@ import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 import logging
 logger = logging.getLogger('root')
+# stop propagting to root logger
+logger.propagate = False
 
 class ExecuteTrnsys():
     """

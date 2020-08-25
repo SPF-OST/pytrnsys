@@ -438,6 +438,8 @@ class RunParallelTrnsys():
 
         self.lines = tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated,controlDataType=False)
         self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
+        # stop propagting to root logger
+        self.logger.propagate = False
         if 'pathBaseSimulations' in self.inputs:
             self.path = self.inputs['pathBaseSimulations']
         if(self.inputs["addResultsFolder"]==False):

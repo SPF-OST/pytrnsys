@@ -18,7 +18,8 @@ from tkinter import messagebox as tkMessageBox
 #from graphviz import Graph
 import logging
 logger = logging.getLogger('root')
-
+# stop propagting to root logger
+logger.propagate = False
 """
 This class uses a list of ddck files to built a complete TRNSYS deck file
 """
@@ -147,7 +148,10 @@ class BuildTrnsysDeck():
 
             self.deckText.append(caption)
             self.deckText =  self.deckText + addedLines
-        logger.info("Replacemenet of Units done")
+        self.logger = logging.getLogger('root')
+        # stop propagting to root logger
+        self.logger.propagate = False
+        self.logger.info("Replacemenet of Units done")
 
     def createDependencyGraph(self):
         e = Graph('ER', filename='er.gv', node_attr={'color': 'lightblue2', 'style': 'filled'})
@@ -282,6 +286,11 @@ class BuildTrnsysDeck():
 
         lines = deckUtils.addEnergyBalanceMonthlyPrinter(unitId,eBalance)
         self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
+
+        unitId=self.unitId+2
+        lines = deckUtils.addEnergyBalanceHourlyPrinter(unitId,eBalance)
+        self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
+        
         self.writeDeck() # Deck rewritten with added printer
 
     def replaceLines(self,replaceList):
