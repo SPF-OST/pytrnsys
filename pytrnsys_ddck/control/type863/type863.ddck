@@ -375,10 +375,10 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 0     ! 12 Output file delimiter
 
 INPUTS 20    
-ProHp   ProSeries   proPar  proWs  proCs  nix ProDfWs ProDfAux PriorWs BoAuxWWOn
+ProHp   ProSeries   proPar  proWs  proCs   ProDfWs ProDfAux PriorWs BoAuxWWOn Nix
 BlockWs BlockWsType BlockCs TwwStAuxON  BlockHp  TwwStAuxOFF THpEvapIn TCollOut TPiIceIn TPiIceOut
 ****LABELS
-ProHp   ProSeries   proPar  proWs  proCs  nix ProDfWs ProDfAux PriorWs BoAuxWWOn
+ProHp   ProSeries   proPar  proWs  proCs   ProDfWs ProDfAux PriorWs BoAuxWWOn Nix
 BlockWs BlockWsType BlockCs TwwStAuxON  BlockHp  TwwStAuxOFF THpEvapIn TCollOut TPiIceIn TPiIceOut
 
 *****

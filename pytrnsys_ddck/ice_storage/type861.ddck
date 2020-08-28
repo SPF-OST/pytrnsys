@@ -145,7 +145,7 @@ nIceHeat=0.25 ! value changed from original by executeTrnsys.py
 CIceCool=0.55 ! value changed from original by executeTrnsys.py
 nIceCool=0.25 ! value changed from original by executeTrnsys.py
 nEnhanceNu=1.0 ! value changed from original by executeTrnsys.py
-verboseLevel = 3
+verboseLevel = 1
 
 UNIT 130 TYPE 861     ! PCM TES
 PARAMETERS nParType861     
