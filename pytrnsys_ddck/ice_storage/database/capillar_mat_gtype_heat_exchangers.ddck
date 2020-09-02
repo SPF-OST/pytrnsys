@@ -17,8 +17,6 @@ uTubeTrue    =  1
 nRealHx      =  INT(Lstore/yBetweenHx/uTubeTrue)
 xBetweenPipes = 0.03
 
-
-
 CONSTANTS 17
 nUsedHxPerHx = 1
 hxGeometry = 1 ! coils    
@@ -46,7 +44,7 @@ charThick= 9e-3
 dxWallHx = 6e-4     
 dOutHx= 4.25e-3   ! 25 Heat exchanger characteristic thickness                  [m]
 dInHx = 2.75e-3   ! 26 Heat exchanger wall thickness                            [m]
-lHx   =  Tankheight*uTubeTrue
+lHx   =  Tankheight*GT(uTubeTrue,0.5)*2
 lambdaHx = 0.33 ! 0.23-2.5
 
 CONSTANTS 6
