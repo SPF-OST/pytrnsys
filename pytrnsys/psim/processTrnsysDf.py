@@ -222,7 +222,7 @@ class ProcessTrnsysDf():
         self.loadFiles()
         self.loadDll()
         self.process()
-                self.addBokehPlot()
+        self.addBokehPlot()
         self.addQvsTPlot()
 
         if(self.inputs['createLatexPdf']==True):
@@ -570,7 +570,7 @@ class ProcessTrnsysDf():
                                           myTitle=None, printData=self.printDataForGle)
 
         self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
-def calcConfigEquations(self):
+    def calcConfigEquations(self):
         for equation in self.inputs['calc']:
             namespace = {**self.deckData,**self.__dict__,**self.yearlySums,**self.yearlyMax,**self.yearlyAvg}
             expression = equation.replace(' ','')
@@ -590,7 +590,7 @@ def calcConfigEquations(self):
             value = splitEquation[0].strip()
             self.monDataDf['Cum_' + value] = self.monDataDf[value].cumsum()
             self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
-         for equation in self.inputs["calcDaily"]:
+        for equation in self.inputs["calcDaily"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
             scalars = kwargs['local_dict'].keys()
             splitEquation = equation.split('=')
@@ -625,7 +625,7 @@ def calcConfigEquations(self):
                         self.houDataDf['cumsum_' + value] = self.houDataDf[value].cumsum()
                         myValue = 'cumsum_' + value
                         self.cumSumEnd = {myValue + '_End': self.houDataDf[myValue][-1]}
-    for equation in self.inputs["calcHourlyTest"]:
+        for equation in self.inputs["calcHourlyTest"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
             scalars = kwargs['local_dict'].keys()
             splitEquation = equation.split('=')
