@@ -262,8 +262,11 @@ information of the simulation like iteration problems and system performance fac
 pdf file. The process configuration file allows to configure the processing. In addition
 further calculations with the simulation results and additional plots can be defined.
 
-Calculations
-------------
+Besides that, the processing functionality can be used on generic data that do not originate from
+TRNSYS simulations.
+
+Processing TRNSYS data
+----------------------
 
 During processing pytrnsys reads in the following values automatically:
 
@@ -278,7 +281,7 @@ During processing pytrnsys reads in the following values automatically:
 3.  All hourly printer values of the simulation.
 
 All values can be adressed in the config file by their name in the header of the trnsys printer file.
-It is recommended to dublicate the internal TRNSYS name in the header of the printer.
+It is recommended to duplicate the internal TRNSYS name in the header of the printer.
 
 .. note::
 
@@ -296,8 +299,17 @@ By default, pytrnsys also calculates the following values:
 5.  The maximum hourly value of an hourly printed file. The hourly maximum of an hourly
     printed variable with the name ``bar`` can be accessed by ``bar_Max``.
 
-Custom calculation keywords
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Processing generic data
+-----------------------
+
+To process generic data, add the following expression to the header of your configuration file::
+
+    bool isTrnsys False
+
+You then need to specify how pytrnsys should access your data.
+
+Calculations
+------------
 
 In the processing-configuration file, the user can specify custom calculations based on the
 readed TRNSYS results and the values that are calculated by default. The type of each equation has to be
