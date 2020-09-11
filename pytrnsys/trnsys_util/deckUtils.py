@@ -478,7 +478,7 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
 
     lines = []
     line = "***************************************************************\n";lines.append(line)
-    line = "**BEGIN Energy Balance printer automatically generated from DDck files\n";lines.append(line)
+    line = "**BEGIN Monthly Energy Balance printer automatically generated from DDck files\n";lines.append(line)
     line = "***************************************************************\n";lines.append(line)
     line = "EQUATIONS 1\n";lines.append(line)
     line = ImbalanceString + '\n';lines.append(line)
@@ -498,6 +498,77 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
     line = "%s\n"%allvars;lines.append(line)
     line = "*******************************\n";lines.append(line)
     line = "%s\n"%allvars;lines.append(line)
+
+    # self.linesChanged=self.linesChanged+lines
+    return lines
+
+
+def addEnergyBalanceHourlyPrinter(unit, eBalance):
+    """
+        Adds a hourly printer in the deck using the energy balance variables.
+        It also calulates the most common KPI such as monthly and yearly SPF
+
+        based on addEnergyBalanceMonthlyPrinter
+
+        1st version: JS, 17.08.2020
+
+    """
+
+    # size = len(self.qBalanceIn)+len(self.qBalanceOut)+len(self.elBalanceIn)+len(self.elBalanceOut)
+
+    # ImbalanceString = 'qImb = '
+    #
+    # for q in eBalance:
+    #     if 'qSysOut' in q:
+    #         ImbalanceString += ' - ' + q
+    #
+    #     elif 'qSysIn' in q or 'elSysIn_Q' in q:
+    #         ImbalanceString += ' + ' + q
+    # if ImbalanceString == 'qImb = ':
+    #     ImbalanceString += '0'
+
+    lines = []
+    line = "***************************************************************\n";
+    lines.append(line)
+    line = "**BEGIN Hourly Energy Balance printer automatically generated from DDck files\n";
+    lines.append(line)
+    line = "***************************************************************\n";
+    lines.append(line)
+    # line = "EQUATIONS 1\n";
+    # lines.append(line)
+    # line = ImbalanceString + '\n';
+    # lines.append(line)
+    line = "CONSTANTS 1\n";
+    lines.append(line)
+    line = "unitPrintEBal_h=%d\n" % unit;
+    lines.append(line)
+    line = "ASSIGN temp\ENERGY_BALANCE_HR.Prt unitPrintEBal_h\n";
+    lines.append(line)
+    line = "UNIT %d Type 46\n" % unit;
+    lines.append(line)
+    line = "PARAMETERS 6\n";
+    lines.append(line)
+    line = "unitPrintEBal_h !1: Logical unit number\n";
+    lines.append(line)
+    line = "-1 !2: for monthly summaries\n";
+    lines.append(line)
+    line = "1  !3: 1:print at absolute times\n";
+    lines.append(line)
+    line = "1 !4 1: hourly integration\n";
+    lines.append(line)
+    line = "1  !5 number of outputs to avoid integration\n";
+    lines.append(line)
+    line = "1  !6 output number to avoid integration\n";
+    lines.append(line)
+    line = "INPUTS %d\n" % (len(eBalance) + 2);
+    lines.append(line)
+    allvars = "TIME " + " ".join(eBalance) + ' qImb'
+    line = "%s\n" % allvars;
+    lines.append(line)
+    line = "*******************************\n";
+    lines.append(line)
+    line = "%s\n" % allvars;
+    lines.append(line)
 
     # self.linesChanged=self.linesChanged+lines
     return lines

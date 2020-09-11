@@ -32,6 +32,9 @@ import re
 import logging
 from datetime import datetime, timedelta
 logger = logging.getLogger('root')
+# stop propagting to root logger
+logger.propagate = False
+
 # import pytrnsys_spf.psim.costConfig as costConfig
 
 
@@ -219,7 +222,6 @@ class ProcessTrnsysDf():
         self.loadFiles()
         self.loadDll()
         self.process()
-
         self.addBokehPlot()
         self.addQvsTPlot()
 
@@ -300,18 +302,19 @@ class ProcessTrnsysDf():
 
         self.yearlySums = {value+'_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
+        self.yearlyAvg = {value + '_Avg': self.houDataDf[value].mean() for value in self.houDataDf.columns}
 
 
         for column in self.monDataDf.columns:
             self.monDataDf['Cum_'+column]=self.monDataDf[column].cumsum()
-
         self.calcConfigEquations()
 
         #This recalculated all, we should only recalculated what was done in caclConfigEquations. DC or it is so fast we don't care ?
 
         self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
-        # self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
+        self.yearlyAvg = {value + '_Avg': self.houDataDf[value].mean() for value in self.houDataDf.columns}
+        self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
 
         logger.info("loadFiles completed using SimulationLoader")
 
@@ -332,8 +335,8 @@ class ProcessTrnsysDf():
 
     def addQvsTPlot(self):
 
-        # if "plotHourly" in self.inputs.keys():
-        #     self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"][0])
+        if "plotHourly" in self.inputs.keys():
+            self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"][0])
 
         if "plotMonthly" in self.inputs.keys():
         #
@@ -381,7 +384,9 @@ class ProcessTrnsysDf():
         self.addDemands()
         self.addElBalance()
         self.addElConsumption()
-
+        if 'calculateEPF' in self.inputs:
+            if self.inputs['calculateEPF']:
+                self.addEPFSystem()
         self.addCustomBalance()
         self.addCustomStackedBar()
         self.addCustomNBar()
@@ -527,17 +532,53 @@ class ProcessTrnsysDf():
 
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
-    def calcConfigEquations(self):
+    def addEPFSystem(self, printData=True):
 
+        self.elSys = num.zeros(12)
+        self.elH = num.zeros(12)
+        self.elPv = num.zeros(12)
+        self.elGrid = num.zeros(12)
+        self.elExp = num.zeros(12)
+        self.elNetE = num.zeros(12)
+        self.EPF = num.zeros(12)
+        
+        for c, value in enumerate(self.elDemandVector):
+            if value.name in ['elSysOut_PuShDemand','elSysOut_CtrlDemand','elSysIn_Q_TesDhwAuxD','elSysIn_Q_TesShAuxD','elSysIn_Q_HpCompD']:
+                self.elSys += value.values
+            elif value.name == 'elSysOut_HHDemand':
+                self.elH = value.values
+
+        self.elPv = self.monDataDf['elSysIn_PV']
+        self.elGrid = self.monDataDf['elSysIn_Grid']
+        self.elExp = self.monDataDf['elSysOut_PvToGrid']
+        self.elNetE = self.elGrid-self.elExp
+        
+        self.EPF = (self.elSys + self.elH)/(self.elPv + self.elGrid - self.elExp )
+        
+        self.EPF_yearly = (self.elSys.sum() + self.elH.sum())/(self.elPv.sum() + self.elGrid.sum() - self.elExp.sum() )
+
+
+        nameFile = "Electrical_Performance_Factor"
+        legend = ["Month", "$Q_{demand}$", "$El_{Heat,Sys}$", "$SPF_{SHP}$"]
+        caption = "Electrical Performance Factor"
+        # self.doc.addTableMonthlyDf(var, legend, ["", "kWh", "kWh", "-"], caption, nameFile, self.myShortMonths,
+        #                            sizeBox=15)
+        yearlyFactor = 1
+        epfToPlot = num.append(self.EPF.values, self.EPF_yearly)
+
+        namePdf = self.plot.plotMonthlyDf(epfToPlot, "electrical performance factor $\eta_{El}$ $[-]$", nameFile, yearlyFactor, self.myShortMonths,
+                                          myTitle=None, printData=self.printDataForGle)
+
+        self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+    def calcConfigEquations(self):
         for equation in self.inputs['calc']:
-            namespace = {**self.deckData,**self.__dict__,**self.yearlySums,**self.yearlyMax}
+            namespace = {**self.deckData,**self.__dict__,**self.yearlySums,**self.yearlyMax,**self.yearlyAvg}
             expression = equation.replace(' ','')
             exec(expression,globals(),namespace)
             self.deckData = namespace
             logger.debug(expression)
-
         for equation in self.inputs["calcMonthly"]:
-            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax,**self.yearlyAvg}}
             scalars = kwargs['local_dict'].keys()
             splitEquation = equation.split('=')
             parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
@@ -549,7 +590,6 @@ class ProcessTrnsysDf():
             value = splitEquation[0].strip()
             self.monDataDf['Cum_' + value] = self.monDataDf[value].cumsum()
             self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
-
         for equation in self.inputs["calcDaily"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
             scalars = kwargs['local_dict'].keys()
@@ -564,7 +604,7 @@ class ProcessTrnsysDf():
             self.cumSumEnd = {value + '_End': self.dayDataDf[value][-1] for value in self.dayDataDf.columns}
 
         for equation in self.inputs["calcHourly"]:
-            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax,**self.yearlyAvg}}
             scalars = kwargs['local_dict'].keys()
             splitEquation = equation.split('=')
             parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
@@ -576,6 +616,8 @@ class ProcessTrnsysDf():
             self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
             self.cumSumEnd = {value + '_End': self.houDataDf[value][-1] for value in self.houDataDf.columns}
 
+
+            self.yearlyAvg = {value + '_Avg': self.houDataDf[value].mean() for value in self.houDataDf.columns}
         for equation in self.inputs["calcCumSumHourly"]:
             for value in equation:
                 for key in self.houDataDf.columns:
@@ -583,7 +625,6 @@ class ProcessTrnsysDf():
                         self.houDataDf['cumsum_' + value] = self.houDataDf[value].cumsum()
                         myValue = 'cumsum_' + value
                         self.cumSumEnd = {myValue + '_End': self.houDataDf[myValue][-1]}
-
         for equation in self.inputs["calcHourlyTest"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax}}
             scalars = kwargs['local_dict'].keys()
@@ -719,7 +760,7 @@ class ProcessTrnsysDf():
 
         namePdf = self.plot.gle.executeGLE(fileName + ".gle")
 
-        self.doc.addPlot(namePdf, "Cumulative energy flow as funciton of reference temperature", fileName, 12)
+        self.doc.addPlot(namePdf, "Cumulative energy flow as function of reference temperature", fileName, 12)
 
         for mIndex in range(len(monthsSplit)):
             timeStepInSeconds = self.readTrnsysFiles.timeStepUsed
@@ -1025,7 +1066,7 @@ class ProcessTrnsysDf():
 
         lines = ""
         jointDicts = {**self.deckData, **self.__dict__, **self.yearlySums,
-                      **self.yearlyMax,**self.cumSumEnd}
+                      **self.yearlyMax,**self.yearlyAvg,**self.cumSumEnd}
         if 'caseDefinition' in self.inputs.keys():
             for variable in self.inputs['caseDefinition'][0]:
                 line = self.getNiceLatexNames(variable)+' & %2.1f& &  \\\\ \n' % (jointDicts[variable])
@@ -1184,10 +1225,12 @@ class ProcessTrnsysDf():
                 self.resultsDict = {'Name':self.fileName.split('-')[1]}
             else:
                 self.resultsDict = {}
-            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax,**self.cumSumEnd} #,**self.maximumMonth,**self.minimumMonth}
+            jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax,**self.yearlyAvg,**self.cumSumEnd} #,**self.maximumMonth,**self.minimumMonth}
             for key in self.inputs['results'][0]:
                 if type(jointDicts[key]) == num.ndarray:
                     value = list(jointDicts[key])
+                elif isinstance(jointDicts[key],  pd.Series):
+                    value = list(jointDicts[key].values)
                 else:
                     value = jointDicts[key]
                 self.resultsDict[key] = value

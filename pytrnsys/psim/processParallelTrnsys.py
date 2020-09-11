@@ -343,8 +343,10 @@ class ProcessParallelTrnsys():
                                                     casesInputs.append((baseClass, pathFolder, name, inputs[i]))
                                     elif "hourlyMean" in name and type=='hourlyMean':
                                         casesInputs.append((baseClass, pathFolder, name, self.inputs))
-                                    else:
+                                    elif "hourlyMean" in name and type !='hourlyMean':
                                         pass
+                                    else:
+                                        casesInputs.append((baseClass, pathFolder, name, self.inputs))
                         else:
                             pass
 

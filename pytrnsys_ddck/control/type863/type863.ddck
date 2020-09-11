@@ -359,33 +359,33 @@ On-Off
 Control
 
 
-UNIT 128 TYPE 65     ! Online Plotter Auxiliary 
-PARAMETERS 12     
-10     ! 1 Nb. of left-axis variables
-10     ! 2 Nb. of right-axis variables
--0.5     ! 3 Left axis minimum
-1.5     ! 4 Left axis maximum
--1.5     ! 5 Right axis minimum
-1.5     ! 6 Right axis maximum
-nPlotsPerSim     ! 7 Number of plots per simulation
-12     ! 8 X-axis gridpoints
-1     ! 9 Shut off Online w/o removing
--1     ! 10 Logical unit for output file
-0     ! 11 Output file units
-0     ! 12 Output file delimiter
+** UNIT 128 TYPE 65     ! Online Plotter Auxiliary 
+** PARAMETERS 12     
+** 10     ! 1 Nb. of left-axis variables
+** 10     ! 2 Nb. of right-axis variables
+** -0.5     ! 3 Left axis minimum
+** 1.5     ! 4 Left axis maximum
+** -1.5     ! 5 Right axis minimum
+** 1.5     ! 6 Right axis maximum
+** nPlotsPerSim     ! 7 Number of plots per simulation
+** 12     ! 8 X-axis gridpoints
+** 1     ! 9 Shut off Online w/o removing
+** -1     ! 10 Logical unit for output file
+** 0     ! 11 Output file units
+** 0     ! 12 Output file delimiter
 
-INPUTS 20    
-ProHp   ProSeries   proPar  proWs  proCs  nix ProDfWs ProDfAux PriorWs BoAuxWWOn
-BlockWs BlockWsType BlockCs TwwStAuxON  BlockHp  TwwStAuxOFF THpEvapIn TCollOut TPiIceIn TPiIceOut
-****LABELS
-ProHp   ProSeries   proPar  proWs  proCs  nix ProDfWs ProDfAux PriorWs BoAuxWWOn
-BlockWs BlockWsType BlockCs TwwStAuxON  BlockHp  TwwStAuxOFF THpEvapIn TCollOut TPiIceIn TPiIceOut
+** INPUTS 20    
+** ProHp   ProSeries   proPar  proWs  proCs  nix ProDfWs ProDfAux PriorWs BoAuxWWOn
+** BlockWs BlockWsType BlockCs TwwStAuxON  BlockHp  TwwStAuxOFF THpEvapIn TCollOut TPiIceIn TPiIceOut
+**LABELS
+** ProHp   ProSeries   proPar  proWs  proCs  nix ProDfWs ProDfAux PriorWs BoAuxWWOn
+** BlockWs BlockWsType BlockCs TwwStAuxON  BlockHp  TwwStAuxOFF THpEvapIn TCollOut TPiIceIn TPiIceOut
 
-*****
-LABELS 3     
-Temperatures     
-On-Off     
-Control-pri
+***
+** LABELS 3     
+** Temperatures     
+** On-Off     
+** Control-pri
 
 **UNIT 128 TYPE 65     ! Online Plotter Auxiliary 
 **PARAMETERS 12     

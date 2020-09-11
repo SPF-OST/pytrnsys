@@ -8,6 +8,8 @@ import pytrnsys.utils.utilsSpf as utils
 import numpy as num
 import logging
 logger = logging.getLogger('root')
+# stop propagting to root logger
+logger.propagate = False
 
 class LogTrnsys():
 

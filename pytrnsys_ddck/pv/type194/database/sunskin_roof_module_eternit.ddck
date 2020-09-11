@@ -5,11 +5,11 @@
 *****************************************
 ** Data for pv module type 194 sunskin roof module eternit. 
 ** Version : v0.0
-** Last Changes: Mattia Battaglia	    
-** Date: 18.06.2020
+** Last Changes: Jeremias Schmidli
+** Date: 11.08.2020
 ******************************************
 
-CONSTANTS 18 
+CONSTANTS 19 
 PvIsc = 9.2 ! Module short-circuit current at reference conditions
 PvVos = 26.8 ! Module open-circuit voltage at reference conditions
 PvRefTemp = 298.15 ! Reference temperature
@@ -28,3 +28,4 @@ PvShuntRs = 859.6 ! Shunt resistance at reference conditions (from Type194 plugi
 PvTempNoct = 308.2 ! Module temperature at NOCT
 PvTambNoct = 293.15 ! Ambient temperature at NOCT
 PvInsNoct = 800 ! Insolation at NOCT
+powerRating = 190 ! rated power at STC (Wp), according to datasheet, PvURefMpp*PvIRefMpp=190.53, slightly larger

@@ -129,7 +129,7 @@ PelBatToHeatSys_kW = MIN(PelFromBat_kW-PelFromBatToHH_kW,PelHeatSys_kW)
 
 PelBatWRLoss_kW   = 0 !PvToBat_kW+PelFuelCellToBat_kW-PelFromBat_kW    !kW, Inverter losses in battery . All included in BatLoss
 PelBatTimeLoss_kW = CapBatMax_kWh*0.05/(30*24)/dtSim  ! kW, Batterie-Ladungsverluste (5% pro Monat)
-PelBatLoss_kW     = PvToBat_kW+PelFuelCellToBat_kW-PelFromBat_kW  ! PelBatWRLoss_kW + PelBatTimeLoss_kW   ! kW
+PelBatLoss_kW     = PvToBat_kW+PelFuelCellToBat_kW-PelFromBat_kW  ! PelBatWRLoss_kW + PelBatTimeLoss_kW   ! kW  !This variable only makes sense when integrated...
 
 ** Calculate ACDC inverter losses
 PelLossesDCAC =  (elSysIn_PV - PvToBatDC_kW + PelFromBat_kW)*(1-inverterEffDCAC)
@@ -173,6 +173,30 @@ Time  PelHH_kW PelPVDC_kW  PelPVRoof_kW PvToBat_kW  PvToHeatSys_kW PvToHH_kW Pel
 PelBatTimeLoss_kW  PelBatStandby_kW PelFromBatToHH_kW PelBatToHeatSys_kW PelFuelCellToBat_kW PvToGrid_kW PvInverterLoss_kW PelHeatSys_kW
 
 
+*******************************
+**Hourly Battery printer
+*******************************
+
+CONSTANTS 1
+unitPrinterBat_h=309
+
+ASSIGN    temp\ELECTRIC_BAT_HR.Prt      unitPrinterBat_h
+
+UNIT 308 Type 46    !, Printegrator Monthly Values for Electricity
+PARAMETERS 6
+unitPrinterBat_h  !, 1, Logical unit number, -
+-1   !, 2, Logical unit for monthly summaries, -
+1    !, 3, Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1   !, 4, Printing & integrating interval, h. -1 for monthly integration
+1    !, 5, Number of inputs to avoid integration, -
+1    !, 6, Output number to avoid integration
+INPUTS 11
+Time  SOCBat_kWh SOCBat   PvToBat_kW  PelFromBat_kW  PelBatWRLoss_kW  PelBatLoss_kW  PelBatTimeLoss_kW  PelBatStandby_kW  PelFromBatToHH_kW PelBatToHeatSys_kW
+*******
+Time  SOCBat_kWh SOCBat   PvToBat_kW  PelFromBat_kW  PelBatWRLoss_kW  PelBatLoss_kW  PelBatTimeLoss_kW  PelBatStandby_kW  PelFromBatToHH_kW PelBatToHeatSys_kW
+
+
+
 UNIT 155 TYPE 65     ! Online Plotter PV
 PARAMETERS 12     
 5     ! 1 Nb. of left-axis variables
@@ -188,11 +212,11 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 8
-elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  PelLossesDCAC  PvInverterLoss_kW  VelMp  VelArrayMp  inverterEffDCAC  
+elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  nix  nix  SOCBat_kWh  BoBatFull  SOCBat  
 **     
-elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  PelLossesDCAC  PvInverterLoss_kW  VelMp  VelArrayMp  inverterEffDCAC  
+elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  nix  nix  SOCBat_kWh  BoBatFull  SOCBat 
 LABELS  3    
 Pel
-Vel
-PV     
+SoC
+Battery     
 		

@@ -64,7 +64,7 @@ MfrGhxNom = MfrHpEvapNom
 
 CONSTANTS 5  
 PrecondON  = 0   
-QDemandPre = 40/8.76 ! 40 MWh* 1000 kW/8760 MWh
+QDemandPre = 40/8.76 ! 40 MWh* 1000 kW/8760 MWh ! JS: this could be wrong, because in the fortran code is a comment, that this value is in W, not kW
 nYearsPre  = 5
 Wprecond   = 52*nYearsPre*1*PrecondON  
 Pprecond   = PrecondON * QDemandPre    
