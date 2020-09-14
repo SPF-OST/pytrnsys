@@ -1357,16 +1357,15 @@ class ProcessTrnsysDf():
                 self.resultsDict = {}
             jointDicts = {**self.deckData,**self.monDataDf.to_dict(orient='list'),**self.__dict__,**self.yearlySums,**self.yearlyMax,**self.yearlyAvg,**self.cumSumEnd} #,**self.maximumMonth,**self.minimumMonth}
             for key in self.inputs['results'][0]:
-                if type(jointDicts[key]) == num.ndarray:
+                if ":month" in key:
+                    valueName = key.split(':')[0]
+                    for monthNumber in range(0, 12):
+                        self.resultsDict[valueName + '_' + self.myShortMonths[monthNumber]] = \
+                        self.monDataDf[valueName].iloc[monthNumber]
+                elif type(jointDicts[key]) == num.ndarray:
                     value = list(jointDicts[key])
                 elif isinstance(jointDicts[key],  pd.Series):
                     value = list(jointDicts[key].values)
-
-                if ":month" in key:
-                    valueName = key.split(':')[0]
-                    for monthNumber in range(0,12):
-                        self.resultsDict[valueName + '_' + self.myShortMonths[monthNumber]] = self.monDataDf[valueName].iloc[monthNumber]
-
                 else:
                     if type(jointDicts[key]) == num.ndarray:
                         value = list(jointDicts[key])
