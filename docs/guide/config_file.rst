@@ -262,8 +262,11 @@ information of the simulation like iteration problems and system performance fac
 pdf file. The process configuration file allows to configure the processing. In addition
 further calculations with the simulation results and additional plots can be defined.
 
-Calculations
-------------
+Besides that, the processing functionality can be used on generic data that do not originate from
+TRNSYS simulations.
+
+Processing TRNSYS data
+----------------------
 
 During processing pytrnsys reads in the following values automatically:
 
@@ -278,7 +281,7 @@ During processing pytrnsys reads in the following values automatically:
 3.  All hourly printer values of the simulation.
 
 All values can be adressed in the config file by their name in the header of the trnsys printer file.
-It is recommended to dublicate the internal TRNSYS name in the header of the printer.
+It is recommended to duplicate the internal TRNSYS name in the header of the printer.
 
 .. note::
 
@@ -296,8 +299,30 @@ By default, pytrnsys also calculates the following values:
 5.  The maximum hourly value of an hourly printed file. The hourly maximum of an hourly
     printed variable with the name ``bar`` can be accessed by ``bar_Max``.
 
-Custom calculation keywords
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Processing generic data
+-----------------------
+
+To process generic data, add the following expression to the header of your configuration file::
+
+    bool isTrnsys False
+
+You then need to specify how pytrnsys should access your data. One way is to identify a data set
+with a json file that includes the parameters of the data set in the format of a python dictionary.
+When you have such a json in each data set folder, you should use::
+
+    string typeOfProcess "json"
+
+Furthermore, you need to specify the folder (here, e.g.: ``dataFolder``) containing your data sets with::
+
+    string pathBase "..\dataFolder"
+
+The program will look for json-files in ``dataFolder`` and on each subfolder level. It will then
+load csv-files, which are in the same folders as the json-files it found. At the moment it can load
+hourly, daily, and monthly data. The names of the respective csv-files need to contain the keywords
+``_Stunden``, ``_Tage``, or ``_Monat``.
+
+Calculations
+------------
 
 In the processing-configuration file, the user can specify custom calculations based on the
 readed TRNSYS results and the values that are calculated by default. The type of each equation has to be
@@ -312,8 +337,14 @@ are available:
 ``calcMonthly``
     Calculates new monthly values (array with length 12) out of other monthly values or scalar values.
 
+``calcDaily``
+    Calculates new daily values (array with length 365) out of other hourly values or scalar values.
+
 ``calcHourly``
     Calculates new hourly values (array with length 8760) out of other hourly values or scalar values.
+
+``calcMonthlyFromHourly``
+    Calculates new monthly values (array with length 12) out of hourly values or scalar values.
 
 A calculations section could be of the following structure. A full working example can be
 found in the example below::
@@ -322,13 +353,30 @@ found in the example below::
     calcMonthly = foo/foo_Tot*1000
     calcHourly = (bar+100)**2
 
+``acrossSetsCalc``
+    Can execute calculations across data sets with variables from the results json-files. Equations
+    are provided as arguments and indicated by a ``=`` and conditions by ``:`` and stated as
+    ``key:value``. A function call (optional arguments in square brackets) then looks like::
+
+        stringArray acrossSetsCalc "x-variable" "y-variable" "calculation variable" "equation 1" ["equation 2"] ... ["key 1:value 1"] ["key 2:value 2"] ...
+
+    Here ``calculation variable`` is a key of the results json-files and specifies what arguments can
+    go into an equation. An example for an equation looks like::
+
+        nameOfValueToBeCalculated=(foo+bar)*100
+
+    where ``foo`` and ``bar`` are valid values of the ``calculation variable``. The program will take
+    different data sets with the same ``x``- and ``y``- but different ``calculation variable``-values
+    and execute the equation for these. Hence, you need to ensure that these combination exist in
+    your data sets. A csv with the calculated results will be generated.
+
 Plotting
 --------
 
 .. _ref-defaultPlotting:
 
-Default plotting
-^^^^^^^^^^^^^^^^
+Default plotting for TRNSYS results
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 By default the processing creates a pdf with the following content:
 
 1.  A table displaying the total simulation time and the number of iteration errors.
@@ -356,17 +404,27 @@ The user can add additional monthly plots to the processing of a single simulati
 run by the use of the following parameters. The custom defined plots will automatically
 be added to the result pdf-file:
 
-``monthlyBars`` (stringArray)
+.. note::
+
+    If an argument in the code excerpts below is set in square brackets, it is optional.
+
+``monthlyBars``
     Plots a monthly bar plot that shows all variables grouped side by side.
 
 .. image:: ./resources/NBar.png
       :width: 400
       :alt: SPF
 
-``monthlyBalance`` (stringArray)
+``monthlyBalance``
     Custom monthly balance. The sign of the values can be inverted by adding a - in front of
     the variable name. If positive and negative values don't add up to zero, the imbalance
-    is shown as black bars. In the solar domestic hot water example system this can be demonstrated
+    is shown as black bars. When adding the optional ``style:relative`` the bars will be shown as
+    values relative to the positive sum of the monthly energy values. To call the function the
+    following statement needs to be added to the config-file::
+
+        stringArray monthlyBalance "pdf name" ["style:relative"] "variable 1" "variable 2" ...
+
+    In the solar domestic hot water example system this can be demonstrated
     by plotting the two system inputs :math:`Q_{col}` and :math:`El_{Aux}^{Tes}` and the usable
     output of the domestic hot water demand. The imbalance in this case are the overall losses of
     the system.
@@ -375,28 +433,59 @@ be added to the result pdf-file:
       :width: 400
       :alt: SPF
 
-``monthlyStackedBar`` (stringArray)
+``monthlyStackedBar``
     Similar to the ``monthlyBalance`` but without showing the imbalance.
 
 .. image:: ./resources/StackedBar.png
       :width: 400
       :alt: SP
 
-``comparePlot`` (stringArray x-Axis y-Axis series style)
-    When processing parametric runs, scalar results of the simulations can be visualized in
-    comparison plots. The first variable of the string array is shown on the x-axis.
-    The second variable is shown on the y-axis. The third is represented as diefferent lines
-    and the fourth as different marker styles.
+``fitHeatingLimit``
+    This function was created to plot and fit heating power values against average daily
+    temperatures. In principle it can plot any daily or hourly data against average daily
+    temperature. The time resolution of the heating power data (or its equivalent) needs to be
+    specified as ``daily`` or ``hourly`` when calling the function::
 
-.. image:: ./resources/ComparisonPlot.png
+        string fitHeatingLimit "y-variable" "heatingDataTimeStep"
+
+    A linear fit is done for ``daily``, while the data only are shown for ``hourly``.
+
+.. image:: ./resources/fitHeatingLimit.png
       :width: 400
       :alt: SP
 
 .. note::
 
-    It is required, that all variables used in comparison plots are saved in the results json-file.
+    All variables used in ``comparePlot``, ``comparePlotConditional``, and
+    ``acrossSetsCalculationsPlot`` need to be saved in the results json-files.
 
-``plotHourly`` (stringArray)
+
+``comparePlot``
+    When processing parametric runs, scalar results of the simulations can be visualized in
+    comparison plots. The first variable of the string array is shown on the x-axis.
+    The second variable is shown on the y-axis. The third is represented as different lines,
+    and the fourth as different marker styles::
+
+        stringArray comparePlot "x-variable" "y-variable" ["series 1 variable"] ["series 2 variable"]
+
+.. image:: ./resources/ComparisonPlot.png
+      :width: 400
+      :alt: SP
+
+``comparePlotConditional``
+    Same as ``comparePlot``, but with the additional feature of imposing conditions on the data that
+    is supposed to be plotted. For a ``key`` in the results json, a condition is indicated by a
+    ``:`` and stated as ``key:value``::
+
+        stringArray comparePlotConditional "x-variable" "y-variable" ["series 1 variable"] ["series 2 variable"] ["key 1:value 1"] ["key 2:value 2"] ...
+
+``acrossSetsCalculationsPlot``
+    Has the same basic functionality as ``acrossSetsCalc``, but can plot the results of
+    equations provided::
+
+        stringArray plotCalculationsAcrossSets "x-variable" "y-variable" "calculation variable" "equation 1" ["equation 2"] ... ["key 1:value 1"] ["key 2:value 2"] ...
+
+``plotHourly``
     Hourly printed values can be displayed in a interactable html-plot that is created using the bokeh
     plotting library.
 
@@ -407,14 +496,14 @@ be added to the result pdf-file:
 
 .. _ref-plotHourlyQvsT:
 
-``plotHourlyQvsT`` (stringArray)
+``plotHourlyQvsT``
     Adds a cumulative plot that contains a line for each heat temperature pair given in the string array.
     Used to show at what temperature levels the heat is released or consumed in different system components.
     Uses hourly printer files.
 
 .. _ref-plotTimestepQvsT:
 
-``plotTimestepQvsT`` (stringArray)
+``plotTimestepQvsT``
     Adds a cumulative plot that contains a line for each heat temperature pair given in the string array.
     Used to show at what temperature levels the heat is released or consumed in different system componenets.
     Uses timestep printer files.
@@ -449,6 +538,9 @@ Generic
 
 ``forceProcess`` (bool, default True)
     If set to False, allready processed folders will not be processed again.
+
+``plotStyle`` (string, default 'line')
+    If set to 'dot', dots will be used instead of lines for the respective plots.
 
 .. _ref-setPrintDataForGle:
 
