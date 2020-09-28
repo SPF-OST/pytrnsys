@@ -184,13 +184,13 @@ nMaterials
 2 3 1			
 1 1 1			
 ************************			
-*Boco left mode (0=temperature,1=flux Newman Boco,2=U)			
+**Boco left mode (0=temperature,1=flux Newman Boco,2=U)			
 leftBoco 			
-*Boco right			
+**Boco right			
 rightBoco 			
-*Boco top			
+**Boco top			
 topBoco 			
-*Boco bot			
+**Boco bot			
 botBoco 			
 ****meteo data			
 modelForInitialTime 			
@@ -307,7 +307,29 @@ INPUTS 7
 qEGroundKW  qWGroundKW  qNGroundKW  qSGroundKW  qVGroundKW  qAcumGroundKW  qImbGroundKW                           			
 *******     			
 qEGroundKW  qWGroundKW  qNGroundKW  qSGroundKW  qVGroundKW  qAcumGroundKW  qImbGroundKW 			
-			
+
+
+*******************************
+** hourly printers
+*******************************
+CONSTANTS 1
+unitPrintGroundHour=223
+
+ASSIGN temp\Ground.hr   unitPrintGroundHour     
+
+UNIT 219 Type 46      !Changed automatically
+PARAMETERS 6    
+unitPrintGroundHour   ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+INPUTS 11
+TIME TSENSOR1  TSENSOR2  TSENSOR3 TSENSOR4 TSENSOR5 TSENSOR6 TSENSOR7 TSENSOR8 TSENSOR9 TSENSOR10
+*****     
+TIME TSENSOR1  TSENSOR2  TSENSOR3 TSENSOR4 TSENSOR5 TSENSOR6 TSENSOR7 TSENSOR8 TSENSOR9 TSENSOR10
+	
 *********************************			
 **END GroundCoupledIceStorage.dck			
 *********************************			

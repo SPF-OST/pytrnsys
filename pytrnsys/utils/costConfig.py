@@ -18,13 +18,20 @@ logger = logging.getLogger('root')
 
 class costConfig(costClass.CostCalculationVar):
 
-    def __int__(self):
+    def __init__(self):
 
         costClass.CostCalculationVar.__init__(self)
+
+        self.readCompleteFolder=True
+        self.fileNameList = None
 
     def setDataPath(self ,dataPath):
 
         self.dataPath = dataPath
+
+    def setFileNameList(self,fileNameList):
+        self.fileNameList=fileNameList
+        self.readCompleteFolder=False
 
     def setDefaultData(self,dictCost):
 
@@ -40,12 +47,11 @@ class costConfig(costClass.CostCalculationVar):
 
     # This will read all results from the folder dataPath
     # To access to the information you should use self.results[i]["nameOfVariable"]
+
     def readResults(self ,dataPath):
 
         self.resClass = results.ResultsProcessedFile(dataPath)
-
-        self.resClass.readResultsData(resultType='json')
-
+        self.resClass.readResultsData(resultType='json',completeFolder=self.readCompleteFolder,fileNameList=self.fileNameList)
 
     @staticmethod
     def readCostJson(path):
@@ -156,6 +162,15 @@ class costConfig(costClass.CostCalculationVar):
             # caseDict["batkWh"] = self.batkWh
             caseDict["investment"] = self.totalInvestCost
             caseDict["energyCost"] = self.heatGenCost
+
+            for component in dictCost['Components']:
+                if(component=="Collector"):
+                    comp = dictCost['Components'][component]
+                    size = self.resClass.results[i].get(comp['size'])
+
+                    caseDict["investmentPerM2"] = self.totalInvestCost/size
+                    caseDict["investmentPerMWh"] = self.totalInvestCost*1000/(self.qDemand)
+
             # caseDict["pvGen"] = self.RpvGen
 
             # batList.append(self.batkWh)

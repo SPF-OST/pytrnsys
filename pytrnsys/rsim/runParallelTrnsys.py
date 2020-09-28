@@ -52,14 +52,17 @@ class RunParallelTrnsys():
 
     """
 
-    def __init__(self,pathConfig,name="pytrnsysRun",configFile=None):
+    def __init__(self,pathConfig,name="pytrnsysRun",configFile=None,runPath=None):
 
 
         self.pathConfig = pathConfig
 
         self.defaultInputs()
         self.cmds = []
-        self.path = os.getcwd()
+        if(runPath==None):
+            self.path = os.getcwd()
+        else:
+            self.path=runPath
         if configFile is not None:
             self.readConfig(self.pathConfig,configFile)
 
@@ -77,7 +80,7 @@ class RunParallelTrnsys():
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
             self.nameBase = name
 
-
+        pass
 
 
 
