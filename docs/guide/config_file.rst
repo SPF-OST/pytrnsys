@@ -569,8 +569,8 @@ processing have to be specified.
     Year of the simulation that is used for processing. 0 is the first year, 1 the second year and so on.
     If the value is set to -1 pytrnsys will use the last 12 months of the simulation for processing.
 
-``firstMonthUsed`` ([0,1,2,3,..,11], default 6)
-    Month in the chosen year where the 12-month processing period begins. If the value is e.g. 6 July to June
+``firstMonth`` (["January", "February", "Mach", ..., "December"], default "January")
+    Month in the chosen year where the 12-month processing period begins. If the value is e.g. "November" November to October
     will be analysed.
 
 Paths

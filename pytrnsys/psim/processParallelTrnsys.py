@@ -146,7 +146,7 @@ class ProcessParallelTrnsys():
         self.inputs["maxMinAvoided"] = False
         self.inputs["yearReadedInMonthlyFile"] = -1
         self.inputs["process"] = True
-        self.inputs["firstMonthUsed"] = 6     # 0=January 1=February 7=August
+        self.inputs["firstMonth"] = "January"     # 0=January 1=February 7=August
         self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder" # "casesDefined"
         self.inputs["forceProcess"]  =  True #even if results file exist it proceess the results, otherwise it checks if it exists
