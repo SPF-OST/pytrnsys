@@ -516,6 +516,19 @@ Results file
 For further custom processing of the simulation results, required scalar and monthly values
 can be saved to a results json-file.
 
+``results``
+    Determines which variables should be stored in a dedicated json-file for each
+    data set::
+
+        stringArray results "variable 1" "variable 2" ...
+
+``pathInfoToJson``
+    Scans the paths of the generated ``-results.json``-files for keywords and adds
+    them as the respective ``parameter name`` in said json-files, and adds an empty
+    string, if it doesn't find any of the keys in the respective path::
+
+        stringArray pathInfoToJson "parameter name" "key 1" "key 2" ...
+
 Parameters
 ----------
 There are different general parameters in the processing configuration file that allow to change

@@ -59,7 +59,6 @@ class RunParallelTrnsys():
 
         self.defaultInputs()
         self.cmds = []
-        self.path = os.getcwd()
         if configFile is not None:
             self.readConfig(self.pathConfig,configFile)
 
@@ -69,6 +68,11 @@ class RunParallelTrnsys():
                 if name=="pytrnsysRun":
                     self.nameBase = self.inputs['addResultsFolder']
 
+            if 'projectPath' in self.inputs:
+                self.path = self.inputs['projectPath']
+            else:
+                self.path = os.getcwd()
+
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
             self.getConfig()
             self.runConfig()
@@ -76,6 +80,7 @@ class RunParallelTrnsys():
         else:
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
             self.nameBase = name
+            self.path = os.getcwd()
 
 
 

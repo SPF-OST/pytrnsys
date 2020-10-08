@@ -62,7 +62,12 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
 	'recommonmark',
+    'rst2pdf.pdfbuilder'
 ]
+#,
+#    'rst2pdf.pdfbuilder'
+
+#pdf_documents = [('index', u'rst2pdf', u'Sample rst2pdf doc', u'Your Name'),]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

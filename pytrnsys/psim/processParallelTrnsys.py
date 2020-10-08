@@ -459,6 +459,10 @@ class ProcessParallelTrnsys():
             self.logger.info('Generating plot of calculations across sets')
             self.plotCalculationsAcrossSets()
 
+        if 'pathInfoToJson' in self.inputs.keys():
+            self.logger.info('Writing information from path into results.json')
+            self.transferPathInfoToJson()
+
         if 'calcClimateCorrections' in self.inputs.keys():
             self.calculateClimateCorrections()
             
@@ -1264,6 +1268,24 @@ class ProcessParallelTrnsys():
                 outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
                 outfile.writelines(lines)
                 outfile.close()
+
+    def transferPathInfoToJson(self):
+        pathFolder = self.inputs["pathBase"]
+        resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+        parameterName = self.inputs['pathInfoToJson'][0][0]
+        possibleKeys = self.inputs['pathInfoToJson'][0][1:]
+        for file in resultFiles:
+            with open(file) as f_in:
+                resultsDict = json.load(f_in)
+            keyNotFound = True
+            for key in possibleKeys:
+                if key in file:
+                    resultsDict[parameterName] = key
+                    keyNotFound = False
+            if keyNotFound:
+                resultsDict[parameterName] = ''
+            with open(file, 'w') as f_out:
+                json.dump(resultsDict, f_out, indent=2, separators=(',', ': '))
 
     def printBoxPlotGLEData(self):
         pathFolder = self.inputs["pathBase"]
