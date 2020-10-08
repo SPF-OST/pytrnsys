@@ -81,6 +81,7 @@ class ProcessTrnsysDf():
         self.units = unit.UnitConverter()
 
 
+        self.addPlotToLaTeX = {}
         self.readTrnsysFiles = readTrnsysFiles.ReadTrnsysFiles(self.tempFolderEnd)
 
         # self.tInEvapHpMonthlyMax = num.zeros(12,float)
@@ -364,7 +365,12 @@ class ProcessTrnsysDf():
         self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.yearlyMax = {value + '_Max': self.houDataDf[value].max() for value in self.houDataDf.columns}
         self.yearlyAvg = {value + '_Avg': self.houDataDf[value].mean() for value in self.houDataDf.columns}
-        self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
+
+
+        try:
+            self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
+        except:
+            pass
 
         logger.info("loadFiles completed using SimulationLoader")
 
@@ -383,20 +389,32 @@ class ProcessTrnsysDf():
                 self.pltB.createBokehPlot(self.steDataDf, self.outputPath,self.fileName+"timeStep",self.inputs["plotTimeStep"][0])
 
 
-    def addQvsTPlot(self):
-
-        if "plotHourly" in self.inputs.keys():
-            self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"][0])
+    def addMonthlyPlots(self):
 
         if "plotMonthly" in self.inputs.keys():
-        #
+            #
             for i in range(len(self.inputs["plotMonthly"])):
                 key = self.inputs["plotMonthly"][i]
                 nameFile = key[0]
                 # namePdf=self.plot.plotMonthlyDf(self.monDataDf[key].values, key[0], nameFile,1,self.myShortMonths,myTitle=None, printData=True)
-                namePdf=self.plot.plotMonthlyDf(self.monDataDf[key].values, key[0], nameFile,10.,self.myShortMonths,myTitle=None, printData=self.printDataForGle)
+                namePdf = self.plot.plotMonthlyDf(self.monDataDf[key].values, key[0], nameFile, 10., self.myShortMonths,
+                                                  myTitle=None, printData=self.printDataForGle)
 
-                logger.debug("%s monthly plot"%namePdf)
+                # self.doc.addTableMonthlyDf(self.monDataDf[key].values, key[0], unit, caption, nameFile, self.myShortMonths, sizeBox=15,
+                #                            addLines=addLines)
+                self.doc.addPlotShort(namePdf, label=nameFile)
+
+                # self.addPlotToLaTeX = {namePdf: "Monthly plot. Yearly value divided by 10."}
+                logger.debug("%s monthly plot" % namePdf)
+
+    def addHourlyPlots(self):
+
+        if "plotHourly" in self.inputs.keys():
+            self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"][0])
+
+    def addQvsTPlot(self):
+
+
 
         # define QvsTDf here!
 
@@ -428,21 +446,36 @@ class ProcessTrnsysDf():
         self.addImages()
         self.addCaseDefinition()
         self.calculateDemands()
-        self.addHeatBalance()
-        self.calculateElHeatConsumption()
-        self.addSPFSystem()
-        self.addDemands()
+
+        if(self.inputs['calculateHeatDemand']==True):
+            self.addHeatBalance()
+            self.calculateElHeatConsumption()
+            self.addDemands()
+        if (self.inputs['calculateSPF'] == True):
+            self.addSPFSystem()
+
         self.addElBalance()
-        self.addElConsumption()
+        if(self.inputs['calculateElectricDemand']==True):
+            self.addElConsumption()
+
         if 'calculateEPF' in self.inputs:
             if self.inputs['calculateEPF']:
                 self.addEPFSystem()
+
         self.addCustomBalance()
         self.addCustomStackedBar()
         self.addCustomNBar()
         self.addTemperatureFreq()
+
+        self.addMonthlyPlots()
+        self.addHourlyPlots()
+        self.addQvsTPlot()
+
+        for key in self.addPlotToLaTeX:
+            self.doc.addPlotShort(key, caption=self.addPlotToLaTeX[key], label=key)
+
         # self.addQvsTPlot()
-        # self.saveHourlyToCsv()
+        self.saveHourlyToCsv()
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
 
@@ -622,12 +655,41 @@ class ProcessTrnsysDf():
         self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def calcConfigEquations(self):
+        for equation in self.inputs["calcMonthlyTest"]:
+            kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax,**self.yearlyAvg}}
+            scalars = kwargs['local_dict'].keys()
+            splitEquation = equation.split('=')
+            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
+            parts = re.split(r'[*/+-]', parsedEquation.replace(r'(', '').replace(r')', ''))
+            for scalar in scalars:
+                if scalar in parts:
+                    equation = equation.replace(scalar,'@'+scalar)
+            self.monDataDf.eval(equation,inplace=True,**kwargs)
+            value = splitEquation[0].strip()
+            self.monDataDf['Cum_' + value] = self.monDataDf[value].cumsum()
+            self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
+
+        for equation in self.inputs["calcMonthlyMin"]:
+            splitEquation = equation.split('=')
+            elem1 = splitEquation[1].split(',')[0][5:] #removing max(
+            elem2 = splitEquation[1].split(',')[1][:-1]
+
+            value = splitEquation[0].strip()
+
+            self.monDataDf[value]=self.monDataDf[elem1]
+            for i in range(len(self.monDataDf[elem1])):
+                self.monDataDf[value].values[i]=min(self.monDataDf[elem1].values[i],self.monDataDf[elem2].values[i])
+
+            self.monDataDf['Cum_' + value] = self.monDataDf[value].cumsum()
+            self.yearlySums = {value + '_Tot': self.monDataDf[value].sum() for value in self.monDataDf.columns}
+
         for equation in self.inputs['calc']:
             namespace = {**self.deckData,**self.__dict__,**self.yearlySums,**self.yearlyMax,**self.yearlyAvg}
             expression = equation.replace(' ','')
             exec(expression,globals(),namespace)
             self.deckData = namespace
             logger.debug(expression)
+
         for equation in self.inputs["calcMonthly"]:
             kwargs = {"local_dict": {**self.deckData,**self.yearlySums,**self.yearlyMax,**self.yearlyAvg}}
             scalars = kwargs['local_dict'].keys()
@@ -790,9 +852,7 @@ class ProcessTrnsysDf():
     def loadQvsTConfig(self, df,inputs, year=False, useOnlyOneYear=False, monthsSplit=[], normalized=False,
                  cut=False):
 
-
         self.QvsTInput = inputs
-
 
         factor = 1.
         tFlow = []
@@ -802,10 +862,12 @@ class ProcessTrnsysDf():
         if "QvsTnormalized" in self.inputs.keys():
             self.QvsTNorm = self.inputs["QvsTnormalized"]
             norm = 0.
+            normalized=True
             for i in range(0, len(self.QvsTNorm)):
                 norm = norm + max(num.cumsum(df[self.QvsTNorm[i]].values * factor))
         else:
             norm = 1.
+            normalized=False
 
 
         for i in range (0,len(self.QvsTInput)):
@@ -817,10 +879,6 @@ class ProcessTrnsysDf():
                 legend.append(self.getNiceLatexNames(name))
             else:
                 tFlow.append(df[self.QvsTInput[i]])
-
-
-
-
 
         # df.columns = df.columns.str.lower()
         # SPACE HEATING DEMAND
@@ -835,7 +893,8 @@ class ProcessTrnsysDf():
 
         namePdf = self.plot.gle.executeGLE(fileName + ".gle")
 
-        self.doc.addPlot(namePdf, "Cumulative energy flow as function of reference temperature", fileName, 12)
+        self.addPlotToLaTeX = {namePdf:"Cumulative energy flow as function of reference temperature"}
+        # self.doc.addPlot(namePdf, "Cumulative energy flow as function of reference temperature", fileName, 12)
 
         for mIndex in range(len(monthsSplit)):
             timeStepInSeconds = self.readTrnsysFiles.timeStepUsed
@@ -1104,7 +1163,10 @@ class ProcessTrnsysDf():
                 var = inVar
                 var.append(sum(inVar))
                 self.doc.addTableMonthlyDf(var, tableNames, "MWh", caption, nameFile, self.myShortMonths, sizeBox=15)
-                self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+
+                self.addPlotToLaTeX={namePdf:caption}
+
+                # self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def addHeatingLimitFit(self):
         """
@@ -1169,7 +1231,10 @@ class ProcessTrnsysDf():
                 var = inVar
                 var.append(sum(inVar))
                 self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
-                self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+
+                self.addPlotToLaTeX={namePdf:caption}
+
+                # self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
                 
     def addCustomNBar(self):
         if "monthlyBars" in self.inputs.keys():
@@ -1184,7 +1249,10 @@ class ProcessTrnsysDf():
                 var = inVar
                 var.append(sum(inVar))
                 self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
-                self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+
+                self.addPlotToLaTeX={namePdf:caption}
+
+                # self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
             
 
     def addCaseDefinition(self,):

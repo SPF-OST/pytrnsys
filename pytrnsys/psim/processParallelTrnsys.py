@@ -146,7 +146,7 @@ class ProcessParallelTrnsys():
         self.inputs["maxMinAvoided"] = False
         self.inputs["yearReadedInMonthlyFile"] = -1
         self.inputs["process"] = True
-        self.inputs["firstMonthUsed"] = 6     # 0=January 1=February 7=August
+        self.inputs["firstMonth"] = "January"     # 0=January 1=February 7=August
         self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder" # "casesDefined"
         self.inputs["forceProcess"]  =  True #even if results file exist it proceess the results, otherwise it checks if it exists
@@ -162,6 +162,13 @@ class ProcessParallelTrnsys():
         self.inputs["plotEmf"] = False
         self.inputs["outputLevel"] = "INFO"
         self.inputs['createLatexPdf'] = True
+        self.inputs['calculateCost'] = False
+
+        self.inputs['calculateHeatDemand']=True
+        self.inputs['calculateSPF']=True
+        self.inputs['calculateElectricDemand']=True
+
+        self.inputs["comparePlotUserName"] = "" #don't change this default value
 
     def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
@@ -440,8 +447,14 @@ class ProcessParallelTrnsys():
                 #     processDataGeneral(casesInputs[i])
                 # except:
                 #     print('WARNING: the following case failed: ' + casesInputs[i][2])
-        if 'cost' in self.inputs.keys():
-            self.calcCost()
+        if  self.inputs['calculateCost']==True and 'cost' in self.inputs.keys(): #
+            if(self.inputs['typeOfProcess']== "casesDefined"):
+                fileNameList=[]
+                fileNameList.append(self.inputs["fileName"])
+            else:
+                fileNameList =None
+
+            self.calcCost(fileNameList=fileNameList)
 
         if 'acrossSetsCalc' in self.inputs.keys():
             self.logger.info('Calculating across sets')
@@ -470,7 +483,6 @@ class ProcessParallelTrnsys():
             self.plotMonthlyBarComparison()
 
         if 'printBoxPlotGLEData' in self.inputs.keys():
-            print("yes")
             self.printBoxPlotGLEData()
 
     def calculationsAcrossSets(self):
@@ -742,12 +754,12 @@ class ProcessParallelTrnsys():
             # box = ax1.get_position()
             #ax1.set_position([box.x0, box.y0, box.width, box.height])
 
-            if chunkVariable is not '':
+            if chunkVariable != '':
                 legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0), bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
-            if seriesVariable is not '':
+            if seriesVariable != '':
                 legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.2, 1.0), bbox_transform=ax1.transAxes)
 
             else:
@@ -764,10 +776,16 @@ class ProcessParallelTrnsys():
             #    legend2.set_in_layout(True)
             #if legend1 is not None:
             #    legend1.set_in_layout(True)
-            if chunkVariable == '':
-                fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable
-            else:
-                fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable
+
+            fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable
+
+            if chunkVariable != '':
+                 fileName = fileName + '_' + chunkVariable
+
+            if (self.inputs["comparePlotUserName"] != ""):
+                fileName = fileName + '_' + self.inputs["comparePlotUserName"]
+
+
             fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
             plt.close()
 
@@ -1392,19 +1410,24 @@ class ProcessParallelTrnsys():
         if(found==False):
             self.logger.warning("changeFile was not able to change %s by %s"%(source,end))
 
-    def calcCost(self):
+    def calcCost(self,fileNameList=None):
 
         path = self.inputs['pathBase']
 
         costPath = self.inputs['cost']
 
-        dictCost = costConfig.costConfig.readCostJson(costPath)
+        cost = costConfig.costConfig()
+        dictCost = cost.readCostJson(costPath)
 
         # for name in names:
         # path = os.path.join(pathBase, name)
 
         small = 15
-        cost = costConfig.costConfig()
+
+
+        if(fileNameList!=None):
+            cost.setFileNameList(fileNameList)
+
         cost.setFontsizes(small)
 
         cost.setDefaultData(dictCost)
