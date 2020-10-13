@@ -94,7 +94,7 @@ def processDataGeneral(casesInputs):
         test.loadAndProcessGeneric()
 
     # rename files if multiple years are available:
-    if inputs["yearReadedInMonthlyFile"] != -1:
+    if inputs["yearReadedInMonthlyFile"] != -1 and inputs["typeOfProcess"] != 'json':
         renameFile = os.path.join(locationPath, fileName, fileName)
 
         fileEndingsDefault = ["-results.json", "-report.pdf","-plots.html"]
@@ -253,6 +253,7 @@ class ProcessParallelTrnsys():
                 fileName = [Path(name).parts[-2] for name in files]
                 relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
                 relPaths = list(dict.fromkeys(relPaths))  # remove duplicates due to folders containing more than one json files
+                a = 1
 
             for relPath in relPaths:
                 name = Path(relPath).parts[-1]
