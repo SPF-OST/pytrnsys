@@ -61,8 +61,7 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-	'recommonmark',
-    'rst2pdf.pdfbuilder'
+	'recommonmark'
 ]
 #,
 #    'rst2pdf.pdfbuilder'
