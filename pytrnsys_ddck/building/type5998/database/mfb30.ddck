@@ -6,6 +6,7 @@
 ** Contact person : Mattia Battaglia  
 ** Creation date  : 29.04.2020
 ** Last changes   : 29.04.2020, MB 
+**				 	20.10.2020, SCJ - move air exchange to type5998.ddck 
 *****************************************
 
 ***************************************************************************
@@ -34,10 +35,11 @@ shd_fix_S = 0.43	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc.
 shd_fix_E = 0.86	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
 shd_fix_W = 0.82	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
 	
-EQUATIONS 3	
-etaHeatRec = 0.8*LT(Tamb24,18)	! Heatrecovery efficiency of the ventilation system
-VfrAirExTot = VfrInf + VfrVent + VfrWindow	! Air exchange of the building [m3/s]
-VfrWindow = AND(GT(MOD(time,8760),2160),LT(MOD(time,8760),6552))*OR(GT(MOD(time,24),20),LT(MOD(time,24),7))*4.2*(ABS((Troom-Tamb))/((Troom+Tamb)/2+273))^(0.5)*ScaleVfrWindow	! Infiltration due window opening [m3/s] (Readout Textfile!)
+** SCJ: move this to type5998.ddck
+** EQUATIONS 3	
+** etaHeatRec = 0.8*LT(Tamb24,18)	! Heatrecovery efficiency of the ventilation system
+** VfrAirExTot = VfrInf + VfrVent + VfrWindow	! Air exchange of the building [m3/s]
+** VfrWindow = AND(GT(MOD(time,8760),2160),LT(MOD(time,8760),6552))*OR(GT(MOD(time,24),20),LT(MOD(time,24),7))*4.2*(ABS((Troom-Tamb))/((Troom+Tamb)/2+273))^(0.5)*ScaleVfrWindow	! Infiltration due window opening [m3/s] (Readout Textfile!)
 
 
 CONSTANTS 12
