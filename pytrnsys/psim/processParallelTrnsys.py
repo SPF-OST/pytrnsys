@@ -20,6 +20,7 @@ import pytrnsys.utils.costConfig as costConfig
 from pathlib import Path
 import pytrnsys.plot.plotMatplotlib as plot
 import sys
+import re
 import pkg_resources
 try:
     import pytrnsys_examples
@@ -93,7 +94,7 @@ def processDataGeneral(casesInputs):
         test.loadAndProcessGeneric()
 
     # rename files if multiple years are available:
-    if inputs["yearReadedInMonthlyFile"] != -1:
+    if inputs["yearReadedInMonthlyFile"] != -1 and inputs["typeOfProcess"] != 'json':
         renameFile = os.path.join(locationPath, fileName, fileName)
 
         fileEndingsDefault = ["-results.json", "-report.pdf","-plots.html"]
@@ -136,6 +137,7 @@ class ProcessParallelTrnsys():
     def defaultInputs(self):
 
         self.inputs = {}
+        self.inputs["plotStyle"] = "line"
         self.inputs["isTrnsys"] = True
         self.inputs["processParallel"] = True
         self.inputs["avoidUser"]    = False
@@ -144,7 +146,7 @@ class ProcessParallelTrnsys():
         self.inputs["maxMinAvoided"] = False
         self.inputs["yearReadedInMonthlyFile"] = -1
         self.inputs["process"] = True
-        self.inputs["firstMonthUsed"] = 6     # 0=January 1=February 7=August
+        self.inputs["firstMonth"] = "January"     # 0=January 1=February 7=August
         self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder" # "casesDefined"
         self.inputs["forceProcess"]  =  True #even if results file exist it proceess the results, otherwise it checks if it exists
@@ -160,6 +162,13 @@ class ProcessParallelTrnsys():
         self.inputs["plotEmf"] = False
         self.inputs["outputLevel"] = "INFO"
         self.inputs['createLatexPdf'] = True
+        self.inputs['calculateCost'] = False
+
+        self.inputs['calculateHeatDemand']=True
+        self.inputs['calculateSPF']=True
+        self.inputs['calculateElectricDemand']=True
+
+        self.inputs["comparePlotUserName"] = "" #don't change this default value
 
     def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
@@ -178,6 +187,49 @@ class ProcessParallelTrnsys():
 
        return processTrnsys.ProcessTrnsysDf(pathFolder, fileName)
 
+    def isStringNumber(self,sample):
+        """
+        Does a given string consist of a number only?
+
+        Parameters
+        ---------
+        sample : str
+            String to be checked
+
+        Returns
+        -------
+        bool
+            Indicates whether sample consists only of a number
+
+        """
+        try:
+            float(sample)
+            return True
+        except ValueError:
+            return False
+
+    def loadPlotJson(self, filePath):
+
+        with open(filePath, 'r') as file:
+            plotParDict = json.load(file)
+
+        returnDict = {}
+
+        pyplotKwargs = ''
+        for entry in plotParDict:
+            try:
+                if isinstance(plotParDict[entry],str):
+                    plotParDict[entry] = '\'' + plotParDict[entry] + '\''
+                plotStatement = 'plt.plot(1.,1.,' + entry + '=%s)' %plotParDict[entry]
+                plt.figure()
+                exec(plotStatement)
+                plt.close()
+                pyplotKwargs = pyplotKwargs + ',' + entry + '=' + str(plotParDict[entry])
+            except:
+                pass
+        return pyplotKwargs
+
+
     def process(self):
 
         casesInputs = []
@@ -187,12 +239,22 @@ class ProcessParallelTrnsys():
         if os.path.exists(os.path.join(self.inputs['pathBase'],'Summary.dat')):
             os.remove(os.path.join(self.inputs['pathBase'],'Summary.dat'))
 
-        if (self.inputs["typeOfProcess"] == "completeFolder"):
+        if (self.inputs["typeOfProcess"] == "completeFolder") or (self.inputs["typeOfProcess"] == "json"):
 
             pathFolder = self.inputs["pathBase"]
-            files =glob.glob(os.path.join(pathFolder, "**/*.lst"), recursive=True)
-            fileName = [Path(name).parts[-2] for name in files]
-            relPaths = [os.path.relpath(os.path.dirname(file),pathFolder) for file in files]
+
+            if (self.inputs["typeOfProcess"] == "completeFolder"):
+                files = glob.glob(os.path.join(pathFolder, "**/*.lst"), recursive=True)
+                fileName = [Path(name).parts[-2] for name in files]
+                relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
+
+            elif (self.inputs["typeOfProcess"] == "json"):
+                files = glob.glob(os.path.join(pathFolder, "**/*.json"), recursive=True)
+                fileName = [Path(name).parts[-2] for name in files]
+                relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
+                relPaths = list(dict.fromkeys(relPaths))  # remove duplicates due to folders containing more than one json files
+                a = 1
+
             for relPath in relPaths:
                 name = Path(relPath).parts[-1]
                 folderUsed = True
@@ -402,20 +464,152 @@ class ProcessParallelTrnsys():
                 #     processDataGeneral(casesInputs[i])
                 # except:
                 #     print('WARNING: the following case failed: ' + casesInputs[i][2])
-        if 'cost' in self.inputs.keys():
-            self.calcCost()
+        if  self.inputs['calculateCost']==True and 'cost' in self.inputs.keys(): #
+            if(self.inputs['typeOfProcess']== "casesDefined"):
+                fileNameList=[]
+                fileNameList.append(self.inputs["fileName"])
+            else:
+                fileNameList =None
+
+            self.calcCost(fileNameList=fileNameList)
+
+        if 'acrossSetsCalc' in self.inputs.keys():
+            self.logger.info('Calculating across sets')
+            self.calculationsAcrossSets()
 
         if 'comparePlot' in self.inputs.keys():
-            print("yes1")
+            self.logger.info('Generating comparison plot')
             self.plotComparison()
+
+        if 'comparePlotConditional' in self.inputs.keys():
+            self.logger.info('Generating conditional comparison plot')
+            self.plotComparisonConditional()
+
+        if 'acrossSetsCalculationsPlot' in self.inputs.keys():
+            self.logger.info('Generating plot of calculations across sets')
+            self.plotCalculationsAcrossSets()
+
+        if 'pathInfoToJson' in self.inputs.keys():
+            self.logger.info('Writing information from path into results.json')
+            self.transferPathInfoToJson()
+
+        if 'calcClimateCorrections' in self.inputs.keys():
+            self.calculateClimateCorrections()
             
         if 'compareMonthlyBarsPlot' in self.inputs.keys():
             self.plotMonthlyBarComparison()
 
-
         if 'printBoxPlotGLEData' in self.inputs.keys():
-            print("yes")
             self.printBoxPlotGLEData()
+
+    def calculationsAcrossSets(self):
+        pathFolder = self.inputs["pathBase"]
+        for plotVariables in self.inputs['acrossSetsCalc']:
+            if len(plotVariables) < 4:
+                raise ValueError(
+                    'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
+            xAxisVariable = plotVariables[0]
+            yAxisVariable = plotVariables[1]
+            calculationVariable = plotVariables[2]
+
+
+            conditionDict = {}
+            equationDict = {}
+            calcVariableDict = {}
+            for plotVariable in plotVariables:
+                if ':' in plotVariable:
+                    conditionEntry, conditionValue = plotVariable.split(':')
+                    conditionDict[conditionEntry] = conditionValue
+                elif "=" in plotVariable:
+                    equationVariable,equationExpression = plotVariable.split('=')
+                    equationDict[equationVariable] = equationExpression
+                    for variable in re.split('\W',equationExpression):
+                        if variable != '' and not(self.isStringNumber(variable)):
+                            calcVariableDict[variable] = ''
+
+            plotXDict = {}
+            plotYDict = {}
+
+            if self.inputs["typeOfProcess"] == "json":
+                resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+            else:
+                resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
+
+            xVariable = []
+
+            for file in resultFiles:
+                with open(file) as f_in:
+                    resultsDict = json.load(f_in)
+                    resultsDict[''] = None
+
+                conditionList = []
+                for conditionEntry in conditionDict:
+                    entryClass = type(resultsDict[conditionEntry])
+                    conditionDict[conditionEntry] = entryClass(conditionDict[conditionEntry])
+                    conditionList.append(conditionDict[conditionEntry]==resultsDict[conditionEntry])
+
+                if all(conditionList):
+
+                    if '[' not in xAxisVariable:
+                        xAxis = resultsDict[xAxisVariable]
+                    else:
+                        name, index = str(xAxisVariable).split('[')
+                        index = int(index.replace(']', ''))
+                        xAxis = resultsDict[name][index]
+                    if '[' not in yAxisVariable:
+                        yAxis = resultsDict[yAxisVariable]
+                    else:
+                        name, index = str(yAxisVariable).split('[')
+                        index = int(index.replace(']', ''))
+                        yAxis = resultsDict[name][index]
+
+                    xVariable.append(xAxis)
+
+                    chunkVariable = ''
+
+                    if resultsDict[chunkVariable] not in plotXDict.keys():
+                        plotXDict[resultsDict[chunkVariable]] = {}
+                        plotYDict[resultsDict[chunkVariable]] = {}
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]] = [xAxis]
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]] = [yAxis]
+                    elif resultsDict[calculationVariable] not in plotXDict[resultsDict[chunkVariable]].keys():
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]] = [xAxis]
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]] = [yAxis]
+                    else:
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]].append(xAxis)
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]].append(yAxis)
+
+                else:
+                    pass
+
+            for variable in calcVariableDict:
+                calcVariableDict[variable] = num.array(plotYDict[None][variable])
+
+            calcVariableDict['equationDict'] = equationDict
+            for equation in equationDict:
+                calcVariableDict['equation'] = equation
+                exec('equationDict[equation]='+equationDict[equation],calcVariableDict)
+
+            xVariable = list(dict.fromkeys(xVariable))
+
+            dataFrameDict = {}
+            dataFrameDict[xAxisVariable] = xVariable
+            dataFrameDict.update(equationDict)
+
+            saveDf = pd.DataFrame(data=dataFrameDict)
+
+            conditionsFileName = ''
+            for conditionEntry in conditionDict:
+                conditionsFileName += '_' + conditionEntry + '=' + str(conditionDict[conditionEntry])
+
+
+            fileName = xAxisVariable + '_' + yAxisVariable + '_' + calculationVariable
+            for equation in equationDict:
+                fileName += '_' + equation
+            fileName += conditionsFileName
+
+            fullCsvPath = os.path.join(pathFolder, fileName + '.csv')
+            saveDf.to_csv(fullCsvPath, index=False, sep=';')
 
     def plotComparison(self):
         pathFolder = self.inputs["pathBase"]
@@ -438,10 +632,17 @@ class ProcessParallelTrnsys():
             seriesColors = {}
             colorsCounter = 0
             colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-            for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
+
+            if self.inputs["typeOfProcess"] == "json":
+                resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+            else:
+                resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
+
+            for file in resultFiles:
                 with open(file) as f_in:
                     resultsDict = json.load(f_in)
                     resultsDict['']=None
+
                 if resultsDict[seriesVariable] not in seriesColors.keys():
                     seriesColors[resultsDict[seriesVariable]]=colors[colorsCounter]
                     colorsCounter+=1
@@ -469,7 +670,7 @@ class ProcessParallelTrnsys():
                 else:
                     plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(xAxis)
                     plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(yAxis)
-    
+
             self.doc = latex.LatexReport('', '')
             if 'latexNames' in self.inputs.keys():
                 if ':' in self.inputs['latexNames']:
@@ -491,7 +692,12 @@ class ProcessParallelTrnsys():
             plt.style.use(self.stylesheet)
 
             fig1,ax1 = plt.subplots(constrained_layout=True)
-            styles = ['x-','x--','x-.','x:','o-','o--','o-.','o:']
+            if self.inputs["plotStyle"] == "line":
+                styles = ['x-','x--','x-.','x:','o-','o--','o-.','o:']
+            elif self.inputs["plotStyle"] == "dot":
+                styles = ['x', 'o', '+', 'd', 's', 'v', '^', 'h']
+            else:
+                self.logger.error("Invalid 'plotStyle' argument")
 
             dummy_lines = []
             chunkLabels = []
@@ -565,12 +771,12 @@ class ProcessParallelTrnsys():
             # box = ax1.get_position()
             #ax1.set_position([box.x0, box.y0, box.width, box.height])
 
-            if chunkVariable is not '':
+            if chunkVariable != '':
                 legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0), bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
-            if seriesVariable is not '':
+            if seriesVariable != '':
                 legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.2, 1.0), bbox_transform=ax1.transAxes)
 
             else:
@@ -587,7 +793,16 @@ class ProcessParallelTrnsys():
             #    legend2.set_in_layout(True)
             #if legend1 is not None:
             #    legend1.set_in_layout(True)
-            fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable
+
+            fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable
+
+            if chunkVariable != '':
+                 fileName = fileName + '_' + chunkVariable
+
+            if (self.inputs["comparePlotUserName"] != ""):
+                fileName = fileName + '_' + self.inputs["comparePlotUserName"]
+
+
             fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
             plt.close()
 
@@ -596,6 +811,516 @@ class ProcessParallelTrnsys():
                 outfile.writelines(lines)
                 outfile.close()
                 # self.plot.gle.getEasyPlot(self, nameGleFile, fileNameData, legends, useSameStyle=True):
+
+    def plotComparisonConditional(self):
+        pathFolder = self.inputs["pathBase"]
+        for plotVariables in self.inputs['comparePlotConditional']:
+            if len(plotVariables) < 2:
+                raise ValueError(
+                    'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
+            xAxisVariable = plotVariables[0]
+            yAxisVariable = plotVariables[1]
+            chunkVariable = ''
+            seriesVariable = ''
+            if len(plotVariables) >= 3 and not(':' in plotVariables[2]):
+                seriesVariable = plotVariables[2]
+                chunkVariable = ''
+            if len(plotVariables) >= 4 and not(':' in plotVariables[3]):
+                chunkVariable = plotVariables[3]
+
+            conditionDict = {}
+            for plotVariable in plotVariables:
+                if ':' in plotVariable:
+                    conditionEntry, conditionValue = plotVariable.split(':')
+                    conditionDict[conditionEntry] = conditionValue
+
+            plotXDict = {}
+            plotYDict = {}
+
+            seriesColors = {}
+            colorsCounter = 0
+            colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+            if self.inputs["typeOfProcess"] == "json":
+                resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+            else:
+                resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
+
+            for file in resultFiles:
+                with open(file) as f_in:
+                    resultsDict = json.load(f_in)
+                    resultsDict[''] = None
+
+                conditionList = []
+                for conditionEntry in conditionDict:
+                    entryClass = type(resultsDict[conditionEntry])
+                    conditionDict[conditionEntry] = entryClass(conditionDict[conditionEntry])
+                    conditionList.append(conditionDict[conditionEntry]==resultsDict[conditionEntry])
+
+                if all(conditionList):
+
+                    if resultsDict[seriesVariable] not in seriesColors.keys():
+                        seriesColors[resultsDict[seriesVariable]] = colors[colorsCounter]
+                        colorsCounter += 1
+
+                    if '[' not in xAxisVariable:
+                        xAxis = resultsDict[xAxisVariable]
+                    else:
+                        name, index = str(xAxisVariable).split('[')
+                        index = int(index.replace(']', ''))
+                        xAxis = resultsDict[name][index]
+                    if '[' not in yAxisVariable:
+                        yAxis = resultsDict[yAxisVariable]
+                    else:
+                        name, index = str(yAxisVariable).split('[')
+                        index = int(index.replace(']', ''))
+                        yAxis = resultsDict[name][index]
+                    if resultsDict[chunkVariable] not in plotXDict.keys():
+                        plotXDict[resultsDict[chunkVariable]] = {}
+                        plotYDict[resultsDict[chunkVariable]] = {}
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [xAxis]
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
+                    elif resultsDict[seriesVariable] not in plotXDict[resultsDict[chunkVariable]].keys():
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [xAxis]
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
+                    else:
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(xAxis)
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(yAxis)
+
+                else:
+                    pass
+
+
+            self.doc = latex.LatexReport('', '')
+            if 'latexNames' in self.inputs.keys():
+                if ':' in self.inputs['latexNames']:
+                    latexNameFullPath = self.inputs['latexNames']
+                else:
+                    latexNameFullPath = os.path.join(self.configPath, self.inputs['latexNames'])
+                self.doc.getLatexNamesDict(file=latexNameFullPath)
+            else:
+                self.doc.getLatexNamesDict()
+            if 'matplotlibStyle' in self.inputs.keys():
+                stylesheet = self.inputs['matplotlibStyle']
+            else:
+                stylesheet = 'word.mplstyle'
+            if stylesheet in plt.style.available:
+                self.stylesheet = stylesheet
+            else:
+                root = os.path.dirname(os.path.abspath(__file__))
+                self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
+            plt.style.use(self.stylesheet)
+
+            fig1, ax1 = plt.subplots(constrained_layout=True)
+            if self.inputs["plotStyle"] == "line":
+                styles = ['x-', 'x--', 'x-.', 'x:', 'o-', 'o--', 'o-.', 'o:']
+            elif self.inputs["plotStyle"] == "dot":
+                styles = ['x', 'o', '+', 'd', 's', 'v', '^', 'h']
+            else:
+                print("Invalid 'plotStyle' argument")
+
+            dummy_lines = []
+            chunkLabels = []
+            labelSet = set()
+            lines = ""
+            for chunk, style in zip(plotXDict.keys(), styles):
+                dummy_lines.append(ax1.plot([], [], style, c='black'))
+                if chunk is not None:
+                    if not isinstance(chunk, str):
+                        chunkLabel = round(float(chunk), 2)
+                        chunkLabels.append("{:.2f}".format(chunkLabel))
+                    else:
+                        chunkLabels.append(chunk)
+
+                for key in plotXDict[chunk].keys():
+                    index = num.argsort(plotXDict[chunk][key])
+                    myX = num.array(plotXDict[chunk][key])[index]
+                    myY = num.array(plotYDict[chunk][key])[index]
+
+                    mySize = len(myX)
+
+                    if key is not None and not isinstance(key, str):
+                        labelValue = round(float(key), 2)
+                    elif key is not None:
+                        labelValue = key
+                    if key is not None and labelValue not in labelSet:
+                        if not isinstance(labelValue, str):
+                            label = "{:.2f}".format(labelValue)
+                        else:
+                            label = labelValue
+                        labelSet.add(labelValue)
+                        ax1.plot(myX, myY,
+                                 style, color=seriesColors[key], label=label)
+                    else:
+                        ax1.plot(myX, myY,
+                                 style, color=seriesColors[key])
+
+                    # for i in range(len(myX)):
+                    #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
+            lines = "!%s\t" % seriesVariable
+            for chunk, style in zip(plotXDict.keys(), styles):
+                for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                    line = "%s\t" % key;
+                    lines = lines + line
+                line = "\n";
+                lines = lines + line
+
+            if (0):
+                for X, Y in zip(myX, myY):
+                    for chunk, style in zip(plotXDict.keys(), styles):
+
+                        for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                            index = num.argsort(plotXDict[chunk][key])
+                            myX = num.array(plotXDict[chunk][key])[index]
+                            myY = num.array(plotYDict[chunk][key])[index]
+                            line = "%8.4f\t%8.4f\t" % (X, Y);
+                            lines = lines + line
+
+                    line = "\n";
+                    lines = lines + line
+            else:
+                for i in range(mySize):
+                    for chunk, style in zip(plotXDict.keys(), styles):
+
+                        for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                            index = num.argsort(plotXDict[chunk][key])
+                            myX = num.array(plotXDict[chunk][key])[index]
+                            myY = num.array(plotYDict[chunk][key])[index]
+
+                            if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
+                                line = myX[i] + "\t" + myY[i] + "\t"
+                            elif type(myX[i]) == num.str_:
+                                line = myX[i] + "\t" + "%8.4f\t" % myY[i]
+                            elif type(myY[i]) == num.str_:
+                                line = "%8.4f\t" % myX[i] + myX[i] + "\t"
+                            else:
+                                line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]);
+                            lines = lines + line
+
+                    line = "\n";
+                    lines = lines + line
+
+            # box = ax1.get_position()
+            # ax1.set_position([box.x0, box.y0, box.width, box.height])
+
+            if chunkVariable is not '':
+                legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
+                                      title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0),
+                                      bbox_transform=ax1.transAxes)
+
+            else:
+                legend2 = None
+            if seriesVariable is not '':
+                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.2, 1.0),
+                                      bbox_transform=ax1.transAxes)
+
+            else:
+                legend1 = None
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
+
+            conditionsFileName = ''
+            if len(conditionDict) == 1:
+                conditionName = self.doc.getNiceLatexNames(sorted(conditionDict)[0])
+                ax1.set_title(conditionName + ' = ' + str(conditionDict[sorted(conditionDict)[0]]))
+                conditionsFileName = sorted(conditionDict)[0] + '=' + str(conditionDict[sorted(conditionDict)[0]])
+            else:
+                conditionsTitle = ''
+                for conditionEntry in conditionDict:
+                    conditionName = self.doc.getNiceLatexNames(conditionEntry)
+                    conditionsTitle += conditionName + ' = ' + str(conditionDict[conditionEntry]) + ', '
+                    conditionsFileName += conditionEntry + '=' + str(conditionDict[conditionEntry]) + '_'
+                conditionsTitle = conditionsTitle[:-2]
+                ax1.set_title(conditionsTitle)
+                conditionsFileName = conditionsFileName[:-1]
+            # if chunkVariable is not '':
+            #
+            if legend2 is not None:
+                fig1.add_artist(legend2)
+            # fig1.canvas.draw()
+            # if legend2 is not None:
+            #    ax1.add_artist(legend2)
+            #    legend2.set_in_layout(True)
+            # if legend1 is not None:
+            #    legend1.set_in_layout(True)
+            if chunkVariable == '':
+                fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + conditionsFileName
+            else:
+                fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable + '_' + conditionsFileName
+            fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
+            plt.close()
+
+            if (self.inputs["setPrintDataForGle"]):
+                outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
+                outfile.writelines(lines)
+                outfile.close()
+
+    def plotCalculationsAcrossSets(self):
+        pathFolder = self.inputs["pathBase"]
+        for plotVariables in self.inputs['acrossSetsCalculationsPlot']:
+            if len(plotVariables) < 4:
+                raise ValueError(
+                    'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
+            xAxisVariable = plotVariables[0]
+            yAxisVariable = plotVariables[1]
+            calculationVariable = plotVariables[2]
+
+
+            conditionDict = {}
+            equationDict = {}
+            calcVariableDict = {}
+            for plotVariable in plotVariables:
+                if ':' in plotVariable:
+                    conditionEntry, conditionValue = plotVariable.split(':')
+                    conditionDict[conditionEntry] = conditionValue
+                elif "=" in plotVariable:
+                    equationVariable,equationExpression = plotVariable.split('=')
+                    equationDict[equationVariable] = equationExpression
+                    for variable in re.split('\W',equationExpression):
+                        if variable != '' and not(self.isStringNumber(variable)):
+                            calcVariableDict[variable] = ''
+
+            plotXDict = {}
+            plotYDict = {}
+
+            seriesColors = {}
+            colorsCounter = 0
+            colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+            if self.inputs["typeOfProcess"] == "json":
+                resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+            else:
+                resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
+
+            for file in resultFiles:
+                with open(file) as f_in:
+                    resultsDict = json.load(f_in)
+                    resultsDict[''] = None
+
+                conditionList = []
+                for conditionEntry in conditionDict:
+                    entryClass = type(resultsDict[conditionEntry])
+                    conditionDict[conditionEntry] = entryClass(conditionDict[conditionEntry])
+                    conditionList.append(conditionDict[conditionEntry]==resultsDict[conditionEntry])
+
+                if all(conditionList):
+
+                    #if equationVariable not in seriesColors.keys():
+                    #    seriesColors[equationVariable] = colors[colorsCounter]
+                    #    colorsCounter += 1
+
+                    if '[' not in xAxisVariable:
+                        xAxis = resultsDict[xAxisVariable]
+                    else:
+                        name, index = str(xAxisVariable).split('[')
+                        index = int(index.replace(']', ''))
+                        xAxis = resultsDict[name][index]
+                    if '[' not in yAxisVariable:
+                        yAxis = resultsDict[yAxisVariable]
+                    else:
+                        name, index = str(yAxisVariable).split('[')
+                        index = int(index.replace(']', ''))
+                        yAxis = resultsDict[name][index]
+
+                    chunkVariable = ''
+
+                    if resultsDict[chunkVariable] not in plotXDict.keys():
+                        plotXDict[resultsDict[chunkVariable]] = {}
+                        plotYDict[resultsDict[chunkVariable]] = {}
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]] = [xAxis]
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]] = [yAxis]
+                    elif resultsDict[calculationVariable] not in plotXDict[resultsDict[chunkVariable]].keys():
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]] = [xAxis]
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]] = [yAxis]
+                    else:
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]].append(xAxis)
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[calculationVariable]].append(yAxis)
+
+                else:
+                    pass
+
+            for variable in calcVariableDict:
+                calcVariableDict[variable] = num.array(plotYDict[None][variable])
+
+            calcVariableDict['equationDict'] = equationDict
+            for equation in equationDict:
+                calcVariableDict['equation'] = equation
+                exec('equationDict[equation]='+equationDict[equation],calcVariableDict)
+                seriesColors[equation] = colors[colorsCounter]
+                colorsCounter += 1
+
+            self.doc = latex.LatexReport('', '')
+            if 'latexNames' in self.inputs.keys():
+                if ':' in self.inputs['latexNames']:
+                    latexNameFullPath = self.inputs['latexNames']
+                else:
+                    latexNameFullPath = os.path.join(self.configPath, self.inputs['latexNames'])
+                self.doc.getLatexNamesDict(file=latexNameFullPath)
+            else:
+                self.doc.getLatexNamesDict()
+            if 'matplotlibStyle' in self.inputs.keys():
+                stylesheet = self.inputs['matplotlibStyle']
+            else:
+                stylesheet = 'word.mplstyle'
+            if stylesheet in plt.style.available:
+                self.stylesheet = stylesheet
+            else:
+                root = os.path.dirname(os.path.abspath(__file__))
+                self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
+            plt.style.use(self.stylesheet)
+
+            fig1, ax1 = plt.subplots(constrained_layout=True)
+            if self.inputs["plotStyle"] == "line":
+                styles = ['x-', 'x--', 'x-.', 'x:', 'o-', 'o--', 'o-.', 'o:']
+            elif self.inputs["plotStyle"] == "dot":
+                styles = ['x', 'o', '+', 'd', 's', 'v', '^', 'h']
+            else:
+                print("Invalid 'plotStyle' argument")
+
+            dummy_lines = []
+            chunkLabels = []
+            labelSet = set()
+            lines = ""
+            for chunk, style in zip(plotXDict.keys(), styles):
+                dummy_lines.append(ax1.plot([], [], style, c='black'))
+                if chunk is not None:
+                    if not isinstance(chunk, str):
+                        chunkLabel = round(float(chunk), 2)
+                        chunkLabels.append("{:.2f}".format(chunkLabel))
+                    else:
+                        chunkLabels.append(chunk)
+
+                globalXAxisVariable = list(plotXDict[chunk].keys())[0]
+                index = num.argsort(plotXDict[chunk][globalXAxisVariable])
+                myX = num.array(plotXDict[chunk][globalXAxisVariable])[index]
+                mySize = len(myX)
+
+                for key in equationDict.keys():
+                    myY = equationDict[key]
+
+                    if key is not None and not isinstance(key, str):
+                        labelValue = round(float(key), 2)
+                    elif key is not None:
+                        labelValue = key
+                    if key is not None and labelValue not in labelSet:
+                        if not isinstance(labelValue, str):
+                            label = "{:.2f}".format(labelValue)
+                        else:
+                            label = labelValue
+                        label = self.doc.getNiceLatexNames(label)
+                        labelSet.add(labelValue)
+
+                        if 'plotStyleJson' in self.inputs:
+                            plotKwargs = self.loadPlotJson(self.inputs['plotStyleJson'])
+                            plotStatement = 'ax1.plot(myX, myY,style, color=seriesColors[key], label=label' + plotKwargs + ')'
+                            exec(plotStatement)
+                        else:
+                            ax1.plot(myX, myY,style, color=seriesColors[key], label=label)
+                    else:
+                        ax1.plot(myX, myY,
+                                 style, color=seriesColors[key])
+
+                    # for i in range(len(myX)):
+                    #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
+            lines = "!%s\t" % calculationVariable
+            for chunk, style in zip(plotXDict.keys(), styles):
+                for key in equationDict.keys():  # the varables that appear in the legend
+                    line = "%s\t" % key;
+                    lines = lines + line
+                line = "\n";
+                lines = lines + line
+
+            for i in range(mySize):
+                for chunk, style in zip(plotXDict.keys(), styles):
+
+                    index = num.argsort(plotXDict[chunk][globalXAxisVariable])
+                    myX = num.array(plotXDict[chunk][globalXAxisVariable])[index]
+                    for key in equationDict.keys():  # the varables that appear in the legend
+                        myY = equationDict[key][index]
+
+                        if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
+                            line = myX[i] + "\t" + myY[i] + "\t"
+                        elif type(myX[i]) == num.str_:
+                            line = myX[i] + "\t" + "%8.4f\t" %myY[i]
+                        elif type(myY[i]) == num.str_:
+                            line = "%8.4f\t" %myX[i] + myX[i] + "\t"
+                        else:
+                            line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]);
+                        lines = lines + line
+
+                line = "\n";
+                lines = lines + line
+
+            if chunkVariable is not '':
+                legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
+                                      title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0),
+                                      bbox_transform=ax1.transAxes)
+
+            else:
+                legend2 = None
+            if calculationVariable is not '':
+                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(calculationVariable), bbox_to_anchor=(1.2, 1.0),
+                                      bbox_transform=ax1.transAxes)
+
+            else:
+                legend1 = None
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
+
+            conditionsFileName = ''
+            if len(conditionDict) == 1:
+                conditionName = self.doc.getNiceLatexNames(sorted(conditionDict)[0])
+                ax1.set_title(conditionName + ' = ' + str(conditionDict[sorted(conditionDict)[0]]))
+                conditionsFileName = sorted(conditionDict)[0] + '=' + str(conditionDict[sorted(conditionDict)[0]])
+            else:
+                conditionsTitle = ''
+                for conditionEntry in conditionDict:
+                    conditionName = self.doc.getNiceLatexNames(conditionEntry)
+                    conditionsTitle += conditionName + ' = ' + str(conditionDict[conditionEntry]) + ', '
+                    conditionsFileName += conditionEntry + '=' + str(conditionDict[conditionEntry]) + '_'
+                conditionsTitle = conditionsTitle[:-2]
+                ax1.set_title(conditionsTitle)
+                conditionsFileName = conditionsFileName[:-1]
+            # if chunkVariable is not '':
+            #
+            if legend2 is not None:
+                fig1.add_artist(legend2)
+            # fig1.canvas.draw()
+            # if legend2 is not None:
+            #    ax1.add_artist(legend2)
+            #    legend2.set_in_layout(True)
+            # if legend1 is not None:
+            #    legend1.set_in_layout(True)
+            fileName = xAxisVariable + '_' + yAxisVariable + '_' + calculationVariable
+            for equation in equationDict:
+                fileName += '_' + equation
+            fileName += '_' + conditionsFileName
+
+            fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
+            plt.close()
+
+            if (self.inputs["setPrintDataForGle"]):
+                outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
+                outfile.writelines(lines)
+                outfile.close()
+
+    def transferPathInfoToJson(self):
+        pathFolder = self.inputs["pathBase"]
+        resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+        parameterName = self.inputs['pathInfoToJson'][0][0]
+        possibleKeys = self.inputs['pathInfoToJson'][0][1:]
+        for file in resultFiles:
+            with open(file) as f_in:
+                resultsDict = json.load(f_in)
+            keyNotFound = True
+            for key in possibleKeys:
+                if key in file:
+                    resultsDict[parameterName] = key
+                    keyNotFound = False
+            if keyNotFound:
+                resultsDict[parameterName] = ''
+            with open(file, 'w') as f_out:
+                json.dump(resultsDict, f_out, indent=2, separators=(',', ': '))
 
     def printBoxPlotGLEData(self):
         pathFolder = self.inputs["pathBase"]
@@ -724,19 +1449,24 @@ class ProcessParallelTrnsys():
         if(found==False):
             self.logger.warning("changeFile was not able to change %s by %s"%(source,end))
 
-    def calcCost(self):
+    def calcCost(self,fileNameList=None):
 
         path = self.inputs['pathBase']
 
         costPath = self.inputs['cost']
 
-        dictCost = costConfig.costConfig.readCostJson(costPath)
+        cost = costConfig.costConfig()
+        dictCost = cost.readCostJson(costPath)
 
         # for name in names:
         # path = os.path.join(pathBase, name)
 
         small = 15
-        cost = costConfig.costConfig()
+
+
+        if(fileNameList!=None):
+            cost.setFileNameList(fileNameList)
+
         cost.setFontsizes(small)
 
         cost.setDefaultData(dictCost)

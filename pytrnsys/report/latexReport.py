@@ -306,7 +306,7 @@ class LatexReport():
         line="\\begin{adjustbox}{max width =\\textwidth}\n" ; self.lines = self.lines + line
 
         # line="{\n" ;self.lines = self.lines + line
-
+        print(_names, len(_names), "TEST _names")
         line="\\begin{tabular}{l | "; self.lines = self.lines + line
         for i in range(len(_names)-1):
              line = "c "; self.lines = self.lines + line 

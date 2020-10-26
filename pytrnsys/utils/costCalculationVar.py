@@ -200,8 +200,9 @@ class CostCalculationVar(mycost.CostCalculation):
         #===================================================
 #        self.npvMaintenance = self.MaintenanceRate*self.totalInvestCost*self.npvFac
         self.npvMaintenance = self.MaintenanceRate*self.totalInvestCost*self.getNPV(self.rate,self.analysPeriod)#sum(self.costNpv)
+        # self.npvMaintenance = self.MaintenanceRate * self.totalInvestCost #We use every year a MaintenanceRate% of the investment cost for maintenance
 
-#        if(self.printInfo):
+    #        if(self.printInfo):
 #            print self.costElecTotalY,self.npvElec,self.npvMaintenance
 
         #===================================================
@@ -249,8 +250,8 @@ class CostCalculationVar(mycost.CostCalculation):
         self.anToInvCost = sum(self.costAnn)
 
         self.anElec = self.annuityFac*self.npvElec
-        # self.anMaint = self.annuityFac*self.npvMaintenance
-        self.anMaint = self.anToInvCost*self.MaintenanceRate
+        self.anMaint = self.MaintenanceRate * self.totalInvestCost #to use DP method
+        #self.anMaint = self.anToInvCost*self.MaintenanceRate
 
         self.anResVal = (-1.)*self.annuityFac*self.npvResVal
 

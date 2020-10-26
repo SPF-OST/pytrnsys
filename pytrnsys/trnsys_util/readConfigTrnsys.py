@@ -64,8 +64,20 @@ class ReadConfigTrnsys():
         if "calcMonthly" not in inputs:
             inputs["calcMonthly"]=[]
 
+        if "calcMonthlyTest" not in inputs:
+            inputs["calcMonthlyTest"]=[]
+
+        if "calcMonthlyMax" not in inputs:
+            inputs["calcMonthlyMax"]=[]
+
+        if "calcMonthlyMin" not in inputs:
+            inputs["calcMonthlyMin"]=[]
+
         if "calcHourly" not in inputs:
             inputs["calcHourly"]=[]
+
+        if "calcMonthlyFromHourly" not in inputs:
+            inputs["calcMonthlyFromHourly"] = []
 
         if "calcDaily" not in inputs:
             inputs["calcDaily"]=[]
@@ -137,10 +149,21 @@ class ReadConfigTrnsys():
 
             elif (splitLine[0]== "calcMonthly"):
                 inputs["calcMonthly"].append(" ".join(splitLine[1:]))
+            elif (splitLine[0]== "calcMonthlyTest"):
+                inputs["calcMonthlyTest"].append(" ".join(splitLine[1:]))
+
+            elif (splitLine[0]== "calcMonthlyMax"):
+                inputs["calcMonthlyMax"].append(" ".join(splitLine[1:]))
+
+            elif (splitLine[0]== "calcMonthlyMin"):
+                inputs["calcMonthlyMin"].append(" ".join(splitLine[1:]))
+
             elif (splitLine[0]== "calc"):
                 inputs["calc"].append(" ".join(splitLine[1:]))
             elif (splitLine[0] == "calcHourly"):
                 inputs["calcHourly"].append(" ".join(splitLine[1:]))
+            elif (splitLine[0] == "calcMonthlyFromHourly"):
+                inputs["calcMonthlyFromHourly"].append(" ".join(splitLine[1:]))
             elif (splitLine[0] == "calcDaily"):
                 inputs["calcDaily"].append(" ".join(splitLine[1:]))
             elif (splitLine[0] == "calcHourlyTest"):

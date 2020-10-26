@@ -18,26 +18,26 @@ class ResultsProcessedFile():
     """
     class for analysis of simulation data to facilitate debugging
     """
-
     def __init__(self, _path):
 
         self.path = _path
         self.cases = []
-
         self.filteredfolder = [".gle"]
-
 
     def get(self, name, resultList):
         for lines in resultList:
             if (lines.split("\t")[0] == name):
                 return float(lines.split("\t")[1])
 
-    def readResultsData(self,resultType = 'dat'):
+    def readResultsData(self, resultType='dat',completeFolder=True,fileNameList=None):
 
         fileName = []
         pathFolder = self.path
 
-        self.fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name) and name[0]!="."] #to avoid looking at hiden folders
+        if(completeFolder):
+            self.fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name) and name[0]!="."] #to avoid looking at hiden folders
+        else:
+            self.fileName = fileNameList
 
         for name in self.fileName:
             for i in range(len(self.filteredfolder)):
