@@ -884,8 +884,12 @@ class PlotMatplotlib():
             bar = []
 
             for i in range(len(variables13)):
-                bar.append(plot.bar(ind - move * width, variables13[i][showMonths], width, color=self.myColorsIn[i],
+                try:
+                    bar.append(plot.bar(ind - move * width, variables13[i][showMonths], width, color=self.myColorsIn[i],
                                     bottom=data_stack[i]))
+                except:
+                    bar.append(plot.bar(ind - move * width, variables13[i][showMonths], width, bottom=data_stack[i]))
+                    
             if printImb:
                 bar.append(plot.bar(ind - move * width, data[-1][showMonths], width, color='k',
                                     bottom=data_stack[-1]))
