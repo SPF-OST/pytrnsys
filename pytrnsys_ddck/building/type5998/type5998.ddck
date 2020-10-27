@@ -6,7 +6,6 @@
 ** Contact person : Dani Carbonell   
 ** Creation date  : 30.09.2016
 ** Last changes   : 30.04.20 MB
-**					20.10.20 SCJ 
 *****************************************
 
 ***************************************************************************
@@ -45,27 +44,13 @@ CoolingNeeded = OR(AND(GE(TroomRc,TroomSetCool-dTCool),CoolingNeededRc),GE(Troom
 
 
 
-***********************************
-** Body of ddck
-***********************************
-
-CONSTANTS 5
-realUserBehaviour = 1 !User behaviour for window ventialtion and shading, 1 means realistic, 0 means ideal
-useAHU = 1 !Air handling unit (1 means with, 0 wihtout AHU)
-
-upperShadeT = 21*realUserBehaviour + 24*NOT(realUserBehaviour)
-lowerShadeT = 20*realUserBehaviour + 22*NOT(realUserBehaviour)
-
-ShadeTinit = (upperShadeT+lowerShadeT)/2
-
-! JS: commented unit 15, because it is not used.
-** UNIT 15 TYPE 816	 !Type816_Transient Value Averaging
-** PARAMETERS 2
-** 1		! 1 NrV
-** 48		! 2 tav(X)
-** INPUTS 1
-** Tamb		! [equation] Va(X)
-** Tamb 
+UNIT 15 TYPE 816	 !Type816_Transient Value Averaging
+PARAMETERS 2
+1		! 1 NrV
+48		! 2 tav(X)
+INPUTS 1
+Tamb		! [equation] Va(X)
+Tamb 
 
 *** SHADING AS DEFINED IN IDA-ICE ACCORDING TO SIA-NORM AND BUILDING GEOMETRY (BALCONY etc.)
 UNIT 32 TYPE 2	! Building Shading Controller: Radiation Nord Side
@@ -150,25 +135,10 @@ shadingConTemp    	! Output control function ->Input control function 49,1
 0,0      	! Upper dead band
 0,0      	! Lower dead band
 *** INITIAL INPUT VALUES	
-ShadeTinit 0 0 0 upperShadeT lowerShadeT 	
+20.1 0 0 0 21 20 	
 EQUATIONS 1	
 shadingConTemp=[49,1]
 	
-UNIT 53 TYPE 2	! Building Shading Controller: Temperature
-PARAMETERS 2	
-5	! 1 No. of oscillations
-95	! 2 High limit cut-out
-INPUTS 6	
-vWind	! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
-0,0      	! Lower input value
-0,0      	! Monitoring value
-vWindAbove10    	! Output control function ->Input control function 49,1
-0,0      	! Upper dead band
-0,0      	! Lower dead band
-*** INITIAL INPUT VALUES	
-10 0 0 0 11 9 	
-EQUATIONS 1	
-vWindAbove10=[49,1]
 	
 
 EQUATIONS 4	! Variable Shading
@@ -177,91 +147,7 @@ Fsh_S = shd_fix_S * (AND(shadingConTemp,shadingControlS)*win_g_shd+NOT(AND(shadi
 Fsh_E = shd_fix_E * (AND(shadingConTemp,shadingControlE)*win_g_shd+NOT(AND(shadingConTemp,shadingControlE))*win_g)	
 Fsh_W = shd_fix_W * (AND(shadingConTemp,shadingControlW)*win_g_shd+NOT(AND(shadingConTemp,shadingControlW))*win_g)	
 	
-****************************
-** Air exchange 
-****************************
-
-CONSTANTS 7
-alphaWindow = 7.5
-heightWindow = 1.5
-widthWindow = 0.94
-numberWindows = 42
-g_earth = 9.81
-C_d = 0.0147*alphaWindow-0.0928*heightWindow*widthWindow^(-1)+0.4116
-C_k = 2.6*(10)^(-7)*alphaWindow^3-1.19*(10)^(-4)*alphaWindow^2+1.86*(10)^(-2)*alphaWindow
-
-** Summer ventilation deadbands:
-
-UNIT 50 TYPE 2	! Outdoor Temperature deadband
-PARAMETERS 2	
-5	! 1 No. of oscillations
-95	! 2 High limit cut-out
-INPUTS 6	
-Tamb24	! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
-0,0      	! Lower input value
-0,0      	! Monitoring value
-Tamb24above18    	! Output control function ->Input control function 49,1
-0,0      	! Upper dead band
-0,0      	! Lower dead band
-*** INITIAL INPUT VALUES	
-18 0 0 0 18.5 17.5 	
-EQUATIONS 1	
-Tamb24above18=[50,1]
-
-UNIT 51 TYPE 2	! Room Temperature deadband
-PARAMETERS 2	
-5	! 1 No. of oscillations
-95	! 2 High limit cut-out
-INPUTS 6	
-Troom	! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
-0,0      	! Lower input value
-0,0      	! Monitoring value
-TroomAbove24    	! Output control function ->Input control function 49,1
-0,0      	! Upper dead band
-0,0      	! Lower dead band
-*** INITIAL INPUT VALUES	
-24 0 0 0 25 23 	
-EQUATIONS 1	
-TroomAbove24=[51,1]
-
-
-EQUATIONS 1
-dTroomAmb = Troom-Tamb ! difference from indoor to outdoor temperature
-
-UNIT 52 TYPE 2	! Room above ambient Temperature deadband
-PARAMETERS 2	
-5	! 1 No. of oscillations
-95	! 2 High limit cut-out
-INPUTS 6	
-dTroomAmb	! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
-0,0      	! Lower input value
-0,0      	! Monitoring value
-dTroomAmbAbove2    	! Output control function ->Input control function 49,1
-0,0      	! Upper dead band
-0,0      	! Lower dead band
-*** INITIAL INPUT VALUES	
-2 0 0 0 3 1 	
-EQUATIONS 1	
-dTroomAmbAbove2=[52,1]
-			
-EQUATIONS 9
-
-f_win_ideal = 0 !ideal user behaviour -> no window opening
-f_win_withAHU = -5E-07*Tamb24^4+ 6E-6*Tamb24^3+0.0005*Tamb24^2+0.0061*Tamb24+0.0579
-f_win_withoutAHU = -7E-07*Tamb24^4+ 6E-7*Tamb24^3+0.0006*Tamb24^2+0.0119*Tamb24+0.0893
-f_win_summer = 1
-
-summerVentOn = OR(GT(MOD(time,24),21),LT(MOD(time,24),8))*Tamb24above18*TroomAbove24*dTroomAmbAbove2
-
-f_win = (f_win_ideal*NOT(realUserBehaviour) + (useAHU*f_win_withAHU + NOT(useAHU)*f_win_withoutAHU)*realUserBehaviour)*NOT(summerVentOn) + summerVentOn*f_win_summer
-
-
-VfrWindow = numberWindows*f_win*C_d*C_k*widthWindow/3*(ABS((Troom-Tamb))/((Troom+Tamb)/2+273)*g_earth*heightWindow^3)^(0.5)*ScaleVfrWindow	! Infiltration due window opening [m3/s] (Readout Textfile!) SCJ: what is scaleVfrWindow?
-** VfrWindow = AND(GT(MOD(time,8760),2160),LT(MOD(time,8760),6552))*OR(GT(MOD(time,24),20),LT(MOD(time,24),7))*4.2*(ABS((Troom-Tamb))/((Troom+Tamb)/2+273))^(0.5)*ScaleVfrWindow	! Infiltration due window opening [m3/s] (Readout Textfile!)
-etaHeatRec = 0.8*LT(Tamb24,18)	! Heatrecovery efficiency of the ventilation system
-VfrAirExTot = VfrInf + VfrVent + VfrWindow	! Air exchange of the building [m3/s]
-
-
+	
 EQUATIONS 2	! Ventilation and Infiltration
 TairSup = ((Tamb+(Troom-Tamb)*etaHeatRec)*VfrVent+Tamb*(VfrInf+VfrWindow))/VfrAirExTot	! Temperature of the air coming into the building (infiltration and ventilation)
 Ua_vent = CPAIR * 1000 * (VfrAirExTot) *RHOAIR	! Thermal transmission coefficient due ventilation and infiltration [W/K]
@@ -384,35 +270,6 @@ PpenSC_kW = UaBui*(dTsc+(dTsc+1)^X-1)/1000.0     ! penalty function for room-tem
 CONSTANTS 1 !The ISO model does not provide these ones
 PbuiInf_kW = 0
 
-*******************************
-** online plotter
-*******************************
-	
-UNIT 59 TYPE 65     ! Online Plotter Building (element OpB)
-PARAMETERS 12     
-4     ! 1 Nb. of left-axis variables
-7     ! 2 Nb. of right-axis variables
--5     ! 3 Left axis minimum
-60     ! 4 Left axis maximum
--10     ! 5 Right axis minimum
-50     ! 6 Right axis maximum
-nPlotsPerSim     ! 7 Number of plots per simulation
-12     ! 8 X-axis gridpoints
-0     ! 9 Shut off Online w/o removing
--1     ! 10 Logical unit for output file
-0     ! 11 Output file units
-0     ! 12 Output file delimiter
-INPUTS 11     
-Tamb Tamb24 myTroomRc vWind  
-BoHS shadingConTemp f_win summerVentOn Tamb24above18 TroomAbove24 dTroomAmbAbove2
-*******
-Tamb Tamb24 myTroomRc vWind  
-BoHS shadingConTemp f_win summerVentOn Tamb24above18 TroomAbove24 dTroomAmbAbove2
-****
-LABELS  3     
-Temperatures     
-Control     
-Building
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
