@@ -68,7 +68,6 @@ pytrnsys.trnsys\_util.trnsysComponent module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

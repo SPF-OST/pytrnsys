@@ -52,14 +52,17 @@ class RunParallelTrnsys():
 
     """
 
-    def __init__(self,pathConfig,name="pytrnsysRun",configFile=None):
+    def __init__(self,pathConfig,name="pytrnsysRun",configFile=None,runPath=None):
 
 
         self.pathConfig = pathConfig
 
         self.defaultInputs()
         self.cmds = []
-        self.path = os.getcwd()
+        if(runPath==None):
+            self.path = os.getcwd()
+        else:
+            self.path=runPath
         if configFile is not None:
             self.readConfig(self.pathConfig,configFile)
 
@@ -69,6 +72,11 @@ class RunParallelTrnsys():
                 if name=="pytrnsysRun":
                     self.nameBase = self.inputs['addResultsFolder']
 
+            if 'projectPath' in self.inputs:
+                self.path = self.inputs['projectPath']
+            else:
+                self.path = os.getcwd()
+
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
             self.getConfig()
             self.runConfig()
@@ -76,8 +84,9 @@ class RunParallelTrnsys():
         else:
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
             self.nameBase = name
+            self.path = os.getcwd()
 
-
+        pass
 
 
 
@@ -201,6 +210,7 @@ class RunParallelTrnsys():
                                 self.scaleVariables(self.inputs['scalingReference'], self.inputs['changeScalingFile'][0], self.inputs['changeScalingFile'][j+1])
                             else:
                                 self.scaleVariables(self.inputs['scalingReference'],originalSourceFile,sinkFile)
+
 
                         sourceFile=sinkFile #for each case the listddck will be changed to the new one, so we need to compare with the updated string
 
@@ -661,11 +671,19 @@ class RunParallelTrnsys():
         with open(resultFile) as f_in:
             resultsDict = json.load(f_in)
 
+
         exec('scalingVariable=' + self.inputs['scalingVariable'], globals(), resultsDict)
         loadDemand = resultsDict['scalingVariable']
+        exec('scaleHP=' + self.inputs['scaleHP'], globals(), resultsDict)
+        loadHPsize = resultsDict['scaleHP']
+
         for j in range(len(self.variablesOutput)):
             for i in range(2, len(self.variablesOutput[j]), 1):
-                self.variablesOutput[j][i] = str(round(self.unscaledVariables[j][i], 3))+ "*" +str(round(loadDemand,3))
+                if self.variablesOutput[j][1] == "sizeHpUsed":
+                    self.variablesOutput[j][i] = str(round(self.unscaledVariables[j][i], 3))+ "*" +str(round(loadHPsize,3))
+                else:
+                    self.variablesOutput[j][i] = str(round(self.unscaledVariables[j][i], 3))+ "*" +str(round(loadDemand,3))
+
 
 def run():
    pathBase = ''

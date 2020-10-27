@@ -44,7 +44,6 @@ pytrnsys.pdata.processHourly module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

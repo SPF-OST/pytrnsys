@@ -76,7 +76,6 @@ pytrnsys.utils.utilsSpf module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

@@ -17,6 +17,8 @@ import time
 import pytrnsys.plot.plotGle as gle
 import os, subprocess
 import logging
+import pandas as pd
+from scipy.optimize import curve_fit
 logger = logging.getLogger('root')
 
 class PlotMatplotlib():
@@ -408,38 +410,38 @@ class PlotMatplotlib():
     def plotMonthlyNBar(self, inVar, legends, myLabel, nameFile, yearlyFactor, defMonths, useYear=False, myTitle=None,
                         plotEmf=False, showMonths=False, ylim=False):
         """
-                Plot Monthly Values of N different data series
+        Plot Monthly Values of N different data series
 
-                Parameters
-                ---------
-                legends : list of str
-                    list of strings containing N entries for the legend
-                var1 : ndarray
-                    2D array of length Nx12 (not containing a yearly value) or Nx13 (containing a yearly value)
-                    or list of 1D-arrays
-                myLabel : str
-                    Label of the y-Axis
-                nameFile : str
-                    Name of the plot file to be saved
-                yearlyFactor : float
-                    Value of the yearly Factor
-                startMonth : obj:'int', optional
-                    Starting month of the Plot (1= January, 12=December), Default is 1
-                myTitle : str, optional
-                    Title of the Plot
-                plotEmf : bool, optional
-                    Plot as Enhanced Meta File
-                showMonths : list of int, optional
-                    list with numbers of which months to plot (0=january), Default is False (shows all files)
-                ylims : [lower,upper], optional
-                    lower and upper limit for y axi, Default is False (automatic limits by matplotlib)
+        Parameters
+        ---------
+        legends : list of str
+            list of strings containing N entries for the legend
+        var1 : ndarray
+            2D array of length Nx12 (not containing a yearly value) or Nx13 (containing a yearly value)
+            or list of 1D-arrays
+        myLabel : str
+            Label of the y-Axis
+        nameFile : str
+            Name of the plot file to be saved
+        yearlyFactor : float
+            Value of the yearly Factor
+        startMonth : obj:'int', optional
+            Starting month of the Plot (1= January, 12=December), Default is 1
+        myTitle : str, optional
+            Title of the Plot
+        plotEmf : bool, optional
+            Plot as Enhanced Meta File
+        showMonths : list of int, optional
+            list with numbers of which months to plot (0=january), Default is False (shows all files)
+        ylims : [lower,upper], optional
+            lower and upper limit for y axi, Default is False (automatic limits by matplotlib)
 
-                Returns
-                -------
-                str
-                    Path of Pdf created.
+        Returns
+        -------
+        str
+            Path of Pdf created.
 
-                """
+        """
 
         move = 0
         if (yearlyFactor == 1):
@@ -792,7 +794,7 @@ class PlotMatplotlib():
 
     def plotMonthlyBalanceDf(self, inVar, outVar, legends, myLabel, nameFile, unit, defMonths,
                                printImb=True, yearlyFactor=1, useYear=False, plotEmf=False, printData=False,
-                               showMonths=False,ylims=None):
+                               showMonths=False,ylims=None, title = '', style = ''):
         """
         Plots monthly energy balance of system input variables and system output variables.
 
@@ -878,19 +880,45 @@ class PlotMatplotlib():
         width = 0.35  # the width of the bars
         ind = num.arange(len(showMonths))  # the x locations for the groups
 
+        if style == 'relative':
+            positiveSum = num.zeros(nMonth)
+            for variable in variables13:
+                positiveSum += num.where(variable > 0., variable, 0.)
+
         with plt.style.context(self.stylesheet):
             fig = plt.figure()
             plot = fig.add_subplot(111)
             bar = []
 
-            for i in range(len(variables13)):
-                bar.append(plot.bar(ind - move * width, variables13[i][showMonths], width, color=self.myColorsIn[i],
-                                    bottom=data_stack[i]))
-            if printImb:
-                bar.append(plot.bar(ind - move * width, data[-1][showMonths], width, color='k',
-                                    bottom=data_stack[-1]))
+            #tempColors = ['r','orange','yellow','brown','c','b','g','grey']
 
-            myLabel = myLabel + " [%s]" % unit
+            for i in range(len(variables13)):
+                if style == 'relative':
+                    test = variables13[i][showMonths]/positiveSum
+                    bar.append(plot.bar(ind - move * width, variables13[i][showMonths]/positiveSum*100., width, color=self.myColorsIn[i], #color=tempColors[i],
+                                        bottom=data_stack[i]/positiveSum*100.))
+                else:
+                    try:
+                        bar.append(
+                            plot.bar(ind - move * width, variables13[i][showMonths], width, color=self.myColorsIn[i],
+                                     bottom=data_stack[i]))
+                    except:
+                        bar.append(
+                            plot.bar(ind - move * width, variables13[i][showMonths], width, bottom=data_stack[i]))
+
+            if printImb:
+                if style == 'relative':
+                    bar.append(plot.bar(ind - move * width, data[-1][showMonths]/positiveSum*100., width, color='k',
+                                        bottom=data_stack[-1]/positiveSum*100.))
+                else:
+                    bar.append(plot.bar(ind - move * width, data[-1][showMonths], width, color='k',
+                                        bottom=data_stack[-1]))
+
+            if style == 'relative':
+                myLabel = myLabel + " [%]"
+            else:
+                myLabel = myLabel + " [%s]" % unit
+
             plot.set_ylabel(myLabel)
             box = plot.get_position()
             plot.set_position([box.x0, box.y0, box.width * 0.8 / 12 * nMonth, box.height])
@@ -902,6 +930,9 @@ class PlotMatplotlib():
                 allbar.append(b[0])
 
             lgd=plot.legend(allbar, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+            if title != '':
+                plot.set_title(title)
 
             namePdf = '%s.%s' % (nameFile, self.extensionPlot)
             nameWithPath = '%s\%s' % (self.path, namePdf)
@@ -925,6 +956,9 @@ class PlotMatplotlib():
                 self._plot_as_emf(fig,filename=nameEmfWithPath)
 
             plt.close()
+
+            if style == 'relative':
+                printData = False
 
             if (printData == True):
 
@@ -968,6 +1002,126 @@ class PlotMatplotlib():
                                            xnames=monthSequence)
 
         return namePdf
+
+    def plotHeatingLimitFit(self,dailyTemperature,heatingPower,fileName,timeStep,title='',yLabel=''):
+        """
+        Generate a plot of heating power values in dependence of average daily temperature. If timeStep == 'daily' a
+        linear fit over these data will be done to obtain values for H and HG (heating limit). Only heating power values
+        > fitHeatingPowerLowerLimit will be used for the fit.
+
+        Parameters
+        ---------
+        dailyTemperature : pandas.Series
+            Series of average daily temperature featuring time stamps
+        heatingPower : pandas.Series
+            Series of heating power values featuring time stamps
+        fileName : str
+            Name of the file to be generated
+        timeStep : str
+            Time step of the heating power data. It can either be 'daily' or 'hourly'.
+        title : str, optional
+            Title of the plot to be generated
+
+        Returns
+        -------
+        namePdf : str
+            Name of pdf created
+        float, optional
+            Fitted value of H
+        float, optional
+            Fitted value of HG (heating limit)
+        float, optional
+            R^2 as obtained from the fit
+
+        """
+
+        def _heatingLimitFittingFunction_(temperature,H,HG):
+            return H*(temperature - HG)
+
+        with plt.style.context(self.stylesheet):
+            fig = plt.figure()
+            plot = fig.add_subplot(111)
+
+            fitHeatingPowerLowerLimit = 500.
+            fitHeatingPower = heatingPower[heatingPower > fitHeatingPowerLowerLimit]
+
+            if timeStep == 'hourly':
+
+                temperatureHourFromDay = []
+                days = heatingPower.index.dayofyear
+                for day in days:
+                    temperatureHourFromDay.append(dailyTemperature.iloc[day-1])
+                plot.plot(temperatureHourFromDay, heatingPower, 'bo', Markersize=3)
+                timeStepTitle = 'Stundenwerte'
+
+                if title == '':
+                    plot.set_title(timeStepTitle)
+                else:
+                    plot.set_title(title + ' [' + timeStepTitle + ']')
+
+                plot.set_ylabel(yLabel)
+                plot.set_xlabel('Tagesdurchschnittstemperatur [$^\circ$C]')
+
+                plt.gcf().subplots_adjust(bottom=0.15)
+
+                namePdf = '%s.%s' % (fileName, self.extensionPlot)
+                nameWithPath = '%s\%s' % (self.path, namePdf)
+
+                logger.debug("PlotMonthlyBalance name:%s" % nameWithPath)
+
+                plt.savefig(nameWithPath)  # , bbox_extra_artists=(lgd,), bbox_inches='tight')
+
+                plt.close()
+
+                return namePdf
+
+            elif timeStep == 'daily':
+
+                plot.plot(dailyTemperature,heatingPower,'bo',Markersize=3)
+                timeStepTitle = 'Tageswerte'
+
+                dayFilterMask = []
+                for day in dailyTemperature.index.dayofyear:
+                    dayFilterMask.append(day in fitHeatingPower.index.dayofyear)
+
+                fitDailyTemperature = dailyTemperature[dayFilterMask]
+
+                fitParametersStartValues = [-1000.,15.]
+                fittedParameters,covarianceParameters = curve_fit(_heatingLimitFittingFunction_,fitDailyTemperature,fitHeatingPower,p0=fitParametersStartValues)
+
+                RSquared = 1.-sum((fitHeatingPower-_heatingLimitFittingFunction_(fitDailyTemperature,fittedParameters[0],fittedParameters[1]))**2)/sum((fitHeatingPower-num.mean(fitHeatingPower))**2)
+
+                plot.plot([min(fitDailyTemperature),fittedParameters[1]],[_heatingLimitFittingFunction_(min(fitDailyTemperature),fittedParameters[0],fittedParameters[1]),_heatingLimitFittingFunction_(fittedParameters[1],fittedParameters[0],fittedParameters[1])],'r-',linewidth=2)
+
+                plot.set_ylabel(yLabel)
+                plot.set_xlabel('Tagesdurchschnittstemperatur [$^\circ$C]')
+
+                textBox = '\n'.join((
+                    r'$\mathrm{H}=%.0f$ W/K' % fittedParameters[0],
+                    r'$\mathrm{HG}=%.1f ^\circ$C' % fittedParameters[1],
+                    r'$R^2=%.2f$' % RSquared))
+
+                textBoxX = max(dailyTemperature-10.)
+                textBoxY = max(heatingPower)
+                plot.text(textBoxX, textBoxY, textBox, fontsize=8,verticalalignment='top',backgroundcolor='w')#, transform=ax.transAxes, bbox=props
+
+                if title == '':
+                    plot.set_title(timeStepTitle)
+                else:
+                    plot.set_title(title + ' [' + timeStepTitle +']')
+
+                plt.gcf().subplots_adjust(bottom=0.15)
+
+                namePdf = '%s.%s' % (fileName, self.extensionPlot)
+                nameWithPath = '%s\%s' % (self.path, namePdf)
+
+                logger.debug("PlotMonthlyBalance name:%s" % nameWithPath)
+
+                plt.savefig(nameWithPath)#, bbox_extra_artists=(lgd,), bbox_inches='tight')
+
+                plt.close()
+
+                return namePdf,round(fittedParameters[0],0),round(fittedParameters[1],1),round(RSquared,2)
 
     def _get_cumulated_array(self,data,**kwargs):
         cum = data.clip(**kwargs)

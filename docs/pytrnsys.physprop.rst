@@ -12,7 +12,6 @@ pytrnsys.physprop.physProp module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 
