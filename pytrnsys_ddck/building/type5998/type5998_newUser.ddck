@@ -259,11 +259,11 @@ f_win = (f_win_ideal*NOT(realUserBehaviour) + (useAHU*f_win_withAHU + NOT(useAHU
 VfrWindow = numberWindows*f_win*C_d*C_k*widthWindow/3*(ABS((Troom-Tamb))/((Troom+Tamb)/2+273)*g_earth*heightWindow^3)^(0.5)*ScaleVfrWindow	! Infiltration due window opening [m3/s] (Readout Textfile!) SCJ: what is scaleVfrWindow?
 ** VfrWindow = AND(GT(MOD(time,8760),2160),LT(MOD(time,8760),6552))*OR(GT(MOD(time,24),20),LT(MOD(time,24),7))*4.2*(ABS((Troom-Tamb))/((Troom+Tamb)/2+273))^(0.5)*ScaleVfrWindow	! Infiltration due window opening [m3/s] (Readout Textfile!)
 etaHeatRec = 0.8*LT(Tamb24,18)	! Heatrecovery efficiency of the ventilation system
-VfrAirExTot = VfrInf + VfrVent + VfrWindow	! Air exchange of the building [m3/s]
+VfrAirExTot = VfrInf + VfrVent*useAHU + VfrWindow	! Air exchange of the building [m3/s]
 
 
 EQUATIONS 2	! Ventilation and Infiltration
-TairSup = ((Tamb+(Troom-Tamb)*etaHeatRec)*VfrVent+Tamb*(VfrInf+VfrWindow))/VfrAirExTot	! Temperature of the air coming into the building (infiltration and ventilation)
+TairSup = ((Tamb+(Troom-Tamb)*etaHeatRec)*VfrVent*useAHU+Tamb*(VfrInf+VfrWindow))/VfrAirExTot	! Temperature of the air coming into the building (infiltration and ventilation)
 Ua_vent = CPAIR * 1000 * (VfrAirExTot) *RHOAIR	! Thermal transmission coefficient due ventilation and infiltration [W/K]
 
 
