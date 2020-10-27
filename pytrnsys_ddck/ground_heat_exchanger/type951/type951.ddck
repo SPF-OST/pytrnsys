@@ -89,7 +89,6 @@ dTSoilAir = 1     ! delta-T between soil-surface and air, K
 
 CONSTANTS 2
 lBorePerkW = 15
-lGhxProbes= lBorePerkW*sizeHpUsed   ! 9: length of heat exchanger probe (Sondenlänge), m
 
 
 CONSTANTS 21
@@ -171,9 +170,11 @@ TGhxIn     ! Temperature of GHX inlet, °C
 MfrGHX    ! Mass flow rate for all borehole heat exchanger, kg/h
 0.0    0.0 
     
-EQUATIONS 3
+EQUATIONS 5
 MfrGhxOut = [85,2]     
 QGhx_kW = [85,3]     ! Power extracted [kW]
+QGhx_kWExt = GT(QGhx_kW,0)* QGhx_kW     !Changed automatically
+QGhx_kWReg = LT(QGhx_kW,0)* QGhx_kW     !Changed automatically
 TRT = [85,6]     ! K temp. drop at RANDAUSSEN
 
 !the whole radial profile (6 values + boundary) at the center of the borehole lenght (axial 6 values, so at 3) (T(3,1)-T(3,2)...T(3,boundary condition)
@@ -210,10 +211,10 @@ unitPrinterGhx     ! 1: Logical unit number, -
 2     ! 5: Number of inputs to avoid integration, -
 1     ! 6: Output number to avoid integration
 2     ! 7: Output number to avoid integration 
-INPUTS 3     
-Time  TRT QGhx_kW      
+INPUTS 5     
+Time  TRT QGhx_kW   QGhx_kWExt	QGhx_kWReg    
 **  
-Time  TRT QGhx_kW   
+Time  TRT QGhx_kW   QGhx_kWExt	QGhx_kWReg
 
 ***********************************
 ** hourly printer
@@ -239,10 +240,10 @@ unitPrinterGhxHr ! 1: Logical unit number, -
 6             ! 11: Output number to avoid integration
 7             ! 12: Output number to avoid integration
 8             ! 13: Output number to avoid integration
-INPUTS 9
-TGHXout TRT TGhxIn   TGHXmon1   TGHXmon2  TGHXmon3  TGHXmon4  TGHXmon5   Qghx_kW
+INPUTS 11
+TGHXout TRT TGhxIn   TGHXmon1   TGHXmon2  TGHXmon3  TGHXmon4  TGHXmon5   Qghx_kW 	QGhx_kWExt	QGhx_kWReg
 **  Labels     
-TGHXout TRT TGhxIn   TGHXmon1   TGHXmon2  TGHXmon3  TGHXmon4  TGHXmon5   Qghx_kW   
+TGHXout TRT TGhxIn   TGHXmon1   TGHXmon2  TGHXmon3  TGHXmon4  TGHXmon5   Qghx_kW    QGhx_kWExt	QGhx_kWReg
 
 ***********************************
 ** Online plotter
