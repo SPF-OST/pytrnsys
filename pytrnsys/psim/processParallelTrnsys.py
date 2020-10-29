@@ -473,6 +473,10 @@ class ProcessParallelTrnsys():
             self.logger.info('Generating plot of calculations across sets')
             self.plotCalculationsAcrossSets()
 
+        if 'scatterPlot' in self.inputs.keys():
+            self.logger.info('Generating scatter plot')
+            self.scatterPlot()
+
         if 'pathInfoToJson' in self.inputs.keys():
             self.logger.info('Writing information from path into results.json')
             self.transferPathInfoToJson()
@@ -1287,6 +1291,108 @@ class ProcessParallelTrnsys():
                 outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
                 outfile.writelines(lines)
                 outfile.close()
+
+    def scatterPlot(self):
+        pathFolder = self.inputs["pathBase"]
+        plotVariables = self.inputs['scatterPlot'][0]
+        differencePlot = False
+        xVariable = plotVariables[0]
+        yVariables = [plotVariables[1]]
+        if '-' in plotVariables[1]:
+            differencePlot = True
+            yVariables = plotVariables[1].split('-')
+        if len(plotVariables) > 2:
+            seriesVariable = plotVariables[2]
+        seriesVariable = ''
+
+        if self.inputs["typeOfProcess"] == "json":
+            resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+        else:
+            resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
+
+        xDict = {}
+        yDict = {}
+        diffDict = {}
+
+        for file in resultFiles:
+            with open(file) as f_in:
+                resultsDict = json.load(f_in)
+                resultsDict[''] = None
+
+            if xVariable not in resultsDict:
+                continue
+            for variable in yVariables:
+                if variable not in resultsDict:
+                    continue
+
+            if str(resultsDict[seriesVariable]) in xDict:
+                xDict[str(resultsDict[seriesVariable])].append(resultsDict[xVariable])
+                yDict[str(resultsDict[seriesVariable])].append(resultsDict[yVariables[0]])
+                if differencePlot:
+                    diffDict[str(resultsDict[seriesVariable])].append(resultsDict[yVariables[1]])
+            else:
+                xDict[str(resultsDict[seriesVariable])] = [resultsDict[xVariable]]
+                yDict[str(resultsDict[seriesVariable])] = [resultsDict[yVariables[0]]]
+                if differencePlot:
+                    diffDict[str(resultsDict[seriesVariable])] = [resultsDict[yVariables[1]]]
+
+        self.doc = latex.LatexReport('', '')
+        if 'latexNames' in self.inputs.keys():
+            if ':' in self.inputs['latexNames']:
+                latexNameFullPath = self.inputs['latexNames']
+            else:
+                latexNameFullPath = os.path.join(self.configPath, self.inputs['latexNames'])
+            self.doc.getLatexNamesDict(file=latexNameFullPath)
+        else:
+            self.doc.getLatexNamesDict()
+
+        fig1, ax1 = plt.subplots(constrained_layout=True)
+        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+        colorsCounter = 0
+
+        for entry in xDict:
+            if differencePlot:
+                for i in range(len(xDict[entry])):
+                    ax1.plot([xDict[entry][i],xDict[entry][i]],[diffDict[entry][i],yDict[entry][i]],'-',color='grey')
+                ax1.plot(xDict[entry], diffDict[entry], 'd', markeredgecolor=colors[colorsCounter], markerfacecolor='w',
+                         label=self.doc.getNiceLatexNames(entry) + ', ' + self.doc.getNiceLatexNames(yVariables[1]))
+                ax1.plot(xDict[entry], yDict[entry], 'd', color=colors[colorsCounter],
+                         label=self.doc.getNiceLatexNames(entry) + ', ' + self.doc.getNiceLatexNames(yVariables[0]))
+            else:
+                ax1.plot(xDict[entry], yDict[entry], 'd', color=colors[colorsCounter],
+                         label=self.doc.getNiceLatexNames(entry))
+            colorsCounter += 1
+        if seriesVariable != '':
+            ax1.legend(loc='best')
+        ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
+        if differencePlot:
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariables[0]) + ' / ' + self.doc.getNiceLatexNames(yVariables[1]))
+        else:
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariables[0]))
+
+        fileName = 'scatter_*' + xVariable
+        for name in yVariables:
+            fileName += '_' + name
+        fileName += '_' + seriesVariable
+        fileName = re.sub(r'[^\w\-_\. ]', '', fileName)
+
+        line = seriesVariable + '\t' +  xVariable
+        for name in yVariables:
+            line += '\t' + name
+        lines = line + '\n'
+        for key in xDict:
+            for i in range(len(xDict[key])):
+                line = key + '\t' + str(xDict[key][i]) + '\t' + str(yDict[key][i])
+                if differencePlot:
+                    line += '\t' + str(diffDict[key][i])
+                lines += line + '\n'
+
+        outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
+        outfile.writelines(lines)
+        outfile.close()
+
+        fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
+        plt.close()
 
     def transferPathInfoToJson(self):
         pathFolder = self.inputs["pathBase"]
