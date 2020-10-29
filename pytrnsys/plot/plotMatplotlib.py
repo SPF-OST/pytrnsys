@@ -898,8 +898,14 @@ class PlotMatplotlib():
                     bar.append(plot.bar(ind - move * width, variables13[i][showMonths]/positiveSum*100., width, color=self.myColorsIn[i], #color=tempColors[i],
                                         bottom=data_stack[i]/positiveSum*100.))
                 else:
-                    bar.append(plot.bar(ind - move * width, variables13[i][showMonths], width, color=self.myColorsIn[i], #color=tempColors[i],
-                                bottom=data_stack[i]))
+                    try:
+                        bar.append(
+                            plot.bar(ind - move * width, variables13[i][showMonths], width, color=self.myColorsIn[i],
+                                     bottom=data_stack[i]))
+                    except:
+                        bar.append(
+                            plot.bar(ind - move * width, variables13[i][showMonths], width, bottom=data_stack[i]))
+
             if printImb:
                 if style == 'relative':
                     bar.append(plot.bar(ind - move * width, data[-1][showMonths]/positiveSum*100., width, color='k',

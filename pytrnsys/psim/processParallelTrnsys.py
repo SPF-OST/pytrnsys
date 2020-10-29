@@ -358,6 +358,22 @@ class ProcessParallelTrnsys():
                                 casesInputs.append((baseClass, pathFolder, name, self.inputs))
 
         elif self.inputs["typeOfProcess"] == "config":
+            """
+            Processes the files that are specified in the process.config file
+            
+            This option is to be used with the following arguments in the process.config file:
+            
+            stringArray cities 
+            stringArray fileTypes 
+            
+            examples for cities:
+            
+            "GVE" "BER" "BAS" "SMA" "DAV" "OTL"
+            
+            examples for fileTypes:
+            
+            "sia" "hourly" "monthlyMean"
+            """
 
             for city in self.inputs["cities"][0]:
                 pathFolder = os.path.join(self.inputs["pathBase"], city)
@@ -1477,7 +1493,29 @@ class ProcessParallelTrnsys():
             self.plot = plot.PlotMatplotlib(language='en')
             self.plot.setPath(pathFolder)
             self.myShortMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-            namePdf = self.plot.plotMonthlyNBar(inVar, legend, self.doc.getNiceLatexNames(valueVariable), nameFile, 10, self.myShortMonths,useYear=True)
+            self.doc = latex.LatexReport('', '')
+            if 'latexNames' in self.inputs.keys():
+                if ':' in self.inputs['latexNames']:
+                    latexNameFullPath = self.inputs['latexNames']
+                else:
+                    latexNameFullPath = os.path.join(self.configPath,self.inputs['latexNames'])
+                self.doc.getLatexNamesDict(file=latexNameFullPath)
+            else:
+                self.doc.getLatexNamesDict()
+            if 'matplotlibStyle' in self.inputs.keys():
+                stylesheet = self.inputs['matplotlibStyle']
+            else:
+                stylesheet = 'word.mplstyle'
+            if stylesheet in plt.style.available:
+                self.stylesheet = stylesheet
+            else:
+                root = os.path.dirname(os.path.abspath(__file__))
+                self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
+            plt.style.use(self.stylesheet)
+            niceLegend = []
+            for entry in legend:
+                niceLegend.append(self.doc.getNiceLatexNames(entry))
+            namePdf = self.plot.plotMonthlyNBar(inVar, niceLegend, self.doc.getNiceLatexNames(valueVariable), nameFile, 10, self.myShortMonths,useYear=True)
             
 
 

@@ -1,0 +1,98 @@
+*******************************
+**BEGIN grid_connection.ddck
+*******************************
+    
+	
+*****************************************
+** grid connection for pv (when no battery is present). 
+** Author : Jeremias Schmidli (SCJ)
+** History: 
+** SCJ: First version 28.09.2020
+******************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** None
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 3
+elSysIn_Grid = PelFromGrid_kW
+elSysOut_PvToGrid  = PvToGrid_kW
+elSysOut_InvLoss = PelLossesDCAC
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+
+EQUATIONS 1
+myPelSystem_kW = (PelAuxTot_kW+PelContr_kW+PelPuSH_kW+PelPuDHW_kW+qAuxStoreDHW_KW+qAuxStoreSH_KW)
+
+**********************************************
+** Dependencies with overall variables 
+** Tamb HT cpWat
+** 
+**********************************************
+**None
+
+
+EQUATIONS 2    ! Stromverbrauch und Stromnetzbilanz THIS WILL BE ELIMINATED           ! System electricity consumption [kW]
+PelHeatSys_kW = myPelSystem_kW
+PelUsedTotal_kW = PelHeatSys_kW + PelHH_kW    !kW, Total konsumierter Strom des Gebaeudes [kW]
+
+**********************************
+** Generic constants
+**********************************
+
+** CONSTANTS 3 !Needed to run but no need here
+** PelFuelCell_kW = 0
+** PelFuelCellToBat_kW = 0
+** PelFuelCellToBui_kW = 0
+
+
+EQUATIONS 6
+PvToHH_kW      = MIN(PelPVAC_kW,PelHH_kW)
+PvToHeatSys_KW = MIN(PelPVAC_kW-PvToHH_kW,PelHeatSys_kW)
+
+PvExcess_kW    = MAX(PelPVAC_kW-PvToHH_kW-PvToHeatSys_KW,0)
+PvToGrid_kW = PvExcess_kW
+PelFromGrid_kW = MAX(PelUsedTotal_kW-PvToHH_kW-PvToHeatSys_KW,0.0)
+
+** Calculate ACDC inverter losses
+PelLossesDCAC =  elSysIn_PV*(1-inverterEffDCAC)
+
+
+
+UNIT 155 TYPE 65     ! Online Plotter PV
+PARAMETERS 12     
+5     ! 1 Nb. of left-axis variables
+3     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+1000     ! 4 Left axis maximum
+0    ! 5 Right axis minimum
+1000     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 8
+elSysIn_PV  elSysIn_Grid  elSysOut_PvToGrid  elSysOut_InvLoss  nix  nix  nix  nix  
+**     
+elSysIn_PV  elSysIn_Grid  elSysOut_PvToGrid  elSysOut_InvLoss  nix  nix  nix  nix 
+LABELS  3    
+Pel
+nix
+nix     
+		
