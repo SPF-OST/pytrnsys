@@ -732,6 +732,7 @@ class ProcessParallelTrnsys():
                             label = "{:.2f}".format(labelValue)
                         else:
                             label = labelValue
+                        label = self.doc.getNiceLatexNames(label)
                         labelSet.add(labelValue)
                         ax1.plot(myX, myY,
                                  style, color=seriesColors[key], label=label)
@@ -952,6 +953,7 @@ class ProcessParallelTrnsys():
                             label = "{:.2f}".format(labelValue)
                         else:
                             label = labelValue
+                        label = self.doc.getNiceLatexNames(label)
                         labelSet.add(labelValue)
                         ax1.plot(myX, myY,
                                  style, color=seriesColors[key], label=label)
