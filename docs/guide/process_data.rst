@@ -178,7 +178,7 @@ A calculations section could be of the following structure. A full working examp
     arguments and indicated by a ``=`` and conditions by ``:`` and stated as ``key:value``. A function call (optional
     arguments in square brackets) then looks like::
 
-        stringArray acrossSetsCalc "x-variable" "y-variable" "calculation variable" "equation 1" ["equation 2"] ... ["key 1:value 1"] ["key 2:value 2"] ...
+        stringArray acrossSetsCalc "x_variable" "y_variable" "calculation variable" "equation 1" ["equation 2"] ... ["key 1:value 1"] ["key 2:value 2"] ...
 
     Here ``calculation variable`` is a key of the results json-files and specifies what arguments can go into an
     equation. An example for an equation looks like::
@@ -280,7 +280,7 @@ parameters. The custom defined plots will automatically be added to the result p
     (or its equivalent) needs to be specified as ``daily`` or ``hourly`` (``heatingDataTimeStep``) when calling the
     function::
 
-        string fitHeatingLimit "y-variable" "heatingDataTimeStep"
+        string fitHeatingLimit "y_variable" "heatingDataTimeStep"
 
     A linear fit is done for ``daily``, while the data only are shown for ``hourly``.
 
@@ -299,7 +299,7 @@ parameters. The custom defined plots will automatically be added to the result p
     variable of the string array is shown on the x-axis. The second variable is shown on the y-axis. The third is
     represented as different lines, and the fourth as different marker styles::
 
-        stringArray comparePlot "x-variable" "y-variable" ["series 1 variable"] ["series 2 variable"]
+        stringArray comparePlot "x_variable" "y_variable" ["series 1 variable"] ["series 2 variable"]
 
     .. image:: ./resources/ComparisonPlot.png
         :width: 400
@@ -309,12 +309,30 @@ parameters. The custom defined plots will automatically be added to the result p
     Same as ``comparePlot``, but with the additional feature of imposing conditions on the data that is supposed to be
     plotted. For a ``key`` in the results json, a condition is indicated by a ``:`` and stated as ``key:value``::
 
-        stringArray comparePlotConditional "x-variable" "y-variable" ["series 1 variable"] ["series 2 variable"] ["key 1:value 1"] ["key 2:value 2"] ...
+        stringArray comparePlotConditional "x_variable" "y_variable" ["series 1 variable"] ["series 2 variable"] ["key 1:value 1"] ["key 2:value 2"] ...
 
 ``acrossSetsCalculationsPlot``
     Has the same basic functionality as ``acrossSetsCalc``, but can plot the results of equations provided::
 
-        stringArray plotCalculationsAcrossSets "x-variable" "y-variable" "calculation variable" "equation 1" ["equation 2"] ... ["key 1:value 1"] ["key 2:value 2"] ...
+        stringArray plotCalculationsAcrossSets "x_variable" "y_variable" "calculation variable" "equation 1" ["equation 2"] ... ["key 1:value 1"] ["key 2:value 2"] ...
+
+``scatterPlot``
+    Generates scatter plots::
+
+        stringArray scatterPlot "x_variable" "y_variable" ["series 1 variable"]
+
+    .. image:: ./resources/scatter.png
+        :width: 400
+        :alt: scatter
+
+    When a ``-`` is added to ``y_variable`` a scatter plot indicating differences is generated::
+
+        stringArray scatterPlot "x_variable" "y_variable 1-y_variable 2" ["series 1 variable"]
+
+    .. image:: ./resources/scatter_diff.png
+        :width: 400
+        :alt: scatter difference
+
 
 ``plotHourly``
     Hourly printed values can be displayed in a interactable html-plot that is created using the bokeh plotting library.
