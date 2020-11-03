@@ -60,6 +60,7 @@ class LatexReport():
         with open(latexFileFullPath) as js:
             self.latexNames = json.load(js)
             self.latexNames = {key: '$'+value+'$' if not value[0]=='$' else value for (key,value) in self.latexNames.items()}
+
     def getNiceLatexNames(self, name):
         if name in self.latexNames:
             niceName = self.latexNames[name]
