@@ -172,10 +172,10 @@ vWindAbove10=[49,1]
 	
 
 EQUATIONS 4	! Variable Shading
-Fsh_N = shd_fix_N * (AND(shadingConTemp,shadingControlN)*realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd+NOT(AND(shadingConTemp,shadingControlN))*win_g)	
-Fsh_S = shd_fix_S * (AND(shadingConTemp,shadingControlS)*realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd+NOT(AND(shadingConTemp,shadingControlS))*win_g)	! Wird Fenster g-Value im Model berücksichtigt??? Entsprechend dann XX ausfüllen bei ideal sind die Hälfte der Fenster geschlossen
-Fsh_E = shd_fix_E * (AND(shadingConTemp,shadingControlE)*realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd+NOT(AND(shadingConTemp,shadingControlE))*win_g)	
-Fsh_W = shd_fix_W * (AND(shadingConTemp,shadingControlW)*realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd+NOT(AND(shadingConTemp,shadingControlW))*win_g)	
+Fsh_N = shd_fix_N * (AND(shadingConTemp,shadingControlN)*(realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlN))*win_g)	
+Fsh_S = shd_fix_S * (AND(shadingConTemp,shadingControlS)*(realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlS))*win_g)	! Wird Fenster g-Value im Model berücksichtigt??? Entsprechend dann XX ausfüllen bei ideal sind die Hälfte der Fenster geschlossen
+Fsh_E = shd_fix_E * (AND(shadingConTemp,shadingControlE)*(realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlE))*win_g)	
+Fsh_W = shd_fix_W * (AND(shadingConTemp,shadingControlW)*(realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlW))*win_g)	
 	
 ****************************
 ** Air exchange 
