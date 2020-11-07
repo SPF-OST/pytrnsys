@@ -272,7 +272,7 @@ VfrWindowWeber = numberWindows*f_win*C_dWeber*C_k*widthWindow/3*(ABS(Troom-Tamb)
 VfrWindowHallFloor = numberWindows*f_win*C_dHallF*Aeff_Hall*(2*g_earth*heightWindow*Z_Hall*ABS(Troom-Tamb)/(Troom+273))^(m_Hall)	! Infiltration due window opening [m3/s] (Readout Textfile!) SCJ: what is scaleVfrWindow?
 VfrWindowHallRad = numberWindows*f_win*C_dHallR*Aeff_Hall*(2*g_earth*heightWindow*Z_Hall*ABS(Troom-Tamb)/((Troom+Tamb)/2+273))^(m_Hall)	! Infiltration due window opening [m3/s] (Readout Textfile!) SCJ: what is scaleVfrWindow?
 
-VfrWindow = LT(VentilationMode,2)*VfrWindowWeber+LT(VentilationMode,3)*GT(VentilationMode,1)*VfrWindowHallFloor+GT(VentilationMode,2)*VfrWindowHallRad
+** VfrWindow = LT(VentilationMode,2)*VfrWindowWeber+LT(VentilationMode,3)*GT(VentilationMode,1)*VfrWindowHallFloor+GT(VentilationMode,2)*VfrWindowHallRad
 
 ** VfrWindow = AND(GT(MOD(time,8760),2160),LT(MOD(time,8760),6552))*OR(GT(MOD(time,24),20),LT(MOD(time,24),7))*4.2*(ABS((Troom-Tamb))/((Troom+Tamb)/2+273))^(0.5)	! Infiltration due window opening [m3/s] (Readout Textfile!)
 etaHeatRec = 0.8*NOT(summerVentOn)	! Heatrecovery efficiency of the ventilation system
