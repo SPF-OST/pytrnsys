@@ -42,7 +42,7 @@ shd_fix_W = 0.82	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc.
 ** VfrWindow = AND(GT(MOD(time,8760),2160),LT(MOD(time,8760),6552))*OR(GT(MOD(time,24),20),LT(MOD(time,24),7))*4.2*(ABS((Troom-Tamb))/((Troom+Tamb)/2+273))^(0.5)*ScaleVfrWindow	! Infiltration due window opening [m3/s] (Readout Textfile!)
 
 
-CONSTANTS 14
+CONSTANTS 13
 ********Fitted parameters***********
 Cm = 814754369.89*scaleBuilding ! J/K Internal capacity of the building J/K, 165000*(floor surface), "moyen" / mittlere therm. Kapazität
 Am = 5446*scaleBuilding      ! m2 effective mass area, 2.5*(floor surface), "moyen" / mittlere therm. Kapazität
@@ -53,7 +53,6 @@ Htr_op = 306.1*scaleBuilding ! Igor W/K, UA value of walls
 PGainPer = 1478*scaleBuilding	! Maximale Wärmeeintrag durch Personen [W] Mattia:1440
 PGainEquip = 7852*scaleBuilding	! Maximaler Wärmeeintrag durch Geräte [W] Mattia:7649.2
 PGainLight = 0!  7649.2*0.75	Maximaler Wärmeeintrag durch Beleuchtung [W]
-ScaleVfrWindow = 0.6667
 ScaleVfrVent = 0.6542
 VfrInfRealAHU=0* AreaBui / 3600			! Infiltration  [m3/s](from m3/hm2) for real user behavior and AHU 
 VfrInfRealnoAHU=0.15 * AreaBui / 3600	! Infiltration  [m3/s](from m3/hm2) for real user behavior and no AHU
