@@ -63,7 +63,7 @@ VfrVent = 0.25	! Ventilation  [m3/s]
 **VfrVent = 0.33*ScaleVfrVent*scaleBuilding	! Ventilation  [m3/s] Fit Mattia
 
 CONSTANTS 4
-alphaWindow = 5
+alphaWindow = 7.5
 heightWindow = 1.43
 widthWindow = 0.88
 numberWindows = 33

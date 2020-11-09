@@ -52,7 +52,7 @@ CoolingNeeded = OR(AND(GE(TroomRc,TroomSetCool-dTCool),CoolingNeededRc),GE(Troom
 CONSTANTS 6
 realUserBehaviour = 1 !User behaviour for window ventialtion and shading, 1 means realistic, 0 means ideal
 useAHU = 1 !Air handling unit (1 means with, 0 wihtout AHU)
-VentilationMode=2 !1 Weber, 2 Hall Radiatiors, 3 Hall floor
+VentilationMode=1 !1 Weber, 2 Hall Radiatiors, 3 Hall floor
 upperShadeT = 21*realUserBehaviour + 24*NOT(realUserBehaviour)
 lowerShadeT = 20*realUserBehaviour + 22*NOT(realUserBehaviour)
 
@@ -172,10 +172,13 @@ vWindAbove10=[49,1]
 	
 
 EQUATIONS 4	! Variable Shading
-Fsh_N = shd_fix_N * (AND(shadingConTemp,shadingControlN)*(realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlN))*win_g)
-Fsh_S = shd_fix_S * (AND(shadingConTemp,shadingControlS)*(realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlS))*win_g)	! Wird Fenster g-Value im Model berücksichtigt??? Entsprechend dann XX ausfüllen bei ideal sind die Hälfte der Fenster geschlossen
-Fsh_E = shd_fix_E * (AND(shadingConTemp,shadingControlE)*(realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlE))*win_g)
-Fsh_W = shd_fix_W * (AND(shadingConTemp,shadingControlW)*(realUserBehaviour*win_g*0.5 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlW))*win_g)
+**FshBalc=MAX(0,(2.6-1/ABS(TAN(AISZ)+0.0001)*3.15)/2.6)!shading from real balcny geometry
+**FshWall=MAX(0,(12-ABS(TAN(AISA))*3.15)/12)!shading from real balcny geometry
+Fsh_N = shd_fix_N * (AND(shadingConTemp,shadingControlN)*win_g_shd+NOT(AND(shadingConTemp,shadingControlN))*win_g)
+**Fsh_S = (0.1*shd_fix_S +0.9*FshBalc*FshWall)* (AND(shadingConTemp,shadingControlS)*(realUserBehaviour*win_g*0.7 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlS))*win_g)	! Wird Fenster g-Value im Model berücksichtigt??? Entsprechend dann XX ausfüllen bei ideal sind die Hälfte der Fenster geschlossen
+Fsh_S = shd_fix_S * (AND(shadingConTemp,shadingControlS)*win_g_shd+NOT(AND(shadingConTemp,shadingControlS))*win_g)	! Wird Fenster g-Value im Model berücksichtigt??? Entsprechend dann XX ausfüllen bei ideal sind die Hälfte der Fenster geschlossen
+Fsh_E = shd_fix_E * (AND(shadingConTemp,shadingControlE)*win_g_shd+NOT(AND(shadingConTemp,shadingControlE))*win_g)
+Fsh_W = shd_fix_W * (AND(shadingConTemp,shadingControlW)*win_g_shd+NOT(AND(shadingConTemp,shadingControlW))*win_g)
 	
 ****************************
 ** Air exchange 
@@ -187,7 +190,7 @@ CONSTANTS 13
 **widthWindow = 0.94	!moved to parameters
 **numberWindows = 42	!moved to parameters
 g_earth = 9.81
-s_Hall= 0.135 ! distance of window from wall to frame when tilted [m] (0.1 m)
+s_Hall= 0.1 ! distance of window from wall to frame when tilted [m] (Hall: 0.1 m)
 y_Hall=0.01 !distance between the blind frame and sash [m] (0.01 m) [Hall]
 d_Hall=0.05 !frame size of window [m] (0.05 m)
 m_Hall=0.6 !air flow exponent [-] (0.6)
