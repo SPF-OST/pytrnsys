@@ -256,6 +256,8 @@ class ProcessParallelTrnsys():
                 a = 1
 
             for relPath in relPaths:
+                if relPath == '.':
+                    continue
                 name = Path(relPath).parts[-1]
                 folderUsed = True
                 for i in range(len(self.filteredfolder)):

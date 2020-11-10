@@ -1,6 +1,4 @@
 import setuptools
-from glob import glob
-import os
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
@@ -8,7 +6,7 @@ with open("README.rst", "r") as fh:
 setuptools.setup(
     name = "pytrnsys",
     packages=setuptools.find_packages(),
-    version="0.3",
+    version="0.4",
     author="Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Martin Neugebauer",
     author_email="martin.neugebauer@spf.ch",
     description="pytrnsys simulation framework",
