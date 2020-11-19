@@ -11,7 +11,7 @@ import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 import matplotlib.pyplot as plt
 import matplotlib
 import os
-import pytrnsys.plot.plotMatplotlib
+import pytrnsys.plot.plotMatplotlib as plotMatplotlib
 import numpy as num
 
 class PlotTrnsysUtils():
@@ -54,8 +54,8 @@ class PlotTrnsysUtils():
     def load(self, _name):
         self.readTrnsysFiles.readUserDefinedFiles(_name)
 
-    def loadHourly(self, _name):
-        self.readTrnsysFiles.readHourlyFiles(_name)
+    def loadHourly(self, _name,firstConsideredTime=8760):
+        self.readTrnsysFiles.readHourlyFiles(_name,firstConsideredTime=firstConsideredTime)
 
     def setYLabel(self,ylabel):
         self.yLabel = ylabel

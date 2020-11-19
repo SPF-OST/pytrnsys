@@ -982,14 +982,14 @@ class ProcessParallelTrnsys():
             # box = ax1.get_position()
             # ax1.set_position([box.x0, box.y0, box.width, box.height])
 
-            if chunkVariable is not '':
+            if chunkVariable !='':
                 legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
                                       title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0),
                                       bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
-            if seriesVariable is not '':
+            if seriesVariable !='':
                 legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.2, 1.0),
                                       bbox_transform=ax1.transAxes)
 
@@ -1230,14 +1230,14 @@ class ProcessParallelTrnsys():
                 line = "\n";
                 lines = lines + line
 
-            if chunkVariable is not '':
+            if chunkVariable !='':
                 legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
                                       title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0),
                                       bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
-            if calculationVariable is not '':
+            if calculationVariable !='':
                 legend1 = fig1.legend(title=self.doc.getNiceLatexNames(calculationVariable), bbox_to_anchor=(1.2, 1.0),
                                       bbox_transform=ax1.transAxes)
 

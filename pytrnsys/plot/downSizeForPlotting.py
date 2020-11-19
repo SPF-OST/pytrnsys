@@ -97,9 +97,24 @@ class DownSizeForPlotting():
                     logger.info("RECALCULATE COLUMN :%d with factor :%f"%(column[k],factor[k]))
                     for i in range(len(self.variablesDownSized)):                         
                         self.variablesDownSized[i][j] = self.variablesDownSized[i][j]*factor[k]
-            
-            
 
 
-        
-  
+    def createDataFile(self):
+        # I include here TinIce and tOutIce because the test switch from ice mode to deice and therefore tIn and tOut are exchanged
+
+        header = ""
+        myName = "%s/%s-DownSized.dat" % (self.path, self.name)
+
+        line = "Down sized tool for printing purposes\n";
+        header = header + line
+        line = "File processed with DownSizeExp.py at %s\n" % (time.strftime('%c'));
+        header = header + line
+        line = "Author:DCarbonell. Version v1 \n";
+        header = header + line
+
+
+
+        header = header + line
+        formatPrint = "%-10.5f"
+
+        num.savetxt(myName, self.variablesDownSized, fmt=formatPrint, header=header, comments='! ')

@@ -34,7 +34,9 @@ class PlotBokeh():
         self.counter=0
         self.fileNameUsed = []
 
-        
+        self.plotWidth  = 1000#800
+        self.plotHeight = 600#250
+
     def createBokehPlot(self,df,path,fileName,inputKeys,showPlot=False,sortPlots=False):
 
         if(fileName in self.fileNameUsed):
@@ -112,9 +114,9 @@ class PlotBokeh():
             key = keysList[i]
 
             if i == 0:
-                plotsDict[key]['fig']=figure(plot_width=800, plot_height=250, x_axis_type="datetime", tools=TOOLS)
+                plotsDict[key]['fig']=figure(plot_width=self.plotWidth, plot_height=self.plotHeight, x_axis_type="datetime", tools=TOOLS)
             else:
-                plotsDict[key]['fig'] = figure(plot_width=800,x_range=plotsDict[keysList[0]]['fig'].x_range, plot_height=250, x_axis_type="datetime", tools=TOOLS)
+                plotsDict[key]['fig'] = figure(plot_width=self.plotWidth,x_range=plotsDict[keysList[0]]['fig'].x_range, plot_height=self.plotHeight, x_axis_type="datetime", tools=TOOLS)
             for column in plotsDict[key]['columns']:
                 plotsDict[key]['fig'].line(timeArray, df[column], color=next(colors), alpha = 0.5, legend_label = column)
                 # plotsDict[key]['fig'].line(timeArray, df[column], color=next(colors), alpha = 0.5)
