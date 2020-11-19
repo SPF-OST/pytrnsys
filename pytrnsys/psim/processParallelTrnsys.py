@@ -94,7 +94,7 @@ def processDataGeneral(casesInputs):
         test.loadAndProcessGeneric()
 
     # rename files if multiple years are available:
-    if inputs["yearReadedInMonthlyFile"] != -1:
+    if inputs["yearReadedInMonthlyFile"] != -1 and inputs["typeOfProcess"] != 'json':
         renameFile = os.path.join(locationPath, fileName, fileName)
 
         fileEndingsDefault = ["-results.json", "-report.pdf","-plots.html"]
@@ -146,7 +146,7 @@ class ProcessParallelTrnsys():
         self.inputs["maxMinAvoided"] = False
         self.inputs["yearReadedInMonthlyFile"] = -1
         self.inputs["process"] = True
-        self.inputs["firstMonthUsed"] = 6     # 0=January 1=February 7=August
+        self.inputs["firstMonth"] = "January"     # 0=January 1=February 7=August
         self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder" # "casesDefined"
         self.inputs["forceProcess"]  =  True #even if results file exist it proceess the results, otherwise it checks if it exists
@@ -253,8 +253,11 @@ class ProcessParallelTrnsys():
                 fileName = [Path(name).parts[-2] for name in files]
                 relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
                 relPaths = list(dict.fromkeys(relPaths))  # remove duplicates due to folders containing more than one json files
+                a = 1
 
             for relPath in relPaths:
+                if relPath == '.':
+                    continue
                 name = Path(relPath).parts[-1]
                 folderUsed = True
                 for i in range(len(self.filteredfolder)):
@@ -357,6 +360,22 @@ class ProcessParallelTrnsys():
                                 casesInputs.append((baseClass, pathFolder, name, self.inputs))
 
         elif self.inputs["typeOfProcess"] == "config":
+            """
+            Processes the files that are specified in the process.config file
+            
+            This option is to be used with the following arguments in the process.config file:
+            
+            stringArray cities 
+            stringArray fileTypes 
+            
+            examples for cities:
+            
+            "GVE" "BER" "BAS" "SMA" "DAV" "OTL"
+            
+            examples for fileTypes:
+            
+            "sia" "hourly" "monthlyMean"
+            """
 
             for city in self.inputs["cities"][0]:
                 pathFolder = os.path.join(self.inputs["pathBase"], city)
@@ -471,6 +490,14 @@ class ProcessParallelTrnsys():
         if 'acrossSetsCalculationsPlot' in self.inputs.keys():
             self.logger.info('Generating plot of calculations across sets')
             self.plotCalculationsAcrossSets()
+
+        if 'scatterPlot' in self.inputs.keys():
+            self.logger.info('Generating scatter plot')
+            self.scatterPlot()
+
+        if 'pathInfoToJson' in self.inputs.keys():
+            self.logger.info('Writing information from path into results.json')
+            self.transferPathInfoToJson()
 
         if 'calcClimateCorrections' in self.inputs.keys():
             self.calculateClimateCorrections()
@@ -707,6 +734,7 @@ class ProcessParallelTrnsys():
                             label = "{:.2f}".format(labelValue)
                         else:
                             label = labelValue
+                        label = self.doc.getNiceLatexNames(label)
                         labelSet.add(labelValue)
                         ax1.plot(myX, myY,
                                  style, color=seriesColors[key], label=label)
@@ -927,6 +955,7 @@ class ProcessParallelTrnsys():
                             label = "{:.2f}".format(labelValue)
                         else:
                             label = labelValue
+                        label = self.doc.getNiceLatexNames(label)
                         labelSet.add(labelValue)
                         ax1.plot(myX, myY,
                                  style, color=seriesColors[key], label=label)
@@ -1283,6 +1312,126 @@ class ProcessParallelTrnsys():
                 outfile.writelines(lines)
                 outfile.close()
 
+    def scatterPlot(self):
+        pathFolder = self.inputs["pathBase"]
+        plotVariables = self.inputs['scatterPlot'][0]
+        differencePlot = False
+        xVariable = plotVariables[0]
+        yVariables = [plotVariables[1]]
+        if '-' in plotVariables[1]:
+            differencePlot = True
+            yVariables = plotVariables[1].split('-')
+        if len(plotVariables) > 2:
+            seriesVariable = plotVariables[2]
+        seriesVariable = ''
+
+        if self.inputs["typeOfProcess"] == "json":
+            resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+        else:
+            resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
+
+        xDict = {}
+        yDict = {}
+        diffDict = {}
+
+        for file in resultFiles:
+            with open(file) as f_in:
+                resultsDict = json.load(f_in)
+                resultsDict[''] = None
+
+            if xVariable not in resultsDict:
+                continue
+            for variable in yVariables:
+                if variable not in resultsDict:
+                    continue
+
+            if str(resultsDict[seriesVariable]) in xDict:
+                xDict[str(resultsDict[seriesVariable])].append(resultsDict[xVariable])
+                yDict[str(resultsDict[seriesVariable])].append(resultsDict[yVariables[0]])
+                if differencePlot:
+                    diffDict[str(resultsDict[seriesVariable])].append(resultsDict[yVariables[1]])
+            else:
+                xDict[str(resultsDict[seriesVariable])] = [resultsDict[xVariable]]
+                yDict[str(resultsDict[seriesVariable])] = [resultsDict[yVariables[0]]]
+                if differencePlot:
+                    diffDict[str(resultsDict[seriesVariable])] = [resultsDict[yVariables[1]]]
+
+        self.doc = latex.LatexReport('', '')
+        if 'latexNames' in self.inputs.keys():
+            if ':' in self.inputs['latexNames']:
+                latexNameFullPath = self.inputs['latexNames']
+            else:
+                latexNameFullPath = os.path.join(self.configPath, self.inputs['latexNames'])
+            self.doc.getLatexNamesDict(file=latexNameFullPath)
+        else:
+            self.doc.getLatexNamesDict()
+
+        fig1, ax1 = plt.subplots(constrained_layout=True)
+        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+        colorsCounter = 0
+
+        for entry in xDict:
+            if differencePlot:
+                for i in range(len(xDict[entry])):
+                    ax1.plot([xDict[entry][i],xDict[entry][i]],[diffDict[entry][i],yDict[entry][i]],'-',color='grey')
+                ax1.plot(xDict[entry], diffDict[entry], 'd', markeredgecolor=colors[colorsCounter], markerfacecolor='w',
+                         label=self.doc.getNiceLatexNames(entry) + ', ' + self.doc.getNiceLatexNames(yVariables[1]))
+                ax1.plot(xDict[entry], yDict[entry], 'd', color=colors[colorsCounter],
+                         label=self.doc.getNiceLatexNames(entry) + ', ' + self.doc.getNiceLatexNames(yVariables[0]))
+            else:
+                ax1.plot(xDict[entry], yDict[entry], 'd', color=colors[colorsCounter],
+                         label=self.doc.getNiceLatexNames(entry))
+            colorsCounter += 1
+        if seriesVariable != '':
+            ax1.legend(loc='best')
+        ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
+        if differencePlot:
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariables[0]) + ' / ' + self.doc.getNiceLatexNames(yVariables[1]))
+        else:
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariables[0]))
+
+        fileName = 'scatter_*' + xVariable
+        for name in yVariables:
+            fileName += '_' + name
+        fileName += '_' + seriesVariable
+        fileName = re.sub(r'[^\w\-_\. ]', '', fileName)
+
+        line = seriesVariable + '\t' +  xVariable
+        for name in yVariables:
+            line += '\t' + name
+        lines = line + '\n'
+        for key in xDict:
+            for i in range(len(xDict[key])):
+                line = key + '\t' + str(xDict[key][i]) + '\t' + str(yDict[key][i])
+                if differencePlot:
+                    line += '\t' + str(diffDict[key][i])
+                lines += line + '\n'
+
+        outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
+        outfile.writelines(lines)
+        outfile.close()
+
+        fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
+        plt.close()
+
+    def transferPathInfoToJson(self):
+        pathFolder = self.inputs["pathBase"]
+        resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+        parameterName = self.inputs['pathInfoToJson'][0][0]
+        possibleKeys = self.inputs['pathInfoToJson'][0][1:]
+        for file in resultFiles:
+            with open(file) as f_in:
+                resultsDict = json.load(f_in)
+            keyNotFound = True
+            for key in possibleKeys:
+                if key in file:
+                    resultsDict[parameterName] = key
+                    keyNotFound = False
+            if keyNotFound:
+                resultsDict[parameterName] = ''
+            with open(file, 'w') as f_out:
+                json.dump(resultsDict, f_out, indent=2, separators=(',', ': '))
+
     def printBoxPlotGLEData(self):
         pathFolder = self.inputs["pathBase"]
         for SPFload in self.inputs['printBoxPlotGLEData']:
@@ -1348,7 +1497,29 @@ class ProcessParallelTrnsys():
             self.plot = plot.PlotMatplotlib(language='en')
             self.plot.setPath(pathFolder)
             self.myShortMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-            namePdf = self.plot.plotMonthlyNBar(inVar, legend, self.doc.getNiceLatexNames(valueVariable), nameFile, 10, self.myShortMonths,useYear=True)
+            self.doc = latex.LatexReport('', '')
+            if 'latexNames' in self.inputs.keys():
+                if ':' in self.inputs['latexNames']:
+                    latexNameFullPath = self.inputs['latexNames']
+                else:
+                    latexNameFullPath = os.path.join(self.configPath,self.inputs['latexNames'])
+                self.doc.getLatexNamesDict(file=latexNameFullPath)
+            else:
+                self.doc.getLatexNamesDict()
+            if 'matplotlibStyle' in self.inputs.keys():
+                stylesheet = self.inputs['matplotlibStyle']
+            else:
+                stylesheet = 'word.mplstyle'
+            if stylesheet in plt.style.available:
+                self.stylesheet = stylesheet
+            else:
+                root = os.path.dirname(os.path.abspath(__file__))
+                self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
+            plt.style.use(self.stylesheet)
+            niceLegend = []
+            for entry in legend:
+                niceLegend.append(self.doc.getNiceLatexNames(entry))
+            namePdf = self.plot.plotMonthlyNBar(inVar, niceLegend, self.doc.getNiceLatexNames(valueVariable), nameFile, 10, self.myShortMonths,useYear=True)
             
 
 

@@ -102,7 +102,7 @@ class loadBase():
         
         if(self.verbose): 
             print ("End of copying Data")
-            print ("numberOfDataPoints:%d numberOfVariables:%d\n") % (self.numberOfDataPoints,self.numberOfVariables)
+            print ("numberOfDataPoints:%d numberOfVariables:%d\n", self.numberOfDataPoints,self.numberOfVariables)
 #        print self.namesVariables
         
         infile.close()        

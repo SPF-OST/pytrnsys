@@ -261,6 +261,9 @@ ID_H      ! Weather data:sky diffuse radiation on horizontal ->Diffuse radiation
 CONSTANTS 1
 unitPrinterWeather=45
 
+EQUATIONS 1
+one = 1 ! this is needed to get the total hours per month
+
 ASSIGN    temp\WEATHER_BASE_MO.Prt     unitPrinterWeather
 	
 UNIT 45 Type 46     ! Printegrator Monthly Values for Weather data
@@ -271,10 +274,9 @@ unitPrinterWeather    ! 1: Logical unit number, -
 -1     ! 4: Printing & integrating interval, h. -1 for monthly integration
 1     ! 5: Number of inputs to avoid integration, -
 1     ! 6: Output number to avoid integration
-INPUTS 3  
-Tamb IT_H_KW IB_H_kW
-****
-Tamb IT_H_KW IB_H_kW
+INPUTS 5  
+Time Tamb one IT_H_KW IB_H_kW
+Time Tamb hoursInMonth IT_H_KW IB_H_kW
 
    
 

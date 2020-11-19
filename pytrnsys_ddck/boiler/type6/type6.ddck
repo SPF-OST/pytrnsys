@@ -17,7 +17,7 @@
 ***********************************
 EQUATIONS 2
 TBoilerIn = TPiAuxIn
-MfrBoilerIn = ABS(MfrPiAuxIn
+MfrBoilerIn = ABS(MfrPiAuxIn)
 
 
 ***********************************

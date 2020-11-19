@@ -60,6 +60,7 @@ class LatexReport():
         with open(latexFileFullPath) as js:
             self.latexNames = json.load(js)
             self.latexNames = {key: '$'+value+'$' if not value[0]=='$' else value for (key,value) in self.latexNames.items()}
+
     def getNiceLatexNames(self, name):
         if name in self.latexNames:
             niceName = self.latexNames[name]
@@ -306,7 +307,7 @@ class LatexReport():
         line="\\begin{adjustbox}{max width =\\textwidth}\n" ; self.lines = self.lines + line
 
         # line="{\n" ;self.lines = self.lines + line
-
+        print(_names, len(_names), "TEST _names")
         line="\\begin{tabular}{l | "; self.lines = self.lines + line
         for i in range(len(_names)-1):
              line = "c "; self.lines = self.lines + line 

@@ -3,16 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+pytrnsys
+========
 
-Welcome to the pytrnsys documentation!
-======================================
+The pytrnsys package provides a complete python-based framework to run, process, plot, and report TRNSYS simulations.
+It is designed to give researchers a fast, fully automatized, and reproducible way to execute and share TRNSYS
+simulations by the use of a single short configuration file. In addition, a large variety of commands is accessible
+to post-process simulation results in one shot. This functionality extends beyond processing TRNSYS generated data and
+can also be used for generic data.
 
-The pytrnsys package provides a complete framework to run and process, plot and report
-TRNSYS simulations. It is designed to give researchers a fast,
-fully automatized and easily reproducible way to execute and share TRNSYS simulations by the use of a single short
-configuration file. In addition, a large variety of commands is accessible
-to post-process simulation results in one shot.
-For more details checkout the :any:`reference <pytrnsys>`.
+The package was developed at the `SPF - Institute for Solar Technology <https://www.spf.ch/>`_ at the `OST - Eastern
+Switzerland University of Applied Sciences <https://www.ost.ch/>`_.
+
+.. image:: ./guide/resources/logos.svg
+      :width: 600
+      :alt: logos
 
 Table of contents
 =================
@@ -20,14 +25,15 @@ Table of contents
 .. toctree::
    :maxdepth: 2
 
-   guide/index
+   guide/getting_started
    guide/tutorial
    guide/config_file
+   guide/run_simulation
+   guide/process_data
    guide/example_systems
    guide/ddck_repository
    guide/developers_guide
    Code Reference <modules>
-
 
 Indices and tables
 ==================
@@ -35,11 +41,6 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-About
------
-This code was not initially developed with the intention to be shared with others outside our institute SPF,
-but after realizing that it could help the community to have a better workflow with TRNSYS, we decided to share it.
 
 Developers
 ^^^^^^^^^^
@@ -49,8 +50,6 @@ Developers
 - Jeremias Schmidli : SPF Institute for Solar Technology, Rapperswil, Switzerland.
 - Maike Schubert : SPF Institute for Solar Technology, Rapperswil, Switzerland.
 - Martin Neugebauer : SPF Institute for Solar Technology, Rapperswil, Switzerland.
-
-
 
 Acknowledgments
 ^^^^^^^^^^^^^^^
