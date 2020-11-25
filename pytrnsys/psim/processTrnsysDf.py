@@ -431,8 +431,9 @@ class ProcessTrnsysDf():
         if "plotTimestepQvsT" in self.inputs.keys():
             InputListQvsT = self.inputs["plotTimestepQvsT"][0]
             QvsTDf = self.steDataDf
+            myFactor = 120/3600.
             logger.debug("stepDfUsed")
-            self.loadQvsTConfig(QvsTDf,InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False)
+            self.loadQvsTConfig(QvsTDf,InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False,factor=myFactor)
         else:
             pass
 
@@ -817,6 +818,13 @@ class ProcessTrnsysDf():
             self.yearlyMin = {value + '_Min': self.steDataDf[value].min() for value in self.steDataDf.columns}
             self.yearlyMax = {value + '_Max': self.steDataDf[value].max() for value in self.steDataDf.columns}
 
+        for equation in self.inputs['calcTest']:
+            namespace = {**self.deckData,**self.__dict__,**self.yearlySums,**self.yearlyMin,**self.yearlyMax,**self.yearlyAvg}
+            expression = equation.replace(' ','')
+            exec(expression,globals(),namespace)
+            self.deckData = namespace
+            logger.debug(expression)
+
     def addPlotConfigEquation(self):
         for equation in self.inputs['calcMonthly']:
 
@@ -860,14 +868,14 @@ class ProcessTrnsysDf():
             #                            sizeBox=15)
 
     def loadQvsTConfig(self, df,inputs, year=False, useOnlyOneYear=False, monthsSplit=[], normalized=False,
-                 cut=False):
+                 cut=False,factor=1):
 
         self.QvsTInput = inputs
 
-        factor = 1.
         tFlow = []
         eCum = []
         legend = []
+        factor=factor/1000. #from kWh to MWh
 
         if "QvsTnormalized" in self.inputs.keys():
             self.QvsTNorm = self.inputs["QvsTnormalized"]

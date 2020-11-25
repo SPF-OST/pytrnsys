@@ -85,6 +85,9 @@ class ReadConfigTrnsys():
         if "calc" not in inputs:
             inputs["calc"]=[]
 
+        if "calcTest" not in inputs:
+            inputs["calcTest"]=[]
+
         if "calcCumSumHourly" not in inputs:
             inputs["calcCumSumHourly"]=[]
 
@@ -187,6 +190,9 @@ class ReadConfigTrnsys():
                     inputs["calcCumSumTimeStep"].append(splitLine[1])
                 else:
                     inputs["calcCumSumTimeStep"].append(splitLine[1:])
+
+            elif (splitLine[0]== "calcTest"):
+                inputs["calcTest"].append(" ".join(splitLine[1:]))
 
             else:
                 if(controlDataType):

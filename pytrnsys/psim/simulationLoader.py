@@ -202,7 +202,7 @@ class SimulationLoader():
                 dict = {k: num.array(v.tolist()) for k, v in file[cols_to_use].items()}
                 self.steData = {**self.steData, **dict}
 
-    def _fileSniffer(self, file): #detects which kind of file to we need to read
+    def _fileSniffer(self, file): #detects which kind of file we need to read
         with open(file) as f:
             for i in range(3):
                 if 'Month' in f.readline():
