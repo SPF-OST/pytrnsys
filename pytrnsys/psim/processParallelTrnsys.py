@@ -30,7 +30,7 @@ except ImportError:
 import pytrnsys.utils.log as log
 
 
-def processDataGeneral(casesInputs):
+def processDataGeneral(casesInputs,withIndividualFiles = False):
     """
     processes all the specified cases
 
@@ -43,8 +43,10 @@ def processDataGeneral(casesInputs):
     -------
 
     """
-
-    (baseClass,locationPath, fileName, inputs) = casesInputs
+    if withIndividualFiles:
+        (baseClass,locationPath, fileName, inputs, individualFiles) = casesInputs
+    else:
+        (baseClass,locationPath, fileName, inputs) = casesInputs
 
     #    locationPath = inputs.pop(0)
     #    fileName,avoidUser,maxMinAvoided,yearReadedInMonthlyFile,cleanModeLatex,firstMonthUsed,processQvsT
@@ -57,6 +59,8 @@ def processDataGeneral(casesInputs):
 
 
     test.setInputs(inputs)
+    if inputs['typeOfProcess'] == 'individual':
+        test.setIndividualFiles(individualFiles)
     if 'latexNames' in inputs.keys():
         test.setLatexNamesFile(inputs['latexNames'])
     else:
@@ -170,6 +174,8 @@ class ProcessParallelTrnsys():
 
         self.inputs["comparePlotUserName"] = "" #don't change this default value
 
+        self.individualFile = False
+
     def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
 
@@ -181,11 +187,13 @@ class ProcessParallelTrnsys():
         if 'latexNames' in self.inputs.keys():
             if ':' not in self.inputs['latexNames']:
                 self.inputs['latexNames'] = os.path.join(self.configPath, self.inputs['latexNames'])
+        if 'fileToLoad' in self.inputs.keys():
+            self.individualFile = True
 
 
     def getBaseClass(self, classProcessing, pathFolder, fileName):
 
-       return processTrnsys.ProcessTrnsysDf(pathFolder, fileName)
+       return processTrnsys.ProcessTrnsysDf(pathFolder, fileName,individualFile=self.individualFile)
 
     def isStringNumber(self,sample):
         """
@@ -253,7 +261,6 @@ class ProcessParallelTrnsys():
                 fileName = [Path(name).parts[-2] for name in files]
                 relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
                 relPaths = list(dict.fromkeys(relPaths))  # remove duplicates due to folders containing more than one json files
-                a = 1
 
             for relPath in relPaths:
                 if relPath == '.':
@@ -285,6 +292,64 @@ class ProcessParallelTrnsys():
                         #                     self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
 
                         casesInputs.append((baseClass,pathFolder, name, self.inputs))
+
+            pathFolder = self.inputs["pathBase"]
+
+            if (self.inputs["typeOfProcess"] == "completeFolder"):
+                files = glob.glob(os.path.join(pathFolder, "**/*.lst"), recursive=True)
+                fileName = [Path(name).parts[-2] for name in files]
+                relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
+
+            elif (self.inputs["typeOfProcess"] == "json"):
+                files = glob.glob(os.path.join(pathFolder, "**/*.json"), recursive=True)
+                fileName = [Path(name).parts[-2] for name in files]
+                relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
+                relPaths = list(dict.fromkeys(relPaths))  # remove duplicates due to folders containing more than one json files
+
+            for relPath in relPaths:
+                if relPath == '.':
+                    continue
+                name = Path(relPath).parts[-1]
+                folderUsed = True
+                for i in range(len(self.filteredfolder)):
+                    if (name == self.filteredfolder[i]):
+                        folderUsed=False
+                if(folderUsed):
+                    nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (relPath, name))
+
+                    if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
+                        self.logger.debug("file :%s already processed" % name)
+
+                    elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (relPath, name))) and  self.inputs["forceProcess"] == False:
+                        self.logger.debug("file :%s already processed" % name)
+
+                    else:
+                        if len(Path(relPath).parts)>1:
+                            newPath = os.path.join(pathFolder,os.path.join(*list(Path(relPath).parts[:-1])))
+                        else:
+                            newPath = pathFolder
+                        baseClass = self.getBaseClass(self.inputs["classProcessing"],newPath,name)
+
+                        self.logger.debug("file :%s will be processed" % name)
+                        # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
+                        #                     self.inputs["cleanModeLatex"],self.inputs["firstMonthUsed"],self.inputs["processQvsT"],self.inputs["firstMonthUsed"],self.inputs["buildingArea"],\
+                        #                     self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
+
+                        casesInputs.append((baseClass,pathFolder, name, self.inputs))
+
+        elif self.inputs["typeOfProcess"] == "individual":
+            self.individualFiles = []
+            for file in self.inputs['fileToLoad']:
+                fileDict = {}
+                fileDict['timeStep'] = file[0]
+                fileDict['path'] = self.inputs[file[1]]
+                fileDict['name'] = file[2]
+                self.individualFiles += [fileDict]
+
+            for fileDict in self.individualFiles:
+                baseClass = self.getBaseClass(self.inputs["classProcessing"], fileDict['path'], fileDict['name'])
+                self.logger.debug("file :%s will be processed" % fileDict['name'])
+                casesInputs.append((baseClass, fileDict['path'], fileDict['name'], self.inputs, self.individualFiles))
 
         elif self.inputs["typeOfProcess"] == "casesDefined":
 
@@ -461,7 +526,10 @@ class ProcessParallelTrnsys():
             debug.finish()
         else:
             for i in range(len(casesInputs)):
-                processDataGeneral(casesInputs[i])
+                if self.inputs['typeOfProcess'] == 'individual':
+                    processDataGeneral(casesInputs[i],True)
+                else:
+                    processDataGeneral(casesInputs[i])
                 # try:
                 #     processDataGeneral(casesInputs[i])
                 # except:

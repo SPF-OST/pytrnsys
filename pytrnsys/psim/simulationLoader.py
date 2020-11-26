@@ -46,7 +46,10 @@ class SimulationLoader():
     steDataDf : :obj:`pandas.DataFrame`
         Dataframe containingt the values printed in timesteps
     """
-    def __init__(self, path, fileNameList=None, mode='complete',fullYear =True,firstMonth='January',year=-1, sortMonths=False,monthlyUsed=True,hourlyUsed=True,timeStepUsed=True, footerPresent=True):
+
+    def __init__(self, path, fileNameList=None, mode='complete', fullYear=True, firstMonth='January', year=-1,
+                 sortMonths=False, monthlyUsed=True, hourlyUsed=True, timeStepUsed=True, footerPresent=True,
+                 individualFiles=False):
 
         self._path = path
         self._mode = mode
@@ -90,9 +93,9 @@ class SimulationLoader():
             fileNameList = os.listdir(self._path)
 
         for fileName in fileNameList:
-            self.loadFile(fileName, footerPresent)
+            self.loadFile(fileName, individualFiles, footerPresent)
 
-    def loadFile(self, file, footerPresent = True):
+    def loadFile(self, file, individualFiles, footerPresent = True):
         """
         Loads file into the field variables
 
@@ -105,7 +108,10 @@ class SimulationLoader():
 
         """
         firstMonthN = pd.to_datetime(self._firstMonth, format='%B').month
-        pathFile = os.path.join(self._path, file)
+        if individualFiles:
+            pathFile = file
+        else:
+            pathFile = os.path.join(self._path, file)
         fileType = self._fileSniffer(pathFile)
         nRows = self._fileLen(pathFile)
 

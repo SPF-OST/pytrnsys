@@ -46,11 +46,14 @@ class ProcessTrnsysDf():
 
     """
 
-    def __init__(self, _path, _name,language='en'):
+    def __init__(self, _path, _name,language='en',individualFile=False):
 
 
         self.fileName = _name
-        self.outputPath = _path + "\%s" % self.fileName
+        if individualFile:
+            self.outputPath = _path
+        else:
+            self.outputPath = os.path.join(_path,self.fileName)
         self.executingPath = _path
 
         # Internal data
@@ -101,6 +104,9 @@ class ProcessTrnsysDf():
     def setInputs(self,inputs):
         self.inputs=inputs
         self.plot.setExtensionPlot(self.inputs['figureFormat'])
+
+    def setIndividualFiles(self,individualFiles):
+        self.individualFiles = individualFiles
 
     def setLatexNamesFile(self,file):
         if file is not None:
@@ -273,12 +279,13 @@ class ProcessTrnsysDf():
         #self.definedResultsFileToRead(self.inputs['fileOutputPath'],self.inputs['listOfFiles'])
 
         self.loadFiles()
-        self.loadDll()
+        if self.inputs['typeOfProcess'] != 'individual':
+            self.loadDll()
         self.process()
         self.addBokehPlot()
         self.addQvsTPlot()
 
-        if(self.inputs['createLatexPdf']==True):
+        if(self.inputs['createLatexPdf']==True and self.inputs['typeOfProcess'] != 'individual'):
             self.doLatexPdf()
 
         self.saveHourlyToCsv()
@@ -314,14 +321,30 @@ class ProcessTrnsysDf():
 
         self.setLoaderParameters()
         locale.setlocale(locale.LC_ALL,'enn')
-        if 'footerPresent' in self.inputs.keys():
-            self.loader = SimulationLoader(self.resultsPath, fileNameList=self.fileNameListToRead,sortMonths=True,
+
+        if self.inputs['typeOfProcess'] == 'individual':
+            self.fileNameListToRead = []
+            for file in self.individualFiles:
+                self.fileNameListToRead += [os.path.join(file['path'],file['name'])]
+            self.loader = SimulationLoader(self.resultsPath, fileNameList=self.fileNameListToRead, sortMonths=True,
                                            mode=self.loadMode, monthlyUsed=self.monthlyUsed, hourlyUsed=self.hourlyUsed,
-                                           timeStepUsed=self.timeStepUsed,firstMonth=self.firstMonth, year = self.yearReadedInMonthlyFile, footerPresent=self.inputs['footerPresent'])
+                                           timeStepUsed=self.timeStepUsed, firstMonth=self.firstMonth,
+                                           year=self.yearReadedInMonthlyFile,individualFiles=True)
+
         else:
-            self.loader = SimulationLoader(self.resultsPath, fileNameList=self.fileNameListToRead,sortMonths=True,
-                                           mode=self.loadMode, monthlyUsed=self.monthlyUsed, hourlyUsed=self.hourlyUsed,
-                                           timeStepUsed=self.timeStepUsed,firstMonth=self.firstMonth, year = self.yearReadedInMonthlyFile)
+            if 'footerPresent' in self.inputs.keys():
+                self.loader = SimulationLoader(self.resultsPath, fileNameList=self.fileNameListToRead, sortMonths=True,
+                                               mode=self.loadMode, monthlyUsed=self.monthlyUsed,
+                                               hourlyUsed=self.hourlyUsed,
+                                               timeStepUsed=self.timeStepUsed, firstMonth=self.firstMonth,
+                                               year=self.yearReadedInMonthlyFile,
+                                               footerPresent=self.inputs['footerPresent'])
+            else:
+                self.loader = SimulationLoader(self.resultsPath, fileNameList=self.fileNameListToRead, sortMonths=True,
+                                               mode=self.loadMode, monthlyUsed=self.monthlyUsed,
+                                               hourlyUsed=self.hourlyUsed,
+                                               timeStepUsed=self.timeStepUsed, firstMonth=self.firstMonth,
+                                               year=self.yearReadedInMonthlyFile)
         # self.monData = self.loader.monData
         self.monDataDf = self.loader.monDataDf
         self.houDataDf = self.loader.houDataDf
@@ -330,8 +353,9 @@ class ProcessTrnsysDf():
 
 
         self.deck = deckTrnsys.DeckTrnsys(self.outputPath,self.fileName)
-        self.deck.loadDeck()
-        self.deckData = self.deck.getAllDataFromDeck()
+        if self.inputs['typeOfProcess'] != 'individual':
+            self.deck.loadDeck()
+            self.deckData = self.deck.getAllDataFromDeck()
         try:
             self.nYearsSimulated = (self.deckData['STOP']-self.deckData['START'])/8760
         except:
@@ -417,11 +441,7 @@ class ProcessTrnsysDf():
             self.pltB.createBokehPlot(self.houDataDf, self.outputPath,self.fileName,self.inputs["plotHourly"][0])
 
     def addQvsTPlot(self):
-
-
-
         # define QvsTDf here!
-
         monthsSplit = []
         if "plotHourlyQvsT" in self.inputs.keys():
             InputListQvsT = self.inputs["plotHourlyQvsT"][0]
@@ -431,9 +451,13 @@ class ProcessTrnsysDf():
         if "plotTimestepQvsT" in self.inputs.keys():
             InputListQvsT = self.inputs["plotTimestepQvsT"][0]
             QvsTDf = self.steDataDf
-            myFactor = 120/3600.
+            if 'Time' in QvsTDf:
+                timestep = (QvsTDf[2]-QvsTDf[1]).seconds
+            else:
+                timestep = (QvsTDf.index[2]-QvsTDf.index[1]).seconds
+            factorForHour = timestep/3600
             logger.debug("stepDfUsed")
-            self.loadQvsTConfig(QvsTDf,InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False,factor=myFactor)
+            self.loadQvsTConfig(QvsTDf,InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False,factor=factorForHour)
         else:
             pass
 

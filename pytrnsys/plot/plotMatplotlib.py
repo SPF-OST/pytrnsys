@@ -1381,9 +1381,9 @@ class PlotMatplotlib():
             
         plt.close()
         
-        return namePdf  
-    
-    def calcAndPrintQVersusT(self,fileName,tFlow,eFlow,legends,printEvery=1,normalized=False,cut=False):
+        return namePdf
+
+    def calcAndPrintQVersusT(self, fileName, tFlow, eFlow, legends, printEvery=1, normalized=False, cut=False):
         
         nVar = len(legends)
         
@@ -1432,8 +1432,7 @@ class PlotMatplotlib():
                         else:
                             line = "- - "; lines = lines+line
 
-                
-        myFileName = self.path + "//" + fileName + ".dat"
+        myFileName = os.path.join(self.path,fileName + ".dat")
         
         logger.debug("File created :%s"%myFileName)
         
