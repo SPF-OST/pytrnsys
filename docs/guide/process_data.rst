@@ -35,12 +35,14 @@ Generic
 ``typeOfProcess`` (string, default 'completeFolder')
     This parameter defines how data is processed. There are various possible arguments:
         - 'completeFolder': Identifies data sets through lst files in ``pathBase`` and its subfolders.
-        - 'individual': Only the specified files will be processed. Files are specified like::
-                stringArray fileToLoad "timeBase" "dataFolder" "fileName"
+        - 'individual': Only the specified files will be processed. With ``timeBase`` specifying the time steps in the
+          file (``monthly``, ``daily``, ``hourly``, or ``timeStep`` for a user-defined time base) and ``dataFolder``
+          the path to the file, which needs to be defined somewhere else in the config file, the files are specified
+          like::
 
-           where ``timeBase`` specifies the time steps in the file (``monthly``, ``daily``, ``hourly``,
-           or ``timeStep`` for a user-defined time base) and ``dataFolder`` the path to the file, which
-           needs to be defined somewhere else in the config file.
+           stringArray fileToLoad "timeBase" "dataFolder" "fileName"
+
+
         - 'casesDefined': TBD
         - 'citiesFolder': Data sets are defined by subfolders in ``pathBase``, which are named according to the
           ``cities`` parameter.
