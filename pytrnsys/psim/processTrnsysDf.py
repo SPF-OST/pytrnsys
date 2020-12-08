@@ -524,6 +524,7 @@ class ProcessTrnsysDf():
         for i in range(len(self.qDemandVector)):
             self.qDemand[:len(self.qDemandVector[i])] = self.qDemand[:len(self.qDemandVector[i])] + self.qDemandVector[i]
 
+        self.monDataDf['qDemand'] = self.qDemand[:12].tolist()
         self.elDemand = num.zeros(12)
 
         for i in range(len(self.elDemandVector)):
@@ -574,6 +575,8 @@ class ProcessTrnsysDf():
                     self.SpfShpDis[i] = 0.
                 else:
                     self.SpfShpDis[i] = self.qDemand[i] / self.elHeatSysTotal[i]
+
+            self.monDataDf['SpfShpDis'] = self.SpfShpDis[:12].tolist()
 
             self.yearQDemand = sum(self.qDemand)
             self.yearElHeatSysTotal = sum(self.elHeatSysTotal)

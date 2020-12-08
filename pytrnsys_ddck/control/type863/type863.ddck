@@ -348,11 +348,11 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 0     ! 12 Output file delimiter
 INPUTS 20    
 **TCollOut TPiColIn TPcmTopUsed TPiHpEvapIn TPcmIceHx tSetDHW tSetSH  TrdSet   TsensorTesDhw TsensorTesSh 
-TCollOut TPiColIn TProCs TPiHpEvapIn  auxStoreDHWIsOn TTesDhwAuxOn  BoAuxWWOn   TTesDhwAuxOff TsensorTesSh BoAuxSHon
-HpIsOn HpIsBlock BoHS PriorWs ProHp ProSeries ProWs ProCs ProPar switchPossible
+TCollOut TPiColIn TProCs TPiHpEvapIn  auxStoreDHWIsOn auxStoreSHIsOn TTesDhwAuxOn  BoAuxWWOn   TTesDhwAuxOff TsensorTesSh BoAuxSHon
+HpIsOn HpIsBlock BoHS PriorWs ProHp ProSeries ProWs ProCs ProPar 
 ****LABELS
-TCollOut TPiColIn TProCs TPiHpEvapIn  auxStoreDHWIsOn TTesDhwAuxOn  BoAuxWWOn   TTesDhwAuxOff TsensorTesSh BoAuxSHon
-HpIsOn HpIsBlock BoHS PriorWs ProHp ProSeries ProWs ProCs ProPar switchPossible
+TCollOut TPiColIn TProCs TPiHpEvapIn  auxStoreDHWIsOn auxStoreSHIsOn TTesDhwAuxOn  BoAuxWWOn   TTesDhwAuxOff TsensorTesSh BoAuxSHon
+HpIsOn HpIsBlock BoHS PriorWs ProHp ProSeries ProWs ProCs ProPar 
 LABELS 3     
 Temperatures     
 On-Off     

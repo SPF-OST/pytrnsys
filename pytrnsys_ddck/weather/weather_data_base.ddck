@@ -274,9 +274,9 @@ unitPrinterWeather    ! 1: Logical unit number, -
 -1     ! 4: Printing & integrating interval, h. -1 for monthly integration
 1     ! 5: Number of inputs to avoid integration, -
 1     ! 6: Output number to avoid integration
-INPUTS 5  
-Time Tamb one IT_H_KW IB_H_kW
-Time Tamb hoursInMonth IT_H_KW IB_H_kW
+INPUTS 6  
+Time Tamb one IT_H_KW IB_H_kW IT_surfUser_1_Wm2
+Time Tamb hoursInMonth IT_H_KW IB_H_kW IT_surfUser_1_Wm2
 
    
 

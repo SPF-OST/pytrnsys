@@ -1433,7 +1433,7 @@ class PlotMatplotlib():
                             line = "- - "; lines = lines+line
 
                 
-        myFileName = self.path + "//" + fileName + ".dat"
+        myFileName = os.path.join(self.path,fileName + ".dat")
         
         logger.debug("File created :%s"%myFileName)
         
