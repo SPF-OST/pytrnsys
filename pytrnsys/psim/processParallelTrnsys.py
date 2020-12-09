@@ -1483,20 +1483,26 @@ class ProcessParallelTrnsys():
         plt.close()
 
     def transferPathInfoToJson(self):
+        parDict = {}
+        for parList in self.inputs['pathInfoToJson']:
+            parDict[parList[0]] = parList[1:]
+
         pathFolder = self.inputs["pathBase"]
         resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
-        parameterName = self.inputs['pathInfoToJson'][0][0]
-        possibleKeys = self.inputs['pathInfoToJson'][0][1:]
+
         for file in resultFiles:
             with open(file) as f_in:
                 resultsDict = json.load(f_in)
-            keyNotFound = True
-            for key in possibleKeys:
-                if key in file:
-                    resultsDict[parameterName] = key
-                    keyNotFound = False
-            if keyNotFound:
-                resultsDict[parameterName] = ''
+
+            for parName in parDict:
+                keyNotFound = True
+                for key in parDict[parName]:
+                    if key in file:
+                        resultsDict[parName] = key
+                        keyNotFound = False
+                if keyNotFound:
+                    resultsDict[parName] = ''
+
             with open(file, 'w') as f_out:
                 json.dump(resultsDict, f_out, indent=2, separators=(',', ': '))
 
