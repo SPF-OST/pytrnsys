@@ -161,7 +161,8 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
 
         if logInstance.logFatalErrors():
             logger.error("======================================")
-            logger.error("First fatal error message in log file:")
+            logger.error(dckFileName)
+            # logger.error("First fatal error message in log file:")
             logger.error("======================================")
             errorList = logInstance.logFatalErrors()
             for line in errorList:
