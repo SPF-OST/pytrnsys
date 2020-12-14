@@ -218,6 +218,13 @@ json-file.
 
         stringArray pathInfoToJson "parameter name" "key 1" "key 2" ...
 
+``jsonCalc``
+    Allows to do calculations with the variables saved in ``-results.json``, of which the results are then saved to the
+    respective json-file as whatever is given as the variable name on the left side of the ``=``::
+
+        stringArray jsonCalc "newVariable1=rightSideOfEquation1" "newVariable2=rightSideOfEquation2" ...
+
+
 Plotting
 --------
 
