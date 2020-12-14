@@ -567,6 +567,9 @@ class ProcessParallelTrnsys():
             self.logger.info('Writing information from path into results.json')
             self.transferPathInfoToJson()
 
+        if 'jsonCalc' in self.inputs.keys():
+            self.calculateInJson()
+
         if 'calcClimateCorrections' in self.inputs.keys():
             self.calculateClimateCorrections()
             
@@ -1502,6 +1505,28 @@ class ProcessParallelTrnsys():
                         keyNotFound = False
                 if keyNotFound:
                     resultsDict[parName] = ''
+
+            with open(file, 'w') as f_out:
+                json.dump(resultsDict, f_out, indent=2, separators=(',', ': '))
+
+    def calculateInJson(self):
+        pathFolder = self.inputs["pathBase"]
+        resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+
+        for file in resultFiles:
+            with open(file) as f_in:
+                resultsDict = json.load(f_in)
+
+            for equation in self.inputs['jsonCalc'][0]:
+                if '=' not in equation:
+                    info.error('Invalid equation statement in `calcJson`')
+                    return -1
+                else:
+                    for variable in re.split('\W', equation):
+                        if variable != '' and not (self.isStringNumber(variable)):
+                            test = 'resultsDict[\"%s\"]' %variable
+                            equation = equation.replace(variable,'resultsDict[\"%s\"]' %variable)
+                    exec(equation)
 
             with open(file, 'w') as f_out:
                 json.dump(resultsDict, f_out, indent=2, separators=(',', ': '))
