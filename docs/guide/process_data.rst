@@ -211,6 +211,11 @@ json-file.
 
         stringArray results "variable 1" "variable 2" ...
 
+``jsonInsert``
+    Adds ``value`` as ``parameter name`` to the generated ``-results.json`` files::
+
+        stringArray jsonInsert "parameter name" "value"
+
 ``pathInfoToJson``
     Scans the paths of the generated ``-results.json`` files for keywords and adds them as the respective
     ``parameter name`` in said json-files, and adds an empty string, if it doesn't find any of the keys in the
