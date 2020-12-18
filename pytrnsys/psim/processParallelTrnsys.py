@@ -560,11 +560,9 @@ class ProcessParallelTrnsys():
             self.plotCalculationsAcrossSets()
 
         if 'scatterPlot' in self.inputs.keys():
-            self.logger.info('Generating scatter plot')
             self.scatterPlot()
 
         if 'pathInfoToJson' in self.inputs.keys():
-            self.logger.info('Writing information from path into results.json')
             self.transferPathInfoToJson()
 
         if 'jsonCalc' in self.inputs.keys():
@@ -1509,6 +1507,8 @@ class ProcessParallelTrnsys():
                 if keyNotFound:
                     resultsDict[parName] = ''
 
+            self.logger.info("Adding path info to " + os.path.split(file)[-1])
+
             with open(file, 'w') as f_out:
                 json.dump(resultsDict, f_out, indent=2, separators=(',', ': '))
 
@@ -1522,13 +1522,15 @@ class ProcessParallelTrnsys():
 
             for equation in self.inputs['jsonCalc'][0]:
                 if '=' not in equation:
-                    info.error('Invalid equation statement in `calcJson`')
+                    info.error('Invalid equation statement in `jsonCalc`')
                     return -1
                 else:
                     for variable in re.split('\W', equation):
                         if variable != '' and not (self.isStringNumber(variable)):
                             equation = equation.replace(variable,'resultsDict[\"%s\"]' %variable)
                     exec(equation)
+
+            self.logger.info("Adding equation result to "  + os.path.split(file)[-1])
 
             with open(file, 'w') as f_out:
                 json.dump(resultsDict, f_out, indent=2, separators=(',', ': '))
@@ -1543,6 +1545,8 @@ class ProcessParallelTrnsys():
 
             for item in self.inputs['jsonInsert']:
                 resultsDict[item[0]] = item[1]
+
+            self.logger.info("Inserting additional items to " + os.path.split(file)[-1])
 
             with open(file, 'w') as f_out:
                 json.dump(resultsDict, f_out, indent=2, separators=(',', ': '))
