@@ -74,7 +74,7 @@ class RunParallelTrnsys():
 
             if 'projectPath' in self.inputs:
                 self.path = self.inputs['projectPath']
-            else:
+            elif (runPath == None):
                 self.path = os.getcwd()
 
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
