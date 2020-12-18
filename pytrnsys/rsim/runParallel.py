@@ -2,6 +2,7 @@
 # Author : Dani Carbonell
 # Date   : 14.12.2012
 import sys, os, time
+import json
 import subprocess
 from subprocess import Popen #, list2cmdline
 import logging
@@ -62,10 +63,14 @@ def getCpuHexadecimal(cpu):
     else:
         raise ValueError("CPU not existent:%d"%cpu)
         
-def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=0.3):
+def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=0.3,trackingFile=None):
     ''' Exec commands in parallel in multiple process 
     (as much as we have CPU)
     '''
+    logDict = {}
+    with open(trackingFile, 'w') as file:
+        json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
+
     maxNumberOfCPU = max(min(getNumberOfCPU() - reduceCpu,len(cmds)),1)
     newCmds = []
     
@@ -137,7 +142,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
     
     for core in cP.keys():
         # print cP[core]
-        
+
         cP[core]['cmd']= "start /wait /affinity %s "%(getCpuHexadecimal(cP[core]['cpu'])) + openCmds.pop(0)
         cP[core]['case']=caseNr
         caseNr +=1
@@ -162,7 +167,6 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
         if logInstance.logFatalErrors():
             logger.error("======================================")
             logger.error(dckFileName)
-            # logger.error("First fatal error message in log file:")
             logger.error("======================================")
             errorList = logInstance.logFatalErrors()
             for line in errorList:
@@ -202,6 +206,14 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
             p = cP[core]['process']
             # start processes:
             if (not p) and cP[core]['cmd']:
+
+                dckName = cP[core]['cmd'].split("\\")[-1].split(" ")[0]
+                with open(trackingFile, 'r') as file:
+                    logDict = json.load(file)
+                logDict[dckName] = [time.strftime("%Y-%m-%d_%H:%M:%S")]
+                with open(trackingFile, 'w') as file:
+                    json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
+
                 cP[core]['process']= Popen(cP[core]['cmd'],stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=True)
                 
                 activeP[cP[core]['cpu']-1] = 1
@@ -217,11 +229,19 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                     if success(p):
                         if(outputFile!=False):
     #                        lines = "Finished simulated case %d\n"%(k,p.stdout.read(),p.stderr.read())
+
                             lines = "Finished simulated case %d at %s\n"%(cP[core]['case'],time.strftime("%H:%M:%S of day %d-%m-%y"))
-                            outfileRun=open(outputFile,'a')    
+                            outfileRun=open(outputFile,'a')
                             outfileRun.writelines(lines)                
                             outfileRun.close()
-                        
+
+                        elif(trackingFile!=None):
+                            dckName = p.args.split("\\")[-1].split(" ")[0]
+                            with open(trackingFile, 'r') as file:
+                                logDict = json.load(file)
+                            logDict[dckName].append(time.strftime("%Y-%m-%d_%H:%M:%S"))
+                            with open(trackingFile, 'w') as file:
+                                json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
                         # empty process:
                         cP[core]['process']=[]
                         finishedCmds.append(cP[core]['cmd'])
