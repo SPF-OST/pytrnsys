@@ -68,8 +68,9 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
     (as much as we have CPU)
     '''
     logDict = {}
-    with open(trackingFile, 'w') as file:
-        json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
+    if trackingFile != None:
+        with open(trackingFile, 'w') as file:
+            json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
 
     maxNumberOfCPU = max(min(getNumberOfCPU() - reduceCpu,len(cmds)),1)
     newCmds = []
@@ -208,11 +209,12 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
             if (not p) and cP[core]['cmd']:
 
                 dckName = cP[core]['cmd'].split("\\")[-1].split(" ")[0]
-                with open(trackingFile, 'r') as file:
-                    logDict = json.load(file)
-                logDict[dckName] = [time.strftime("%Y-%m-%d_%H:%M:%S")]
-                with open(trackingFile, 'w') as file:
-                    json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
+                if trackingFile != None:
+                    with open(trackingFile, 'r') as file:
+                        logDict = json.load(file)
+                    logDict[dckName] = [time.strftime("%Y-%m-%d_%H:%M:%S")]
+                    with open(trackingFile, 'w') as file:
+                        json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
 
                 cP[core]['process']= Popen(cP[core]['cmd'],stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=True)
                 

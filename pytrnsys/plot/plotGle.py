@@ -299,7 +299,7 @@ class PlotGle():
     def executeGLE(self,fileName):
                 
         gleExe ='"%s"'% os.getenv("GLE_EXE")
-        if os.path.exists(os.getenv("GLE_EXE")):
+        if os.path.exists(gleExe):
             cmd = "%s -vb 0 -d pdf %s\%s" % (gleExe,self.path,fileName)
         else:
             cmd = "%s -vb 0 -d pdf %s\%s" % ('gle.exe',self.path,fileName)
