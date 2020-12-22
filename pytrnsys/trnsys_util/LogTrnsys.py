@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import glob
 import string,shutil
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.utils.utilsSpf as utils
@@ -225,7 +226,35 @@ class LogTrnsys():
         infile=open(nameItProblem,'w')
         lines=infile.writelines(lines)
         infile.close()
-                
 
-        
-    
+    def checkSimulatedHours(self):
+        hourInterval = []
+
+        prtFiles = glob.glob(os.path.join(self.path, "**/*.Prt"), recursive=True)
+        for prtFile in prtFiles:
+            if "HR" in os.path.split(prtFile)[-1]:
+                with open(prtFile) as f_in:
+                    hourlyFile = f_in.readlines()
+                break
+
+        indexFirstHour = -1
+        firstFound = False
+        lastHour = -1
+        for i in range(0,len(hourlyFile)):
+            lineBeginning = hourlyFile[i].split("\t")[0]
+            if "Period" in lineBeginning:
+                indexFirstHour = i+1
+            if i == indexFirstHour:
+                firstFound = True
+                try:
+                    hourInterval.append(int(lineBeginning))
+                except:
+                    hourInterval.append(None)
+            elif firstFound:
+                try:
+                    lastHour = int(lineBeginning)
+                except:
+                    hourInterval.append(lastHour)
+                    break
+
+        return  hourInterval

@@ -403,8 +403,13 @@ class RunParallelTrnsys():
     def runParallel(self,writeLogFile=True):
         if writeLogFile:
             self.writeRunLogFile()
-        if 'trackingFile' in self.inputs:
-            runPar.runParallel(self.cmds, reduceCpu=int(self.inputs["reduceCpu"]), trackingFile=self.inputs['trackingFile'])
+
+        if 'masterFile' in self.inputs:
+            runPar.runParallel(self.cmds, reduceCpu=int(self.inputs["reduceCpu"]),
+                               trackingFile=self.inputs['trackingFile'], masterFile=self.inputs['masterFile'])
+        elif 'trackingFile' in self.inputs:
+            runPar.runParallel(self.cmds, reduceCpu=int(self.inputs["reduceCpu"]),
+                               trackingFile=self.inputs['trackingFile'])
         else:
             runPar.runParallel(self.cmds, reduceCpu=int(self.inputs["reduceCpu"]), outputFile=self.outputFileDebugRun)
 

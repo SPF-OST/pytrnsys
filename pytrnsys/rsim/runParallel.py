@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # Author : Dani Carbonell
 # Date   : 14.12.2012
-import sys, os, time
+import sys, os, time, shutil
 import json
 import subprocess
+import pandas as pd
 from subprocess import Popen #, list2cmdline
 import logging
 logger = logging.getLogger('root')
@@ -63,7 +64,7 @@ def getCpuHexadecimal(cpu):
     else:
         raise ValueError("CPU not existent:%d"%cpu)
         
-def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=0.3,trackingFile=None):
+def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=0.3,trackingFile=None,masterFile=None):
     ''' Exec commands in parallel in multiple process 
     (as much as we have CPU)
     '''
@@ -237,13 +238,33 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                             outfileRun.writelines(lines)                
                             outfileRun.close()
 
-                        elif(trackingFile!=None):
+                        if(trackingFile!=None):
                             dckName = p.args.split("\\")[-1].split(" ")[0]
                             with open(trackingFile, 'r') as file:
                                 logDict = json.load(file)
                             logDict[dckName].append(time.strftime("%Y-%m-%d_%H:%M:%S"))
+
+                            fullDckFilePath = p.args.split(" ")[-2]
+                            (logFilePath, dckFileName) = os.path.split(fullDckFilePath)
+                            logFileName = os.path.splitext(dckFileName)[0]
+                            logInstance = LogTrnsys.LogTrnsys(logFilePath, logFileName)
+
+                            if logInstance.logFatalErrors():
+                                logDict[dckName].append('fatal error')
+                            else:
+                                logDict[dckName].append('success')
+
+                            simulationHours = logInstance.checkSimulatedHours()
+                            if len(simulationHours) == 2:
+                                logDict[dckName].append(simulationHours[0])
+                                logDict[dckName].append(simulationHours[1])
+                            elif len(simulationHours) == 1:
+                                logDict[dckName].append(simulationHours[0])
+                                logDict[dckName].append(None)
+
                             with open(trackingFile, 'w') as file:
                                 json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
+
                         # empty process:
                         cP[core]['process']=[]
                         finishedCmds.append(cP[core]['cmd'])
@@ -251,8 +272,30 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                         cP[core]['case'] = []
                         
                         activeP[cP[core]['cpu']-1] = 0
-    
-                        
+
+                        if masterFile != None and (len(finishedCmds) == len(cmds)):
+                            masterDf = pd.DataFrame.from_dict(logDict, orient='index',
+                                                              columns=['started', 'finished', 'outcome', 'hour start',
+                                                                       'hour end'])
+
+                            if os.path.isfile(masterFile):
+                                masterPath, masterOrig = os.path.split(masterFile)
+                                masterBackup = masterOrig.split('.')[0] + '_BACKUP.csv'
+                                try:
+                                    shutil.copyfile(masterFile,os.path.join(masterPath, masterBackup))
+                                    logger.info("Updated " + masterBackup)
+                                except:
+                                    logger.error('Unable to generate BACKUP of ' + masterFile)
+                                origDf = pd.read_csv(masterFile, sep=";", index_col=0)
+                                origDf.update(masterDf)
+                                masterDf = origDf
+
+                            try:
+                                masterDf.to_csv(masterFile, sep=";")
+                                logger.info("Updated " + masterFile)
+                            except:
+                                logger.error("Unable to write to " + masterFile)
+
                         # assign new command if there are open commands:
                         
                         if openCmds:
