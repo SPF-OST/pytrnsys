@@ -174,9 +174,8 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
             for line in errorList:
                 logger.error(line.replace("\n",""))
         else:
-            logger.info("No fatal errors during simulation")
+            logger.info("Success: No fatal errors during execution of " + dckFileName)
             logger.warning("Number of warnings during simulation: %s" %logInstance.checkWarnings())
-            logger.info("Simulation of %s successful" %dckFileName)
 
         return p.returncode == 0
 
@@ -230,6 +229,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                 if done(p):
                     
                     if success(p):
+
                         if(outputFile!=False):
     #                        lines = "Finished simulated case %d\n"%(k,p.stdout.read(),p.stderr.read())
 
@@ -272,6 +272,8 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                         cP[core]['case'] = []
                         
                         activeP[cP[core]['cpu']-1] = 0
+
+                        logger.info("Runs completed: %s/%s" % (len(finishedCmds), len(cmds)))
 
                         if masterFile != None and (len(finishedCmds) == len(cmds)):
                             masterDf = pd.DataFrame.from_dict(logDict, orient='index',
