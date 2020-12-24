@@ -57,6 +57,8 @@ class BuildTrnsysDeck():
 
         self.replaceAutomaticUnits=False
 
+        self.existingDckUnchecked = True
+        self.dckAlreadyExists = True
 
     def loadDeck(self,_path,_name):        
             
@@ -189,12 +191,15 @@ class BuildTrnsysDeck():
         -------
 
         """
-
         tempName = "%s" % self.nameDeck
+
+        if self.existingDckUnchecked:
+            self.dckAlreadyExists = os.path.isfile(tempName)
+            self.existingDckUnchecked = False
 
         ok = True
 
-        if (os.path.isfile(tempName) and self.overwriteForcedByUser==False):
+        if (self.dckAlreadyExists and self.overwriteForcedByUser==False):
 
             window = tk.Tk()
             window.geometry("2x2+" + str(window.winfo_screenwidth()) + "+" + str(window.winfo_screenheight()))
