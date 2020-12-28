@@ -7,6 +7,7 @@ import subprocess
 import pandas as pd
 from subprocess import Popen #, list2cmdline
 import logging
+import datetime
 logger = logging.getLogger('root')
 import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
 
@@ -279,10 +280,8 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                         currentTime = time.time()
                         timeSoFarSec = currentTime - startTime
                         totalTimePredictionSec = timeSoFarSec*len(finishedCmds)/len(cmds)
-                        remainingTimePredictionHour = (totalTimePredictionSec - timeSoFarSec) / 3600.
-                        logger.info(
-                            "Prediction of remaining time:\t{0} h {1} m".format(int(remainingTimePredictionHour), int(
-                                (remainingTimePredictionHour % 1) * 60)))
+                        endTimePrediction = datetime.datetime.fromtimestamp(startTime + totalTimePredictionSec).strftime("%H:%M on %d.%m.%Y")
+                        logger.info("Predicted time of completion of all runs: " + endTimePrediction)
 
                         if masterFile != None and (len(finishedCmds) == len(cmds)):
                             masterDf = pd.DataFrame.from_dict(logDict, orient='index',
