@@ -284,9 +284,9 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                         logger.info("Predicted time of completion of all runs: " + endTimePrediction)
 
                         if masterFile != None and (len(finishedCmds) == len(cmds)):
-                            masterDf = pd.DataFrame.from_dict(logDict, orient='index',
-                                                              columns=['started', 'finished', 'outcome', 'hour start',
-                                                                       'hour end'])
+                            newDf = pd.DataFrame.from_dict(logDict, orient='index',
+                                                           columns=['started', 'finished', 'outcome', 'hour start',
+                                                                    'hour end'])
 
                             if os.path.isfile(masterFile):
                                 masterPath, masterOrig = os.path.split(masterFile)
@@ -297,8 +297,11 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                                 except:
                                     logger.error('Unable to generate BACKUP of ' + masterFile)
                                 origDf = pd.read_csv(masterFile, sep=";", index_col=0)
-                                origDf.update(masterDf)
-                                masterDf = origDf
+
+                                masterDf = origDf.append(newDf)
+                                masterDf = masterDf[~masterDf.index.duplicated(keep='last')]
+                            else:
+                                masterDf = newDf
 
                             try:
                                 masterDf.to_csv(masterFile, sep=";")
