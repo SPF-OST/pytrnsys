@@ -277,11 +277,14 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
 
                         logger.info("Runs completed: %s/%s" % (len(finishedCmds), len(cmds)))
 
-                        currentTime = time.time()
-                        timeSoFarSec = currentTime - startTime
-                        totalTimePredictionSec = timeSoFarSec*len(finishedCmds)/len(cmds)
-                        endTimePrediction = datetime.datetime.fromtimestamp(startTime + totalTimePredictionSec).strftime("%H:%M on %d.%m.%Y")
-                        logger.info("Predicted time of completion of all runs: " + endTimePrediction)
+                        if len(finishedCmds)%len(cP) == 0:
+                            currentTime = time.time()
+                            timeSoFarSec = currentTime - startTime
+                            totalTimePredictionSec = timeSoFarSec*len(finishedCmds)/len(cmds)
+                            endTimePrediction = datetime.datetime.fromtimestamp(startTime + totalTimePredictionSec).strftime("%H:%M on %d.%m.%Y")
+                            logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                            logger.info("Predicted time of completion of all runs: " + endTimePrediction)
+                            logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
                         if masterFile != None and (len(finishedCmds) == len(cmds)):
                             newDf = pd.DataFrame.from_dict(logDict, orient='index',
