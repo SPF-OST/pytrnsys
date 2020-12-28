@@ -280,7 +280,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                         if len(finishedCmds)%len(cP) == 0:
                             currentTime = time.time()
                             timeSoFarSec = currentTime - startTime
-                            totalTimePredictionSec = timeSoFarSec*len(finishedCmds)/len(cmds)
+                            totalTimePredictionSec = timeSoFarSec*len(cmds)/len(finishedCmds)
                             endTimePrediction = datetime.datetime.fromtimestamp(startTime + totalTimePredictionSec).strftime("%H:%M on %d.%m.%Y")
                             logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
                             logger.info("Predicted time of completion of all runs: " + endTimePrediction)
