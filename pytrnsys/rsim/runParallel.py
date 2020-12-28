@@ -199,6 +199,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
 #        while openCmds:
         
     running = True
+    startTime = time.time()
     
     while running:
         
@@ -274,6 +275,14 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                         activeP[cP[core]['cpu']-1] = 0
 
                         logger.info("Runs completed: %s/%s" % (len(finishedCmds), len(cmds)))
+
+                        currentTime = time.time()
+                        timeSoFarSec = currentTime - startTime
+                        totalTimePredictionSec = timeSoFarSec*len(finishedCmds)/len(cmds)
+                        remainingTimePredictionHour = (totalTimePredictionSec - timeSoFarSec) / 3600.
+                        logger.info(
+                            "Prediction of remaining time:\t{0} h {1} m".format(int(remainingTimePredictionHour), int(
+                                (remainingTimePredictionHour % 1) * 60)))
 
                         if masterFile != None and (len(finishedCmds) == len(cmds)):
                             masterDf = pd.DataFrame.from_dict(logDict, orient='index',
