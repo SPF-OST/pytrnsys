@@ -10,6 +10,7 @@ ToDo :
 
 import string, os
 import pytrnsys.utils.utilsSpf as utils
+import pytrnsys.utils.log as log
 from string import ascii_letters, digits, whitespace
 import shutil
 import codecs
@@ -181,7 +182,7 @@ class LatexReport():
                 logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
             
         if os.path.isfile(self.outputPath + "\\" + self.fileName + ".pdf"):
-           logger.info("Latex File created sucessfully")
+           logger.info("Successfully created %s.pdf" % self.fileName)
         else:
             raise ValueError('PDF was not generated, or not saved in the right directory')
           
@@ -307,7 +308,7 @@ class LatexReport():
         line="\\begin{adjustbox}{max width =\\textwidth}\n" ; self.lines = self.lines + line
 
         # line="{\n" ;self.lines = self.lines + line
-        print(_names, len(_names), "TEST _names")
+        # print(_names, len(_names), "TEST _names")
         line="\\begin{tabular}{l | "; self.lines = self.lines + line
         for i in range(len(_names)-1):
              line = "c "; self.lines = self.lines + line 

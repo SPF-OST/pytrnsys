@@ -22,6 +22,7 @@ import pytrnsys.plot.plotMatplotlib as plot
 import sys
 import re
 import pkg_resources
+import logging
 try:
     import pytrnsys_examples
 except ImportError:
@@ -137,6 +138,9 @@ class ProcessParallelTrnsys():
 
         self.defaultInputs()
         self.filteredfolder = [".gle"]
+        log.setup_custom_logger('root', self.inputs['outputLevel'])
+        self.logger = logging.getLogger('root')
+
 
     def defaultInputs(self):
 
@@ -183,7 +187,6 @@ class ProcessParallelTrnsys():
         self.configPath = path
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated)
-        self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
         if 'latexNames' in self.inputs.keys():
             if ':' not in self.inputs['latexNames']:
                 self.inputs['latexNames'] = os.path.join(self.configPath, self.inputs['latexNames'])
@@ -239,7 +242,6 @@ class ProcessParallelTrnsys():
 
 
     def process(self):
-
         casesInputs = []
         fileName = []
         classList = []
@@ -274,10 +276,10 @@ class ProcessParallelTrnsys():
                     nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (relPath, name))
 
                     if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                        self.logger.debug("file :%s already processed" % name)
+                        self.logger.info("%s already processed" % name)
 
                     elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (relPath, name))) and  self.inputs["forceProcess"] == False:
-                        self.logger.debug("file :%s already processed" % name)
+                        self.logger.info("%s already processed" % name)
 
                     else:
                         if len(Path(relPath).parts)>1:
@@ -286,51 +288,7 @@ class ProcessParallelTrnsys():
                             newPath = pathFolder
                         baseClass = self.getBaseClass(self.inputs["classProcessing"],newPath,name)
 
-                        self.logger.debug("file :%s will be processed" % name)
-                        # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
-                        #                     self.inputs["cleanModeLatex"],self.inputs["firstMonthUsed"],self.inputs["processQvsT"],self.inputs["firstMonthUsed"],self.inputs["buildingArea"],\
-                        #                     self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
-
-                        casesInputs.append((baseClass,pathFolder, name, self.inputs))
-
-            pathFolder = self.inputs["pathBase"]
-
-            if (self.inputs["typeOfProcess"] == "completeFolder"):
-                files = glob.glob(os.path.join(pathFolder, "**/*.lst"), recursive=True)
-                fileName = [Path(name).parts[-2] for name in files]
-                relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
-
-            elif (self.inputs["typeOfProcess"] == "json"):
-                files = glob.glob(os.path.join(pathFolder, "**/*.json"), recursive=True)
-                fileName = [Path(name).parts[-2] for name in files]
-                relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
-                relPaths = list(dict.fromkeys(relPaths))  # remove duplicates due to folders containing more than one json files
-
-            for relPath in relPaths:
-                if relPath == '.':
-                    continue
-                name = Path(relPath).parts[-1]
-                folderUsed = True
-                for i in range(len(self.filteredfolder)):
-                    if (name == self.filteredfolder[i]):
-                        folderUsed=False
-                if(folderUsed):
-                    nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (relPath, name))
-
-                    if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                        self.logger.debug("file :%s already processed" % name)
-
-                    elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (relPath, name))) and  self.inputs["forceProcess"] == False:
-                        self.logger.debug("file :%s already processed" % name)
-
-                    else:
-                        if len(Path(relPath).parts)>1:
-                            newPath = os.path.join(pathFolder,os.path.join(*list(Path(relPath).parts[:-1])))
-                        else:
-                            newPath = pathFolder
-                        baseClass = self.getBaseClass(self.inputs["classProcessing"],newPath,name)
-
-                        self.logger.debug("file :%s will be processed" % name)
+                        self.logger.info("%s will be processed" % name)
                         # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
                         #                     self.inputs["cleanModeLatex"],self.inputs["firstMonthUsed"],self.inputs["processQvsT"],self.inputs["firstMonthUsed"],self.inputs["buildingArea"],\
                         #                     self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
@@ -348,7 +306,7 @@ class ProcessParallelTrnsys():
 
             for fileDict in self.individualFiles:
                 baseClass = self.getBaseClass(self.inputs["classProcessing"], fileDict['path'], fileDict['name'])
-                self.logger.debug("file :%s will be processed" % fileDict['name'])
+                self.logger.info("%s will be processed" % fileDict['name'])
                 casesInputs.append((baseClass, fileDict['path'], fileDict['name'], self.inputs, self.individualFiles))
 
         elif self.inputs["typeOfProcess"] == "casesDefined":
@@ -375,7 +333,7 @@ class ProcessParallelTrnsys():
             #     if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
             #         print ("file :%s already processed" % name)
             #     else:
-            #         print ("file :%s will be processed" % name)
+            #         print ("%s will be processed" % name)
             #
             #
             #         baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder,self.inputs["fileName"])
@@ -398,15 +356,15 @@ class ProcessParallelTrnsys():
                         nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
 
                         if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                            self.logger.debug("file :%s already processed" % name)
+                            self.logger.info("%s already processed" % name)
 
                         elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (name, name))) and self.inputs["forceProcess"] == False:
-                            self.logger.debug("file :%s already processed" % name)
+                            self.logger.info("%s already processed" % name)
 
                         else:
                             baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)
 
-                            self.logger.debug("file :%s will be processed" % name)
+                            self.logger.info("%s will be processed" % name)
 
 
                             if ("hourly" in name or "hourlyOld" in name) and not "Mean" in name:
@@ -459,16 +417,16 @@ class ProcessParallelTrnsys():
                                 nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
 
                                 if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-                                    self.logger.debug("file :%s already processed" % name)
+                                    self.logger.info("file :%s already processed" % name)
 
                                 elif os.path.isfile(os.path.join(pathFolder, "%s\\%s-Year1-results.json" % (name, name))) and \
                                         self.inputs["forceProcess"] == False:
-                                    self.logger.debug("file :%s already processed" % name)
+                                    self.logger.info("file :%s already processed" % name)
 
                                 else:
                                     baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)
 
-                                    self.logger.debug("file :%s will be processed" % name)
+                                    self.logger.info("%s will be processed" % name)
 
                                     if ("hourly" in name or "hourlyOld" in name) and not "Mean" in name:
                                         if self.inputs["forceHourlyYear"]:
@@ -499,7 +457,6 @@ class ProcessParallelTrnsys():
 
         else:
             raise ValueError("Not Implemented yet")
-
 
         if(self.inputs["processParallel"]==True):
 
@@ -548,7 +505,6 @@ class ProcessParallelTrnsys():
             self.calculationsAcrossSets()
 
         if 'comparePlot' in self.inputs.keys():
-            self.logger.info('Generating comparison plot')
             self.plotComparison()
 
         if 'comparePlotConditional' in self.inputs.keys():
@@ -704,6 +660,9 @@ class ProcessParallelTrnsys():
                 chunkVariable = ''
             if len(plotVariables) == 4:
                 chunkVariable = plotVariables[3]
+
+            self.logger.info('Generating "comparePlot %s %s %s"' % (xAxisVariable, yAxisVariable, seriesVariable))
+
             plotXDict = {}
             plotYDict = {}
     
@@ -715,6 +674,12 @@ class ProcessParallelTrnsys():
                 resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
             else:
                 resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
+
+            if not(resultFiles):
+                self.logger.error('No results.json-files found.')
+                self.logger.error(
+                    'Unable to generate "comparePlot %s %s %s"' % (xAxisVariable, yAxisVariable, seriesVariable))
+                return
 
             for file in resultFiles:
                 with open(file) as f_in:
@@ -842,8 +807,11 @@ class ProcessParallelTrnsys():
                             myX = num.array(plotXDict[chunk][key])[index]
                             myY = num.array(plotYDict[chunk][key])[index]
 
-                            line = "%8.4f\t%8.4f\t" % (myX[i],myY[i]);
-                            lines = lines + line
+                            try:
+                                line = "%8.4f\t%8.4f\t" % (myX[i],myY[i]);
+                                lines = lines + line
+                            except:
+                                pass
 
                     line = "\n"; lines = lines + line
 

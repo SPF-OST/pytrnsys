@@ -153,7 +153,7 @@ class BuildTrnsysDeck():
         self.logger = logging.getLogger('root')
         # stop propagting to root logger
         self.logger.propagate = False
-        self.logger.info("Replacemenet of Units done")
+        self.logger.debug("Replacemenet of Units done")
 
     def createDependencyGraph(self):
         e = Graph('ER', filename='er.gv', node_attr={'color': 'lightblue2', 'style': 'filled'})
@@ -276,7 +276,7 @@ class BuildTrnsysDeck():
 
         nameFile = os.path.join(self.pathDeck, name)
 
-        logger.info("Type file :%s created" % nameFile)
+        logger.info("Type file %s created" % nameFile)
         outfile = open(nameFile, 'w')
         outfile.writelines(lines)
 

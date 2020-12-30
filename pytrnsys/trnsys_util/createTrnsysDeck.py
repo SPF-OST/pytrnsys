@@ -88,10 +88,7 @@ class CreateTrnsysDeck():
         
             nameLabelOfVariation = []
             nameVariationInDeck = []
-            
-            
-            
-            
+
             for nvar in range (len(self.variations)):
                 nameLabelOfVariation.append(self.variations[nvar][0])
                 nameVariationInDeck.append(self.variations[nvar][1])

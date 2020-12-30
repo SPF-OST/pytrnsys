@@ -1399,7 +1399,7 @@ class PlotMatplotlib():
         cumEnerVec = []
         
         for i in range(nVar):
-            logger.info("calcAndPrintQVersusT var:%s "%legends[i])
+            logger.debug("calcAndPrintQVersusT var:%s "%legends[i])
             tSort,cumE = utils.calcQvsT(tFlow[i],eFlow[i])
             tSortVec.append(tSort)
             cumEnerVec.append(cumE)

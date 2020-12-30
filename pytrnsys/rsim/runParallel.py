@@ -218,6 +218,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                     with open(trackingFile, 'w') as file:
                         json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
 
+                logger.info('Starting ' + dckName)
                 cP[core]['process']= Popen(cP[core]['cmd'],stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=True)
                 
                 activeP[cP[core]['cpu']-1] = 1
@@ -277,14 +278,14 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
 
                         logger.info("Runs completed: %s/%s" % (len(finishedCmds), len(cmds)))
 
-                        if len(finishedCmds)%len(cP) == 0:
+                        if len(finishedCmds)%len(cP) == 0 and len(finishedCmds) != len(cmds):
                             currentTime = time.time()
                             timeSoFarSec = currentTime - startTime
                             totalTimePredictionSec = timeSoFarSec*len(cmds)/len(finishedCmds)
                             endTimePrediction = datetime.datetime.fromtimestamp(startTime + totalTimePredictionSec).strftime("%H:%M on %d.%m.%Y")
-                            logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                            logger.info("Predicted time of completion of all runs: " + endTimePrediction)
-                            logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                            logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                            logger.info("Predicted time of completion of all %s runs: %s" % (len(cmds), endTimePrediction))
+                            logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
                         if masterFile != None and (len(finishedCmds) == len(cmds)):
                             newDf = pd.DataFrame.from_dict(logDict, orient='index',
