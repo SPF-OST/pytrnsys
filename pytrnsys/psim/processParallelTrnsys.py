@@ -29,6 +29,7 @@ except ImportError:
     pass
 #we would need to pass the Class as inputs
 import pytrnsys.utils.log as log
+logger = logging.getLogger('root')
 
 
 def processDataGeneral(casesInputs,withIndividualFiles = False):
@@ -112,9 +113,9 @@ def processDataGeneral(casesInputs,withIndividualFiles = False):
                 os.rename(renameFile + ending, renameFile + newEnding)
                 os.remove(renameFile + ending)
             except:
-                warnings.warn(
-                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
-                                renameFile + newEnding))
+                logger.warning(
+                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)"
+                    % (renameFile + newEnding))
 
     del test  # time.sleep(5)
 
