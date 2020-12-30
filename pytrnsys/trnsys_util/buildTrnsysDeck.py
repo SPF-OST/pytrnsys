@@ -276,7 +276,7 @@ class BuildTrnsysDeck():
 
         nameFile = os.path.join(self.pathDeck, name)
 
-        logger.info("Type file %s created" % nameFile)
+        logger.debug("Type file %s created" % nameFile)
         outfile = open(nameFile, 'w')
         outfile.writelines(lines)
 
