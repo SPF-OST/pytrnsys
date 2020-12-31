@@ -50,6 +50,7 @@ class BuildTrnsysDeck():
         self.deckText = []
 
         self.overwriteForcedByUser=False
+        self.abortedByUser = False
         self.extOneSheetDeck = "ddck"
 
         self.skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
@@ -178,7 +179,7 @@ class BuildTrnsysDeck():
 
 
         
-    def writeDeck(self,addedLines=None):
+    def writeDeck(self, addedLines=None):
         """
         Writes the deck stored in self.deckText in the file self.nameDeck
 
@@ -218,9 +219,8 @@ class BuildTrnsysDeck():
             tempFile.writelines(text)
             tempFile.close()
         else:
-            raise ValueError("Not Accepted by user")
-        
-
+            logger.warning("dck export cancelled by user")
+            self.abortedByUser = True
 
     def readTrnsyDeck(self,useDeckName=False):
         """
