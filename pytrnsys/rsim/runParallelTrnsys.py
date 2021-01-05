@@ -278,7 +278,7 @@ class RunParallelTrnsys():
 
         if myDeckGenerator.noVariationCreated:
             self.logger.warning("No variation dck files created from " + self.nameBase)
-            return 
+            return
 
         tests = []
         cmds  = []
@@ -479,9 +479,10 @@ class RunParallelTrnsys():
         tool = readConfig.ReadConfigTrnsys()
 
         self.lines = tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated,controlDataType=False)
-        self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
-        # stop propagting to root logger
-        self.logger.propagate = False
+        try:
+            self.logger = logging.getLogger('root')
+        except:
+            self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
         if 'pathBaseSimulations' in self.inputs:
             self.path = self.inputs['pathBaseSimulations']
         if(self.inputs["addResultsFolder"]==False):
