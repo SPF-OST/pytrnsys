@@ -276,7 +276,7 @@ class RunParallelTrnsys():
             fileName=[]
             fileName.append(self.nameBase)
 
-        if myDeckGenerator.noVariationCreated:
+        if myDeckGenerator.noVariationCreated and self.variation:
             self.logger.warning("No variation dck files created from " + self.nameBase)
             return
 
