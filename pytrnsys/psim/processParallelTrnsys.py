@@ -29,8 +29,6 @@ except ImportError:
     pass
 #we would need to pass the Class as inputs
 import pytrnsys.utils.log as log
-logger = logging.getLogger('root')
-
 
 def processDataGeneral(casesInputs,withIndividualFiles = False):
     """
@@ -113,9 +111,9 @@ def processDataGeneral(casesInputs,withIndividualFiles = False):
                 os.rename(renameFile + ending, renameFile + newEnding)
                 os.remove(renameFile + ending)
             except:
-                logger.warning(
-                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)"
-                    % (renameFile + newEnding))
+                print(
+                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
+                                renameFile + newEnding))
 
     del test  # time.sleep(5)
 
@@ -140,11 +138,9 @@ class ProcessParallelTrnsys():
         self.defaultInputs()
         self.filteredfolder = [".gle"]
         try:
-            self.logger = logging.getLogger('root')
+            self.logger = logging.getself.logger('root')
         except:
             self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
-
-
 
     def defaultInputs(self):
 
@@ -901,6 +897,8 @@ class ProcessParallelTrnsys():
             else:
                 resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
 
+            conditionNeverMet = True
+
             for file in resultFiles:
                 with open(file) as f_in:
                     resultsDict = json.load(f_in)
@@ -913,6 +911,8 @@ class ProcessParallelTrnsys():
                     conditionList.append(conditionDict[conditionEntry]==resultsDict[conditionEntry])
 
                 if all(conditionList):
+
+                    conditionNeverMet = False
 
                     if resultsDict[seriesVariable] not in seriesColors.keys():
                         seriesColors[resultsDict[seriesVariable]] = colors[colorsCounter]
@@ -945,6 +945,12 @@ class ProcessParallelTrnsys():
                 else:
                     pass
 
+            if conditionNeverMet:
+                self.logger.warning('The following conditions from "comparePlotConditional" were never met all at once:')
+                for entry in conditionDict:
+                    self.logger.warning('%s = %s' %(entry, str(conditionDict[entry])))
+                self.logger.warning('The respective plot cannot be generated')
+                return 
 
             self.doc = latex.LatexReport('', '')
             if 'latexNames' in self.inputs.keys():
