@@ -9,6 +9,7 @@ import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
 import pytrnsys.rsim.executeTrnsys as exeTrnsys
 import pytrnsys.trnsys_util.buildTrnsysDeck as build
 import numpy as num
+import pandas as pd
 import os
 import pytrnsys.pdata.processFiles
 import string
@@ -250,12 +251,34 @@ class RunParallelTrnsys():
         
         myDeckGenerator.combineAllCases = self.inputs["combineAllCases"]
 
+        successfulCases = []
+
+        if 'masterFile' in self.inputs:
+            try:
+                masterDf = pd.read_csv(self.inputs['masterFile'], sep = ';', index_col=0)
+            except:
+                self.logger.error("Unable to read " + self.inputs['trackingFile'])
+                self.logger.error("Variation dck files of %s won't be created" % self.nameBase)
+                return
+
+            self.logger.info("Checking for successful runs in " + self.inputs['masterFile'])
+            for index,row in masterDf.iterrows():
+                if row['outcome'] == 'success':
+                    successfulCases.append(index)
+
         # creates a list of decks with the appripiate name but nothing changed inside!!
         if(self.variationsUsed or (self.changeDDckFilesUsed==True and self.foldersForDDckVariationUsed==False)):
-            fileName = myDeckGenerator.generateDecks()
+            if successfulCases:
+                fileName = myDeckGenerator.generateDecks(successfulCases=successfulCases)
+            else:
+                fileName = myDeckGenerator.generateDecks()
         else:
             fileName=[]
             fileName.append(self.nameBase)
+
+        if myDeckGenerator.noVariationCreated and self.variation:
+            self.logger.warning("No variation dck files created from " + self.nameBase)
+            return
 
         tests = []
         cmds  = []
@@ -309,6 +332,7 @@ class RunParallelTrnsys():
             tests[i].moveFileFromSource()
 
             if(self.inputs['runCases']==True):
+                test = os.path.split(tests[i].nameDck)[-1]
                 self.cmds.append(tests[i].getExecuteTrnsys(self.inputs))
 
         #self.cmds = cmds
@@ -403,8 +427,13 @@ class RunParallelTrnsys():
     def runParallel(self,writeLogFile=True):
         if writeLogFile:
             self.writeRunLogFile()
-        if 'trackingFile' in self.inputs:
-            runPar.runParallel(self.cmds, reduceCpu=int(self.inputs["reduceCpu"]), trackingFile=self.inputs['trackingFile'])
+
+        if 'masterFile' in self.inputs:
+            runPar.runParallel(self.cmds, reduceCpu=int(self.inputs["reduceCpu"]),
+                               trackingFile=self.inputs['trackingFile'], masterFile=self.inputs['masterFile'])
+        elif 'trackingFile' in self.inputs:
+            runPar.runParallel(self.cmds, reduceCpu=int(self.inputs["reduceCpu"]),
+                               trackingFile=self.inputs['trackingFile'])
         else:
             runPar.runParallel(self.cmds, reduceCpu=int(self.inputs["reduceCpu"]), outputFile=self.outputFileDebugRun)
 
@@ -450,9 +479,10 @@ class RunParallelTrnsys():
         tool = readConfig.ReadConfigTrnsys()
 
         self.lines = tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated,controlDataType=False)
-        self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
-        # stop propagting to root logger
-        self.logger.propagate = False
+        try:
+            self.logger = logging.getLogger('root')
+        except:
+            self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
         if 'pathBaseSimulations' in self.inputs:
             self.path = self.inputs['pathBaseSimulations']
         if(self.inputs["addResultsFolder"]==False):

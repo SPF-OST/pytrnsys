@@ -24,6 +24,8 @@ class CreateTrnsysDeck():
         
         self.deckOutputs = []
         self.combineAllCases=False
+
+        self.noVariationCreated = True
         
         self.createNewOne =True # In principle always on. Otherwise if a dck is found its not created again, and 
         # if we have changed something from the original we will no see the changes if this is set to False.
@@ -88,10 +90,7 @@ class CreateTrnsysDeck():
         
             nameLabelOfVariation = []
             nameVariationInDeck = []
-            
-            
-            
-            
+
             for nvar in range (len(self.variations)):
                 nameLabelOfVariation.append(self.variations[nvar][0])
                 nameVariationInDeck.append(self.variations[nvar][1])
@@ -166,7 +165,7 @@ class CreateTrnsysDeck():
         
         return  self.deckOutputs
 
-    def generateDecks(self):
+    def generateDecks(self, successfulCases = None):
         """
         This function will generate as many deck cases as the number of variations defined in the confg file.
         The deck are stored in self.path using the variations and the base name to create the individual names
@@ -227,6 +226,10 @@ class CreateTrnsysDeck():
                 # except:
                 #     nameDeck = "%s%s" % (self.case, variationsLine)
 
+                if successfulCases != None:
+                    if (nameDeck + '.dck') in successfulCases:
+                        logger.info((nameDeck + '.dck') + " was already successfully run before and hence won't be created again")
+                        continue
 
                 self.deckOutputs.append(nameDeck)
                 nameDeckCreated = "%s\%s.dck" % (self.path, nameDeck)
@@ -236,7 +239,7 @@ class CreateTrnsysDeck():
                         os.remove(nameDeckCreated)
                         shutil.copy(self.originalDeckName, nameDeckCreated)
                     else:
-                        print ("File exist, I do not create a new one")
+                        logger.info("%s exists and won't be replaced" % os.path.split(nameDeckCreated)[-1])
                     pass
                 else:
                     shutil.copy(self.originalDeckName, nameDeckCreated)
@@ -257,6 +260,7 @@ class CreateTrnsysDeck():
                     parameterDict[nameVariationInDeck[nvar]] = valuesOfVariation
 
                 self.myListOfParameterDicts.append(parameterDict)
+                self.noVariationCreated = False
                 logger.info("Parametric variation generated with the following values" + str(parameterDict))
         if not self.deckOutputs:
             self.deckOutputs.append(self.case)

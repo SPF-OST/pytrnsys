@@ -400,7 +400,7 @@ class ProcessTrnsysDf():
         except:
             pass
 
-        logger.info("loadFiles completed using SimulationLoader")
+        logger.info("Completed loading files of " + self.fileName)
 
     def addBokehPlot(self):
 

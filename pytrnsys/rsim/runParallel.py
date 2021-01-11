@@ -1,11 +1,13 @@
 #!/usr/bin/python
 # Author : Dani Carbonell
 # Date   : 14.12.2012
-import sys, os, time
+import sys, os, time, shutil
 import json
 import subprocess
+import pandas as pd
 from subprocess import Popen #, list2cmdline
 import logging
+import datetime
 logger = logging.getLogger('root')
 import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
 
@@ -63,7 +65,7 @@ def getCpuHexadecimal(cpu):
     else:
         raise ValueError("CPU not existent:%d"%cpu)
         
-def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=0.3,trackingFile=None):
+def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=0.3,trackingFile=None,masterFile=None):
     ''' Exec commands in parallel in multiple process 
     (as much as we have CPU)
     '''
@@ -173,9 +175,8 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
             for line in errorList:
                 logger.error(line.replace("\n",""))
         else:
-            logger.info("No fatal errors during simulation")
+            logger.info("Success: No fatal errors during execution of " + dckFileName)
             logger.warning("Number of warnings during simulation: %s" %logInstance.checkWarnings())
-            logger.info("Simulation of %s successful" %dckFileName)
 
         return p.returncode == 0
 
@@ -199,6 +200,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
 #        while openCmds:
         
     running = True
+    startTime = time.time()
     
     while running:
         
@@ -216,6 +218,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                     with open(trackingFile, 'w') as file:
                         json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
 
+                logger.info('Starting ' + dckName)
                 cP[core]['process']= Popen(cP[core]['cmd'],stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=True)
                 
                 activeP[cP[core]['cpu']-1] = 1
@@ -229,6 +232,7 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                 if done(p):
                     
                     if success(p):
+
                         if(outputFile!=False):
     #                        lines = "Finished simulated case %d\n"%(k,p.stdout.read(),p.stderr.read())
 
@@ -237,13 +241,33 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                             outfileRun.writelines(lines)                
                             outfileRun.close()
 
-                        elif(trackingFile!=None):
+                        if(trackingFile!=None):
                             dckName = p.args.split("\\")[-1].split(" ")[0]
                             with open(trackingFile, 'r') as file:
                                 logDict = json.load(file)
                             logDict[dckName].append(time.strftime("%Y-%m-%d_%H:%M:%S"))
+
+                            fullDckFilePath = p.args.split(" ")[-2]
+                            (logFilePath, dckFileName) = os.path.split(fullDckFilePath)
+                            logFileName = os.path.splitext(dckFileName)[0]
+                            logInstance = LogTrnsys.LogTrnsys(logFilePath, logFileName)
+
+                            if logInstance.logFatalErrors():
+                                logDict[dckName].append('fatal error')
+                            else:
+                                logDict[dckName].append('success')
+
+                            simulationHours = logInstance.checkSimulatedHours()
+                            if len(simulationHours) == 2:
+                                logDict[dckName].append(simulationHours[0])
+                                logDict[dckName].append(simulationHours[1])
+                            elif len(simulationHours) == 1:
+                                logDict[dckName].append(simulationHours[0])
+                                logDict[dckName].append(None)
+
                             with open(trackingFile, 'w') as file:
                                 json.dump(logDict, file, indent=2, separators=(',', ': '), sort_keys=True)
+
                         # empty process:
                         cP[core]['process']=[]
                         finishedCmds.append(cP[core]['cmd'])
@@ -251,8 +275,44 @@ def runParallel(cmds,reduceCpu=0,outputFile=False,estimedCPUTime=0.33,delayTime=
                         cP[core]['case'] = []
                         
                         activeP[cP[core]['cpu']-1] = 0
-    
-                        
+
+                        logger.info("Runs completed: %s/%s" % (len(finishedCmds), len(cmds)))
+
+                        if len(finishedCmds)%len(cP) == 0 and len(finishedCmds) != len(cmds):
+                            currentTime = time.time()
+                            timeSoFarSec = currentTime - startTime
+                            totalTimePredictionSec = timeSoFarSec*len(cmds)/len(finishedCmds)
+                            endTimePrediction = datetime.datetime.fromtimestamp(startTime + totalTimePredictionSec).strftime("%H:%M on %d.%m.%Y")
+                            logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                            logger.info("Predicted time of completion of all %s runs: %s" % (len(cmds), endTimePrediction))
+                            logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+                        if masterFile != None and (len(finishedCmds) == len(cmds)):
+                            newDf = pd.DataFrame.from_dict(logDict, orient='index',
+                                                           columns=['started', 'finished', 'outcome', 'hour start',
+                                                                    'hour end'])
+
+                            if os.path.isfile(masterFile):
+                                masterPath, masterOrig = os.path.split(masterFile)
+                                masterBackup = masterOrig.split('.')[0] + '_BACKUP.csv'
+                                try:
+                                    shutil.copyfile(masterFile,os.path.join(masterPath, masterBackup))
+                                    logger.info("Updated " + masterBackup)
+                                except:
+                                    logger.error('Unable to generate BACKUP of ' + masterFile)
+                                origDf = pd.read_csv(masterFile, sep=";", index_col=0)
+
+                                masterDf = origDf.append(newDf)
+                                masterDf = masterDf[~masterDf.index.duplicated(keep='last')]
+                            else:
+                                masterDf = newDf
+
+                            try:
+                                masterDf.to_csv(masterFile, sep=";")
+                                logger.info("Updated " + masterFile)
+                            except:
+                                logger.error("Unable to write to " + masterFile)
+
                         # assign new command if there are open commands:
                         
                         if openCmds:

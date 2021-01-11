@@ -415,7 +415,7 @@ class DeckTrnsys():
                 
                 
                              
-             logger.info('variation deck file at %s' % self.nameDck)
+             logger.debug('variation deck file at %s' % self.nameDck)
 
              outfile=open(self.nameDck,'w')
 

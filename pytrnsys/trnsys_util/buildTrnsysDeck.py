@@ -50,6 +50,7 @@ class BuildTrnsysDeck():
         self.deckText = []
 
         self.overwriteForcedByUser=False
+        self.abortedByUser = False
         self.extOneSheetDeck = "ddck"
 
         self.skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
@@ -57,6 +58,8 @@ class BuildTrnsysDeck():
 
         self.replaceAutomaticUnits=False
 
+        self.existingDckUnchecked = True
+        self.dckAlreadyExists = True
 
     def loadDeck(self,_path,_name):        
             
@@ -151,7 +154,7 @@ class BuildTrnsysDeck():
         self.logger = logging.getLogger('root')
         # stop propagting to root logger
         self.logger.propagate = False
-        self.logger.info("Replacemenet of Units done")
+        self.logger.debug("Replacemenet of Units done")
 
     def createDependencyGraph(self):
         e = Graph('ER', filename='er.gv', node_attr={'color': 'lightblue2', 'style': 'filled'})
@@ -176,7 +179,7 @@ class BuildTrnsysDeck():
 
 
         
-    def writeDeck(self,addedLines=None):
+    def writeDeck(self, addedLines=None):
         """
         Writes the deck stored in self.deckText in the file self.nameDeck
 
@@ -189,12 +192,15 @@ class BuildTrnsysDeck():
         -------
 
         """
-
         tempName = "%s" % self.nameDeck
+
+        if self.existingDckUnchecked:
+            self.dckAlreadyExists = os.path.isfile(tempName)
+            self.existingDckUnchecked = False
 
         ok = True
 
-        if (os.path.isfile(tempName) and self.overwriteForcedByUser==False):
+        if (self.dckAlreadyExists and self.overwriteForcedByUser==False):
 
             window = tk.Tk()
             window.geometry("2x2+" + str(window.winfo_screenwidth()) + "+" + str(window.winfo_screenheight()))
@@ -213,9 +219,8 @@ class BuildTrnsysDeck():
             tempFile.writelines(text)
             tempFile.close()
         else:
-            raise ValueError("Not Accepted by user")
-        
-
+            logger.warning("dck export cancelled by user")
+            self.abortedByUser = True
 
     def readTrnsyDeck(self,useDeckName=False):
         """
@@ -271,7 +276,7 @@ class BuildTrnsysDeck():
 
         nameFile = os.path.join(self.pathDeck, name)
 
-        logger.info("Type file :%s created" % nameFile)
+        logger.debug("Type file %s created" % nameFile)
         outfile = open(nameFile, 'w')
         outfile.writelines(lines)
 
