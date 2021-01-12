@@ -1049,15 +1049,16 @@ class ProcessParallelTrnsys():
                             myX = num.array(plotXDict[chunk][key])[index]
                             myY = num.array(plotYDict[chunk][key])[index]
 
-                            if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
-                                line = myX[i] + "\t" + myY[i] + "\t"
-                            elif type(myX[i]) == num.str_:
-                                line = myX[i] + "\t" + "%8.4f\t" % myY[i]
-                            elif type(myY[i]) == num.str_:
-                                line = "%8.4f\t" % myX[i] + myX[i] + "\t"
-                            else:
-                                line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]);
-                            lines = lines + line
+                            if (len(myX) < i-1):
+                                if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
+                                    line = myX[i] + "\t" + myY[i] + "\t"
+                                elif type(myX[i]) == num.str_:
+                                    line = myX[i] + "\t" + "%8.4f\t" % myY[i]
+                                elif type(myY[i]) == num.str_:
+                                    line = "%8.4f\t" % myX[i] + myX[i] + "\t"
+                                else:
+                                    line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]);
+                                lines = lines + line
 
                     line = "\n";
                     lines = lines + line
@@ -1165,6 +1166,7 @@ class ProcessParallelTrnsys():
                 resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
 
             for file in resultFiles:
+                print(file)
                 with open(file) as f_in:
                     resultsDict = json.load(f_in)
                     resultsDict[''] = None
@@ -1775,7 +1777,7 @@ class ProcessParallelTrnsys():
                     return -1
                 else:
                     for variable in re.split('\W', equation):
-                        if variable != '' and not (self.isStringNumber(variable)):
+                        if variable != '' and variable!= "round" and not (self.isStringNumber(variable)):
                             equation = equation.replace(variable,'resultsDict[\"%s\"]' %variable)
                     exec(equation)
 
