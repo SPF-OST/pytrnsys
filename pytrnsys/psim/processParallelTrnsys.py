@@ -693,6 +693,7 @@ class ProcessParallelTrnsys():
                 if resultsDict[seriesVariable] not in seriesColors.keys():
                     seriesColors[resultsDict[seriesVariable]]=colors[colorsCounter]
                     colorsCounter+=1
+                    colorsCounter = colorsCounter%len(colors)
 
                 if '[' not in xAxisVariable:
                     xAxis = resultsDict[xAxisVariable]
@@ -771,11 +772,11 @@ class ProcessParallelTrnsys():
                     elif key is not None:
                         labelValue = key
                     if key is not None and labelValue not in labelSet:
-                        if not isinstance(labelValue,str):
-                            label = "{:.2f}".format(labelValue)
+                        if not isinstance(labelValue, str):
+                            label = "{0:.1f}".format(labelValue)
                         else:
                             label = labelValue
-                        label = self.doc.getNiceLatexNames(label)
+                            label = self.doc.getNiceLatexNames(label)
                         labelSet.add(labelValue)
                         ax1.plot(myX, myY,
                                  style, color=seriesColors[key], label=label)
@@ -921,6 +922,7 @@ class ProcessParallelTrnsys():
                     if resultsDict[seriesVariable] not in seriesColors.keys():
                         seriesColors[resultsDict[seriesVariable]] = colors[colorsCounter]
                         colorsCounter += 1
+                        colorsCounter = colorsCounter % len(colors)
 
                     if '[' not in xAxisVariable:
                         xAxis = resultsDict[xAxisVariable]
@@ -1447,6 +1449,7 @@ class ProcessParallelTrnsys():
                     if resultsDict[seriesVariable] not in seriesColors.keys():
                         seriesColors[resultsDict[seriesVariable]] = colors[colorsCounter]
                         colorsCounter += 1
+                        colorsCounter = colorsCounter % len(colors)
 
                     if '[' not in xAxisVariable:
                         xAxis = resultsDict[xAxisVariable]
@@ -1749,6 +1752,7 @@ class ProcessParallelTrnsys():
                 exec('equationDict[equation]='+equationDict[equation],calcVariableDict)
                 seriesColors[equation] = colors[colorsCounter]
                 colorsCounter += 1
+                colorsCounter = colorsCounter % len(colors)
 
             self.doc = latex.LatexReport('', '')
             if 'latexNames' in self.inputs.keys():
@@ -1805,11 +1809,10 @@ class ProcessParallelTrnsys():
                         labelValue = key
                     if key is not None and labelValue not in labelSet:
                         if not isinstance(labelValue, str):
-                            label = "{:.2f}".format(labelValue)
+                            label = "{0:.1f}".format(labelValue)
                         else:
                             label = labelValue
-                        label = self.doc.getNiceLatexNames(label)
-                        labelSet.add(labelValue)
+                            label = self.doc.getNiceLatexNames(label)
 
                         if 'plotStyleJson' in self.inputs:
                             plotKwargs = self.loadPlotJson(self.inputs['plotStyleJson'])
@@ -1975,6 +1978,7 @@ class ProcessParallelTrnsys():
                 ax1.plot(xDict[entry], yDict[entry], 'd', color=colors[colorsCounter],
                          label=self.doc.getNiceLatexNames(entry))
             colorsCounter += 1
+            colorsCounter = colorsCounter % len(colors)
         if seriesVariable != '':
             ax1.legend(loc='best')
         ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
