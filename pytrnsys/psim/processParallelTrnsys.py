@@ -863,6 +863,9 @@ class ProcessParallelTrnsys():
                 outfile.close()
                 # self.plot.gle.getEasyPlot(self, nameGleFile, fileNameData, legends, useSameStyle=True):
 
+
+
+
     def plotComparisonConditional(self):
         pathFolder = self.inputs["pathBase"]
         for plotVariables in self.inputs['comparePlotConditional']:
@@ -901,6 +904,7 @@ class ProcessParallelTrnsys():
 
             for file in resultFiles:
                 with open(file) as f_in:
+                    #print(file)
                     resultsDict = json.load(f_in)
                     resultsDict[''] = None
 
@@ -950,7 +954,7 @@ class ProcessParallelTrnsys():
                 for entry in conditionDict:
                     self.logger.warning('%s = %s' %(entry, str(conditionDict[entry])))
                 self.logger.warning('The respective plot cannot be generated')
-                return 
+                return
 
             self.doc = latex.LatexReport('', '')
             if 'latexNames' in self.inputs.keys():
@@ -1050,7 +1054,266 @@ class ProcessParallelTrnsys():
                             myX = num.array(plotXDict[chunk][key])[index]
                             myY = num.array(plotYDict[chunk][key])[index]
 
-                            if (len(myX) < i-1):
+                            if (len(myY) > i):
+                                if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
+                                    line = myX[i] + "\t" + myY[i] + "\t"
+                                elif type(myX[i]) == num.str_:
+                                    line = myX[i] + "\t" + "%8.4f\t" % myY[i]
+                                elif type(myY[i]) == num.str_:
+                                    line = "%8.4f\t" % myX[i] + myX[i] + "\t"
+                                else:
+                                    line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]);
+                                lines = lines + line
+                            else:
+                                pass
+
+                    line = "\n";
+                    lines = lines + line
+
+            # box = ax1.get_position()
+            # ax1.set_position([box.x0, box.y0, box.width, box.height])
+
+            if chunkVariable !='':
+                legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
+                                      title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0),
+                                      bbox_transform=ax1.transAxes)
+
+            else:
+                legend2 = None
+            if seriesVariable !='':
+                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.2, 1.0),   #change legend position!
+                                      bbox_transform=ax1.transAxes)
+
+            else:
+                legend1 = None
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
+
+            conditionsFileName = ''
+            if len(conditionDict) == 1:
+                conditionName = self.doc.getNiceLatexNames(sorted(conditionDict)[0])
+                ax1.set_title(conditionName + ' = ' + str(conditionDict[sorted(conditionDict)[0]]))
+                conditionsFileName = sorted(conditionDict)[0] + '=' + str(conditionDict[sorted(conditionDict)[0]])
+            else:
+                conditionsTitle = ''
+                for conditionEntry in conditionDict:
+                    conditionName = self.doc.getNiceLatexNames(conditionEntry)
+                    conditionsTitle += conditionName + ' = ' + str(conditionDict[conditionEntry]) + ', '
+                    conditionsFileName += conditionEntry + '=' + str(conditionDict[conditionEntry]) + '_'
+                conditionsTitle = conditionsTitle[:-2]
+                ax1.set_title(conditionsTitle)
+                conditionsFileName = conditionsFileName[:-1]
+            # if chunkVariable is not '':
+            #
+            if legend2 is not None:
+                fig1.add_artist(legend2)
+            # fig1.canvas.draw()
+            # if legend2 is not None:
+            #    ax1.add_artist(legend2)
+            #    legend2.set_in_layout(True)
+            # if legend1 is not None:
+            #    legend1.set_in_layout(True)
+            if chunkVariable == '':
+                fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + conditionsFileName
+            else:
+                fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable + '_' + conditionsFileName
+            fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
+            plt.close()
+
+            if (self.inputs["setPrintDataForGle"]):
+                outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
+                outfile.writelines(lines)
+                outfile.close()
+
+    def plotBarplotConditional(self):
+        pathFolder = self.inputs["pathBase"]
+        for plotVariables in self.inputs['comparePlotConditional']:
+            if len(plotVariables) < 2:
+                raise ValueError(
+                    'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
+            xAxisVariable = plotVariables[0]
+            yAxisVariable = plotVariables[1]
+            chunkVariable = ''
+            seriesVariable = ''
+            if len(plotVariables) >= 3 and not (':' in plotVariables[2]):
+                seriesVariable = plotVariables[2]
+                chunkVariable = ''
+            if len(plotVariables) >= 4 and not (':' in plotVariables[3]):
+                chunkVariable = plotVariables[3]
+
+            conditionDict = {}
+            for plotVariable in plotVariables:
+                if ':' in plotVariable:
+                    conditionEntry, conditionValue = plotVariable.split(':')
+                    conditionDict[conditionEntry] = conditionValue
+
+            plotXDict = {}
+            plotYDict = {}
+
+            seriesColors = {}
+            colorsCounter = 0
+            colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+            if self.inputs["typeOfProcess"] == "json":
+                resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
+            else:
+                resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
+
+            conditionNeverMet = True
+
+            for file in resultFiles:
+                with open(file) as f_in:
+                    resultsDict = json.load(f_in)
+                    resultsDict[''] = None
+
+                conditionList = []
+                for conditionEntry in conditionDict:
+                    entryClass = type(resultsDict[conditionEntry])
+                    conditionDict[conditionEntry] = entryClass(conditionDict[conditionEntry])
+                    conditionList.append(conditionDict[conditionEntry] == resultsDict[conditionEntry])
+
+                if all(conditionList):
+
+                    conditionNeverMet = False
+
+                    if resultsDict[seriesVariable] not in seriesColors.keys():
+                        seriesColors[resultsDict[seriesVariable]] = colors[colorsCounter]
+                        colorsCounter += 1
+
+                    if '[' not in xAxisVariable:
+                        xAxis = resultsDict[xAxisVariable]
+                    else:
+                        name, index = str(xAxisVariable).split('[')
+                        index = int(index.replace(']', ''))
+                        xAxis = resultsDict[name][index]
+                    if '[' not in yAxisVariable:
+                        yAxis = resultsDict[yAxisVariable]
+                    else:
+                        name, index = str(yAxisVariable).split('[')
+                        index = int(index.replace(']', ''))
+                        yAxis = resultsDict[name][index]
+                    if resultsDict[chunkVariable] not in plotXDict.keys():
+                        plotXDict[resultsDict[chunkVariable]] = {}
+                        plotYDict[resultsDict[chunkVariable]] = {}
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [xAxis]
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
+                    elif resultsDict[seriesVariable] not in plotXDict[resultsDict[chunkVariable]].keys():
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [xAxis]
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
+                    else:
+                        plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(xAxis)
+                        plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(yAxis)
+
+                else:
+                    pass
+
+            if conditionNeverMet:
+                self.logger.warning(
+                    'The following conditions from "comparePlotConditional" were never met all at once:')
+                for entry in conditionDict:
+                    self.logger.warning('%s = %s' % (entry, str(conditionDict[entry])))
+                self.logger.warning('The respective plot cannot be generated')
+                return
+
+            self.doc = latex.LatexReport('', '')
+            if 'latexNames' in self.inputs.keys():
+                if ':' in self.inputs['latexNames']:
+                    latexNameFullPath = self.inputs['latexNames']
+                else:
+                    latexNameFullPath = os.path.join(self.configPath, self.inputs['latexNames'])
+                self.doc.getLatexNamesDict(file=latexNameFullPath)
+            else:
+                self.doc.getLatexNamesDict()
+            if 'matplotlibStyle' in self.inputs.keys():
+                stylesheet = self.inputs['matplotlibStyle']
+            else:
+                stylesheet = 'word.mplstyle'
+            if stylesheet in plt.style.available:
+                self.stylesheet = stylesheet
+            else:
+                root = os.path.dirname(os.path.abspath(__file__))
+                self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
+            plt.style.use(self.stylesheet)
+
+            fig1, ax1 = plt.subplots(constrained_layout=True)
+            if self.inputs["plotStyle"] == "line":
+                styles = ['x-', 'x--', 'x-.', 'x:', 'o-', 'o--', 'o-.', 'o:']
+            elif self.inputs["plotStyle"] == "dot":
+                styles = ['x', 'o', '+', 'd', 's', 'v', '^', 'h']
+            else:
+                print("Invalid 'plotStyle' argument")
+
+            dummy_lines = []
+            chunkLabels = []
+            labelSet = set()
+            lines = ""
+            for chunk, style in zip(plotXDict.keys(), styles):
+                dummy_lines.append(ax1.plot([], [], style, c='black'))
+                if chunk is not None:
+                    if not isinstance(chunk, str):
+                        chunkLabel = round(float(chunk), 2)
+                        chunkLabels.append("{:.2f}".format(chunkLabel))
+                    else:
+                        chunkLabels.append(chunk)
+
+                for key in plotXDict[chunk].keys():
+                    index = num.argsort(plotXDict[chunk][key])
+                    myX = num.array(plotXDict[chunk][key])[index]
+                    myY = num.array(plotYDict[chunk][key])[index]
+
+                    mySize = len(myX)
+
+                    if key is not None and not isinstance(key, str):
+                        labelValue = round(float(key), 2)
+                    elif key is not None:
+                        labelValue = key
+                    if key is not None and labelValue not in labelSet:
+                        if not isinstance(labelValue, str):
+                            label = "{0:.1f}".format(labelValue)
+                        else:
+                            label = labelValue
+                            label = self.doc.getNiceLatexNames(label)
+
+                        labelSet.add(labelValue)
+                        ax1.plot(myX, myY,
+                                 style, color=seriesColors[key], label=label)
+                    else:
+                        ax1.plot(myX, myY,
+                                 style, color=seriesColors[key])
+
+                    # for i in range(len(myX)):
+                    #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
+            lines = "!%s\t" % seriesVariable
+            for chunk, style in zip(plotXDict.keys(), styles):
+                for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                    line = "%s\t" % key;
+                    lines = lines + line
+                line = "\n";
+                lines = lines + line
+
+            if (0):
+                for X, Y in zip(myX, myY):
+                    for chunk, style in zip(plotXDict.keys(), styles):
+
+                        for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                            index = num.argsort(plotXDict[chunk][key])
+                            myX = num.array(plotXDict[chunk][key])[index]
+                            myY = num.array(plotYDict[chunk][key])[index]
+                            line = "%8.4f\t%8.4f\t" % (X, Y);
+                            lines = lines + line
+
+                    line = "\n";
+                    lines = lines + line
+            else:
+                for i in range(mySize):
+                    for chunk, style in zip(plotXDict.keys(), styles):
+
+                        for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                            index = num.argsort(plotXDict[chunk][key])
+                            myX = num.array(plotXDict[chunk][key])[index]
+                            myY = num.array(plotYDict[chunk][key])[index]
+
+                            if (len(myX) < i - 1):
                                 if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
                                     line = myX[i] + "\t" + myY[i] + "\t"
                                 elif type(myX[i]) == num.str_:
@@ -1067,14 +1330,14 @@ class ProcessParallelTrnsys():
             # box = ax1.get_position()
             # ax1.set_position([box.x0, box.y0, box.width, box.height])
 
-            if chunkVariable !='':
+            if chunkVariable != '':
                 legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
                                       title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0),
                                       bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
-            if seriesVariable !='':
+            if seriesVariable != '':
                 legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.2, 1.0),
                                       bbox_transform=ax1.transAxes)
 
@@ -1118,6 +1381,7 @@ class ProcessParallelTrnsys():
                 outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
                 outfile.writelines(lines)
                 outfile.close()
+
 
 
 
@@ -1278,10 +1542,15 @@ class ProcessParallelTrnsys():
             cityName = []
             for chunk, style in zip(plotXDict.keys(), styles):
                 for key in plotXDict[chunk].keys():  # the varables that appear in the legend
-
-                    line = "%s\t" % key;
-                    lines = lines + line
-                    cityName.append(key)
+                    if type(key) == str:
+                        keyNice = self.doc.getNiceLatexNames(key)
+                        line = "%s\t" % self.doc.getNiceLatexNames(key);
+                        lines = lines + line
+                        cityName.append(keyNice)
+                    else:
+                        line = "%s\t" % key;
+                        lines = lines + line
+                        cityName.append(key)
                     counter = counter + 1
 
                 line = "\n";
