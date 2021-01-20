@@ -511,6 +511,10 @@ class ProcessParallelTrnsys():
             self.logger.info('Generating conditional comparison plot')
             self.plotComparisonConditional()
 
+        if 'barPlotConditional' in self.inputs.keys():
+            self.logger.info('Generating conditional bar plot')
+            self.plotBarplotConditional()
+
         if 'boxPlotConditional' in self.inputs.keys():
             self.logger.info('Generating conditional box plot')
             self.plotBoxConditional()
@@ -1083,7 +1087,7 @@ class ProcessParallelTrnsys():
             else:
                 legend2 = None
             if seriesVariable !='':
-                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.2, 1.0),   #change legend position!
+                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.0, 0.45),   #change legend position!
                                       bbox_transform=ax1.transAxes)
 
             else:
@@ -1127,9 +1131,13 @@ class ProcessParallelTrnsys():
                 outfile.writelines(lines)
                 outfile.close()
 
+
+
+
+
     def plotBarplotConditional(self):
         pathFolder = self.inputs["pathBase"]
-        for plotVariables in self.inputs['comparePlotConditional']:
+        for plotVariables in self.inputs['barPlotConditional']:
             if len(plotVariables) < 2:
                 raise ValueError(
                     'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
@@ -1258,12 +1266,22 @@ class ProcessParallelTrnsys():
                     else:
                         chunkLabels.append(chunk)
 
+
+
+                YBarPlot = []
+                labelBarPlot = []
+                keyBarPlot = []
                 for key in plotXDict[chunk].keys():
+
+
                     index = num.argsort(plotXDict[chunk][key])
                     myX = num.array(plotXDict[chunk][key])[index]
                     myY = num.array(plotYDict[chunk][key])[index]
 
+                    YBarPlot.append(myY)
                     mySize = len(myX)
+                    XBase = num.arange(len(myX))
+                    keyBarPlot.append(key)
 
                     if key is not None and not isinstance(key, str):
                         labelValue = round(float(key), 2)
@@ -1272,26 +1290,35 @@ class ProcessParallelTrnsys():
                     if key is not None and labelValue not in labelSet:
                         if not isinstance(labelValue, str):
                             label = "{0:.1f}".format(labelValue)
+                            labelBarPlot.append(label)
                         else:
                             label = labelValue
                             label = self.doc.getNiceLatexNames(label)
+                            labelBarPlot.append(label)
 
-                        labelSet.add(labelValue)
-                        ax1.plot(myX, myY,
-                                 style, color=seriesColors[key], label=label)
-                    else:
-                        ax1.plot(myX, myY,
-                                 style, color=seriesColors[key])
+                    labelSet.add(labelValue)
 
-                    # for i in range(len(myX)):
-                    #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
-            lines = "!%s\t" % seriesVariable
-            for chunk, style in zip(plotXDict.keys(), styles):
-                for key in plotXDict[chunk].keys():  # the varables that appear in the legend
-                    line = "%s\t" % key;
-                    lines = lines + line
-                line = "\n";
+                N = len(keyBarPlot)
+                Number = num.arange(N)
+
+                widthBarPlot = 1/(N+1)
+
+                lines = "!%s\t" % "BarPlotData"
+                line = "%s\t" % myX + "\n"
                 lines = lines + line
+                for n in Number:
+                    nW = n-(N-1)/2
+                    ax1.bar(XBase+nW
+                            *widthBarPlot, YBarPlot[n],color=colors[n],edgecolor='black', width=widthBarPlot, label=labelBarPlot[n])
+                    line = "%s\t" % labelBarPlot[n];
+                    lines = lines + line
+                    line = "%s\t" % YBarPlot[n] + "\n"
+                    lines = lines + line
+
+
+
+
+
 
             if (0):
                 for X, Y in zip(myX, myY):
@@ -1303,6 +1330,7 @@ class ProcessParallelTrnsys():
                             myY = num.array(plotYDict[chunk][key])[index]
                             line = "%8.4f\t%8.4f\t" % (X, Y);
                             lines = lines + line
+
 
                     line = "\n";
                     lines = lines + line
@@ -1340,15 +1368,18 @@ class ProcessParallelTrnsys():
             else:
                 legend2 = None
             if seriesVariable != '':
-                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.2, 1.0),
+                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.4, 1.0),
                                       bbox_transform=ax1.transAxes)
 
             else:
                 legend1 = None
             ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
             ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
+            ax1.set_xticks(XBase)
+            ax1.set_xticklabels(myX)
 
-            conditionsFileName = ''
+
+            conditionsFileName = 'Barplot'
             if len(conditionDict) == 1:
                 conditionName = self.doc.getNiceLatexNames(sorted(conditionDict)[0])
                 ax1.set_title(conditionName + ' = ' + str(conditionDict[sorted(conditionDict)[0]]))
