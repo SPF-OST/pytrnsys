@@ -30,6 +30,7 @@ from string import ascii_letters, digits, whitespace
 import locale
 import re
 import logging
+from calendar import monthrange
 from datetime import datetime, timedelta
 logger = logging.getLogger('root')
 # stop propagting to root logger
@@ -482,6 +483,13 @@ class ProcessTrnsysDf():
             self.addDemands()
         if (self.inputs['calculateSPF'] == True):
             self.addSPFSystem()
+            
+        if (self.inputs['dailyBalance']==True):
+            daysSelected = self.inputs['daysSelected']
+            self.addHeatBalanceDaily(daysSelected)
+        if (self.inputs['hourlyBalance']==True):
+            daySelected = self.inputs['daySelected']
+            self.addHeatBalanceHourly(daySelected)
 
         self.addElBalance()
         if(self.inputs['calculateElectricDemand']==True):
@@ -1108,7 +1116,261 @@ class ProcessTrnsysDf():
             self.doc.addTableMonthlyDf(var, names, unit, caption, nameFile, self.myShortMonths, sizeBox=15,
                                        addLines=addLines)
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
-    
+
+
+
+
+
+
+
+    def addHeatBalanceDaily(self, month,  printData=False,unit="kWh"):
+
+        if(unit=="kWh"):
+            myUnit=1.
+        elif(unit=="MWh"):
+            myUnit = 1000.
+        elif(unit=="GWh"):
+            myUnit = 1e6
+        else:
+            raise ValueError("unit %s not considered"%unit)
+
+        inVar = []
+        outVar = []
+        legendsIn = []
+        legendsOut = []
+
+        #selectedDays_list = daysSelected.split(" ")   #eval(daysSelected.split()[0])
+        monthDate = datetime.strptime(month,"%B")
+        monthNr = datetime.strftime(monthDate, '%m')
+        monthNr = int(monthNr)
+        if monthNr > 10:
+            getDate = datetime(year=2018, month = monthNr, day = 1)
+            endDate = datetime(year = 2018, month = monthNr+1, day = 1)
+        else:
+            getDate = datetime(year=2019, month = monthNr, day = 1)
+            endDate = datetime(year=2019, month=monthNr + 1, day=1)
+        difference = endDate - getDate
+        diffSeconds = difference.total_seconds()
+        NrDays = int(diffSeconds/(60*60*24))
+        Days = num.arange(NrDays)
+        selectedDays_list = getDate + pd.to_timedelta(Days, unit='d')
+
+        nr = len(selectedDays_list)
+
+        selectedDays = []
+        count = num.arange(nr)
+        for i in count:
+            help = selectedDays_list[i]
+            selectedDays.append(help)
+
+        #period = selectedDays[0]#+pd.to_timedelta('1 day')
+       # month = datetime.strptime(self.firstMonth, '%B').month,
+        Date = datetime(year=2018, month=1, day=1) + pd.to_timedelta(self.houDataDf['Time'], unit='h')
+        df_selectedDay = self.houDataDf
+        df_selectedDay["Date"] = Date
+      #  df_selectedDay["Date"] = df_selectedDay["DateTime"].date()
+      #  Test = df_selectedDay.groupby("Date").cumsum()
+
+        numDays = len(selectedDays)
+        Days = num.arange(numDays)
+
+        #Test = pd.DataFrame()
+        DaysSelected = pd.DataFrame()
+        for i in Days:
+
+            min_time = selectedDays[i]
+            max_time = selectedDays[i] + pd.to_timedelta(23, unit = 'h')
+
+            df_DataSelected=df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
+            Test = pd.DataFrame(df_DataSelected.sum(), df_DataSelected.columns)
+            Test2 = Test.T
+            Test2["Date"] = min_time.date()
+
+
+            DaysSelected = DaysSelected.append(Test2)
+
+        for name in DaysSelected.columns:
+
+            found = False
+
+            try:
+                if (name[0:7] == "qSysIn_" or name[0:10] == "elSysOut_Q_" or name[0:10] == "elSysIn_Q_"):
+                    # inVar.append(self.monData[name])
+                    inVar.append(DaysSelected[name].values/myUnit)
+                    legendsIn.append(self.getNiceLatexNames(name))
+
+
+
+                elif (name[0:8] == "qSysOut_"):
+                    # outVar.append(self.monData[name])
+                    outVar.append(DaysSelected[name].values/myUnit)
+
+                    legendsOut.append(self.getNiceLatexNames(name))
+            except:
+                pass
+
+        nameFile = 'HeatDaily_' + month
+
+        niceLegend = legendsIn + legendsOut
+        nrOfDays = len(DaysSelected)
+
+
+        legendDates = num.arange(nrOfDays)+1
+
+        xLegend = 'Month ' + month
+
+        if len(inVar)>0 or len(outVar)>0:
+
+
+
+            namePdf = self.plot.plotDailyBalanceDf(inVar, outVar,legendDates, niceLegend, "Energy Flows Daily", xLegend, nameFile, unit,
+                                                     self.myShortMonths,
+                                                     useYear=False, printData=self.printDataForGle,
+                                                     plotEmf=self.inputs['plotEmf'])
+
+            for i in range(len(outVar)):
+                outVar[i] = -outVar[i]
+
+            var = inVar + outVar
+            var.append(sum(inVar) + sum(outVar))
+
+            names = ["Month"] + niceLegend + ["Imb"]
+
+            caption = "System Heat Balance"
+
+            totalDemand = sum(self.qDemand)/myUnit
+
+            imb = sum(var[len(var) - 1])
+
+            addLines = ""
+            symbol = "\%"
+            line = "\\hline \\\\ \n";
+            addLines = addLines + line
+            line = "$Q_D$ & %.2f & MWh \\\\ \n" % (totalDemand / 1000.);
+            addLines = addLines + line
+            line = "Imb & %.1f & %s \\\\ \n" % (100 * imb / totalDemand, symbol);
+            addLines = addLines + line
+
+            #self.doc.addTableMonthlyDf(var, names, unit, caption, nameFile, self.myShortMonths, sizeBox=15,
+#                                       addLines=addLines)
+            self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+
+    def addHeatBalanceHourly(self, daySelected, printData=False, unit="kWh"):
+
+        if (unit == "kWh"):
+            myUnit = 1.
+        elif (unit == "MWh"):
+            myUnit = 1000.
+        elif (unit == "GWh"):
+            myUnit = 1e6
+        else:
+            raise ValueError("unit %s not considered" % unit)
+
+        inVar = []
+        outVar = []
+        legendsIn = []
+        legendsOut = []
+
+
+        selectedDays_list = daySelected  # eval(daysSelected.split()[0])
+
+        nr = len(selectedDays_list)
+
+
+
+        selectedDays = datetime.strptime(selectedDays_list, '%Y,%m,%d')
+
+
+        #period = selectedDays  # +pd.to_timedelta('1 day')
+            # month = datetime.strptime(self.firstMonth, '%B').month,
+        getDate = datetime(year=2018, month=1, day=1) + pd.to_timedelta(self.houDataDf['Time'], unit='h')
+        df_selectedDay = self.houDataDf
+        df_selectedDay["Date"] = getDate
+            #  df_selectedDay["Date"] = df_selectedDay["DateTime"].date()
+            #  Test = df_selectedDay.groupby("Date").cumsum()
+
+
+
+            # Test = pd.DataFrame()
+        DaysSelected = pd.DataFrame()
+
+
+        min_time = selectedDays
+        max_time = selectedDays + pd.to_timedelta(23, unit='h')
+
+        df_DataSelected = df_selectedDay[
+                    (df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
+
+        DaysSelected = df_DataSelected
+
+
+
+        for name in DaysSelected.columns:
+
+            found = False
+
+            try:
+                if (name[0:7] == "qSysIn_" or name[0:10] == "elSysOut_Q_" or name[0:10] == "elSysIn_Q_"):
+                        # inVar.append(self.monData[name])
+                    inVar.append(DaysSelected[name].values / myUnit)
+                    legendsIn.append(self.getNiceLatexNames(name))
+
+
+
+                elif (name[0:8] == "qSysOut_"):
+                        # outVar.append(self.monData[name])
+                    outVar.append(DaysSelected[name].values / myUnit)
+
+                    legendsOut.append(self.getNiceLatexNames(name))
+            except:
+                pass
+
+
+
+        niceLegend = legendsIn + legendsOut
+
+        legendDates = num.arange(24)
+        help = DaysSelected["Date"]
+        XLabel = str(help[5].date())
+
+        nameFile = 'HeatHourly_' + XLabel
+        if len(inVar) > 0 or len(outVar) > 0:
+
+            namePdf = self.plot.plotDailyBalanceDf(inVar, outVar, legendDates, niceLegend, "Energy Flows Hourly",XLabel,
+                                                       nameFile, unit,
+                                                       useYear=False, printData=self.printDataForGle,
+                                                       plotEmf=self.inputs['plotEmf'])
+
+            for i in range(len(outVar)):
+                outVar[i] = -outVar[i]
+
+            var = inVar + outVar
+            var.append(sum(inVar) + sum(outVar))
+
+            names = ["Month"] + niceLegend + ["Imb"]
+
+            caption = "System Heat Balance"
+
+            totalDemand = sum(self.qDemand) / myUnit
+
+            imb = sum(var[len(var) - 1])
+
+            addLines = ""
+            symbol = "\%"
+            line = "\\hline \\\\ \n";
+            addLines = addLines + line
+            line = "$Q_D$ & %.2f & MWh \\\\ \n" % (totalDemand / 1000.);
+            addLines = addLines + line
+            line = "Imb & %.1f & %s \\\\ \n" % (100 * imb / totalDemand, symbol);
+            addLines = addLines + line
+
+                # self.doc.addTableMonthlyDf(var, names, unit, caption, nameFile, self.myShortMonths, sizeBox=15,
+                #                                       addLines=addLines)
+            self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+
+
+
+
     
 
     def calculateElHeatConsumption(self):

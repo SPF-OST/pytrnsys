@@ -74,6 +74,7 @@ def processDataGeneral(casesInputs,withIndividualFiles = False):
 
     test.setBuildingArea(inputs["buildingArea"])
     test.setTrnsysDllPath(inputs["dllTrnsysPath"])
+    
 
     # test.setTrnsysVersion("TRNSYS17_EXE")
 
@@ -171,6 +172,9 @@ class ProcessParallelTrnsys():
         self.inputs["outputLevel"] = "INFO"
         self.inputs['createLatexPdf'] = True
         self.inputs['calculateCost'] = False
+        self.inputs['dailyBalance'] = False
+        self.inputs['hourlyBalance'] = False
+        #self.inputs['daysSelected'] = "2019,2,30" "2019,4,30" "2019,8,30"
 
         self.inputs['calculateHeatDemand']=True
         self.inputs['calculateSPF']=True
@@ -1081,13 +1085,13 @@ class ProcessParallelTrnsys():
 
             if chunkVariable !='':
                 legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
-                                      title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0),
+                                      title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.31, 1.0),
                                       bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
             if seriesVariable !='':
-                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.0, 0.45),   #change legend position!
+                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.15, 1.0),   #change legend position!
                                       bbox_transform=ax1.transAxes)
 
             else:
@@ -1245,7 +1249,7 @@ class ProcessParallelTrnsys():
                 self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
             plt.style.use(self.stylesheet)
 
-            fig1, ax1 = plt.subplots(constrained_layout=True)
+            fig1, ax1 = plt.subplots(constrained_layout=True, figsize = [8, 3], dpi = 200)
             if self.inputs["plotStyle"] == "line":
                 styles = ['x-', 'x--', 'x-.', 'x:', 'o-', 'o--', 'o-.', 'o:']
             elif self.inputs["plotStyle"] == "dot":
@@ -1368,7 +1372,7 @@ class ProcessParallelTrnsys():
             else:
                 legend2 = None
             if seriesVariable != '':
-                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.4, 1.0),
+                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.15, 1.0),
                                       bbox_transform=ax1.transAxes)
 
             else:
@@ -1377,6 +1381,35 @@ class ProcessParallelTrnsys():
             ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
             ax1.set_xticks(XBase)
             ax1.set_xticklabels(myX)
+
+            fig2, ax2 = plt.subplots(constrained_layout=True, figsize = [8, 3], dpi = 200)
+
+            width2 = 0.33
+            ax2.bar(XBase - 0.165, (YBarPlot[0]-YBarPlot[2])/YBarPlot[2]*100, color=colors[0], edgecolor='black', width=width2,
+                    label=labelBarPlot[0])
+            ax2.bar(XBase + 0.165, (YBarPlot[1]-YBarPlot[2])/YBarPlot[2]*100, color=colors[1], edgecolor='black', width=width2,
+                    label=labelBarPlot[1])
+
+            if chunkVariable != '':
+                legend2 = fig2.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
+                                      title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0),
+                                      bbox_transform=ax2.transAxes)
+
+            else:
+                legend2 = None
+            if seriesVariable != '':
+                legend1 = fig2.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.15, 1.0),
+                                      bbox_transform=ax2.transAxes)
+
+            else:
+                legend1 = None
+
+            ax2.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
+            ax2.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable)+ "[%]")
+            ax2.set_xticks(XBase)
+            ax2.set_xticklabels(myX)
+
+
 
 
             conditionsFileName = 'Barplot'
@@ -1408,6 +1441,9 @@ class ProcessParallelTrnsys():
             else:
                 fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable + '_' + conditionsFileName
             fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
+            plt.close()
+
+            fig2.savefig(os.path.join(pathFolder, 'diffPlot' + fileName + '.png'), bbox_inches='tight')
             plt.close()
 
             if (self.inputs["setPrintDataForGle"]):
@@ -1594,7 +1630,7 @@ class ProcessParallelTrnsys():
             #test2 = test[cityName[2]].astype(float)
             #boxplot = test.boxplot(column = [cityName[1], cityName[2]])
             pos = num.arange(counter)
-            ax1.boxplot(myY)#,test[cityName[1]].astype(float)])
+            ax1.boxplot(myY,showfliers=False)#,test[cityName[1]].astype(float)])
             ax1.set_xticklabels(cityName)
            # ax1.text(pos,cityName)
            # ax1.boxplot(num.array(plotYDict[chunk][cityName[1]],dtype=float),'DAV') #plotYDict[chunk][0:3])  # ,'labels',{'1','2','3','4'})
@@ -1668,7 +1704,7 @@ class ProcessParallelTrnsys():
                 fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + conditionsFileName
             else:
                 fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable + '_' + conditionsFileName
-            fig1.savefig(os.path.join(pathFolder, 'BoxPlot' + fileName + 'png'), bbox_inches='tight')
+            fig1.savefig(os.path.join(pathFolder, 'BoxPlot' + fileName), bbox_inches='tight')
             plt.close()
 
             if (self.inputs["setPrintDataForGle"]):

@@ -1003,6 +1003,201 @@ class PlotMatplotlib():
 
         return namePdf
 
+    
+
+
+
+    def plotDailyBalanceDf(self, inVar, outVar, dayLabel, legends, myLabel, myXLabel, nameFile, unit,
+                               printImb=True, useYear=False, plotEmf=False, printData=False,
+                               showMonths=False,ylims=None, title = '', style = ''):
+        """
+        Plots daily energy balance for selected days of system input variables and system output variables.
+
+        Parameters
+        ----------
+        inVar : ndarray
+            1D array of length 12 containing monthly values of system input variables
+        outVar : ndarray
+            1D array of length 12 containing monthly values of system output variables
+        legends : list of str
+            list of strings containing N entries for the legend. Input variables go first Output vairables go second)
+        myLabel : str
+            Label of the y-Axis
+        nameFile : str
+            Name of the plot file to be saved
+        defMonths : list of str
+            list of strings with the month names
+        printImb : bool, optional
+            Print the monthly imbalance between in and out variables, Default is True
+        yearlyFactor : float, optional
+            Value for the reduction of the yearly sum to make it fit in the y-axis, Default is 1
+        useYear : bool, optional
+            Show the yearly sum, Default is false
+        plotEmf : bool, optional
+            Print the plot as an emf (requres an installation of inkscape), Default is False
+        printData : bool, optional
+            Print the data to a .dat file, Default is false
+        showMonths : list of int, optional
+            list with numbers of which months to plot (0=january), Default is False (shows all files)
+        ylims : [lower,upper], optional
+            lower and upper limit for y axi, Default is False (automatic limits by matplotlib)
+
+        Returns
+        -------
+        str
+            Path of Pdf created.
+        """
+
+        move = 0
+
+
+
+        variables = inVar.copy()
+        for var in outVar:
+            variables.append(-var)
+
+        nDays = len(dayLabel)
+        showDays = [i for i in range(nDays)]
+
+
+        data = num.array(variables)
+        if printImb:
+            data = num.append(data, [-num.sum(data[:,showDays], axis=0)], axis=0)
+
+        cumulated_data = self._get_cumulated_array(data, min=0)
+        cumulated_data_neg = self._get_cumulated_array(data, max=0)
+
+        row_mask = (data < 0)
+        cumulated_data[row_mask] = cumulated_data_neg[row_mask]
+        data_stack = cumulated_data
+
+        width = 0.35  # the width of the bars
+        ind = num.arange(len(showDays))  # the x locations for the groups
+
+        if style == 'relative':
+            positiveSum = num.zeros(nDays)
+            for variable in variables:
+                positiveSum += num.where(variable > 0., variable, 0.)
+
+        with plt.style.context(self.stylesheet):
+            fig = plt.figure()
+            plot = fig.add_subplot(111)
+            bar = []
+
+            #tempColors = ['r','orange','yellow','brown','c','b','g','grey']
+
+            for i in range(len(variables)):
+                if style == 'relative':
+                    test = variables[i][showDays]/positiveSum
+                    bar.append(plot.bar(ind - move * width, variables[i][showDays]/positiveSum*100., width, color=self.myColorsIn[i], #color=tempColors[i],
+                                        bottom=data_stack[i]/positiveSum*100.))
+                else:
+                    try:
+                        bar.append(
+                            plot.bar(ind - move * width, variables[i][showDays], width, color=self.myColorsIn[i],
+                                     bottom=data_stack[i]))
+                    except:
+                        bar.append(
+                            plot.bar(ind - move * width, variables[i][showDays], width, bottom=data_stack[i]))
+
+            if printImb:
+                if style == 'relative':
+                    bar.append(plot.bar(ind - move * width, data[-1][showDays]/positiveSum*100., width, color='k',
+                                        bottom=data_stack[-1]/positiveSum*100.))
+                else:
+                    bar.append(plot.bar(ind - move * width, data[-1][showDays], width, color='k',
+                                        bottom=data_stack[-1]))
+
+            if style == 'relative':
+                myLabel = myLabel + " [%]"
+            else:
+                myLabel = myLabel + " [%s]" % unit
+
+            plot.set_ylabel(myLabel)
+            plot.set_xlabel(myXLabel)
+            box = plot.get_position()
+            plot.set_position([box.x0, box.y0, box.width * 0.8 / (nDays-1) * nDays, box.height])
+            plot.set_xticks(ind)
+            plot.set_xticklabels(dayLabel, rotation='45')
+
+            allbar = []
+            for b in bar:
+                allbar.append(b[0])
+
+            lgd=plot.legend(allbar, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+            if title != '':
+                plot.set_title(title)
+
+            namePdf = '%s.%s' % (nameFile, self.extensionPlot)
+            nameWithPath = '%s\%s' % (self.path, namePdf)
+
+            logger.debug("PlotMonthlyBalance name:%s" % nameWithPath)
+
+            if (useYear == True):
+                plt.xlim([-0.5, 13.5])
+            else:
+                plt.xlim([-0.5, len(showDays)])
+
+            if ylims is not None:
+                plt.ylim(ylims)
+
+            plt.savefig(nameWithPath, bbox_extra_artists=(lgd,), bbox_inches='tight')
+
+            if (plotEmf):
+                nameEmf = '%s.png' % nameFile
+                nameEmfWithPath = '%s\%s' % (self.path, nameEmf)
+
+                self._plot_as_emf(fig,filename=nameEmfWithPath)
+
+            plt.close()
+
+            if style == 'relative':
+                printData = False
+
+            if (printData == True):
+
+                lines = ""
+                line = "!nMonth\t";
+                lines = lines + line
+
+                for label in legends:
+                    line = "%s\t" % label;
+                    lines = lines + line
+                line = "\n";
+                lines = lines + line
+
+                # variables(nVar,nMonth)
+
+                for j in range(nDays):
+                    line = "%d\t" % (j + 1);
+                    lines = lines + line
+                    sumVar = 0.
+                    sumVarNeg = 0.
+                    for i in range(len(variables)):
+
+                        sumVarNeg +=variables[i][j]
+                        line = "%.2f\t" % sumVarNeg;
+
+                        lines = lines + line
+
+                    line = "\n";
+                    lines = lines + line
+
+                nameWithPath = '%s\%s.dat' % (self.path, nameFile)
+                outfile = open(nameWithPath, 'w')
+                outfile.writelines(lines)
+                outfile.close()
+
+               # self.gle.getBarBalancePlot(nameFile, nameWithPath, legends, len(variables), 0,
+#                                           xnames=dayLabel)
+
+        return namePdf
+
+
+
+
+
     def plotHeatingLimitFit(self,dailyTemperature,heatingPower,fileName,timeStep,title='',yLabel=''):
         """
         Generate a plot of heating power values in dependence of average daily temperature. If timeStep == 'daily' a
