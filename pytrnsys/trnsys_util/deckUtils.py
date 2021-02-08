@@ -199,12 +199,22 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
         else:
             for i in range(len(lines)):
 
-                oldString = "[%d," % (oldUnit)
-                newString = "[%s," % (newUnit)
+                # oldString = "[%d," % (oldUnit)
+                # newString = "[%s," % (newUnit)
+
+                oldString = "%d," % (oldUnit)
+                newString = "%s," % (newUnit)
 
                 mySplit = lines[i].split("!")
 
-                newLine = mySplit[0].replace(oldString, newString)
+                if oldString in mySplit[0]:
+                    newLine = mySplit[0].replace('['+oldString, '['+newString)
+                    if mySplit[0][len(oldString)-1]==',':
+                        newLine = mySplit[0].replace(oldString, newString)
+
+                else:
+                    newLine = mySplit[0]
+
                 replaced=False
                 if(newLine!=mySplit[0]):
                     myNewSplit = newLine.split("!")
