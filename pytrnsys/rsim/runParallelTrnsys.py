@@ -254,17 +254,20 @@ class RunParallelTrnsys():
         successfulCases = []
 
         if 'masterFile' in self.inputs:
-            try:
-                masterDf = pd.read_csv(self.inputs['masterFile'], sep = ';', index_col=0)
-            except:
-                self.logger.error("Unable to read " + self.inputs['trackingFile'])
-                self.logger.error("Variation dck files of %s won't be created" % self.nameBase)
-                return
+            if os.path.isfile(self.inputs['masterFile']):
+                try:
+                    masterDf = pd.read_csv(self.inputs['masterFile'], sep = ';', index_col=0)
+                except:
+                    self.logger.error("Unable to read " + self.inputs['masterFile'])
+                    self.logger.error("Variation dck files of %s won't be created" % self.nameBase)
+                    return
 
-            self.logger.info("Checking for successful runs in " + self.inputs['masterFile'])
-            for index,row in masterDf.iterrows():
-                if row['outcome'] == 'success':
-                    successfulCases.append(index)
+                self.logger.info("Checking for successful runs in " + self.inputs['masterFile'])
+                for index,row in masterDf.iterrows():
+                    if row['outcome'] == 'success':
+                        successfulCases.append(index)
+            else:
+                self.logger.info("Master file does not exist, no runs will be excluded")
 
         # creates a list of decks with the appripiate name but nothing changed inside!!
         if(self.variationsUsed or (self.changeDDckFilesUsed==True and self.foldersForDDckVariationUsed==False)):
