@@ -10,12 +10,15 @@ ToDo :
 """
 
 
-import pytrnsys.utils as utils
-import pytrnsys.report.latexReport as latex
-import matplotlib.pyplot as plt
-import matplotlib
-import matplotlib as mpl
 import logging
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+import pytrnsys.report.latexReport as latex
+import pytrnsys.utils as utils
+from pytrnsys.cost_calculation import economicFunctions as ef
+
 logger = logging.getLogger('root')
 
 class CostCalculation():
@@ -72,25 +75,10 @@ class CostCalculation():
         self.costResidual    = costResidual
         self.lifeTimeResVal = lifeTimeRes
 
-    def getNPV(self,rate,period):
-        
-        npv = ((1.+rate)**period-1.)/(rate*(1.+rate)**period)
-        return npv
-        
-    def getAnnuity(self,rate,period):
-        
-        Anu = (rate*(1.+rate)**period)/((1.+rate)**period-1.)
-        return Anu
-
-    def getNPVIncreaseCost(self,rate,period,increaseCost):
-        
-        npv = 1/(rate-increaseCost)*(1.-((1.+increaseCost)/(1.+rate))**period)          
-        return npv
-
     def calculate(self):
                       
 #        self.npvFac = ((1.+self.rate)**self.analysPeriod-1.)/((1.+self.rate)**self.analysPeriod*self.rate)
-        self.npvFac = self.getNPV(self.rate,self.analysPeriod)
+        self.npvFac = ef.getNPV(self.rate, self.analysPeriod)
         
         self.costElecTotalY = self.costElecFix+self.costElecKwh*self.elDemandTotal  
         
@@ -116,7 +104,7 @@ class CostCalculation():
         
         logger.debug("npvSystem:%f totalInvestCost :%f npvElec :%f npvMaintenance:%f npvResVal:%f"%(self.npvSystem,self.totalInvestCost,self.npvElec,self.npvMaintenance,self.npvResVal))
 
-        self.annuityFac = self.getAnnuity(self.rate,self.analysPeriod)
+        self.annuityFac = ef.getAnnuity(self.rate, self.analysPeriod)
         
         self.annuity = self.annuityFac*self.npvSystem  # Fr.
         

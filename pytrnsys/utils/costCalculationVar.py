@@ -12,6 +12,9 @@ ToDo :
 import pytrnsys.utils.costCalculation as mycost
 import numpy as num
 import logging
+
+from pytrnsys.cost_calculation import economicFunctions as ef
+
 logger = logging.getLogger('root')
 
 class CostCalculationVar(mycost.CostCalculation):
@@ -173,7 +176,8 @@ class CostCalculationVar(mycost.CostCalculation):
             logger.debug("ncomp:%d rate:%f lifeTime%f"%(i,self.rate,self.lifeTimeComp[i]))
             
 #            npv = self.getNPV(self.rate,self.lifeTimeComp[i]) # All is lifetime or analysisPeriod?
-            ann = self.getAnnuity(self.rate,self.lifeTimeComp[i]) 
+            period = self.lifeTimeComp[i]
+            ann = ef.getAnnuity(self.rate, period)
 #            self.npvFac[i] = npv 
             self.annFac[i] = ann
 #            self.costNpv[i] =self.costComponent[i]*npv
@@ -191,7 +195,7 @@ class CostCalculationVar(mycost.CostCalculation):
         if(self.rate==self.increaseElecCost): 
             self.npvFacElec = self.analysPeriod/(1.+self.rate) #DC It was lifeTime but now its different from each other
         else:
-            self.npvFacElec = self.getNPVIncreaseCost(self.rate,self.analysPeriod,self.increaseElecCost)          
+            self.npvFacElec = ef.getNPVIncreaseCost(self.rate, self.analysPeriod, self.increaseElecCost)
             
         self.npvElec = self.costElecTotalY*self.npvFacElec
                     
@@ -199,7 +203,7 @@ class CostCalculationVar(mycost.CostCalculation):
         #Maintenance cost 
         #===================================================
 #        self.npvMaintenance = self.MaintenanceRate*self.totalInvestCost*self.npvFac
-        self.npvMaintenance = self.MaintenanceRate*self.totalInvestCost*self.getNPV(self.rate,self.analysPeriod)#sum(self.costNpv)
+        self.npvMaintenance = self.MaintenanceRate * self.totalInvestCost * ef.getNPV(self.rate, self.analysPeriod)  #sum(self.costNpv)
         # self.npvMaintenance = self.MaintenanceRate * self.totalInvestCost #We use every year a MaintenanceRate% of the investment cost for maintenance
 
     #        if(self.printInfo):
@@ -214,7 +218,7 @@ class CostCalculationVar(mycost.CostCalculation):
         self.costNpvYearlyComp = num.zeros(self.nYearlyComp)
 
         for i in range(self.nYearlyComp):
-            npv = self.getNPV(self.rate,self.analysPeriod)
+            npv = ef.getNPV(self.rate, self.analysPeriod)
             self.costNpvYearlyComp[i] = self.yearlyCompCost[i]*npv
 
         #===================================================
@@ -239,7 +243,7 @@ class CostCalculationVar(mycost.CostCalculation):
         #ANNUITY
         #===================================================
 
-        self.annuityFac = self.getAnnuity(self.rate,self.analysPeriod)
+        self.annuityFac = ef.getAnnuity(self.rate, self.analysPeriod)
 #        self.annuity = self.annuityFac*self.npvSystem  # Fr.
         
 #        print "annuity:%f annuityFac:%f npvSystem:%f"%(self.annuity,self.annuityFac,self.npvSystem)
