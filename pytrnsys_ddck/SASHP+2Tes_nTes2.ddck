@@ -1,0 +1,302 @@
+*************************************
+**BEGIN SASHP+2Tes_nTes2.ddck
+*************************************
+
+*******************************************
+** Plug-Flow Model exported from TRNSYS GUI
+*******************************************
+
+*******************************************
+** To be checked: 
+** check cp and rho values for the cirquits 
+** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used 
+*******************************************
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 3
+qSysOut_TesDhwLoss = sumQLoss_Tes2
+qSysOut_TesDhwAcum = sumQAcum_Tes2
+elSysIn_Q_TesDhwAux = qHeatSource_Tes2
+*****************************************************
+**************** Inputs from hydraulic solver ********************
+*****************************************************
+EQUATIONS 3
+Tdp1In_Tes2 = TPiAuxToTesDhw ! @connectDdck
+Mfrdp1_Tes2 = MfrPiAuxToTesDhw ! @connectDdck
+Tdp1InRev_Tes2 = TPiTesDhwtoAux ! @connectDdck
+EQUATIONS 3
+Thx1In_Tes2 = TPiTesDhwOut ! @connectDdck
+Mfrhx1_Tes2 = MfrPiTesDhwOut ! @connectDdck
+Thx1InRev_Tes2 = TPiTesDhwIn ! @connectDdck
+CONSTANTS 2
+zAux1_Tes2=0.00 !connectDDck
+qAux1_Tes2=0.00 !connectDDck
+
+*****************************************************
+**************** Parameters of Type1924 ********************
+*****************************************************
+CONSTANTS 3
+TRoomStore=15 ! @userDefined
+VStoreRef = 0.763
+ratioTes = Vol_Tes2 / VStoreRef
+*********Connecting values of DIRECT PORT=1***********
+CONSTANTS 2
+zInDp1_Tes2=0.90 ! @connectDdck 
+zOutDp1_Tes2=0.70 ! @connectDdck 
+*********Connecting values of HX=1***********
+CONSTANTS 4
+zInhx1_Tes2=1.00  ! @connectDdck
+zOuthx1_Tes2=0.00 ! @connectDdck
+Cphx1_Tes2=cpwat     ! @connectDdck
+Rhohx1_Tes2=rhowat    ! @connectDdck
+*********Constant of DIRECT PORT=1***********
+CONSTANTS 1
+Dp1Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
+********** HEAT EXCHANGER CONSTANTS*******
+CONSTANTS 1
+nHxUsed_Tes2=1 
+*********Constant values of HX=1***********
+CONSTANTS 15
+dInHx1_Tes2=0.05 ! m only if modHx1=1
+dOutHx1_Tes2=0.06 ! m only if modHx1=1
+LHx1_Tes2=20 ! m only if modHx1=1
+LamHx1_Tes2=50 ! W/mK only if modHx1=1
+brineConcHx1_Tes2=30 ! [0-100] only if modHx1=1
+VHx1_Tes2=0. 
+nCvHx1_Tes2=20 
+modHx1_Tes2=1 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)
+nNuHx1_Tes2=0.5 !  only if modHx1=1
+cNuHx1_Tes2=0.25 !  only if modHx1=1
+dUaMfrHx1_Tes2=0.375 ! only if modHx1=0
+dUadTHx1_Tes2=0.0 ! only if modHx1=0
+dUaTHx1_Tes2=0.458 ! only if modHx1=0
+UaHx1_Tes2=1105*ratioTes ! kJ/hK only if modHx1=0
+startUpHx1_Tes2=0. ! only if modHx1=0
+*****************************************************
+** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
+*****************************************************
+CONSTANTS 10
+zSen1_Tes2=0.05
+zSen2_Tes2=0.15
+zSen3_Tes2=0.25
+zSen4_Tes2=0.35
+zSen5_Tes2=0.45
+zSen6_Tes2=0.55
+zSen7_Tes2=0.65
+zSen8_Tes2=0.75
+zSen9_Tes2=0.85
+zSen10_Tes2=0.95
+*****************************************************
+** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
+*****************************************************
+CONSTANTS 10
+zSenAvgBot1_Tes2 = 0.05
+zSenAvgTop1_Tes2 = 0.15
+zSenAvgBot2_Tes2 = 0.25
+zSenAvgTop2_Tes2 = 0.35
+zSenAvgBot3_Tes2 = 0.45
+zSenAvgTop3_Tes2 = 0.55
+zSenAvgBot4_Tes2 = 0.65
+zSenAvgTop4_Tes2 = 0.75
+zSenAvgBot5_Tes2 = 0.85
+zSenAvgTop5_Tes2 = 0.95
+CONSTANTS 12
+Vol_Tes2=1          ! 1: m3, volume of store
+RhoWat_Tes2=RhoWat  ! 2: kg/m3, density of storage media
+CpWat_Tes2=CpWat    ! 3: kJ/kgK, specific heat of storage media
+lamZ_Tes2=0.6       ! 4: W/mK, effective vertical thermal conductivity of TES
+Heigh_Tes2=1.       ! 5: m, storage height
+Tini_Tes2=60.       ! 6: oC, initial temperature
+nCvMax_Tes2=400     ! 7: -, minimum relative plug height
+nCvMin_Tes2=20      ! 8: -, maximum relative plug height
+maxTDiff_Tes2=0.015 ! 9: K, maximum temperature difference between plugs
+readMode_Tes2=0     ! 10: 1: from table, 0: Tini and CapTot
+Tref_Tes2=273.15    ! 11: oC, reference temperature
+Tmax_Tes2=100.       ! 6: oC, initial temperature
+CONSTANTS 10
+Ufoam_Tes2= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) 
+Ubot_Tes2 = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)
+Atop_Tes2 = Vol_Tes2/Heigh_Tes2 ! m2
+Diameter_Tes2 = (4*ATop_Tes2/PI)^0.5 ! m 
+ALat_Tes2 = Heigh_Tes2*PI*Diameter_Tes2 ! m2
+UaBot_Tes2= Ubot_Tes2*ATop_Tes2 ! @userDefined W/k 
+Uaz1_Tes2 = Ufoam_Tes2*ALat_Tes2/3 ! @userDefined W/k
+Uaz2_Tes2 = Ufoam_Tes2*ALat_Tes2/3 ! @userDefined W/k
+Uaz3_Tes2 = Ufoam_Tes2*ALat_Tes2/3 ! @userDefined W/k
+UaTop_Tes2 = Ufoam_Tes2*ATop_Tes2 ! @userDefined W/k
+************* MOVING PLATE *******************
+CONSTANTS 4
+MoInsPlate_Tes2=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
+zInsPlate_Tes2=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
+TinsPlate_Tes2=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
+UAinsPlate_Tes2=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
+*****************************************************
+**************** TYPE DEFINITION ********************
+*****************************************************
+UNIT 50 TYPE 1925     ! plug flow tank
+PARAMETERS 219 
+Vol_Tes2     ! 1: m3, volume of store
+RhoWat_Tes2  ! 2: kg/m3, density of storage media
+CpWat_Tes2   ! 3: kJ/kgK, specific heat of storage media
+lamZ_Tes2    ! 4: W/mK, effective vertical thermal conductivity of TES
+Heigh_Tes2   ! 5: m, storage height
+TIni_Tes2   ! 6: oC, initial temperature
+nCvMax_Tes2  ! 7: -, minimum relative plug height
+nCvMin_Tes2  ! 8: -, maximum relative plug height
+maxTDiff_Tes2  ! 9: K, maximum temperature difference between plugs
+readMode_Tes2  ! 10: 1: from table, 0: Tini and CapTot
+Tref_Tes2     ! 11: oC, reference temperature
+UaBot_Tes2 ! W/k 
+Uaz1_Tes2  ! W/k
+Uaz2_Tes2  ! W/k
+Uaz3_Tes2  ! W/k
+UaTop_Tes2 ! W/k
+tMax_Tes2
+0	0	0 ! 17-20 unsused parameters
+zInDp1_Tes2 zOutDp1_Tes2 zero Dp1Strat_Tes2 ! 21 - 25: zIn, zOut, cp, strat
+-1 -1 zero zero ! 26 - 30: zIn, zOut, cp, strat
+-1 -1 zero zero ! 31 - 35: zIn, zOut, cp, strat
+-1 -1 zero zero ! 36 - 40: zIn, zOut, cp, strat
+-1 -1 zero zero ! 41 - 45: zIn, zOut, cp, strat
+-1 -1 zero zero ! 46 - 50: zIn, zOut, cp, strat
+-1 -1 zero zero ! 51 - 55: zIn, zOut, cp, strat
+-1 -1 zero zero ! 56 - 60: zIn, zOut, cp, strat
+-1 -1 zero zero ! 61 - 65: zIn, zOut, cp, strat
+-1 -1 zero zero ! 66 - 70: zIn, zOut, cp, strat
+zSen1_Tes2 zSen2_Tes2 zSen3_Tes2 zSen4_Tes2 zSen5_Tes2 zSen6_Tes2 zSen7_Tes2 zSen8_Tes2 zSen9_Tes2 zSen10_Tes2 ! 61-71 : relative storage temperature sensor heights 
+zSenAvgBot1_Tes2 zSenAvgTop1_Tes2 ! 71-72 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot2_Tes2 zSenAvgTop2_Tes2 ! 73-74 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot3_Tes2 zSenAvgTop3_Tes2 ! 75-76 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot4_Tes2 zSenAvgTop4_Tes2 ! 77-78 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot5_Tes2 zSenAvgTop5_Tes2 ! 79-80 : relative position of lower and upper edge temeprature sensors
+MoInsPlate_Tes2 ! 81: 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
+zInsPlate_Tes2  ! 82: 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
+TinsPlate_Tes2  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
+UAinsPlate_Tes2 ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
+nHxUsed_Tes2     ! 85: number Of used Hx
+** Parameters for heat Exchanger number 1
+zInHx1_Tes2 zOutHx1_Tes2 dInHx1_Tes2 dOutHx1_Tes2 LHx1_Tes2 LamHx1_Tes2 brineConcHx1_Tes2 VHx1_Tes2 CpHx1_Tes2 RhoHx1_Tes2 nCvHx1_Tes2 modHx1_Tes2 nNuHx1_Tes2 cNuHx1_Tes2 dUaMfrHx1_Tes2 dUadTHx1_Tes2 dUaTHx1_Tes2 UaHx1_Tes2 startUpHx1_Tes2 ! Heax exchanger 1
+** Parameters for heat Exchanger number 2
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 2
+** Parameters for heat Exchanger number 3
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 3
+** Parameters for heat Exchanger number 4
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 4
+** Parameters for heat Exchanger number 5
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 5
+** Parameters for heat Exchanger number 6
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 6
+** 20 height position for any heat source, e.g. electrical backup or heat pump condenser. Any position can be due to a different heat source
+zAux1_Tes2 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
+INPUTS 69
+************10 DIRECT PORTS INPUTS***************
+Tdp1In_Tes2 Mfrdp1_Tes2 Tdp1InRev_Tes2
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+****************
+TroomStore
+***************** 6 HX INPUTS ******************
+Thx1In_Tes2 Mfrhx1_Tes2 Thx1InRev_Tes2
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+***************** 20 HEAT SOURCE INPUTS ******************
+qAux1_Tes2 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
+****************** INTIAL INPUTS***********************
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero 
+*****************OUTPUTS****************
+EQUATIONS 2
+Tdp1Out_Tes2=[50,1] ! 
+Qdp1_Tes2=[50,31] ! 
+EQUATIONS 21
+TAvg_Tes2 = [50,180] ! Average storage temperature 
+***Temperatures at 10 equallay distributed height 
+T1_Tes2 =[50,21] !temperature at 0.05 
+T2_Tes2 =[50,22] !temperature at 0.15 
+T3_Tes2 =[50,23] !temperature at 0.25 
+T4_Tes2 =[50,24] !temperature at 0.35 
+T5_Tes2 =[50,25] !temperature at 0.45 
+T6_Tes2 =[50,26] !temperature at 0.55 
+T7_Tes2 =[50,27] !temperature at 0.65 
+T8_Tes2 =[50,28] !temperature at 0.75 
+T9_Tes2 =[50,29] !temperature at 0.85 
+T10_Tes2 =[50,30] !temperature at 0.95 
+***Temperatures at 10 sensors user defined height
+Tsen1_Tes2 =[50,71] ! temperature at user defined sensor height Tsen1_Tes2 
+Tsen2_Tes2 =[50,72] ! temperature at user defined sensor height Tsen2_Tes2 
+Tsen3_Tes2 =[50,73] ! temperature at user defined sensor height Tsen3_Tes2 
+Tsen4_Tes2 =[50,74] ! temperature at user defined sensor height Tsen4_Tes2 
+Tsen5_Tes2 =[50,75] ! temperature at user defined sensor height Tsen5_Tes2 
+Tsen6_Tes2 =[50,76] ! temperature at user defined sensor height Tsen6_Tes2 
+Tsen7_Tes2 =[50,77] ! temperature at user defined sensor height Tsen7_Tes2 
+Tsen8_Tes2 =[50,78] ! temperature at user defined sensor height Tsen8_Tes2 
+Tsen9_Tes2 =[50,79] ! temperature at user defined sensor height Tsen9_Tes2 
+Tsen10_Tes2 =[50,80] ! temperature at user defined sensor height Tsen10_Tes2 
+EQUATIONS 2
+Thx1Out_Tes2=[50,102] ! 
+Qhx1Out_Tes2=[50,104] ! 
+EQUATIONS 1
+qHeatSource_Tes2 = [50,181] ! Heat input of all auxiliary heat sources [kW]
+EQUATIONS 5
+sumQv_Tes2     = [50,176] ! Heat input of all heat exchangers [kW]
+sumQLoss_Tes2  = [50,177] ! Heat Losses of the Tes [kW]
+sumQAcum_Tes2  = [50,178] ! Sensible accumulated heat [kW]
+sumQPorts_Tes2 = [50,179] ! Heat Input by direct ports [kW]
+Imb_Tes2       = [50,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort
+CONSTANTS 1 
+unitPrinter_Tes2 = 51 
+ASSIGN temp\TES2_MO.Prt unitPrinter_Tes2
+UNIT 51 TYPE 46
+PARAMETERS 5
+unitPrinter_Tes2 ! 1: Logical unit number, -
+-1  ! 2: Logical unit for monthly summaries
+1 ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0  ! 5: Number of inputs to avoid integration
+INPUTS 8
+sumQv_Tes1 sumQLoss_Tes1 sumQAcum_Tes1 sumQPorts_Tes1 Imb_Tes1 Qdp1_Tes2 Qhx1Out_Tes2 qHeatSource_Tes2 
+zero zero zero zero zero zero zero zero 
+*****************************
+******* Online Plotter *******
+*****************************
+
+UNIT 501 TYPE 65     ! Online Plotter HX 
+PARAMETERS 12   
+10     ! 1 Nb. of left-axis variables 
+0     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum 
+100     ! 4 Left axis maximum -
+0     ! 5 Right axis minimum100     ! 6 Right axis maximum 
+nPlotsPerSim     ! 7 Number of plots per simulation 
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing 
+-1     ! 10 Logical unit for output file 
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 10     
+T1_Tes2 T2_Tes2 T3_Tes2 T4_Tes2 T5_Tes2 T6_Tes2 T7_Tes2 T8_Tes2 T9_Tes2 T10_Tes2 
+T1_Tes2 T2_Tes2 T3_Tes2 T4_Tes2 T5_Tes2 T6_Tes2 T7_Tes2 T8_Tes2 T9_Tes2 T10_Tes2 
+LABELS  3         
+Temperatures  
+MassFlows  
+Tes%d 
+
+

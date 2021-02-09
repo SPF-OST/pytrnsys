@@ -45,7 +45,7 @@ class PlotMatplotlib():
 
         myColorsIn = plt.rcParams['axes.prop_cycle'].by_key()['color']
         
-        self.myColorsIn = myColorsIn+myColorsIn+myColorsIn
+        self.myColorsIn = myColorsIn+myColorsIn+myColorsIn+myColorsIn
         self.myColorsOut = self.myColorsIn[::-1]
 
         self.myColorsImb = 'k'

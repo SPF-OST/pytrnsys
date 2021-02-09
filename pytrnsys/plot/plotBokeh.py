@@ -37,7 +37,7 @@ class PlotBokeh():
         self.plotWidth  = 1000#800
         self.plotHeight = 600#250
 
-    def createBokehPlot(self,df,path,fileName,inputKeys,showPlot=False,sortPlots=False):
+    def createBokehPlot(self,df,path,fileName,inputKeys,showPlot=False,sortPlots=True):
 
         if(fileName in self.fileNameUsed):
             self.counter+=1
@@ -121,7 +121,13 @@ class PlotBokeh():
                 plotsDict[key]['fig'].line(timeArray, df[column], color=next(colors), alpha = 0.5, legend_label = column)
                 # plotsDict[key]['fig'].line(timeArray, df[column], color=next(colors), alpha = 0.5)
 
-            plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(months=["%b"])
+            # plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(months=["%b"])
+
+            # plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(hours = ['%Hh', '%H:%M'])
+            plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(hours = ['%Hh'])
+
+
+
             plotsDict[key]['fig'].yaxis.axis_label = plotsDict[key]['ylabel']
 
             plotsDict[key]['fig'].add_layout(plotsDict[key]['fig'].legend[0],'right')
