@@ -1,0 +1,96 @@
+\documentclass[english]{SPFShortReport}
+\usepackage{subfigure}
+\usepackage{longtable}
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage{adjustbox}
+\usepackage{gensymb}
+\usepackage{booktabs}
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\reportName{System6\_SolarIce\_MFH30\_flatPlate\_HP20-CHE\_tmy-Ac50-Vice25}
+\reportSubName{Energy generation costs} 
+\reportDate{\today \hspace{0.1cm} at: \currenttime \hspace{0.1cm} h} 
+\author{damian.birchler}
+\address{damian.birchler}
+\begin{document}
+\begin{table}[!ht]
+\centering
+\caption{Assumptions for calculation of heat generation costs}
+\begin{adjustbox}{max width =\textwidth}
+\begin{tabular}{l | c c c } 
+\hline
+\hline
+$$ &$$ &$$ &$$ \\ 
+\hline
+Rate & 3.0 \% $per$ $annum$\\ 
+Analysis period & 30 $years$\\ 
+Maintenance & 1.0 \% $of$ $Investment$ $costs$ $per$ $year$ \\ 
+\hline \\ 
+Electricity & Fix costs:  0  $Fr.$ $per$ $year$ \\ 
+ & Variable costs:  0.20 $Fr.$ $per$ $kWh$ \\ 
+Increase of electricity costs & 0.0 \% $per$ $year$ \\ 
+Electricity costs year 1 & 4108 Fr. in year 1 \\ 
+\hline
+\hline
+\end{tabular}
+\end{adjustbox}
+\label{definitionTable}
+\end{table}
+\begin{table}[!ht]
+\centering
+\caption{System and Heat generation costs (all values incl. 8$\%$ VAT) }
+\begin{adjustbox}{max width =\textwidth}
+\begin{tabular}{l | c c c c c } 
+\hline
+\hline
+Group &Component &Costs &Size &LifeTime &Total Costs \\ 
+ & &[CHF] & &Years &[CHF]\\ 
+\hline
+\\ 
+\textbf{TES} & Storage (Stainless Steel) & -2000+10173/m$^3$ & 2.00 m$^3$ &30 & 18345.6 (13.2 \%) \\ 
+ & Storage (Steel) & 666+1214/m$^3$ & 1.00 m$^3$ &30 & 1879.8 (1.4 \%) \\ 
+ & electric rod & 600+0/m$^3$ & 2.00 m$^3$ &30 & 600.0 (0.4 \%) \\ 
+&\cline{1-5} 
+ &\textbf{Total TES} &  & & & 20825 (15.0 \%) \\ 
+\hline \\ 
+\textbf{Col} & Collector & 9282+875/m$^2$ & 50.00 m$^2$ &30 & 53032.0 (38.1 \%) \\ 
+\hline \\ 
+\textbf{IceStorage} & Ice Storage (inc. installation) & 0+850/m$^3$ & 25.00 m$^3$ &20 & 21250.0 (15.3 \%) \\ 
+\hline \\ 
+\textbf{Hp} & HeatPump & 8194+363/kW & 20.00 kW &20 & 15454.0 (11.1 \%) \\ 
+\hline \\ 
+\textbf{Installation system} & Installation System (Hydraulics) & 24596+193/kW & 20.00 kW &30 & 28456.0 (20.5 \%) \\ 
+\hline \\ 
+ & \textbf{Total Investment Cost} & && &\textbf{139017.40} (100\%) \\ 
+\hline \\ 
+\hline \\ 
+Annuity & Annuity (yearly costs over lifetime)  &&& & 13185 $CHF/a$  \\ 
+ & Share of Investment & &&& 7687 $CHF/a$ (58\%) \\ 
+ & Share of Electricity  & 0+0.20/kWh & 20541 kWh&  & 4108 $CHF/a$ (31\%)\\ 
+ & Share of Maintenance & &&& 1390 $CHF/a$ (11\%)\\ 
+ & Share of Transmission grid & 0+0.00/kWh & 36589  kWh & &  0 $CHF/a$ ( 0\%)\\ 
+ & Share of Residual Value &&& & -0 $CHF/a$ (-0\%)\\ 
+Present Value  & Present Value of all costs  & &&& 246788.33 CHF  \\ 
+\hline \\ 
+ Energy Generation Costs & Using annuity: &&& 26.83 & $Rp./kWh$ \\ 
+\hline
+\hline
+\end{tabular}
+\end{adjustbox}
+\label{CostsTable}
+\end{table}
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{C:/Users/damian.birchler/src/pytrnsys/tests/pytrnsys/utils/cost_calculation/output/actual/results/System6_SolarIce_MFH30_flatPlate_HP20-CHE_tmy-Ac50-Vice25/costShare-System6_SolarIce_MFH30_flatPlate_HP20-CHE_tmy-Ac50-Vice25.pdf}
+\caption{System cost}
+\label{systemCost}
+\end{center}
+\end{figure}
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{C:/Users/damian.birchler/src/pytrnsys/tests/pytrnsys/utils/cost_calculation/output/actual/results/System6_SolarIce_MFH30_flatPlate_HP20-CHE_tmy-Ac50-Vice25/costShareAnnuity-System6_SolarIce_MFH30_flatPlate_HP20-CHE_tmy-Ac50-Vice25.pdf}
+\caption{System cost annuity share}
+\label{systemCostannuity}
+\end{center}
+\end{figure}
+\end{document}
