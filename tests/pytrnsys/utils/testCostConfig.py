@@ -3,60 +3,80 @@ import shutil
 import filecmp
 import typing as tp
 
+import diff_pdf_visually as dpdf
+
 import pytrnsys.utils.costConfig as cc
 
 
 def testCostConfig():
-    actualResultsDir, expectedResultsDir, costParametersFilePath = setupDirsAndGetPaths()
+    helper = Helper()
+    helper.setup()
+
+    actualResultsDir = str(helper.actualResultsDir)
+    costParametersFilePath = str(helper.costParametersFilePath)
 
     costConfig = cc.costConfig()
-
-    costParameters = costConfig.readCostJson(str(costParametersFilePath))
-
+    costParameters = costConfig.readCostJson(costParametersFilePath)
     costConfig.setFontsizes(small=15)
     costConfig.setDefaultData(costParameters)
-    costConfig.readResults(str(actualResultsDir))
-
+    costConfig.readResults(actualResultsDir)
     costConfig.process(costParameters)
 
-    assertDirectoriesRecursivelyEqual(actualResultsDir, expectedResultsDir)
+    helper.assertResultsAreAsExpected()
 
 
-def setupDirsAndGetPaths():
-    data_dir = pl.Path(__file__).parent / 'cost_calculation'
+class Helper:
+    def __init__(self):
+        data_dir = pl.Path(__file__).parent / 'cost_calculation'
 
-    inputDir = data_dir / 'input'
-    resultsDir = inputDir / 'results'
-    costParametersFilePath = inputDir / "costSolarIce_HpSplit.json"
+        inputDir = data_dir / 'input'
+        self._resultsDir = inputDir / 'results'
+        self.costParametersFilePath = inputDir / "costSolarIce_HpSplit.json"
 
-    outputDir = data_dir / 'output'
-    actualDir = outputDir / 'actual'
-    actualResultsDir = actualDir / 'results'
-    expectedDir = outputDir / 'expected'
-    expectedResultsDir = expectedDir / 'results'
+        outputDir = data_dir / 'output'
+        actualDir = outputDir / 'actual'
+        self.actualResultsDir = actualDir / 'results'
+        expectedDir = outputDir / 'expected'
+        self._expectedResultsDir = expectedDir / 'results'
 
-    if actualDir.exists():
-        shutil.rmtree(actualDir)
+    def setup(self):
+        actualDir = self.actualResultsDir.parent
+        if actualDir.exists():
+            shutil.rmtree(actualDir)
 
-    shutil.copytree(resultsDir, actualResultsDir)
+        shutil.copytree(self._resultsDir, self.actualResultsDir)
 
-    return actualResultsDir, expectedResultsDir, costParametersFilePath
+    def assertResultsAreAsExpected(self):
+        self._assertFileStructureEqual()
+        self._assertPlotsAndReportTexFileEqual()
 
+    def _assertFileStructureEqual(self):
+        dircmp = filecmp.dircmp(self.actualResultsDir, self._expectedResultsDir)
+        assert not dircmp.left_only
+        assert not dircmp.right_only
 
-def assertDirectoriesRecursivelyEqual(actualResultsDir: pl.Path, expectedResultsDir: pl.Path) -> None:
-    expectedFiles = enumerateFilesRecursively(expectedResultsDir)
+    def _assertPlotsAndReportTexFileEqual(self):
+        for directory in self._expectedResultsDir.iterdir():
+            dirName = directory.name
 
-    _, mismatch, errors = filecmp.cmpfiles(actualResultsDir, expectedResultsDir, expectedFiles, shallow=False)
+            costPlotName = f"costShare-{dirName}.pdf"
+            annuityPlotName = f"costShareAnnuity-{dirName}.pdf"
+            reportTexName = f"{dirName}-cost.tex"
 
-    assert not mismatch
-    assert not errors
+            self._assertPdfEqual(dirName, costPlotName)
+            self._assertPdfEqual(dirName, annuityPlotName)
+            self._assertTextFileEqual(dirName, reportTexName)
 
+    def _assertPdfEqual(self, dirName, pdfFileName):
+        expectedPath, actualPath = self._getExpectedAndActualPath(dirName, pdfFileName)
+        assert dpdf.pdfdiff(actualPath, expectedPath)
 
-def enumerateFilesRecursively(directory: pl.Path) -> tp.Iterable[str]:
-    assert directory.is_dir()
+    def _assertTextFileEqual(self, dirName, texFileName):
+        expectedPath, actualPath = self._getExpectedAndActualPath(dirName, texFileName)
+        assert filecmp.cmp(actualPath, expectedPath, shallow=False)
 
-    for child in directory.iterdir():
-        if child.is_file():
-            yield str(child)
-        elif child.is_dir():
-            yield from enumerateFilesRecursively(child)
+    def _getExpectedAndActualPath(self, dirName, fileName):
+        expected = self._expectedResultsDir / dirName / fileName
+        actual = self.actualResultsDir / dirName / fileName
+
+        return expected, actual
