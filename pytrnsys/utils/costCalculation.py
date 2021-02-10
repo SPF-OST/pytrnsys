@@ -12,9 +12,6 @@ ToDo :
 
 import logging
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-
 import pytrnsys.report.latexReport as latex
 import pytrnsys.utils as utils
 from pytrnsys.cost_calculation import economicFunctions as ef
@@ -28,21 +25,7 @@ class CostCalculation():
         self.method="VDI"
         self.unit=1
         self.cleanModeLatex = True
-        
-    def initialize(self):
 
-        #initialInputs
-
-        self.rate = 0.
-        self.analysPeriod = 0.
-        self.costElecFix = 0.
-        self.costEleckWh = 0.
-        self.lifeTime = 0.
-        self.increaseElecCost  = 0.
-
-        self.elDemand = 0.    
-        self.totalInvestCost = 0.
-    
     def setOutputhPathAndFileName(self,path,fileName):
         
         self.outputPath = path
@@ -193,97 +176,8 @@ class CostCalculation():
         doc.addTable(caption,sizeBox,names,units,label,lines,useFormula=False)
         
         #inVar in Fr. !!!
-    def plotCostShare(self,inVar,legends,nameFile,plotSize=15,sizeFont=15,plotJpg=False,writeFile=False):
-        
-        mpl.rcParams['font.size'] = sizeFont
 
-        fig = plt.figure(1,figsize=(plotSize,plotSize))
-        
-        fig.add_subplot(111)
-                   
-        total = sum(inVar)        
-
-        myColors = ['#66CCFF','#336699','#FFCC00','#3366CC','#66FF66','#FF9966','#FF9933','#CCFF33','#CCFFFF','#FF9933']
-        
-
-        fracs = []
-        colors = []
-        explode = []
-        for i in range(len(inVar)):
-            fracs.append(inVar[i]/total)        
-            colors.append(myColors[i])
-            explode.append(0.) #(0.05)
-        
-        patches, texts, autotexts = plt.pie(fracs, labels=legends,explode=explode,colors=colors,autopct='%1.1f%%', shadow=False, startangle=0)
-
-
-        for i in range(len(texts)):
-            texts[i].set_fontsize(sizeFont)
-        
-#        texts[0].set_position(00)
-        
-        # The default startangle is 0, which would start
-        # the Frogs slice on the x-axis.  With startangle=90,
-        # everything is rotated counter-clockwise by 90 degrees,
-        # so the plotting starts on the positive y-axis.
-
-#        matplotlib.rcParams.update({'font.size':50})
-
-        #myTitle = "Total cost %.2f [kFr]" % (total/1000.)
-        # plt.title(myTitle, bbox={'facecolor':'0.9','pad':10},fontsize=sizeFont)
-        plt.title("",bbox={'facecolor':'0.9','pad':10},fontsize=sizeFont)
-
-# This is working , just erase the labels section
-#        plt.legend(bbox_to_anchor=(0.15,0.9),loc='upper right', borderaxespad=0.,fontsize=8)
-
-        namePdf = '%s.pdf'%nameFile
-        nameWithPath = '%s\%s' % (self.outputPath,namePdf)
-
-        
-        plt.savefig(nameWithPath)
-        
-        if(plotJpg):
-            
-#            nameJpg = '%s.svg'%nameFile 
-#            nameJpg = '%s.emf'%nameFile 
-            nameJpg = '%s.jpg'%nameFile 
-
-            nameJpgWithPath = '%s\%s' % (self.outputPath,nameJpg)
-            logger.info("Plot printed as %s"%nameJpgWithPath)
-            
-            plt.savefig(nameJpgWithPath)
-            
-        plt.close()
-        
-        if(writeFile):
-            lines = ""
-            line = "!Units kFr.\n";lines=lines+line
-            line = "!";lines=lines+line
-            for i in range(len(legends)):
-                line = "%s\t"%legends[i];lines=lines+line
-            line = "\n";lines=lines+line
-
-            sumVar = 0.
-            for i in range(len(legends)):
-                # sumVar = sumVar+inVar[i]/1000. #I assume Fr. and change to kFr. !!!!
-                sumVar = inVar[i]/1000. #I assume Fr. and change to kFr. !!!!
-
-                line = "%f\t"%sumVar;lines=lines+line
-            line = "\n";lines=lines+line
-            nameDat = '%s.dat'%nameFile 
-            nameDatWithPath = '%s\%s' % (self.outputPath,nameDat)
-
-            logger.info("PRINT FILE COST SHARE : %s"%nameDatWithPath)
-            outfile=open(nameDatWithPath,'w')
-            outfile.writelines(lines)
-            outfile.close()
-            
-        
-            
-        return namePdf
-
-        
-    def createLatex(self):        
+    def createLatex(self):
             
         self.doc.setAuthor(utils.getNameFromUserName())
         self.doc.setEMail(utils.getEmailFromUserName())
