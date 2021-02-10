@@ -17,7 +17,7 @@ def testCostConfig():
 
     costConfig = cc.costConfig()
     costParameters = costConfig.readCostJson(costParametersFilePath)
-    costConfig.setFontsizes(small=15)
+    costConfig.setFontSizes(small=15)
     costConfig.setDefaultData(costParameters)
     costConfig.readResults(actualResultsDir)
     costConfig.process(costParameters)

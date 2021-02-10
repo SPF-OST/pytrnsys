@@ -24,9 +24,11 @@ logger = logging.getLogger('root')
 
 
 class costConfig:
+    _USE_kCHF_FOR_TOTAL_COSTS = False
+
+    # public: used
     def __init__(self):
         self.method = "VDI"
-        self.unit = 1
         self.cleanModeLatex = True
 
         self.components = []
@@ -62,9 +64,6 @@ class costConfig:
         self.readCompleteFolder = True
         self.fileNameList = None
 
-    def setDataPath(self, dataPath):
-        self.dataPath = dataPath
-
     def setFileNameList(self, fileNameList):
         self.fileNameList = fileNameList
         self.readCompleteFolder = False
@@ -96,64 +95,27 @@ class costConfig:
     def process(self, dictCost):
         self.investVec = []
         self.annuityVec = []
-        self.resultsVecDict = []
 
         for i in range(len(self.resClass.results)):
-            caseDict = {}
+            self._processResult(dictCost, i)
 
-            fileName = self.resClass.fileName[i]
-            outputPath = os.path.join(self.resClass.path, fileName)
+        self._clean()
 
-            self.setOutputPathAndFileName(outputPath, fileName)
+    @staticmethod
+    def setFontSizes(small):
+        SMALL_SIZE = small
+        MEDIUM_SIZE = SMALL_SIZE + 2
+        BIGGER_SIZE = MEDIUM_SIZE + 2
 
-            for component in dictCost['Components']:
-                comp = dictCost['Components'][component]
-                size = self.resClass.results[i].get(comp['size'])
-                self.addComponent(component, size, comp["baseCost"], comp["varCost"], comp["varUnit"], comp["group"],
-                                  comp["lifeTime"])
+        plt.rc('font', size=SMALL_SIZE)  # controls default text sizes
+        plt.rc('axes', titlesize=SMALL_SIZE)  # fontsize of the axes title
+        plt.rc('axes', labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+        plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
+        plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
+        plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
+        plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-            self.qDemand = self.resClass.results[i].get(dictCost['DefaultData']['qDemand'])
-            self.elFromGrid = self.resClass.results[i].get(dictCost['DefaultData']['elFromGrid'])
-            self.elDemandTotal = self.elFromGrid
-
-            for yearlyCost in dictCost['YearlyCosts']:
-                cost = dictCost['YearlyCosts'][yearlyCost]
-                size = self.resClass.results[i].get(cost['size'])
-                self.addYearlyComponentCost(yearlyCost, size, cost['baseCost'], cost['varCost'], cost['varUnit'])
-
-            self.calculate()
-
-            self.investVec.append(self.totalInvestCost)
-            self.annuityVec.append(self.heatGenCost)
-
-            self.doPlots()
-            self.doPlotsAnnuity()
-
-            fileName = self.fileName + "-cost"
-
-            self.doc.resetTexName(fileName)
-            self.unit = 1
-
-            self.createLatex()
-            self.clean()
-
-            caseDict["investment"] = self.totalInvestCost
-            caseDict["energyCost"] = self.heatGenCost
-
-            for component in dictCost['Components']:
-                if component == "Collector":
-                    comp = dictCost['Components'][component]
-                    size = self.resClass.results[i].get(comp['size'])
-
-                    caseDict["investmentPerM2"] = self.totalInvestCost / size
-                    caseDict["investmentPerMWh"] = self.totalInvestCost * 1000 / self.qDemand
-
-            self.resultsVecDict.append(caseDict)
-            resultJsonPath = os.path.join(outputPath, self.fileName + '-results.json')
-            self.addCostToJson(resultJsonPath, self.resClass.results[i], caseDict)
-
-        self.clean()
-
+    # public: unused (?)
     def printDataFile(self):
         for bat in self.batList:
 
@@ -176,19 +138,6 @@ class costConfig:
             outfile = open(myFileName, 'w')
             outfile.writelines(lines)
             outfile.close()
-
-    def setFontsizes(self, small):
-        SMALL_SIZE = small
-        MEDIUM_SIZE = SMALL_SIZE + 2
-        BIGGER_SIZE = MEDIUM_SIZE + 2
-
-        plt.rc('font', size=SMALL_SIZE)  # controls default text sizes
-        plt.rc('axes', titlesize=SMALL_SIZE)  # fontsize of the axes title
-        plt.rc('axes', labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
-        plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
-        plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
-        plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
-        plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
     def plotLines(self, varXAxis, nameXAxis, varYAxis, nameYAxis, varDiffLines, nameLines, nameFig, extension="pdf"):
         fig, ax = plt.subplots(figsize=(16, 8))
@@ -310,19 +259,30 @@ class costConfig:
 
         fig.savefig(plotName)
 
-    @staticmethod
-    def addCostToJson(jsonPath, resultsDict, costResultsDict):
+    # private
+    def _processResult(self, dictCost, i):
+        fileName = self.resClass.fileName[i]
+        outputPath = os.path.join(self.resClass.path, fileName)
 
-        logger.debug("updating results.json file")
+        self._setOutputPathAndFileName(outputPath, fileName)
 
-        newResultsDict = {**resultsDict, **costResultsDict}
+        self._addComponentSizes(dictCost, i)
 
-        with open(jsonPath, 'w') as fp:
-            json.dump(newResultsDict, fp, indent=2, separators=(',', ': '), sort_keys=True)
+        self.qDemand = self.resClass.results[i].get(dictCost['DefaultData']['qDemand'])
+        self.elFromGrid = self.resClass.results[i].get(dictCost['DefaultData']['elFromGrid'])
+        self.elDemandTotal = self.elFromGrid
 
-        logger.info("results.json file was updated with cost data")
+        self._addYearlySizes(dictCost, i)
 
-    def calculate(self):
+        self._calculate()
+        self.investVec.append(self.totalInvestCost)
+        self.annuityVec.append(self.heatGenCost)
+
+        self._generateOutputs(dictCost, i, outputPath)
+
+        self._clean()
+
+    def _calculate(self):
         self.nComp = len(self.costComponent)
         self.costAnn = num.zeros(self.nComp)
         self.annFac = num.zeros(self.nComp)
@@ -413,7 +373,89 @@ class costConfig:
         logger.info("AnnuityFac:%f  " % self.annuityFac)
         logger.info("Heat Generation Cost Annuity:%f " % self.heatGenCost)
 
-    def doPlots(self):
+    def _generateOutputs(self, dictCost, i, outputPath):
+        self._doPlots()
+        self._doPlotsAnnuity()
+        self._createLatex()
+
+        self._addCostsToResultJson(dictCost, i, outputPath)
+
+    def _addCostsToResultJson(self, dictCost, i, outputPath):
+        costDict = self._createCostDict(dictCost, i)
+        resultJsonPath = os.path.join(outputPath, self.fileName + '-results.json')
+        self._addCostToJson(costDict, self.resClass.results[i], resultJsonPath)
+
+    def _createCostDict(self, dictCost, i):
+        caseDict = dict()
+        caseDict["investment"] = self.totalInvestCost
+        caseDict["energyCost"] = self.heatGenCost
+        for component in dictCost['Components']:
+            if component == "Collector":
+                comp = dictCost['Components'][component]
+                size = self.resClass.results[i].get(comp['size'])
+
+                caseDict["investmentPerM2"] = self.totalInvestCost / size
+                caseDict["investmentPerMWh"] = self.totalInvestCost * 1000 / self.qDemand
+        return caseDict
+
+    def _addYearlySizes(self, dictCost, i):
+        for yearlyCost in dictCost['YearlyCosts']:
+            cost = dictCost['YearlyCosts'][yearlyCost]
+            size = self.resClass.results[i].get(cost['size'])
+            self._addYearlySize(yearlyCost, size, cost['baseCost'], cost['varCost'], cost['varUnit'])
+
+    def _addComponentSizes(self, dictCost, i):
+        for component in dictCost['Components']:
+            comp = dictCost['Components'][component]
+            size = self.resClass.results[i].get(comp['size'])
+            self._addComponentSize(component, size, comp["baseCost"], comp["varCost"], comp["varUnit"], comp["group"],
+                                   comp["lifeTime"])
+
+    def _clean(self):
+        self.components = []
+        self.baseCost = []
+        self.varCost = []
+        self.group = []
+        self.size = []
+        self.varUnit = []
+        self.lifeTimeComp = []
+        self.costComponent = []
+
+        # This are variables that add cost every year such as materials consumed, oil, etc..
+        self.yearlyComp = []
+        self.yearlyCompSize = []
+        self.yearlyCompBaseCost = []
+        self.yearlyCompVarCost = []
+        self.yearlyCompVarUnit = []
+        self.yearlyCompCost = []
+
+    # components
+    def _addComponentSize(self, name, size, base, var, varUnit, group, lifeTime):
+        self.components.append(name)
+        self.size.append(size)
+        self.baseCost.append(base)
+        self.varCost.append(var)
+        self.varUnit.append(varUnit)
+        self.group.append(group)
+        self.lifeTimeComp.append(lifeTime)
+        cost = base + var * size
+        self.costComponent.append(cost)
+
+        logger.debug("cost:%f name:%s base:%f var:%f" % (cost, name, base, var))
+
+    def _addYearlySize(self, name, size, base, var, varUnit):
+        self.yearlyComp.append(name)
+        self.yearlyCompSize.append(size)
+        self.yearlyCompBaseCost.append(base)
+        self.yearlyCompVarCost.append(var)
+        self.yearlyCompVarUnit.append(varUnit)
+        cost = base + var * size
+        self.yearlyCompCost.append(cost)
+
+        logger.debug("cost:%f name:%s base:%f var:%f" % (cost, name, base, var))
+    # plots
+
+    def _doPlots(self):
         legends = []
         inVar = []
 
@@ -438,10 +480,10 @@ class costConfig:
                 groupCost = groupCost + self.costComponent[i]
                 logger.debug("groupCost:%f group:%s" % (groupCost, self.group[i]))
 
-        self.nameCostPdf = self.plotCostShare(inVar, legends, "costShare" + "-" + self.fileName, sizeFont=30,
-                                              plotJpg=False, writeFile=False)
+        self.nameCostPdf = self._plotCostShare(inVar, legends, "costShare" + "-" + self.fileName, sizeFont=30,
+                                               plotJpg=False, writeFile=False)
 
-    def doPlotsAnnuity(self):
+    def _doPlotsAnnuity(self):
         legends = []
         inVar = []
 
@@ -467,59 +509,10 @@ class costConfig:
                 else:
                     legends.append(self.yearlyComp[i])
 
-        self.nameCostAnnuityPdf = self.plotCostShare(inVar, legends, "costShareAnnuity" + "-" + self.fileName,
-                                                     plotSize=17, sizeFont=30, plotJpg=False, writeFile=False)
+        self.nameCostAnnuityPdf = self._plotCostShare(inVar, legends, "costShareAnnuity" + "-" + self.fileName,
+                                                      plotSize=17, sizeFont=30, plotJpg=False, writeFile=False)
 
-    def clean(self):
-        self.components = []
-        self.baseCost = []
-        self.varCost = []
-        self.group = []
-        self.size = []
-        self.varUnit = []
-        self.lifeTimeComp = []
-        self.costComponent = []
-
-        # This are variables that add cost every year such as materials consumed, oil, etc..
-        self.yearlyComp = []
-        self.yearlyCompSize = []
-        self.yearlyCompBaseCost = []
-        self.yearlyCompVarCost = []
-        self.yearlyCompVarUnit = []
-        self.yearlyCompCost = []
-
-    def setOutputPathAndFileName(self, path, fileName):
-        self.outputPath = path
-        self.fileName   = fileName
-
-        logger.debug("path:%s name:%s" %(self.outputPath,self.fileName))
-        self.doc = latex.LatexReport(self.outputPath,self.fileName)
-
-    def addComponent(self, name, size, base, var, varUnit, group, lifeTime):
-        self.components.append(name)
-        self.size.append(size)
-        self.baseCost.append(base)
-        self.varCost.append(var)
-        self.varUnit.append(varUnit)
-        self.group.append(group)
-        self.lifeTimeComp.append(lifeTime)
-        cost = base + var * size
-        self.costComponent.append(cost)
-
-        logger.debug("cost:%f name:%s base:%f var:%f" % (cost, name, base, var))
-
-    def addYearlyComponentCost(self, name, size, base, var, varUnit):
-        self.yearlyComp.append(name)
-        self.yearlyCompSize.append(size)
-        self.yearlyCompBaseCost.append(base)
-        self.yearlyCompVarCost.append(var)
-        self.yearlyCompVarUnit.append(varUnit)
-        cost = base + var * size
-        self.yearlyCompCost.append(cost)
-
-        logger.debug("cost:%f name:%s base:%f var:%f" % (cost, name, base, var))
-
-    def plotCostShare(self, inVar, legends, nameFile, plotSize=15, sizeFont=15, plotJpg=False, writeFile=False):
+    def _plotCostShare(self, inVar, legends, nameFile, plotSize=15, sizeFont=15, plotJpg=False, writeFile=False):
         mpl.rcParams['font.size'] = sizeFont
 
         fig = plt.figure(1, figsize=(plotSize, plotSize))
@@ -590,19 +583,20 @@ class costConfig:
             outfile.close()
 
         return namePdf
+    # latex
 
-    def createLatex(self, fileName=False):
+    def _createLatex(self):
+        fileName = self.fileName + "-cost"
+        self.doc.resetTexName(fileName)
+
         self.doc.setSubTitle("Energy generation costs")
 
-        if not fileName:
-            self.doc.setTitle(self.fileName)
-        else:
-            self.doc.setTitle(fileName)
+        self.doc.setTitle(self.fileName)
 
         self.doc.setCleanMode(self.cleanModeLatex)
         self.doc.addBeginDocument()
-        self.addTableEconomicAssumptions()
-        self.addTableCosts(self.doc, self.unit)
+        self._addTableEconomicAssumptions()
+        self._addTableCosts(self.doc)
 
         try:
             self.doc.addPlot(self.nameCostPdf, "System cost", "systemCost", 13)
@@ -613,7 +607,7 @@ class costConfig:
         self.doc.addEndDocumentAndCreateTexFile()
         self.doc.executeLatexFile()
 
-    def addTableEconomicAssumptions(self):
+    def _addTableEconomicAssumptions(self):
         caption = "Assumptions for calculation of heat generation costs"
         names = ["", "", "", ""]
         units = None
@@ -643,17 +637,16 @@ class costConfig:
 
         self.doc.addTable(caption, names, units, label, lines, useFormula=True)
 
-    def addTableCosts(self, doc, unit=1):
+    def _addTableCosts(self, doc):
+        totalCostScaleFactor = 1e-3 if self._USE_kCHF_FOR_TOTAL_COSTS else 1
         symbol = "$\\%$"
         caption = "System and Heat generation costs (all values incl. 8%s VAT) " % symbol
 
         names = ["Group", "Component", "Costs", "Size", "LifeTime", "Total Costs"]
-        if unit == 1e-3:
+        if self._USE_kCHF_FOR_TOTAL_COSTS:
             units = ["", "", "[CHF]", "", "", "[kCHF]"]
-        elif unit == 1:
-            units = ["", "", "[CHF]", "", "Years", "[CHF]"]
         else:
-            raise ValueError("unit not found:%f" % unit)
+            units = ["", "", "[CHF]", "", "Years", "[CHF]"]
 
         label = "CostsTable"
         lines = ""
@@ -684,7 +677,7 @@ class costConfig:
                     line = "\\textbf{%s} & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n" % (
                         group, self.components[i],
                         self.baseCost[i], self.varCost[i], self.varUnit[i], self.size[i], self.varUnit[i],
-                        self.lifeTimeComp[i], self.costComponent[i] * unit,
+                        self.lifeTimeComp[i], self.costComponent[i] * totalCostScaleFactor,
                         100 * self.costComponent[i] / self.totalInvestCost, symbol)
                 else:
                     line = " & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n" % (self.components[i],
@@ -695,7 +688,7 @@ class costConfig:
                                                                                             self.varUnit[i],
                                                                                             self.lifeTimeComp[i],
                                                                                             self.costComponent[
-                                                                                                i] * unit,
+                                                                                                i] * totalCostScaleFactor,
                                                                                             100 * self.costComponent[
                                                                                                 i] / self.totalInvestCost,
                                                                                             symbol)
@@ -703,7 +696,7 @@ class costConfig:
                 lines = lines + line
                 j = j + 1
 
-            sumGroup = sumGroup + self.costComponent[i] * unit
+            sumGroup = sumGroup + self.costComponent[i] * totalCostScaleFactor
 
         if j > 1:  # The last component
             logger.info("===================================j:%d===============================" % j)
@@ -716,7 +709,7 @@ class costConfig:
         line = "\\hline \\\\ \n"
         lines = lines + line
         line = " & \\textbf{Total Investment Cost} & && &\\textbf{%2.2f} (100%s) \\\\ \n" % (
-            self.totalInvestCost * unit, symbol)
+            self.totalInvestCost * totalCostScaleFactor, symbol)
         lines = lines + line
 
         line = "\\hline \\\\ \n"
@@ -760,3 +753,23 @@ class costConfig:
         lines = lines + line
 
         doc.addTable(caption, names, units, label, lines, useFormula=False)
+    # misc
+
+    def _setOutputPathAndFileName(self, path, fileName):
+        self.outputPath = path
+        self.fileName   = fileName
+
+        logger.debug("path:%s name:%s" %(self.outputPath,self.fileName))
+        self.doc = latex.LatexReport(self.outputPath,self.fileName)
+
+    @staticmethod
+    def _addCostToJson(costResultsDict, resultsDict, jsonPath):
+
+        logger.debug("updating results.json file")
+
+        newResultsDict = {**resultsDict, **costResultsDict}
+
+        with open(jsonPath, 'w') as fp:
+            json.dump(newResultsDict, fp, indent=2, separators=(',', ': '), sort_keys=True)
+
+        logger.info("results.json file was updated with cost data")

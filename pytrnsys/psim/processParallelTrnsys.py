@@ -2288,7 +2288,7 @@ class ProcessParallelTrnsys():
         if(fileNameList!=None):
             cost.setFileNameList(fileNameList)
 
-        cost.setFontsizes(small)
+        cost.setFontSizes(small)
 
         cost.setDefaultData(dictCost)
         cost.readResults(path)
