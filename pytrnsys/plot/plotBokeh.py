@@ -121,10 +121,10 @@ class PlotBokeh():
                 plotsDict[key]['fig'].line(timeArray, df[column], color=next(colors), alpha = 0.5, legend_label = column)
                 # plotsDict[key]['fig'].line(timeArray, df[column], color=next(colors), alpha = 0.5)
 
-            # plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(months=["%b"])
+            plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(months=["%b"])
 
             # plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(hours = ['%Hh', '%H:%M'])
-            plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(hours = ['%Hh'])
+            # plotsDict[key]['fig'].xaxis.formatter = DatetimeTickFormatter(hours = ['%Hh'])
 
 
 

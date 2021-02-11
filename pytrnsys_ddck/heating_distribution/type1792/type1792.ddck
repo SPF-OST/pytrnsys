@@ -116,9 +116,9 @@ myTroomRc         !  Building: 1- (air temperature of zone)  TAIR   1 ->Feedback
      
 EQUATIONS 4    
 PIDRadCoolBuiMin = 0.15  !  0.05    !0.01   
-PIDRaCooldBui = MIN(MAX([44,1],PIDRadCoolBuiMin),1) ! DC, JEREMIAS you had [41,1]
+PIDRaCooldBui = MIN(MAX([44,1],PIDRadCoolBuiMin),1) 
 MfrBuiCoolRd  = MfrBuiRdNom*myCoolingOn  ! JS: cooling no longer uses PID, but instead a deadband
-MfrBuiHeatRd  = MfrBuiRdNom*NOT(myCoolingOn)*PIDRadBui
+MfrBuiHeatRd  = MfrBuiRdNom*NOT(myCoolingOn)*PIDRadBui*BoHS*NOT(BoAuxWWOn) !DC otherwise is keeps running in summer
 
 
 *******************************************************
@@ -309,28 +309,28 @@ Time TRdFl TrdRt ImbRad
 MfrBuiRd PRdIn_KW  PheatBui_kW
 	
 	
-UNIT 59 TYPE 65     ! Online Plotter Building (element OpB)
-PARAMETERS 12     
-4     ! 1 Nb. of left-axis variables
-7     ! 2 Nb. of right-axis variables
--5     ! 3 Left axis minimum
-60     ! 4 Left axis maximum
--10     ! 5 Right axis minimum
-50     ! 6 Right axis maximum
-nPlotsPerSim     ! 7 Number of plots per simulation
-12     ! 8 X-axis gridpoints
-0     ! 9 Shut off Online w/o removing
--1     ! 10 Logical unit for output file
-0     ! 11 Output file units
-0     ! 12 Output file delimiter
-INPUTS 11     
-Tamb  myTroomRc  TRdFl TrdRt  
-BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW   ImbRad
-*******
-Tamb  myTroomRc  TRdFl TrdRt  
-BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW  ImbRad
-****
-LABELS  3     
-Temperatures     
-Power     
-RadFloor
+**UNIT 59 TYPE 65     ! Online Plotter Building (element OpB)
+**PARAMETERS 12     
+**4     ! 1 Nb. of left-axis variables
+**7     ! 2 Nb. of right-axis variables
+**-5     ! 3 Left axis minimum
+**60     ! 4 Left axis maximum
+**-10     ! 5 Right axis minimum
+**50     ! 6 Right axis maximum
+**nPlotsPerSim     ! 7 Number of plots per simulation
+**12     ! 8 X-axis gridpoints
+**0     ! 9 Shut off Online w/o removing
+**-1     ! 10 Logical unit for output file
+**0     ! 11 Output file units
+**0     ! 12 Output file delimiter
+**INPUTS 11     
+**Tamb  myTroomRc  TRdFl TrdRt  
+**BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW   ImbRad
+*********
+**Tamb  myTroomRc  TRdFl TrdRt  
+**BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW  ImbRad
+******
+**LABELS  3     
+**Temperatures     
+**Power     
+**RadFloor

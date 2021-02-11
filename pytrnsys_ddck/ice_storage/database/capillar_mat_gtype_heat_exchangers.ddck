@@ -13,8 +13,8 @@
 ***********************************
 EQUATIONS 4
 nUsedPipes   =  INT(Tankwidth/xBetweenPipes) ! 48 (before 96 but was wrong) S-type, 64 G-type
-uTubeTrue    =  1
-nRealHx      =  INT(Lstore/yBetweenHx/uTubeTrue)
+nUTube    =  2 !DC-21  we have a u-tubw with double lengh compared to nUtube=1 but half Hx. This increase mass flow per tube and reduces risks of too low mass flow
+nRealHx      =  INT(Lstore/yBetweenHx/nUTube)
 xBetweenPipes = 0.03
 
 CONSTANTS 17
@@ -44,7 +44,7 @@ charThick= 9e-3
 dxWallHx = 6e-4     
 dOutHx= 4.25e-3   ! 25 Heat exchanger characteristic thickness                  [m]
 dInHx = 2.75e-3   ! 26 Heat exchanger wall thickness                            [m]
-lHx   =  Tankheight*GT(uTubeTrue,0.5)*2
+lHx   =  Tankheight*nUTube
 lambdaHx = 0.33 ! 0.23-2.5
 
 CONSTANTS 6
