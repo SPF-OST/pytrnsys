@@ -148,7 +148,7 @@ verboseLevel = 1
 
 UNIT 130 TYPE 861     ! PCM TES
 PARAMETERS nParType861     
-verbseLevel     ! 0 : verbose level 0 no messages, 1 only important messages, 3 all messages, 4 debug mode ((print where is in the code to check if it hangs out) 
+verboseLevel     ! 0 : verbose level 0 no messages, 1 only important messages, 3 all messages, 4 debug mode ((print where is in the code to check if it hangs out) 
 VIceS     ! 2Tank Volume                        [m^3]
 Tankheight     ! 3Tank height                        [m]
 Tankwidth     ! 4Tank width                         [m]
