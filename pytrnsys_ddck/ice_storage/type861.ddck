@@ -71,8 +71,7 @@ qSysIn_IceMelt     = qIcePcm-sumQMeltkW     ! kW latent heat for ice formed in H
 ** Generic variables
 ***********************************
 
-CONSTANTS 5
-rhoIce=rhoWat     
+CONSTANTS 4
 QnomHxIce=140/1000    ! Nominal power of hx at icing conditions KW/m2
 TFreeze = 0.0    
 lambdaIce =2.2222     ! [W/m.K]
@@ -149,17 +148,17 @@ verboseLevel = 1
 
 UNIT 130 TYPE 861     ! PCM TES
 PARAMETERS nParType861     
-verboseLevel     ! 0 : verbose level 0 no messages, 1 only important messages, 3 all messages, 4 debug mode ((print where is in the code to check if it hangs out) 
+verbseLevel     ! 0 : verbose level 0 no messages, 1 only important messages, 3 all messages, 4 debug mode ((print where is in the code to check if it hangs out) 
 VIceS     ! 2Tank Volume                        [m^3]
 Tankheight     ! 3Tank height                        [m]
 Tankwidth     ! 4Tank width                         [m]
-iceStorageGeometry     ! 5Tank geometry 0 box, 1 cilinder
+iceStorageGeometry     ! 5Tank geometry 0 box, 1 cylinder
 x1Type861     ! xBetweenPipes in capillary mats, yBetweenHx in Flat plates
 x2Type861     ! yBetweenHx, not used in flat plates 
 LamEff     ! 8Eff. thermal cond. of tank         [W/m.K]
 RHOWAT     ! 9Density water                      [kg/m^3]
 CPWAT_SI     ! 10Specific heat water                [J/kg.K]
-rhoIce     ! 11Density ice                        [kg/m^3]
+notused     ! 
 lambdaIce     ! 12Tank ice thermal conductivity      [[W/m.K]
 hFusion     ! 13Water<->Ice enthalpy               [J/kg]
 TSubcool     ! 14Water<->Ice temperature            [C]
@@ -289,8 +288,8 @@ PHx1o = [130,15]     ! Power Exchange        [W]
 IceThicknessHx1 = [130,16]     ! Ice Thickness on Hx  [m]
 IceMeltHx1 = [130,17]     
 UAPCMHx1 = [130,18]     ! Heat transfer             [W/K]
-VIceRatio = 100.0*MassIce/(VIceS*RHOICE)     
-VIceRatioFloat = 100*MassIceFloating/(VIceS*RhoIce)     ! VIceRatioUp = 100*icekg/(VIceSUp*RHOWAT)
+VIceRatio = 100.0*MassIce/(VIceS*RHOWAT)     
+VIceRatioFloat = 100*MassIceFloating/(VIceS*RHOWAT)     ! VIceRatioUp = 100*icekg/(VIceSUp*RHOWAT)
 cmIceOneSide = 100*IceThicknessHx1/NHx1         
 yRelativeIceDown = heightIceHx/Tankheight     
 VIceRatioMax = maxIceFrac*100       
