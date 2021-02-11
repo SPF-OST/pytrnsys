@@ -1,11 +1,10 @@
+import filecmp
 import pathlib as pl
 import shutil
-import filecmp
-import typing as tp
 
 import diff_pdf_visually as dpdf
 
-import pytrnsys.utils.costConfig as cc
+import pytrnsys.cost_calculation.costConfig as cc
 
 
 def testCostConfig():
