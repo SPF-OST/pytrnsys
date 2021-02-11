@@ -11,14 +11,17 @@ Date : 07.04.2020
 import json
 import logging
 import os
+import typing as _tp
+import itertools as _it
 
 import matplotlib as mpl
 import numpy as num
 from matplotlib import pyplot as plt
 
 import pytrnsys.psim.resultsProcessedFile as results
-from pytrnsys.cost_calculation import economicFunctions as ef
+from pytrnsys.cost_calculation import economicFunctions as _ef
 from pytrnsys.report import latexReport as latex
+from . import extracted as _ext
 
 logger = logging.getLogger('root')
 
@@ -31,14 +34,7 @@ class costConfig:
         self.method = "VDI"
         self.cleanModeLatex = True
 
-        self.components = []
-        self.baseCost = []
-        self.varCost = []
-        self.group = []
-        self.size = []
-        self.varUnit = []
-        self.lifeTimeComp = []
-        self.costComponent = []
+        self.componentSizes: _tp.List[_ext.ComponentSize] = []
 
         self.yearlyComp = []
         self.yearlyCompSize = []
@@ -93,11 +89,14 @@ class costConfig:
         return dictCost
 
     def process(self, dictCost):
+        componentsDict = dictCost["Components"]
+        components = _ext.createComponentsFromDict(componentsDict)
+
         self.investVec = []
         self.annuityVec = []
 
         for i in range(len(self.resClass.results)):
-            self._processResult(dictCost, i)
+            self._processResult(dictCost, i, components)
 
         self._clean()
 
@@ -260,13 +259,13 @@ class costConfig:
         fig.savefig(plotName)
 
     # private
-    def _processResult(self, dictCost, i):
+    def _processResult(self, dictCost, i, components: _tp.Sequence[_ext.Component]):
         fileName = self.resClass.fileName[i]
         outputPath = os.path.join(self.resClass.path, fileName)
 
         self._setOutputPathAndFileName(outputPath, fileName)
 
-        self._addComponentSizes(dictCost, i)
+        self._addComponentSizes(dictCost, i, components)
 
         self.qDemand = self.resClass.results[i].get(dictCost['DefaultData']['qDemand'])
         self.elFromGrid = self.resClass.results[i].get(dictCost['DefaultData']['elFromGrid'])
@@ -283,20 +282,22 @@ class costConfig:
         self._clean()
 
     def _calculate(self):
-        self.nComp = len(self.costComponent)
+        self.nComp = len(self.componentSizes)
         self.costAnn = num.zeros(self.nComp)
         self.annFac = num.zeros(self.nComp)
 
         self.totalInvestCost = 0.
-        for i in range(self.nComp):
-            logger.debug("ncomp:%d rate:%f lifeTime%f" % (i, self.rate, self.lifeTimeComp[i]))
+        for i, componentSize in enumerate(self.componentSizes):
+            component = componentSize.component
 
-            period = self.lifeTimeComp[i]
-            ann = ef.getAnnuity(self.rate, period)
+            logger.debug("ncomp:%d rate:%f lifeTime%f" % (i, self.rate, component.lifetimeInYears))
+
+            period = component.lifetimeInYears
+            ann = _ef.getAnnuity(self.rate, period)
 
             self.annFac[i] = ann
-            self.costAnn[i] = self.costComponent[i] * ann
-            self.totalInvestCost = self.totalInvestCost + self.costComponent[i]
+            self.costAnn[i] = componentSize.cost * ann
+            self.totalInvestCost = self.totalInvestCost + componentSize.cost
 
         # ===================================================
         # electricity
@@ -308,20 +309,20 @@ class costConfig:
             self.npvFacElec = self.analysPeriod / (
                     1. + self.rate)  # DC It was lifeTime but now its different from each other
         else:
-            self.npvFacElec = ef.getNPVIncreaseCost(self.rate, self.analysPeriod, self.increaseElecCost)
+            self.npvFacElec = _ef.getNPVIncreaseCost(self.rate, self.analysPeriod, self.increaseElecCost)
 
         self.npvElec = self.costElecTotalY * self.npvFacElec
 
         # ===================================================
         # Maintenance cost
         # ===================================================
-        self.npvMaintenance = self.MaintenanceRate * self.totalInvestCost * ef.getNPV(self.rate,
-                                                                                      self.analysPeriod)
+        self.npvMaintenance = self.MaintenanceRate * self.totalInvestCost * _ef.getNPV(self.rate,
+                                                                                       self.analysPeriod)
         self.nYearlyComp = len(self.yearlyComp)
         self.costNpvYearlyComp = num.zeros(self.nYearlyComp)
 
         for i in range(self.nYearlyComp):
-            npv = ef.getNPV(self.rate, self.analysPeriod)
+            npv = _ef.getNPV(self.rate, self.analysPeriod)
             self.costNpvYearlyComp[i] = self.yearlyCompCost[i] * npv
 
         # ===================================================
@@ -349,7 +350,7 @@ class costConfig:
         # ANNUITY
         # ===================================================
 
-        self.annuityFac = ef.getAnnuity(self.rate, self.analysPeriod)
+        self.annuityFac = _ef.getAnnuity(self.rate, self.analysPeriod)
 
         self.anToInvCost = sum(self.costAnn)
 
@@ -404,22 +405,14 @@ class costConfig:
             size = self.resClass.results[i].get(cost['size'])
             self._addYearlySize(yearlyCost, size, cost['baseCost'], cost['varCost'], cost['varUnit'])
 
-    def _addComponentSizes(self, dictCost, i):
-        for component in dictCost['Components']:
-            comp = dictCost['Components'][component]
-            size = self.resClass.results[i].get(comp['size'])
-            self._addComponentSize(component, size, comp["baseCost"], comp["varCost"], comp["varUnit"], comp["group"],
-                                   comp["lifeTime"])
+    def _addComponentSizes(self, dictCost, i, components: _tp.Sequence[_ext.Component]):
+        for component in components:
+            variableName = component.variableCost.variable.name
+            size = self.resClass.results[i].get(variableName)
+            self._addComponentSize(component, size)
 
     def _clean(self):
-        self.components = []
-        self.baseCost = []
-        self.varCost = []
-        self.group = []
-        self.size = []
-        self.varUnit = []
-        self.lifeTimeComp = []
-        self.costComponent = []
+        self.componentSizes = []
 
         # This are variables that add cost every year such as materials consumed, oil, etc..
         self.yearlyComp = []
@@ -430,18 +423,15 @@ class costConfig:
         self.yearlyCompCost = []
 
     # components
-    def _addComponentSize(self, name, size, base, var, varUnit, group, lifeTime):
-        self.components.append(name)
-        self.size.append(size)
-        self.baseCost.append(base)
-        self.varCost.append(var)
-        self.varUnit.append(varUnit)
-        self.group.append(group)
-        self.lifeTimeComp.append(lifeTime)
-        cost = base + var * size
-        self.costComponent.append(cost)
+    def _addComponentSize(self, component: _ext.Component, size):
+        componentSize = _ext.ComponentSize(component, size)
+        self.componentSizes.append(componentSize)
 
-        logger.debug("cost:%f name:%s base:%f var:%f" % (cost, name, base, var))
+        logger.debug("cost:%f name:%s base:%f var:%f",
+                     componentSize.cost,
+                     componentSize.component.name,
+                     componentSize.component.baseCost,
+                     componentSize.component.variableCost.costPerUnit)
 
     def _addYearlySize(self, name, size, base, var, varUnit):
         self.yearlyComp.append(name)
@@ -456,32 +446,24 @@ class costConfig:
     # plots
 
     def _doPlots(self):
-        legends = []
-        inVar = []
+        groupNamesWithCost = self._getGroupNamesAndCost()
 
-        groupCost = 0.
+        groupNames, groupCosts = zip(*groupNamesWithCost)
+        self.nameCostPdf = self._plotCostShare(groupCosts, groupNames, "costShare" + "-" + self.fileName,
+                                               sizeFont=30, plotJpg=False, writeFile=False)
 
-        for i in range(self.nComp):
+    def _getGroupNamesAndCost(self) -> _tp.Sequence[_tp.Tuple[str, float]]:
+        componentSizesByGroup = self._getComponentSizeGroups()
+        return [(n, sum(cs.cost for cs in g)) for n, g in componentSizesByGroup]
 
-            logger.debug("group:%s" % self.group[i])
+    def _getComponentSizeGroups(self) -> _tp.Iterable[_tp.Tuple[str, _tp.Iterable[_ext.ComponentSize]]]:
+        sortedComponentSizes = sorted(self.componentSizes, key=self._getComponentSizeGroupName)
+        return _it.groupby(sortedComponentSizes, key=self._getComponentSizeGroupName)
 
-            if i < (self.nComp - 1) and self.group[i] != self.group[i + 1]:
-                groupCost = groupCost + self.costComponent[i]
-                inVar.append(groupCost)
-                legends.append(self.group[i])
-                groupCost = 0.
-                logger.debug("Inside group:%s" % self.group[i])
-            elif i == (self.nComp - 1):
-                groupCost = groupCost + self.costComponent[i]
-                inVar.append(groupCost)
-                legends.append(self.group[i])
-                logger.debug("Last group:%s" % self.group[i])
-            else:
-                groupCost = groupCost + self.costComponent[i]
-                logger.debug("groupCost:%f group:%s" % (groupCost, self.group[i]))
+    @staticmethod
+    def _getComponentSizeGroupName(componentSize: _ext.ComponentSize) -> str:
+        return componentSize.component.group
 
-        self.nameCostPdf = self._plotCostShare(inVar, legends, "costShare" + "-" + self.fileName, sizeFont=30,
-                                               plotJpg=False, writeFile=False)
 
     def _doPlotsAnnuity(self):
         legends = []
@@ -498,7 +480,7 @@ class costConfig:
 
         for i in range(len(self.yearlyComp)):
 
-            logger.debug("cost:%f name:%s" % (self.costComponent[i], self.yearlyComp[i]))
+            logger.debug("cost:%f name:%s" % (self.yearlyCompCost[i], self.yearlyComp[i]))
 
             if self.yearlyCompCost[i] > 0.:
                 inVar.append(self.anYearlyComp[i])
@@ -654,56 +636,40 @@ class costConfig:
 
         line = "\\\\ \n"
         lines = lines + line
-        j = 0
-        sumGroup = 0.
-        for i in range(self.nComp):
-            if i > 0 and self.group[i] != self.group[i - 1]:
-                if j > 1:
-                    line = "&\\cline{1-5} \n"
-                    lines = lines + line
-                    line = " &\\textbf{Total %s} &  & & & %.0f (%.1f %s) \\\\ \n" % (
-                        self.group[i - 1], sumGroup, 100 * sumGroup / self.totalInvestCost, symbol)
-                    lines = lines + line
-                line = "\\hline \\\\ \n"
-                lines = lines + line
-                group = self.group[i]
-                j = 0
-                sumGroup = 0.
-            else:
-                group = self.group[i]
+        componentSizesByGroup = self._getComponentSizeGroups()
+        for group, componentSizesForGroup in componentSizesByGroup:
+            nonZeroCostComponents = [cs for cs in componentSizesForGroup if cs.cost > 0]
 
-            if self.costComponent[i] > 0.:
-                if j == 0:
-                    line = "\\textbf{%s} & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n" % (
-                        group, self.components[i],
-                        self.baseCost[i], self.varCost[i], self.varUnit[i], self.size[i], self.varUnit[i],
-                        self.lifeTimeComp[i], self.costComponent[i] * totalCostScaleFactor,
-                        100 * self.costComponent[i] / self.totalInvestCost, symbol)
-                else:
-                    line = " & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n" % (self.components[i],
-                                                                                            self.baseCost[i],
-                                                                                            self.varCost[i],
-                                                                                            self.varUnit[i],
-                                                                                            self.size[i],
-                                                                                            self.varUnit[i],
-                                                                                            self.lifeTimeComp[i],
-                                                                                            self.costComponent[
-                                                                                                i] * totalCostScaleFactor,
-                                                                                            100 * self.costComponent[
-                                                                                                i] / self.totalInvestCost,
-                                                                                            symbol)
+            if not nonZeroCostComponents:
+                continue
 
-                lines = lines + line
-                j = j + 1
-
-            sumGroup = sumGroup + self.costComponent[i] * totalCostScaleFactor
-
-        if j > 1:  # The last component
-            logger.info("===================================j:%d===============================" % j)
-            line = "&\cline{1-5} \n"
+            firstComponent = nonZeroCostComponents[0]
+            line = "\\textbf{%s} & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n" % (
+                group, firstComponent.component.name,
+                firstComponent.component.baseCost, firstComponent.component.variableCost.costPerUnit,
+                firstComponent.component.variableCost.variable.unit, firstComponent.size, firstComponent.component.variableCost.variable.unit,
+                firstComponent.component.lifetimeInYears, firstComponent.cost * totalCostScaleFactor,
+                100 * firstComponent.cost / self.totalInvestCost, symbol)
             lines = lines + line
-            line = " &\\textbf{Total %s} &  & & & %.0f (%.0f %s) \\\\ \n" % (
-                self.group[self.nComp - 1], sumGroup, 100 * sumGroup / self.totalInvestCost, symbol)
+
+            otherComponents = nonZeroCostComponents[1:]
+            for cs in otherComponents:
+                line = " & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n"\
+                       % (cs.component.name, cs.component.baseCost, cs.component.variableCost.costPerUnit,
+                          cs.component.variableCost.variable.unit, cs.size, cs.component.variableCost.variable.unit,
+                          cs.component.lifetimeInYears, cs.cost * totalCostScaleFactor,
+                          100 * cs.cost / self.totalInvestCost, symbol)
+                lines = lines + line
+
+            if len(nonZeroCostComponents) > 1:
+                groupCost = sum(cs.cost for cs in nonZeroCostComponents)
+                line = "&\\cline{1-5} \n"
+                lines = lines + line
+                line = " &\\textbf{Total %s} &  & & & %.0f (%.1f %s) \\\\ \n" % (
+                    group, groupCost, 100 * groupCost / self.totalInvestCost, symbol)
+                lines = lines + line
+
+            line = "\\hline \\\\ \n"
             lines = lines + line
 
         line = "\\hline \\\\ \n"
