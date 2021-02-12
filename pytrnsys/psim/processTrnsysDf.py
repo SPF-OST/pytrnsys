@@ -491,8 +491,9 @@ class ProcessTrnsysDf():
             daySelected = self.inputs['daySelected']
             self.addHeatBalanceHourly(daySelected)
 
-        self.addElBalance()
+
         if(self.inputs['calculateElectricDemand']==True):
+            self.addElBalance()
             self.addElConsumption()
 
         if 'calculateEPF' in self.inputs:
@@ -1436,7 +1437,8 @@ class ProcessTrnsysDf():
                 nameFile = name
                 legend = ["Month", name]
                 
-    def addCustomBalance(self):
+
+    def addCustomBalance(self): 
         if "monthlyBalance" in self.inputs.keys():
             for i in range(len(self.inputs['monthlyBalance'])):
                 namePlot = self.inputs['monthlyBalance'][i][0]
@@ -1461,7 +1463,7 @@ class ProcessTrnsysDf():
                 else:
                     nameFile  = namePlot #'Balance'+'_'.join(variables)
                 titlePlot = 'Balance'
-                titleOfPlot = self.deckData['Simulation_MFH'] + ' (' + self.deckData['Umgebungstemperatur'] + ')'
+                titleOfPlot = titlePlot #self.deckData['Simulation_MFH'] + ' (' + self.deckData['Umgebungstemperatur'] + ')'
                 namePdf = self.plot.plotMonthlyBalanceDf(inVar,[],legend, "Energy", nameFile, 'MWh',
                                                      self.myShortMonths, yearlyFactor=10,
                                                      useYear=False, printData=self.printDataForGle,plotEmf=self.inputs['plotEmf'],style=plotStyle,title=titleOfPlot)#

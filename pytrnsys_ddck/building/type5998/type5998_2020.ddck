@@ -477,11 +477,12 @@ unitPrintHouVar   ! 1: Logical unit number, -
 1     ! 4: Printing & integrating interval, h. -1 for monthly integration
 1     ! 5: Number of inputs to avoid integration, -
 1 ! 6: Output number to avoid integration
-
-INPUTS 4
-Time Tamb Tamb24  Troom  
+INPUTS 11
+Time Tamb Tamb24  Troom  PBuiSol_kW PBuiGains_KW PpenSH_kW  
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PAcumBui_kW
 ***
-Time Tamb Tamb24  Troom 
+Time Tamb Tamb24  Troom  PBuiSol_kW PBuiGains_KW PpenSH_kW  
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PAcumBui_kW
 	
 *******************************
 **END Building.dck
