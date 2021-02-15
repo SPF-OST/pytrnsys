@@ -73,7 +73,7 @@ class costConfig:
         self.MaintenanceRate = dictCost["DefaultData"]["MaintenanceRate"]
         self.costResidual = dictCost["DefaultData"]["costResidual"]
         self.cleanModeLatex = dictCost["DefaultData"]["cleanModeLatex"]
-        self.lifeTimeResVal = dictCost["DefaultData"]["lifeTimeResVal"]
+        self.lifeTimeResVal = dictCost["DefaultData"]["lifetimeResVal"]
 
     def readResults(self, dataPath):
         self.resClass = results.ResultsProcessedFile(dataPath)
@@ -89,11 +89,11 @@ class costConfig:
         return dictCost
 
     def process(self, dictCost):
-        serializedComponentsByName = dictCost["Components"]
-        groupNames = dictCost["Groups"]
+        serializedComponents = dictCost["Components"]
+        # groupNames = dictCost["Groups"]
 
-        components = _ext.deserializeComponents(serializedComponentsByName,
-                                                groupNames)
+        components = map(_ext.Component.from_dict, serializedComponents)
+        components = list(components)
 
         self.investVec = []
         self.annuityVec = []
@@ -410,7 +410,7 @@ class costConfig:
 
     def _addComponentSizes(self, dictCost, i, components: _tp.Sequence[_ext.Component]):
         for component in components:
-            variableName = component.variableCost.variable.name
+            variableName = component.cost.variable.name
             size = self.resClass.results[i].get(variableName)
             self._addComponentSize(component, size)
 
@@ -429,12 +429,6 @@ class costConfig:
     def _addComponentSize(self, component: _ext.Component, size):
         componentSize = _ext.ComponentSize(component, size)
         self.componentSizes.append(componentSize)
-
-        logger.debug("cost:%f name:%s base:%f var:%f",
-                     componentSize.cost,
-                     componentSize.component.name,
-                     componentSize.component.baseCost,
-                     componentSize.component.variableCost.costPerUnit)
 
     def _addYearlySize(self, name, size, base, var, varUnit):
         self.yearlyComp.append(name)
@@ -465,11 +459,12 @@ class costConfig:
 
     @staticmethod
     def _getComponentSizeGroupIndex(componentSize: _ext.ComponentSize) -> int:
-        return componentSize.component.group.index
+        # TODO@bdi keep order of groups and components within groups
+        return 0
 
     @staticmethod
     def _getComponentSizeGroupName(componentSize: _ext.ComponentSize) -> str:
-        return componentSize.component.group.name
+        return componentSize.component.group
 
     def _doPlotsAnnuity(self):
         legends = []
@@ -652,8 +647,8 @@ class costConfig:
             firstComponent = nonZeroCostComponents[0]
             line = "\\textbf{%s} & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n" % (
                 group, firstComponent.component.name,
-                firstComponent.component.baseCost, firstComponent.component.variableCost.costPerUnit,
-                firstComponent.component.variableCost.variable.unit, firstComponent.size, firstComponent.component.variableCost.variable.unit,
+                firstComponent.component.cost.coeffs.offset.value, firstComponent.component.cost.coeffs.slope.value,
+                firstComponent.component.cost.variable.unit, firstComponent.size, firstComponent.component.cost.variable.unit,
                 firstComponent.component.lifetimeInYears, firstComponent.cost * totalCostScaleFactor,
                 100 * firstComponent.cost / self.totalInvestCost, symbol)
             lines = lines + line
@@ -661,8 +656,8 @@ class costConfig:
             otherComponents = nonZeroCostComponents[1:]
             for cs in otherComponents:
                 line = " & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n"\
-                       % (cs.component.name, cs.component.baseCost, cs.component.variableCost.costPerUnit,
-                          cs.component.variableCost.variable.unit, cs.size, cs.component.variableCost.variable.unit,
+                       % (cs.component.name, cs.component.cost.coeffs.offset.value, cs.component.cost.coeffs.slope.value,
+                          cs.component.cost.variable.unit, cs.size, cs.component.cost.variable.unit,
                           cs.component.lifetimeInYears, cs.cost * totalCostScaleFactor,
                           100 * cs.cost / self.totalInvestCost, symbol)
                 lines = lines + line
