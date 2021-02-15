@@ -1,6 +1,8 @@
 import dataclasses as dc
 import typing as tp
 
+# TODO@bdi https://github.com/SPF-OST/pytrnsys/issues/5: Wrap components within group?
+
 
 @dc.dataclass(frozen=True)
 class Component:
@@ -40,14 +42,14 @@ class ComponentSize:
 
 
 Properties = tp.Mapping[str, tp.Union[str, float, int]]
-ComponentsDict = tp.Mapping[str, Properties]
+SerializedComponents = tp.Mapping[str, Properties]
 
 
-def createComponentsFromDict(serializedComponentsByName: ComponentsDict, groupNames: tp.Sequence[str]):
+def deserializeComponents(serializedComponents: SerializedComponents, groupNames: tp.Sequence[str]):
     groupsByName = {n: Group(n, i) for i, n in enumerate(groupNames)}
 
     components = []
-    for name, properties in serializedComponentsByName.items():
+    for name, properties in serializedComponents.items():
         component = _createComponent(name, properties, groupsByName)
         components.append(component)
 

@@ -92,8 +92,8 @@ class costConfig:
         serializedComponentsByName = dictCost["Components"]
         groupNames = dictCost["Groups"]
 
-        components = _ext.createComponentsFromDict(serializedComponentsByName,
-                                                   groupNames)
+        components = _ext.deserializeComponents(serializedComponentsByName,
+                                                groupNames)
 
         self.investVec = []
         self.annuityVec = []
