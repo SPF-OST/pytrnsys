@@ -89,8 +89,11 @@ class costConfig:
         return dictCost
 
     def process(self, dictCost):
-        componentsDict = dictCost["Components"]
-        components = _ext.createComponentsFromDict(componentsDict)
+        serializedComponentsByName = dictCost["Components"]
+        groupNames = dictCost["Groups"]
+
+        components = _ext.createComponentsFromDict(serializedComponentsByName,
+                                                   groupNames)
 
         self.investVec = []
         self.annuityVec = []
@@ -453,17 +456,20 @@ class costConfig:
                                                sizeFont=30, plotJpg=False, writeFile=False)
 
     def _getGroupNamesAndCost(self) -> _tp.Sequence[_tp.Tuple[str, float]]:
-        componentSizesByGroup = self._getComponentSizeGroups()
+        componentSizesByGroup = self._getComponentSizeGroupsOrderdedByIndex()
         return [(n, sum(cs.cost for cs in g)) for n, g in componentSizesByGroup]
 
-    def _getComponentSizeGroups(self) -> _tp.Iterable[_tp.Tuple[str, _tp.Iterable[_ext.ComponentSize]]]:
-        sortedComponentSizes = sorted(self.componentSizes, key=self._getComponentSizeGroupName)
+    def _getComponentSizeGroupsOrderdedByIndex(self) -> _tp.Iterable[_tp.Tuple[str, _tp.Iterable[_ext.ComponentSize]]]:
+        sortedComponentSizes = sorted(self.componentSizes, key=self._getComponentSizeGroupIndex)
         return _it.groupby(sortedComponentSizes, key=self._getComponentSizeGroupName)
 
     @staticmethod
-    def _getComponentSizeGroupName(componentSize: _ext.ComponentSize) -> str:
-        return componentSize.component.group
+    def _getComponentSizeGroupIndex(componentSize: _ext.ComponentSize) -> int:
+        return componentSize.component.group.index
 
+    @staticmethod
+    def _getComponentSizeGroupName(componentSize: _ext.ComponentSize) -> str:
+        return componentSize.component.group.name
 
     def _doPlotsAnnuity(self):
         legends = []
@@ -636,7 +642,7 @@ class costConfig:
 
         line = "\\\\ \n"
         lines = lines + line
-        componentSizesByGroup = self._getComponentSizeGroups()
+        componentSizesByGroup = self._getComponentSizeGroupsOrderdedByIndex()
         for group, componentSizesForGroup in componentSizesByGroup:
             nonZeroCostComponents = [cs for cs in componentSizesForGroup if cs.cost > 0]
 
@@ -672,8 +678,6 @@ class costConfig:
             line = "\\hline \\\\ \n"
             lines = lines + line
 
-        line = "\\hline \\\\ \n"
-        lines = lines + line
         line = " & \\textbf{Total Investment Cost} & && &\\textbf{%2.2f} (100%s) \\\\ \n" % (
             self.totalInvestCost * totalCostScaleFactor, symbol)
         lines = lines + line
