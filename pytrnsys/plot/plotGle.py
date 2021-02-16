@@ -23,9 +23,9 @@ class PlotGle():
 
         self.useMarkers=True
 
-        self.colorGLE = ['red','blue','green','gray40','orange','magenta','yellow','cyan',\
+        self.colorGLE = ["#d62728","#1f77b4","#2ca02c","#7f7f7f","#17becf","#ff7f0e","#9467bd","#bcbd22","#8c564b","#e377c2",\
+        'black','red','blue','green','gray40','orange','magenta','yellow','cyan',\
         'forestgreen','lightblue','slateblue','khaki','darkorange','firebrick','deepskyblue','gray50','black']
-
 
         # "#1f77b4" #blue
         # "#ff7f0e" #orange
@@ -54,8 +54,16 @@ class PlotGle():
         line ="nx = 1\n";lines=lines+line
         line ="sizeYT = ny*sizeY\n";lines=lines+line
         line ="sizeXT = nx*sizeX+5\n";lines=lines+line
-        line ="useLatex = 1\n";lines=lines+line
         line ="size sizeXT sizeYT\n";lines=lines+line
+
+        line ="useLatex = 1\n";lines=lines+line
+
+        line ="begin texpreamble \n";lines=lines+line
+        line ="\\usepackage[T1]{fontenc} \n";lines=lines+line
+        line ="\\usepackage{sansmathfonts} \n";lines=lines+line
+        line ="\\renewcommand{\\familydefault}{\\sfdefault} \n";lines=lines+line
+        line ="end texpreamble \n";lines=lines+line
+
         line ="set texlabels useLatex\n";lines=lines+line
         line ="set font texcmr\n";lines=lines+line
         line ="sizeLegend=0.25\n"
