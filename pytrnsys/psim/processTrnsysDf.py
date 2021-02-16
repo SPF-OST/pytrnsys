@@ -600,19 +600,32 @@ class ProcessTrnsysDf():
 
     def addSPFSystem(self, printData=True):
         if max(self.qDemand)>0 and not isinstance(self.elHeatSysTotal,int):
+
             self.SpfShpDis = num.zeros(13)
+            self.SpfCOP = num.zeros(13)
+
+            for i in range(len(self.elHeatSysTotal_HPPumps)):
+                if (self.elHeatSysTotal_HPPumps[i] == 0):
+                    self.SpfShpDis[i] = 0.
+                else:
+                    self.SpfShpDis[i] = self.qDemand[i] / self.elHeatSysTotal_HPPumps[i]
 
             for i in range(len(self.elHeatSysTotal)):
                 if (self.elHeatSysTotal[i] == 0):
-                    self.SpfShpDis[i] = 0.
+                    self.SpfCOP[i] = 0.
                 else:
-                    self.SpfShpDis[i] = self.qDemand[i] / self.elHeatSysTotal[i]
+                    self.SpfCOP[i] = self.qDemand[i] / self.elHeatSysTotal[i]
 
             self.monDataDf['SpfShpDis'] = self.SpfShpDis[:12].tolist()
 
             self.yearQDemand = sum(self.qDemand)
             self.yearElHeatSysTotal = sum(self.elHeatSysTotal)
-            self.yearSpfShpDis = self.yearQDemand / self.yearElHeatSysTotal
+            self.yearElHeatSysTotal_HPpumps = sum(self.elHeatSysTotal_HPPumps)
+
+            self.yearSpfCOP = self.yearQDemand / self.yearElHeatSysTotal
+            self.SpfCOP[12] = self.yearSpfCOP
+
+            self.yearSpfShpDis = self.yearQDemand / self.yearElHeatSysTotal_HPpumps
             self.SpfShpDis[12] = self.yearSpfShpDis
 
             var = []
@@ -623,15 +636,16 @@ class ProcessTrnsysDf():
             var.append(qD)
 
             el = self.elHeatSysTotal
-            el = num.append(el, sum(self.elHeatSysTotal))
+            el = num.append(el, sum(self.elHeatSysTotal_HPPumps))
 
             var.append(el)
             var.append(self.SpfShpDis)
+            var.append(self.SpfCOP)
 
             nameFile = "SPF_SHP"
-            legend = ["Month", "$Q_{demand}$", "$El_{Heat,Sys}$", "$SPF_{SHP}$"]
+            legend = ["Month", "$Q_{demand}$", "$El_{Heat,Sys}$", "$SPF_{SHP}$", "$SPF_{COP}$"]
             caption = "Seasonal performance factor of the complete system"
-            self.doc.addTableMonthlyDf(var, legend, ["", "kWh", "kWh", "-"], caption, nameFile, self.myShortMonths,
+            self.doc.addTableMonthlyDf(var, legend, ["", "kWh", "kWh", "-", "-"], caption, nameFile, self.myShortMonths,
                                        sizeBox=15)
 
             yearlyFactor = 10.
@@ -1380,6 +1394,10 @@ class ProcessTrnsysDf():
         self.legendsElHeatConsumption = []
         self.elHeatSysTotal = []  # vector of a sum of all electricity consumption used for the heating system
         self.elHeatSysMatrix = []  # matrix with all vectors included in the el consumption. For table printing and plot
+        self.elHeatSysTotal_HPPumps = []
+        self.elHeatSysTotal_allPumps = []
+        self.elHeatSysMatrix_HPpumps = []
+        self.elHeatSysMatrix_allPumps = []
 
         for name in self.monDataDf.columns:
 
@@ -1389,12 +1407,22 @@ class ProcessTrnsysDf():
                 if (name[0:10] == "elSysIn_Q_"):
                     el = self.monDataDf[name].values
                     self.elHeatSysMatrix.append(el)
+                    self.elHeatSysMatrix_HPpumps.append(el)
+                    self.elHeatSysMatrix_allPumps.append(el)
                     # self.elHeatSysTotal = self.elHeatSysTotal + el
                     self.legendsElHeatConsumption.append(self.getNiceLatexNames(name))
+                if (name[0:8] == "PelPuAux"):                ## add el. demand pump
+                    el = self.monDataDf[name].values
+                    self.elHeatSysMatrix_HPpumps.append(el)
+                                        # self.elHeatSysTotal = self.elHeatSysTotal + el
+                    self.legendsElHeatConsumption.append(self.getNiceLatexNames(name))
+
             except:
                 pass
 
         self.elHeatSysTotal = sum(self.elHeatSysMatrix)
+        self.elHeatSysTotal_HPPumps = sum(self.elHeatSysMatrix_HPpumps)
+
 
     def addElConsumption(self):
 
