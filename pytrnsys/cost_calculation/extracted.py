@@ -4,7 +4,8 @@ import typing as _tp
 
 # TODO@bdi https://github.com/SPF-OST/pytrnsys/issues/5: Wrap components within group?
 
-__all__ = ['Component',
+__all__ = ['ComponentGroup',
+           'Component',
            'Cost',
            'LinearCoefficients',
            'UncertainFloat',
@@ -13,9 +14,14 @@ __all__ = ['Component',
 
 
 @_dc.dataclass(frozen=True)
+class ComponentGroup(_dcj.JsonSchemaMixin):
+    name: str
+    components: _tp.Sequence["Component"]
+
+
+@_dc.dataclass(frozen=True, eq=False)
 class Component(_dcj.JsonSchemaMixin):
     name: str
-    group: str
     lifetimeInYears: int
     cost: "Cost"
 
@@ -30,6 +36,9 @@ class Group(_dcj.JsonSchemaMixin):
 class Cost(_dcj.JsonSchemaMixin):
     coeffs: "LinearCoefficients"
     variable: "Variable"
+
+    def at(self, value: float) -> "UncertainFloat":
+        return self.coeffs.offset + self.coeffs.slope * value
 
 
 @_dc.dataclass(frozen=True)

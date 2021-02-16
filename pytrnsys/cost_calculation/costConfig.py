@@ -34,7 +34,7 @@ class costConfig:
         self.method = "VDI"
         self.cleanModeLatex = True
 
-        self.componentSizes: _tp.List[_ext.ComponentSize] = []
+        self._sizesByComponent: _tp.Dict[_ext.Component, float] = {}
 
         self.yearlyComp = []
         self.yearlyCompSize = []
@@ -89,17 +89,15 @@ class costConfig:
         return dictCost
 
     def process(self, dictCost):
-        serializedComponents = dictCost["Components"]
-        # groupNames = dictCost["Groups"]
+        serializedComponentGroups = dictCost["componentGroups"]
 
-        components = map(_ext.Component.from_dict, serializedComponents)
-        components = list(components)
+        componentGroups = [_ext.ComponentGroup.from_dict(g) for g in serializedComponentGroups]
 
         self.investVec = []
         self.annuityVec = []
 
         for i in range(len(self.resClass.results)):
-            self._processResult(dictCost, i, components)
+            self._processResult(dictCost, i, componentGroups)
 
         self._clean()
 
@@ -262,13 +260,13 @@ class costConfig:
         fig.savefig(plotName)
 
     # private
-    def _processResult(self, dictCost, i, components: _tp.Sequence[_ext.Component]):
+    def _processResult(self, dictCost, i, componentGroups: _tp.Sequence[_ext.ComponentGroup]):
         fileName = self.resClass.fileName[i]
         outputPath = os.path.join(self.resClass.path, fileName)
 
         self._setOutputPathAndFileName(outputPath, fileName)
 
-        self._addComponentSizes(dictCost, i, components)
+        self._addComponentSizes(i, componentGroups)
 
         self.qDemand = self.resClass.results[i].get(dictCost['DefaultData']['qDemand'])
         self.elFromGrid = self.resClass.results[i].get(dictCost['DefaultData']['elFromGrid'])
@@ -280,27 +278,28 @@ class costConfig:
         self.investVec.append(self.totalInvestCost)
         self.annuityVec.append(self.heatGenCost)
 
-        self._generateOutputs(dictCost, i, outputPath)
+        self._generateOutputs(i, outputPath, componentGroups)
 
         self._clean()
 
     def _calculate(self):
-        self.nComp = len(self.componentSizes)
+        self.nComp = len(self._sizesByComponent)
         self.costAnn = num.zeros(self.nComp)
         self.annFac = num.zeros(self.nComp)
 
         self.totalInvestCost = 0.
-        for i, componentSize in enumerate(self.componentSizes):
-            component = componentSize.component
-
+        component: _ext.Component
+        size: float
+        for i, (component, size) in enumerate(self._sizesByComponent.items()):
             logger.debug("ncomp:%d rate:%f lifeTime%f" % (i, self.rate, component.lifetimeInYears))
 
             period = component.lifetimeInYears
             ann = _ef.getAnnuity(self.rate, period)
 
             self.annFac[i] = ann
-            self.costAnn[i] = componentSize.cost * ann
-            self.totalInvestCost = self.totalInvestCost + componentSize.cost
+            costAtSize = component.cost.at(size).value
+            self.costAnn[i] = costAtSize * ann
+            self.totalInvestCost = self.totalInvestCost + costAtSize
 
         # ===================================================
         # electricity
@@ -377,30 +376,35 @@ class costConfig:
         logger.info("AnnuityFac:%f  " % self.annuityFac)
         logger.info("Heat Generation Cost Annuity:%f " % self.heatGenCost)
 
-    def _generateOutputs(self, dictCost, i, outputPath):
-        self._doPlots()
+    def _generateOutputs(self, i, outputPath, componentGroups: _tp.Sequence[_ext.ComponentGroup]):
+        self._doPlots(componentGroups)
         self._doPlotsAnnuity()
-        self._createLatex()
+        self._createLatex(componentGroups)
 
-        self._addCostsToResultJson(dictCost, i, outputPath)
+        self._addCostsToResultJson(componentGroups, i, outputPath)
 
-    def _addCostsToResultJson(self, dictCost, i, outputPath):
-        costDict = self._createCostDict(dictCost, i)
+    def _addCostsToResultJson(self, componentGroups: _tp.Sequence[_ext.ComponentGroup], i, outputPath):
+        costDict = self._createCostDict(componentGroups, i)
         resultJsonPath = os.path.join(outputPath, self.fileName + '-results.json')
         self._addCostToJson(costDict, self.resClass.results[i], resultJsonPath)
 
-    def _createCostDict(self, dictCost, i):
-        caseDict = dict()
-        caseDict["investment"] = self.totalInvestCost
-        caseDict["energyCost"] = self.heatGenCost
-        for component in dictCost['Components']:
-            if component == "Collector":
-                comp = dictCost['Components'][component]
-                size = self.resClass.results[i].get(comp['size'])
+    def _createCostDict(self, componentGroups: _tp.Sequence[_ext.ComponentGroup], i):
+        collectorComponents = [c for g in componentGroups for c in g.components if c.name == "Collector"]
+        if not collectorComponents:
+            raise RuntimeError("No `Collector' component found.")
 
-                caseDict["investmentPerM2"] = self.totalInvestCost / size
-                caseDict["investmentPerMWh"] = self.totalInvestCost * 1000 / self.qDemand
-        return caseDict
+        if len(collectorComponents) > 1:
+            raise RuntimeError("More than one `Collector' component found.")
+
+        collectorComponent = collectorComponents[0]
+        size = self._sizesByComponent[collectorComponent]
+
+        return {
+            "investment": self.totalInvestCost,
+            "energyCost": self.heatGenCost,
+            "investmentPerM2": self.totalInvestCost / size,
+            "investmentPerMWh": self.totalInvestCost * 1000 / self.qDemand
+        }
 
     def _addYearlySizes(self, dictCost, i):
         for yearlyCost in dictCost['YearlyCosts']:
@@ -408,14 +412,15 @@ class costConfig:
             size = self.resClass.results[i].get(cost['size'])
             self._addYearlySize(yearlyCost, size, cost['baseCost'], cost['varCost'], cost['varUnit'])
 
-    def _addComponentSizes(self, dictCost, i, components: _tp.Sequence[_ext.Component]):
-        for component in components:
-            variableName = component.cost.variable.name
-            size = self.resClass.results[i].get(variableName)
-            self._addComponentSize(component, size)
+    def _addComponentSizes(self, i, componentGroups: _tp.Sequence[_ext.ComponentGroup]):
+        for group in componentGroups:
+            for component in group.components:
+                variableName = component.cost.variable.name
+                size = self.resClass.results[i].get(variableName)
+                self._addComponentSize(component, size)
 
     def _clean(self):
-        self.componentSizes = []
+        self._sizesByComponent = {}
 
         # This are variables that add cost every year such as materials consumed, oil, etc..
         self.yearlyComp = []
@@ -427,8 +432,7 @@ class costConfig:
 
     # components
     def _addComponentSize(self, component: _ext.Component, size):
-        componentSize = _ext.ComponentSize(component, size)
-        self.componentSizes.append(componentSize)
+        self._sizesByComponent[component] = size
 
     def _addYearlySize(self, name, size, base, var, varUnit):
         self.yearlyComp.append(name)
@@ -442,29 +446,25 @@ class costConfig:
         logger.debug("cost:%f name:%s base:%f var:%f" % (cost, name, base, var))
     # plots
 
-    def _doPlots(self):
-        groupNamesWithCost = self._getGroupNamesAndCost()
+    def _doPlots(self, componentGroups: _tp.Sequence[_ext.ComponentGroup]) -> None:
+        groupNamesWithCost = self._getGroupNamesWithCost(componentGroups)
 
         groupNames, groupCosts = zip(*groupNamesWithCost)
         self.nameCostPdf = self._plotCostShare(groupCosts, groupNames, "costShare" + "-" + self.fileName,
                                                sizeFont=30, plotJpg=False, writeFile=False)
 
-    def _getGroupNamesAndCost(self) -> _tp.Sequence[_tp.Tuple[str, float]]:
-        componentSizesByGroup = self._getComponentSizeGroupsOrderdedByIndex()
-        return [(n, sum(cs.cost for cs in g)) for n, g in componentSizesByGroup]
+    def _getGroupNamesWithCost(self, componentGroups: _tp.Sequence[_ext.ComponentGroup])\
+            -> _tp.Sequence[_tp.Tuple[str, float]]:
+        result = []
+        for group in componentGroups:
+            cost = _ext.UncertainFloat(0)
+            for component in group.components:
+                size = self._sizesByComponent[component]
+                cost += component.cost.at(size)
 
-    def _getComponentSizeGroupsOrderdedByIndex(self) -> _tp.Iterable[_tp.Tuple[str, _tp.Iterable[_ext.ComponentSize]]]:
-        sortedComponentSizes = sorted(self.componentSizes, key=self._getComponentSizeGroupIndex)
-        return _it.groupby(sortedComponentSizes, key=self._getComponentSizeGroupName)
+            result.append((group.name, cost.value))
 
-    @staticmethod
-    def _getComponentSizeGroupIndex(componentSize: _ext.ComponentSize) -> int:
-        # TODO@bdi keep order of groups and components within groups
-        return 0
-
-    @staticmethod
-    def _getComponentSizeGroupName(componentSize: _ext.ComponentSize) -> str:
-        return componentSize.component.group
+        return result
 
     def _doPlotsAnnuity(self):
         legends = []
@@ -568,7 +568,7 @@ class costConfig:
         return namePdf
     # latex
 
-    def _createLatex(self):
+    def _createLatex(self, componentGroups: _tp.Sequence[_ext.ComponentGroup]):
         fileName = self.fileName + "-cost"
         self.doc.resetTexName(fileName)
 
@@ -579,7 +579,7 @@ class costConfig:
         self.doc.setCleanMode(self.cleanModeLatex)
         self.doc.addBeginDocument()
         self._addTableEconomicAssumptions()
-        self._addTableCosts(self.doc)
+        self._addTableCosts(self.doc, componentGroups)
 
         try:
             self.doc.addPlot(self.nameCostPdf, "System cost", "systemCost", 13)
@@ -620,7 +620,7 @@ class costConfig:
 
         self.doc.addTable(caption, names, units, label, lines, useFormula=True)
 
-    def _addTableCosts(self, doc):
+    def _addTableCosts(self, doc, componentGroups: _tp.Sequence[_ext.ComponentGroup]):
         totalCostScaleFactor = 1e-3 if self._USE_kCHF_FOR_TOTAL_COSTS else 1
         symbol = "$\\%$"
         caption = "System and Heat generation costs (all values incl. 8%s VAT) " % symbol
@@ -637,37 +637,36 @@ class costConfig:
 
         line = "\\\\ \n"
         lines = lines + line
-        componentSizesByGroup = self._getComponentSizeGroupsOrderdedByIndex()
-        for group, componentSizesForGroup in componentSizesByGroup:
-            nonZeroCostComponents = [cs for cs in componentSizesForGroup if cs.cost > 0]
+        for group in componentGroups:
+            components = self._getComponentsWithSizeAndPositiveCost(group.components)
 
-            if not nonZeroCostComponents:
+            if not components:
                 continue
 
-            firstComponent = nonZeroCostComponents[0]
+            firstComponent, firstSize, firstCost = components[0]
             line = "\\textbf{%s} & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n" % (
-                group, firstComponent.component.name,
-                firstComponent.component.cost.coeffs.offset.value, firstComponent.component.cost.coeffs.slope.value,
-                firstComponent.component.cost.variable.unit, firstComponent.size, firstComponent.component.cost.variable.unit,
-                firstComponent.component.lifetimeInYears, firstComponent.cost * totalCostScaleFactor,
-                100 * firstComponent.cost / self.totalInvestCost, symbol)
+                group.name, firstComponent.name,
+                firstComponent.cost.coeffs.offset.value, firstComponent.cost.coeffs.slope.value,
+                firstComponent.cost.variable.unit, firstSize, firstComponent.cost.variable.unit,
+                firstComponent.lifetimeInYears, firstCost * totalCostScaleFactor,
+                100 * firstCost / self.totalInvestCost, symbol)
             lines = lines + line
 
-            otherComponents = nonZeroCostComponents[1:]
-            for cs in otherComponents:
+            otherComponents = components[1:]
+            for component, size, cost in otherComponents:
                 line = " & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n"\
-                       % (cs.component.name, cs.component.cost.coeffs.offset.value, cs.component.cost.coeffs.slope.value,
-                          cs.component.cost.variable.unit, cs.size, cs.component.cost.variable.unit,
-                          cs.component.lifetimeInYears, cs.cost * totalCostScaleFactor,
-                          100 * cs.cost / self.totalInvestCost, symbol)
+                       % (component.name, component.cost.coeffs.offset.value, component.cost.coeffs.slope.value,
+                          component.cost.variable.unit, size, component.cost.variable.unit,
+                          component.lifetimeInYears, cost * totalCostScaleFactor,
+                          100 * cost / self.totalInvestCost, symbol)
                 lines = lines + line
 
-            if len(nonZeroCostComponents) > 1:
-                groupCost = sum(cs.cost for cs in nonZeroCostComponents)
+            if len(components) > 1:
+                groupCost = sum(c[2] for c in components)
                 line = "&\\cline{1-5} \n"
                 lines = lines + line
                 line = " &\\textbf{Total %s} &  & & & %.0f (%.1f %s) \\\\ \n" % (
-                    group, groupCost, 100 * groupCost / self.totalInvestCost, symbol)
+                    group.name, groupCost, 100 * groupCost / self.totalInvestCost, symbol)
                 lines = lines + line
 
             line = "\\hline \\\\ \n"
@@ -718,6 +717,17 @@ class costConfig:
         lines = lines + line
 
         doc.addTable(caption, names, units, label, lines, useFormula=False)
+
+    def _getComponentsWithSizeAndPositiveCost(self, components: _tp.Sequence[_ext.Component]) \
+            -> _tp.Sequence[_tp.Tuple[_ext.Component, float, float]]:
+        result = []
+        for component in components:
+            size = self._sizesByComponent[component]
+            cost = component.cost.at(size).value
+            if cost > 0:
+                result.append((component, size, cost))
+
+        return result
     # misc
 
     def _setOutputPathAndFileName(self, path, fileName):
