@@ -2,8 +2,6 @@ import dataclasses as _dc
 import dataclasses_jsonschema as _dcj
 import typing as _tp
 
-# TODO@bdi https://github.com/SPF-OST/pytrnsys/issues/5: Wrap components within group?
-
 __all__ = ['ComponentGroup',
            'Component',
            'Cost',
@@ -53,6 +51,14 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
     toLowerBound: float = 0
     toUpperBound: float = 0
 
+    @property
+    def min(self) -> float:
+        return self.value + self.toLowerBound
+
+    @property
+    def max(self) -> float:
+        return self.value + self.toUpperBound
+
     @staticmethod
     def create(other: _tp.Union["UncertainFloat", _tp.SupportsFloat]):
         if isinstance(other, UncertainFloat):
@@ -62,6 +68,19 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
         uncertainFloat = UncertainFloat(asFloat)
 
         return uncertainFloat
+
+    def format(self, precision=2):
+        uncertainty = self._formatUncertainty(precision)
+        return f"{self.value:.{precision}f}{uncertainty}"
+
+    def _formatUncertainty(self, precision):
+        if not self.toLowerBound and not self.toUpperBound:
+            return ""
+
+        toLower = _formatDistance(self.toLowerBound, precision)
+        toUpper = _formatDistance(self.toUpperBound, precision)
+
+        return f"-{toLower}/+{toUpper}"
 
     def __post_init__(self):
         self._ensureAllFieldsAreConvertableToFloat()
@@ -110,6 +129,13 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
 
     def __rmul__(self, other):
         return self * other
+
+
+def _formatDistance(distance, precision):
+    if not distance:
+        return "0"
+
+    return f"{abs(distance):.{precision}f}"
 
 
 @_dc.dataclass(frozen=True)

@@ -12,8 +12,6 @@ import json
 import logging
 import os
 import typing as _tp
-import itertools as _it
-
 import matplotlib as mpl
 import numpy as num
 from matplotlib import pyplot as plt
@@ -21,7 +19,9 @@ from matplotlib import pyplot as plt
 import pytrnsys.psim.resultsProcessedFile as results
 from pytrnsys.cost_calculation import economicFunctions as _ef
 from pytrnsys.report import latexReport as latex
-from . import extracted as _ext
+
+import pytrnsys.cost_calculation.model as _ext
+import pytrnsys.cost_calculation.costTable as _rw
 
 logger = logging.getLogger('root')
 
@@ -622,8 +622,7 @@ class costConfig:
 
     def _addTableCosts(self, doc, componentGroups: _tp.Sequence[_ext.ComponentGroup]):
         totalCostScaleFactor = 1e-3 if self._USE_kCHF_FOR_TOTAL_COSTS else 1
-        symbol = "$\\%$"
-        caption = "System and Heat generation costs (all values incl. 8%s VAT) " % symbol
+        caption = r"System and Heat generation costs (all values incl. 8$\%$ VAT) "
 
         names = ["Group", "Component", "Costs", "Size", "LifeTime", "Total Costs"]
         if self._USE_kCHF_FOR_TOTAL_COSTS:
@@ -632,49 +631,14 @@ class costConfig:
             units = ["", "", "[CHF]", "", "Years", "[CHF]"]
 
         label = "CostsTable"
-        lines = ""
+        lines = r"\\" + "\n"
+
+        writer = _rw.ComponentGroupsRowsLinesWriter(self.totalInvestCost, totalCostScaleFactor)
+        componentRowsLines = writer.createLines(componentGroups, self._sizesByComponent)
+
+        lines += componentRowsLines
+
         symbol = "\\%"
-
-        line = "\\\\ \n"
-        lines = lines + line
-        for group in componentGroups:
-            components = self._getComponentsWithSizeAndPositiveCost(group.components)
-
-            if not components:
-                continue
-
-            firstComponent, firstSize, firstCost = components[0]
-            line = "\\textbf{%s} & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n" % (
-                group.name, firstComponent.name,
-                firstComponent.cost.coeffs.offset.value, firstComponent.cost.coeffs.slope.value,
-                firstComponent.cost.variable.unit, firstSize, firstComponent.cost.variable.unit,
-                firstComponent.lifetimeInYears, firstCost * totalCostScaleFactor,
-                100 * firstCost / self.totalInvestCost, symbol)
-            lines = lines + line
-
-            otherComponents = components[1:]
-            for component, size, cost in otherComponents:
-                line = " & %s & %.0f+%.0f/%s & %.2f %s &%d & %.1f (%.1f %s) \\\\ \n"\
-                       % (component.name, component.cost.coeffs.offset.value, component.cost.coeffs.slope.value,
-                          component.cost.variable.unit, size, component.cost.variable.unit,
-                          component.lifetimeInYears, cost * totalCostScaleFactor,
-                          100 * cost / self.totalInvestCost, symbol)
-                lines = lines + line
-
-            if len(components) > 1:
-                groupCost = sum(c[2] for c in components)
-                line = "&\\cline{1-5} \n"
-                lines = lines + line
-                line = " &\\textbf{Total %s} &  & & & %.0f (%.1f %s) \\\\ \n" % (
-                    group.name, groupCost, 100 * groupCost / self.totalInvestCost, symbol)
-                lines = lines + line
-
-            line = "\\hline \\\\ \n"
-            lines = lines + line
-
-        line = " & \\textbf{Total Investment Cost} & && &\\textbf{%2.2f} (100%s) \\\\ \n" % (
-            self.totalInvestCost * totalCostScaleFactor, symbol)
-        lines = lines + line
 
         line = "\\hline \\\\ \n"
         lines = lines + line
@@ -718,16 +682,6 @@ class costConfig:
 
         doc.addTable(caption, names, units, label, lines, useFormula=False)
 
-    def _getComponentsWithSizeAndPositiveCost(self, components: _tp.Sequence[_ext.Component]) \
-            -> _tp.Sequence[_tp.Tuple[_ext.Component, float, float]]:
-        result = []
-        for component in components:
-            size = self._sizesByComponent[component]
-            cost = component.cost.at(size).value
-            if cost > 0:
-                result.append((component, size, cost))
-
-        return result
     # misc
 
     def _setOutputPathAndFileName(self, path, fileName):
