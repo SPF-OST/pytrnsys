@@ -7,7 +7,7 @@ __all__ = ['ComponentGroupsRowsLinesWriter']
 
 
 class ComponentGroupsRowsLinesWriter:
-    def __init__(self, totalCost, totalCostScaleFactor):
+    def __init__(self, totalCost: _model.UncertainFloat, totalCostScaleFactor: float):
         self._totalCost = totalCost
         self._totalCostScaleFactor = totalCostScaleFactor
 
@@ -18,8 +18,10 @@ class ComponentGroupsRowsLinesWriter:
 
             lines += groupLines + r"\hline \\" + "\n"
 
-        scaledTotalCost = self._totalCost * self._totalCostScaleFactor
-        line = rf" & \\textbf{{Total Investment Cost}} & & & & \textbf{{{scaledTotalCost:.2f}}} (100\%) \\ "
+        totalCost = self._totalCost * self._totalCostScaleFactor
+        formattedTotalCost = totalCost.format(precision=2)
+
+        line = rf" & \textbf{{Total Investment Cost}} & & & & \textbf{{{formattedTotalCost}}} (100\%) \\ "
         lines += line + "\n"
 
         return lines
@@ -46,18 +48,20 @@ class ComponentGroupsRowsLinesWriter:
 
         return lines
 
-    def _createGroupRowsLines(self, components, group):
+    def _createGroupRowsLines(self, components: _tp.Sequence["_SizedComponent"], group):
         groupLines = ""
 
+        cost: _model.UncertainFloat
         cost = sum(c.cost for c in components)
-        costShare = 100 * cost.value / self._totalCost
+        costShare = 100 * cost / self._totalCost
 
         formattedCost = cost.format(precision=1)
+        formattedCostShare = costShare.format(precision=1)
 
         line = r"&\cline{1-5}"
         groupLines += line + "\n"
 
-        line = rf" & \textbf{{Total {group.name}}} & & & & {formattedCost} ({costShare:.1f}\%) \\"
+        line = rf" & \textbf{{Total {group.name}}} & & & & {formattedCost} ({formattedCostShare}\%) \\"
 
         groupLines += line + "\n"
 
@@ -71,8 +75,11 @@ class ComponentGroupsRowsLinesWriter:
         formattedGroupNameOrEmpty = rf"\textbf{{{groupName}}}" if withGroupName else ""
 
         size = sizedComponent.size
-        cost = sizedComponent.cost.format(precision=1)
-        costShare = 100 * sizedComponent.cost.value / self._totalCost
+        cost = sizedComponent.cost
+        costShare = 100 * sizedComponent.cost / self._totalCost
+
+        formattedCost = cost.format(precision=1)
+        formattedCostShare = costShare.format(precision=1)
 
         component = sizedComponent.component
         compName = component.name
@@ -82,7 +89,7 @@ class ComponentGroupsRowsLinesWriter:
         lifetime = component.lifetimeInYears
 
         line = rf"{formattedGroupNameOrEmpty} & {compName} & {offset}+({slope})/{unit} "\
-               rf"& {size:.2f} {unit} & {lifetime} & {cost} ({costShare:.1f}\%) \\"
+               rf"& {size:.2f} {unit} & {lifetime} & {formattedCost} ({formattedCostShare}\%) \\"
 
         return line
 
