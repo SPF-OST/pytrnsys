@@ -83,7 +83,7 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
 
     def format(self, precision) -> str:
         uncertainty = self._formatUncertainty(precision)
-        return f"{self.value:.{precision}f}{uncertainty}"
+        return rf"$\mathbf{{{self.value:.{precision}f}}}{uncertainty}$"
 
     def _formatUncertainty(self, precision):
         if not self.toLowerBound and not self.toUpperBound:
@@ -92,7 +92,7 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
         toLower = _formatDistance(self.toLowerBound, precision)
         toUpper = _formatDistance(self.toUpperBound, precision)
 
-        return f"-{toLower}/+{toUpper}"
+        return f"^{{+{toUpper}}}_{{-{toLower}}}"
 
     def __post_init__(self):
         self._ensureAllFieldsAreConvertableToFloat()
