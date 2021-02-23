@@ -1,14 +1,16 @@
 import filecmp
 import pathlib as pl
 import shutil
+import logging as log
 
+import pytest
 import diff_pdf_visually as dpdf
 
 import pytrnsys.cost_calculation.costConfig as cc
 
 
-def testCostConfig():
-    helper = Helper()
+def testCostConfig(caplog: pytest.LogCaptureFixture):
+    helper = Helper(caplog)
     helper.setup()
 
     actualResultsDir = str(helper.actualResultsDir)
@@ -25,7 +27,9 @@ def testCostConfig():
 
 
 class Helper:
-    def __init__(self):
+    def __init__(self, caplog: pytest.LogCaptureFixture):
+        self._caplog = caplog
+
         data_dir = pl.Path(__file__).parent / 'cost_calculation'
 
         inputDir = data_dir / 'input'
@@ -39,10 +43,16 @@ class Helper:
         self._expectedResultsDir = expectedDir / 'results'
 
     def setup(self):
+        self._setupLogging()
+        self._setupActualDirectory()
+
+    def _setupLogging(self):
+        self._caplog.set_level(log.DEBUG, 'root')
+
+    def _setupActualDirectory(self):
         actualDir = self.actualResultsDir.parent
         if actualDir.exists():
             shutil.rmtree(actualDir)
-
         shutil.copytree(self._resultsDir, self.actualResultsDir)
 
     def assertResultsAreAsExpected(self):
