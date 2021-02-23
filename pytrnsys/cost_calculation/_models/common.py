@@ -1,56 +1,14 @@
-__all__ = ['ComponentGroup',
-           'Component',
-           'Cost',
-           'LinearCoefficients',
-           'UncertainFloat',
-           'Variable',
-           'ComponentSize']
+__all__ = ['UncertainFloat', 'FloatLike']
 
 import dataclasses as _dc
-import dataclasses_jsonschema as _dcj
 import typing as _tp
 import operator as _op
-
-
-@_dc.dataclass(frozen=True)
-class ComponentGroup(_dcj.JsonSchemaMixin):
-    name: str
-    components: _tp.Sequence["Component"]
-
-
-@_dc.dataclass(frozen=True, eq=False)
-class Component(_dcj.JsonSchemaMixin):
-    name: str
-    lifetimeInYears: int
-    cost: "Cost"
-
-
-@_dc.dataclass(frozen=True)
-class Group(_dcj.JsonSchemaMixin):
-    name: str
-    index: int
-
-
-@_dc.dataclass(frozen=True)
-class Cost(_dcj.JsonSchemaMixin):
-    coeffs: "LinearCoefficients"
-    variable: "Variable"
-
-    def at(self, value: float) -> "UncertainFloat":
-        return self.coeffs.offset + self.coeffs.slope * value
-
-
-@_dc.dataclass(frozen=True)
-class LinearCoefficients(_dcj.JsonSchemaMixin):
-    offset: "UncertainFloat"
-    slope: "UncertainFloat"
-
 
 FloatLike = _tp.Union["UncertainFloat", _tp.SupportsFloat]
 
 
 @_dc.dataclass(frozen=True)
-class UncertainFloat(_dcj.JsonSchemaMixin):
+class UncertainFloat:
     value: float
     toLowerBound: float = 0
     toUpperBound: float = 0
@@ -135,6 +93,11 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
     def __rtruediv__(self, other: FloatLike) -> "UncertainFloat":
         return _doOp(_op.truediv, other, self)
 
+    def __gt__(self, other: FloatLike) -> bool:
+        other = self.create(other)
+
+        return self.min > other.max
+
 
 def _doOp(op: _tp.Callable[[float, float], float], x: FloatLike, y: FloatLike) -> UncertainFloat:
     x = UncertainFloat.create(x)
@@ -161,24 +124,3 @@ def _formatDistance(distance, precision) -> str:
         return "0"
 
     return f"{abs(distance):.{precision}f}"
-
-
-@_dc.dataclass(frozen=True)
-class Variable(_dcj.JsonSchemaMixin):
-    name: str
-    unit: str
-
-
-@_dc.dataclass(frozen=True)
-class ComponentSize(_dcj.JsonSchemaMixin):
-    component: Component
-    size: float
-
-    @property
-    def cost(self) -> float:
-        coeffs = self.component.cost.coeffs
-        cost = coeffs.offset + self.size * coeffs.slope
-
-        return UncertainFloat.create(cost).value
-
-

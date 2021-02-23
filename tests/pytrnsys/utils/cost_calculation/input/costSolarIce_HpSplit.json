@@ -164,23 +164,34 @@
       ]
     }
   ],
-  "YearlyCosts": {
-    "Transmission grid": {
-      "size": "E_yearly",
-      "baseCost": 0,
-      "varCost": 0.0,
-      "varUnit": "kWh"
+  "yearlyCosts": [
+    {
+      "name": "Transmission grid",
+      "cost": {
+        "coeffs": {
+          "offset": {
+            "value": 0
+          },
+          "slope": {
+            "value": 0.0
+          }
+        },
+        "variable": {
+          "name": "E_yearly",
+          "unit": "kWh"
+        }
+      }
     }
-  },
-  "DefaultData": {
+  ],
+  "parameters": {
     "rate": 0.03,
-    "analysPeriod": 30,
-    "qDemand": "Q_yearly",
-    "elFromGrid": "ElHeatSys_Tot",
+    "analysisPeriod": 30,
+    "qDemandVariable": "Q_yearly",
+    "elFromGridVariable": "ElHeatSys_Tot",
     "costElecFix": 0,
-    "costEleckWh": 0.2,
+    "costElecKWh": 0.2,
     "increaseElecCost": 0,
-    "MaintenanceRate": 0.01,
+    "maintenanceRate": 0.01,
     "costResidual": 0,
     "lifetimeResVal": 30,
     "cleanModeLatex": false
