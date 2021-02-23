@@ -8,15 +8,16 @@ Date   : 2016
 ToDo :
 """
 
-import string, os
-import pytrnsys.utils.utilsSpf as utils
-import pytrnsys.utils.log as log
-from string import ascii_letters, digits, whitespace
-import shutil
 import codecs
 import json
-import subprocess
 import logging
+import os
+import shutil
+import subprocess
+from string import ascii_letters, digits
+
+import pytrnsys.utils.utilsSpf as utils
+
 logger = logging.getLogger('root')
 
 class LatexReport():
@@ -147,6 +148,8 @@ class LatexReport():
             raise ValueError('The specified LatexPackage \"%s\" is not implemented yet or does not exist.'%LatexPackage)
 
         myCmd ='"%s"'%cmd #for blank spaces in paths
+
+        logger.debug("About to run '%s' (cwd = %s)", myCmd, os.getcwd())
 
         subprocessOutput = subprocess.run(cmd, capture_output=True)
         errorMessage = subprocessOutput.stderr.decode("utf-8")
