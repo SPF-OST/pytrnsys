@@ -17,11 +17,11 @@ import numpy as num
 from matplotlib import pyplot as plt
 
 import pytrnsys.psim.resultsProcessedFile as results
-from pytrnsys.cost_calculation import economicFunctions as _ef
+from pytrnsys.cost_calculation import _economicFunctions as _ef
 from pytrnsys.report import latexReport as latex
 
-import pytrnsys.cost_calculation.model as _model
-import pytrnsys.cost_calculation.costTable as _rw
+import pytrnsys.cost_calculation._model as _model
+import pytrnsys.cost_calculation._costTable as _rw
 
 logger = logging.getLogger('root')
 

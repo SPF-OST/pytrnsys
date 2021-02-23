@@ -1,8 +1,3 @@
-import dataclasses as _dc
-import dataclasses_jsonschema as _dcj
-import typing as _tp
-import operator as _op
-
 __all__ = ['ComponentGroup',
            'Component',
            'Cost',
@@ -10,6 +5,11 @@ __all__ = ['ComponentGroup',
            'UncertainFloat',
            'Variable',
            'ComponentSize']
+
+import dataclasses as _dc
+import dataclasses_jsonschema as _dcj
+import typing as _tp
+import operator as _op
 
 
 @_dc.dataclass(frozen=True)

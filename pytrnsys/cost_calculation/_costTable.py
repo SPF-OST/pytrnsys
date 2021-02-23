@@ -1,9 +1,10 @@
+__all__ = ['ComponentGroupsRowsLinesWriter']
+
+
 import typing as _tp
 import dataclasses as _dc
 
-import pytrnsys.cost_calculation.model as _model
-
-__all__ = ['ComponentGroupsRowsLinesWriter']
+import pytrnsys.cost_calculation._model as _model
 
 
 class ComponentGroupsRowsLinesWriter:
@@ -88,7 +89,7 @@ class ComponentGroupsRowsLinesWriter:
         unit = component.cost.variable.unit
         lifetime = component.lifetimeInYears
 
-        line = rf"{formattedGroupNameOrEmpty} & {compName} & {offset}+({slope})/{unit} "\
+        line = rf"{formattedGroupNameOrEmpty} & {compName} & {offset}+{slope}/{unit} "\
                rf"& {size:.2f} {unit} & {lifetime} & {formattedCost} ({formattedCostShare}\%) \\"
 
         return line
