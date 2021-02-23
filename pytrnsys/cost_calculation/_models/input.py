@@ -15,13 +15,20 @@ class Input(_dcj.JsonSchemaMixin):
     yearlyCosts: _tp.Sequence["YearlyCost"]
     parameters: "Parameters"
 
+    @property
+    def variables(self) -> _tp.Iterable["Variable"]:
+        yield from (c.variable for cg in self.componentGroups for c in cg.components)
+        yield from (yc.variable for yc in self.yearlyCosts)
+        yield self.parameters.qDemandVariable
+        yield self.parameters.elFromGridVariable
+
 
 @_dc.dataclass(frozen=True)
 class Parameters(_dcj.JsonSchemaMixin):
     rate: float
     analysisPeriod: int
-    qDemandVariable: str
-    elFromGridVariable: str
+    qDemandVariable: "Variable"
+    elFromGridVariable: "Variable"
     costElecFix: float
     costElecKWh: float
     increaseElecCost: float

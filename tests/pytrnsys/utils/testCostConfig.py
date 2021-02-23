@@ -13,15 +13,12 @@ def testCostConfig(caplog: pytest.LogCaptureFixture):
     helper = Helper(caplog)
     helper.setup()
 
-    actualResultsDir = str(helper.actualResultsDir)
-    costParametersFilePath = str(helper.costParametersFilePath)
+    actualResultsDir = helper.actualResultsDir
+    costParametersFilePath = helper.costParametersFilePath
 
     costConfig = cc.costConfig()
-    costParameters = costConfig.readCostJson(costParametersFilePath)
     costConfig.setFontSizes(small=15)
-    costConfig.setDefaultData(costParameters)
-    costConfig.readResults(actualResultsDir)
-    costConfig.process(costParameters)
+    costConfig.process(costParametersFilePath, actualResultsDir)
 
     helper.assertResultsAreAsExpected()
 

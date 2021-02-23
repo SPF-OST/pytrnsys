@@ -11,18 +11,17 @@ Date : 07.04.2020
 import json
 import logging
 import os
-import typing as _tp
+import pathlib as _pl
+
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
-import pytrnsys.psim.resultsProcessedFile as results
-from pytrnsys.cost_calculation import _economicFunctions as _ef
 from pytrnsys.report import latexReport as latex
-
+from ._cost_table import componentGroups as _crl
+from ._cost_table import annuities as _arl
+from . import createOutput as _co
 from ._models import input as _input
 from ._models import output as _output
-from ._models import common as _common
-from . import _costTable as _ct
 
 logger = logging.getLogger('root')
 
@@ -33,48 +32,14 @@ class costConfig:
     # public: used
     def __init__(self):
         self.method = "VDI"
-        self.cleanModeLatex = True
+        self.cleanModeLatex = None
 
-        self._input: _tp.Optional[_input.Input] = None
-        self._output: _tp.Optional[_output.Output] = None
-        self._valuesByVariable: _tp.Dict[_input.Variable, float] = {}
-
-        self.rate = 0.
-        self.analysPeriod = 0.
-        self.costElecFix = 0.
-        self.costEleckWh = 0.
-        self.lifeTime = 0.
-        self.increaseElecCost = 0.
-        self.elDemand = 0.
-        self.totalInvestCost = _common.UncertainFloat.zero()
-
-        self.qDemand = 0.
-        self.elDemandTotal = 0.
-        self.MaintenanceRate = 0.
-        self.costResidual = 0.
-        self.lifeTimeResVal = 0.
         self.readCompleteFolder = True
         self.fileNameList = None
 
     def setFileNameList(self, fileNameList):
         self.fileNameList = fileNameList
         self.readCompleteFolder = False
-
-    def setDefaultData(self, dictCost):
-        self.rate = dictCost["parameters"]["rate"]
-        self.analysPeriod = dictCost["parameters"]["analysisPeriod"]
-        self.costElecFix = dictCost["parameters"]["costElecFix"]
-        self.costEleckWh = dictCost["parameters"]["costElecKWh"]
-        self.increaseElecCost = dictCost["parameters"]["increaseElecCost"]
-        self.MaintenanceRate = dictCost["parameters"]["maintenanceRate"]
-        self.costResidual = dictCost["parameters"]["costResidual"]
-        self.cleanModeLatex = dictCost["parameters"]["cleanModeLatex"]
-        self.lifeTimeResVal = dictCost["parameters"]["lifetimeResVal"]
-
-    def readResults(self, dataPath):
-        self.resClass = results.ResultsProcessedFile(dataPath)
-        self.resClass.readResultsData(resultType='json', completeFolder=self.readCompleteFolder,
-                                      fileNameList=self.fileNameList)
 
     @staticmethod
     def readCostJson(path):
@@ -84,16 +49,15 @@ class costConfig:
 
         return dictCost
 
-    def process(self, dictCost):
-        self._input = _input.Input.from_dict(dictCost)
+    def process(self, configFilePath: _pl.Path, resultsDirPath: _pl.Path):
+        config = _input.Input.from_dict(self.readCostJson(configFilePath))
+        resultOutputs = _co.createOutputs(config, resultsDirPath, self.readCompleteFolder, self.fileNameList)
 
         self.investVec = []
         self.annuityVec = []
 
-        for i in range(len(self.resClass.results)):
-            self._processResult(dictCost, i, self._input.componentGroups, self._input.yearlyCosts)
-
-        self._clean()
+        for resultOutput in resultOutputs:
+            self._processResult(config.parameters, resultOutput, resultsDirPath)
 
     @staticmethod
     def setFontSizes(small):
@@ -254,125 +218,33 @@ class costConfig:
         fig.savefig(plotName)
 
     # private
-    def _processResult(self, dictCost, i,
-                       componentGroups: _tp.Sequence[_input.ComponentGroup],
-                       yearlyCosts: _tp.Sequence[_input.YearlyCost]):
-        fileName = self.resClass.fileName[i]
-        outputPath = os.path.join(self.resClass.path, fileName)
+    def _processResult(self, parameters: _input.Parameters, resultOutput: _co.ResultOutput, resultsDirPath: _pl.Path):
+        fileName = str(resultOutput.resultsDir)
+        outputPath = os.path.join(str(resultsDirPath), fileName)
 
         self._setOutputPathAndFileName(outputPath, fileName)
 
-        self._addComponentSizes(i, componentGroups)
+        self.investVec.append(resultOutput.output.componentGroups.cost.mean)
+        self.annuityVec.append(resultOutput.output.heatGenerationCost)
 
-        self.qDemand = self.resClass.results[i].get(dictCost['parameters']['qDemandVariable'])
-        self.elFromGrid = self.resClass.results[i].get(dictCost['parameters']['elFromGridVariable'])
-        self.elDemandTotal = self.elFromGrid
+        self._generateOutputs(parameters, outputPath, resultOutput.output)
 
-        self._addYearlySizes(i, yearlyCosts)
+    def _generateOutputs(self, parameters: _input.Parameters, outputPath, output: _output.Output):
+        self._doPlots(output.componentGroups)
+        self._doPlotsAnnuity(output)
+        self._createLatex(parameters, output)
 
-        componentGroups = _output.ComponentGroups.createFromValues(self._input.componentGroups,
-                                                                   self._valuesByVariable,
-                                                                   self._input.parameters.rate)
-        yearlyCosts = _output.CostFactors.createForYearlyCosts(self._input.yearlyCosts,
-                                                               self._valuesByVariable,
-                                                               self._input.parameters.rate,
-                                                               self._input.parameters.analysisPeriod)
-        self._output = _output.Output(componentGroups, yearlyCosts)
+        self._addCostsToResultJson(output, outputPath)
 
-        self._calculate()
-        self.investVec.append(self.totalInvestCost.mean)
-        self.annuityVec.append(self.heatGenCost)
-
-        self._generateOutputs(i, outputPath, componentGroups, yearlyCosts)
-
-        self._clean()
-
-    def _calculate(self):
-        self.totalInvestCost = _common.UncertainFloat.zero()
-        size: float
-        for i, component in enumerate(c for cg in self._output.componentGroups.groups for c in cg.components.factors):
-            logger.debug("ncomp:%d rate:%f lifeTime%f" % (i, self.rate, component.period))
-            self.totalInvestCost = self.totalInvestCost + component.cost
-
-        # ===================================================
-        # electricity
-        # ===================================================
-
-        self.costElecTotalY = self.costElecFix + self.costEleckWh * self.elDemandTotal
-
-        if self.rate == self.increaseElecCost:
-            self.npvFacElec = self.analysPeriod / (
-                    1. + self.rate)  # DC It was lifeTime but now its different from each other
-        else:
-            self.npvFacElec = _ef.getNPVIncreaseCost(self.rate, self.analysPeriod, self.increaseElecCost)
-
-        self.npvElec = self.costElecTotalY * self.npvFacElec
-
-        # ===================================================
-        # Maintenance cost
-        # ===================================================
-        self.npvMaintenance = self.MaintenanceRate * self.totalInvestCost.mean \
-                              * _ef.getNPV(self.rate, self.analysPeriod)
-
-        # ===================================================
-        # Residual Value. Do for all that have a longer life time. What happens with replacement 5 y before
-        # analysis period? Should we also add this?
-        # ===================================================
-
-        self.discountFromEnd = (1 + self.rate) ** (-1. * self.analysPeriod)
-        self.resValFactor = (self.lifeTimeResVal - self.analysPeriod) / self.lifeTimeResVal
-        self.residualValue = self.costResidual * self.resValFactor
-        self.npvResVal = self.residualValue * self.discountFromEnd
-
-        # ===================================================
-        # NET PRESENT VALUE
-        # ===================================================
-
-        self.npvSystem = self.totalInvestCost.mean + self._output.yearlyCosts.npvCost.mean \
-                         + self.npvElec + self.npvMaintenance - self.npvResVal
-
-        logger.debug("npvSystem:%f totalInvestCost :%f AlMatcost:%f npvElec :%f npvMaintenance:%f npvResVal:%f" % (
-            self.npvSystem, self.totalInvestCost.mean, self._output.yearlyCosts.npvCost.mean,
-            self.npvElec, self.npvMaintenance, self.npvResVal))
-
-        # ===================================================
-        # ANNUITY
-        # ===================================================
-
-        self.annuityFac = _ef.getAnnuity(self.rate, self.analysPeriod)
-
-        self.anElec = self.annuityFac * self.npvElec
-        self.anMaint = self.MaintenanceRate * self.totalInvestCost.mean  # to use DP method
-
-        self.anResVal = (-1.) * self.annuityFac * self.npvResVal
-
-        self.annuity = self._output.componentGroups.annualizedCost.mean + self.anElec + self.anMaint + self.anResVal \
-                       + self._output.yearlyCosts.cost.mean
-
-        logger.info(" AnElectricity:%f npvElec:%f npvFacElec:%f annnuityFac:%f   " % (
-            self.anElec, self.npvElec, self.npvFacElec, self.annuityFac))
-
-        self.heatGenCost = self.annuity / self.qDemand  # Fr./kWh
-
-        logger.info("AnnuityFac:%f  " % self.annuityFac)
-        logger.info("Heat Generation Cost Annuity:%f " % self.heatGenCost)
-
-    def _generateOutputs(self, i, outputPath,
-                         componentGroups: _output.ComponentGroups,
-                         yearlyCosts: _output.CostFactors):
-        self._doPlots(componentGroups)
-        self._doPlotsAnnuity(componentGroups, yearlyCosts)
-        self._createLatex()
-
-        self._addCostsToResultJson(componentGroups, i, outputPath)
-
-    def _addCostsToResultJson(self, componentGroups: _output.ComponentGroups, i, outputPath):
-        costDict = self._createCostDict(componentGroups)
+    def _addCostsToResultJson(self, output: _output.Output, outputPath):
+        costDict = self._createCostDict(output)
         resultJsonPath = os.path.join(outputPath, self.fileName + '-results.json')
-        self._addCostToJson(costDict, self.resClass.results[i], resultJsonPath)
+        with open(resultJsonPath, 'r') as resultsJson:
+            oldResults = json.load(resultsJson)
+        self._addCostToJson(costDict, oldResults, resultJsonPath)
 
-    def _createCostDict(self, componentGroups: _output.ComponentGroups):
-        collectorComponents = [c for g in componentGroups.groups
+    def _createCostDict(self, output: _output.Output):
+        collectorComponents = [c for g in output.componentGroups.groups
                                for c in g.components.factors if c.name == "Collector"]
         if not collectorComponents:
             raise RuntimeError("No `Collector' component found.")
@@ -383,30 +255,14 @@ class costConfig:
         collectorComponent = collectorComponents[0]
         size = collectorComponent.value
 
-        totalCost = self.totalInvestCost.mean
+        totalCost = output.componentGroups.cost.mean
 
         return {
             "investment": totalCost,
-            "energyCost": self.heatGenCost,
+            "energyCost": output.heatGenerationCost.mean,
             "investmentPerM2": totalCost / size.value,
-            "investmentPerMWh": totalCost * 1000 / self.qDemand
+            "investmentPerMWh": totalCost * 1000 / output.heatingDemand
         }
-
-    def _addYearlySizes(self, i, yearlyCosts: _tp.Sequence[_input.YearlyCost]):
-        for yearlyCost in yearlyCosts:
-            variable = yearlyCost.variable
-            size = self.resClass.results[i].get(variable.name)
-            self._valuesByVariable[variable] = size
-
-    def _addComponentSizes(self, i, componentGroups: _tp.Sequence[_input.ComponentGroup]):
-        for group in componentGroups:
-            for component in group.components:
-                variable = component.variable
-                size = self.resClass.results[i].get(variable.name)
-                self._valuesByVariable[variable] = size
-
-    def _clean(self):
-        self._valuesByVariable = {}
 
     # plots
 
@@ -417,20 +273,20 @@ class costConfig:
         self.nameCostPdf = self._plotCostShare(groupCosts, groupNames, "costShare" + "-" + self.fileName,
                                                sizeFont=30, plotJpg=False, writeFile=False)
 
-    def _doPlotsAnnuity(self, componentGroups: _output.ComponentGroups, yearlyCosts: _output.CostFactors):
+    def _doPlotsAnnuity(self, output: _output.Output):
         legends = []
         inVar = []
 
-        inVar.append(componentGroups.annualizedCost.mean)
+        inVar.append(output.componentGroups.annuity.mean)
         legends.append("Capital cost")
 
-        inVar.append(self.anMaint)
+        inVar.append(output.componentGroups.maintenanceCost.mean)
         legends.append("Maintenance")
 
-        inVar.append(self.anElec)
+        inVar.append(output.electricity.annuity)
         legends.append("El. purchased \n from the grid")
 
-        for yearlyCost in yearlyCosts.factors:
+        for yearlyCost in output.yearlyCosts.factors:
             name = yearlyCost.name
             cost = yearlyCost.cost.mean
 
@@ -522,7 +378,7 @@ class costConfig:
 
     # latex
 
-    def _createLatex(self):
+    def _createLatex(self, parameters: _input.Parameters, output: _output.Output):
         fileName = self.fileName + "-cost"
         self.doc.resetTexName(fileName)
 
@@ -530,10 +386,10 @@ class costConfig:
 
         self.doc.setTitle(self.fileName)
 
-        self.doc.setCleanMode(self.cleanModeLatex)
+        self.doc.setCleanMode(self._getIsLatexCleanMode(parameters))
         self.doc.addBeginDocument()
-        self._addTableEconomicAssumptions()
-        self._addTableCosts(self.doc)
+        self._addTableEconomicAssumptions(parameters, output)
+        self._addTableCosts(self.doc, output)
 
         try:
             self.doc.addPlot(self.nameCostPdf, "System cost", "systemCost", 13)
@@ -544,7 +400,10 @@ class costConfig:
         self.doc.addEndDocumentAndCreateTexFile()
         self.doc.executeLatexFile()
 
-    def _addTableEconomicAssumptions(self):
+    def _getIsLatexCleanMode(self, parameters):
+        return parameters.cleanModeLatex if self.cleanModeLatex is None else self.cleanModeLatex
+
+    def _addTableEconomicAssumptions(self, parameters: _input.Parameters, output: _output.Output):
         caption = "Assumptions for calculation of heat generation costs"
         names = ["", "", "", ""]
         units = None
@@ -552,93 +411,49 @@ class costConfig:
         perc = "\\%"
 
         lines = ""
-        line = "Rate & %2.1f %s $per$ $annum$\\\\ \n" % (self.rate * 100., perc)
+        line = "Rate & %2.1f %s $per$ $annum$\\\\ \n" % (parameters.rate * 100., perc)
         lines = lines + line
-        line = "Analysis period & %2.0f $years$\\\\ \n" % self.analysPeriod
+        line = "Analysis period & %2.0f $years$\\\\ \n" % parameters.analysisPeriod
         lines = lines + line
         line = "Maintenance & %2.1f %s $of$ $Investment$ $costs$ $per$ $year$ \\\\ \n" % (
-            self.MaintenanceRate * 100., perc)
+            parameters.maintenanceRate * 100., perc)
         lines = lines + line
         line = "\\hline \\\\ \n"
         lines = lines + line
-        line = "Electricity & Fix costs: %2.0f  $Fr.$ $per$ $year$ \\\\ \n" % self.costElecFix
+        line = "Electricity & Fix costs: %2.0f  $Fr.$ $per$ $year$ \\\\ \n" % parameters.costElecFix
         lines = lines + line
-        line = " & Variable costs:  %2.2f $Fr.$ $per$ $kWh$ \\\\ \n" % self.costEleckWh
+        line = " & Variable costs:  %2.2f $Fr.$ $per$ $kWh$ \\\\ \n" % parameters.costElecKWh
         lines = lines + line
-        line = "Increase of electricity costs & %2.1f %s $per$ $year$ \\\\ \n" % (self.increaseElecCost * 100., perc)
+        line = "Increase of electricity costs & %2.1f %s $per$ $year$ \\\\ \n" % (parameters.increaseElecCost * 100., perc)
         lines = lines + line
-        line = "Electricity costs year 1 & %2.0f Fr. in year 1 \\\\ \n" % self.costElecTotalY
+        line = "Electricity costs year 1 & %2.0f Fr. in year 1 \\\\ \n" % output.electricity.cost
         lines = lines + line
 
         label = "definitionTable"
 
         self.doc.addTable(caption, names, units, label, lines, useFormula=True)
 
-    def _addTableCosts(self, doc):
+    def _addTableCosts(self, doc, output: _output.Output):
         totalCostScaleFactor = 1e-3 if self._USE_kCHF_FOR_TOTAL_COSTS else 1
-        caption = r"System and Heat generation costs (all values incl. 8$\%$ VAT) "
 
+        componentRowsLines = _crl.createLines(output.componentGroups, totalCostScaleFactor)
+        annuitiesLines = _arl.createLines(output)
+
+        lines = r"\\" + "\n" + componentRowsLines + annuitiesLines
+
+        caption = r"System and Heat generation costs (all values incl. 8$\%$ VAT) "
         names = ["Group", "Component", "Costs", "Size", "LifeTime", "Total Costs"]
+        units = self._getUnitsForAnnuityPlot()
+        label = "CostsTable"
+
+        doc.addTable(caption, names, units, label, lines, useFormula=False)
+
+    def _getUnitsForAnnuityPlot(self):
         if self._USE_kCHF_FOR_TOTAL_COSTS:
             units = ["", "", "[CHF]", "", "", "[kCHF]"]
         else:
             units = ["", "", "[CHF]", "", "Years", "[CHF]"]
-
-        label = "CostsTable"
-        lines = r"\\" + "\n"
-
-        writer = _ct.ComponentGroupsRowsLinesWriter(self.totalInvestCost, totalCostScaleFactor)
-        componentRowsLines = writer.createLines(self._output.componentGroups)
-
-        lines += componentRowsLines
-
-        symbol = "\\%"
-
-        line = "\\hline \\\\ \n"
-        lines = lines + line
-        line = "\\hline \\\\ \n"
-        lines = lines + line
-
-        costUnit = " $CHF/a$"
-
-        line = "Annuity & Annuity (yearly costs over lifetime)  &&& & %2.0f% s  \\\\ \n" % (self.annuity, costUnit)
-        lines = lines + line
-        line = " & Share of Investment & &&& %2.0f%s (%2.0f%s) \\\\ \n" % (
-            self._output.componentGroups.annualizedCost.mean, costUnit,
-            self._output.componentGroups.annualizedCost.mean * 100. / self.annuity, symbol)
-        lines = lines + line
-        line = " & Share of Electricity  & %.0f+%.2f/kWh & %2.0f kWh&  & %2.0f%s (%2.0f%s)\\\\ \n" % (
-            self.costElecFix, self.costEleckWh, self.elDemandTotal, self.anElec, costUnit,
-            self.anElec * 100. / self.annuity, symbol)
-        lines = lines + line
-        line = " & Share of Maintenance & &&& %2.0f%s (%2.0f%s)\\\\ \n" % (
-            self.anMaint, costUnit, self.anMaint * 100. / self.annuity, symbol)
-        lines = lines + line
-        for yc in self._output.yearlyCosts.factors:
-            line = " & Share of %s & %.0f+%.2f/%s & %.0f  %s & & %2.0f%s (%2.0f%s)\\\\ \n" % (
-                yc.name,
-                yc.coeffs.offset.mean,
-                yc.coeffs.slope.mean,
-                yc.value.unit,
-                yc.value.value, yc.value.unit, yc.cost.mean, costUnit,
-                yc.cost.mean * 100. / self.annuity, symbol)
-            lines = lines + line
-
-        line = " & Share of Residual Value &&& & %2.0f%s (%2.0f%s)\\\\ \n" % (
-            self.anResVal, costUnit, self.anResVal * 100. / self.annuity, symbol)
-        lines = lines + line
-
-        line = "Present Value  & Present Value of all costs  & &&& %2.2f% s  \\\\ \n" % (self.npvSystem, " CHF")
-        lines = lines + line
-        line = "\\hline \\\\ \n"
-        lines = lines + line
-
-        hgcUnit = "$Rp./kWh$"
-
-        line = " Energy Generation Costs & Using annuity: &&& %2.2f & %s \\\\ \n" % (self.heatGenCost * 100., hgcUnit)
-        lines = lines + line
-
-        doc.addTable(caption, names, units, label, lines, useFormula=False)
+        return units
 
     # misc
 

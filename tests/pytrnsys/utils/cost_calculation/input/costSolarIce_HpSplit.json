@@ -170,8 +170,14 @@
   "parameters": {
     "rate": 0.03,
     "analysisPeriod": 30,
-    "qDemandVariable": "Q_yearly",
-    "elFromGridVariable": "ElHeatSys_Tot",
+    "qDemandVariable": {
+      "name": "Q_yearly",
+      "unit": "?"
+    },
+    "elFromGridVariable": {
+      "name": "ElHeatSys_Tot",
+      "unit": "?"
+    },
     "costElecFix": 0,
     "costElecKWh": 0.2,
     "increaseElecCost": 0,
