@@ -1,25 +1,27 @@
-__all__ = ['UncertainFloat', 'FloatLike']
+__all__ = ['UncertainFloat', 'FloatLike', 'LinearCoefficients']
 
 import dataclasses as _dc
 import typing as _tp
 import operator as _op
 
+import dataclasses_jsonschema as _dcj
+
 FloatLike = _tp.Union["UncertainFloat", _tp.SupportsFloat]
 
 
 @_dc.dataclass(frozen=True)
-class UncertainFloat:
-    value: float
+class UncertainFloat(_dcj.JsonSchemaMixin):
+    mean: float
     toLowerBound: float = 0
     toUpperBound: float = 0
 
     @property
     def min(self) -> float:
-        return self.value + self.toLowerBound
+        return self.mean + self.toLowerBound
 
     @property
     def max(self) -> float:
-        return self.value + self.toUpperBound
+        return self.mean + self.toUpperBound
 
     @staticmethod
     def create(other: FloatLike):
@@ -41,7 +43,7 @@ class UncertainFloat:
 
     def format(self, precision) -> str:
         uncertainty = self._formatUncertainty(precision)
-        return rf"$\mathbf{{{self.value:.{precision}f}}}{uncertainty}$"
+        return rf"$\mathbf{{{self.mean:.{precision}f}}}{uncertainty}$"
 
     def _formatUncertainty(self, precision):
         if not self.toLowerBound and not self.toUpperBound:
@@ -53,7 +55,7 @@ class UncertainFloat:
         return f"^{{+{toUpper}}}_{{-{toLower}}}"
 
     def __post_init__(self):
-        self._ensureAllFieldsAreConvertableToFloat()
+        self._ensureAllFieldsAreConvertibleToFloat()
 
         if self.toLowerBound > 0:
             raise ValueError(f"`toLowerBound' must be non-positive. Was {self.toLowerBound}")
@@ -61,8 +63,8 @@ class UncertainFloat:
         if self.toUpperBound < 0:
             raise ValueError(f"`toUpperBound' must be non-negative. Was {self.toUpperBound}")
 
-    def _ensureAllFieldsAreConvertableToFloat(self):
-        fields = [self.value, self.toLowerBound, self.toUpperBound]
+    def _ensureAllFieldsAreConvertibleToFloat(self):
+        fields = [self.mean, self.toLowerBound, self.toUpperBound]
         for f in fields:
             try:
                 float(f)
@@ -108,7 +110,7 @@ def _doOp(op: _tp.Callable[[float, float], float], x: FloatLike, y: FloatLike) -
     lower = min(bounds)
     upper = max(bounds)
 
-    value = op(x.value, y.value)
+    value = op(x.mean, y.mean)
     assert lower <= value <= upper
 
     toLower = -value + lower
@@ -124,3 +126,9 @@ def _formatDistance(distance, precision) -> str:
         return "0"
 
     return f"{abs(distance):.{precision}f}"
+
+
+@_dc.dataclass(frozen=True)
+class LinearCoefficients(_dcj.JsonSchemaMixin):
+    offset: "UncertainFloat"
+    slope: "UncertainFloat"

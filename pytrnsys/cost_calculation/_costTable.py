@@ -75,18 +75,17 @@ class ComponentGroupsRowsLinesWriter:
         groupName = group.name
         formattedGroupNameOrEmpty = rf"\textbf{{{groupName}}}" if withGroupName else ""
 
-        size = component.value
         cost = component.cost
         costShare = 100 * component.cost / self._totalCost
 
         formattedCost = cost.format(precision=1)
         formattedCostShare = costShare.format(precision=1)
 
-        definition = component.definition
-        compName = definition.name
-        offset = definition.cost.coeffs.offset.format(precision=0)
-        slope = definition.cost.coeffs.slope.format(precision=0)
-        unit = definition.cost.variable.unit
+        compName = component.name
+        offset = component.coeffs.offset.format(precision=0)
+        slope = component.coeffs.slope.format(precision=0)
+        size = component.value.value
+        unit = component.value.unit
         lifetime = component.period
 
         line = rf"{formattedGroupNameOrEmpty} & {compName} & {offset}+{slope}/{unit} "\

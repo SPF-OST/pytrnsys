@@ -1,14 +1,10 @@
 __all__ = ['ComponentGroup',
            'Component',
-           'Cost',
-           'LinearCoefficients',
-           'UncertainFloat',
            'Variable']
 
 import dataclasses as _dc
 import dataclasses_jsonschema as _dcj
 import typing as _tp
-
 
 from . import common as _common
 
@@ -44,7 +40,8 @@ class ComponentGroup(_dcj.JsonSchemaMixin):
 @_dc.dataclass(frozen=True)
 class CostFactor(_dcj.JsonSchemaMixin):
     name: str
-    cost: "Cost"
+    coeffs: _common.LinearCoefficients
+    variable: "Variable"
 
 
 @_dc.dataclass(frozen=True)
@@ -58,28 +55,6 @@ class Component(CostFactor):
 
 
 @_dc.dataclass(frozen=True)
-class Cost(_dcj.JsonSchemaMixin):
-    coeffs: "LinearCoefficients"
-    variable: "Variable"
-
-    def at(self, value: float) -> "UncertainFloat":
-        return self.coeffs.offset + self.coeffs.slope * value
-
-
-@_dc.dataclass(frozen=True)
-class LinearCoefficients(_dcj.JsonSchemaMixin):
-    offset: "UncertainFloat"
-    slope: "UncertainFloat"
-
-
-class UncertainFloat(_common.UncertainFloat, _dcj.JsonSchemaMixin):
-    pass
-
-
-@_dc.dataclass(frozen=True)
 class Variable(_dcj.JsonSchemaMixin):
     name: str
     unit: str
-
-
-

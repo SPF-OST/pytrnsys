@@ -114,14 +114,14 @@ class costConfig:
         for bat in self.batList:
 
             lines = ""
-            line = "!pvPeak\tBatsize\t investment\tAnnuity\tPvGen\n";
+            line = "!pvPeak\tBatsize\t investment\tAnnuity\tPvGen\n"
             lines = lines + line
-            line = "!kW\t \tkWh \t kFr\t CHF/kWh\t-\n";
+            line = "!kW\t \tkWh \t kFr\t CHF/kWh\t-\n"
             lines = lines + line
 
             for i in range(len(self.pvAreaVec)):
                 if self.batSizeVec[i] == bat:
-                    line = "%f\t%f\t%f\t%f\t%f\n" % (self.pvAreaVec[i], self.batSizeVec[i], \
+                    line = "%f\t%f\t%f\t%f\t%f\n" % (self.pvAreaVec[i], self.batSizeVec[i],
                                                      self.investVec[i], self.annuityVec[i], self.RpvGenVec[i])
                     lines = lines + line
             fileName = "cost-batkWh%.0f" % bat
@@ -198,7 +198,7 @@ class costConfig:
             ax.plot(areaSorted, varSorted)
 
         ax.legend(legendList)
-        ax.set(xlabel='PV [kWp]', ylabel='Energy cost [\Euro/kWh]')
+        ax.set(xlabel='PV [kWp]', ylabel=r'Energy cost [\Euro/kWh]')
 
         ax.grid()
 
@@ -280,7 +280,7 @@ class costConfig:
         self._output = _output.Output(componentGroups, yearlyCosts)
 
         self._calculate()
-        self.investVec.append(self.totalInvestCost.value)
+        self.investVec.append(self.totalInvestCost.mean)
         self.annuityVec.append(self.heatGenCost)
 
         self._generateOutputs(i, outputPath, componentGroups, yearlyCosts)
@@ -311,7 +311,7 @@ class costConfig:
         # ===================================================
         # Maintenance cost
         # ===================================================
-        self.npvMaintenance = self.MaintenanceRate * self.totalInvestCost.value \
+        self.npvMaintenance = self.MaintenanceRate * self.totalInvestCost.mean \
                               * _ef.getNPV(self.rate, self.analysPeriod)
 
         # ===================================================
@@ -328,11 +328,11 @@ class costConfig:
         # NET PRESENT VALUE
         # ===================================================
 
-        self.npvSystem = self.totalInvestCost.value + self._output.yearlyCosts.npvCost.value\
+        self.npvSystem = self.totalInvestCost.mean + self._output.yearlyCosts.npvCost.mean \
                          + self.npvElec + self.npvMaintenance - self.npvResVal
 
         logger.debug("npvSystem:%f totalInvestCost :%f AlMatcost:%f npvElec :%f npvMaintenance:%f npvResVal:%f" % (
-            self.npvSystem, self.totalInvestCost.value, self._output.yearlyCosts.npvCost.value,
+            self.npvSystem, self.totalInvestCost.mean, self._output.yearlyCosts.npvCost.mean,
             self.npvElec, self.npvMaintenance, self.npvResVal))
 
         # ===================================================
@@ -342,12 +342,12 @@ class costConfig:
         self.annuityFac = _ef.getAnnuity(self.rate, self.analysPeriod)
 
         self.anElec = self.annuityFac * self.npvElec
-        self.anMaint = self.MaintenanceRate * self.totalInvestCost.value  # to use DP method
+        self.anMaint = self.MaintenanceRate * self.totalInvestCost.mean  # to use DP method
 
         self.anResVal = (-1.) * self.annuityFac * self.npvResVal
 
-        self.annuity = self._output.componentGroups.annualizedCost.value + self.anElec + self.anMaint + self.anResVal \
-                       + self._output.yearlyCosts.cost.value
+        self.annuity = self._output.componentGroups.annualizedCost.mean + self.anElec + self.anMaint + self.anResVal \
+                       + self._output.yearlyCosts.cost.mean
 
         logger.info(" AnElectricity:%f npvElec:%f npvFacElec:%f annnuityFac:%f   " % (
             self.anElec, self.npvElec, self.npvFacElec, self.annuityFac))
@@ -373,7 +373,7 @@ class costConfig:
 
     def _createCostDict(self, componentGroups: _output.ComponentGroups):
         collectorComponents = [c for g in componentGroups.groups
-                               for c in g.components.factors if c.definition.name == "Collector"]
+                               for c in g.components.factors if c.name == "Collector"]
         if not collectorComponents:
             raise RuntimeError("No `Collector' component found.")
 
@@ -383,25 +383,25 @@ class costConfig:
         collectorComponent = collectorComponents[0]
         size = collectorComponent.value
 
-        totalCost = self.totalInvestCost.value
+        totalCost = self.totalInvestCost.mean
 
         return {
             "investment": totalCost,
             "energyCost": self.heatGenCost,
-            "investmentPerM2": totalCost / size,
+            "investmentPerM2": totalCost / size.value,
             "investmentPerMWh": totalCost * 1000 / self.qDemand
         }
 
     def _addYearlySizes(self, i, yearlyCosts: _tp.Sequence[_input.YearlyCost]):
         for yearlyCost in yearlyCosts:
-            variable = yearlyCost.cost.variable
+            variable = yearlyCost.variable
             size = self.resClass.results[i].get(variable.name)
             self._valuesByVariable[variable] = size
 
     def _addComponentSizes(self, i, componentGroups: _tp.Sequence[_input.ComponentGroup]):
         for group in componentGroups:
             for component in group.components:
-                variable = component.cost.variable
+                variable = component.variable
                 size = self.resClass.results[i].get(variable.name)
                 self._valuesByVariable[variable] = size
 
@@ -411,7 +411,7 @@ class costConfig:
     # plots
 
     def _doPlots(self, componentGroups: _output.ComponentGroups) -> None:
-        groupNamesWithCost = [(g.name, g.components.cost.value) for g in componentGroups.groups]
+        groupNamesWithCost = [(g.name, g.components.cost.mean) for g in componentGroups.groups]
 
         groupNames, groupCosts = zip(*groupNamesWithCost)
         self.nameCostPdf = self._plotCostShare(groupCosts, groupNames, "costShare" + "-" + self.fileName,
@@ -421,7 +421,7 @@ class costConfig:
         legends = []
         inVar = []
 
-        inVar.append(componentGroups.annualizedCost.value)
+        inVar.append(componentGroups.annualizedCost.mean)
         legends.append("Capital cost")
 
         inVar.append(self.anMaint)
@@ -431,8 +431,8 @@ class costConfig:
         legends.append("El. purchased \n from the grid")
 
         for yearlyCost in yearlyCosts.factors:
-            name = yearlyCost.definition.name
-            cost = yearlyCost.cost.value
+            name = yearlyCost.name
+            cost = yearlyCost.cost.mean
 
             logger.debug("cost:%f name:%s", cost, name)
 
@@ -604,8 +604,8 @@ class costConfig:
         line = "Annuity & Annuity (yearly costs over lifetime)  &&& & %2.0f% s  \\\\ \n" % (self.annuity, costUnit)
         lines = lines + line
         line = " & Share of Investment & &&& %2.0f%s (%2.0f%s) \\\\ \n" % (
-            self._output.componentGroups.annualizedCost.value, costUnit,
-            self._output.componentGroups.annualizedCost.value * 100. / self.annuity, symbol)
+            self._output.componentGroups.annualizedCost.mean, costUnit,
+            self._output.componentGroups.annualizedCost.mean * 100. / self.annuity, symbol)
         lines = lines + line
         line = " & Share of Electricity  & %.0f+%.2f/kWh & %2.0f kWh&  & %2.0f%s (%2.0f%s)\\\\ \n" % (
             self.costElecFix, self.costEleckWh, self.elDemandTotal, self.anElec, costUnit,
@@ -616,12 +616,12 @@ class costConfig:
         lines = lines + line
         for yc in self._output.yearlyCosts.factors:
             line = " & Share of %s & %.0f+%.2f/%s & %.0f  %s & & %2.0f%s (%2.0f%s)\\\\ \n" % (
-                yc.definition.name,
-                yc.definition.cost.coeffs.offset.value,
-                yc.definition.cost.coeffs.slope.value,
-                yc.definition.cost.variable.unit,
-                yc.value, yc.definition.cost.variable.unit, yc.cost.value, costUnit,
-                yc.cost.value * 100. / self.annuity, symbol)
+                yc.name,
+                yc.coeffs.offset.mean,
+                yc.coeffs.slope.mean,
+                yc.value.unit,
+                yc.value.value, yc.value.unit, yc.cost.mean, costUnit,
+                yc.cost.mean * 100. / self.annuity, symbol)
             lines = lines + line
 
         line = " & Share of Residual Value &&& & %2.0f%s (%2.0f%s)\\\\ \n" % (

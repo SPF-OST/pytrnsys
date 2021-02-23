@@ -81,25 +81,29 @@ class YearlyCosts(CostFactors):
     pass
 
 
-def _createCostFactors(definition, values, rate, period):
-    variable = definition.cost.variable
-    value = values[variable]
+def _createCostFactors(inputFactor: _input.CostFactor, values, rate, period):
+    variable = inputFactor.variable
 
-    yearlyCost = CostFactor(definition, rate, period, value)
+    v = values[variable]
+    unit = variable.unit
+    value = Value(v, unit)
+
+    yearlyCost = CostFactor(inputFactor.name, inputFactor.coeffs, rate, period, value)
 
     return yearlyCost
 
 
 @_dc.dataclass(frozen=True)
 class CostFactor:
-    definition: _input.CostFactor
+    name: str
+    coeffs: _common.LinearCoefficients
     rate: float
     period: float
-    value: float
+    value: "Value"
 
     @property
     def cost(self) -> _common.UncertainFloat:
-        return self.definition.cost.at(self.value)
+        return self.coeffs.offset + self.coeffs.slope * self.value.value
 
     @property
     def npvCost(self) -> _common.UncertainFloat:
@@ -116,6 +120,12 @@ class CostFactor:
     @property
     def annuityFactor(self) -> float:
         return _ef.getAnnuity(self.rate, self.period)
+
+
+@_dc.dataclass(frozen=True)
+class Value:
+    value: float
+    unit: str
 
 
 
