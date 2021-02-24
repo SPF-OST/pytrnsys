@@ -68,7 +68,7 @@ PheatRadNom = PheatBuiD*frQRadToQd
 pGainRad = 0.6     
 iGainRad = 0.05     
 ftemp = (60./((TBuiFlNom+TBuiRtNom)/2-myTroomSet))**m_Rd        ! ftemp: faktor Qnominal -> Qnorm,real (DT=60 - 90/70/20) Radiator (c>=0.7), -
-PRadBuidT60 = ftemp*PheatRadNom                       ! Heating Rate at 60 �C Radiator temperature, kJ/h
+PRadBuidT60 = ftemp*PheatRadNom                       ! Heating Rate at 60 oC Radiator temperature, kJ/h
 
 
 *******************************************************
@@ -111,7 +111,7 @@ TBuiFlNom     !Nominal flow temp
 TBuiRtNom     !Nominal return temp
 TambD     ! Design ambient
 m_Rd     !Radiator Exponent
-CeffRad             !Lumped radiaotr capacity [KJ/K]
+CeffRad             !Lumped radiator capacity [KJ/K]
 CPWAT            !specific heat water [KJ/KgK]
 0     ! Pipe capacity 
 10     !number of control volumes

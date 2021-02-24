@@ -22,8 +22,8 @@
 CONSTANTS 5   
 scaleBuilding = 1
 **PheatBuiD = 12830*scaleBuilding  ! design heating rate for building an location [kJ/h]
-TBuiFlNom = 30 ! 35     ! Design flow temp. heating syst. [°C]
-TBuiRtNom = 25 ! 30     ! Design return temp. heating syst. [°C]
+TBuiFlNom = 45 ! 35     ! Design flow temp. heating syst. [°C]
+TBuiRtNom = 40 ! 30     ! Design return temp. heating syst. [°C]
 Precond = NIX      ! Extracted mean ground preconditioning power
 PheatBuiD = 15*3600
 

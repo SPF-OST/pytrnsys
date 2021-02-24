@@ -118,7 +118,7 @@ EQUATIONS 4
 PIDRadCoolBuiMin = 0.15  !  0.05    !0.01   
 PIDRaCooldBui = MIN(MAX([44,1],PIDRadCoolBuiMin),1) 
 MfrBuiCoolRd  = MfrBuiRdNom*myCoolingOn  ! JS: cooling no longer uses PID, but instead a deadband
-MfrBuiHeatRd  = MfrBuiRdNom*NOT(myCoolingOn)*PIDRadBui*BoHS!DC otherwise is keeps running in summer
+MfrBuiHeatRd  = MfrBuiRdNom*NOT(myCoolingOn)*PIDRadBui*BoHS !DC otherwise is keeps running in summer
 
 
 *******************************************************
