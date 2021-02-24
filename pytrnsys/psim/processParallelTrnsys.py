@@ -6,17 +6,15 @@ import json
 import pytrnsys.psim.debugProcess as debugProcess
 import multiprocessing as mp
 import pytrnsys.rsim.runParallel as run
-import pytrnsys.utils.utilsSpf as utils
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.psim.processTrnsysDf as processTrnsys
-import warnings
 import copy
 import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import numpy as num
 import pandas as pd
 #import seaborn as sns
-import pytrnsys.utils.costConfig as costConfig
+import pytrnsys.cost_calculation.costConfig as costConfig
 from pathlib import Path
 import pytrnsys.plot.plotMatplotlib as plot
 import sys
@@ -2288,7 +2286,7 @@ class ProcessParallelTrnsys():
         if(fileNameList!=None):
             cost.setFileNameList(fileNameList)
 
-        cost.setFontsizes(small)
+        cost.setFontSizes(small)
 
         cost.setDefaultData(dictCost)
         cost.readResults(path)
