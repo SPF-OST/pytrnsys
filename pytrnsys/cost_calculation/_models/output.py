@@ -39,8 +39,8 @@ class Output:
                                                        parameters.maintenanceRate)
 
         costResidual = _common.UncertainFloat.create(parameters.costResidual)
-        residualCost = ResidualCost(parameters.rate, parameters.analysisPeriod,
-                                    parameters.lifetimeResVal, costResidual)
+        residualCost = ResidualCost(costResidual, parameters.rate, parameters.lifetimeResVal,
+                                    parameters.analysisPeriod)
 
         electricityDemand = values[parameters.elFromGridVariable]
         electricity = Electricity(electricityDemand, parameters.costElecFix, parameters.costElecKWh,
@@ -66,7 +66,7 @@ class Output:
                + self.componentGroups.npvMaintenanceCost \
                + self.yearlyCosts.npvCost \
                + self.electricity.npvCost \
-               - self.residualCost.npvCost
+               - self.residualCost.npvResidualValue
 
     @property
     def heatGenerationCost(self) -> _common.UncertainFloat:
@@ -251,19 +251,19 @@ class Electricity:
 
 @_dc.dataclass(frozen=True)
 class ResidualCost:
+    value: _common.UncertainFloat
     rate: float
-    analysisPeriod: float
     lifetimeInYears: float
-    cost: _common.UncertainFloat
+    analysisPeriod: float
 
     @property
     def residualValue(self) -> _common.UncertainFloat:
         residualValueFactor = (self.lifetimeInYears - self.analysisPeriod) / self.lifetimeInYears
-        residualValue = residualValueFactor * self.cost
+        residualValue = residualValueFactor * self.value
         return residualValue
 
     @property
-    def npvCost(self) -> _common.UncertainFloat:
+    def npvResidualValue(self) -> _common.UncertainFloat:
         discountFromEnd = (1 + self.rate) ** (-1. * self.analysisPeriod)
         npvResidualValue = discountFromEnd * self.residualValue
         return npvResidualValue
@@ -271,5 +271,5 @@ class ResidualCost:
     @property
     def annuity(self) -> _common.UncertainFloat:
         annuityFactor = _ef.getAnnuity(self.rate, self.analysisPeriod)
-        annuity = annuityFactor * self.npvCost
+        annuity = annuityFactor * self.npvResidualValue
         return annuity
