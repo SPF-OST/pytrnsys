@@ -41,19 +41,6 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
     def one() -> "UncertainFloat":
         return UncertainFloat(1)
 
-    def format(self, precision) -> str:
-        uncertainty = self._formatUncertainty(precision)
-        return rf"$\mathbf{{{self.mean:.{precision}f}}}{uncertainty}$"
-
-    def _formatUncertainty(self, precision):
-        if not self.toLowerBound and not self.toUpperBound:
-            return ""
-
-        toLower = _formatDistance(self.toLowerBound, precision)
-        toUpper = _formatDistance(self.toUpperBound, precision)
-
-        return f"^{{+{toUpper}}}_{{-{toLower}}}"
-
     def __post_init__(self):
         self._ensureAllFieldsAreConvertibleToFloat()
 
@@ -70,6 +57,19 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
                 float(f)
             except TypeError as e:
                 raise ValueError("All arguments must be floats") from e
+
+    def __format__(self, format_spec):
+        uncertainty = self._formatUncertainty(format_spec)
+        return rf"{self.mean:{format_spec}}{uncertainty}"
+
+    def _formatUncertainty(self, format_spec):
+        if not self.toLowerBound and not self.toUpperBound:
+            return ""
+
+        toLower = _formatDistance(self.toLowerBound, format_spec)
+        toUpper = _formatDistance(self.toUpperBound, format_spec)
+
+        return r"$^{\mathrm{+%(toUpper)s}}_{\mathrm{-%(toLower)s}}$" % dict(toLower=toLower, toUpper=toUpper)
 
     def __add__(self, other: FloatLike) -> "UncertainFloat":
         return _doOp(_op.add, self, other)
@@ -121,11 +121,11 @@ def _doOp(op: _tp.Callable[[float, float], float], x: FloatLike, y: FloatLike) -
     return result
 
 
-def _formatDistance(distance, precision) -> str:
+def _formatDistance(distance, format_spec) -> str:
     if not distance:
         return "0"
 
-    return f"{abs(distance):.{precision}f}"
+    return f"{abs(distance):{format_spec}}"
 
 
 @_dc.dataclass(frozen=True)
