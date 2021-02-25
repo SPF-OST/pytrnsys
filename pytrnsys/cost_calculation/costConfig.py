@@ -1,13 +1,3 @@
-#!/usr/bin/env python
-
-"""
-Child class from costClass customized for general calculation with config file
-
-Author : Dani Carbonell
-Last Change: Jeremias Schmidli
-Date : 07.04.2020
-"""
-
 import json
 import logging
 import os
@@ -52,9 +42,6 @@ class costConfig:
         config = _input.Input.from_dict(self.readCostJson(configFilePath))
         resultOutputs = _co.createOutputs(config, resultsDirPath, self.readCompleteFolder, self.fileNameList)
 
-        self.investVec = []
-        self.annuityVec = []
-
         for resultOutput in resultOutputs:
             self._processResult(config.parameters, resultOutput, resultsDirPath)
 
@@ -72,160 +59,12 @@ class costConfig:
         plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
         plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-    # public: unused (?)
-    def printDataFile(self):
-        for bat in self.batList:
-
-            lines = ""
-            line = "!pvPeak\tBatsize\t investment\tAnnuity\tPvGen\n"
-            lines = lines + line
-            line = "!kW\t \tkWh \t kFr\t CHF/kWh\t-\n"
-            lines = lines + line
-
-            for i in range(len(self.pvAreaVec)):
-                if self.batSizeVec[i] == bat:
-                    line = "%f\t%f\t%f\t%f\t%f\n" % (self.pvAreaVec[i], self.batSizeVec[i],
-                                                     self.investVec[i], self.annuityVec[i], self.RpvGenVec[i])
-                    lines = lines + line
-            fileName = "cost-batkWh%.0f" % bat
-            myFileName = self.resClass.path + "\\%s.dat" % fileName
-
-            logger.debug("%s file created" % myFileName)
-
-            outfile = open(myFileName, 'w')
-            outfile.writelines(lines)
-            outfile.close()
-
-    def plotLines(self, varXAxis, nameXAxis, varYAxis, nameYAxis, varDiffLines, nameLines, nameFig, extension="pdf"):
-        fig, ax = plt.subplots(figsize=(16, 8))
-
-        legendList = []
-
-        xList = sorted(list(set(varXAxis)))
-        lineList = sorted(list(set(varDiffLines)))
-
-        for i in range(len(lineList)):
-
-            varVec = []
-            xVec = []
-
-            legendList.append("%s=%s" % (nameLines, lineList[i]))
-
-            for j in range(len(xList)):
-
-                for k in range(len(self.annuityVec)):
-                    if varXAxis[k] == xList[j] and varDiffLines[k] == lineList[i]:
-                        xVec.append(xList[j])
-                        varVec.append(varYAxis[k])
-
-            ax.plot(xVec, varVec, marker='o')
-
-        ax.legend(legendList)
-        ax.set(xlabel=nameXAxis, ylabel=nameYAxis)
-
-        ax.grid()
-
-        fig.show()
-
-        figureName = "%s.%s" % (nameFig, extension)
-
-        plotName = os.path.join(self.resClass.path, figureName)
-
-        fig.savefig(plotName)
-
-    def plotVsPv(self, extension="pdf"):
-        fig, ax = plt.subplots(figsize=(16, 8))
-
-        legendList = []
-
-        pvList = sorted(list(set(self.pvAreaVec)))
-        batList = sorted(list(set(self.batSizeVec)))
-
-        for i in range(len(batList)):
-
-            varVec = []
-            areaVec = []
-
-            legendList.append("Bat-Size=%s kWh" % batList[i])
-
-            for j in range(len(pvList)):
-
-                for k in range(len(self.annuityVec)):
-                    if self.pvAreaVec[k] == pvList[j] and self.batSizeVec[k] == batList[i]:
-                        areaVec.append(pvList[j])
-                        varVec.append(self.annuityVec[k])
-
-            varSorted = varVec
-            areaSorted = areaVec
-
-            ax.plot(areaSorted, varSorted)
-
-        ax.legend(legendList)
-        ax.set(xlabel='PV [kWp]', ylabel=r'Energy cost [\Euro/kWh]')
-
-        ax.grid()
-
-        fig.show()
-        ax.grid()
-
-        figureName = "Annuity_vs_PvPeak.%s" % extension
-
-        plotName = os.path.join(self.resClass.path, figureName)
-
-        fig.savefig(plotName)
-
-    def plotVsBat(self, extension="pdf"):
-        fig, ax = plt.subplots(figsize=(16, 8))
-
-        legendList = []
-
-        pvList = sorted(list(set(self.pvAreaVec)))
-        batList = sorted(list(set(self.batSizeVec)))
-
-        for i in range(len(pvList)):
-
-            varVec = []
-            batVec = []
-
-            legendList.append("Pv_p=%s kWh" % pvList[i])
-
-            for j in range(len(batList)):
-
-                for k in range(len(self.annuityVec)):
-                    if self.pvAreaVec[k] == pvList[i] and self.batSizeVec[k] == batList[j]:
-                        batVec.append(batList[j])
-                        varVec.append(self.annuityVec[k])
-
-            varSorted = varVec
-            batSorted = batVec
-
-            ax.plot(batSorted, varSorted, marker='o')
-
-        ax.legend(legendList)
-
-        ax.set(xlabel='Battery [kWh]', ylabel='Energy cost [Euro/kWh]')
-
-        ax.grid()
-
-        fig.show()
-        ax.grid()
-
-        figureName = "Annuity_vs_Bat.%s" % extension
-
-        plotName = os.path.join(self.resClass.path, figureName)
-
-        fig.savefig(plotName)
-
     # private
     def _processResult(self, parameters: _input.Parameters, resultOutput: _co.ResultOutput, resultsDirPath: _pl.Path):
         fileName = str(resultOutput.resultsDir)
         outputPath = os.path.join(str(resultsDirPath), fileName)
 
         self._setOutputPathAndFileName(outputPath, fileName)
-
-        self.investVec.append(resultOutput.output.componentGroups.cost.mean)
-        self.annuityVec.append(resultOutput.output.heatGenerationCost)
-
         self._generateOutputs(parameters, outputPath, resultOutput.output)
 
     def _generateOutputs(self, parameters: _input.Parameters, outputPath, output: _output.Output):
