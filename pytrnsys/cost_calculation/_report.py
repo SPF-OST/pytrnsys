@@ -1,3 +1,5 @@
+__all__ = ['ReportWriter']
+
 import json
 import logging
 import os
@@ -8,14 +10,14 @@ from matplotlib import pyplot as plt
 
 from pytrnsys.report import latexReport as latex
 from . import _cost_table as _ct
-from . import createOutput as _co
+from . import _createCostCalculations as _co
 from ._models import input as _input
 from ._models import output as _output
 
 logger = logging.getLogger('root')
 
 
-class costConfig:
+class ReportWriter:
     _SHALL_USE_kCHF_FOR_TOTAL_COSTS = False
 
     # public: used
@@ -23,12 +25,16 @@ class costConfig:
         self.method = "VDI"
         self.cleanModeLatex = None
 
-        self.readCompleteFolder = True
-        self.fileNameList = None
+    # private
+    def writeReportAndResults(self, parameters: _input.Parameters,
+                              costCalculation: _co.CostCalculation, resultsDirPath: _pl.Path):
+        fileName = str(costCalculation.resultsDir)
+        outputPath = os.path.join(str(resultsDirPath), fileName)
 
-    def setFileNameList(self, fileNameList):
-        self.fileNameList = fileNameList
-        self.readCompleteFolder = False
+        self._doPlots(costCalculation.output.componentGroups, outputPath, fileName)
+        self._doPlotsAnnuity(costCalculation.output, outputPath, fileName)
+        self._createLatex(parameters, costCalculation.output, outputPath, fileName)
+        self._addCostsToResultJson(costCalculation.output, outputPath, fileName)
 
     @staticmethod
     def readCostJson(path):
@@ -37,13 +43,6 @@ class costConfig:
             dictCost = json.load(json_file)
 
         return dictCost
-
-    def process(self, configFilePath: _pl.Path, resultsDirPath: _pl.Path):
-        config = _input.Input.from_dict(self.readCostJson(configFilePath))
-        resultOutputs = _co.createOutputs(config, resultsDirPath, self.readCompleteFolder, self.fileNameList)
-
-        for resultOutput in resultOutputs:
-            self._processResult(config.parameters, resultOutput, resultsDirPath)
 
     @staticmethod
     def setFontSizes(small):
@@ -59,29 +58,15 @@ class costConfig:
         plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
         plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-    # private
-    def _processResult(self, parameters: _input.Parameters, resultOutput: _co.ResultOutput, resultsDirPath: _pl.Path):
-        fileName = str(resultOutput.resultsDir)
-        outputPath = os.path.join(str(resultsDirPath), fileName)
-
-        self._setOutputPathAndFileName(outputPath, fileName)
-        self._generateOutputs(parameters, outputPath, resultOutput.output)
-
-    def _generateOutputs(self, parameters: _input.Parameters, outputPath, output: _output.Output):
-        self._doPlots(output.componentGroups)
-        self._doPlotsAnnuity(output)
-        self._createLatex(parameters, output)
-
-        self._addCostsToResultJson(output, outputPath)
-
-    def _addCostsToResultJson(self, output: _output.Output, outputPath):
+    def _addCostsToResultJson(self, output: _output.Output, outputPath: str, fileName: str):
         costDict = self._createCostDict(output)
-        resultJsonPath = os.path.join(outputPath, self.fileName + '-results.json')
+        resultJsonPath = os.path.join(outputPath, fileName + '-results.json')
         with open(resultJsonPath, 'r') as resultsJson:
             oldResults = json.load(resultsJson)
         self._addCostToJson(costDict, oldResults, resultJsonPath)
 
-    def _createCostDict(self, output: _output.Output):
+    @staticmethod
+    def _createCostDict(output: _output.Output):
         collectorComponents = [c for g in output.componentGroups.groups
                                for c in g.components.factors if c.name == "Collector"]
         if not collectorComponents:
@@ -102,16 +87,28 @@ class costConfig:
             "investmentPerMWh": totalCost * 1000 / output.heatingDemand
         }
 
+    @staticmethod
+    def _addCostToJson(costResultsDict, resultsDict, jsonPath):
+
+        logger.debug("updating results.json file")
+
+        newResultsDict = {**resultsDict, **costResultsDict}
+
+        with open(jsonPath, 'w') as fp:
+            json.dump(newResultsDict, fp, indent=2, separators=(',', ': '), sort_keys=True)
+
+        logger.info("results.json file was updated with cost data")
+
     # plots
 
-    def _doPlots(self, componentGroups: _output.ComponentGroups) -> None:
+    def _doPlots(self, componentGroups: _output.ComponentGroups, outputPath: str, fileName: str) -> None:
         groupNamesWithCost = [(g.name, g.components.cost.mean) for g in componentGroups.groups]
 
         groupNames, groupCosts = zip(*groupNamesWithCost)
-        self.nameCostPdf = self._plotCostShare(groupCosts, groupNames, "costShare" + "-" + self.fileName,
-                                               sizeFont=30, plotJpg=False, writeFile=False)
+        self.nameCostPdf = self._plotCostShare(groupCosts, groupNames,
+                                               outputPath, "costShare" + "-" + fileName, plotSize=15)
 
-    def _doPlotsAnnuity(self, output: _output.Output):
+    def _doPlotsAnnuity(self, output: _output.Output, outputPath: str, fileName: str):
         legends = []
         inVar = []
 
@@ -139,10 +136,12 @@ class costConfig:
                 else:
                     legends.append(name)
 
-        self.nameCostAnnuityPdf = self._plotCostShare(inVar, legends, "costShareAnnuity" + "-" + self.fileName,
-                                                      plotSize=17, sizeFont=30, plotJpg=False, writeFile=False)
+        self.nameCostAnnuityPdf = self._plotCostShare(inVar, legends, outputPath, "costShareAnnuity" + "-" + fileName,
+                                                      plotSize=17)
 
-    def _plotCostShare(self, inVar, legends, nameFile, plotSize=15, sizeFont=15, plotJpg=False, writeFile=False):
+    def _plotCostShare(self, inVar, legends, outputPath: str, fileName, plotSize):
+        sizeFont = 30
+
         mpl.rcParams['font.size'] = sizeFont
 
         fig = plt.figure(1, figsize=(plotSize, plotSize))
@@ -170,78 +169,39 @@ class costConfig:
 
         plt.title("", bbox={'facecolor': '0.9', 'pad': 10}, fontsize=sizeFont)
 
-        namePdf = '%s.pdf' % nameFile
-        nameWithPath = '%s\\%s' % (self.outputPath, namePdf)
+        namePdf = '%s.pdf' % fileName
+        nameWithPath = '%s\\%s' % (outputPath, namePdf)
 
         plt.savefig(nameWithPath)
 
-        if plotJpg:
-            nameJpg = '%s.jpg' % nameFile
-
-            nameJpgWithPath = '%s\\%s' % (self.outputPath, nameJpg)
-            logger.info("Plot printed as %s" % nameJpgWithPath)
-
-            plt.savefig(nameJpgWithPath)
-
         plt.close()
-
-        if writeFile:
-            lines = ""
-            line = "!Units kFr.\n"
-            lines = lines + line
-            line = "!"
-            lines = lines + line
-            for i in range(len(legends)):
-                line = "%s\t" % legends[i]
-                lines = lines + line
-            line = "\n"
-            lines = lines + line
-
-            for i in range(len(legends)):
-                sumVar = inVar[i] / 1000.  # I assume Fr. and change to kFr. !!!!
-
-                line = "%f\t" % sumVar
-                lines = lines + line
-            line = "\n"
-            lines = lines + line
-            nameDat = '%s.dat' % nameFile
-            nameDatWithPath = '%s\\%s' % (self.outputPath, nameDat)
-
-            logger.info("PRINT FILE COST SHARE : %s" % nameDatWithPath)
-            outfile = open(nameDatWithPath, 'w')
-            outfile.writelines(lines)
-            outfile.close()
 
         return namePdf
 
     # latex
 
-    def _createLatex(self, parameters: _input.Parameters, output: _output.Output):
-        fileName = self.fileName + "-cost"
-        self.doc.resetTexName(fileName)
+    def _createLatex(self, parameters: _input.Parameters, output: _output.Output, outputPath: str, fileName: str):
+        doc = latex.LatexReport(outputPath, fileName)
+        doc.resetTexName(fileName + "-cost")
+        doc.setSubTitle("Energy generation costs")
+        doc.setTitle(fileName)
+        doc.setCleanMode(self._getIsLatexCleanMode(parameters))
 
-        self.doc.setSubTitle("Energy generation costs")
+        doc.addBeginDocument()
+        self._addTableEconomicAssumptions(parameters, output, doc)
+        self._addTableCosts(output, doc)
+        doc.addPlot(self.nameCostPdf, "System cost", "systemCost", size=13)
+        doc.addPlot(self.nameCostAnnuityPdf, "System cost annuity share", "systemCostannuity", size=13)
+        doc.addEndDocumentAndCreateTexFile()
 
-        self.doc.setTitle(self.fileName)
-
-        self.doc.setCleanMode(self._getIsLatexCleanMode(parameters))
-        self.doc.addBeginDocument()
-        self._addTableEconomicAssumptions(parameters, output)
-        self._addTableCosts(self.doc, output)
-
-        try:
-            self.doc.addPlot(self.nameCostPdf, "System cost", "systemCost", 13)
-            self.doc.addPlot(self.nameCostAnnuityPdf, "System cost annuity share", "systemCostannuity", 13)
-        except:
-            pass
-
-        self.doc.addEndDocumentAndCreateTexFile()
-        self.doc.executeLatexFile()
+        doc.executeLatexFile()
 
     def _getIsLatexCleanMode(self, parameters):
         return parameters.cleanModeLatex if self.cleanModeLatex is None else self.cleanModeLatex
 
-    def _addTableEconomicAssumptions(self, parameters: _input.Parameters, output: _output.Output):
+    @staticmethod
+    def _addTableEconomicAssumptions(parameters: _input.Parameters,
+                                     output: _output.Output, doc: latex.LatexReport):
         caption = "Assumptions for calculation of heat generation costs"
         names = ["", "", "", ""]
         units = None
@@ -269,9 +229,9 @@ class costConfig:
 
         label = "definitionTable"
 
-        self.doc.addTable(caption, names, units, label, lines, useFormula=True)
+        doc.addTable(caption, names, units, label, lines, useFormula=True)
 
-    def _addTableCosts(self, doc, output: _output.Output):
+    def _addTableCosts(self, output: _output.Output, doc):
         lines = _ct.createLines(output, self._SHALL_USE_kCHF_FOR_TOTAL_COSTS)
 
         caption = r"System and Heat generation costs (all values incl. 8$\%$ VAT) "
@@ -287,24 +247,3 @@ class costConfig:
         else:
             units = ["", "", "[CHF]", "", "Years", "[CHF]"]
         return units
-
-    # misc
-
-    def _setOutputPathAndFileName(self, path, fileName):
-        self.outputPath = path
-        self.fileName = fileName
-
-        logger.debug("path:%s name:%s" % (self.outputPath, self.fileName))
-        self.doc = latex.LatexReport(self.outputPath, self.fileName)
-
-    @staticmethod
-    def _addCostToJson(costResultsDict, resultsDict, jsonPath):
-
-        logger.debug("updating results.json file")
-
-        newResultsDict = {**resultsDict, **costResultsDict}
-
-        with open(jsonPath, 'w') as fp:
-            json.dump(newResultsDict, fp, indent=2, separators=(',', ': '), sort_keys=True)
-
-        logger.info("results.json file was updated with cost data")

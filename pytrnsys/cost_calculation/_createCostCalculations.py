@@ -1,4 +1,4 @@
-__all__ = ['ResultOutput', 'createOutputs']
+__all__ = ['CostCalculation', 'createCostCalculations']
 
 import pathlib as _pl
 import typing as _tp
@@ -13,28 +13,27 @@ _Result = _tp.Dict[str, float]
 
 
 @_dc.dataclass(frozen=True)
-class ResultOutput:
+class CostCalculation:
     resultsDir: _pl.Path
     output: _output.Output
 
 
-def createOutputs(config: _input.Input, resultsDirPath: _pl.Path,
-                  shallReadCompleteFolder: bool, fileNamesToRead: _tp.Sequence[str])\
-        -> _tp.Sequence["ResultOutput"]:
+def createCostCalculations(config: _input.Input, resultsDirPath: _pl.Path,
+                           fileNamesToRead: _tp.Sequence[str])\
+        -> _tp.Iterable["CostCalculation"]:
     results = _results.ResultsProcessedFile(str(resultsDirPath))
+
+    shallReadCompleteFolder = not fileNamesToRead
     results.readResultsData(resultType='json',
                             completeFolder=shallReadCompleteFolder,
                             fileNameList=fileNamesToRead)
 
-    resultOutputs = []
     for i, result in enumerate(results.results):
         values = _getValues(config, result)
         output = _output.Output.createOutput(config, values)
         resultsDir = _pl.Path(results.fileName[i])
-        resultOutput = ResultOutput(resultsDir, output)
-        resultOutputs.append(resultOutput)
-
-    return resultOutputs
+        resultOutput = CostCalculation(resultsDir, output)
+        yield resultOutput
 
 
 def _getValues(config: _input.Input, result: _Result) -> _output.Values:

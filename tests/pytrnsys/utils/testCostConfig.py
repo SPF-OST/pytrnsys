@@ -6,7 +6,7 @@ import logging as log
 import pytest
 import diff_pdf_visually as dpdf
 
-import pytrnsys.cost_calculation.costConfig as cc
+import pytrnsys.cost_calculation as cc
 
 
 def testCostConfig(caplog: pytest.LogCaptureFixture):
@@ -16,9 +16,7 @@ def testCostConfig(caplog: pytest.LogCaptureFixture):
     actualResultsDir = helper.actualResultsDir
     costParametersFilePath = helper.costParametersFilePath
 
-    costConfig = cc.costConfig()
-    costConfig.setFontSizes(small=15)
-    costConfig.process(costParametersFilePath, actualResultsDir)
+    cc.calculateCostsAndWriteReports(costParametersFilePath, actualResultsDir)
 
     helper.assertResultsAreAsExpected()
 
