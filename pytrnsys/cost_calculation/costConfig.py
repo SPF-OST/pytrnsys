@@ -17,8 +17,7 @@ import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 from pytrnsys.report import latexReport as latex
-from ._cost_table import componentGroups as _crl
-from ._cost_table import annuities as _arl
+from . import _cost_table as _ct
 from . import createOutput as _co
 from ._models import input as _input
 from ._models import output as _output
@@ -27,7 +26,7 @@ logger = logging.getLogger('root')
 
 
 class costConfig:
-    _USE_kCHF_FOR_TOTAL_COSTS = False
+    _SHALL_USE_kCHF_FOR_TOTAL_COSTS = False
 
     # public: used
     def __init__(self):
@@ -434,12 +433,7 @@ class costConfig:
         self.doc.addTable(caption, names, units, label, lines, useFormula=True)
 
     def _addTableCosts(self, doc, output: _output.Output):
-        totalCostScaleFactor = 1e-3 if self._USE_kCHF_FOR_TOTAL_COSTS else 1
-
-        componentRowsLines = _crl.createLines(output.componentGroups, totalCostScaleFactor)
-        annuitiesLines = _arl.createLines(output)
-
-        lines = r"\\" + "\n" + componentRowsLines + annuitiesLines
+        lines = _ct.createLines(output, self._SHALL_USE_kCHF_FOR_TOTAL_COSTS)
 
         caption = r"System and Heat generation costs (all values incl. 8$\%$ VAT) "
         names = ["Group", "Component", "Costs", "Size", "LifeTime", "Total Costs"]
@@ -449,7 +443,7 @@ class costConfig:
         doc.addTable(caption, names, units, label, lines, useFormula=False)
 
     def _getUnitsForAnnuityPlot(self):
-        if self._USE_kCHF_FOR_TOTAL_COSTS:
+        if self._SHALL_USE_kCHF_FOR_TOTAL_COSTS:
             units = ["", "", "[CHF]", "", "", "[kCHF]"]
         else:
             units = ["", "", "[CHF]", "", "Years", "[CHF]"]
