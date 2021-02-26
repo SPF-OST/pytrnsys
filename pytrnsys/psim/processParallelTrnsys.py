@@ -1,26 +1,29 @@
 #!/usr/bin/python
 
-import os
+import copy
 import glob
 import json
-import pytrnsys.psim.debugProcess as debugProcess
+import logging
 import multiprocessing as mp
-import pytrnsys.rsim.runParallel as run
-import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
-import pytrnsys.psim.processTrnsysDf as processTrnsys
-import copy
-import pytrnsys.report.latexReport as latex
+import os
+import pathlib as _pl
+import re
+import sys
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as num
 import pandas as pd
-#import seaborn as sns
-import pytrnsys.cost_calculation.costConfig as costConfig
-from pathlib import Path
-import pytrnsys.plot.plotMatplotlib as plot
-import sys
-import re
 import pkg_resources
-import logging
+
+import pytrnsys.plot.plotMatplotlib as plot
+import pytrnsys.psim.debugProcess as debugProcess
+import pytrnsys.psim.processTrnsysDf as processTrnsys
+import pytrnsys.report.latexReport as latex
+import pytrnsys.rsim.runParallel as run
+import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
+from .. import cost_calculation as _cc
+
 try:
     import pytrnsys_examples
 except ImportError:
@@ -500,7 +503,7 @@ class ProcessParallelTrnsys():
             else:
                 fileNameList =None
 
-            self.calcCost(fileNameList=fileNameList)
+            self.calcCost(fileNamesToRead=fileNameList)
 
         if 'acrossSetsCalc' in self.inputs.keys():
             self.logger.info('Calculating across sets')
@@ -2268,38 +2271,12 @@ class ProcessParallelTrnsys():
         if(found==False):
             self.logger.warning("changeFile was not able to change %s by %s"%(source,end))
 
-    def calcCost(self,fileNameList=None):
+    def calcCost(self, fileNamesToRead=None):
+        resultsDirPath = _pl.Path(self.inputs['pathBase'])
+        configFilePath = _pl.Path(self.inputs['cost'])
 
-        path = self.inputs['pathBase']
+        _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, fileNamesToRead)
 
-        costPath = self.inputs['cost']
-
-        cost = costConfig.costConfig()
-        dictCost = cost.readCostJson(costPath)
-
-        # for name in names:
-        # path = os.path.join(pathBase, name)
-
-        small = 15
-
-
-        if(fileNameList!=None):
-            cost.setFileNameList(fileNameList)
-
-        cost.setFontSizes(small)
-
-        cost.setDefaultData(dictCost)
-        cost.readResults(path)
-
-        cost.process(dictCost)
-
-
-        # cost.plotLines(cost.pvAreaVec,"PvPeak [kW]",cost.annuityVec,"Annuity [Euro/kWh]",cost.batSizeVec,"Bat-Size [kWh]", "Annuity_vs_PvPeak", extension="pdf")
-        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.annuityVec,"Annuity [Euro/kWh]",cost.pvAreaVec,"PvPeak [kW]","Annuity_vs_Bat", extension="pdf")
-        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RselfSuffVec,"$R_{self,suff}$",cost.pvAreaVec,"PvPeak [kW]","RselfSuff_vs_Bat", extension="pdf")
-        # cost.plotLines(cost.batSizeVec,"Bat-Size [kWh]",cost.RpvGenVec,"$R_{pv,gen}$",cost.pvAreaVec,"PvPeak [kW]","RpvGen_vs_Bat", extension="pdf")
-
-        # cost.printDataFile()
 
 def process():
    pathBase = ''

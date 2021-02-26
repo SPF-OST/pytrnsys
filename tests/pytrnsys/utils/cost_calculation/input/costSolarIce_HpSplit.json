@@ -12,58 +12,52 @@
       "components": [
         {
           "name": "Storage (Stainless Steel)",
-          "cost": {
-            "coeffs": {
-              "offset": {
-                "value": -2000
-              },
-              "slope": {
-                "value": 10172.8,
-                "toLowerBound": -100,
-                "toUpperBound": 250
-              }
+          "coeffs": {
+            "offset": {
+              "mean": -2000
             },
-            "variable": {
-              "name": "Vol_Tes1",
-              "unit": "m$^3$"
+            "slope": {
+              "mean": 10172.8,
+              "toLowerBound": -100,
+              "toUpperBound": 250
             }
+          },
+          "variable": {
+            "name": "Vol_Tes1",
+            "unit": "m$^3$"
           },
           "lifetimeInYears": 30
         },
         {
           "name": "Storage (Steel)",
-          "cost": {
-            "coeffs": {
-              "offset": {
-                "value": 666
-              },
-              "slope": {
-                "value": 1213.8,
-                "toLowerBound": -100
-              }
+          "coeffs": {
+            "offset": {
+              "mean": 666
             },
-            "variable": {
-              "name": "Vol_Tes2",
-              "unit": "m$^3$"
+            "slope": {
+              "mean": 1213.8,
+              "toLowerBound": -100
             }
+          },
+          "variable": {
+            "name": "Vol_Tes2",
+            "unit": "m$^3$"
           },
           "lifetimeInYears": 30
         },
         {
           "name": "electric rod",
-          "cost": {
-            "coeffs": {
-              "offset": {
-                "value": 600
-              },
-              "slope": {
-                "value": 0
-              }
+          "coeffs": {
+            "offset": {
+              "mean": 600
             },
-            "variable": {
-              "name": "Vol_Tes1",
-              "unit": "m$^3$"
+            "slope": {
+              "mean": 0
             }
+          },
+          "variable": {
+            "name": "Vol_Tes1",
+            "unit": "m$^3$"
           },
           "lifetimeInYears": 30
         }
@@ -74,21 +68,19 @@
       "components": [
         {
           "name": "Collector",
-          "cost": {
-            "coeffs": {
-              "offset": {
-                "value": 9282
-              },
-              "slope": {
-                "value": 875,
-                "toLowerBound": -100,
-                "toUpperBound": 250
-              }
+          "coeffs": {
+            "offset": {
+              "mean": 9282
             },
-            "variable": {
-              "name": "AcollAp",
-              "unit": "m$^2$"
+            "slope": {
+              "mean": 875,
+              "toLowerBound": -100,
+              "toUpperBound": 250
             }
+          },
+          "variable": {
+            "name": "AcollAp",
+            "unit": "m$^2$"
           },
           "lifetimeInYears": 30
         }
@@ -99,19 +91,17 @@
       "components": [
         {
           "name": "Ice Storage (inc. installation)",
-          "cost": {
-            "coeffs": {
-              "offset": {
-                "value": 0
-              },
-              "slope": {
-                "value": 850
-              }
+          "coeffs": {
+            "offset": {
+              "mean": 0
             },
-            "variable": {
-              "name": "VIceS",
-              "unit": "m$^3$"
+            "slope": {
+              "mean": 850
             }
+          },
+          "variable": {
+            "name": "VIceS",
+            "unit": "m$^3$"
           },
           "lifetimeInYears": 20
         }
@@ -122,19 +112,17 @@
       "components": [
         {
           "name": "HeatPump",
-          "cost": {
-            "coeffs": {
-              "offset": {
-                "value": 8194
-              },
-              "slope": {
-                "value": 363
-              }
+          "coeffs": {
+            "offset": {
+              "mean": 8194
             },
-            "variable": {
-              "name": "sizeHpUsed",
-              "unit": "kW"
+            "slope": {
+              "mean": 363
             }
+          },
+          "variable": {
+            "name": "sizeHpUsed",
+            "unit": "kW"
           },
           "lifetimeInYears": 20
         }
@@ -145,42 +133,55 @@
       "components": [
         {
           "name": "Installation System (Hydraulics)",
-          "cost": {
-            "coeffs": {
-              "offset": {
-                "value": 24596
-              },
-              "slope": {
-                "value": 193
-              }
+          "coeffs": {
+            "offset": {
+              "mean": 24596
             },
-            "variable": {
-              "name": "sizeHpUsed",
-              "unit": "kW"
+            "slope": {
+              "mean": 193
             }
+          },
+          "variable": {
+            "name": "sizeHpUsed",
+            "unit": "kW"
           },
           "lifetimeInYears": 30
         }
       ]
     }
   ],
-  "YearlyCosts": {
-    "Transmission grid": {
-      "size": "E_yearly",
-      "baseCost": 0,
-      "varCost": 0.0,
-      "varUnit": "kWh"
+  "yearlyCosts": [
+    {
+      "name": "Transmission grid",
+      "coeffs": {
+        "offset": {
+          "mean": 0
+        },
+        "slope": {
+          "mean": 0.0
+        }
+      },
+      "variable": {
+        "name": "E_yearly",
+        "unit": "kWh"
+      }
     }
-  },
-  "DefaultData": {
+  ],
+  "parameters": {
     "rate": 0.03,
-    "analysPeriod": 30,
-    "qDemand": "Q_yearly",
-    "elFromGrid": "ElHeatSys_Tot",
+    "analysisPeriod": 30,
+    "qDemandVariable": {
+      "name": "Q_yearly",
+      "unit": "?"
+    },
+    "elFromGridVariable": {
+      "name": "ElHeatSys_Tot",
+      "unit": "?"
+    },
     "costElecFix": 0,
-    "costEleckWh": 0.2,
+    "costElecKWh": 0.2,
     "increaseElecCost": 0,
-    "MaintenanceRate": 0.01,
+    "maintenanceRate": 0.01,
     "costResidual": 0,
     "lifetimeResVal": 30,
     "cleanModeLatex": false
