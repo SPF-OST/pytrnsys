@@ -9,7 +9,7 @@ import diff_pdf_visually as dpdf
 import pytrnsys.cost_calculation as cc
 
 
-def testCostConfig(caplog: pytest.LogCaptureFixture):
+def testCostCalculation(caplog: pytest.LogCaptureFixture):
     helper = Helper(caplog)
     helper.setup()
 
@@ -25,13 +25,11 @@ class Helper:
     def __init__(self, caplog: pytest.LogCaptureFixture):
         self._caplog = caplog
 
-        data_dir = pl.Path(__file__).parent / 'cost_calculation'
-
-        inputDir = data_dir / 'input'
+        inputDir = pl.Path('input')
         self._resultsDir = inputDir / 'results'
         self.costParametersFilePath = inputDir / "costSolarIce_HpSplit.json"
 
-        outputDir = data_dir / 'output'
+        outputDir = pl.Path('output')
         actualDir = outputDir / 'actual'
         self.actualResultsDir = actualDir / 'results'
         expectedDir = outputDir / 'expected'
