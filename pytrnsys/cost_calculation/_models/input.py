@@ -9,7 +9,7 @@ import typing as _tp
 from . import common as _common
 
 
-@_dc.dataclass(frozen=True)
+@_dc.dataclass(frozen=True, eq=True, )
 class Input(_dcj.JsonSchemaMixin):
     componentGroups: _tp.Sequence["ComponentGroup"]
     yearlyCosts: _tp.Sequence["YearlyCost"]
@@ -25,15 +25,15 @@ class Input(_dcj.JsonSchemaMixin):
 
 @_dc.dataclass(frozen=True)
 class Parameters(_dcj.JsonSchemaMixin):
-    rate: float
+    rate: _common.UncertainFloat
     analysisPeriod: int
     qDemandVariable: "Variable"
     elFromGridVariable: "Variable"
-    costElecFix: float
-    costElecKWh: float
-    increaseElecCost: float
-    maintenanceRate: float
-    costResidual: float
+    costElecFix: _common.UncertainFloat
+    costElecKWh: _common.UncertainFloat
+    increaseElecCost: _common.UncertainFloat
+    maintenanceRate: _common.UncertainFloat
+    costResidual: _common.UncertainFloat
     lifetimeResVal: int
     cleanModeLatex: bool
 

@@ -168,7 +168,11 @@
     }
   ],
   "parameters": {
-    "rate": 0.03,
+    "rate": {
+      "mean": 0.03,
+      "toLowerBound": -0.001,
+      "toUpperBound": 0.001
+    },
     "analysisPeriod": 30,
     "qDemandVariable": {
       "name": "Q_yearly",
@@ -178,11 +182,21 @@
       "name": "ElHeatSys_Tot",
       "unit": "?"
     },
-    "costElecFix": 0,
-    "costElecKWh": 0.2,
-    "increaseElecCost": 0,
-    "maintenanceRate": 0.01,
-    "costResidual": 0,
+    "costElecFix": {
+      "mean": 0
+    },
+    "costElecKWh": {
+      "mean": 0.2
+    },
+    "increaseElecCost": {
+      "mean": 0
+    },
+    "maintenanceRate": {
+      "mean": 0.01
+    },
+    "costResidual": {
+      "mean": 0
+    },
     "lifetimeResVal": 30,
     "cleanModeLatex": false
   }

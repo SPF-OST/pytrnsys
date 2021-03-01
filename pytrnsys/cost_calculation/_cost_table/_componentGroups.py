@@ -81,4 +81,3 @@ def _createGroupRowsLines(group: _output.ComponentGroup, totalCost: _common.Unce
     groupLines += line + "\n"
 
     return groupLines
-

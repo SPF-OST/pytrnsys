@@ -42,4 +42,3 @@ def _getValues(config: _input.Input, result: _Result) -> _output.Values:
 
 def _getValue(variable: _input.Variable, result: _Result) -> float:
     return result[variable.name]
-

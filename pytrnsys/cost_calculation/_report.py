@@ -118,7 +118,7 @@ class ReportWriter:
         inVar.append(output.componentGroups.maintenanceCost.mean)
         legends.append("Maintenance")
 
-        inVar.append(output.electricity.annuity)
+        inVar.append(output.electricity.annuity.mean)
         legends.append("El. purchased \n from the grid")
 
         for yearlyCost in output.yearlyCosts.factors:
@@ -206,26 +206,23 @@ class ReportWriter:
         names = ["", "", "", ""]
         units = None
 
-        perc = "\\%"
-
         lines = ""
-        line = "Rate & %2.1f %s $per$ $annum$\\\\ \n" % (parameters.rate * 100., perc)
-        lines = lines + line
-        line = "Analysis period & %2.0f $years$\\\\ \n" % parameters.analysisPeriod
-        lines = lines + line
-        line = "Maintenance & %2.1f %s $of$ $Investment$ $costs$ $per$ $year$ \\\\ \n" % (
-            parameters.maintenanceRate * 100., perc)
-        lines = lines + line
-        line = "\\hline \\\\ \n"
-        lines = lines + line
-        line = "Electricity & Fix costs: %2.0f  $Fr.$ $per$ $year$ \\\\ \n" % parameters.costElecFix
-        lines = lines + line
-        line = " & Variable costs:  %2.2f $Fr.$ $per$ $kWh$ \\\\ \n" % parameters.costElecKWh
-        lines = lines + line
-        line = "Increase of electricity costs & %2.1f %s $per$ $year$ \\\\ \n" % (parameters.increaseElecCost * 100., perc)
-        lines = lines + line
-        line = "Electricity costs year 1 & %2.0f Fr. in year 1 \\\\ \n" % output.electricity.cost
-        lines = lines + line
+        line = rf"Rate & {parameters.rate * 100:2.1f} \% $per$ $annum$\\"
+        lines += line + "\n"
+        line = rf"Analysis period & {parameters.analysisPeriod:2.0f} $years$\\"
+        lines += line + "\n"
+        line = rf"Maintenance & {parameters.maintenanceRate * 100:2.1f} \% $of$ $Investment$ $costs$ $per$ $year$ \\"
+        lines += line + "\n"
+        line = r"\hline \\"
+        lines += line + "\n"
+        line = rf"Electricity & Fix costs: {parameters.costElecFix:2.0f}  $Fr.$ $per$ $year$ \\"
+        lines += line + "\n"
+        line = rf" & Variable costs:  {parameters.costElecKWh:2.2f} $Fr.$ $per$ $kWh$ \\"
+        lines += line + "\n"
+        line = rf"Increase of electricity costs & {parameters.increaseElecCost:2.1f} \% $per$ $year$ \\"
+        lines += line + "\n"
+        line = rf"Electricity costs year 1 & {output.electricity.cost:2.0f} Fr. in year 1 \\"
+        lines += line + "\n"
 
         label = "definitionTable"
 

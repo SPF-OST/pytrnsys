@@ -22,7 +22,7 @@ import pytrnsys.psim.processTrnsysDf as processTrnsys
 import pytrnsys.report.latexReport as latex
 import pytrnsys.rsim.runParallel as run
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
-from .. import cost_calculation as _cc
+import pytrnsys.cost_calculation as _cc
 
 try:
     import pytrnsys_examples
