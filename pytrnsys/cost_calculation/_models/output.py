@@ -79,9 +79,10 @@ class ComponentGroups:
 
     @staticmethod
     def createFromValues(definitions: _tp.Sequence[_input.ComponentGroup], values: Values,
-                         rate: float, period: float, maintenanceRate) \
+                         rate: _common.UncertainFloat, analysisPeriod: float, maintenanceRate: _common.UncertainFloat) \
             -> "ComponentGroups":
-        componentGroups = [ComponentGroup.createFromValues(g, values, rate, period, maintenanceRate) for g in definitions]
+        componentGroups = [ComponentGroup.createFromValues(g, values, rate, analysisPeriod, maintenanceRate)
+                           for g in definitions]
         return ComponentGroups(componentGroups)
 
     @property
@@ -108,8 +109,9 @@ class ComponentGroup:
 
     @staticmethod
     def createFromValues(definition: _input.ComponentGroup, values: Values,
-                         rate: float, period: float, maintenanceRate: float) -> "ComponentGroup":
-        costFactors = CostFactors.createForComponentGroup(definition, values, rate, period, maintenanceRate)
+                         rate: _common.UncertainFloat, analysisPeriod: float, maintenanceRate: _common.UncertainFloat)\
+            -> "ComponentGroup":
+        costFactors = CostFactors.createForComponentGroup(definition, values, rate, analysisPeriod, maintenanceRate)
 
         return ComponentGroup(definition.name, costFactors)
 
@@ -120,16 +122,19 @@ class CostFactors:
 
     @staticmethod
     def createForYearlyCosts(definitions: _tp.Sequence[_input.YearlyCost], values: Values,
-                             rate: float, period: float, maintenanceRate: float) \
+                             rate: _common.UncertainFloat, analysisPeriod: float,
+                             maintenanceRate: _common.UncertainFloat) \
             -> "CostFactors":
-        costFactors = [_createCostFactor(d, values, rate, period, period, maintenanceRate) for d in definitions]
+        costFactors = [_createCostFactor(d, values, rate, analysisPeriod, analysisPeriod, maintenanceRate)
+                       for d in definitions]
         return CostFactors(costFactors)
 
     @staticmethod
     def createForComponentGroup(definition: _input.ComponentGroup, values: Values,
-                                rate: float, period: float, maintenanceRate: float) \
+                                rate: _common.UncertainFloat, analysisPeriod: float,
+                                maintenanceRate: _common.UncertainFloat) \
             -> "CostFactors":
-        yearlyCosts = [_createCostFactor(d, values, rate, d.lifetimeInYears, period, maintenanceRate)
+        yearlyCosts = [_createCostFactor(d, values, rate, d.lifetimeInYears, analysisPeriod, maintenanceRate)
                        for d in definition.components]
         return CostFactors(yearlyCosts)
 
@@ -174,10 +179,10 @@ def _createCostFactor(inputFactor: _input.CostFactor, values, rate, lifetime, pe
 class CostFactor:
     name: str
     coeffs: _common.LinearCoefficients
-    rate: float
+    rate: _common.UncertainFloat
     lifetimeInYears: float
     analysisPeriodInYears: float
-    maintenanceRate: float
+    maintenanceRate: _common.UncertainFloat
     value: "Value"
 
     @property
@@ -201,11 +206,11 @@ class CostFactor:
         return self.npvFactor * self.maintenanceCost
 
     @property
-    def npvFactor(self) -> float:
+    def npvFactor(self) -> _common.UncertainFloat:
         return _ef.getNPV(self.rate, self.analysisPeriodInYears)
 
     @property
-    def annuityFactor(self) -> float:
+    def annuityFactor(self) -> _common.UncertainFloat:
         return _ef.getAnnuity(self.rate, self.lifetimeInYears)
 
 
@@ -218,41 +223,41 @@ class Value:
 @_dc.dataclass(frozen=True)
 class Electricity:
     electricityDemandInKWh: float
-    costElecFix: float
-    costElecKWh: float
+    costElecFix: _common.UncertainFloat
+    costElecKWh: _common.UncertainFloat
 
-    increaseElecCost: float
-    rate: float
+    increaseElecCost: _common.UncertainFloat
+    rate: _common.UncertainFloat
     analysisPeriod: float
 
     @property
-    def cost(self) -> float:
+    def cost(self) -> _common.UncertainFloat:
         return self.costElecFix + self.costElecKWh * self.electricityDemandInKWh
 
     @property
-    def npvCost(self) -> float:
+    def npvCost(self) -> _common.UncertainFloat:
         return self.cost * self.nvpFactor
 
     @property
-    def annuity(self) -> float:
+    def annuity(self) -> _common.UncertainFloat:
         return self.annuityFactor * self.npvCost
 
     @property
-    def nvpFactor(self) -> float:
+    def nvpFactor(self) -> _common.UncertainFloat:
         if self.rate == self.increaseElecCost:
             return self.analysisPeriod / (1 + self.rate)
 
         return _ef.getNPVIncreaseCost(self.rate, self.analysisPeriod, self.increaseElecCost)
 
     @property
-    def annuityFactor(self) -> float:
+    def annuityFactor(self) -> _common.UncertainFloat:
         return _ef.getAnnuity(self.rate, self.analysisPeriod)
 
 
 @_dc.dataclass(frozen=True)
 class ResidualCost:
     value: _common.UncertainFloat
-    rate: float
+    rate: _common.UncertainFloat
     lifetimeInYears: float
     analysisPeriod: float
 

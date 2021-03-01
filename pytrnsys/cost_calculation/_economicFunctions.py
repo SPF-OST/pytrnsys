@@ -1,12 +1,16 @@
-def getNPV(rate: float, period: float) -> float:
-    npv = ((1. + rate) ** period - 1.) / (rate * (1. + rate) ** period)
+from ._models import common as _common
+
+
+def getNPV(rate: _common.UncertainFloat, analysisPeriod: float) -> _common.UncertainFloat:
+    npv = ((1. + rate) ** analysisPeriod - 1.) / (rate * (1. + rate) ** analysisPeriod)
     return npv
 
 
-def getAnnuity(rate: float, period: float) -> float:
-    return 1. / getNPV(rate, period)
+def getAnnuity(rate: _common.UncertainFloat, analysisPeriod: float) -> _common.UncertainFloat:
+    return 1. / getNPV(rate, analysisPeriod)
 
 
-def getNPVIncreaseCost(rate: float, period: float, increaseCost: float) -> float:
-    npv = 1 / (rate - increaseCost) * (1. - ((1. + increaseCost) / (1. + rate)) ** period)
+def getNPVIncreaseCost(rate: _common.UncertainFloat, analysisPeriod: float,
+                       increaseCost: _common.UncertainFloat) -> _common.UncertainFloat:
+    npv = 1 / (rate - increaseCost) * (1. - ((1. + increaseCost) / (1. + rate)) ** analysisPeriod)
     return npv

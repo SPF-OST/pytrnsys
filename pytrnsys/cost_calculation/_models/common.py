@@ -41,6 +41,12 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
     def one() -> "UncertainFloat":
         return UncertainFloat(1)
 
+    def isCertain(self):
+        return not self.toLowerBound and not self.toUpperBound
+
+    def isUncertain(self):
+        return not self.isCertain()
+
     def __post_init__(self):
         self._ensureAllFieldsAreConvertibleToFloat()
 
@@ -95,10 +101,28 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
     def __rtruediv__(self, other: FloatLike) -> "UncertainFloat":
         return _doOp(_op.truediv, other, self)
 
+    def __pow__(self, power: FloatLike, modulo=None):
+        raiser = ModuloRaiser(modulo)
+
+        return _doOp(raiser.pow, self, power)
+
+    def __rpow__(self, power: FloatLike, modulo=None):
+        raiser = ModuloRaiser(modulo)
+
+        return _doOp(raiser.pow, power, self)
+
     def __gt__(self, other: FloatLike) -> bool:
         other = self.create(other)
 
         return self.min > other.max
+
+
+class ModuloRaiser:
+    def __init__(self, modulo: _tp.SupportsFloat):
+        self._modulo = modulo
+
+    def pow(self, x, y):
+        return pow(x, y, self._modulo)
 
 
 def _doOp(op: _tp.Callable[[float, float], float], x: FloatLike, y: FloatLike) -> UncertainFloat:
