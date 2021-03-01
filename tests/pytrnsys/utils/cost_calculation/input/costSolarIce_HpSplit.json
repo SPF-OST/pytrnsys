@@ -169,7 +169,9 @@
   ],
   "parameters": {
     "rate": {
-      "mean": 0.03
+      "mean": 0.03,
+      "toLowerBound": -0.001,
+      "toUpperBound": 0.001
     },
     "analysisPeriod": 30,
     "qDemandVariable": {
