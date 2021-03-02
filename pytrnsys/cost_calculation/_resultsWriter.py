@@ -28,13 +28,13 @@ class ResultsWriter:
     # private
     def writeReportAndResults(self, parameters: _input.Parameters,
                               costCalculation: _co.CostCalculation, resultsDirPath: _pl.Path):
-        fileName = str(costCalculation.resultsDir)
-        outputPath = os.path.join(str(resultsDirPath), fileName)
+        fileName = costCalculation.resultsDir.name
+        outputPath = resultsDirPath / fileName
 
         self._doPlots(costCalculation.output.componentGroups, outputPath, fileName)
         self._doPlotsAnnuity(costCalculation.output, outputPath, fileName)
         self._createLatex(parameters, costCalculation.output, outputPath, fileName)
-        self._addCostsToResultJson(costCalculation.output, outputPath, fileName)
+        self._addCostsToResultsJson(costCalculation.output, outputPath, fileName)
 
     @staticmethod
     def readCostJson(path):
@@ -58,15 +58,20 @@ class ResultsWriter:
         plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
         plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-    def _addCostsToResultJson(self, output: _output.Output, outputPath: str, fileName: str):
-        costDict = self._createCostDict(output)
-        resultJsonPath = os.path.join(outputPath, fileName + '-results.json')
-        with open(resultJsonPath, 'r') as resultsJson:
-            oldResults = json.load(resultsJson)
-        self._addCostToJson(costDict, oldResults, resultJsonPath)
+    def _addCostsToResultsJson(self, output: _output.Output, outputPath: _pl.Path, fileName: str):
+        resultsJsonPath = outputPath / f"{fileName}-results.json"
+
+        serializedResults = resultsJsonPath.read_text()
+        results = json.loads(serializedResults)
+
+        costsDict = self._createCostsDict(output)
+        resultsWithCosts = results | costsDict
+
+        serializedResultsWithCosts = json.dumps(resultsWithCosts, indent=2, sort_keys=True)
+        resultsJsonPath.write_text(serializedResultsWithCosts)
 
     @staticmethod
-    def _createCostDict(output: _output.Output):
+    def _createCostsDict(output: _output.Output):
         collectorComponents = [c for g in output.componentGroups.groups
                                for c in g.components.factors if c.name == "Collector"]
         if not collectorComponents:
@@ -87,28 +92,16 @@ class ResultsWriter:
             "investmentPerMWh": totalCost * 1000 / output.heatingDemandInKWh
         }
 
-    @staticmethod
-    def _addCostToJson(costResultsDict, resultsDict, jsonPath):
-
-        logger.debug("updating results.json file")
-
-        newResultsDict = {**resultsDict, **costResultsDict}
-
-        with open(jsonPath, 'w') as fp:
-            json.dump(newResultsDict, fp, indent=2, separators=(',', ': '), sort_keys=True)
-
-        logger.info("results.json file was updated with cost data")
-
     # plots
 
-    def _doPlots(self, componentGroups: _output.ComponentGroups, outputPath: str, fileName: str) -> None:
+    def _doPlots(self, componentGroups: _output.ComponentGroups, outputPath: _pl.Path, fileName: str) -> None:
         groupNamesWithCost = [(g.name, g.components.cost.mean) for g in componentGroups.groups]
 
         groupNames, groupCosts = zip(*groupNamesWithCost)
         self.nameCostPdf = self._plotCostShare(groupCosts, groupNames,
                                                outputPath, "costShare" + "-" + fileName, plotSize=15)
 
-    def _doPlotsAnnuity(self, output: _output.Output, outputPath: str, fileName: str):
+    def _doPlotsAnnuity(self, output: _output.Output, outputPath: _pl.Path, fileName: str):
         legends = []
         inVar = []
 
@@ -139,7 +132,7 @@ class ResultsWriter:
         self.nameCostAnnuityPdf = self._plotCostShare(inVar, legends, outputPath, "costShareAnnuity" + "-" + fileName,
                                                       plotSize=17)
 
-    def _plotCostShare(self, inVar, legends, outputPath: str, fileName, plotSize):
+    def _plotCostShare(self, inVar, legends, outputPath: _pl.Path, fileName, plotSize):
         sizeFont = 30
 
         mpl.rcParams['font.size'] = sizeFont
@@ -169,8 +162,8 @@ class ResultsWriter:
 
         plt.title("", bbox={'facecolor': '0.9', 'pad': 10}, fontsize=sizeFont)
 
-        namePdf = '%s.pdf' % fileName
-        nameWithPath = '%s\\%s' % (outputPath, namePdf)
+        namePdf = f'{fileName}.pdf'
+        nameWithPath = outputPath / namePdf
 
         plt.savefig(nameWithPath)
 
@@ -180,8 +173,8 @@ class ResultsWriter:
 
     # latex
 
-    def _createLatex(self, parameters: _input.Parameters, output: _output.Output, outputPath: str, fileName: str):
-        doc = latex.LatexReport(outputPath, fileName)
+    def _createLatex(self, parameters: _input.Parameters, output: _output.Output, outputPath: _pl.Path, fileName: str):
+        doc = latex.LatexReport(str(outputPath), fileName)
         doc.resetTexName(fileName + "-cost")
         doc.setSubTitle("Energy generation costs")
         doc.setTitle(fileName)
