@@ -83,13 +83,15 @@ class ResultsWriter:
         collectorComponent = collectorComponents[0]
         size = collectorComponent.value
 
-        totalCost = output.componentGroups.cost.mean
+        totalCost = output.componentGroups.cost
+        totalCostPerM2 = totalCost / size.value
+        totalCostPerMwh = totalCost / (output.heatingDemandInKWh / 1000)
 
         return {
-            "investment": totalCost,
-            "energyCost": output.heatGenerationCost.mean,
-            "investmentPerM2": totalCost / size.value,
-            "investmentPerMWh": totalCost * 1000 / output.heatingDemandInKWh
+            "investment": totalCost.to_dict(),
+            "energyCost": output.heatGenerationCost.to_dict(),
+            "investmentPerM2": totalCostPerM2.to_dict(),
+            "investmentPerMWh": totalCostPerMwh.to_dict()
         }
 
     # plots

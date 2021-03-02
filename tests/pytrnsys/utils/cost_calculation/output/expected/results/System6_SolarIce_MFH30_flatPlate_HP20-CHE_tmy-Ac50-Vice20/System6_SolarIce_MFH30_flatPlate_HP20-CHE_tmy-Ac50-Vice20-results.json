@@ -15,10 +15,26 @@
   "VicevsMWh": 0.40404040404040403,
   "Vol_Tes1": 2.0,
   "Vol_Tes2": 1.0,
-  "energyCost": 0.26347167052081305,
-  "investment": 134767.4,
-  "investmentPerM2": 2695.348,
-  "investmentPerMWh": 2734.0613933308764,
+  "energyCost": {
+    "mean": 0.26347167052081305,
+    "toLowerBound": -0.03440319143080328,
+    "toUpperBound": 0.050209784979997285
+  },
+  "investment": {
+    "mean": 134767.4,
+    "toLowerBound": -5300.0,
+    "toUpperBound": 13000.0
+  },
+  "investmentPerM2": {
+    "mean": 2695.348,
+    "toLowerBound": -106.0,
+    "toUpperBound": 260.0
+  },
+  "investmentPerMWh": {
+    "mean": 2734.061393330876,
+    "toLowerBound": -107.52248232624243,
+    "toUpperBound": 263.7343906115384
+  },
   "renShare_Tot": 0.5701125846242383,
   "sizeHpUsed": 20.0,
   "yearSpfShpDis": 2.3261904494829353
