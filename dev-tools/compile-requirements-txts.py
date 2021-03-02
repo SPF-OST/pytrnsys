@@ -10,8 +10,8 @@ requirements\test\requirements.in file and then run
 
         python dev-tools\compile-requirements-txts.py -P pdfdiff
 
-Finally, sanity-check the newly generated requirements.txt file(s) by diffing them against the checked-in version
-and if they make sense, check in *both the requirements.txt and the requirements.in file(s).
+Finally, sanity-check the newly generated requirements.txt file(s) by diff'ing them against the checked-in version
+and if they make sense, check in *both* the requirements.txt and the requirements.in file(s).
 
 To try and upgrade a given package also do
 
