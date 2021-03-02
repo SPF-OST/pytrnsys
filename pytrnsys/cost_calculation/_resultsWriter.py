@@ -1,4 +1,4 @@
-__all__ = ['ReportWriter']
+__all__ = ['ResultsWriter']
 
 import json
 import logging
@@ -17,7 +17,7 @@ from ._models import output as _output
 logger = logging.getLogger('root')
 
 
-class ReportWriter:
+class ResultsWriter:
     _SHALL_USE_kCHF_FOR_TOTAL_COSTS = False
 
     # public: used
@@ -84,7 +84,7 @@ class ReportWriter:
             "investment": totalCost,
             "energyCost": output.heatGenerationCost.mean,
             "investmentPerM2": totalCost / size.value,
-            "investmentPerMWh": totalCost * 1000 / output.heatingDemand
+            "investmentPerMWh": totalCost * 1000 / output.heatingDemandInKWh
         }
 
     @staticmethod
