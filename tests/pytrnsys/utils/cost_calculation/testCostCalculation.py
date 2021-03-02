@@ -79,7 +79,7 @@ class Helper:
 
     def _assertTextFileEqual(self, dirName, texFileName):
         expectedPath, actualPath = self._getExpectedAndActualPath(dirName, texFileName)
-        assert filecmp.cmp(actualPath, expectedPath, shallow=False)
+        assert actualPath.read_text() == expectedPath.read_text()
 
     def _getExpectedAndActualPath(self, dirName, fileName):
         expected = self._expectedResultsDir / dirName / fileName
