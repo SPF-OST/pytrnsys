@@ -5,6 +5,6 @@ pytest-cov
 mypy
 pylint
 
-pdfdiff
+diff-pdf-visually
 
 -e file:.#egg=pytrnsys

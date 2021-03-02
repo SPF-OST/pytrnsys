@@ -34,8 +34,8 @@ cycler==0.10.0
     # via matplotlib
 dataclasses-jsonschema==2.14.1
     # via pytrnsys
-icdiff==1.9.1
-    # via pdfdiff
+diff-pdf-visually==1.5.1
+    # via -r requirements\dev\../test/requirements.in
 iniconfig==1.1.1
     # via pytest
 isort==5.7.0
@@ -80,10 +80,6 @@ pandas==1.2.2
     #   seaborn
 pathspec==0.8.1
     # via black
-pdfdiff==0.1
-    # via -r requirements\dev\../test/requirements.in
-pdfminer==20191125
-    # via pdfdiff
 pillow==8.1.1
     # via
     #   bokeh
@@ -94,8 +90,6 @@ pluggy==0.13.1
     # via pytest
 py==1.10.0
     # via pytest
-pycryptodome==3.10.1
-    # via pdfminer
 pylint==2.7.2
     # via -r requirements\dev\../test/requirements.in
 pyparsing==2.4.7
