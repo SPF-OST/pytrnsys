@@ -35,13 +35,11 @@ DIRS = [
 
 
 def getDirPaths():
-    topLevelDir = pl.Path(__file__).parent.parent
-    for d in DIRS:
-        yield topLevelDir / d
+    return [pl.Path(d) for d in DIRS]
 
 
 for d in getDirPaths():
-    requirementsFile = str(d / 'requirements.in')
-    args = [*baseArgs, requirementsFile]
+    inFile = str(d / 'requirements.in')
+    args = [*baseArgs, inFile]
     print(f"Calling \"{' '.join(args)}\":")
-    sp.run(baseArgs)
+    sp.run(args)
