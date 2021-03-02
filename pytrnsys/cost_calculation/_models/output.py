@@ -21,7 +21,7 @@ class Output:
     yearlyCosts: "CostFactors"
     electricity: "Electricity"
     residualCost: "ResidualCost"
-    heatingDemand: float
+    heatingDemandInKWh: float
 
     @staticmethod
     def createOutput(config: _input.Input, values: Values):
@@ -70,7 +70,7 @@ class Output:
 
     @property
     def heatGenerationCost(self) -> _common.UncertainFloat:
-        return self.annuity / self.heatingDemand
+        return self.annuity / self.heatingDemandInKWh
 
 
 @_dc.dataclass(frozen=True)
