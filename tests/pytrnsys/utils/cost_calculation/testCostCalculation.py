@@ -50,24 +50,28 @@ class Helper:
 
     def assertResultsAreAsExpected(self):
         self._assertFileStructureEqual()
-        self._assertPlotsAndReportTexFileEqual()
+        self._assertOutputFilesEqual()
 
     def _assertFileStructureEqual(self):
         dircmp = filecmp.dircmp(self.actualResultsDir, self._expectedResultsDir)
         assert not dircmp.left_only
         assert not dircmp.right_only
 
-    def _assertPlotsAndReportTexFileEqual(self):
+    def _assertOutputFilesEqual(self):
         for directory in self._expectedResultsDir.iterdir():
             dirName = directory.name
 
             costPlotName = f"costShare-{dirName}.pdf"
-            annuityPlotName = f"costShareAnnuity-{dirName}.pdf"
-            reportTexName = f"{dirName}-cost.tex"
-
             self._assertPdfEqual(dirName, costPlotName)
+
+            annuityPlotName = f"costShareAnnuity-{dirName}.pdf"
             self._assertPdfEqual(dirName, annuityPlotName)
+
+            reportTexName = f"{dirName}-cost.tex"
             self._assertTextFileEqual(dirName, reportTexName)
+
+            resultJsonName = f"{dirName}-results.json"
+            self._assertTextFileEqual(dirName, resultJsonName)
 
     def _assertPdfEqual(self, dirName, pdfFileName):
         expectedPath, actualPath = self._getExpectedAndActualPath(dirName, pdfFileName)
