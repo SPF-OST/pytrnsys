@@ -1,0 +1,3 @@
+pip-tools
+black
+-r ../test/requirements.in
