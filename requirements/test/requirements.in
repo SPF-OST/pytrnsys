@@ -1,6 +1,10 @@
+wheel
+
 pytest
 pytest-cov
 mypy
 pylint
+
 pdfdiff
--r ../../requirements.in
+
+-e file:.#egg=pytrnsys

@@ -28,7 +28,7 @@ setuptools.setup(
         'matplotlib',
         'seaborn',
         'bokeh',
-        'datclasses-jsonschema'
+        'dataclasses-jsonschema'
     ],
     package_data={'pytrnsys_examples': ['./*.*','./**/*.*','./**/**/*.*'],
                   'pytrnsys_ddck': ['./*.*','./**/*.*','./**/**/*.*','./**/**/**/*.*','./**/**/**/**/*.*','./**/**/**/**/**/*.*'],

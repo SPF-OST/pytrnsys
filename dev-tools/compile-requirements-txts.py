@@ -26,22 +26,20 @@ import subprocess as sp
 import sys
 import pathlib as pl
 
-args = ['pip-compile', *sys.argv[1:]]
+baseArgs = ['pip-compile', *sys.argv[1:]]
 
 DIRS = [
-    ".",
     "requirements/dev",
     "requirements/test"
 ]
 
 
 def getDirPaths():
-    topLevelDir = pl.Path(__file__).parent.parent
-    for d in DIRS:
-        yield topLevelDir / d
+    return [pl.Path(d) for d in DIRS]
 
 
-print(f"Going to call \"{' '.join(args)}\" for each requirements.in file.")
 for d in getDirPaths():
-    print(f"Compiling {d / 'requirements.txt'}...")
-    sp.run(args, cwd=d)
+    inFile = str(d / 'requirements.in')
+    args = [*baseArgs, inFile]
+    print(f"Calling \"{' '.join(args)}\":")
+    sp.run(args)
