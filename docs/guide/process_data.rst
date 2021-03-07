@@ -329,9 +329,38 @@ parameters. The custom defined plots will automatically be added to the result p
 
 ``comparePlotConditional``
     Same as ``comparePlot``, but with the additional feature of imposing conditions on the data that is supposed to be
-    plotted. For a ``key`` in the results json, a condition is indicated by a ``:`` and stated as ``key:value``::
+    plotted::
 
-        stringArray comparePlotConditional "x_variable" "y_variable" ["series 1 variable"] ["series 2 variable"] ["key 1:value 1"] ["key 2:value 2"] ...
+        stringArray comparePlotConditional "x_variable" "y_variable" ["series 1 variable"] ["series 2 variable"] ["condition 1"] ["condition 2"] ...
+
+    A ``condition`` for a ``key`` can take the following forms:
+
+    Equality::
+
+        key=value
+        key=value1&value2&...
+
+    For multiple values to be included, they need to be separated by ``&`` without spaces. For equalities the values can
+    be numbers or strings, depending on the type of the ``key``.
+
+    Inequality::
+
+        key>value
+        key<value
+        key>=value
+        key<=value
+
+    Logically, for inequalities ``value`` needs to be a number.
+
+    Ranges::
+
+        value1<key<value2
+        value1<key<=value2
+        value1<=key<value2
+        value1<=key<=value2
+
+    Ranges need to be specified by ``<`` or ``<=`` and the values need to be numbers. Note that each ``key`` can only be
+    used once, so a range cannot be replaced by two separate inequality statements.
 
 ``acrossSetsCalculationsPlot``
     Has the same basic functionality as ``acrossSetsCalc``, but can plot the results of equations provided::

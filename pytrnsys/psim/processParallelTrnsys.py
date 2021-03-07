@@ -892,7 +892,7 @@ class ProcessParallelTrnsys():
                     conditionList.append(eval('resultsDict[conditionEntry]' + conditionDict[conditionEntry]))
                 else:
                     conditionList.append(resultsDict[conditionEntry] == conditionValue)
-                    
+
         return all(conditionList)
 
 
