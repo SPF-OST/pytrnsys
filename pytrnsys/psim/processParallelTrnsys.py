@@ -139,6 +139,8 @@ class ProcessParallelTrnsys():
 
         self.defaultInputs()
         self.filteredfolder = [".gle"]
+        self.keyChars = ['=', '<', '>', '>=', '<=']
+
         try:
             self.logger = logging.getself.logger('root')
         except:
@@ -294,10 +296,6 @@ class ProcessParallelTrnsys():
                         baseClass = self.getBaseClass(self.inputs["classProcessing"],newPath,name)
 
                         self.logger.info("%s will be processed" % name)
-                        # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
-                        #                     self.inputs["cleanModeLatex"],self.inputs["firstMonthUsed"],self.inputs["processQvsT"],self.inputs["firstMonthUsed"],self.inputs["buildingArea"],\
-                        #                     self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
-
                         casesInputs.append((baseClass,pathFolder, name, self.inputs))
 
         elif self.inputs["typeOfProcess"] == "individual":
@@ -315,35 +313,10 @@ class ProcessParallelTrnsys():
                 casesInputs.append((baseClass, fileDict['path'], fileDict['name'], self.inputs, self.individualFiles))
 
         elif self.inputs["typeOfProcess"] == "casesDefined":
-
-            #for city in self.inputs["cities"]:
-            #    for fileType in self.inputs["fileTypes"]:
-
-            #        name = self.inputs["fileName"]+"-%s_%s"%(city,fileType)
-            #        pathFolder = os.path.join(self.inputs["pathBase"],city)
             name = self.inputs["fileName"]
             pathFolder = self.inputs["pathBase"]
             baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name) #DC This was missing
             casesInputs.append((baseClass, pathFolder, name, self.inputs)) #DC This was missing
-
-            # fileName.append(name)
-
-            # folderUsed = True #DC Why this is here ? casesDefined are the ones defined in the config.
-            # for i in range(len(self.filteredfolder)):
-            #     if (name == self.filteredfolder[i]):
-            #         folderUsed = False
-            # if (folderUsed):
-            #     nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
-            #
-            #     if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
-            #         print ("file :%s already processed" % name)
-            #     else:
-            #         print ("%s will be processed" % name)
-            #
-            #
-            #         baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder,self.inputs["fileName"])
-            #
-            #         casesInputs.append((baseClass,pathFolder, name, self.inputs))
 
         elif self.inputs["typeOfProcess"] == "citiesFolder":
 
@@ -475,13 +448,6 @@ class ProcessParallelTrnsys():
 
             results = pool.map(processDataGeneral,casesInputs)
 
-            # if(self.inputs["classProcessing"]=="BigIce"):
-            #     results = pool.map(processDataGeneral,casesInputs)
-            #if(self.inputs["classProcessing"]=="GSHP"):
-            #    results = pool.map(processDataGshp,casesInputs)
-            #else:
-            #    results = pool.map(processDataGeneral, casesInputs)
-
             pool.close()
 
             debug.addLines(results)
@@ -492,10 +458,7 @@ class ProcessParallelTrnsys():
                     processDataGeneral(casesInputs[i],True)
                 else:
                     processDataGeneral(casesInputs[i])
-                # try:
-                #     processDataGeneral(casesInputs[i])
-                # except:
-                #     print('WARNING: the following case failed: ' + casesInputs[i][2])
+
         if  self.inputs['calculateCost']==True and 'cost' in self.inputs.keys(): #
             if(self.inputs['typeOfProcess']== "casesDefined"):
                 fileNameList=[]
@@ -793,8 +756,6 @@ class ProcessParallelTrnsys():
                         ax1.plot(myX, myY,
                                  style, color=seriesColors[key])
 
-                    # for i in range(len(myX)):
-                    #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
             lines="!%s\t"%seriesVariable
             for chunk, style in zip(plotXDict.keys(), styles):
                 for key in plotXDict[chunk].keys():  # the varables that appear in the legend
@@ -829,9 +790,6 @@ class ProcessParallelTrnsys():
 
                     line = "\n"; lines = lines + line
 
-            # box = ax1.get_position()
-            #ax1.set_position([box.x0, box.y0, box.width, box.height])
-
             if chunkVariable != '':
                 legend2=fig1.legend([dummy_line[0] for dummy_line in dummy_lines],chunkLabels,title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0), bbox_transform=ax1.transAxes)
 
@@ -844,16 +802,9 @@ class ProcessParallelTrnsys():
                 legend1 = None
             ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
             ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
-            #if chunkVariable is not '':
-            #
+
             if legend2 is not None:
                 fig1.add_artist(legend2)
-            #fig1.canvas.draw()
-            #if legend2 is not None:
-            #    ax1.add_artist(legend2)
-            #    legend2.set_in_layout(True)
-            #if legend1 is not None:
-            #    legend1.set_in_layout(True)
 
             fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable
 
@@ -871,9 +822,78 @@ class ProcessParallelTrnsys():
                 outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
                 outfile.writelines(lines)
                 outfile.close()
-                # self.plot.gle.getEasyPlot(self, nameGleFile, fileNameData, legends, useSameStyle=True):
 
+    def conditionDictGenerator(self, plotVariables):
+        conditionDict = {}
+        for plotVariable in plotVariables:
+            if any(char in plotVariable for char in self.keyChars):
+                if '<' in plotVariable:
+                    ineqCounter = plotVariable.count('<')
+                    if ineqCounter == 1:
+                        if '<=' in plotVariable:
+                            conditionEntry, conditionValue = plotVariable.split('<=')
+                            conditionValue = '<=' + conditionValue
+                        else:
+                            conditionEntry, conditionValue = plotVariable.split('<')
+                            conditionValue = '<' + conditionValue
+                    elif ineqCounter == 2:
+                        conditionEntry = plotVariable.split('<')[1]
+                        conditionEntry = conditionEntry.replace('=', '')
+                        conditionValue = 'RANGE:'+plotVariable
+                    else:
+                        self.logger.error('Incorrect range statement: ' + plotVariable)
+                        continue
+                    conditionDict[conditionEntry] = conditionValue
+                elif '>' in plotVariable:
+                    conditionEntry, conditionValue = plotVariable.split('>')
+                    conditionEntry = conditionEntry.replace('=', '')
+                    conditionValue = '>' + conditionValue
+                    conditionDict[conditionEntry] = conditionValue
+                elif '=' in plotVariable:
+                    conditionEntry, conditionValue = plotVariable.split('=')
+                    if '&' in conditionValue:
+                        conditionValue = 'LIST:' + conditionValue
+                    else:
+                        conditionValue = '==' + conditionValue
+                    conditionDict[conditionEntry] = conditionValue
 
+        return conditionDict
+
+    def conditionChecker(self, conditionDict, resultsDict):
+        conditionList = []
+        for conditionEntry in conditionDict:
+            isNumber = True
+            if 'RANGE:' in conditionDict[conditionEntry]:
+                conditionValue = conditionDict[conditionEntry]
+                conditionValue = conditionValue.replace('RANGE:', '')
+                conditionValue = conditionValue.replace(conditionEntry, str(resultsDict[conditionEntry]))
+                conditionList.append(eval(conditionValue))
+            elif 'LIST:' in conditionDict[conditionEntry]:
+                conditionValue = conditionDict[conditionEntry]
+                conditionValue = conditionValue.replace('LIST:', '')
+                valueList = conditionValue.split('&')
+                agreementList = []
+                for valueEntry in valueList:
+                    try:
+                        valueEntry = float(valueEntry)
+                    except:
+                        pass
+                    agreementList.append(resultsDict[conditionEntry] == valueEntry)
+                conditionList.append(any(agreementList))
+            else:
+                if '==' in conditionDict[conditionEntry]:
+                    conditionValue = conditionDict[conditionEntry].split('==')[-1]
+                    try:
+                        float(conditionValue)
+                    except ValueError:
+                        isNumber = False
+
+                if isNumber:
+                    conditionList.append(eval('resultsDict[conditionEntry]' + conditionDict[conditionEntry]))
+                else:
+                    conditionList.append(resultsDict[conditionEntry] == conditionValue)
+                    
+        return all(conditionList)
 
 
     def plotComparisonConditional(self):
@@ -886,17 +906,13 @@ class ProcessParallelTrnsys():
             yAxisVariable = plotVariables[1]
             chunkVariable = ''
             seriesVariable = ''
-            if len(plotVariables) >= 3 and not(':' in plotVariables[2]):
+            if len(plotVariables) >= 3 and not any(char in plotVariables[2] for char in self.keyChars):
                 seriesVariable = plotVariables[2]
                 chunkVariable = ''
-            if len(plotVariables) >= 4 and not(':' in plotVariables[3]):
+            if len(plotVariables) >= 4 and not any(char in plotVariables[3] for char in self.keyChars):
                 chunkVariable = plotVariables[3]
 
-            conditionDict = {}
-            for plotVariable in plotVariables:
-                if ':' in plotVariable:
-                    conditionEntry, conditionValue = plotVariable.split(':')
-                    conditionDict[conditionEntry] = conditionValue
+            conditionDict = self.conditionDictGenerator(plotVariables)
 
             plotXDict = {}
             plotYDict = {}
@@ -914,17 +930,12 @@ class ProcessParallelTrnsys():
 
             for file in resultFiles:
                 with open(file) as f_in:
-                    #print(file)
                     resultsDict = json.load(f_in)
                     resultsDict[''] = None
 
-                conditionList = []
-                for conditionEntry in conditionDict:
-                    entryClass = type(resultsDict[conditionEntry])
-                    conditionDict[conditionEntry] = entryClass(conditionDict[conditionEntry])
-                    conditionList.append(conditionDict[conditionEntry]==resultsDict[conditionEntry])
+                conditionsFulfilled = self.conditionChecker(conditionDict, resultsDict)
 
-                if all(conditionList):
+                if conditionsFulfilled:
 
                     conditionNeverMet = False
 
@@ -1081,9 +1092,6 @@ class ProcessParallelTrnsys():
                     line = "\n";
                     lines = lines + line
 
-            # box = ax1.get_position()
-            # ax1.set_position([box.x0, box.y0, box.width, box.height])
-
             if chunkVariable !='':
                 legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
                                       title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.31, 1.0),
@@ -1101,29 +1109,30 @@ class ProcessParallelTrnsys():
             ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
 
             conditionsFileName = ''
-            if len(conditionDict) == 1:
-                conditionName = self.doc.getNiceLatexNames(sorted(conditionDict)[0])
-                ax1.set_title(conditionName + ' = ' + str(conditionDict[sorted(conditionDict)[0]]))
-                conditionsFileName = sorted(conditionDict)[0] + '=' + str(conditionDict[sorted(conditionDict)[0]])
-            else:
-                conditionsTitle = ''
-                for conditionEntry in conditionDict:
-                    conditionName = self.doc.getNiceLatexNames(conditionEntry)
-                    conditionsTitle += conditionName + ' = ' + str(conditionDict[conditionEntry]) + ', '
-                    conditionsFileName += conditionEntry + '=' + str(conditionDict[conditionEntry]) + '_'
-                conditionsTitle = conditionsTitle[:-2]
-                ax1.set_title(conditionsTitle)
-                conditionsFileName = conditionsFileName[:-1]
-            # if chunkVariable is not '':
-            #
+            conditionsTitle = ''
+            for conditionEntry in conditionDict:
+                conditionsFileName += conditionEntry + conditionDict[conditionEntry]
+                if conditionsTitle != '':
+                    conditionsTitle += ', ' + conditionEntry + conditionDict[conditionEntry]
+                else:
+                    conditionsTitle += conditionEntry + conditionDict[conditionEntry]
+
+            conditionsTitle = conditionsTitle.replace('RANGE', '')
+            conditionsTitle = conditionsTitle.replace('LIST', '')
+
+            conditionsFileName = conditionsFileName.replace('==', '=')
+            conditionsFileName = conditionsFileName.replace('>', '_g_')
+            conditionsFileName = conditionsFileName.replace('<', '_l_')
+            conditionsFileName = conditionsFileName.replace('>=', '_ge_')
+            conditionsFileName = conditionsFileName.replace('<=', '_le_')
+            conditionsFileName = conditionsFileName.replace('&', '_u_')
+            conditionsFileName = conditionsFileName.replace('RANGE:', '')
+            conditionsFileName = conditionsFileName.replace('LIST:', '')
+
+            ax1.set_title(conditionsTitle)
+
             if legend2 is not None:
                 fig1.add_artist(legend2)
-            # fig1.canvas.draw()
-            # if legend2 is not None:
-            #    ax1.add_artist(legend2)
-            #    legend2.set_in_layout(True)
-            # if legend1 is not None:
-            #    legend1.set_in_layout(True)
             if chunkVariable == '':
                 fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + conditionsFileName
             else:
@@ -1135,10 +1144,6 @@ class ProcessParallelTrnsys():
                 outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
                 outfile.writelines(lines)
                 outfile.close()
-
-
-
-
 
     def plotBarplotConditional(self):
         pathFolder = self.inputs["pathBase"]
