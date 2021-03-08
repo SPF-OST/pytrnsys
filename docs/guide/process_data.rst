@@ -338,9 +338,9 @@ parameters. The custom defined plots will automatically be added to the result p
     Equality::
 
         key=value
-        key=value1&value2&...
+        key=value1|value2|...
 
-    For multiple values to be included, they need to be separated by ``&`` without spaces. For equalities the values can
+    For multiple values to be included, they need to be separated by ``|`` without spaces. For equalities the values can
     be numbers or strings, depending on the type of the ``key``.
 
     Inequality::
