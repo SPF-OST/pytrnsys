@@ -23,7 +23,7 @@ import pytrnsys.report.latexReport as latex
 import pytrnsys.rsim.runParallel as run
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.cost_calculation as _cc
-import pytrnsys.psim.conditionHandler as cH
+import pytrnsys.psim.ConditionHandler as cH
 
 try:
     import pytrnsys_examples
@@ -832,7 +832,7 @@ class ProcessParallelTrnsys():
 
     def plotComparisonConditional(self):
         pathFolder = self.inputs["pathBase"]
-        conditionHandler = cH.conditionHandler()
+        conditionHandler = cH.ConditionHandler()
         for plotVariables in self.inputs['comparePlotConditional']:
             if len(plotVariables) < 2:
                 raise ValueError(

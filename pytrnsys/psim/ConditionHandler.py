@@ -1,4 +1,4 @@
-class conditionHandler:
+class ConditionHandler:
 
     COMP_OPS = ['=', '<', '>']
 
