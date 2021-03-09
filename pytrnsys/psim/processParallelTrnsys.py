@@ -23,7 +23,7 @@ import pytrnsys.report.latexReport as latex
 import pytrnsys.rsim.runParallel as run
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.cost_calculation as _cc
-import pytrnsys.psim.ConditionHandler as cH
+import pytrnsys.psim.conditions as _conds
 
 try:
     import pytrnsys_examples
@@ -817,7 +817,6 @@ class ProcessParallelTrnsys():
 
     def plotComparisonConditional(self):
         pathFolder = self.inputs["pathBase"]
-        conditionHandler = cH.ConditionHandler()
         for plotVariables in self.inputs['comparePlotConditional']:
             if len(plotVariables) < 2:
                 raise ValueError(
@@ -826,13 +825,15 @@ class ProcessParallelTrnsys():
             yAxisVariable = plotVariables[1]
             chunkVariable = ''
             seriesVariable = ''
-            if len(plotVariables) >= 3 and not any(char in plotVariables[2] for char in conditionHandler.COMP_OPS):
+            serializedConditions = plotVariables[2:]
+            if len(plotVariables) >= 3 and not _conds.mayBeSerializedCondition(plotVariables[2]):
                 seriesVariable = plotVariables[2]
-                chunkVariable = ''
-            if len(plotVariables) >= 4 and not any(char in plotVariables[3] for char in conditionHandler.COMP_OPS):
+                serializedConditions = plotVariables[3:]
+            if len(plotVariables) >= 4 and not _conds.mayBeSerializedCondition(plotVariables[3]):
                 chunkVariable = plotVariables[3]
+                serializedConditions = plotVariables[4:]
 
-            conditionDict = conditionHandler.conditionDictGenerator(plotVariables)
+            conditions = _conds.createConditions(serializedConditions)
 
             plotXDict = {}
             plotYDict = {}
@@ -853,7 +854,7 @@ class ProcessParallelTrnsys():
                     resultsDict = json.load(f_in)
                     resultsDict[''] = None
 
-                conditionsFulfilled = conditionHandler.conditionChecker(conditionDict, resultsDict)
+                conditionsFulfilled = conditions.doResultsSatisfyConditions(resultsDict)
 
                 if conditionsFulfilled:
 
@@ -894,8 +895,8 @@ class ProcessParallelTrnsys():
             if conditionNeverMet:
                 self.logger.warning(
                     'The following conditions from "comparePlotConditional" were never met all at once:')
-                for entry in conditionDict:
-                    self.logger.warning('%s = %s' % (entry, str(conditionDict[entry])))
+                for condition in conditions.conditions:
+                    self.logger.warning(condition)
                 self.logger.warning('The respective plot cannot be generated')
                 return
 
@@ -1032,12 +1033,12 @@ class ProcessParallelTrnsys():
 
             conditionsFileName = ''
             conditionsTitle = ''
-            for conditionEntry in conditionDict:
-                conditionsFileName += conditionEntry + conditionDict[conditionEntry]
+            for condition in conditions.conditions:
+                conditionsFileName += condition.serializedCondition
                 if conditionsTitle != '':
-                    conditionsTitle += ', ' + conditionEntry + conditionDict[conditionEntry]
+                    conditionsTitle += ', ' + condition.serializedCondition
                 else:
-                    conditionsTitle += conditionEntry + conditionDict[conditionEntry]
+                    conditionsTitle += condition.serializedCondition
 
             conditionsTitle = conditionsTitle.replace('RANGE', '')
             conditionsTitle = conditionsTitle.replace('LIST', '')
