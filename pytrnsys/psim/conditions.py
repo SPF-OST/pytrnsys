@@ -108,7 +108,7 @@ class _IntervalConditionFactory:
             return None, _Bound(bound, isInclusive=False)
         elif op == '<=':
             return None, _Bound(bound, isInclusive=True)
-        if op == '>':
+        elif op == '>':
             return _Bound(bound, isInclusive=False), None
         elif op == '<=':
             return _Bound(bound, isInclusive=True), None
@@ -187,7 +187,7 @@ def createConditions(serializedConditions: _tp.Sequence[str]) -> Conditions:
     return Conditions(conditions)
 
 
-def _createCondition(serializedCondition: str) -> "ConditionBase":
+def _createCondition(serializedCondition: str) -> ConditionBase:
     try:
         return _IntervalConditionFactory.create(serializedCondition)
     except ValueError:
