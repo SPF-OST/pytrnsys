@@ -51,53 +51,38 @@ def processDataGeneral(casesInputs, withIndividualFiles=False):
     else:
         (baseClass, locationPath, fileName, inputs) = casesInputs
 
-    #    locationPath = inputs.pop(0)
-    #    fileName,avoidUser,maxMinAvoided,yearReadedInMonthlyFile,cleanModeLatex,firstMonthUsed,processQvsT
-
-    test = baseClass
-
-    # casesInputs.append((baseClass,pathFolder, name, self.inputs["avoidUser"],self.inputs["maxMinAvoided"],self.inputs["yearReadedInMonthlyFile"],\
-    #                     self.inputs["cleanModeLatex"],self.inputs["firstMonthUsed"],self.inputs["processQvsT"],self.inputs["firstMonthUsed"],self.inputs["buildingArea"],\
-    #                     self.inputs["dllTrnsysPath"],self.inputs["setPrintDataForGle"],self.inputs["firstConsideredTime"]))
-
-    test.setInputs(inputs)
+    baseClass.setInputs(inputs)
     if inputs['typeOfProcess'] == 'individual':
-        test.setIndividualFiles(individualFiles)
+        baseClass.setIndividualFiles(individualFiles)
     if 'latexNames' in inputs.keys():
-        test.setLatexNamesFile(inputs['latexNames'])
+        baseClass.setLatexNamesFile(inputs['latexNames'])
     else:
-        test.setLatexNamesFile(None)
+        baseClass.setLatexNamesFile(None)
 
     if "matplotlibStyle" in inputs:
-        test.setMatplotlibStyle(inputs["matplotlibStyle"])
+        baseClass.setMatplotlibStyle(inputs["matplotlibStyle"])
 
     if "setFontsize" in inputs:
-        test.setFontsize(inputs["setFontsize"])
+        baseClass.setFontsize(inputs["setFontsize"])
 
-    test.setBuildingArea(inputs["buildingArea"])
-    test.setTrnsysDllPath(inputs["dllTrnsysPath"])
+    baseClass.setBuildingArea(inputs["buildingArea"])
+    baseClass.setTrnsysDllPath(inputs["dllTrnsysPath"])
 
-    # test.setTrnsysVersion("TRNSYS17_EXE")
 
-    test.setPrintDataForGle(inputs["setPrintDataForGle"])
+    baseClass.setPrintDataForGle(inputs["setPrintDataForGle"])
 
-    # test.avoidUserDefinedCalculation = inputs["avoidUser"]
-    # test.maxMinAvoided = inputs["maxMinAvoided"]
-    test.yearReadedInMonthylFile = inputs["yearReadedInMonthlyFile"]
 
-    test.cleanModeLatex = inputs["cleanModeLatex"]
-    # test.firstConsideredTime = firstConsideredTime
+    baseClass.yearReadedInMonthylFile = inputs["yearReadedInMonthlyFile"]
 
-    # myFirstMonthLong = utils.getMonthLongName(firstMonthUsed + 1)  # starts at 1
-    # test.firstMonth = myFirstMonthLong
-    # test.firstMonthIndex = 0  # firstMonthUsed
+    baseClass.cleanModeLatex = inputs["cleanModeLatex"]
+
 
     doProcess = True
 
     if (inputs['isTrnsys']):
-        test.loadAndProcessTrnsys()
+        baseClass.loadAndProcessTrnsys()
     else:
-        test.loadAndProcessGeneric()
+        baseClass.loadAndProcessGeneric()
 
     # rename files if multiple years are available:
     if inputs["yearReadedInMonthlyFile"] != -1 and inputs["typeOfProcess"] != 'json':
@@ -117,7 +102,7 @@ def processDataGeneral(casesInputs, withIndividualFiles=False):
                     "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
                             renameFile + newEnding))
 
-    del test  # time.sleep(5)
+    del baseClass
 
     return " Finished: " + fileName
 
