@@ -17,6 +17,7 @@ class ConditionBase(_abc.ABC):
     def __str__(self):
         return self.serializedCondition
 
+    @_abc.abstractmethod
     def doesValueFulfillCondition(self, value: VALUE) -> bool:
         pass
 
