@@ -57,14 +57,15 @@ class ConditionHandler:
             else:
                 isNumber = True
                 if '==' in conditionValue:
-                    conditionValue = conditionValue.split('==')[-1]
+                    rawConditionValue = conditionValue.split('==')[-1]
                     try:
-                        float(conditionValue)
-                    except ValueError:
+                        float(rawConditionValue)
+                    except:
                         isNumber = False
+                        conditionValue = rawConditionValue
 
-                conditionEntryFulfilled = resultsDict[conditionEntry] == conditionValue if isNumber \
-                    else eval('resultsDict[conditionEntry]' + conditionValue)
+                conditionEntryFulfilled = eval('resultsDict[conditionEntry]' + conditionValue) if isNumber \
+                    else resultsDict[conditionEntry] == conditionValue
 
             if not (conditionEntryFulfilled):
                 return False
