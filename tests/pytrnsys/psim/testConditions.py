@@ -2,7 +2,7 @@ import typing as tp
 
 import pytest
 
-import pytrnsys.psim.ConditionHandler as ch
+import pytrnsys.psim.conditions as conds
 
 
 ResultsDict = tp.Dict[str, tp.Union[str, float, int]]
@@ -25,7 +25,6 @@ class TestConditionHandler:
     def test(self, serializedConditions: tp.Sequence[str],
              resultsDict: ResultsDict,
              areConditionsFulfilled: bool):
-        conditionHandler = ch.ConditionHandler()
-        condition = conditionHandler.conditionDictGenerator(serializedConditions)
+        conditions = conds.createConditions(serializedConditions)
 
-        assert conditionHandler.conditionChecker(condition, resultsDict) == areConditionsFulfilled
+        assert conditions.doResultsSatisfyConditions(resultsDict) == areConditionsFulfilled

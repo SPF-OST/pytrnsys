@@ -1,3 +1,5 @@
+__all__ = ['createConditions', 'Conditions', 'ConditionBase', 'VALUE', 'mayBeSerializedCondition']
+
 import typing as _tp
 import abc as _abc
 import dataclasses as _dc
@@ -8,22 +10,28 @@ VALUE = _tp.Union[str, float, int]
 
 
 class ConditionBase(_abc.ABC):
-    def __init__(self, variableName: str) -> None:
+    def __init__(self, variableName: str, serializedCondition: str) -> None:
         self.variableName = variableName
+        self.serializedCondition = serializedCondition
+
+    def __str__(self):
+        return self.serializedCondition
 
     def doesValueFulfillCondition(self, value: VALUE) -> bool:
         pass
 
 
 @_dc.dataclass()
-class Bound:
+class _Bound:
     value: float
     isInclusive: bool
 
 
-class IntervalCondition(ConditionBase):
-    def __init__(self, name: str, lowerBound: _tp.Optional[Bound], upperBound: _tp.Optional[Bound]):
-        super().__init__(name)
+class _IntervalCondition(ConditionBase):
+    def __init__(self, name: str,
+                 lowerBound: _tp.Optional[_Bound], upperBound: _tp.Optional[_Bound],
+                 serializedCondition: str):
+        super().__init__(name, serializedCondition)
         self.lowerBound = lowerBound
         self.upperBound = upperBound
 
@@ -52,9 +60,9 @@ class IntervalCondition(ConditionBase):
         return value < self.upperBound.value
 
 
-class CaseCondition(ConditionBase):
-    def __init__(self, name: str, values: _tp.Sequence[VALUE]) -> None:
-        super().__init__(name)
+class _CaseCondition(ConditionBase):
+    def __init__(self, name: str, values: _tp.Sequence[VALUE], serializedCondition: str) -> None:
+        super().__init__(name, serializedCondition)
         self.values = values
 
     def __repr__(self):
@@ -64,13 +72,13 @@ class CaseCondition(ConditionBase):
         return any(v == value for v in self.values)
 
 
-class IntervalConditionFactory:
+class _IntervalConditionFactory:
     UNBOUNDED_PATTERN: _tp.Pattern = _re.compile(r"^(?P<variable>[^<=>]+)(?P<op>[<>]=?)(?P<bound>[^<=>]+)$")
     BOUNDED_PATTERN: _tp.Pattern = \
         _re.compile(r"^(?<lower>[^<=>]+)(?P<op1><=?)(?P<variable>[^<=>]+)(?P<op2><=?)(?<upper>[^<=>]+)?")
 
     @classmethod
-    def create(cls, serializedCondition: str) -> "IntervalCondition":
+    def create(cls, serializedCondition: str) -> "_IntervalCondition":
         match = cls.UNBOUNDED_PATTERN.match(serializedCondition)
         if match:
             return cls._createUnboundedInterval(match, serializedCondition)
@@ -82,7 +90,7 @@ class IntervalConditionFactory:
         raise ValueError(f"Couldn't not parse condition {serializedCondition}")
 
     @classmethod
-    def _createUnboundedInterval(cls, match: _tp.Match, serializedCondition: str) -> "IntervalCondition":
+    def _createUnboundedInterval(cls, match: _tp.Match, serializedCondition: str) -> "_IntervalCondition":
         variableName = match.group('variable')
         op = match.group('op')
         bound = match.group('bound')
@@ -91,22 +99,22 @@ class IntervalConditionFactory:
 
         lowerBound, upperBound = cls._createBoundsForUnbounded(bound, op)
 
-        return IntervalCondition(variableName, lowerBound, upperBound)
+        return _IntervalCondition(variableName, lowerBound, upperBound, serializedCondition)
 
     @classmethod
     def _createBoundsForUnbounded(cls, bound: float, op: str) \
-            -> _tp.Tuple[_tp.Optional[Bound], _tp.Optional[Bound]]:
+            -> _tp.Tuple[_tp.Optional[_Bound], _tp.Optional[_Bound]]:
         if op == '<':
-            return None, Bound(bound, isInclusive=False)
+            return None, _Bound(bound, isInclusive=False)
         elif op == '<=':
-            return None, Bound(bound, isInclusive=True)
+            return None, _Bound(bound, isInclusive=True)
         if op == '>':
-            return Bound(bound, isInclusive=False), None
+            return _Bound(bound, isInclusive=False), None
         elif op == '<=':
-            return Bound(bound, isInclusive=True), None
+            return _Bound(bound, isInclusive=True), None
 
     @classmethod
-    def _createBoundedInterval(cls, match, serializedCondition) -> "IntervalCondition":
+    def _createBoundedInterval(cls, match: _tp.Match, serializedCondition: str) -> "_IntervalCondition":
         lower = match.group('lower')
         op1 = match.group('op1')
         variableName = match.group('variable')
@@ -114,15 +122,15 @@ class IntervalConditionFactory:
         upper = match.group('upper')
         lowerBound = cls._createBoundForBounded(lower, op1, serializedCondition)
         upperBound = cls._createBoundForBounded(upper, op2, serializedCondition)
-        return IntervalCondition(variableName, lowerBound, upperBound)
+        return _IntervalCondition(variableName, lowerBound, upperBound, serializedCondition)
 
     @classmethod
-    def _createBoundForBounded(cls, lower: str, op1: str, serializedCondition: str) -> Bound:
+    def _createBoundForBounded(cls, lower: str, op1: str, serializedCondition: str) -> _Bound:
         lower = cls._convertToFloatOrThrow(lower, serializedCondition)
 
         isInclusive = (op1 == '<=')
 
-        return Bound(lower, isInclusive)
+        return _Bound(lower, isInclusive)
 
     @classmethod
     def _convertToFloatOrThrow(cls, bound: str, serializedCondition: str) -> float:
@@ -133,11 +141,11 @@ class IntervalConditionFactory:
         return bound
 
 
-class CaseConditionFactory:
+class _CaseConditionFactory:
     PATTERN: _tp.Pattern = _re.compile(r"^(?P<name>[^<>=]+)=(?P<values>[^<>=|]+(\|[^<>=|]+)*)")
 
     @classmethod
-    def create(cls, serializedCondition: str) -> "CaseCondition":
+    def create(cls, serializedCondition: str) -> "_CaseCondition":
         match = cls.PATTERN.match(serializedCondition)
 
         if not match:
@@ -148,7 +156,7 @@ class CaseConditionFactory:
 
         values = [cls._convertToFloatIfPossible(v) for v in values]
 
-        return CaseCondition(variableName, values)
+        return _CaseCondition(variableName, values, serializedCondition)
 
     @classmethod
     def _convertToFloatIfPossible(cls, value: str) -> _tp.Union[str, float]:
@@ -158,30 +166,12 @@ class CaseConditionFactory:
             return value
 
 
-class ConditionFactory:
-    @classmethod
-    def create(cls, serializedCondition: str) -> "ConditionBase":
-        try:
-            return IntervalConditionFactory.create(serializedCondition)
-        except ValueError:
-            pass
+@_dc.dataclass()
+class Conditions:
+    conditions: _tp.Sequence[ConditionBase]
 
-        try:
-            return CaseConditionFactory.create(serializedCondition)
-        except ValueError:
-            pass
-
-        raise ValueError(f"Couldn't not parse condition {serializedCondition}")
-
-
-class ConditionHandler:
-    COMP_OPS = ['=', '<', '>']
-
-    def conditionDictGenerator(self, plotVariables):
-        return [ConditionFactory.create(sc) for sc in plotVariables]
-
-    def conditionChecker(self, conditionDict: _tp.Sequence[ConditionBase], resultsDict):
-        for condition in conditionDict:
+    def doResultsSatisfyConditions(self, resultsDict):
+        for condition in self.conditions:
             variableName = condition.variableName
             value = resultsDict[variableName]
 
@@ -189,3 +179,27 @@ class ConditionHandler:
                 return False
 
         return True
+
+
+def createConditions(serializedConditions: _tp.Sequence[str]) -> Conditions:
+    conditions = [_createCondition(sc) for sc in serializedConditions]
+
+    return Conditions(conditions)
+
+
+def _createCondition(serializedCondition: str) -> "ConditionBase":
+    try:
+        return _IntervalConditionFactory.create(serializedCondition)
+    except ValueError:
+        pass
+
+    try:
+        return _CaseConditionFactory.create(serializedCondition)
+    except ValueError:
+        pass
+
+    raise ValueError(f"Couldn't not parse condition {serializedCondition}")
+
+
+def mayBeSerializedCondition(string: str) -> bool:
+    return any(c in string for c in "<>=")
