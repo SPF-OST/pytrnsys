@@ -16,7 +16,7 @@ def testCostCalculation(caplog: pytest.LogCaptureFixture):
     actualResultsDir = helper.actualResultsDir
     costParametersFilePath = helper.costParametersFilePath
 
-    cc.calculateCostsAndWriteReports(costParametersFilePath, actualResultsDir)
+    cc.calculateCostsAndWriteReports(costParametersFilePath, actualResultsDir, cc.ProcessType.OTHER)
 
     helper.assertResultsAreAsExpected()
 

@@ -2,7 +2,6 @@ __all__ = ['ResultsWriter']
 
 import json
 import logging
-import os
 import pathlib as _pl
 
 import matplotlib as mpl
@@ -20,21 +19,17 @@ logger = logging.getLogger('root')
 class ResultsWriter:
     _SHALL_USE_kCHF_FOR_TOTAL_COSTS = False
 
-    # public: used
     def __init__(self):
         self.method = "VDI"
         self.cleanModeLatex = None
 
-    # private
-    def writeReportAndResults(self, parameters: _input.Parameters,
-                              costCalculation: _co.CostCalculation, resultsDirPath: _pl.Path):
-        fileName = costCalculation.resultsDir.name
-        outputPath = resultsDirPath / fileName
+    def writeReportAndResults(self, parameters: _input.Parameters, costCalculation: _co.CostCalculation):
+        resultsJsonFilePath = costCalculation.resultsJsonFilePath
 
-        self._doPlots(costCalculation.output.componentGroups, outputPath, fileName)
-        self._doPlotsAnnuity(costCalculation.output, outputPath, fileName)
-        self._createLatex(parameters, costCalculation.output, outputPath, fileName)
-        self._addCostsToResultsJson(costCalculation.output, outputPath, fileName)
+        self._doPlots(costCalculation.output.componentGroups, resultsJsonFilePath)
+        self._doPlotsAnnuity(costCalculation.output, resultsJsonFilePath)
+        self._createLatex(parameters, costCalculation.output, resultsJsonFilePath)
+        self._addCostsToResultsJson(costCalculation.output, resultsJsonFilePath)
 
     @staticmethod
     def readCostJson(path):
@@ -58,17 +53,15 @@ class ResultsWriter:
         plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
         plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-    def _addCostsToResultsJson(self, output: _output.Output, outputPath: _pl.Path, fileName: str):
-        resultsJsonPath = outputPath / f"{fileName}-results.json"
-
-        serializedResults = resultsJsonPath.read_text()
+    def _addCostsToResultsJson(self, output: _output.Output, resultsJsonFilePath: _pl.Path):
+        serializedResults = resultsJsonFilePath.read_text()
         results = json.loads(serializedResults)
 
         costsDict = self._createCostsDict(output)
         resultsWithCosts = {**results, **costsDict}
 
         serializedResultsWithCosts = json.dumps(resultsWithCosts, indent=2, sort_keys=True)
-        resultsJsonPath.write_text(serializedResultsWithCosts)
+        resultsJsonFilePath.write_text(serializedResultsWithCosts)
 
     @staticmethod
     def _createCostsDict(output: _output.Output):
@@ -96,14 +89,17 @@ class ResultsWriter:
 
     # plots
 
-    def _doPlots(self, componentGroups: _output.ComponentGroups, outputPath: _pl.Path, fileName: str) -> None:
+    def _doPlots(self, componentGroups: _output.ComponentGroups, resultsJsonFilePath: _pl.Path) -> None:
         groupNamesWithCost = [(g.name, g.components.cost.mean) for g in componentGroups.groups]
 
         groupNames, groupCosts = zip(*groupNamesWithCost)
+        simulationName = self._getSimulationName(resultsJsonFilePath)
         self.nameCostPdf = self._plotCostShare(groupCosts, groupNames,
-                                               outputPath, "costShare" + "-" + fileName, plotSize=15)
+                                               resultsJsonFilePath.parent,
+                                               fileName="costShare" + "-" + simulationName,
+                                               plotSize=15)
 
-    def _doPlotsAnnuity(self, output: _output.Output, outputPath: _pl.Path, fileName: str):
+    def _doPlotsAnnuity(self, output: _output.Output, resultsJsonFilePath: _pl.Path):
         legends = []
         inVar = []
 
@@ -131,7 +127,11 @@ class ResultsWriter:
                 else:
                     legends.append(name)
 
-        self.nameCostAnnuityPdf = self._plotCostShare(inVar, legends, outputPath, "costShareAnnuity" + "-" + fileName,
+        simulationName = self._getSimulationName(resultsJsonFilePath)
+        self.nameCostAnnuityPdf = self._plotCostShare(inVar,
+                                                      legends,
+                                                      resultsJsonFilePath.parent,
+                                                      fileName="costShareAnnuity" + "-" + simulationName,
                                                       plotSize=17)
 
     def _plotCostShare(self, inVar, legends, outputPath: _pl.Path, fileName, plotSize):
@@ -175,11 +175,13 @@ class ResultsWriter:
 
     # latex
 
-    def _createLatex(self, parameters: _input.Parameters, output: _output.Output, outputPath: _pl.Path, fileName: str):
-        doc = latex.LatexReport(str(outputPath), fileName)
-        doc.resetTexName(fileName + "-cost")
+    def _createLatex(self, parameters: _input.Parameters, output: _output.Output, resultsJsonFilePath: _pl.Path):
+        simulationName = self._getSimulationName(resultsJsonFilePath)
+
+        doc = latex.LatexReport(str(resultsJsonFilePath.parent), simulationName)
+        doc.resetTexName(simulationName + "-cost")
         doc.setSubTitle("Energy generation costs")
-        doc.setTitle(fileName)
+        doc.setTitle(simulationName)
         doc.setCleanMode(self._getIsLatexCleanMode(parameters))
 
         doc.addBeginDocument()
@@ -190,6 +192,13 @@ class ResultsWriter:
         doc.addEndDocumentAndCreateTexFile()
 
         doc.executeLatexFile()
+
+    @staticmethod
+    def _getSimulationName(resultsJsonFilePath):
+        suffix = '-results'
+        stem = resultsJsonFilePath.stem
+        assert stem.endswith(suffix)
+        return stem[:-len(suffix)]
 
     def _getIsLatexCleanMode(self, parameters):
         return parameters.cleanModeLatex if self.cleanModeLatex is None else self.cleanModeLatex

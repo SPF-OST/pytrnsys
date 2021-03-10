@@ -463,6 +463,7 @@ class ProcessParallelTrnsys():
         else:
             raise ValueError("Not Implemented yet")
 
+        typeOfProcess = self.inputs['typeOfProcess']
         if(self.inputs["processParallel"]==True):
 
             debug = debugProcess.DebugProcess(pathFolder, "FileProcessed.dat", fileName)
@@ -488,22 +489,15 @@ class ProcessParallelTrnsys():
             debug.finish()
         else:
             for i in range(len(casesInputs)):
-                if self.inputs['typeOfProcess'] == 'individual':
+                if typeOfProcess == 'individual':
                     processDataGeneral(casesInputs[i],True)
                 else:
                     processDataGeneral(casesInputs[i])
-                # try:
-                #     processDataGeneral(casesInputs[i])
-                # except:
-                #     print('WARNING: the following case failed: ' + casesInputs[i][2])
-        if  self.inputs['calculateCost']==True and 'cost' in self.inputs.keys(): #
-            if(self.inputs['typeOfProcess']== "casesDefined"):
-                fileNameList=[]
-                fileNameList.append(self.inputs["fileName"])
-            else:
-                fileNameList =None
 
-            self.calcCost(fileNamesToRead=fileNameList)
+        if self.inputs['calculateCost'] and 'cost' in self.inputs:
+            fileNameList = [self.inputs["fileName"]] if typeOfProcess == "casesDefined" else None
+
+            self.calcCost(typeOfProcess, fileNameList)
 
         if 'acrossSetsCalc' in self.inputs.keys():
             self.logger.info('Calculating across sets')
@@ -2271,11 +2265,13 @@ class ProcessParallelTrnsys():
         if(found==False):
             self.logger.warning("changeFile was not able to change %s by %s"%(source,end))
 
-    def calcCost(self, fileNamesToRead=None):
+    def calcCost(self, typeOfProcess: str, fileNamesToRead=None):
         resultsDirPath = _pl.Path(self.inputs['pathBase'])
         configFilePath = _pl.Path(self.inputs['cost'])
 
-        _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, fileNamesToRead)
+        processType = _cc.ProcessType.JSON if typeOfProcess == "json" else _cc.ProcessType.OTHER
+
+        _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, processType, fileNamesToRead)
 
 
 def process():

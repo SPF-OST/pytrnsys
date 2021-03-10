@@ -7,16 +7,18 @@ import typing as _tp
 from ._models import input as _input
 from . import _createCostCalculations as _co
 from . import _resultsWriter
+from .processType import ProcessType
 
 
 def calculateCostsAndWriteReports(configFilePath: _pl.Path, resultsDirPath: _pl.Path,
+                                  typeOfProcess: ProcessType,
                                   fileNamesToRead: _tp.Sequence[str] = ()) -> None:
     config = _createConfig(configFilePath)
-    costCalculations = _co.createCostCalculations(config, resultsDirPath, fileNamesToRead)
+    costCalculations = _co.createCostCalculations(config, resultsDirPath, typeOfProcess, fileNamesToRead)
 
     reportWriter = _resultsWriter.ResultsWriter()
     for costCalculation in costCalculations:
-        reportWriter.writeReportAndResults(config.parameters, costCalculation, resultsDirPath)
+        reportWriter.writeReportAndResults(config.parameters, costCalculation)
 
 
 def _createConfig(configFilePath):
