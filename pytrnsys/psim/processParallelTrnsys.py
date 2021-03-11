@@ -599,10 +599,25 @@ class ProcessParallelTrnsys():
             saveDf.to_csv(fullCsvPath, index=False, sep=';')
 
     def plotComparison(self):
+        comparePlotCommands = self.inputs['comparePlotConditional'] + self.inputs['comparePlots']
         pathFolder = self.inputs["pathBase"]
+        typeOfProcess = self.inputs["typeOfProcess"]
+        logger = self.logger
+        latexNames = self.inputs.get('latexNames')
+        configPath = self.configPath
+        stylesheet = self.inputs.get('matplotlibStyle')
+        plotStyle = self.inputs["plotStyle"]
+        comparePlotUserName = self.inputs["comparePlotUserName"]
+        setPrintDataForGle = self.inputs["setPrintDataForGle"]
 
-        comparePlotCommand = self.inputs['comparePlotConditional'] + self.inputs['comparePlots']
-        for plotVariables in comparePlotCommand:
+        self.plotComparisonInner(comparePlotCommands, pathFolder, typeOfProcess,
+                                 logger, latexNames, configPath, stylesheet,
+                                 plotStyle, comparePlotUserName, setPrintDataForGle)
+
+    @staticmethod
+    def plotComparisonInner(comparePlotCommands, pathFolder, typeOfProcess, logger, latexNames, configPath,
+                            stylesheet, plotStyle, comparePlotUserName, setPrintDataForGle):
+        for plotVariables in comparePlotCommands:
             if len(plotVariables) < 2:
                 raise ValueError(
                     'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
@@ -627,14 +642,14 @@ class ProcessParallelTrnsys():
             colorsCounter = 0
             colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-            if self.inputs["typeOfProcess"] == "json":
+            if typeOfProcess == "json":
                 resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
             else:
                 resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
 
             if not resultFiles:
-                self.logger.error('No results.json-files found.')
-                self.logger.error(
+                logger.error('No results.json-files found.')
+                logger.error(
                     'Unable to generate "comparePlot %s %s %s"' % (xAxisVariable, yAxisVariable, seriesVariable))
                 return
 
@@ -681,40 +696,38 @@ class ProcessParallelTrnsys():
                         plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(yAxis)
 
             if conditionNeverMet:
-                self.logger.warning(
+                logger.warning(
                     'The following conditions from "comparePlotConditional" were never met all at once:')
                 for condition in conditions.conditions:
-                    self.logger.warning(condition)
-                self.logger.warning('The respective plot cannot be generated')
+                    logger.warning(condition)
+                logger.warning('The respective plot cannot be generated')
                 return
 
-            self.doc = latex.LatexReport('', '')
-            if 'latexNames' in self.inputs.keys():
-                if ':' in self.inputs['latexNames']:
-                    latexNameFullPath = self.inputs['latexNames']
+            doc = latex.LatexReport('', '')
+            if latexNames:
+                if ':' in latexNames:
+                    latexNameFullPath = latexNames
                 else:
-                    latexNameFullPath = os.path.join(self.configPath, self.inputs['latexNames'])
-                self.doc.getLatexNamesDict(file=latexNameFullPath)
+                    latexNameFullPath = os.path.join(configPath, latexNames)
+                doc.getLatexNamesDict(file=latexNameFullPath)
             else:
-                self.doc.getLatexNamesDict()
-            if 'matplotlibStyle' in self.inputs.keys():
-                stylesheet = self.inputs['matplotlibStyle']
-            else:
+                doc.getLatexNamesDict()
+
+            if not stylesheet:
                 stylesheet = 'word.mplstyle'
-            if stylesheet in plt.style.available:
-                self.stylesheet = stylesheet
-            else:
+            if stylesheet not in plt.style.available:
                 root = os.path.dirname(os.path.abspath(__file__))
-                self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
-            plt.style.use(self.stylesheet)
+                stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
+
+            plt.style.use(stylesheet)
 
             fig1, ax1 = plt.subplots(constrained_layout=True)
-            if self.inputs["plotStyle"] == "line":
+            if plotStyle == "line":
                 styles = ['x-', 'x--', 'x-.', 'x:', 'o-', 'o--', 'o-.', 'o:']
-            elif self.inputs["plotStyle"] == "dot":
+            elif plotStyle == "dot":
                 styles = ['x', 'o', '+', 'd', 's', 'v', '^', 'h']
             else:
-                self.logger.error("Invalid 'plotStyle' argument")
+                logger.error("Invalid 'plotStyle' argument")
 
             dummy_lines = []
             chunkLabels = []
@@ -745,7 +758,7 @@ class ProcessParallelTrnsys():
                             label = "{0:.1f}".format(labelValue)
                         else:
                             label = labelValue
-                            label = self.doc.getNiceLatexNames(label)
+                            label = doc.getNiceLatexNames(label)
 
                         labelSet.add(labelValue)
                         ax1.plot(myX, myY,
@@ -788,20 +801,20 @@ class ProcessParallelTrnsys():
 
             if chunkVariable !='':
                 legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
-                                      title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.31, 1.0),
+                                      title=doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.31, 1.0),
                                       bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
             if seriesVariable !='':
-                legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.15, 1.0),
+                legend1 = fig1.legend(title=doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.15, 1.0),
                                       # change legend position!
                                       bbox_transform=ax1.transAxes)
 
             else:
                 legend1 = None
-            ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
-            ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
+            ax1.set_xlabel(doc.getNiceLatexNames(xAxisVariable))
+            ax1.set_ylabel(doc.getNiceLatexNames(yAxisVariable))
 
             conditionsFileName = ''
             conditionsTitle = ''
@@ -838,13 +851,13 @@ class ProcessParallelTrnsys():
             if conditionsFileName:
                 fileName += '_' + conditionsFileName
 
-            if (self.inputs["comparePlotUserName"] != ""):
-                fileName += '_' + self.inputs["comparePlotUserName"]
+            if comparePlotUserName:
+                fileName += '_' + comparePlotUserName
 
             fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
             plt.close()
 
-            if (self.inputs["setPrintDataForGle"]):
+            if setPrintDataForGle:
                 outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
                 outfile.writelines(lines)
                 outfile.close()
