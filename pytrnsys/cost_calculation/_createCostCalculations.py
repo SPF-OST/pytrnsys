@@ -28,10 +28,9 @@ class _PathAndResult:
 
 
 def createCostCalculations(config: _input.Input, resultsDirPath: _pl.Path,
-                           typeOfProcess: _pt.ProcessType,
-                           fileNamesToRead: _tp.Sequence[str])\
+                           processType: _pt.ProcessType) \
         -> _tp.Iterable["CostCalculation"]:
-    pathAndResults = _loadResults(resultsDirPath, typeOfProcess, fileNamesToRead)
+    pathAndResults = _loadResults(resultsDirPath, processType)
 
     for pathAndResult in pathAndResults:
         values = _getValues(config, pathAndResult.result)
@@ -40,21 +39,9 @@ def createCostCalculations(config: _input.Input, resultsDirPath: _pl.Path,
         yield costCalculation
 
 
-def _loadResults(resultsDirPath: _pl.Path,
-                 processType: _pt.ProcessType,
-                 fileNamesToRead: _tp.Sequence[str]) -> _tp.Iterable[_PathAndResult]:
-    if processType == _pt.ProcessType.OTHER:
-        return _loadResultsForProcessTypeOther(resultsDirPath, fileNamesToRead)
-    elif processType == _pt.ProcessType.JSON:
-        return _loadResultsForProcessTypeJson(resultsDirPath, fileNamesToRead)
-    else:
-        raise AssertionError(f"Unknown process type {processType}")
-
-
-def _loadResultsForProcessTypeJson(resultsDirPath: _pl.Path, fileNamesToRead: _tp.Sequence[str]) \
+def _loadResults(resultsDirPath: _pl.Path, processType: _pt.ProcessType) \
         -> _tp.Iterable[_PathAndResult]:
-    resultJsonFilePaths = [resultsDirPath / name for name in fileNamesToRead] if fileNamesToRead \
-        else resultsDirPath.rglob('*-results.json')
+    resultJsonFilePaths = _getResultJsonFilePaths(resultsDirPath, processType)
 
     for resultsJsonFilePath in resultJsonFilePaths:
         serializedResults = resultsJsonFilePath.read_text()
@@ -62,16 +49,13 @@ def _loadResultsForProcessTypeJson(resultsDirPath: _pl.Path, fileNamesToRead: _t
         yield _PathAndResult(resultsJsonFilePath, results)
 
 
-def _loadResultsForProcessTypeOther(resultsDirPath: _pl.Path, fileNamesToRead: _tp.Sequence[str]) \
-        -> _tp.Iterable[_PathAndResult]:
-    results = _results.ResultsProcessedFile(str(resultsDirPath))
-    shallReadCompleteFolder = not fileNamesToRead
-    results.readResultsData(resultType='json',
-                            completeFolder=shallReadCompleteFolder,
-                            fileNameList=fileNamesToRead)
-    for containingDirPath, result in [(_pl.Path(p), r) for p, r in zip(results.fileName, results.results)]:
-        resultsJsonFilePath = resultsDirPath / containingDirPath / f"{containingDirPath.name}-results.json"
-        yield _PathAndResult(_pl.Path(resultsJsonFilePath), result)
+def _getResultJsonFilePaths(resultsDirPath: _pl.Path, processType: _pt.ProcessType):
+    if isinstance(processType, _pt.CasesDefined):
+        return [resultsDirPath / case / f"{case}-results.json" for case in processType.cases]
+    elif processType == _pt.OTHER:
+        return resultsDirPath.rglob('*-results.json')
+    else:
+        raise AssertionError(f"Unknown processType: {processType}")
 
 
 def _getValues(config: _input.Input, result: _Result) -> _output.Values:

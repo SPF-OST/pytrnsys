@@ -1,6 +1,16 @@
-import enum as _enum
+import typing as _tp
+import dataclasses as _dc
+
+ProcessType = _tp.Union["CasesDefined", "Other", "OTHER"]
 
 
-class ProcessType(_enum.Enum):
-    JSON = _enum.auto()
-    OTHER = _enum.auto()
+@_dc.dataclass()
+class CasesDefined:
+    cases: _tp.Sequence[str]
+
+
+class Other:
+    pass
+
+
+OTHER = Other()

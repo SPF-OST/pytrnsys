@@ -21,7 +21,7 @@ class TestCostCalculation:
         actualResultsDir = helper.actualResultsDir
         costParametersFilePath = helper.costParametersFilePath
 
-        cc.calculateCostsAndWriteReports(costParametersFilePath, actualResultsDir, cc.ProcessType.OTHER)
+        cc.calculateCostsAndWriteReports(costParametersFilePath, actualResultsDir, processType=cc.OTHER)
 
         helper.assertResultsAreAsExpected()
 

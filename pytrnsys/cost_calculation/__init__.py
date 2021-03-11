@@ -1,20 +1,22 @@
-__all__ = ['calculateCostsAndWriteReports']
+__all__ = ['calculateCostsAndWriteReports', 'CasesDefined', 'OTHER']
 
 import pathlib as _pl
 import json as _json
-import typing as _tp
 
 from ._models import input as _input
 from . import _createCostCalculations as _co
 from . import _resultsWriter
-from .processType import ProcessType
+from . import processType as _pt
+
+
+CasesDefined = _pt.CasesDefined
+OTHER = _pt.OTHER
 
 
 def calculateCostsAndWriteReports(configFilePath: _pl.Path, resultsDirPath: _pl.Path,
-                                  typeOfProcess: ProcessType,
-                                  fileNamesToRead: _tp.Sequence[str] = ()) -> None:
+                                  processType: _pt.ProcessType) -> None:
     config = _createConfig(configFilePath)
-    costCalculations = _co.createCostCalculations(config, resultsDirPath, typeOfProcess, fileNamesToRead)
+    costCalculations = _co.createCostCalculations(config, resultsDirPath, processType)
 
     reportWriter = _resultsWriter.ResultsWriter()
     for costCalculation in costCalculations:

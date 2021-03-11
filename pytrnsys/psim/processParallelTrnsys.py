@@ -2269,9 +2269,9 @@ class ProcessParallelTrnsys():
         resultsDirPath = _pl.Path(self.inputs['pathBase'])
         configFilePath = _pl.Path(self.inputs['cost'])
 
-        processType = _cc.ProcessType.JSON if typeOfProcess == "json" else _cc.ProcessType.OTHER
+        processType = _cc.OTHER if not fileNamesToRead else _cc.CasesDefined(fileNamesToRead)
 
-        _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, processType, fileNamesToRead)
+        _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, processType)
 
 
 def process():
