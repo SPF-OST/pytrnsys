@@ -23,7 +23,7 @@
             }
           },
           "variable": {
-            "name": "Vol_Tes1",
+            "name": "Vol_TesDHW",
             "unit": "m$^3$"
           },
           "lifetimeInYears": 30
@@ -35,12 +35,11 @@
               "mean": 666
             },
             "slope": {
-              "mean": 1213.8,
-              "toLowerBound": -100
+              "mean": 1213.8
             }
           },
           "variable": {
-            "name": "Vol_Tes2",
+            "name": "Vol_TesSH",
             "unit": "m$^3$"
           },
           "lifetimeInYears": 30
@@ -56,7 +55,7 @@
             }
           },
           "variable": {
-            "name": "Vol_Tes1",
+            "name": "Vol_TesDHW",
             "unit": "m$^3$"
           },
           "lifetimeInYears": 30
@@ -73,9 +72,7 @@
               "mean": 9282
             },
             "slope": {
-              "mean": 875,
-              "toLowerBound": -100,
-              "toUpperBound": 250
+              "mean": 875
             }
           },
           "variable": {
@@ -129,16 +126,37 @@
       ]
     },
     {
+      "name": "Hydraulics",
+      "components": [
+        {
+          "name": "Hydraulics",
+          "coeffs": {
+            "offset": {
+              "mean": 11500
+            },
+            "slope": {
+              "mean": 0
+            }
+          },
+          "variable": {
+            "name": "sizeHpUsed",
+            "unit": "kW"
+          },
+          "lifetimeInYears": 30
+        }
+      ]
+    },
+    {
       "name": "Installation system",
       "components": [
         {
-          "name": "Installation System (Hydraulics)",
+          "name": "Installation System",
           "coeffs": {
             "offset": {
-              "mean": 24596
+              "mean": 14000
             },
             "slope": {
-              "mean": 193
+              "mean": 0
             }
           },
           "variable": {
@@ -151,31 +169,14 @@
     }
   ],
   "yearlyCosts": [
-    {
-      "name": "Transmission grid",
-      "coeffs": {
-        "offset": {
-          "mean": 0
-        },
-        "slope": {
-          "mean": 0.0
-        }
-      },
-      "variable": {
-        "name": "E_yearly",
-        "unit": "kWh"
-      }
-    }
   ],
   "parameters": {
     "rate": {
-      "mean": 0.03,
-      "toLowerBound": -0.001,
-      "toUpperBound": 0.001
+      "mean": 0.03
     },
     "analysisPeriod": 30,
     "qDemandVariable": {
-      "name": "Q_yearly",
+      "name": "yearQDemand",
       "unit": "?"
     },
     "elFromGridVariable": {

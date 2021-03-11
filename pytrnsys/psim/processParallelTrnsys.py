@@ -29,11 +29,11 @@ try:
     import pytrnsys_examples
 except ImportError:
     pass
-# we would need to pass the Class as inputs
+#we would need to pass the Class as inputs
 import pytrnsys.utils.log as log
 
 
-def processDataGeneral(casesInputs, withIndividualFiles=False):
+def processDataGeneral(casesInputs,withIndividualFiles = False):
     """
     processes all the specified cases
 
@@ -47,9 +47,9 @@ def processDataGeneral(casesInputs, withIndividualFiles=False):
 
     """
     if withIndividualFiles:
-        (baseClass, locationPath, fileName, inputs, individualFiles) = casesInputs
+        (baseClass,locationPath, fileName, inputs, individualFiles) = casesInputs
     else:
-        (baseClass, locationPath, fileName, inputs) = casesInputs
+        (baseClass,locationPath, fileName, inputs) = casesInputs
 
     baseClass.setInputs(inputs)
     if inputs['typeOfProcess'] == 'individual':
@@ -67,7 +67,7 @@ def processDataGeneral(casesInputs, withIndividualFiles=False):
 
     baseClass.setBuildingArea(inputs["buildingArea"])
     baseClass.setTrnsysDllPath(inputs["dllTrnsysPath"])
-
+    
 
     baseClass.setPrintDataForGle(inputs["setPrintDataForGle"])
 
@@ -79,7 +79,7 @@ def processDataGeneral(casesInputs, withIndividualFiles=False):
 
     doProcess = True
 
-    if (inputs['isTrnsys']):
+    if(inputs['isTrnsys']):
         baseClass.loadAndProcessTrnsys()
     else:
         baseClass.loadAndProcessGeneric()
@@ -88,7 +88,7 @@ def processDataGeneral(casesInputs, withIndividualFiles=False):
     if inputs["yearReadedInMonthlyFile"] != -1 and inputs["typeOfProcess"] != 'json':
         renameFile = os.path.join(locationPath, fileName, fileName)
 
-        fileEndingsDefault = ["-results.json", "-report.pdf", "-plots.html"]
+        fileEndingsDefault = ["-results.json", "-report.pdf","-plots.html"]
 
         for ending in fileEndingsDefault:
             newEnding = "-Year%i" % inputs["yearReadedInMonthlyFile"] + ending
@@ -100,7 +100,7 @@ def processDataGeneral(casesInputs, withIndividualFiles=False):
             except:
                 print(
                     "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)" % (
-                            renameFile + newEnding))
+                                renameFile + newEnding))
 
     del baseClass
 
@@ -134,20 +134,20 @@ class ProcessParallelTrnsys():
         self.inputs["plotStyle"] = "line"
         self.inputs["isTrnsys"] = True
         self.inputs["processParallel"] = True
-        self.inputs["avoidUser"] = False
-        self.inputs["processQvsT"] = True
+        self.inputs["avoidUser"]    = False
+        self.inputs["processQvsT"]  = True
         self.inputs["cleanModeLatex"] = False
         self.inputs["maxMinAvoided"] = False
         self.inputs["yearReadedInMonthlyFile"] = -1
         self.inputs["process"] = True
-        self.inputs["firstMonth"] = "January"  # 0=January 1=February 7=August
+        self.inputs["firstMonth"] = "January"     # 0=January 1=February 7=August
         self.inputs["reduceCpu"] = 2
-        self.inputs["typeOfProcess"] = "completeFolder"  # "casesDefined"
+        self.inputs["typeOfProcess"] = "completeFolder" # "casesDefined"
         self.inputs[
             "forceProcess"] = True  # even if results file exist it proceess the results, otherwise it checks if it exists
         self.inputs["pathBase"] = os.getcwd()
         self.inputs["setPrintDataForGle"] = True
-        self.inputs['firstConsideredTime'] = None  # Be carefull here. Thsi will not be proprly filtered
+        self.inputs['firstConsideredTime'] = None #Be carefull here. Thsi will not be proprly filtered
         self.inputs["buildingArea"] = 1072.
         self.inputs["parseFileCreated"] = False
         self.inputs["dllTrnsysPath"] = False
@@ -160,23 +160,23 @@ class ProcessParallelTrnsys():
         self.inputs['calculateCost'] = False
         self.inputs['dailyBalance'] = False
         self.inputs['hourlyBalance'] = False
-        # self.inputs['daysSelected'] = "2019,2,30" "2019,4,30" "2019,8,30"
+        #self.inputs['daysSelected'] = "2019,2,30" "2019,4,30" "2019,8,30"
 
-        self.inputs['calculateHeatDemand'] = True
-        self.inputs['calculateSPF'] = True
-        self.inputs['calculateElectricDemand'] = True
+        self.inputs['calculateHeatDemand']=True
+        self.inputs['calculateSPF']=True
+        self.inputs['calculateElectricDemand']=True
 
-        self.inputs["comparePlotUserName"] = ""  # don't change this default value
+        self.inputs["comparePlotUserName"] = "" #don't change this default value
 
         self.individualFile = False
 
-    def setFilteredFolders(self, foldersNotUsed):
+    def setFilteredFolders(self,foldersNotUsed):
         self.filteredfolder = foldersNotUsed
 
-    def readConfig(self, path, name, parseFileCreated=False):
+    def readConfig(self,path,name,parseFileCreated=False):
         self.configPath = path
         tool = readConfig.ReadConfigTrnsys()
-        tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated)
+        tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated)
         if 'latexNames' in self.inputs.keys():
             if ':' not in self.inputs['latexNames']:
                 self.inputs['latexNames'] = os.path.join(self.configPath, self.inputs['latexNames'])
@@ -185,9 +185,9 @@ class ProcessParallelTrnsys():
 
     def getBaseClass(self, classProcessing, pathFolder, fileName):
 
-        return processTrnsys.ProcessTrnsysDf(pathFolder, fileName, individualFile=self.individualFile)
+       return processTrnsys.ProcessTrnsysDf(pathFolder, fileName,individualFile=self.individualFile)
 
-    def isStringNumber(self, sample):
+    def isStringNumber(self,sample):
         """
         Does a given string consist of a number only?
 
@@ -218,9 +218,9 @@ class ProcessParallelTrnsys():
         pyplotKwargs = ''
         for entry in plotParDict:
             try:
-                if isinstance(plotParDict[entry], str):
+                if isinstance(plotParDict[entry],str):
                     plotParDict[entry] = '\'' + plotParDict[entry] + '\''
-                plotStatement = 'plt.plot(1.,1.,' + entry + '=%s)' % plotParDict[entry]
+                plotStatement = 'plt.plot(1.,1.,' + entry + '=%s)' %plotParDict[entry]
                 plt.figure()
                 exec(plotStatement)
                 plt.close()
@@ -234,8 +234,8 @@ class ProcessParallelTrnsys():
         fileName = []
         classList = []
 
-        if os.path.exists(os.path.join(self.inputs['pathBase'], 'Summary.dat')):
-            os.remove(os.path.join(self.inputs['pathBase'], 'Summary.dat'))
+        if os.path.exists(os.path.join(self.inputs['pathBase'],'Summary.dat')):
+            os.remove(os.path.join(self.inputs['pathBase'],'Summary.dat'))
 
         if (self.inputs["typeOfProcess"] == "completeFolder") or (self.inputs["typeOfProcess"] == "json"):
 
@@ -260,8 +260,8 @@ class ProcessParallelTrnsys():
                 folderUsed = True
                 for i in range(len(self.filteredfolder)):
                     if (name == self.filteredfolder[i]):
-                        folderUsed = False
-                if (folderUsed):
+                        folderUsed=False
+                if(folderUsed):
                     nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (relPath, name))
 
                     if (os.path.isfile(nameWithPath) and self.inputs["forceProcess"] == False):
@@ -272,14 +272,14 @@ class ProcessParallelTrnsys():
                         self.logger.info("%s already processed" % name)
 
                     else:
-                        if len(Path(relPath).parts) > 1:
-                            newPath = os.path.join(pathFolder, os.path.join(*list(Path(relPath).parts[:-1])))
+                        if len(Path(relPath).parts)>1:
+                            newPath = os.path.join(pathFolder,os.path.join(*list(Path(relPath).parts[:-1])))
                         else:
                             newPath = pathFolder
-                        baseClass = self.getBaseClass(self.inputs["classProcessing"], newPath, name)
+                        baseClass = self.getBaseClass(self.inputs["classProcessing"],newPath,name)
 
                         self.logger.info("%s will be processed" % name)
-                        casesInputs.append((baseClass, pathFolder, name, self.inputs))
+                        casesInputs.append((baseClass,pathFolder, name, self.inputs))
 
         elif self.inputs["typeOfProcess"] == "individual":
             self.individualFiles = []
@@ -298,13 +298,13 @@ class ProcessParallelTrnsys():
         elif self.inputs["typeOfProcess"] == "casesDefined":
             name = self.inputs["fileName"]
             pathFolder = self.inputs["pathBase"]
-            baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)  # DC This was missing
-            casesInputs.append((baseClass, pathFolder, name, self.inputs))  # DC This was missing
+            baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name) #DC This was missing
+            casesInputs.append((baseClass, pathFolder, name, self.inputs)) #DC This was missing
 
         elif self.inputs["typeOfProcess"] == "citiesFolder":
 
             for city in self.inputs["cities"]:
-                pathFolder = os.path.join(self.inputs["pathBase"], city)
+                pathFolder = os.path.join(self.inputs["pathBase"],city)
                 fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
 
                 for name in fileName:
@@ -407,21 +407,22 @@ class ProcessParallelTrnsys():
                                                     inputs[i]['yearReadedInMonthlyFile'] = self.inputs[
                                                                                                "yearReadedInMonthlyFile"] + i
                                                     casesInputs.append((baseClass, pathFolder, name, inputs[i]))
-                                    elif "hourlyMean" in name and type == 'hourlyMean':
+                                    elif "hourlyMean" in name and type=='hourlyMean':
                                         casesInputs.append((baseClass, pathFolder, name, self.inputs))
-                                    elif "hourlyMean" in name and type != 'hourlyMean':
+                                    elif "hourlyMean" in name and type !='hourlyMean':
                                         pass
                                     else:
                                         casesInputs.append((baseClass, pathFolder, name, self.inputs))
                         else:
                             pass
 
-            # sort to process 10 year files first and all 10 years:
+            #sort to process 10 year files first and all 10 years:
 
         else:
             raise ValueError("Not Implemented yet")
 
-        if (self.inputs["processParallel"] == True):
+        typeOfProcess = self.inputs['typeOfProcess']
+        if(self.inputs["processParallel"]==True):
 
             debug = debugProcess.DebugProcess(pathFolder, "FileProcessed.dat", fileName)
             debug.start()
@@ -431,7 +432,7 @@ class ProcessParallelTrnsys():
 
             pool = mp.Pool(processes=maxNumberOfCPU)
 
-            results = pool.map(processDataGeneral, casesInputs)
+            results = pool.map(processDataGeneral,casesInputs)
 
             pool.close()
 
@@ -439,19 +440,15 @@ class ProcessParallelTrnsys():
             debug.finish()
         else:
             for i in range(len(casesInputs)):
-                if self.inputs['typeOfProcess'] == 'individual':
-                    processDataGeneral(casesInputs[i], True)
+                if typeOfProcess == 'individual':
+                    processDataGeneral(casesInputs[i],True)
                 else:
                     processDataGeneral(casesInputs[i])
 
-        if self.inputs['calculateCost'] == True and 'cost' in self.inputs.keys():  #
-            if (self.inputs['typeOfProcess'] == "casesDefined"):
-                fileNameList = []
-                fileNameList.append(self.inputs["fileName"])
-            else:
-                fileNameList = None
+        if self.inputs['calculateCost'] and 'cost' in self.inputs:
+            fileNameList = [self.inputs["fileName"]] if typeOfProcess == "casesDefined" else None
 
-            self.calcCost(fileNamesToRead=fileNameList)
+            self.calcCost(typeOfProcess, fileNameList)
 
         if 'acrossSetsCalc' in self.inputs.keys():
             self.logger.info('Calculating across sets')
@@ -490,7 +487,7 @@ class ProcessParallelTrnsys():
 
         if 'calcClimateCorrections' in self.inputs.keys():
             self.calculateClimateCorrections()
-
+            
         if 'compareMonthlyBarsPlot' in self.inputs.keys():
             self.plotMonthlyBarComparison()
 
@@ -515,10 +512,10 @@ class ProcessParallelTrnsys():
                     conditionEntry, conditionValue = plotVariable.split(':')
                     conditionDict[conditionEntry] = conditionValue
                 elif "=" in plotVariable:
-                    equationVariable, equationExpression = plotVariable.split('=')
+                    equationVariable,equationExpression = plotVariable.split('=')
                     equationDict[equationVariable] = equationExpression
-                    for variable in re.split('\W', equationExpression):
-                        if variable != '' and not (self.isStringNumber(variable)):
+                    for variable in re.split('\W',equationExpression):
+                        if variable != '' and not(self.isStringNumber(variable)):
                             calcVariableDict[variable] = ''
 
             plotXDict = {}
@@ -540,7 +537,7 @@ class ProcessParallelTrnsys():
                 for conditionEntry in conditionDict:
                     entryClass = type(resultsDict[conditionEntry])
                     conditionDict[conditionEntry] = entryClass(conditionDict[conditionEntry])
-                    conditionList.append(conditionDict[conditionEntry] == resultsDict[conditionEntry])
+                    conditionList.append(conditionDict[conditionEntry]==resultsDict[conditionEntry])
 
                 if all(conditionList):
 
@@ -582,7 +579,7 @@ class ProcessParallelTrnsys():
             calcVariableDict['equationDict'] = equationDict
             for equation in equationDict:
                 calcVariableDict['equation'] = equation
-                exec('equationDict[equation]=' + equationDict[equation], calcVariableDict)
+                exec('equationDict[equation]='+equationDict[equation],calcVariableDict)
 
             xVariable = list(dict.fromkeys(xVariable))
 
@@ -624,7 +621,7 @@ class ProcessParallelTrnsys():
 
             plotXDict = {}
             plotYDict = {}
-
+    
             seriesColors = {}
             colorsCounter = 0
             colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -634,7 +631,7 @@ class ProcessParallelTrnsys():
             else:
                 resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
 
-            if not (resultFiles):
+            if not(resultFiles):
                 self.logger.error('No results.json-files found.')
                 self.logger.error(
                     'Unable to generate "comparePlot %s %s %s"' % (xAxisVariable, yAxisVariable, seriesVariable))
@@ -643,24 +640,24 @@ class ProcessParallelTrnsys():
             for file in resultFiles:
                 with open(file) as f_in:
                     resultsDict = json.load(f_in)
-                    resultsDict[''] = None
+                    resultsDict['']=None
 
                 if resultsDict[seriesVariable] not in seriesColors.keys():
-                    seriesColors[resultsDict[seriesVariable]] = colors[colorsCounter]
-                    colorsCounter += 1
-                    colorsCounter = colorsCounter % len(colors)
+                    seriesColors[resultsDict[seriesVariable]]=colors[colorsCounter]
+                    colorsCounter+=1
+                    colorsCounter = colorsCounter%len(colors)
 
                 if '[' not in xAxisVariable:
                     xAxis = resultsDict[xAxisVariable]
                 else:
-                    name, index = str(xAxisVariable).split('[')
-                    index = int(index.replace(']', ''))
+                    name,index = str(xAxisVariable).split('[')
+                    index = int(index.replace(']',''))
                     xAxis = resultsDict[name][index]
                 if '[' not in yAxisVariable:
                     yAxis = resultsDict[yAxisVariable]
                 else:
-                    name, index = str(yAxisVariable).split('[')
-                    index = int(index.replace(']', ''))
+                    name,index = str(yAxisVariable).split('[')
+                    index = int(index.replace(']',''))
                     yAxis = resultsDict[name][index]
                 if resultsDict[chunkVariable] not in plotXDict.keys():
                     plotXDict[resultsDict[chunkVariable]] = {}
@@ -679,7 +676,7 @@ class ProcessParallelTrnsys():
                 if ':' in self.inputs['latexNames']:
                     latexNameFullPath = self.inputs['latexNames']
                 else:
-                    latexNameFullPath = os.path.join(self.configPath, self.inputs['latexNames'])
+                    latexNameFullPath = os.path.join(self.configPath,self.inputs['latexNames'])
                 self.doc.getLatexNamesDict(file=latexNameFullPath)
             else:
                 self.doc.getLatexNamesDict()
@@ -694,9 +691,9 @@ class ProcessParallelTrnsys():
                 self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
             plt.style.use(self.stylesheet)
 
-            fig1, ax1 = plt.subplots(constrained_layout=True)
+            fig1,ax1 = plt.subplots(constrained_layout=True)
             if self.inputs["plotStyle"] == "line":
-                styles = ['x-', 'x--', 'x-.', 'x:', 'o-', 'o--', 'o-.', 'o:']
+                styles = ['x-','x--','x-.','x:','o-','o--','o-.','o:']
             elif self.inputs["plotStyle"] == "dot":
                 styles = ['x', 'o', '+', 'd', 's', 'v', '^', 'h']
             else:
@@ -706,10 +703,10 @@ class ProcessParallelTrnsys():
             chunkLabels = []
             labelSet = set()
             lines = ""
-            for chunk, style in zip(plotXDict.keys(), styles):
-                dummy_lines.append(ax1.plot([], [], style, c='black'))
+            for chunk,style in zip(plotXDict.keys(),styles):
+                dummy_lines.append(ax1.plot([],[],style,c='black'))
                 if chunk is not None:
-                    if not isinstance(chunk, str):
+                    if not isinstance(chunk,str):
                         chunkLabel = round(float(chunk), 2)
                         chunkLabels.append("{:.2f}".format(chunkLabel))
                     else:
@@ -722,8 +719,8 @@ class ProcessParallelTrnsys():
 
                     mySize = len(myX)
 
-                    if key is not None and not isinstance(key, str):
-                        labelValue = round(float(key), 2)
+                    if key is not None and not isinstance(key,str):
+                        labelValue=round(float(key),2)
                     elif key is not None:
                         labelValue = key
                     if key is not None and labelValue not in labelSet:
@@ -739,7 +736,7 @@ class ProcessParallelTrnsys():
                         ax1.plot(myX, myY,
                                  style, color=seriesColors[key])
 
-            lines = "!%s\t" % seriesVariable
+            lines="!%s\t"%seriesVariable
             for chunk, style in zip(plotXDict.keys(), styles):
                 for key in plotXDict[chunk].keys():  # the varables that appear in the legend
                     line = "%s\t" % key;
@@ -747,11 +744,11 @@ class ProcessParallelTrnsys():
                 line = "\n";
                 lines = lines + line
 
-            if (0):
-                for X, Y in zip(myX, myY):
+            if(0):
+                for X,Y in zip(myX,myY):
                     for chunk, style in zip(plotXDict.keys(), styles):
 
-                        for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                        for key in plotXDict[chunk].keys(): #the varables that appear in the legend
                             index = num.argsort(plotXDict[chunk][key])
                             myX = num.array(plotXDict[chunk][key])[index]
                             myY = num.array(plotYDict[chunk][key])[index]
@@ -770,7 +767,7 @@ class ProcessParallelTrnsys():
                             myY = num.array(plotYDict[chunk][key])[index]
 
                             try:
-                                line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]);
+                                line = "%8.4f\t%8.4f\t" % (myX[i],myY[i]);
                                 lines = lines + line
                             except:
                                 pass
@@ -800,7 +797,7 @@ class ProcessParallelTrnsys():
             fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable
 
             if chunkVariable != '':
-                fileName = fileName + '_' + chunkVariable
+                 fileName = fileName + '_' + chunkVariable
 
             if (self.inputs["comparePlotUserName"] != ""):
                 fileName = fileName + '_' + self.inputs["comparePlotUserName"]
@@ -808,7 +805,7 @@ class ProcessParallelTrnsys():
             fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
             plt.close()
 
-            if (self.inputs["setPrintDataForGle"]):
+            if(self.inputs["setPrintDataForGle"]):
                 outfile = open(os.path.join(pathFolder, fileName + '.dat'), 'w')
                 outfile.writelines(lines)
                 outfile.close()
@@ -1014,14 +1011,14 @@ class ProcessParallelTrnsys():
                     line = "\n";
                     lines = lines + line
 
-            if chunkVariable != '':
+            if chunkVariable !='':
                 legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
                                       title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.31, 1.0),
                                       bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
-            if seriesVariable != '':
+            if seriesVariable !='':
                 legend1 = fig1.legend(title=self.doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.15, 1.0),
                                       # change legend position!
                                       bbox_transform=ax1.transAxes)
@@ -1037,7 +1034,7 @@ class ProcessParallelTrnsys():
                 conditionsFileName += condition.serializedCondition
                 if conditionsTitle != '':
                     conditionsTitle += ', ' + condition.serializedCondition
-                else:
+            else:
                     conditionsTitle += condition.serializedCondition
 
             conditionsTitle = conditionsTitle.replace('RANGE', '')
@@ -1052,7 +1049,7 @@ class ProcessParallelTrnsys():
             conditionsFileName = conditionsFileName.replace('RANGE:', '')
             conditionsFileName = conditionsFileName.replace('LIST:', '')
 
-            ax1.set_title(conditionsTitle)
+                ax1.set_title(conditionsTitle)
 
             if legend2 is not None:
                 fig1.add_artist(legend2)
@@ -1178,7 +1175,7 @@ class ProcessParallelTrnsys():
                 self.stylesheet = os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
             plt.style.use(self.stylesheet)
 
-            fig1, ax1 = plt.subplots(constrained_layout=True, figsize=[8, 3], dpi=200)
+            fig1, ax1 = plt.subplots(constrained_layout=True, figsize = [8, 3], dpi = 200)
             if self.inputs["plotStyle"] == "line":
                 styles = ['x-', 'x--', 'x-.', 'x:', 'o-', 'o--', 'o-.', 'o:']
             elif self.inputs["plotStyle"] == "dot":
@@ -1231,14 +1228,14 @@ class ProcessParallelTrnsys():
                 N = len(keyBarPlot)
                 Number = num.arange(N)
 
-                widthBarPlot = 1 / (N + 1)
+                widthBarPlot = 1/(N+1)
 
                 lines = "!%s\t" % "BarPlotData"
                 line = "%s\t" % myX + "\n"
                 lines = lines + line
                 for n in Number:
-                    nW = n - (N - 1) / 2
-                    ax1.bar(XBase + nW
+                    nW = n-(N-1)/2
+                    ax1.bar(XBase+nW
                             * widthBarPlot, YBarPlot[n], color=colors[n], edgecolor='black', width=widthBarPlot,
                             label=labelBarPlot[n])
                     line = "%s\t" % labelBarPlot[n];
@@ -1303,7 +1300,7 @@ class ProcessParallelTrnsys():
             ax1.set_xticks(XBase)
             ax1.set_xticklabels(myX)
 
-            fig2, ax2 = plt.subplots(constrained_layout=True, figsize=[8, 3], dpi=200)
+            fig2, ax2 = plt.subplots(constrained_layout=True, figsize = [8, 3], dpi = 200)
 
             width2 = 0.33
             ax2.bar(XBase - 0.165, (YBarPlot[0] - YBarPlot[2]) / YBarPlot[2] * 100, color=colors[0], edgecolor='black',
@@ -1328,7 +1325,7 @@ class ProcessParallelTrnsys():
                 legend1 = None
 
             ax2.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
-            ax2.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable) + "[%]")
+            ax2.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable)+ "[%]")
             ax2.set_xticks(XBase)
             ax2.set_xticklabels(myX)
 
@@ -1381,10 +1378,10 @@ class ProcessParallelTrnsys():
             yAxisVariable = plotVariables[1]
             chunkVariable = ''
             seriesVariable = ''
-            if len(plotVariables) >= 3 and not (':' in plotVariables[2]):
+            if len(plotVariables) >= 3 and not(':' in plotVariables[2]):
                 seriesVariable = plotVariables[2]
                 chunkVariable = ''
-            if len(plotVariables) >= 4 and not (':' in plotVariables[3]):
+            if len(plotVariables) >= 4 and not(':' in plotVariables[3]):
                 chunkVariable = plotVariables[3]
 
             conditionDict = {}
@@ -1415,7 +1412,7 @@ class ProcessParallelTrnsys():
                 for conditionEntry in conditionDict:
                     entryClass = type(resultsDict[conditionEntry])
                     conditionDict[conditionEntry] = entryClass(conditionDict[conditionEntry])
-                    conditionList.append(conditionDict[conditionEntry] == resultsDict[conditionEntry])
+                    conditionList.append(conditionDict[conditionEntry]==resultsDict[conditionEntry])
 
                 if all(conditionList):
 
@@ -1484,8 +1481,8 @@ class ProcessParallelTrnsys():
             labelSet = set()
             lines = ""
 
-            # for i in range(len(myX)):
-            #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
+                    # for i in range(len(myX)):
+                    #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
             lines = "!%s\t" % seriesVariable
 
             for chunk, style in zip(plotXDict.keys(), styles):
@@ -1504,7 +1501,7 @@ class ProcessParallelTrnsys():
                     index = num.argsort(plotXDict[chunk][key])
                     myX.append(num.array(plotXDict[chunk][key])[index])
                     myY.append(num.array(plotYDict[chunk][key])[index])
-                    counter = counter + 1
+                    counter=counter+1
                     mySize = len(myX)
 
             counter = 0;
@@ -1525,13 +1522,13 @@ class ProcessParallelTrnsys():
                 line = "\n";
                 lines = lines + line
 
-            # test2 = test[cityName[2]].astype(float)
-            # boxplot = test.boxplot(column = [cityName[1], cityName[2]])
+            #test2 = test[cityName[2]].astype(float)
+            #boxplot = test.boxplot(column = [cityName[1], cityName[2]])
             pos = num.arange(counter)
-            ax1.boxplot(myY, showfliers=False)  # ,test[cityName[1]].astype(float)])
+            ax1.boxplot(myY,showfliers=False)#,test[cityName[1]].astype(float)])
             ax1.set_xticklabels(cityName)
-            # ax1.text(pos,cityName)
-            # ax1.boxplot(num.array(plotYDict[chunk][cityName[1]],dtype=float),'DAV') #plotYDict[chunk][0:3])  # ,'labels',{'1','2','3','4'})
+           # ax1.text(pos,cityName)
+           # ax1.boxplot(num.array(plotYDict[chunk][cityName[1]],dtype=float),'DAV') #plotYDict[chunk][0:3])  # ,'labels',{'1','2','3','4'})
 
             if (0):
                 for X, Y in zip(myX, myY):
@@ -1605,7 +1602,7 @@ class ProcessParallelTrnsys():
             plt.close()
 
             if (self.inputs["setPrintDataForGle"]):
-                outfile = open(os.path.join(pathFolder, 'BoxPlot' + fileName + 'dat'), 'w')
+                outfile = open(os.path.join(pathFolder, 'BoxPlot' + fileName +'dat'), 'w')
                 outfile.writelines(lines)
                 outfile.close()
 
@@ -1627,10 +1624,10 @@ class ProcessParallelTrnsys():
                     conditionEntry, conditionValue = plotVariable.split(':')
                     conditionDict[conditionEntry] = conditionValue
                 elif "=" in plotVariable:
-                    equationVariable, equationExpression = plotVariable.split('=')
+                    equationVariable,equationExpression = plotVariable.split('=')
                     equationDict[equationVariable] = equationExpression
-                    for variable in re.split('\W', equationExpression):
-                        if variable != '' and not (self.isStringNumber(variable)):
+                    for variable in re.split('\W',equationExpression):
+                        if variable != '' and not(self.isStringNumber(variable)):
                             calcVariableDict[variable] = ''
 
             plotXDict = {}
@@ -1654,11 +1651,11 @@ class ProcessParallelTrnsys():
                 for conditionEntry in conditionDict:
                     entryClass = type(resultsDict[conditionEntry])
                     conditionDict[conditionEntry] = entryClass(conditionDict[conditionEntry])
-                    conditionList.append(conditionDict[conditionEntry] == resultsDict[conditionEntry])
+                    conditionList.append(conditionDict[conditionEntry]==resultsDict[conditionEntry])
 
                 if all(conditionList):
 
-                    # if equationVariable not in seriesColors.keys():
+                    #if equationVariable not in seriesColors.keys():
                     #    seriesColors[equationVariable] = colors[colorsCounter]
                     #    colorsCounter += 1
 
@@ -1698,7 +1695,7 @@ class ProcessParallelTrnsys():
             calcVariableDict['equationDict'] = equationDict
             for equation in equationDict:
                 calcVariableDict['equation'] = equation
-                exec('equationDict[equation]=' + equationDict[equation], calcVariableDict)
+                exec('equationDict[equation]='+equationDict[equation],calcVariableDict)
                 seriesColors[equation] = colors[colorsCounter]
                 colorsCounter += 1
                 colorsCounter = colorsCounter % len(colors)
@@ -1768,7 +1765,7 @@ class ProcessParallelTrnsys():
                             plotStatement = 'ax1.plot(myX, myY,style, color=seriesColors[key], label=label' + plotKwargs + ')'
                             exec(plotStatement)
                         else:
-                            ax1.plot(myX, myY, style, color=seriesColors[key], label=label)
+                            ax1.plot(myX, myY,style, color=seriesColors[key], label=label)
                     else:
                         ax1.plot(myX, myY,
                                  style, color=seriesColors[key])
@@ -1794,9 +1791,9 @@ class ProcessParallelTrnsys():
                         if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
                             line = myX[i] + "\t" + myY[i] + "\t"
                         elif type(myX[i]) == num.str_:
-                            line = myX[i] + "\t" + "%8.4f\t" % myY[i]
+                            line = myX[i] + "\t" + "%8.4f\t" %myY[i]
                         elif type(myY[i]) == num.str_:
-                            line = "%8.4f\t" % myX[i] + myX[i] + "\t"
+                            line = "%8.4f\t" %myX[i] + myX[i] + "\t"
                         else:
                             line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]);
                         lines = lines + line
@@ -1804,14 +1801,14 @@ class ProcessParallelTrnsys():
                 line = "\n";
                 lines = lines + line
 
-            if chunkVariable != '':
+            if chunkVariable !='':
                 legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
                                       title=self.doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.5, 1.0),
                                       bbox_transform=ax1.transAxes)
 
             else:
                 legend2 = None
-            if calculationVariable != '':
+            if calculationVariable !='':
                 legend1 = fig1.legend(title=self.doc.getNiceLatexNames(calculationVariable), bbox_to_anchor=(1.2, 1.0),
                                       bbox_transform=ax1.transAxes)
 
@@ -1944,7 +1941,7 @@ class ProcessParallelTrnsys():
         fileName += '_' + seriesVariable
         fileName = re.sub(r'[^\w\-_\. ]', '', fileName)
 
-        line = seriesVariable + '\t' + xVariable
+        line = seriesVariable + '\t' +  xVariable
         for name in yVariables:
             line += '\t' + name
         lines = line + '\n'
@@ -2002,11 +1999,11 @@ class ProcessParallelTrnsys():
                     return -1
                 else:
                     for variable in re.split('\W', equation):
-                        if variable != '' and variable != "round" and not (self.isStringNumber(variable)):
-                            equation = equation.replace(variable, 'resultsDict[\"%s\"]' % variable)
+                        if variable != '' and variable!= "round" and not (self.isStringNumber(variable)):
+                            equation = equation.replace(variable,'resultsDict[\"%s\"]' %variable)
                     exec(equation)
 
-            self.logger.info("Adding equation result to " + os.path.split(file)[-1])
+            self.logger.info("Adding equation result to "  + os.path.split(file)[-1])
 
             with open(file, 'w') as f_out:
                 json.dump(resultsDict, f_out, indent=2, separators=(',', ': '))
@@ -2032,18 +2029,18 @@ class ProcessParallelTrnsys():
         for SPFload in self.inputs['printBoxPlotGLEData']:
             SPF = SPFload[0]
 
-            # SPF = plotVariables[0]
-            # SPFload = []
+        #SPF = plotVariables[0]
+            #SPFload = []
             SPFValues = []
 
             for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
                 with open(file) as f_in:
                     resultsDict = json.load(f_in)
-                    # resultsDict[''] = None
-                    # name, index = str(SPF).split('[')
-                    # index = int(index.replace(']', ''))
+                #resultsDict[''] = None
+                     #name, index = str(SPF).split('[')
+                    #index = int(index.replace(']', ''))
 
-                    SPFValue = resultsDict[SPF]
+                    SPFValue=resultsDict[SPF]
                     SPFValues.append(SPFValue)
 
         SPFV = num.array(SPFValues)
@@ -2055,8 +2052,8 @@ class ProcessParallelTrnsys():
         SPFMin = num.min(SPFV)
         SPFMax = num.max(SPFV)
 
-        # line = "\n";
-        # lines = lines + line
+       # line = "\n";
+        #lines = lines + line
 
         lines = "%8.4f\t%8.4f\t%8.4f\t%8.4f\t%8.4f\t%8.4f\t" % (SPFAv, SPFMin, SPFQ25, SPFQ50, SPFQ75, SPFMax)
         outfileName = "yearSpfShpDisgle"
@@ -2075,20 +2072,20 @@ class ProcessParallelTrnsys():
             for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
                 with open(file) as f_in:
                     resultsDict = json.load(f_in)
-                    resultsDict[''] = None
+                    resultsDict['']=None
                 legend.append(resultsDict[seriesVariable])
                 inVar.append(num.array(resultsDict[valueVariable]))
             nameFile = '_'.join(plotVariables)
             titlePlot = 'Balance'
             self.plot = plot.PlotMatplotlib(language='en')
             self.plot.setPath(pathFolder)
-            self.myShortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            self.myShortMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
             self.doc = latex.LatexReport('', '')
             if 'latexNames' in self.inputs.keys():
                 if ':' in self.inputs['latexNames']:
                     latexNameFullPath = self.inputs['latexNames']
                 else:
-                    latexNameFullPath = os.path.join(self.configPath, self.inputs['latexNames'])
+                    latexNameFullPath = os.path.join(self.configPath,self.inputs['latexNames'])
                 self.doc.getLatexNamesDict(file=latexNameFullPath)
             else:
                 self.doc.getLatexNamesDict()
@@ -2107,7 +2104,7 @@ class ProcessParallelTrnsys():
                 niceLegend.append(self.doc.getNiceLatexNames(entry))
             namePdf = self.plot.plotMonthlyNBar(inVar, niceLegend, self.doc.getNiceLatexNames(valueVariable), nameFile,
                                                 10, self.myShortMonths, useYear=True)
-
+            
     def plotComparisonSeaborn(self):
         pathFolder = self.inputs["pathBase"]
         plotVariables = self.inputs['comparePlot']
@@ -2115,10 +2112,10 @@ class ProcessParallelTrnsys():
             raise ValueError(
                 'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
         elif len(plotVariables) == 2:
-            plotVariables.extend([None, None])
+            plotVariables.extend([None,None])
         elif len(plotVariables) == 3:
             plotVariables.append([None])
-
+        
         df = pd.DataFrame(columns=plotVariables)
         for file in glob.glob(os.path.join(pathFolder, "**/*-results.json")):
             with open(file) as f_in:
@@ -2129,42 +2126,44 @@ class ProcessParallelTrnsys():
                                palette=None, markers=True, data=df)
         fig = snsPlot.get_figure()
         name = '_'.join(plotVariables)
-        fig.savefig(os.path.join(pathFolder, name + '.png'), dpi=500)
+        fig.savefig(os.path.join(pathFolder, name+'.png'), dpi=500)
 
-    def changeFile(self, source, end):
+    def changeFile(self,source,end):
 
         # todo: this function is currently not working
 
-        found = False
+        found=False
         for i in range(len(self.lines)):
             # self.lines[i].replace(source,end)
-            if (self.lines[i] == source):
+            if(self.lines[i]==source):
                 self.lines[i] = end
-                found = True
+                found=True
 
-        if (found == False):
-            self.logger.warning("changeFile was not able to change %s by %s" % (source, end))
+        if(found==False):
+            self.logger.warning("changeFile was not able to change %s by %s"%(source,end))
 
-    def calcCost(self, fileNamesToRead=None):
+    def calcCost(self, typeOfProcess: str, fileNamesToRead=None):
         resultsDirPath = _pl.Path(self.inputs['pathBase'])
         configFilePath = _pl.Path(self.inputs['cost'])
 
-        _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, fileNamesToRead)
+        processType = _cc.OTHER if not fileNamesToRead else _cc.CasesDefined(fileNamesToRead)
+
+        _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, processType)
 
 
 def process():
-    pathBase = ''
-    template = pkg_resources.resource_filename('pytrnsys_examples', 'solar_dhw/process_solar_dhw.config')
-    if len(sys.argv) > 1:
-        pathBase, configFile = os.path.split(sys.argv[1])
-    else:
-        pathBase, configFile = os.path.split(template)
+   pathBase = ''
+   template = pkg_resources.resource_filename('pytrnsys_examples', 'solar_dhw/process_solar_dhw.config')
+   if len(sys.argv)>1:
+       pathBase,configFile = os.path.split(sys.argv[1])
+   else:
+       pathBase,configFile = os.path.split(template)
 
-    if ':' not in pathBase:
-        pathBase = os.path.join(os.getcwd(), pathBase)
-    tool = ProcessParallelTrnsys()
-    tool.readConfig(pathBase, configFile)
-    tool.process()
+   if ':' not in pathBase:
+       pathBase = os.path.join(os.getcwd(),pathBase)
+   tool = ProcessParallelTrnsys()
+   tool.readConfig(pathBase, configFile)
+   tool.process()
 
 
 if __name__ == '__main__':
