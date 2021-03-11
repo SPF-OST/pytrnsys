@@ -810,8 +810,6 @@ class ProcessParallelTrnsys():
                 outfile.writelines(lines)
                 outfile.close()
 
-
-
     def plotComparisonConditional(self):
         pathFolder = self.inputs["pathBase"]
         for plotVariables in self.inputs['comparePlotConditional']:
@@ -843,6 +841,12 @@ class ProcessParallelTrnsys():
                 resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"), recursive=True)
             else:
                 resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
+
+            if not resultFiles:
+                self.logger.error('No results.json-files found.')
+                self.logger.error(
+                    'Unable to generate "comparePlot %s %s %s"' % (xAxisVariable, yAxisVariable, seriesVariable))
+                return
 
             conditionNeverMet = True
 
@@ -886,9 +890,6 @@ class ProcessParallelTrnsys():
                         plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(xAxis)
                         plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(yAxis)
 
-                else:
-                    pass
-
             if conditionNeverMet:
                 self.logger.warning(
                     'The following conditions from "comparePlotConditional" were never met all at once:')
@@ -923,7 +924,7 @@ class ProcessParallelTrnsys():
             elif self.inputs["plotStyle"] == "dot":
                 styles = ['x', 'o', '+', 'd', 's', 'v', '^', 'h']
             else:
-                print("Invalid 'plotStyle' argument")
+                self.logger.error("Invalid 'plotStyle' argument")
 
             dummy_lines = []
             chunkLabels = []
@@ -963,8 +964,6 @@ class ProcessParallelTrnsys():
                         ax1.plot(myX, myY,
                                  style, color=seriesColors[key])
 
-                    # for i in range(len(myX)):
-                    #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
             lines = "!%s\t" % seriesVariable
             for chunk, style in zip(plotXDict.keys(), styles):
                 for key in plotXDict[chunk].keys():  # the varables that appear in the legend
@@ -973,43 +972,29 @@ class ProcessParallelTrnsys():
                 line = "\n";
                 lines = lines + line
 
-            if (0):
-                for X, Y in zip(myX, myY):
-                    for chunk, style in zip(plotXDict.keys(), styles):
+            for i in range(mySize):
+                for chunk, style in zip(plotXDict.keys(), styles):
 
-                        for key in plotXDict[chunk].keys():  # the varables that appear in the legend
-                            index = num.argsort(plotXDict[chunk][key])
-                            myX = num.array(plotXDict[chunk][key])[index]
-                            myY = num.array(plotYDict[chunk][key])[index]
-                            line = "%8.4f\t%8.4f\t" % (X, Y);
-                            lines = lines + line
+                    for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                        index = num.argsort(plotXDict[chunk][key])
+                        myX = num.array(plotXDict[chunk][key])[index]
+                        myY = num.array(plotYDict[chunk][key])[index]
 
-                    line = "\n";
-                    lines = lines + line
-            else:
-                for i in range(mySize):
-                    for chunk, style in zip(plotXDict.keys(), styles):
-
-                        for key in plotXDict[chunk].keys():  # the varables that appear in the legend
-                            index = num.argsort(plotXDict[chunk][key])
-                            myX = num.array(plotXDict[chunk][key])[index]
-                            myY = num.array(plotYDict[chunk][key])[index]
-
-                            if (len(myY) > i):
-                                if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
-                                    line = myX[i] + "\t" + myY[i] + "\t"
-                                elif type(myX[i]) == num.str_:
-                                    line = myX[i] + "\t" + "%8.4f\t" % myY[i]
-                                elif type(myY[i]) == num.str_:
-                                    line = "%8.4f\t" % myX[i] + myX[i] + "\t"
-                                else:
-                                    line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]);
-                                lines = lines + line
+                        if (len(myY) > i):
+                            if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
+                                line = myX[i] + "\t" + myY[i] + "\t"
+                            elif type(myX[i]) == num.str_:
+                                line = myX[i] + "\t" + "%8.4f\t" % myY[i]
+                            elif type(myY[i]) == num.str_:
+                                line = "%8.4f\t" % myX[i] + myX[i] + "\t"
                             else:
-                                pass
+                                line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]);
+                            lines = lines + line
+                        else:
+                            pass
 
-                    line = "\n";
-                    lines = lines + line
+                line = "\n";
+                lines = lines + line
 
             if chunkVariable !='':
                 legend2 = fig1.legend([dummy_line[0] for dummy_line in dummy_lines], chunkLabels,
@@ -1049,14 +1034,23 @@ class ProcessParallelTrnsys():
             conditionsFileName = conditionsFileName.replace('RANGE:', '')
             conditionsFileName = conditionsFileName.replace('LIST:', '')
 
+            if conditionsTitle:
                 ax1.set_title(conditionsTitle)
 
             if legend2 is not None:
                 fig1.add_artist(legend2)
-            if chunkVariable == '':
-                fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + conditionsFileName
-            else:
-                fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + chunkVariable + '_' + conditionsFileName
+
+            fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable
+
+            if chunkVariable:
+                 fileName += '_' + chunkVariable
+
+            if conditionsFileName:
+                fileName += '_' + conditionsFileName
+
+            if (self.inputs["comparePlotUserName"] != ""):
+                fileName += '_' + self.inputs["comparePlotUserName"]
+
             fig1.savefig(os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
             plt.close()
 
