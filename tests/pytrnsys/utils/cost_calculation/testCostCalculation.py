@@ -9,31 +9,36 @@ import diff_pdf_visually as dpdf
 import pytrnsys.cost_calculation as cc
 
 
-def testCostCalculation(caplog: pytest.LogCaptureFixture):
-    helper = Helper(caplog)
-    helper.setup()
+class TestCostCalculation:
+    @pytest.mark.parametrize(["costConfigFileName", "resultsDirName"], [
+        ['costSolarIce_HpSplit.json', 'results'],
+        ['costSolarIce_HpSplit_typeOfProcess_json.json', 'results_json_files'],
+    ])
+    def test(self, costConfigFileName: str, resultsDirName: str, caplog: pytest.LogCaptureFixture):
+        helper = Helper(costConfigFileName, resultsDirName, caplog)
+        helper.setup()
 
-    actualResultsDir = helper.actualResultsDir
-    costParametersFilePath = helper.costParametersFilePath
+        actualResultsDir = helper.actualResultsDir
+        costParametersFilePath = helper.costParametersFilePath
 
-    cc.calculateCostsAndWriteReports(costParametersFilePath, actualResultsDir, cc.ProcessType.OTHER)
+        cc.calculateCostsAndWriteReports(costParametersFilePath, actualResultsDir, cc.ProcessType.OTHER)
 
-    helper.assertResultsAreAsExpected()
+        helper.assertResultsAreAsExpected()
 
 
 class Helper:
-    def __init__(self, caplog: pytest.LogCaptureFixture):
+    def __init__(self, costConfigFileName: str, resultsDirName: str, caplog: pytest.LogCaptureFixture):
         self._caplog = caplog
 
         inputDir = pl.Path('input')
-        self._resultsDir = inputDir / 'results'
-        self.costParametersFilePath = inputDir / "costSolarIce_HpSplit.json"
+        self._resultsDir = inputDir / resultsDirName
+        self.costParametersFilePath = inputDir / costConfigFileName
 
         outputDir = pl.Path('output')
         actualDir = outputDir / 'actual'
-        self.actualResultsDir = actualDir / 'results'
+        self.actualResultsDir = actualDir / resultsDirName
         expectedDir = outputDir / 'expected'
-        self._expectedResultsDir = expectedDir / 'results'
+        self._expectedResultsDir = expectedDir / resultsDirName
 
     def setup(self):
         self._setupLogging()
@@ -43,9 +48,8 @@ class Helper:
         self._caplog.set_level(log.DEBUG, 'root')
 
     def _setupActualDirectory(self):
-        actualDir = self.actualResultsDir.parent
-        if actualDir.exists():
-            shutil.rmtree(actualDir)
+        if self.actualResultsDir.exists():
+            shutil.rmtree(self.actualResultsDir)
         shutil.copytree(self._resultsDir, self.actualResultsDir)
 
     def assertResultsAreAsExpected(self):
@@ -58,31 +62,32 @@ class Helper:
         assert not dircmp.right_only
 
     def _assertOutputFilesEqual(self):
-        for directory in self._expectedResultsDir.iterdir():
-            dirName = directory.name
+        for resultsJsonFilePath in self._expectedResultsDir.rglob("*-results.json"):
+            simulationName = resultsJsonFilePath.name[:-len("-results.json")]
+            relativeContainingDirPath = resultsJsonFilePath.parent.relative_to(self._expectedResultsDir)
 
-            costPlotName = f"costShare-{dirName}.pdf"
-            self._assertPdfEqual(dirName, costPlotName)
+            costPlotName = f"costShare-{simulationName}.pdf"
+            self._assertPdfEqual(relativeContainingDirPath, costPlotName)
 
-            annuityPlotName = f"costShareAnnuity-{dirName}.pdf"
-            self._assertPdfEqual(dirName, annuityPlotName)
+            annuityPlotName = f"costShareAnnuity-{simulationName}.pdf"
+            self._assertPdfEqual(relativeContainingDirPath, annuityPlotName)
 
-            reportTexName = f"{dirName}-cost.tex"
-            self._assertTextFileEqual(dirName, reportTexName)
+            reportTexName = f"{simulationName}-cost.tex"
+            self._assertTextFileEqual(relativeContainingDirPath, reportTexName)
 
-            resultJsonName = f"{dirName}-results.json"
-            self._assertTextFileEqual(dirName, resultJsonName)
+            resultJsonName = f"{simulationName}-results.json"
+            self._assertTextFileEqual(relativeContainingDirPath, resultJsonName)
 
-    def _assertPdfEqual(self, dirName, pdfFileName):
-        expectedPath, actualPath = self._getExpectedAndActualPath(dirName, pdfFileName)
+    def _assertPdfEqual(self, relativeContainingDirPath, pdfFileName):
+        expectedPath, actualPath = self._getExpectedAndActualPath(relativeContainingDirPath, pdfFileName)
         assert dpdf.pdfdiff(actualPath, expectedPath)
 
-    def _assertTextFileEqual(self, dirName, texFileName):
-        expectedPath, actualPath = self._getExpectedAndActualPath(dirName, texFileName)
+    def _assertTextFileEqual(self, relativeContainingDirPath, texFileName):
+        expectedPath, actualPath = self._getExpectedAndActualPath(relativeContainingDirPath, texFileName)
         assert actualPath.read_text() == expectedPath.read_text()
 
-    def _getExpectedAndActualPath(self, dirName, fileName):
-        expected = self._expectedResultsDir / dirName / fileName
-        actual = self.actualResultsDir / dirName / fileName
+    def _getExpectedAndActualPath(self, relativeContainingDirPath, fileName):
+        expected = self._expectedResultsDir / relativeContainingDirPath / fileName
+        actual = self.actualResultsDir / relativeContainingDirPath / fileName
 
         return expected, actual

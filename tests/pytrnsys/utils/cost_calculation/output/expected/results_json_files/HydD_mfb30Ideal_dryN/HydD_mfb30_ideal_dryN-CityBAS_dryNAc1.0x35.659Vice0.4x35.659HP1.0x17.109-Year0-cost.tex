@@ -1,0 +1,97 @@
+\documentclass[english]{SPFShortReport}
+\usepackage{subfigure}
+\usepackage{longtable}
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage{adjustbox}
+\usepackage{gensymb}
+\usepackage{booktabs}
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\reportName{HydD\_mfb30\_ideal\_dryN-CityBAS\_dryNAc1.0x35.659Vice0.4x35.659HP1.0x17.109-Year0}
+\reportSubName{Energy generation costs} 
+\reportDate{\today \hspace{0.1cm} at: \currenttime \hspace{0.1cm} h} 
+\author{damian.birchler}
+\address{damian.birchler}
+\begin{document}
+\begin{table}[!ht]
+\centering
+\caption{Assumptions for calculation of heat generation costs}
+\begin{adjustbox}{max width =\textwidth}
+\begin{tabular}{l | c c c } 
+\hline
+\hline
+$$ &$$ &$$ &$$ \\ 
+\hline
+Rate & 3.0 \% $per$ $annum$\\
+Analysis period & 30 $years$\\
+Maintenance & 1.0 \% $of$ $Investment$ $costs$ $per$ $year$ \\
+\hline \\
+Electricity & Fix costs:  0  $Fr.$ $per$ $year$ \\
+ & Variable costs:  0.20 $Fr.$ $per$ $kWh$ \\
+Increase of electricity costs & 0.0 \% $per$ $year$ \\
+Electricity costs year 1 & 3579 Fr. in year 1 \\
+\hline
+\hline
+\end{tabular}
+\end{adjustbox}
+\label{definitionTable}
+\end{table}
+\begin{table}[!ht]
+\centering
+\caption{System and Heat generation costs (all values incl. 8$\%$ VAT) }
+\begin{adjustbox}{max width =\textwidth}
+\begin{tabular}{l | c c c c c } 
+\hline
+\hline
+Group &Component &Costs &Size &LifeTime &Total Costs \\ 
+ & &[CHF] & &Years &[CHF]\\ 
+\hline
+\\
+\textbf{TES} & Storage (Stainless Steel) & -2000+10173$^{\mathrm{+250}}_{\mathrm{-100}}$/m$^3$ & 2.00 m$^3$ & 30 & 18345.6$^{\mathrm{+500.0}}_{\mathrm{-200.0}}$ (16.1$^{\mathrm{+0.5}}_{\mathrm{-0.2}}$\%) \\
+ & Storage (Steel) & 666+1214/m$^3$ & 1.30 m$^3$ & 30 & 2238.2 (2.0$^{\mathrm{+0.0}}_{\mathrm{-0.0}}$\%) \\
+ & electric rod & 600+0/m$^3$ & 2.00 m$^3$ & 30 & 600.0 (0.5$^{\mathrm{+0.0}}_{\mathrm{-0.0}}$\%) \\
+&\cline{1-5}
+ & \textbf{Total TES} & & & & 21183.8$^{\mathrm{+500.0}}_{\mathrm{-200.0}}$ (18.6$^{\mathrm{+0.5}}_{\mathrm{-0.3}}$\%) \\
+\hline \\
+\textbf{Col} & Collector & 9282+875/m$^2$ & 35.66 m$^2$ & 30 & 40483.6 (35.6$^{\mathrm{+0.1}}_{\mathrm{-0.2}}$\%) \\
+\hline \\
+\textbf{IceStorage} & Ice Storage (inc. installation) & 0+850/m$^3$ & 14.26 m$^3$ & 20 & 12124.1 (10.7$^{\mathrm{+0.0}}_{\mathrm{-0.0}}$\%) \\
+\hline \\
+\textbf{Hp} & HeatPump & 8194+363/kW & 17.11 kW & 20 & 14404.6 (12.7$^{\mathrm{+0.0}}_{\mathrm{-0.1}}$\%) \\
+\hline \\
+\textbf{Hydraulics} & Hydraulics & 11500+0/kW & 17.11 kW & 30 & 11500.0 (10.1$^{\mathrm{+0.0}}_{\mathrm{-0.0}}$\%) \\
+\hline \\
+\textbf{Installation system} & Installation System & 14000+0/kW & 17.11 kW & 30 & 14000.0 (12.3$^{\mathrm{+0.0}}_{\mathrm{-0.1}}$\%) \\
+\hline \\
+ & \textbf{Total Investment Cost} & & & & \textbf{113696.03$^{\mathrm{+500.00}}_{\mathrm{-200.00}}$} (100\%) \\ 
+\hline \\ 
+\hline \\ 
+Annuity & Annuity (yearly costs over lifetime)  &&& & 10946$^{\mathrm{+31}}_{\mathrm{-12}}$ /a  \\
+ & Share of Investment & &&& 6230$^{\mathrm{+26}}_{\mathrm{-10}}$ /a (57$^{\mathrm{+ 0}}_{\mathrm{- 0}}$\%) \\
+ & Share of Electricity & 0+0.20/kWh & 17893 kWh &  & 3579 /a (33$^{\mathrm{+ 0}}_{\mathrm{- 0}}$\%)\\
+ & Share of Maintenance & &&& 1137$^{\mathrm{+ 5}}_{\mathrm{- 2}}$ /a (10$^{\mathrm{+ 0}}_{\mathrm{- 0}}$\%)\\ 
+ & Share of Residual Value &&& &  0 /a ( 0\%)\\
+Present Value  & Present Value of all costs  & &&& 206123.53$^{\mathrm{+598.00}}_{\mathrm{-239.20}}$ CHF \\
+\hline \\ 
+ Energy Generation Costs & Using annuity: &&& 30.76$^{\mathrm{+0.09}}_{\mathrm{-0.03}}$ & Rp./kWh \\
+\hline
+\hline
+\end{tabular}
+\end{adjustbox}
+\label{CostsTable}
+\end{table}
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{output/actual/results_json_files/HydD_mfb30Ideal_dryN/costShare-HydD_mfb30_ideal_dryN-CityBAS_dryNAc1.0x35.659Vice0.4x35.659HP1.0x17.109-Year0.pdf}
+\caption{System cost}
+\label{systemCost}
+\end{center}
+\end{figure}
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{output/actual/results_json_files/HydD_mfb30Ideal_dryN/costShareAnnuity-HydD_mfb30_ideal_dryN-CityBAS_dryNAc1.0x35.659Vice0.4x35.659HP1.0x17.109-Year0.pdf}
+\caption{System cost annuity share}
+\label{systemCostannuity}
+\end{center}
+\end{figure}
+\end{document}
