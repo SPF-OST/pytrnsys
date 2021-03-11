@@ -35,7 +35,8 @@
               "mean": 666
             },
             "slope": {
-              "mean": 1213.8
+              "mean": 1213.8,
+              "toLowerBound": -100
             }
           },
           "variable": {
@@ -72,7 +73,9 @@
               "mean": 9282
             },
             "slope": {
-              "mean": 875
+              "mean": 875,
+              "toLowerBound": -100,
+              "toUpperBound": 250
             }
           },
           "variable": {
@@ -126,37 +129,16 @@
       ]
     },
     {
-      "name": "Hydraulics",
-      "components": [
-        {
-          "name": "Hydraulics",
-          "coeffs": {
-            "offset": {
-              "mean": 11500
-            },
-            "slope": {
-              "mean": 0
-            }
-          },
-          "variable": {
-            "name": "sizeHpUsed",
-            "unit": "kW"
-          },
-          "lifetimeInYears": 30
-        }
-      ]
-    },
-    {
       "name": "Installation system",
       "components": [
         {
-          "name": "Installation System",
+          "name": "Installation System (Hydraulics)",
           "coeffs": {
             "offset": {
-              "mean": 14000
+              "mean": 24596
             },
             "slope": {
-              "mean": 0
+              "mean": 193
             }
           },
           "variable": {
@@ -187,7 +169,9 @@
   ],
   "parameters": {
     "rate": {
-      "mean": 0.03
+      "mean": 0.03,
+      "toLowerBound": -0.001,
+      "toUpperBound": 0.001
     },
     "analysisPeriod": 30,
     "qDemandVariable": {
