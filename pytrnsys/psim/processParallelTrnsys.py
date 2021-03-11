@@ -610,9 +610,10 @@ class ProcessParallelTrnsys():
         comparePlotUserName = self.inputs["comparePlotUserName"]
         setPrintDataForGle = self.inputs["setPrintDataForGle"]
 
-        _pc.Comparison.createPlot(comparePlotCommands, pathFolder, typeOfProcess,
-                                  logger, latexNames, configPath, stylesheet,
-                                  plotStyle, comparePlotUserName, setPrintDataForGle)
+        for plotVariables in comparePlotCommands:
+            _pc.Comparison.createPlot(plotVariables, pathFolder, typeOfProcess,
+                                      logger, latexNames, configPath, stylesheet,
+                                      plotStyle, comparePlotUserName, setPrintDataForGle)
 
     def plotBarplotConditional(self):
         pathFolder = self.inputs["pathBase"]
