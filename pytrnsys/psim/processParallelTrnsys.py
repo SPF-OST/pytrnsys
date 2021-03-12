@@ -599,7 +599,8 @@ class ProcessParallelTrnsys():
             saveDf.to_csv(fullCsvPath, index=False, sep=';')
 
     def plotComparison(self):
-        comparePlotCommands = self.inputs['comparePlotConditional'] + self.inputs['comparePlots']
+        comparePlotCommands = self.inputs.get('comparePlotConditional', []) \
+                              + self.inputs.get('comparePlot', [])
         pathFolder = self.inputs["pathBase"]
         typeOfProcess = self.inputs["typeOfProcess"]
         logger = self.logger
@@ -611,9 +612,9 @@ class ProcessParallelTrnsys():
         setPrintDataForGle = self.inputs["setPrintDataForGle"]
 
         for plotVariables in comparePlotCommands:
-            _pc.Comparison.createPlot(plotVariables, pathFolder, typeOfProcess,
-                                      logger, latexNames, configPath, stylesheet,
-                                      plotStyle, comparePlotUserName, setPrintDataForGle)
+            _pc.createPlot(plotVariables, pathFolder, typeOfProcess,
+                           logger, latexNames, configPath, stylesheet,
+                           plotStyle, comparePlotUserName, setPrintDataForGle)
 
     def plotBarplotConditional(self):
         pathFolder = self.inputs["pathBase"]
