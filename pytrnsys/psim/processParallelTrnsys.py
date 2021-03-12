@@ -1049,7 +1049,7 @@ class ProcessParallelTrnsys():
             conditionsFileName = conditionsFileName.replace('RANGE:', '')
             conditionsFileName = conditionsFileName.replace('LIST:', '')
 
-                ax1.set_title(conditionsTitle)
+            ax1.set_title(conditionsTitle)
 
             if legend2 is not None:
                 fig1.add_artist(legend2)
