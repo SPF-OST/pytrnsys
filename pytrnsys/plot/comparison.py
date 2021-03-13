@@ -32,7 +32,7 @@ def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, con
         logger.warning('The respective plot cannot be generated.')
         return
 
-    _configurePyplotStyle(stylesheet)
+    _configurePypltStyle(stylesheet)
 
     styles = ['x-', 'x--', 'x-.', 'x:', 'o-', 'o--', 'o-.', 'o:']
     if plotStyle == "dot":
@@ -61,29 +61,87 @@ def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, con
                      conditionsFileNamePart, values, setPrintDataForGle, styles)
 
 
-def _savePlotAndData(fig, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, pathFolder, comparePlotUserName,
-                     conditionsFileNamePart, values, setPrintDataForGle, styles):
-    fileName = _getFileName(xAxisVariable, yAxisVariable, seriesVariable,
-                            chunkVariable, conditionsFileNamePart, comparePlotUserName)
-    fig.savefig(_os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
-    _plt.close()
-    if setPrintDataForGle:
-        _doPrintDataForGle(fileName, pathFolder, values, seriesVariable, styles)
+def _separatePlotVariables(plotVariables):
+    if len(plotVariables) < 2:
+        raise ValueError('You did not specify variable names and labels '
+                         'for the x and the y Axis in a compare Plot line')
+    xAxisVariable = plotVariables[0]
+    yAxisVariable = plotVariables[1]
+    chunkVariable = ''
+    seriesVariable = ''
+    serializedConditions = plotVariables[2:]
+    if len(plotVariables) >= 3 and not _conds.mayBeSerializedCondition(plotVariables[2]):
+        seriesVariable = plotVariables[2]
+        serializedConditions = plotVariables[3:]
+    if len(plotVariables) >= 4 and not _conds.mayBeSerializedCondition(plotVariables[3]):
+        chunkVariable = plotVariables[3]
+        serializedConditions = plotVariables[4:]
+    conditions = _conds.createConditions(serializedConditions)
+    return xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions
 
 
-def _setLegendsAndLabels(fig, ax, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, chunkLabels, dummyLines,
-                         doc):
-    if chunkVariable:
-        legend = fig.legend([dummy_line[0] for dummy_line in dummyLines], chunkLabels,
-                            title=doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.31, 1.0),
-                            bbox_transform=ax.transAxes)
-        fig.add_artist(legend)
-    if seriesVariable:
-        legend = fig.legend(title=doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.15, 1.0),
-                            bbox_transform=ax.transAxes)
-        fig.add_artist(legend)
-    ax.set_xlabel(doc.getNiceLatexNames(xAxisVariable))
-    ax.set_ylabel(doc.getNiceLatexNames(yAxisVariable))
+def _getResultsFilePaths(pathFolder, typeOfProcess) -> _tp.Sequence[_pl.Path]:
+    pathFolder = _pl.Path(pathFolder)
+    pattern = "*-results.json"
+
+    if typeOfProcess == "json":
+        return list(pathFolder.rglob(pattern))
+
+    return list(pathFolder.glob(pattern))
+
+
+def _loadValues(resultFilePaths, xAxisVariable, yAxisVariable,
+                chunkVariable, seriesVariable, conditions) \
+        -> _tp.Dict[str, _tp.Dict[str, _tp.Sequence[float]]]:
+    values = {}
+    for resultFilePath in resultFilePaths:
+        results = _loadResults(resultFilePath)
+
+        conditionsFulfilled = conditions.doResultsSatisfyConditions(results)
+        if not conditionsFulfilled:
+            continue
+
+        xAxis = _getValue(results, xAxisVariable)
+        yAxis = _getValue(results, yAxisVariable)
+
+        chunkVariableValue = results[chunkVariable] if chunkVariable else None
+        if chunkVariableValue not in values:
+            values[chunkVariableValue] = {}
+        chunk = values[chunkVariableValue]
+
+        seriesVariableValue = results[seriesVariable] if seriesVariable else None
+        if seriesVariableValue not in chunk:
+            chunk[seriesVariableValue] = []
+        seriesValues = chunk[seriesVariableValue]
+
+        seriesValues.append((xAxis, yAxis))
+
+    return values
+
+
+def _loadResults(resultFilePath) -> _tp.Dict[str, _tp.Any]:
+    serializedResults = resultFilePath.read_text()
+    resultsDict = _json.loads(serializedResults)
+    return resultsDict
+
+
+def _getValue(resultsDict, variable):
+    if '[' not in variable:
+        yAxis = resultsDict[variable]
+    else:
+        name, index = str(variable).split('[')
+        index = int(index.replace(']', ''))
+        yAxis = resultsDict[name][index]
+    return yAxis
+
+
+def _configurePypltStyle(stylesheet):
+    if not stylesheet:
+        stylesheet = 'word.mplstyle'
+    if stylesheet not in _plt.style.available:
+        root = _os.path.dirname(_os.path.abspath(__file__))
+        stylesheet = _os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
+    _plt.style.use(stylesheet)
 
 
 def _plotValues(ax, values, seriesColors, styles, doc):
@@ -112,13 +170,27 @@ def _plotValues(ax, values, seriesColors, styles, doc):
     return chunkLabels, dummyLines
 
 
-def _configurePyplotStyle(stylesheet):
-    if not stylesheet:
-        stylesheet = 'word.mplstyle'
-    if stylesheet not in _plt.style.available:
-        root = _os.path.dirname(_os.path.abspath(__file__))
-        stylesheet = _os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
-    _plt.style.use(stylesheet)
+def _getXAndYValuesAndErrorsOrderedByXValues(series):
+    xs, ys = zip(*series)
+
+    xValues, xErrors = _getValuesAndErrors(xs)
+    yValues, yErrors = _getValuesAndErrors(xs)
+
+    indices = _np.argsort(xValues)
+
+    return xValues[indices], xErrors[indices], yValues[indices], yErrors[indices]
+
+
+def _getValuesAndErrors(us):
+    if all(not isinstance(u, dict) for u in us):
+        return us, None
+
+    us = [_uf.UncertainFloat.from_dict(u) for u in us]
+
+    values = [u.mean for u in us]
+    errors = [(-u.toLowerBound, u.toUpperBound) for u in us]
+
+    return _np.array(values), _np.array(errors)
 
 
 def _createLatexDoc(configPath, latexNames):
@@ -134,6 +206,13 @@ def _createLatexDoc(configPath, latexNames):
     return doc
 
 
+def _getSeriesColors(values):
+    colors = _plt.rcParams['axes.prop_cycle'].by_key()['color']
+    series = {s for (c, vs) in values.items() for s in vs}
+    seriesColors = {s: colors[i % len(colors)] for i, s in enumerate(series)}
+    return seriesColors
+
+
 def _getChunkLabel(chunkVariableValue):
     if chunkVariableValue is None:
         return None
@@ -143,17 +222,6 @@ def _getChunkLabel(chunkVariableValue):
 
     roundedValue = round(float(chunkVariableValue), 2)
     return "{:.2f}".format(roundedValue)
-
-
-def _getFileName(xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileName, comparePlotUserName):
-    fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable
-    if chunkVariable:
-        fileName += '_' + chunkVariable
-    if conditionsFileName:
-        fileName += '_' + conditionsFileName
-    if comparePlotUserName:
-        fileName += '_' + comparePlotUserName
-    return fileName
 
 
 def _getSeriesLabel(seriesVariableValue, labelSet, doc):
@@ -174,6 +242,42 @@ def _getSeriesLabel(seriesVariableValue, labelSet, doc):
         label = doc.getNiceLatexNames(labelValue)
 
     return label
+
+
+def _setLegendsAndLabels(fig, ax, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, chunkLabels, dummyLines,
+                         doc):
+    if chunkVariable:
+        legend = fig.legend([dummy_line[0] for dummy_line in dummyLines], chunkLabels,
+                            title=doc.getNiceLatexNames(chunkVariable), bbox_to_anchor=(1.31, 1.0),
+                            bbox_transform=ax.transAxes)
+        fig.add_artist(legend)
+    if seriesVariable:
+        legend = fig.legend(title=doc.getNiceLatexNames(seriesVariable), bbox_to_anchor=(1.15, 1.0),
+                            bbox_transform=ax.transAxes)
+        fig.add_artist(legend)
+    ax.set_xlabel(doc.getNiceLatexNames(xAxisVariable))
+    ax.set_ylabel(doc.getNiceLatexNames(yAxisVariable))
+
+
+def _savePlotAndData(fig, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, pathFolder, comparePlotUserName,
+                     conditionsFileNamePart, values, setPrintDataForGle, styles):
+    fileName = _getFileName(xAxisVariable, yAxisVariable, seriesVariable,
+                            chunkVariable, conditionsFileNamePart, comparePlotUserName)
+    fig.savefig(_os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
+    _plt.close()
+    if setPrintDataForGle:
+        _doPrintDataForGle(fileName, pathFolder, values, seriesVariable, styles)
+
+
+def _getFileName(xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileName, comparePlotUserName):
+    fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable
+    if chunkVariable:
+        fileName += '_' + chunkVariable
+    if conditionsFileName:
+        fileName += '_' + conditionsFileName
+    if comparePlotUserName:
+        fileName += '_' + comparePlotUserName
+    return fileName
 
 
 def _getConditionsFileNameAndTitle(conditions):
@@ -219,8 +323,8 @@ def _doPrintDataForGle(fileName, pathFolder, values, seriesVariable, styles):
                 x = xs[i]
                 y = ys[i]
 
-                formattedX = _format(x)
-                formattedY = _format(y)
+                formattedX = _formatForGle(x)
+                formattedY = _formatForGle(y)
 
                 line = f"{formattedX}\t{formattedY}\t"
 
@@ -232,112 +336,10 @@ def _doPrintDataForGle(fileName, pathFolder, values, seriesVariable, styles):
         datFilePath.write_text(lines)
 
 
-def _format(u):
+def _formatForGle(u):
     if isinstance(u, str):
         return u
 
     return f"{u:8.4f}"
 
 
-def _getXAndYValuesAndErrorsOrderedByXValues(series):
-    xs, ys = zip(*series)
-
-    xValues, xErrors = _getValuesAndErrors(xs)
-    yValues, yErrors = _getValuesAndErrors(xs)
-
-    indices = _np.argsort(xValues)
-
-    return xValues[indices], xErrors[indices], yValues[indices], yErrors[indices]
-
-
-def _getValuesAndErrors(us):
-    if all(not isinstance(u, dict) for u in us):
-        return us, None
-
-    us = [_uf.UncertainFloat.from_dict(u) for u in us]
-
-    values = [u.mean for u in us]
-    errors = [(-u.toLowerBound, u.toUpperBound) for u in us]
-
-    return _np.array(values), _np.array(errors)
-
-
-def _getSeriesColors(values):
-    colors = _plt.rcParams['axes.prop_cycle'].by_key()['color']
-    series = {s for (c, vs) in values.items() for s in vs}
-    seriesColors = {s: colors[i % len(colors)] for i, s in enumerate(series)}
-    return seriesColors
-
-
-def _loadValues(resultFilePaths, xAxisVariable, yAxisVariable,
-                chunkVariable, seriesVariable, conditions) \
-        -> _tp.Dict[str, _tp.Dict[str, _tp.Sequence[float]]]:
-    values = {}
-    for resultFilePath in resultFilePaths:
-        results = _loadResults(resultFilePath)
-
-        conditionsFulfilled = conditions.doResultsSatisfyConditions(results)
-        if not conditionsFulfilled:
-            continue
-
-        xAxis = _getValue(results, xAxisVariable)
-        yAxis = _getValue(results, yAxisVariable)
-
-        chunkVariableValue = results[chunkVariable] if chunkVariable else None
-        if chunkVariableValue not in values:
-            values[chunkVariableValue] = {}
-        chunk = values[chunkVariableValue]
-
-        seriesVariableValue = results[seriesVariable] if seriesVariable else None
-        if seriesVariableValue not in chunk:
-            chunk[seriesVariableValue] = []
-        seriesValues = chunk[seriesVariableValue]
-
-        seriesValues.append((xAxis, yAxis))
-
-    return values
-
-
-def _loadResults(resultFilePath) -> _tp.Dict[str, _tp.Any]:
-    serializedResults = resultFilePath.read_text()
-    resultsDict = _json.loads(serializedResults)
-    return resultsDict
-
-
-def _getValue(resultsDict, yAxisVariable):
-    if '[' not in yAxisVariable:
-        yAxis = resultsDict[yAxisVariable]
-    else:
-        name, index = str(yAxisVariable).split('[')
-        index = int(index.replace(']', ''))
-        yAxis = resultsDict[name][index]
-    return yAxis
-
-
-def _getResultsFilePaths(pathFolder, typeOfProcess) -> _tp.Sequence[_pl.Path]:
-    pathFolder = _pl.Path(pathFolder)
-    pattern = "*-results.json"
-
-    if typeOfProcess == "json":
-        return list(pathFolder.rglob(pattern))
-
-    return list(pathFolder.glob(pattern))
-
-
-def _separatePlotVariables(plotVariables):
-    if len(plotVariables) < 2:
-        raise ValueError('You did not specify variable names and labels '
-                         'for the x and the y Axis in a compare Plot line')
-    xAxisVariable = plotVariables[0]
-    yAxisVariable = plotVariables[1]
-    chunkVariable = ''
-    seriesVariable = ''
-    serializedConditions = plotVariables[2:]
-    if len(plotVariables) >= 3 and not _conds.mayBeSerializedCondition(plotVariables[2]):
-        seriesVariable = plotVariables[2]
-        serializedConditions = plotVariables[3:]
-    if len(plotVariables) >= 4 and not _conds.mayBeSerializedCondition(plotVariables[3]):
-        chunkVariable = plotVariables[3]
-        serializedConditions = plotVariables[4:]
-    conditions = _conds.createConditions(serializedConditions)
-    return xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions
