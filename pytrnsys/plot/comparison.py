@@ -8,6 +8,7 @@ import numpy as _np
 
 import pytrnsys.psim.conditions as _conds
 import pytrnsys.report.latexReport as _latex
+import pytrnsys.utils.uncertainFloat as _uf
 
 
 def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, configPath,
@@ -100,7 +101,7 @@ def _plotValues(ax, values, seriesColors, styles, doc):
         for seriesVariableValue in chunk:
             series = chunk[seriesVariableValue]
 
-            xs, ys = _getXsAndYsSortedByXs(series)
+            xs, _, ys, _ = _getXAndYValuesAndErrorsOrderedByXValues(series)
 
             label = _getSeriesLabel(seriesVariableValue, seriesLabels, doc)
 
@@ -214,7 +215,7 @@ def _doPrintDataForGle(fileName, pathFolder, values, seriesVariable, styles):
                 if len(series) <= i:
                     continue
 
-                xs, ys = _getXsAndYsSortedByXs(series)
+                xs, _, ys, _ = _getXAndYValuesAndErrorsOrderedByXValues(series)
                 x = xs[i]
                 y = ys[i]
 
@@ -238,12 +239,27 @@ def _format(u):
     return f"{u:8.4f}"
 
 
-def _getXsAndYsSortedByXs(series):
-    myX, myY = [_np.array(vs) for vs in zip(*series)]
-    index = _np.argsort(myX)
-    myX = myX[index]
-    myY = myY[index]
-    return myX, myY
+def _getXAndYValuesAndErrorsOrderedByXValues(series):
+    xs, ys = zip(*series)
+
+    xValues, xErrors = _getValuesAndErrors(xs)
+    yValues, yErrors = _getValuesAndErrors(xs)
+
+    indices = _np.argsort(xValues)
+
+    return xValues[indices], xErrors[indices], yValues[indices], yErrors[indices]
+
+
+def _getValuesAndErrors(us):
+    if all(not isinstance(u, dict) for u in us):
+        return us, None
+
+    us = [_uf.UncertainFloat.from_dict(u) for u in us]
+
+    values = [u.mean for u in us]
+    errors = [(-u.toLowerBound, u.toUpperBound) for u in us]
+
+    return _np.array(values), _np.array(errors)
 
 
 def _getSeriesColors(values):
