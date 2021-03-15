@@ -170,11 +170,11 @@ def _plotValues(ax, values, seriesColors, styles, doc):
     return chunkLabels, dummyLines
 
 
-def _getXAndYValuesAndErrorsOrderedByXValues(series):
+def _getXAndYValuesAndErrorsOrderedByXValues(series) -> _tp.Tuple[_np.ndarray, _np.ndarray, _np.ndarray, _np.ndarray]:
     xs, ys = zip(*series)
 
     xValues, xErrors = _getValuesAndErrors(xs)
-    yValues, yErrors = _getValuesAndErrors(xs)
+    yValues, yErrors = _getValuesAndErrors(ys)
 
     indices = _np.argsort(xValues)
 
