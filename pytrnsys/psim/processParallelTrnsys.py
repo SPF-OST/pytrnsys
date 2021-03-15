@@ -456,7 +456,14 @@ class ProcessParallelTrnsys():
 
         if 'comparePlot' in self.inputs or 'comparePlotConditional' in self.inputs:
             self.logger.info('Generating comparison plots.')
-            self.plotComparison()
+            commands = self.inputs.get('comparePlotConditional', []) \
+                                  + self.inputs.get('comparePlot', [])
+            self.plotComparison(commands, shallPlotUncertainties=False)
+
+        if 'comparePlotUncertain' in self.inputs:
+            commands = self.inputs['comparePlotUncertain']
+            self.logger.info('Generating comparison plots with uncertainties.')
+            self.plotComparison(commands, shallPlotUncertainties=True)
 
         if 'barPlotConditional' in self.inputs.keys():
             self.logger.info('Generating conditional bar plot')
@@ -598,9 +605,7 @@ class ProcessParallelTrnsys():
             fullCsvPath = os.path.join(pathFolder, fileName + '.csv')
             saveDf.to_csv(fullCsvPath, index=False, sep=';')
 
-    def plotComparison(self):
-        comparePlotCommands = self.inputs.get('comparePlotConditional', []) \
-                              + self.inputs.get('comparePlot', [])
+    def plotComparison(self, commands, shallPlotUncertainties: bool):
         pathFolder = self.inputs["pathBase"]
         typeOfProcess = self.inputs["typeOfProcess"]
         logger = self.logger
@@ -611,10 +616,11 @@ class ProcessParallelTrnsys():
         comparePlotUserName = self.inputs["comparePlotUserName"]
         setPrintDataForGle = self.inputs["setPrintDataForGle"]
 
-        for plotVariables in comparePlotCommands:
+        for plotVariables in commands:
             _pc.createPlot(plotVariables, pathFolder, typeOfProcess,
                            logger, latexNames, configPath, stylesheet,
-                           plotStyle, comparePlotUserName, setPrintDataForGle)
+                           plotStyle, comparePlotUserName, setPrintDataForGle,
+                           shallPlotUncertainties)
 
     def plotBarplotConditional(self):
         pathFolder = self.inputs["pathBase"]

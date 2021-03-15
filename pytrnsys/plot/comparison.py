@@ -12,7 +12,7 @@ import pytrnsys.utils.uncertainFloat as _uf
 
 
 def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, configPath,
-               stylesheet, plotStyle, comparePlotUserName, setPrintDataForGle):
+               stylesheet, plotStyle, comparePlotUserName, setPrintDataForGle, shallPlotUncertainties):
     xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions = \
         _separatePlotVariables(plotVariables)
 
@@ -47,7 +47,7 @@ def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, con
 
     fig, ax = _plt.subplots(constrained_layout=True)
 
-    chunkLabels, dummyLines = _plotValues(ax, values, seriesColors, styles, doc)
+    chunkLabels, dummyLines = _plotValues(ax, values, shallPlotUncertainties, seriesColors, styles, doc)
 
     _setLegendsAndLabels(fig, ax, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable,
                          chunkLabels, dummyLines, doc)
@@ -144,7 +144,7 @@ def _configurePypltStyle(stylesheet):
     _plt.style.use(stylesheet)
 
 
-def _plotValues(ax, values, seriesColors, styles, doc):
+def _plotValues(ax: _plt.Axes, values, shallPlotUncertainties, seriesColors, styles, doc):
     dummyLines = []
     chunkLabels = []
     seriesLabels = set()
@@ -159,14 +159,16 @@ def _plotValues(ax, values, seriesColors, styles, doc):
         for seriesVariableValue in chunk:
             series = chunk[seriesVariableValue]
 
-            xs, _, ys, _ = _getXAndYValuesAndErrorsOrderedByXValues(series)
+            xs, xerrors, ys, yerrors = _getXAndYValuesAndErrorsOrderedByXValues(series)
 
-            label = _getSeriesLabel(seriesVariableValue, seriesLabels, doc)
+            label = _getSeriesLabelOrNone(seriesVariableValue, seriesLabels, doc)
 
-            if label:
-                ax.plot(xs, ys, style, color=seriesColors[seriesVariableValue], label=label)
+            if shallPlotUncertainties:
+                ax.errorbar(xs, ys, yerrors.transpose(), xerrors.transpose(),
+                            style, color=seriesColors[seriesVariableValue], label=label)
             else:
-                ax.plot(xs, ys, style, color=seriesColors[seriesVariableValue])
+                ax.plot(xs, ys, style, color=seriesColors[seriesVariableValue], label=label)
+
     return chunkLabels, dummyLines
 
 
@@ -224,7 +226,7 @@ def _getChunkLabel(chunkVariableValue):
     return "{:.2f}".format(roundedValue)
 
 
-def _getSeriesLabel(seriesVariableValue, labelSet, doc):
+def _getSeriesLabelOrNone(seriesVariableValue, labelSet, doc):
     if seriesVariableValue is None:
         return None
 
