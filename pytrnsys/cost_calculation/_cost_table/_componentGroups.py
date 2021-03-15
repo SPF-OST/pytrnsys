@@ -3,6 +3,7 @@ __all__ = ['createLines']
 
 import typing as _tp
 
+import pytrnsys.utils.uncertainFloat
 from .._models import output as _output
 from .._models import common as _common
 
@@ -23,7 +24,7 @@ def createLines(componentGroups: _output.ComponentGroups, shallUseKCHF):
     return lines
 
 
-def _createComponentGroupRowsLines(group: _output.ComponentGroup, totalCost: _common.UncertainFloat):
+def _createComponentGroupRowsLines(group: _output.ComponentGroup, totalCost: pytrnsys.utils.uncertainFloat.UncertainFloat):
     components = [c for c in group.components.factors if c.cost > 0]
 
     if not components:
@@ -47,7 +48,7 @@ def _createComponentGroupRowsLines(group: _output.ComponentGroup, totalCost: _co
 
 
 def _createComponentRowLine(component: _output.CostFactor,
-                            totalCost: _common.UncertainFloat,
+                            totalCost: pytrnsys.utils.uncertainFloat.UncertainFloat,
                             groupName: _tp.Optional[str]) \
         -> str:
     formattedGroupNameOrEmpty = rf"\textbf{{{groupName}}}" if groupName else ""
@@ -67,7 +68,7 @@ def _createComponentRowLine(component: _output.CostFactor,
     return line
 
 
-def _createGroupRowsLines(group: _output.ComponentGroup, totalCost: _common.UncertainFloat):
+def _createGroupRowsLines(group: _output.ComponentGroup, totalCost: pytrnsys.utils.uncertainFloat.UncertainFloat):
     groupLines = ""
 
     cost = group.components.cost
