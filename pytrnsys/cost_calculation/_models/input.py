@@ -6,6 +6,8 @@ import dataclasses as _dc
 import dataclasses_jsonschema as _dcj
 import typing as _tp
 
+import pytrnsys.utils.uncertainFloat as _uf
+
 from . import common as _common
 
 
@@ -25,15 +27,15 @@ class Input(_dcj.JsonSchemaMixin):
 
 @_dc.dataclass(frozen=True)
 class Parameters(_dcj.JsonSchemaMixin):
-    rate: _common.UncertainFloat
+    rate: _uf.UncertainFloat
     analysisPeriod: int
     qDemandVariable: "Variable"
     elFromGridVariable: "Variable"
-    costElecFix: _common.UncertainFloat
-    costElecKWh: _common.UncertainFloat
-    increaseElecCost: _common.UncertainFloat
-    maintenanceRate: _common.UncertainFloat
-    costResidual: _common.UncertainFloat
+    costElecFix: _uf.UncertainFloat
+    costElecKWh: _uf.UncertainFloat
+    increaseElecCost: _uf.UncertainFloat
+    maintenanceRate: _uf.UncertainFloat
+    costResidual: _uf.UncertainFloat
     lifetimeResVal: int
     cleanModeLatex: bool
 
