@@ -1,3 +1,5 @@
+__all__ = ['createPlot']
+
 import os as _os
 import json as _json
 import typing as _tp

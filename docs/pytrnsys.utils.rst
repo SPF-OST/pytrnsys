@@ -4,42 +4,10 @@ pytrnsys.utils package
 Submodules
 ----------
 
-pytrnsys.utils.cleanFiles module
---------------------------------
-
-.. automodule:: pytrnsys.utils.cleanFiles
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pytrnsys.utils.copyDllFiles module
 ----------------------------------
 
 .. automodule:: pytrnsys.utils.copyDllFiles
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pytrnsys.utils.costCalculation module
--------------------------------------
-
-.. automodule:: pytrnsys.utils.costCalculation
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pytrnsys.utils.costCalculationVar module
-----------------------------------------
-
-.. automodule:: pytrnsys.utils.costCalculationVar
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pytrnsys.utils.costConfig module
---------------------------------
-
-.. automodule:: pytrnsys.utils.costConfig
    :members:
    :undoc-members:
    :show-inheritance:
@@ -56,6 +24,14 @@ pytrnsys.utils.log module
 -------------------------
 
 .. automodule:: pytrnsys.utils.log
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pytrnsys.utils.uncertainFloat module
+------------------------------------
+
+.. automodule:: pytrnsys.utils.uncertainFloat
    :members:
    :undoc-members:
    :show-inheritance:

@@ -20,6 +20,14 @@ pytrnsys.psim.checkSimulationDataClass module
    :undoc-members:
    :show-inheritance:
 
+pytrnsys.psim.conditions module
+-------------------------------
+
+.. automodule:: pytrnsys.psim.conditions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pytrnsys.psim.debugProcess module
 ---------------------------------
 
