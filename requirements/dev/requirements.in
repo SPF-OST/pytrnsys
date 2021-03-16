@@ -4,4 +4,6 @@ pip-tools
 black
 
 Sphinx
+recommonmark
+
 -r ../test/requirements.in
