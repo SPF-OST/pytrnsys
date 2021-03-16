@@ -159,10 +159,13 @@ six==1.15.0
     #   python-dateutil
 snowballstemmer==2.1.0
     # via sphinx
+sphinx-rtd-theme==0.5.1
+    # via -r requirements\dev\requirements.in
 sphinx==3.5.2
     # via
     #   -r requirements\dev\requirements.in
     #   recommonmark
+    #   sphinx-rtd-theme
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2

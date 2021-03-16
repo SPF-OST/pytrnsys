@@ -4,6 +4,7 @@ pip-tools
 black
 
 Sphinx
+sphinx_rtd_theme
 recommonmark
 
 -r ../test/requirements.in
