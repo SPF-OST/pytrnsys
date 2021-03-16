@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   pytrnsys.cost_calculation
    pytrnsys.pdata
    pytrnsys.physprop
    pytrnsys.plot

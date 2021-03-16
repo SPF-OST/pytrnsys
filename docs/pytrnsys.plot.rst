@@ -4,6 +4,14 @@ pytrnsys.plot package
 Submodules
 ----------
 
+pytrnsys.plot.comparison module
+-------------------------------
+
+.. automodule:: pytrnsys.plot.comparison
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pytrnsys.plot.downSizeForPlotting module
 ----------------------------------------
 
