@@ -3,4 +3,5 @@ wheel
 pip-tools
 black
 
+Sphinx
 -r ../test/requirements.in
