@@ -9,7 +9,7 @@ Installation from source
 Pytrnsys is available as open source code under the MIT license. Follow these steps to install pytrnsys
 from source:
 
-1. Install [Python 3.9](https://www.python.org/downloads/)
+1. Install `Python 3.9 <https://www.python.org/downloads/>`_
 2. Clone this repo into a folder called ``pytnsys`` somewhere on your local machine::
 
     git clone https://github.com/SPF-OST/pytrnsys.git
