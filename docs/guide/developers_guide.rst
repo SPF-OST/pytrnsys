@@ -3,37 +3,40 @@
 Developer's guide
 =================
 
-Get the source code from github
+Installation from source
 -------------------------------
 
-Pytrnsys is available as open source code under the MIT license. If you want to run
-pytrnsys from source, it is recommended to use a designated virtual environment. Make sure that in your python environment
-the following dependencies are installed:
+Pytrnsys is available as open source code under the MIT license. Follow these steps to install pytrnsys
+from source:
 
-- numpy
-- scipy
-- pandas
-- matplotlib
-- seaborn
-- bokeh
+1. Install [Python 3.9](https://www.python.org/downloads/)
+2. Clone this repo into a folder called ``pytnsys`` somewhere on your local machine::
 
-If you would like to contribute to pytrnsys and the documentation, you also need the following python packages:
+    git clone https://github.com/SPF-OST/pytrnsys.git
 
-- sphinx
-- recommonmark
-- sphinx_rtd_theme
+3. Create a virtual environment (this command and all the following ones should be run from
+within the ``pytrnsys`` folder)::
 
-You can fork the source code at (toBeFilledInWhenPublic) or by the following command::
+    py -3.9 -m venv venv
 
-    git clone (toBeFilledInWhenPublic)
+4. Activate the virtual environment (you'll have to redo this every time you want to run ``pytrnsys``
+from a new console windows)::
 
-Once you have you local copy of the pytrnsys source code you can add the pytrnsys package subfolder
-to your Python project source paths.
-Once you have the pytrnsys package installed from source and you should be able to execute::
+    venv\Scripts\activate
+
+5. Install the requirements into the virtual environment::
+
+    pip install wheel
+    pip install -r requirements\dev\requirements.txt
+
+
+6. To test if everything has worked out, start the Python interpreter and at its command prompt type:
+
+.. code-block:: python
 
     import pytrnsys
 
-in your Python environment.
+If there's no error you are all set.
 
 Run the example systems from source
 -----------------------------------
@@ -128,7 +131,24 @@ please consider the following style guidelines:
 
 - Please chose meaningful variable names and use in line comments only where really needed.
 
+Adding dependencies to pytrnsys
+---------------------------------
 
+If your dependency is a core dependency of pytrnsys i.e. it needs to be installed so all parts
+of pytrnsys can run, add it to the ``install_requires`` list in the top-level ``setup.py`` file.
+As with the other packages already in this list, don't add a version to the package. We'll deal with
+versions later.
+
+If your dependency is only needed for development (``Sphinx`` which is used for generating this documentation would be
+an example) add it to the ``requirements\dev\requirements.in`` file.
+
+If it is only needed for testing (``pytest``, our unit testing framework, is a good example, here) add it to
+``requirements\test\requirements.in``.
+
+In any case, now run ``dev-tools/compile-requirements-txts.py -P <your_dependency>`` to write the versioned
+dependency to the ``requirements.txt`` files. Review the changes to the ``requirements.in`` and ``requirements.txt``
+files (they should only contain changes to do with your new dependency) and if satisfied commit and push the
+changed ``requirements.in`` *and* ``requirements.txt`` files.
 
 
 
