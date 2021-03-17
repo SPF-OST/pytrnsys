@@ -187,7 +187,8 @@ def _getXAndYValuesAndErrorsOrderedByXValues(series) -> _tp.Tuple[_np.ndarray, _
 
 def _getValuesAndErrors(us):
     if all(not isinstance(u, dict) for u in us):
-        return us, None
+        errors = [(0, 0) for _ in us]
+        return _np.array(us), _np.array(errors)
 
     us = [_uf.UncertainFloat.from_dict(u) for u in us]
 
