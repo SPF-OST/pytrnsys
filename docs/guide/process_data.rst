@@ -312,7 +312,7 @@ parameters. The custom defined plots will automatically be added to the result p
 
 .. note::
 
-    All variables used in ``comparePlot``, ``comparePlotConditional``, and ``acrossSetsCalculationsPlot`` need to be
+    All variables used in ``comparePlot``, ``comparePlotUncertain``, and ``acrossSetsCalculationsPlot`` need to be
     saved in the ``-results.json`` files.
 
 
@@ -321,17 +321,51 @@ parameters. The custom defined plots will automatically be added to the result p
     variable of the string array is shown on the x-axis. The second variable is shown on the y-axis. The third is
     represented as different lines, and the fourth as different marker styles::
 
-        stringArray comparePlot "x_variable" "y_variable" ["series 1 variable"] ["series 2 variable"]
+        stringArray comparePlot "x_variable" "y_variable" ["series 1 variable"] ["series 2 variable"] ["filter1"] ["filter2"] ...
 
     .. image:: ./resources/ComparisonPlot.png
         :width: 400
-        :alt: SP
 
-``comparePlotConditional``
-    Same as ``comparePlot``, but with the additional feature of imposing conditions on the data that is supposed to be
-    plotted. For a ``key`` in the results json, a condition is indicated by a ``:`` and stated as ``key:value``::
+    Additionally, you can filter the data that should be plotted by passing in filter expressions for the "filter"s
+    above: only the data taken from ``-results.json`` files that match the filter expressions will then be considered.
+    Filter expressions can take the following form:
 
-        stringArray comparePlotConditional "x_variable" "y_variable" ["series 1 variable"] ["series 2 variable"] ["key 1:value 1"] ["key 2:value 2"] ...
+    Equality::
+
+        key=value
+        key=value1|value2|...
+
+    For multiple values to be included, they need to be separated by ``|`` without spaces. For equalities the values can
+    be numbers or strings, depending on the type of the ``key``.
+
+    Inequality::
+
+        key>value
+        key<value
+        key>=value
+        key<=value
+
+    Logically, for inequalities ``value`` needs to be a number.
+
+    Ranges::
+
+        value1<key<value2
+        value1<key<=value2
+        value1<=key<value2
+        value1<=key<=value2
+
+    Ranges need to be specified by ``<`` or ``<=`` and the values need to be numbers. Note that each ``key`` can only be
+    used once, so a range cannot be replaced by two separate inequality statements.
+
+
+``comparePlotConditional`` (*deprecated*)
+    Same as ``comparePlot``, only retained for backwards compatibility. Use ``comparePlot`` instead.
+
+``comparePlotUncertain``
+    Same as ``comparePlot`` but displays uncertain values with error bars:
+
+    .. image:: ./resources/comparePlotUncertain.png
+        :width: 400
 
 ``acrossSetsCalculationsPlot``
     Has the same basic functionality as ``acrossSetsCalc``, but can plot the results of equations provided::

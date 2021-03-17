@@ -147,27 +147,19 @@ class ProcessTrnsysDf():
         pass
 
     def loadAndProcessGeneric(self):
-
         self.houDataDf = pd.DataFrame()
         self.monDataDf = pd.DataFrame()
         self.dayDataDf = pd.DataFrame()
 
-
-        fileNameList = None
-
-        if fileNameList is None or not fileNameList:
-            fileNameList = os.listdir(self.outputPath)
-
-        for fileName in fileNameList:
-            file = fileName #+".csv"
-            path = os.path.join(self.outputPath,file)
-            if('_Monats' in fileName):
+        for fileName in os.listdir(self.outputPath):
+            path = os.path.join(self.outputPath, fileName)
+            if '_Monats' in fileName:
                 self.loadMonthlyFile(path)
-            elif("_Stunden" in fileName):
+            elif "_Stunden" in fileName:
                 self.loadHourlyFile(path)
-            elif("_Tage" in fileName):
+            elif "_Tage" in fileName:
                 self.loadDailyFile(path)
-            elif (".json" in fileName) and not("results" in fileName):
+            elif ".json" in fileName and "results" not in fileName:
                 self.loadJson(path)
 
         if 'loadClimateData' in self.inputs.keys():

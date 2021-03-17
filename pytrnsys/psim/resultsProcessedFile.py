@@ -7,12 +7,14 @@ Date   : 09.05.2018
 ToDo   :
 """
 
-import os
-import shutil
-import string
-import pytrnsys.report.latexReport as latex
-import matplotlib.pyplot as plt
 import json
+import os
+import pathlib as pl
+
+import matplotlib.pyplot as plt
+
+import pytrnsys.report.latexReport as latex
+
 
 class ResultsProcessedFile():
     """
@@ -29,24 +31,17 @@ class ResultsProcessedFile():
             if (lines.split("\t")[0] == name):
                 return float(lines.split("\t")[1])
 
-    def readResultsData(self, resultType='dat',completeFolder=True,fileNameList=None):
+    def readResultsData(self, resultType='dat', completeFolder=True, fileNameList=None):
 
-        fileName = []
         pathFolder = self.path
 
-        if(completeFolder):
-            self.fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name) and name[0]!="."] #to avoid looking at hiden folders
+        if completeFolder:
+            self.fileName = [p.relative_to(pathFolder) for p in pl.Path(pathFolder).iterdir()
+                             if p.is_dir() and p.name[0] != "." and p.name not in self.filteredfolder]
         else:
             self.fileName = fileNameList
 
-        for name in self.fileName:
-            for i in range(len(self.filteredfolder)):
-                if (name == self.filteredfolder[i]):
-                    del self.fileName[i]
-
         self.results = []
-
-        lines = ""
 
         for name in self.fileName:
 
