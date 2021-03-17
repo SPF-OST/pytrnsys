@@ -186,7 +186,7 @@ def _getXAndYValuesAndErrorsOrderedByXValues(series) -> _tp.Tuple[_np.ndarray, _
 
 
 def _getValuesAndErrors(us):
-    if all(not isinstance(u, dict) for u in us):
+    if not _haveValuesErrors(us):
         errors = [(0, 0) for _ in us]
         return _np.array(us), _np.array(errors)
 
@@ -196,6 +196,10 @@ def _getValuesAndErrors(us):
     errors = [(-u.toLowerBound, u.toUpperBound) for u in us]
 
     return _np.array(values), _np.array(errors)
+
+
+def _haveValuesErrors(us):
+    return any(isinstance(u, dict) for u in us)
 
 
 def _createLatexDoc(configPath, latexNames):
