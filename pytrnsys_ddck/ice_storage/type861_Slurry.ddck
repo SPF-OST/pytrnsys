@@ -180,7 +180,7 @@ useTwallOld
 nRealHx   ! not used for flat plates     
 PhysicalPropConst     
 useCorrugated !only implemented for flat plates      
-*** HEAT EXCHANGER 1 (icing)  
+*** HEAT EXCHANGER 1 (icing, from hp)  
 hxGeometry     
 NHx1
 hxType861par3

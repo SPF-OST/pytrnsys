@@ -674,19 +674,20 @@ class ProcessTrnsysDf():
 
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
-            self.SPFShpWeighted = num.zeros(13)
+            if(self.inputs['addWeightedSPF']==True):
+                self.SPFShpWeighted = num.zeros(13)
 
-            self.SPFShpWeighted[12] = self.yearSpfShpDis
+                self.SPFShpWeighted[12] = self.yearSpfShpDis
 
-            for i in range(len(self.qDemand)):
-                self.SPFShpWeighted[i]=self.SpfShpDis[i]*self.qDemand[i]/sum(self.qDemand)
+                for i in range(len(self.qDemand)):
+                    self.SPFShpWeighted[i]=self.SpfShpDis[i]*self.qDemand[i]/sum(self.qDemand)
 
-            nameFile = "SPF_SHP_weighted"
+                nameFile = "SPF_SHP_weighted"
 
-            namePdf = self.plot.plotMonthlyDf(self.SPFShpWeighted, "$\widetilde{SPF_{SHP}}$", nameFile, yearlyFactor, self.myShortMonths,
-                                              myTitle=None, printData=self.printDataForGle)
+                namePdf = self.plot.plotMonthlyDf(self.SPFShpWeighted, "$\widetilde{SPF_{SHP}}$", nameFile, yearlyFactor, self.myShortMonths,
+                                                  myTitle=None, printData=self.printDataForGle)
 
-            self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
+                self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def addEPFSystem(self, printData=True):
 

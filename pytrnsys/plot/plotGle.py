@@ -306,9 +306,9 @@ class PlotGle():
 
     def executeGLE(self,fileName):
                 
-        gleExe ='"%s"'% os.getenv("GLE_EXE")
+        gleExe =r'%s'% os.getenv("GLE_EXE")
         if os.path.exists(gleExe):
-            cmd = "%s -vb 0 -d pdf %s\%s" % (gleExe,self.path,fileName)
+            cmd = r'%s -vb 0 -d pdf %s\%s' % (os.getenv("GLE_EXE"),self.path,fileName)
         else:
             cmd = "%s -vb 0 -d pdf %s\%s" % ('gle.exe',self.path,fileName)
         logger.debug(cmd)

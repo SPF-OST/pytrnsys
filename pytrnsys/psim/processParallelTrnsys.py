@@ -179,6 +179,7 @@ class ProcessParallelTrnsys():
 
         self.inputs['calculateHeatDemand']=True
         self.inputs['calculateSPF']=True
+        self.inputs['addWeightedSPF']=False
         self.inputs['calculateElectricDemand']=True
 
         self.inputs["comparePlotUserName"] = "" #don't change this default value
