@@ -1,9 +1,9 @@
 __all__ = ['createPlot']
 
-import os as _os
 import json as _json
-import typing as _tp
+import os as _os
 import pathlib as _pl
+import typing as _tp
 
 import matplotlib.pyplot as _plt
 import numpy as _np
@@ -60,7 +60,7 @@ def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, con
         ax.set_title(conditionsTitle)
 
     _savePlotAndData(fig, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, pathFolder, comparePlotUserName,
-                     conditionsFileNamePart, values, setPrintDataForGle, styles)
+                     conditionsFileNamePart, values, setPrintDataForGle, shallPlotUncertainties)
 
 
 def _separatePlotVariables(plotVariables):
@@ -269,13 +269,13 @@ def _setLegendsAndLabels(fig, ax, xAxisVariable, yAxisVariable, seriesVariable, 
 
 
 def _savePlotAndData(fig, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, pathFolder, comparePlotUserName,
-                     conditionsFileNamePart, values, setPrintDataForGle, styles):
+                     conditionsFileNamePart, values, setPrintDataForGle, shallPlotUncertainties):
     fileName = _getFileName(xAxisVariable, yAxisVariable, seriesVariable,
                             chunkVariable, conditionsFileNamePart, comparePlotUserName)
     fig.savefig(_os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
     _plt.close()
     if setPrintDataForGle:
-        _doPrintDataForGle(fileName, pathFolder, values, seriesVariable, styles)
+        _doPrintDataForGle(fileName, pathFolder, values, chunkVariable, seriesVariable, shallPlotUncertainties)
 
 
 def _getFileName(xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileName, comparePlotUserName):
@@ -311,33 +311,37 @@ def _getConditionsFileNameAndTitle(conditions):
     return conditionsFileName, conditionsTitle
 
 
-def _doPrintDataForGle(fileName, pathFolder, values, seriesVariable, styles):
-    lines = "!%s\t" % seriesVariable
-    for chunkVariableValue, style in zip(values, styles):
-        chunk = values[chunkVariableValue]
-        for seriesVariableValue in chunk:
-            line = "%s\t" % seriesVariableValue
-            lines = lines + line
-        line = "\n"
-        lines = lines + line
+def _doPrintDataForGle(fileName, pathFolder, values, chunkVariable, seriesVariable, shallPlotUncertainties):
+    header = _getHeader(chunkVariable, seriesVariable, values, shallPlotUncertainties)
+
+    lines = header + "\n"
 
     maxSeriesLength = max(len(s) for c in values.values() for s in c.values())
-    for i in range(maxSeriesLength):
+    for rowIndex in range(maxSeriesLength):
+        columnIndex = 0
         for chunk in values.values():
             for series in chunk.values():
-                if len(series) <= i:
+                if len(series) <= rowIndex:
+                    lines += "-\t"
                     continue
 
-                xs, _, ys, _ = _getXAndYValuesAndErrorsOrderedByXValues(series)
-                x = xs[i]
-                y = ys[i]
+                xs, xErrors, ys, yErrors = _getXAndYValuesAndErrorsOrderedByXValues(series)
 
-                formattedX = _formatForGle(x)
-                formattedY = _formatForGle(y)
+                entry = ""
 
-                line = f"{formattedX}\t{formattedY}\t"
+                isXColumn = columnIndex == 0
+                if isXColumn:
+                    xMin, x, xMax = _getMinMeanMaxAt(xs, xErrors, rowIndex)
+                    formattedX = _formatUncertainValue(xMin, x, xMax, shallPlotUncertainties)
+                    entry = f"{formattedX}\t"
 
-                lines += line
+                yMin, y, yMax = _getMinMeanMaxAt(ys, yErrors, rowIndex)
+                formattedY = _formatUncertainValue(yMin, y, yMax, shallPlotUncertainties)
+                entry += f"{formattedY}\t"
+
+                lines += entry
+
+                columnIndex += 1
 
         lines += "\n"
 
@@ -345,10 +349,45 @@ def _doPrintDataForGle(fileName, pathFolder, values, seriesVariable, styles):
         datFilePath.write_text(lines)
 
 
-def _formatForGle(u):
+def _getHeader(chunkVariable, seriesVariable, values, shallPlotUncertainties):
+    xLegend = "x-\tx=\tx+" if shallPlotUncertainties else "x"
+
+    variableLegend = f"{chunkVariable}/{seriesVariable}"
+
+    variableHeaders = [f"{chunkValue}/{seriesValue}"
+                       for chunkValue, chunk in values.items()
+                       for seriesValue in chunk]
+    if shallPlotUncertainties:
+        variableHeaders = [f"{ch}{sign}" for ch in variableHeaders for sign in ["-", "=", "+"]]
+
+    joinedVariableHeaders = "\t".join(variableHeaders)
+
+    header = f"!{xLegend}\t{variableLegend}\t{joinedVariableHeaders}"
+
+    return header
+
+
+def _getMinMeanMaxAt(us, uErrors, i):
+    u = us[i]
+    toLower, toUpper = uErrors[i]
+
+    uMin = u - toLower
+    uMax = u + toUpper
+
+    return uMin, u, uMax
+
+
+def _formatUncertainValue(uMin, u, uMax, shallPlotUncertainties):
+    if not shallPlotUncertainties:
+        return _formatValue(u)
+
+    formattedValues = [_formatValue(v) for v in [uMin, u, uMax]]
+
+    return "\t".join(formattedValues)
+
+
+def _formatValue(u):
     if isinstance(u, str):
         return u
 
     return f"{u:8.4f}"
-
-
