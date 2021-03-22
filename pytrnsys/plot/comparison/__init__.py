@@ -6,11 +6,12 @@ import pathlib as _pl
 import typing as _tp
 
 import matplotlib.pyplot as _plt
-import numpy as _np
 
 import pytrnsys.psim.conditions as _conds
 import pytrnsys.report.latexReport as _latex
-import pytrnsys.utils.uncertainFloat as _uf
+
+from . import _gle
+from . import _common
 
 
 def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, configPath,
@@ -25,9 +26,9 @@ def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, con
                      xAxisVariable, yAxisVariable, seriesVariable)
         return
 
-    values = _loadValues(resultFilePaths, xAxisVariable, yAxisVariable,
-                         chunkVariable, seriesVariable, conditions)
-    if not values:
+    manySeriesOrChunks = _loadValues(resultFilePaths, xAxisVariable, yAxisVariable,
+                                     seriesVariable, chunkVariable, conditions, shallPlotUncertainties)
+    if not manySeriesOrChunks:
         logger.warning('The following conditions from "comparePlotConditional" were never met all at once:')
         for condition in conditions.conditions:
             logger.warning(condition)
@@ -40,16 +41,18 @@ def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, con
     if plotStyle == "dot":
         styles = ['x', 'o', '+', 'd', 's', 'v', '^', 'h']
 
-    if len(values) > len(styles):
+    if isinstance(manySeriesOrChunks, _common.ManyChunks) and len(manySeriesOrChunks.chunks) > len(styles):
         raise AssertionError("Too many chunks")
 
-    seriesColors = _getSeriesColors(values)
+    allSeries = manySeriesOrChunks.allSeries if isinstance(manySeriesOrChunks, _common.ManySeries) \
+        else [s for c in manySeriesOrChunks.chunks for s in c.allSeries]
+    seriesColors = _getSeriesColors(allSeries)
 
     doc = _createLatexDoc(configPath, latexNames)
 
     fig, ax = _plt.subplots(constrained_layout=True)
 
-    chunkLabels, dummyLines = _plotValues(ax, values, shallPlotUncertainties, seriesColors, styles, doc)
+    chunkLabels, dummyLines = _plotValues(ax, manySeriesOrChunks, shallPlotUncertainties, seriesColors, styles, doc)
 
     _setLegendsAndLabels(fig, ax, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable,
                          chunkLabels, dummyLines, doc)
@@ -60,7 +63,7 @@ def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, con
         ax.set_title(conditionsTitle)
 
     _savePlotAndData(fig, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, pathFolder, comparePlotUserName,
-                     conditionsFileNamePart, values, setPrintDataForGle, shallPlotUncertainties)
+                     conditionsFileNamePart, allSeries, setPrintDataForGle, shallPlotUncertainties)
 
 
 def _separatePlotVariables(plotVariables):
@@ -69,16 +72,21 @@ def _separatePlotVariables(plotVariables):
                          'for the x and the y Axis in a compare Plot line')
     xAxisVariable = plotVariables[0]
     yAxisVariable = plotVariables[1]
-    chunkVariable = ''
+
     seriesVariable = ''
+    chunkVariable = ''
+
     serializedConditions = plotVariables[2:]
     if len(plotVariables) >= 3 and not _conds.mayBeSerializedCondition(plotVariables[2]):
         seriesVariable = plotVariables[2]
         serializedConditions = plotVariables[3:]
+
     if len(plotVariables) >= 4 and not _conds.mayBeSerializedCondition(plotVariables[3]):
         chunkVariable = plotVariables[3]
         serializedConditions = plotVariables[4:]
+
     conditions = _conds.createConditions(serializedConditions)
+
     return xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions
 
 
@@ -92,9 +100,9 @@ def _getResultsFilePaths(pathFolder, typeOfProcess) -> _tp.Sequence[_pl.Path]:
     return list(pathFolder.glob(pattern))
 
 
-def _loadValues(resultFilePaths, xAxisVariable, yAxisVariable,
-                chunkVariable, seriesVariable, conditions) \
-        -> _tp.Dict[str, _tp.Dict[str, _tp.Sequence[float]]]:
+def _loadValues(resultFilePaths, xAxisVariable, yAxisVariable, seriesVariable,
+                chunkVariable, conditions, shallPlotUncertainties) \
+        -> _tp.Union[_common.ManySeries, _common.ManyChunks, None]:
     values = {}
     for resultFilePath in resultFilePaths:
         results = _loadResults(resultFilePath)
@@ -118,7 +126,10 @@ def _loadValues(resultFilePaths, xAxisVariable, yAxisVariable,
 
         seriesValues.append((xAxis, yAxis))
 
-    return values
+    manySeriesOrChunks = _common.createManySeriesOrManyChunksFromValues(xAxisVariable, yAxisVariable, seriesVariable,
+                                                                        chunkVariable, values, shallPlotUncertainties)
+
+    return manySeriesOrChunks
 
 
 def _loadResults(resultFilePath) -> _tp.Dict[str, _tp.Any]:
@@ -142,64 +153,50 @@ def _configurePypltStyle(stylesheet):
         stylesheet = 'word.mplstyle'
     if stylesheet not in _plt.style.available:
         root = _os.path.dirname(_os.path.abspath(__file__))
-        stylesheet = _os.path.join(root, r"..\\plot\\stylesheets", stylesheet)
+        stylesheet = _os.path.join(root, r"../stylesheets", stylesheet)
     _plt.style.use(stylesheet)
 
 
-def _plotValues(ax: _plt.Axes, values, shallPlotUncertainties, seriesColors, styles, doc):
-    dummyLines = []
-    chunkLabels = []
-    seriesLabels = set()
-    for chunkVariableValue, style in zip(values, styles):
-        dummyLines.append(ax.plot([], [], style, c='black'))
-        chunkLabel = _getChunkLabel(chunkVariableValue)
+def _plotValues(ax: _plt.Axes, manySeriesOrChunks: _tp.Union[_common.ManySeries, _common.ManyChunks],
+                shallPlotUncertainties, seriesColors, styles, doc):
+    if isinstance(manySeriesOrChunks, _common.ManySeries):
+        styles = styles[0]
 
-        if chunkLabel:
-            chunkLabels.append(chunkLabel)
+        seriesLabels = set()
+        for series in manySeriesOrChunks.allSeries:
+            _plotSeries(ax, series, styles, seriesColors, seriesLabels, doc, shallPlotUncertainties)
 
-        chunk = values[chunkVariableValue]
-        for seriesVariableValue in chunk:
-            series = chunk[seriesVariableValue]
+        return [], []
+    else:
+        dummyLines = []
+        chunkLabels = []
+        seriesLabels = set()
+        for chunk, style in zip(manySeriesOrChunks.chunks, styles):
+            dummyLines.append(ax.plot([], [], style, c='black'))
+            chunkLabel = _getChunkLabel(chunk.groupingValue.value)
 
-            xs, xerrors, ys, yerrors = _getXAndYValuesAndErrorsOrderedByXValues(series)
+            if chunkLabel:
+                chunkLabels.append(chunkLabel)
 
-            label = _getSeriesLabelOrNone(seriesVariableValue, seriesLabels, doc)
+            for series in chunk.allSeries:
+                _plotSeries(ax, series, style, seriesColors, seriesLabels, doc, shallPlotUncertainties)
 
-            if shallPlotUncertainties:
-                ax.errorbar(xs, ys, yerrors.transpose(), xerrors.transpose(),
-                            style, color=seriesColors[seriesVariableValue], label=label)
-            else:
-                ax.plot(xs, ys, style, color=seriesColors[seriesVariableValue], label=label)
-
-    return chunkLabels, dummyLines
-
-
-def _getXAndYValuesAndErrorsOrderedByXValues(series) -> _tp.Tuple[_np.ndarray, _np.ndarray, _np.ndarray, _np.ndarray]:
-    xs, ys = zip(*series)
-
-    xValues, xErrors = _getValuesAndErrors(xs)
-    yValues, yErrors = _getValuesAndErrors(ys)
-
-    indices = _np.argsort(xValues)
-
-    return xValues[indices], xErrors[indices], yValues[indices], yErrors[indices]
+        return chunkLabels, dummyLines
 
 
-def _getValuesAndErrors(us):
-    if not _haveValuesErrors(us):
-        errors = [(0, 0) for _ in us]
-        return _np.array(us), _np.array(errors)
+def _plotSeries(ax, series, style, seriesColors, seriesLabels, doc, shallPlotUncertainties):
+    seriesVariableValue = series.groupingValue.value if series.groupingValue else None
 
-    us = [_uf.UncertainFloat.from_dict(u) for u in us]
+    label = _getSeriesLabelOrNone(seriesVariableValue, seriesLabels, doc)
 
-    values = [u.mean for u in us]
-    errors = [(-u.toLowerBound, u.toUpperBound) for u in us]
+    abscissa = series.abscissa
+    ordinate = series.ordinate
 
-    return _np.array(values), _np.array(errors)
-
-
-def _haveValuesErrors(us):
-    return any(isinstance(u, dict) for u in us)
+    if shallPlotUncertainties:
+        ax.errorbar(abscissa.means, ordinate.means, ordinate.errors, abscissa.errors,
+                    style, color=seriesColors[series], label=label)
+    else:
+        ax.plot(abscissa.means, ordinate.means, style, color=seriesColors[series], label=label)
 
 
 def _createLatexDoc(configPath, latexNames):
@@ -215,10 +212,9 @@ def _createLatexDoc(configPath, latexNames):
     return doc
 
 
-def _getSeriesColors(values):
+def _getSeriesColors(allSeries):
     colors = _plt.rcParams['axes.prop_cycle'].by_key()['color']
-    series = {s for (c, vs) in values.items() for s in vs}
-    seriesColors = {s: colors[i % len(colors)] for i, s in enumerate(series)}
+    seriesColors = {s: colors[i % len(colors)] for i, s in enumerate(allSeries)}
     return seriesColors
 
 
@@ -269,24 +265,31 @@ def _setLegendsAndLabels(fig, ax, xAxisVariable, yAxisVariable, seriesVariable, 
 
 
 def _savePlotAndData(fig, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, pathFolder, comparePlotUserName,
-                     conditionsFileNamePart, values, setPrintDataForGle, shallPlotUncertainties):
+                     conditionsFileNamePart, allSeries, setPrintDataForGle, shallPlotUncertainties):
     fileName = _getFileName(xAxisVariable, yAxisVariable, seriesVariable,
                             chunkVariable, conditionsFileNamePart, comparePlotUserName)
+
     fig.savefig(_os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
     _plt.close()
+
     if setPrintDataForGle:
-        _doPrintDataForGle(fileName, pathFolder, values, chunkVariable, seriesVariable, shallPlotUncertainties)
+        _gle.writeData(pathFolder, fileName, allSeries, xAxisVariable, yAxisVariable,
+                       seriesVariable, chunkVariable, shallPlotUncertainties)
 
 
 def _getFileName(xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileName, comparePlotUserName):
-    fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable
-    if chunkVariable:
-        fileName += '_' + chunkVariable
-    if conditionsFileName:
-        fileName += '_' + conditionsFileName
-    if comparePlotUserName:
-        fileName += '_' + comparePlotUserName
-    return fileName
+    possibleParts = [
+        xAxisVariable,
+        yAxisVariable,
+        seriesVariable,
+        chunkVariable,
+        conditionsFileName,
+        comparePlotUserName
+    ]
+
+    parts = [part for part in possibleParts if part]
+
+    return "_".join(parts)
 
 
 def _getConditionsFileNameAndTitle(conditions):
@@ -309,85 +312,3 @@ def _getConditionsFileNameAndTitle(conditions):
     conditionsFileName = conditionsFileName.replace('RANGE:', '')
     conditionsFileName = conditionsFileName.replace('LIST:', '')
     return conditionsFileName, conditionsTitle
-
-
-def _doPrintDataForGle(fileName, pathFolder, values, chunkVariable, seriesVariable, shallPlotUncertainties):
-    header = _getHeader(chunkVariable, seriesVariable, values, shallPlotUncertainties)
-
-    lines = header + "\n"
-
-    maxSeriesLength = max(len(s) for c in values.values() for s in c.values())
-    for rowIndex in range(maxSeriesLength):
-        columnIndex = 0
-        for chunk in values.values():
-            for series in chunk.values():
-                if len(series) <= rowIndex:
-                    lines += "-\t"
-                    continue
-
-                xs, xErrors, ys, yErrors = _getXAndYValuesAndErrorsOrderedByXValues(series)
-
-                entry = ""
-
-                isXColumn = columnIndex == 0
-                if isXColumn:
-                    xMin, x, xMax = _getMinMeanMaxAt(xs, xErrors, rowIndex)
-                    formattedX = _formatUncertainValue(xMin, x, xMax, shallPlotUncertainties)
-                    entry = f"{formattedX}\t"
-
-                yMin, y, yMax = _getMinMeanMaxAt(ys, yErrors, rowIndex)
-                formattedY = _formatUncertainValue(yMin, y, yMax, shallPlotUncertainties)
-                entry += f"{formattedY}\t"
-
-                lines += entry
-
-                columnIndex += 1
-
-        lines += "\n"
-
-        datFilePath = _pl.Path(pathFolder) / f"{fileName}.dat"
-        datFilePath.write_text(lines)
-
-
-def _getHeader(chunkVariable, seriesVariable, values, shallPlotUncertainties):
-    xLegend = "x-\tx=\tx+" if shallPlotUncertainties else "x"
-
-    variableLegend = f"{chunkVariable}/{seriesVariable}"
-
-    variableHeaders = [f"{chunkValue}/{seriesValue}"
-                       for chunkValue, chunk in values.items()
-                       for seriesValue in chunk]
-    if shallPlotUncertainties:
-        variableHeaders = [f"{ch}{sign}" for ch in variableHeaders for sign in ["-", "=", "+"]]
-
-    joinedVariableHeaders = "\t".join(variableHeaders)
-
-    header = f"!{xLegend}\t{variableLegend}\t{joinedVariableHeaders}"
-
-    return header
-
-
-def _getMinMeanMaxAt(us, uErrors, i):
-    u = us[i]
-    toLower, toUpper = uErrors[i]
-
-    uMin = u - toLower
-    uMax = u + toUpper
-
-    return uMin, u, uMax
-
-
-def _formatUncertainValue(uMin, u, uMax, shallPlotUncertainties):
-    if not shallPlotUncertainties:
-        return _formatValue(u)
-
-    formattedValues = [_formatValue(v) for v in [uMin, u, uMax]]
-
-    return "\t".join(formattedValues)
-
-
-def _formatValue(u):
-    if isinstance(u, str):
-        return u
-
-    return f"{u:8.4f}"
