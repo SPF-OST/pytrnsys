@@ -4,6 +4,7 @@ import json as _json
 import os as _os
 import pathlib as _pl
 import typing as _tp
+import dataclasses as _dc
 
 import matplotlib.pyplot as _plt
 import numpy as _np
@@ -25,8 +26,7 @@ def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, con
                      xAxisVariable, yAxisVariable, seriesVariable)
         return
 
-    values = _loadValues(resultFilePaths, xAxisVariable, yAxisVariable,
-                         chunkVariable, seriesVariable, conditions)
+    values = _loadValues(resultFilePaths, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions)
     if not values:
         logger.warning('The following conditions from "comparePlotConditional" were never met all at once:')
         for condition in conditions.conditions:
@@ -69,16 +69,21 @@ def _separatePlotVariables(plotVariables):
                          'for the x and the y Axis in a compare Plot line')
     xAxisVariable = plotVariables[0]
     yAxisVariable = plotVariables[1]
-    chunkVariable = ''
+
     seriesVariable = ''
+    chunkVariable = ''
+
     serializedConditions = plotVariables[2:]
     if len(plotVariables) >= 3 and not _conds.mayBeSerializedCondition(plotVariables[2]):
         seriesVariable = plotVariables[2]
         serializedConditions = plotVariables[3:]
+
     if len(plotVariables) >= 4 and not _conds.mayBeSerializedCondition(plotVariables[3]):
         chunkVariable = plotVariables[3]
         serializedConditions = plotVariables[4:]
+
     conditions = _conds.createConditions(serializedConditions)
+
     return xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions
 
 
@@ -92,8 +97,7 @@ def _getResultsFilePaths(pathFolder, typeOfProcess) -> _tp.Sequence[_pl.Path]:
     return list(pathFolder.glob(pattern))
 
 
-def _loadValues(resultFilePaths, xAxisVariable, yAxisVariable,
-                chunkVariable, seriesVariable, conditions) \
+def _loadValues(resultFilePaths, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions) \
         -> _tp.Dict[str, _tp.Dict[str, _tp.Sequence[float]]]:
     values = {}
     for resultFilePath in resultFilePaths:
@@ -272,21 +276,28 @@ def _savePlotAndData(fig, xAxisVariable, yAxisVariable, seriesVariable, chunkVar
                      conditionsFileNamePart, values, setPrintDataForGle, shallPlotUncertainties):
     fileName = _getFileName(xAxisVariable, yAxisVariable, seriesVariable,
                             chunkVariable, conditionsFileNamePart, comparePlotUserName)
+
     fig.savefig(_os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
     _plt.close()
+
     if setPrintDataForGle:
-        _doPrintDataForGle(fileName, pathFolder, values, chunkVariable, seriesVariable, shallPlotUncertainties)
+        _doPrintDataForGle(pathFolder, fileName, values, xAxisVariable, yAxisVariable,
+                           seriesVariable, chunkVariable, shallPlotUncertainties)
 
 
 def _getFileName(xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileName, comparePlotUserName):
-    fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable
-    if chunkVariable:
-        fileName += '_' + chunkVariable
-    if conditionsFileName:
-        fileName += '_' + conditionsFileName
-    if comparePlotUserName:
-        fileName += '_' + comparePlotUserName
-    return fileName
+    possibleParts = [
+        xAxisVariable,
+        yAxisVariable,
+        seriesVariable,
+        chunkVariable,
+        conditionsFileName,
+        comparePlotUserName
+    ]
+
+    parts = [part for part in possibleParts if part]
+
+    return "_".join(parts)
 
 
 def _getConditionsFileNameAndTitle(conditions):
@@ -311,37 +322,29 @@ def _getConditionsFileNameAndTitle(conditions):
     return conditionsFileName, conditionsTitle
 
 
-def _doPrintDataForGle(fileName, pathFolder, values, chunkVariable, seriesVariable, shallPlotUncertainties):
-    header = _getHeader(chunkVariable, seriesVariable, values, shallPlotUncertainties)
+def _doPrintDataForGle(pathFolder, fileName, values, abscissaVariable, ordinateVariable, seriesVariable, chunkVariable,
+                       shallPlotUncertainties):
+    allSeries = _Series.fromValues(abscissaVariable, ordinateVariable, seriesVariable,
+                                   chunkVariable, values, shallPlotUncertainties)
 
-    lines = header + "\n"
+    columnHeadersLegend = _getColumnHeadersLegend(abscissaVariable, ordinateVariable, seriesVariable, chunkVariable)
+    columnHeaders = "\t".join(f"{s.getAbscissaHeader()}\t{s.getOrdinateHeader()}" for s in allSeries)
 
-    maxSeriesLength = max(len(s) for c in values.values() for s in c.values())
+    lines = f"! {columnHeadersLegend}\n! {columnHeaders}\n"
+    maxSeriesLength = max(s.length for s in allSeries)
     for rowIndex in range(maxSeriesLength):
-        columnIndex = 0
-        for chunk in values.values():
-            for series in chunk.values():
-                if len(series) <= rowIndex:
-                    lines += "-\t"
-                    continue
+        for series in allSeries:
+            if series.length <= rowIndex:
+                lines += "-\t"
+                continue
 
-                xs, xErrors, ys, yErrors = _getXAndYValuesAndErrorsOrderedByXValues(series)
+            x, xMax, xMin = _getMinMeanMaxAt(series.abscissa, rowIndex)
+            formattedX = _formatUncertainValue(xMin, x, xMax, shallPlotUncertainties)
 
-                entry = ""
+            yMin, y, yMax = _getMinMeanMaxAt(series.ordinate, rowIndex)
+            formattedY = _formatUncertainValue(yMin, y, yMax, shallPlotUncertainties)
 
-                isXColumn = columnIndex == 0
-                if isXColumn:
-                    xMin, x, xMax = _getMinMeanMaxAt(xs, xErrors, rowIndex)
-                    formattedX = _formatUncertainValue(xMin, x, xMax, shallPlotUncertainties)
-                    entry = f"{formattedX}\t"
-
-                yMin, y, yMax = _getMinMeanMaxAt(ys, yErrors, rowIndex)
-                formattedY = _formatUncertainValue(yMin, y, yMax, shallPlotUncertainties)
-                entry += f"{formattedY}\t"
-
-                lines += entry
-
-                columnIndex += 1
+            lines += f"{formattedX}\t{formattedY}"
 
         lines += "\n"
 
@@ -349,32 +352,158 @@ def _doPrintDataForGle(fileName, pathFolder, values, chunkVariable, seriesVariab
         datFilePath.write_text(lines)
 
 
-def _getHeader(chunkVariable, seriesVariable, values, shallPlotUncertainties):
-    xLegend = "x-\tx=\tx+" if shallPlotUncertainties else "x"
-
-    variableLegend = f"{chunkVariable}/{seriesVariable}"
-
-    variableHeaders = [f"{chunkValue}/{seriesValue}"
-                       for chunkValue, chunk in values.items()
-                       for seriesValue in chunk]
-    if shallPlotUncertainties:
-        variableHeaders = [f"{ch}{sign}" for ch in variableHeaders for sign in ["-", "=", "+"]]
-
-    joinedVariableHeaders = "\t".join(variableHeaders)
-
-    header = f"!{xLegend}\t{variableLegend}\t{joinedVariableHeaders}"
-
-    return header
-
-
-def _getMinMeanMaxAt(us, uErrors, i):
-    u = us[i]
-    toLower, toUpper = uErrors[i]
-
-    uMin = u - toLower
-    uMax = u + toUpper
-
+def _getMinMeanMaxAt(axisValues, rowIndex):
+    uMin, u, uMax = axisValues.mins[rowIndex], axisValues.means[rowIndex], axisValues.maxs[rowIndex]
     return uMin, u, uMax
+
+
+@_dc.dataclass()
+class _Series:
+    index: _tp.Optional[int]
+    series: _tp.Optional["_GroupingValue"]
+    chunk: _tp.Optional["_GroupingValue"]
+
+    abscissa: "_AxisValues"
+    ordinate: "_AxisValues"
+
+    shallPrintUncertainties: bool
+
+    @classmethod
+    def fromValues(cls, abscissaVariable, ordinateVariable, seriesVariable,
+                   chunkVariable, values, shallPrintUncertainties):
+        if not seriesVariable:
+            valuesForSeries = values[None][None]
+
+            abscissaValues, ordinateValues = \
+                cls._createAbscissaAndOrdinateAxisValues(abscissaVariable, ordinateVariable, valuesForSeries)
+
+            series = _Series(index=None, series=None, chunk=None, abscissa=abscissaValues,
+                             ordinate=ordinateValues, shallPrintUncertainties=shallPrintUncertainties)
+            return [series]
+
+        if not chunkVariable:
+            allSeries = []
+            for seriesValue, valuesForSeries in values[None].items():
+                i = len(allSeries) + 1
+                seriesGroupingValue = _GroupingValue(seriesVariable, seriesValue)
+                chunkGroupingValue = None
+
+                abscissaValues, ordinateValues = \
+                    cls._createAbscissaAndOrdinateAxisValues(abscissaVariable, ordinateVariable, valuesForSeries)
+
+                series = _Series(i, seriesGroupingValue, chunkGroupingValue,
+                                 abscissaValues, ordinateValues, shallPrintUncertainties)
+
+                allSeries.append(series)
+
+            return allSeries
+
+        allSeries = []
+        for chunkValue, chunkGroupingValue in values.items():
+            for seriesValue, valuesForSeries in chunkGroupingValue.items():
+                i = len(allSeries) + 1
+                seriesGroupingValue = _GroupingValue(seriesVariable, seriesValue)
+                chunkGroupingValue = _GroupingValue(chunkVariable, chunkValue)
+
+                abscissaValues, ordinateValues = \
+                    cls._createAbscissaAndOrdinateAxisValues(abscissaVariable, ordinateVariable, valuesForSeries)
+
+                series = _Series(i, seriesGroupingValue, chunkGroupingValue,
+                                 abscissaValues, ordinateValues, shallPrintUncertainties)
+
+                allSeries.append(series)
+
+        return allSeries
+
+    @classmethod
+    def _createAbscissaAndOrdinateAxisValues(cls, abscissaVariable, ordinateVariable, valuesForSeries):
+        xs, xerrors, ys, yerrors = _getXAndYValuesAndErrorsOrderedByXValues(valuesForSeries)
+        xAxisValues = cls._createAxisValues(abscissaVariable, xs, xerrors)
+        yAxisValues = cls._createAxisValues(ordinateVariable, ys, yerrors)
+        return xAxisValues, yAxisValues
+
+    @staticmethod
+    def _createAxisValues(variableName, means, errors):
+        xAxisValues = _AxisValues(variableName,
+                                  mins=means - errors[:, 0],
+                                  means=means,
+                                  maxs=means + errors[:, 1])
+        return xAxisValues
+
+    def __post_init__(self):
+        if self.abscissa.length != self.ordinate.length:
+            raise ValueError("`abscissaValues` and `ordinateValues` must be the same length.")
+        self.length = self.abscissa.length
+
+        if self.series and self.index is None:
+            raise ValueError("If you specify a `series` you also need to provide an `index`.")
+
+        if self.chunk and not self.series:
+            raise ValueError("If you specify a `chunk` you must also specify a `series` .")
+
+        self._indexedAbscissaName = f"{self.abscissa.name}_{self.index}"
+
+        self._signs = ["-", "=", "+"] if self.shallPrintUncertainties else [""]
+
+    def getAbscissaHeader(self):
+        parts = self._getAbscissaHeaderParts()
+        return "\t".join(parts)
+
+    def getOrdinateHeader(self):
+        parts = self._getOrdinateHeaderParts()
+        return "\t".join(parts)
+
+    def _getAbscissaHeaderParts(self):
+        if not self.series:
+            return [f"{self.abscissa.name}{sign}" for sign in self._signs]
+
+        return [f"{self._indexedAbscissaName}{sign}" for sign in self._signs]
+
+    def _getOrdinateHeaderParts(self):
+        if not self.series:
+            return [f"{self.ordinate.name}{sign}({self.abscissa.name})" for sign in self._signs]
+
+        if not self.chunk:
+            return [f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.series.value})"
+                    for sign in self._signs]
+
+        return [f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.series.value},{self.chunk.value})"
+                for sign in self._signs]
+
+
+@_dc.dataclass()
+class _GroupingValue:
+    name: str
+    value: float
+
+
+@_dc.dataclass()
+class _AxisValues:
+    name: str
+    mins: _tp.Sequence[float]
+    means: _tp.Sequence[float]
+    maxs: _tp.Sequence[float]
+
+    def __post_init__(self):
+        self._ensureAlLengthsEqualOrValueError()
+
+        self.length = len(self.means)
+
+    def _ensureAlLengthsEqualOrValueError(self):
+        lens = {len(self.mins), len(self.means), len(self.maxs)}
+
+        if len(lens) != 1:
+            raise ValueError("`mins`, `means` and `maxs` must all be same length.")
+
+
+def _getColumnHeadersLegend(abscissaVariable, ordinateVariable, seriesVariable, chunkVariable):
+    if not seriesVariable:
+        return f"{ordinateVariable}={ordinateVariable}({abscissaVariable})"
+
+    if not chunkVariable:
+        return f"{ordinateVariable}={ordinateVariable}({abscissaVariable}_j, {seriesVariable})"
+
+    return f"{ordinateVariable}={ordinateVariable}({abscissaVariable}_j, {seriesVariable}, {chunkVariable})"
 
 
 def _formatUncertainValue(uMin, u, uMax, shallPlotUncertainties):
