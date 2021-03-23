@@ -1,4 +1,4 @@
-name: Pytrnsys GUI
+name: Static checks and unit tests
 
 on:
   push:
