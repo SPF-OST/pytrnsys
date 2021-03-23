@@ -1,0 +1,41 @@
+{
+  "AcollAp": 50.0,
+  "AcolvsMWh": 1.0143630408136077,
+  "E_yearly": 0,
+  "ElHeatSys_Tot": 21190.017680009045,
+  "Name": "CHE_tmy",
+  "PColl_kWm2_Tot": 722.3772399102726,
+  "Pcoll_kW_Tot": 36118.861995513646,
+  "Pdhw_kW_Tot": 17374.563504633945,
+  "PheatBui_kW_Tot": 31917.453246977617,
+  "Q_DHW": 17374.563504633945,
+  "Q_SH": 31917.453246977617,
+  "Q_yearly": 49292.01675161156,
+  "VIceS": 20.0,
+  "VicevsMWh": 0.40404040404040403,
+  "Vol_Tes1": 2.0,
+  "Vol_Tes2": 1.0,
+  "energyCost": {
+    "mean": 0.26347167052081305,
+    "toLowerBound": -0.03440319143080328,
+    "toUpperBound": 0.050209784979997285
+  },
+  "investment": {
+    "mean": 134767.4,
+    "toLowerBound": -5300.0,
+    "toUpperBound": 13000.0
+  },
+  "investmentPerM2": {
+    "mean": 2695.348,
+    "toLowerBound": -106.0,
+    "toUpperBound": 260.0
+  },
+  "investmentPerMWh": {
+    "mean": 2734.061393330876,
+    "toLowerBound": -107.52248232624243,
+    "toUpperBound": 263.7343906115384
+  },
+  "renShare_Tot": 0.5701125846242383,
+  "sizeHpUsed": 20.0,
+  "yearSpfShpDis": 2.3261904494829353
+}

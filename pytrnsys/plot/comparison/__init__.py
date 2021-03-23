@@ -92,12 +92,17 @@ def _separatePlotVariables(plotVariables):
 
 def _getResultsFilePaths(pathFolder, typeOfProcess) -> _tp.Sequence[_pl.Path]:
     pathFolder = _pl.Path(pathFolder)
-    pattern = "*-results.json"
+
+    if not pathFolder.is_dir():
+        raise ValueError("`pathFolder` needs to point to a directory.")
 
     if typeOfProcess == "json":
-        return list(pathFolder.rglob(pattern))
+        return list(pathFolder.rglob("*-results.json"))
 
-    return list(pathFolder.glob(pattern))
+    resultFilePaths = [d / f"{d.name}-results.json"
+                       for d in pathFolder.iterdir() if d.is_dir()]
+
+    return resultFilePaths
 
 
 def _loadValues(resultFilePaths, xAxisVariable, yAxisVariable, seriesVariable,
