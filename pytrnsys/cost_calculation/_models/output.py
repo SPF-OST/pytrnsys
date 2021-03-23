@@ -184,6 +184,9 @@ class CostFactor:
 
     @property
     def cost(self) -> _uf.UncertainFloat:
+        if not self.value.value:
+            return _uf.UncertainFloat.zero()
+
         return self.coeffs.offset + self.coeffs.slope * self.value.value
 
     @property
