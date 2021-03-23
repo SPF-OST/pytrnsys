@@ -1,0 +1,205 @@
+{
+  "_comments": {
+    "Version": 1.0,
+    "Author": "Daniel Carbonell",
+    "Date": "04.09.2020",
+    "General Remarks": "This cost.json config file is to be used for cost calculations of systems. It has four sections: '_comments', 'Components', 'YearlyCosts' and 'DefaultData'",
+    "IMPORTANT": "Tes data from TRI-HP report. Collector data from R:\\Projekte\\BFE_SolTherm2050\\CostData\\SimulatedCases_WithCost_v6 (01.09.20)"
+  },
+  "componentGroups": [
+    {
+      "name": "TES",
+      "components": [
+        {
+          "name": "Storage (Stainless Steel)",
+          "coeffs": {
+            "offset": {
+              "mean": -2000
+            },
+            "slope": {
+              "mean": 10172.8,
+              "toLowerBound": -100,
+              "toUpperBound": 250
+            }
+          },
+          "variable": {
+            "name": "Vol_Tes1",
+            "unit": "m$^3$"
+          },
+          "lifetimeInYears": 30
+        },
+        {
+          "name": "Storage (Steel)",
+          "coeffs": {
+            "offset": {
+              "mean": 666
+            },
+            "slope": {
+              "mean": 1213.8,
+              "toLowerBound": -100
+            }
+          },
+          "variable": {
+            "name": "Vol_Tes2",
+            "unit": "m$^3$"
+          },
+          "lifetimeInYears": 30
+        },
+        {
+          "name": "electric rod",
+          "coeffs": {
+            "offset": {
+              "mean": 600
+            },
+            "slope": {
+              "mean": 0
+            }
+          },
+          "variable": {
+            "name": "Vol_Tes1",
+            "unit": "m$^3$"
+          },
+          "lifetimeInYears": 30
+        }
+      ]
+    },
+    {
+      "name": "Col",
+      "components": [
+        {
+          "name": "Collector",
+          "coeffs": {
+            "offset": {
+              "mean": 9282
+            },
+            "slope": {
+              "mean": 875,
+              "toLowerBound": -100,
+              "toUpperBound": 250
+            }
+          },
+          "variable": {
+            "name": "AcollAp",
+            "unit": "m$^2$"
+          },
+          "lifetimeInYears": 30
+        }
+      ]
+    },
+    {
+      "name": "IceStorage",
+      "components": [
+        {
+          "name": "Ice Storage (inc. installation)",
+          "coeffs": {
+            "offset": {
+              "mean": 0
+            },
+            "slope": {
+              "mean": 850
+            }
+          },
+          "variable": {
+            "name": "VIceS",
+            "unit": "m$^3$"
+          },
+          "lifetimeInYears": 20
+        }
+      ]
+    },
+    {
+      "name": "Hp",
+      "components": [
+        {
+          "name": "HeatPump",
+          "coeffs": {
+            "offset": {
+              "mean": 8194
+            },
+            "slope": {
+              "mean": 363
+            }
+          },
+          "variable": {
+            "name": "sizeHpUsed",
+            "unit": "kW"
+          },
+          "lifetimeInYears": 20
+        }
+      ]
+    },
+    {
+      "name": "Installation system",
+      "components": [
+        {
+          "name": "Installation System (Hydraulics)",
+          "coeffs": {
+            "offset": {
+              "mean": 24596
+            },
+            "slope": {
+              "mean": 193
+            }
+          },
+          "variable": {
+            "name": "sizeHpUsed",
+            "unit": "kW"
+          },
+          "lifetimeInYears": 30
+        }
+      ]
+    }
+  ],
+  "yearlyCosts": [
+    {
+      "name": "Transmission grid",
+      "coeffs": {
+        "offset": {
+          "mean": 50
+        },
+        "slope": {
+          "mean": 50
+        }
+      },
+      "variable": {
+        "name": "E_yearly",
+        "unit": "kWh"
+      }
+    }
+  ],
+  "parameters": {
+    "rate": {
+      "mean": 0.03,
+      "toLowerBound": -0.001,
+      "toUpperBound": 0.001
+    },
+    "analysisPeriod": 30,
+    "qDemandVariable": {
+      "name": "Q_yearly",
+      "unit": "?"
+    },
+    "elFromGridVariable": {
+      "name": "ElHeatSys_Tot",
+      "unit": "?"
+    },
+    "costElecFix": {
+      "mean": 0
+    },
+    "costElecKWh": {
+      "mean": 0.2
+    },
+    "increaseElecCost": {
+      "mean": 0
+    },
+    "maintenanceRate": {
+      "mean": 0.01
+    },
+    "costResidual": {
+      "mean": 0
+    },
+    "lifetimeResVal": 30,
+    "cleanModeLatex": false
+  }
+}
+		
+	
