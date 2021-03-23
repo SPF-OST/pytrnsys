@@ -2,7 +2,6 @@ __all__ = ['Output',
            'ComponentGroups',
            'ComponentGroup',
            'CostFactors',
-           'YearlyCosts',
            'CostFactor']
 
 import dataclasses as _dc
@@ -34,7 +33,7 @@ class Output:
                                                            parameters.rate,
                                                            parameters.analysisPeriod,
                                                            parameters.maintenanceRate)
-        yearlyCosts = YearlyCosts.createForYearlyCosts(config.yearlyCosts,
+        yearlyCosts = CostFactors.createForYearlyCosts(config.yearlyCosts,
                                                        values,
                                                        parameters.rate,
                                                        parameters.analysisPeriod,
@@ -159,10 +158,6 @@ class CostFactors:
     @property
     def npvMaintenanceCost(self) -> _uf.UncertainFloat:
         return sum(f.npvMaintenanceCost for f in self.factors)
-
-
-class YearlyCosts(CostFactors):
-    pass
 
 
 def _createCostFactor(inputFactor: _input.CostFactor, values, rate, lifetime, period, maintenanceRate):
