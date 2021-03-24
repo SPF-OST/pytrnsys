@@ -11,6 +11,45 @@ to post-process simulation results in one shot.
 
 The documentation can be found on [pytrnsys.readthedocs.io](https://pytrnsys.readthedocs.io).
 
+## Developer Installation
+
+### Prerequisites
+
+#### Required:
+
+1. [Python 3.9](https://www.python.org/downloads/)
+1. A local clone of this GIT repository (`https://github.com/SPF-OST/pytrnsys.git`) into
+a folder called `pytrnsys`.
+
+#### Recommended
+* [PyCharm Community IDE](https://www.jetbrains.com/pycharm/downloa)
+
+### Getting started
+
+All the following commands should be run from the `pytrnsys` directory. The commands
+specified are for a Windows environment. They are very similar for Linux.
+
+1. Create a virtual environment:
+    ```commandline
+    py -3.9 -m venv venv
+    ```
+1. Activate it:
+    ```commandline
+    venv\Scripts\activate
+    ```
+1. Install the requirements:
+    ```commandline
+    pip install wheel
+    pip install -r requirements\dev\requirements.txt
+    ```
+
+And you're ready to go!
+    
+Beware that `pytrnsys` can only be run from within the virtual environment you created in 
+step 1, i.e., whenever you open a new console window from which you want to run it you 
+first need to active the environment (step 2. above).
+
+
 ## About
 
 This code was not initially developed with the intention to be shared with others outside our institute SPF,
