@@ -3,7 +3,7 @@ __all__ = ['createConditions', 'Conditions', 'ConditionBase', 'VALUE', 'mayBeSer
 import typing as _tp
 import abc as _abc
 import dataclasses as _dc
-import regex as _re
+import re as _re
 
 
 VALUE = _tp.Union[str, float, int]
@@ -76,7 +76,7 @@ class _CaseCondition(ConditionBase):
 class _IntervalConditionFactory:
     UNBOUNDED_PATTERN: _tp.Pattern = _re.compile(r"^(?P<variable>[^<=>]+)(?P<op>[<>]=?)(?P<bound>[^<=>]+)$")
     BOUNDED_PATTERN: _tp.Pattern = \
-        _re.compile(r"^(?<lower>[^<=>]+)(?P<op1><=?)(?P<variable>[^<=>]+)(?P<op2><=?)(?<upper>[^<=>]+)?")
+        _re.compile(r"^(?P<lower>[^<=>]+)(?P<op1><=?)(?P<variable>[^<=>]+)(?P<op2><=?)(?P<upper>[^<=>]+)?")
 
     @classmethod
     def create(cls, serializedCondition: str) -> "_IntervalCondition":
