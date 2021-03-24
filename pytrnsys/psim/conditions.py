@@ -3,7 +3,7 @@ __all__ = ['createConditions', 'Conditions', 'ConditionBase', 'VALUE', 'mayBeSer
 import typing as _tp
 import abc as _abc
 import dataclasses as _dc
-import regex as _re
+import re as _re
 
 
 VALUE = _tp.Union[str, float, int]
