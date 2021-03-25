@@ -10,6 +10,7 @@ import pytrnsys.cost_calculation as cc
 
 
 class TestCostCalculation:
+    @pytest.mark.manual
     @pytest.mark.parametrize(["costConfigFileName", "resultsDirName"], [
         ['costSolarIce_HpSplit.json', 'results'],
         ['costSolarIce_HpSplit_eYearly0.json', 'results_eYearly0'],
