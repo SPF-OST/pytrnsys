@@ -1070,12 +1070,18 @@ class ProcessParallelTrnsys():
             counter = 0
             myX = []
             myY = []
+            mySize = 0
             for key in plotXDict[chunk].keys():
                 index = num.argsort(plotXDict[chunk][key])
-                myX.append(num.array(plotXDict[chunk][key])[index])
-                myY.append(num.array(plotYDict[chunk][key])[index])
+
+                sortedSeriesXs = num.array(plotXDict[chunk][key])[index]
+                sortedSeriesYs = num.array(plotYDict[chunk][key])
+
+                myX.append(sortedSeriesXs)
+                myY.append(sortedSeriesYs[index])
+
                 counter = counter + 1
-                mySize = len(myX)
+                mySize = max(len(sortedSeriesXs), mySize)
 
         counter = 0
         cityName = []
@@ -1120,7 +1126,7 @@ class ProcessParallelTrnsys():
                         else:
                             entry = "%8.4f\t%8.4f\t" % (myX[i], myY[i])
                     else:
-                        entry = "-\t"
+                        entry = "-\t-\t"
                     lines = lines + entry
 
             entry = "\n"
