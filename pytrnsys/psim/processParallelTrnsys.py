@@ -24,6 +24,7 @@ import pytrnsys.rsim.runParallel as run
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.cost_calculation as _cc
 import pytrnsys.plot.comparison as _pc
+import pytrnsys.psim.conditions as _conds
 
 try:
     import pytrnsys_examples
@@ -470,9 +471,9 @@ class ProcessParallelTrnsys():
             self.logger.info('Generating conditional bar plot')
             self.plotBarplotConditional()
 
-        if 'boxPlotConditional' in self.inputs.keys():
-            self.logger.info('Generating conditional box plot')
-            self.plotBoxConditional()
+        if 'boxPlot' in self.inputs or 'boxPlotConditional' in self.inputs:
+            self.logger.info('Generating box plot')
+            self.plotBox()
 
         if 'acrossSetsCalculationsPlot' in self.inputs.keys():
             self.logger.info('Generating plot of calculations across sets')
@@ -926,9 +927,11 @@ class ProcessParallelTrnsys():
                 outfile.writelines(lines)
                 outfile.close()
 
-    def plotBoxConditional(self):
+    def plotBox(self):
         pathFolder = self.inputs["pathBase"]
-        for plotVariables in self.inputs['boxPlotConditional']:
+
+        allPlotVariables = self.inputs.get('boxPlot', []) + self.inputs.get('boxPlotConditional', [])
+        for plotVariables in allPlotVariables:
             if len(plotVariables) < 2:
                 raise ValueError(
                     'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
@@ -936,17 +939,15 @@ class ProcessParallelTrnsys():
             yAxisVariable = plotVariables[1]
             chunkVariable = ''
             seriesVariable = ''
-            if len(plotVariables) >= 3 and not(':' in plotVariables[2]):
+            serializedConditions = plotVariables[2:]
+            if len(plotVariables) >= 3 and not _conds.mayBeSerializedCondition(plotVariables[2]):
                 seriesVariable = plotVariables[2]
-                chunkVariable = ''
-            if len(plotVariables) >= 4 and not(':' in plotVariables[3]):
+                serializedConditions = plotVariables[3:]
+            if len(plotVariables) >= 4 and not _conds.mayBeSerializedCondition(plotVariables[3]):
                 chunkVariable = plotVariables[3]
+                serializedConditions = plotVariables[4:]
 
-            conditionDict = {}
-            for plotVariable in plotVariables:
-                if ':' in plotVariable:
-                    conditionEntry, conditionValue = plotVariable.split(':')
-                    conditionDict[conditionEntry] = conditionValue
+            conditions = _conds.createConditions(serializedConditions)
 
             plotXDict = {}
             plotYDict = {}
@@ -960,19 +961,18 @@ class ProcessParallelTrnsys():
             else:
                 resultFiles = glob.glob(os.path.join(pathFolder, "**/*-results.json"))
 
+            conditionNeverMet = True
+
             for file in resultFiles:
-                print(file)
                 with open(file) as f_in:
                     resultsDict = json.load(f_in)
                     resultsDict[''] = None
 
-                conditionList = []
-                for conditionEntry in conditionDict:
-                    entryClass = type(resultsDict[conditionEntry])
-                    conditionDict[conditionEntry] = entryClass(conditionDict[conditionEntry])
-                    conditionList.append(conditionDict[conditionEntry]==resultsDict[conditionEntry])
+                conditionsFulfilled = conditions.doResultsSatisfyConditions(resultsDict)
 
-                if all(conditionList):
+                if conditionsFulfilled:
+
+                    conditionNeverMet = False
 
                     if resultsDict[seriesVariable] not in seriesColors.keys():
                         seriesColors[resultsDict[seriesVariable]] = colors[colorsCounter]
@@ -1006,6 +1006,14 @@ class ProcessParallelTrnsys():
                 else:
                     pass
 
+            if conditionNeverMet:
+                self.logger.warning(
+                    'The following conditions from "plotBoxConditional" were never met all at once:')
+                for condition in conditions.conditions:
+                    self.logger.warning(condition)
+                self.logger.warning('The respective plot cannot be generated')
+                return
+
             self.doc = latex.LatexReport('', '')
             if 'latexNames' in self.inputs.keys():
                 if ':' in self.inputs['latexNames']:
@@ -1036,11 +1044,6 @@ class ProcessParallelTrnsys():
 
             dummy_lines = []
             chunkLabels = []
-            labelSet = set()
-            lines = ""
-
-                    # for i in range(len(myX)):
-                    #     line="%8.4f\t%8.4f\n"%(myX[i],myY[i]);lines=lines+line
             lines = "!%s\t" % seriesVariable
 
             for chunk, style in zip(plotXDict.keys(), styles):
@@ -1062,96 +1065,77 @@ class ProcessParallelTrnsys():
                     counter=counter+1
                     mySize = len(myX)
 
-            counter = 0;
+            counter = 0
             cityName = []
             for chunk, style in zip(plotXDict.keys(), styles):
-                for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                for key in plotXDict[chunk].keys():
                     if type(key) == str:
                         keyNice = self.doc.getNiceLatexNames(key)
-                        line = "%s\t" % self.doc.getNiceLatexNames(key);
-                        lines = lines + line
+                        entry = "%s\t" % self.doc.getNiceLatexNames(key)
+                        lines = lines + entry
                         cityName.append(keyNice)
                     else:
-                        line = "%s\t" % key;
-                        lines = lines + line
+                        entry = "%s\t" % key
+                        lines = lines + entry
                         cityName.append(key)
                     counter = counter + 1
 
-                line = "\n";
-                lines = lines + line
+                entry = "\n"
+                lines = lines + entry
 
-            #test2 = test[cityName[2]].astype(float)
-            #boxplot = test.boxplot(column = [cityName[1], cityName[2]])
-            pos = num.arange(counter)
-            ax1.boxplot(myY,showfliers=False)#,test[cityName[1]].astype(float)])
+            ax1.boxplot(myY, showfliers=False)
             ax1.set_xticklabels(cityName)
-           # ax1.text(pos,cityName)
-           # ax1.boxplot(num.array(plotYDict[chunk][cityName[1]],dtype=float),'DAV') #plotYDict[chunk][0:3])  # ,'labels',{'1','2','3','4'})
 
-            if (0):
-                for X, Y in zip(myX, myY):
-                    for chunk, style in zip(plotXDict.keys(), styles):
+            for i in range(mySize):
+                for chunk, style in zip(plotXDict.keys(), styles):
 
-                        for key in plotXDict[chunk].keys():  # the varables that appear in the legend
-                            index = num.argsort(plotXDict[chunk][key])
-                            myX = num.array(plotXDict[chunk][key])[index]
-                            myY = num.array(plotYDict[chunk][key])[index]
-                            line = "%8.4f\t%8.4f\t" % (X, Y);
-                            lines = lines + line
+                    for key in plotXDict[chunk].keys():  # the varables that appear in the legend
+                        index = num.argsort(plotXDict[chunk][key])
+                        myX = num.array(plotXDict[chunk][key])[index]
+                        myY = num.array(plotYDict[chunk][key])[index]
 
-                    line = "\n";
-                    lines = lines + line
-            else:
-                for i in range(mySize):
-                    for chunk, style in zip(plotXDict.keys(), styles):
-
-                        for key in plotXDict[chunk].keys():  # the varables that appear in the legend
-                            index = num.argsort(plotXDict[chunk][key])
-                            myX = num.array(plotXDict[chunk][key])[index]
-                            myY = num.array(plotYDict[chunk][key])[index]
-
+                        if len(myX) > i:
                             if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
-                                line = myX[i] + "\t" + myY[i] + "\t"
+                                entry = myX[i] + "\t" + myY[i] + "\t"
                             elif type(myX[i]) == num.str_:
-                                line = myX[i] + "\t" + "%8.4f\t" % myY[i]
+                                entry = myX[i] + "\t" + "%8.4f\t" % myY[i]
                             elif type(myY[i]) == num.str_:
-                                line = "%8.4f\t" % myX[i] + myX[i] + "\t"
+                                entry = "%8.4f\t" % myX[i] + myY[i] + "\t"
                             else:
-                                line = "%8.4f\t%8.4f\t" % (myX[i], myY[i]);
-                            lines = lines + line
+                                entry = "%8.4f\t%8.4f\t" % (myX[i], myY[i])
+                        else:
+                            entry = "-\t"
+                        lines = lines + entry
 
-                    line = "\n";
-                    lines = lines + line
-
-            # box = ax1.get_position()
-            # ax1.set_position([box.x0, box.y0, box.width, box.height])
+                entry = "\n"
+                lines = lines + entry
 
             ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
             ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
 
             conditionsFileName = ''
-            if len(conditionDict) == 1:
-                conditionName = self.doc.getNiceLatexNames(sorted(conditionDict)[0])
-                ax1.set_title(conditionName + ' = ' + str(conditionDict[sorted(conditionDict)[0]]))
-                conditionsFileName = sorted(conditionDict)[0] + '=' + str(conditionDict[sorted(conditionDict)[0]])
-            else:
-                conditionsTitle = ''
-                for conditionEntry in conditionDict:
-                    conditionName = self.doc.getNiceLatexNames(conditionEntry)
-                    conditionsTitle += conditionName + ' = ' + str(conditionDict[conditionEntry]) + ', '
-                    conditionsFileName += conditionEntry + '=' + str(conditionDict[conditionEntry]) + '_'
-                conditionsTitle = conditionsTitle[:-2]
-                ax1.set_title(conditionsTitle)
-                conditionsFileName = conditionsFileName[:-1]
-            # if chunkVariable is not '':
-            #
+            conditionsTitle = ''
+            for condition in conditions.conditions:
+                conditionsFileName += condition.serializedCondition
+                if conditionsTitle != '':
+                    conditionsTitle += ', ' + condition.serializedCondition
+                else:
+                    conditionsTitle += condition.serializedCondition
 
-            # fig1.canvas.draw()
-            # if legend2 is not None:
-            #    ax1.add_artist(legend2)
-            #    legend2.set_in_layout(True)
-            # if legend1 is not None:
-            #    legend1.set_in_layout(True)
+            conditionsTitle = conditionsTitle.replace('RANGE', '')
+            conditionsTitle = conditionsTitle.replace('LIST', '')
+
+            conditionsFileName = conditionsFileName.replace('==', '=')
+            conditionsFileName = conditionsFileName.replace('>', '_g_')
+            conditionsFileName = conditionsFileName.replace('<', '_l_')
+            conditionsFileName = conditionsFileName.replace('>=', '_ge_')
+            conditionsFileName = conditionsFileName.replace('<=', '_le_')
+            conditionsFileName = conditionsFileName.replace('|', '_o_')
+            conditionsFileName = conditionsFileName.replace('RANGE:', '')
+            conditionsFileName = conditionsFileName.replace('LIST:', '')
+
+            ax1.set_title(conditionsTitle)
+
             if chunkVariable == '':
                 fileName = xAxisVariable + '_' + yAxisVariable + '_' + seriesVariable + '_' + conditionsFileName
             else:
@@ -1159,7 +1143,7 @@ class ProcessParallelTrnsys():
             fig1.savefig(os.path.join(pathFolder, 'BoxPlot' + fileName), bbox_inches='tight')
             plt.close()
 
-            if (self.inputs["setPrintDataForGle"]):
+            if self.inputs["setPrintDataForGle"]:
                 outfile = open(os.path.join(pathFolder, 'BoxPlot' + fileName +'dat'), 'w')
                 outfile.writelines(lines)
                 outfile.close()
