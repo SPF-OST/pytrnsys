@@ -66,8 +66,9 @@ class PlotGle():
 
         line ="set texlabels useLatex\n";lines=lines+line
         line ="set font texcmr\n";lines=lines+line
-        line ="sizeLegend=0.25\n"
-        line ="markerSize=0.05\n";lines=lines+line
+        line ="sizeLegend=0.25\n";lines=lines+line
+        line ="set hei 0.35\n";lines=lines+line
+        line ="markerSize=0.15\n";lines=lines+line
         line ="lSize=0.05\n";lines=lines+line
         line ="myMarker1$=\"triangle\"\n";lines=lines+line
         line ="myStyle1  =1\n";lines=lines+line
@@ -86,7 +87,7 @@ class PlotGle():
 
         return lines        
     
-    def getEasyPlot(self,nameGleFile,fileNameData,legends,useSameStyle=True):
+    def getEasyPlot(self,nameGleFile,fileNameData,legends,useSameStyle=True,inputsAsPairs=False):
         
         
         lines = self.getFigCaption()
@@ -95,25 +96,38 @@ class PlotGle():
         lines = lines+"\tfileData$=\"%s\"\n"%fileNameData
         
         col1=1
-        col2=2        
-        
-        for i in range(len(legends)):
+        col2=2
+
+        if (inputsAsPairs):
+            mySize = int(len(legends)/2)
+        else:
+            mySize = len(legends)
+
+        for i in range(mySize):
             
             line="\tdata fileData$ d%d=c%d,c%d  ignore 0\n"%(i+1,col1,col2);lines=lines+line
-                       
+
+            if (inputsAsPairs):
+                legendLine = "$%s$"%legends[col2-1]
+            else:
+                legendLine = legends[i]
+
             if(useSameStyle):
                 if(self.useMarkers==True):
-                    line="\td%d marker myMarker1$ msize markerSize line lstyle myStyle1 lwidth lSize color %s key \"%s\"\n"%(i+1,self.colorGLE[i],legends[i]);lines=lines+line            
+                    line="\td%d marker myMarker1$ msize markerSize line lstyle myStyle1 lwidth lSize color %s key \"%s\"\n"%(i+1,self.colorGLE[i],legendLine);lines=lines+line
                 else:
-                    line="\td%d line lstyle myStyle1 lwidth lSize color %s key \"%s\"\n"%(i+1,self.colorGLE[i],legends[i]);lines=lines+line                                        
+                    line="\td%d line lstyle myStyle1 lwidth lSize color %s key \"%s\"\n"%(i+1,self.colorGLE[i],legendLine);lines=lines+line
             else:
                 if(self.useMarkers==True):
-                    line="\td%d marker myMarker%d$ msize markerSize line lstyle myStyle%d lwidth lSize color %s key \"%s\"\n"%(i+1,i+1,i+1,self.colorGLE[i],legends[i]);lines=lines+line            
+                    line="\td%d marker myMarker%d$ msize markerSize line lstyle myStyle%d lwidth lSize color %s key \"%s\"\n"%(i+1,i+1,i+1,self.colorGLE[i],legendLine);lines=lines+line
                 else:
-                    line="\td%d line lstyle myStyle%d lwidth lSize color %s key \"%s\"\n"%(i+1,i+1,self.colorGLE[i],legends[i]);lines=lines+line                                        
-
-            col2=col2+1
-            
+                    line="\td%d line lstyle myStyle%d lwidth lSize color %s key \"%s\"\n"%(i+1,i+1,self.colorGLE[i],legendLine);lines=lines+line
+            if(inputsAsPairs):
+                col1=col1+2
+                col2=col2+2
+            else:
+                col2=col2+1
+        line="key pos tr hei sizeLegend offset  -0.5 0\n";lines=lines+line
         line="end graph\n";lines=lines+line                               
 			 		
         myFileNameGleFile = self.path  +"\\"+ nameGleFile+ ".gle"        

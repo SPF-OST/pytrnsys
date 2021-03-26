@@ -15,7 +15,7 @@ from . import _common
 
 
 def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, configPath,
-               stylesheet, plotStyle, comparePlotUserName, setPrintDataForGle, shallPlotUncertainties):
+               stylesheet, plotStyle, comparePlotUserName, setPrintDataForGle, shallPlotUncertainties,extensionFig):
     xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions = \
         _separatePlotVariables(plotVariables)
 
@@ -63,7 +63,7 @@ def createPlot(plotVariables, pathFolder, typeOfProcess, logger, latexNames, con
         ax.set_title(conditionsTitle)
 
     _savePlotAndData(fig, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, pathFolder, comparePlotUserName,
-                     conditionsFileNamePart, allSeries, setPrintDataForGle, shallPlotUncertainties)
+                     conditionsFileNamePart, allSeries, setPrintDataForGle, shallPlotUncertainties,extensionFig)
 
 
 def _separatePlotVariables(plotVariables):
@@ -270,16 +270,17 @@ def _setLegendsAndLabels(fig, ax, xAxisVariable, yAxisVariable, seriesVariable, 
 
 
 def _savePlotAndData(fig, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, pathFolder, comparePlotUserName,
-                     conditionsFileNamePart, allSeries, setPrintDataForGle, shallPlotUncertainties):
+                     conditionsFileNamePart, allSeries, setPrintDataForGle, shallPlotUncertainties,extensionFig):
     fileName = _getFileName(xAxisVariable, yAxisVariable, seriesVariable,
                             chunkVariable, conditionsFileNamePart, comparePlotUserName)
 
-    fig.savefig(_os.path.join(pathFolder, fileName + '.png'), bbox_inches='tight')
+    fig.savefig(_os.path.join(pathFolder, fileName + extensionFig), bbox_inches='tight')
     _plt.close()
 
     if setPrintDataForGle:
         _gle.writeData(pathFolder, fileName, allSeries, xAxisVariable, yAxisVariable,
                        seriesVariable, chunkVariable, shallPlotUncertainties)
+
 
 
 def _getFileName(xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileName, comparePlotUserName):
