@@ -12,7 +12,7 @@ class TestConditionHandler:
     @pytest.mark.parametrize(
         ["serializedConditions", "resultsDict", "areConditionsFulfilled"],
         [
-            [["city=BAS", "30<sizeHpUsed<=50", "VIceS>28"], dict(city="BAS", sizeHpUsed=44.064, VIceS=28.0676), True],
+            [["city=BAS", "30<sizeHpUsed<=50", "VIceS>28"], dict(city="BAS", sizeHpUsed=50, VIceS=28.0676), True],
             [["city=BAS", "30<sizeHpUsed<=50", "VIceS>=28"], dict(city="BAS", sizeHpUsed=44.064, VIceS=28), True],
             [["city=ZRH", "30<sizeHpUsed<50", "VIceS>28"], dict(city="BAS", sizeHpUsed=44.064, VIceS=28.0676), False],
             [["city=ZRH|BAS", "30<sizeHpUsed<50", "VIceS>28"],
