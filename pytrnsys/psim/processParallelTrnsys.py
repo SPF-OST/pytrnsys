@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as num
 import pandas as pd
 import seaborn as _seb
+import dataclasses_jsonschema as _dcj
 
 import pytrnsys.plot.plotMatplotlib as plot
 import pytrnsys.psim.debugProcess as debugProcess
@@ -25,6 +26,7 @@ import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.cost_calculation as _cc
 import pytrnsys.plot.comparison as _pc
 import pytrnsys.psim.conditions as _conds
+import pytrnsys.utils.uncertainFloat as _uf
 
 try:
     import pytrnsys_examples
@@ -995,6 +997,11 @@ class ProcessParallelTrnsys():
                     name, index = str(yAxisVariable).split('[')
                     index = int(index.replace(']', ''))
                     yAxis = resultsDict[name][index]
+
+                if isinstance(yAxis, dict):
+                    uncertainFloat: _uf.UncertainFloat = _uf.UncertainFloat.from_dict(yAxis)
+                    yAxis = uncertainFloat.mean
+
                 if resultsDict[chunkVariable] not in plotYDict.keys():
                     plotYDict[resultsDict[chunkVariable]] = {}
                     plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
@@ -1045,6 +1052,7 @@ class ProcessParallelTrnsys():
         dummy_lines = []
         chunkLabels = []
 
+        myY = []
         for chunk, style in zip(plotYDict.keys(), styles):
             dummy_lines.append(ax1.plot([], [], style, c='black'))
             if chunk is not None:
@@ -1054,7 +1062,6 @@ class ProcessParallelTrnsys():
                 else:
                     chunkLabels.append(chunk)
 
-            myY = []
             for key in plotYDict[chunk].keys():
                 sortedSeriesYs = num.sort(plotYDict[chunk][key])
 
