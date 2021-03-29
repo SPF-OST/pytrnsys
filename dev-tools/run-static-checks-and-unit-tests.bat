@@ -6,6 +6,7 @@ if exist test-results (
     rmdir /s /q test-results
 )
 
+mypy pytrnsys tests
 pylint pytrnsys pytrnsys_examples tests
 pytest ^
     --cov=pytrnsys --cov-report html:test-results/coverage --cov-report term^
