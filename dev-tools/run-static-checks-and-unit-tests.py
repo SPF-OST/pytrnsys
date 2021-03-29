@@ -41,7 +41,8 @@ def main():
         pytestCommand = "pytest " \
                         "--cov=pytrnsys --cov-report html:test-results/coverage --cov-report term " \
                         "--html=test-results/report/report.html " \
-                        "-m \"not manual\""
+                        "-m \"not manual\" " \
+                        "tests"
         sp.run(pytestCommand)
 
 
