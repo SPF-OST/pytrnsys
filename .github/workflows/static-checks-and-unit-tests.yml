@@ -34,7 +34,7 @@ jobs:
         pylint pytrnsys pytrnsys_examples tests
       continue-on-error: true
     - name: Test with pytest
-      run: |
+      run: >
         pytest
             --cov=pytrnsys --cov-report html:test-results/coverage --cov-report term
             --html=test-results/report/report.html
