@@ -1,4 +1,4 @@
-__all__ = ['createLines']
+__all__ = ["createLines"]
 
 
 import typing as _tp
@@ -24,7 +24,9 @@ def createLines(componentGroups: _output.ComponentGroups, shallUseKCHF):
     return lines
 
 
-def _createComponentGroupRowsLines(group: _output.ComponentGroup, totalCost: pytrnsys.utils.uncertainFloat.UncertainFloat):
+def _createComponentGroupRowsLines(
+    group: _output.ComponentGroup, totalCost: pytrnsys.utils.uncertainFloat.UncertainFloat
+):
     components = [c for c in group.components.factors if c.cost > 0]
 
     if not components:
@@ -47,10 +49,9 @@ def _createComponentGroupRowsLines(group: _output.ComponentGroup, totalCost: pyt
     return lines
 
 
-def _createComponentRowLine(component: _output.CostFactor,
-                            totalCost: pytrnsys.utils.uncertainFloat.UncertainFloat,
-                            groupName: _tp.Optional[str]) \
-        -> str:
+def _createComponentRowLine(
+    component: _output.CostFactor, totalCost: pytrnsys.utils.uncertainFloat.UncertainFloat, groupName: _tp.Optional[str]
+) -> str:
     formattedGroupNameOrEmpty = rf"\textbf{{{groupName}}}" if groupName else ""
 
     cost = component.cost
@@ -62,8 +63,10 @@ def _createComponentRowLine(component: _output.CostFactor,
     unit = component.value.unit
     lifetime = component.lifetimeInYears
 
-    line = rf"{formattedGroupNameOrEmpty} & {compName} & {coeffs.offset:.0f}+{coeffs.slope:.0f}/{unit} " \
-           rf"& {size:.2f} {unit} & {lifetime} & {cost:.1f} ({costShare:.1f}\%) \\"
+    line = (
+        rf"{formattedGroupNameOrEmpty} & {compName} & {coeffs.offset:.0f}+{coeffs.slope:.0f}/{unit} "
+        rf"& {size:.2f} {unit} & {lifetime} & {cost:.1f} ({costShare:.1f}\%) \\"
+    )
 
     return line
 

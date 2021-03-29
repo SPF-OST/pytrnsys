@@ -1,44 +1,49 @@
-
 import numpy as num
 import pytrnsys.pdata.processFiles as spfUtils
 import os
 import re
 from string import digits
 import logging
-logger = logging.getLogger('root')
 
-def replaceAllUnits(linesRead ,idBegin ,TrnsysUnits ,filesUnitUsedInDdck ,filesUsedInDdck):
+logger = logging.getLogger("root")
+
+
+def replaceAllUnits(linesRead, idBegin, TrnsysUnits, filesUnitUsedInDdck, filesUsedInDdck):
 
     unitId = idBegin
 
     for i in range(len(TrnsysUnits)):
-        unitId=unitId+1
-        replaceUnitNumber(linesRead ,int(TrnsysUnits[i]) ,'£'+str(unitId))
-
+        unitId = unitId + 1
+        replaceUnitNumber(linesRead, int(TrnsysUnits[i]), "£" + str(unitId))
 
     for i in range(len(filesUnitUsedInDdck)):
 
         try:
             filesUnitUsedInDdck[i] = int(filesUnitUsedInDdck[i])
 
-            raise ValueError("fileUnit is an integer %d. THIS IS NOT ALLOWED IF AUTOMATIC UNIT NUMBERING IS ACTIVE" % filesUnitUsedInDdck[i])
+            raise ValueError(
+                "fileUnit is an integer %d. THIS IS NOT ALLOWED IF AUTOMATIC UNIT NUMBERING IS ACTIVE"
+                % filesUnitUsedInDdck[i]
+            )
 
         except:
             # print ("fileUnit is a string %s. Look for the string unit" % self.filesUnitUsedInDdck[i])
             for j in range(len(linesRead)):
-                splitEqual= linesRead[j].split("=")
+                splitEqual = linesRead[j].split("=")
 
-                if (splitEqual[0].replace(" " ,"") == filesUnitUsedInDdck[i]):
+                if splitEqual[0].replace(" ", "") == filesUnitUsedInDdck[i]:
                     unitId = unitId + 1
 
-                    linesRead[j] = "%s = %d\n " %(filesUnitUsedInDdck[i] ,unitId)
-                    logger.debug("StringUnit from file %s changed from %s to %d" %
-                    (filesUsedInDdck[i], splitEqual[1][:-1], unitId))
+                    linesRead[j] = "%s = %d\n " % (filesUnitUsedInDdck[i], unitId)
+                    logger.debug(
+                        "StringUnit from file %s changed from %s to %d"
+                        % (filesUsedInDdck[i], splitEqual[1][:-1], unitId)
+                    )
 
     return unitId
 
 
-def readAllTypes(lines,sort=True):
+def readAllTypes(lines, sort=True):
 
     """
     It reads all types and units from a a list of lines readed from a deck file.
@@ -75,8 +80,8 @@ def readAllTypes(lines,sort=True):
         splitBlank = lines[i].split()
 
         try:
-            if (splitBlank[0] == "ASSIGN"):
-                if(len(splitBlank)>2):
+            if splitBlank[0] == "ASSIGN":
+                if len(splitBlank) > 2:
                     filesUnitUsedInDdck.append(splitBlank[2])
                     filesUsedInDdck.append(splitBlank[1])
                 else:
@@ -93,28 +98,28 @@ def readAllTypes(lines,sort=True):
         except:
             # raise ValueError('Logical ASSIGN number of the following ddck-line cannot be changed: '+line)
             pass
-        
+
         try:
-            if len(splitBlank)>3:
+            if len(splitBlank) > 3:
                 nUnit = "".join([c for c in splitBlank[1].replace(" ", "") if c in digits])
                 types = splitBlank[2].replace(" ", "")
                 ntype = "".join([c for c in splitBlank[3].replace(" ", "") if c in digits])
                 unit = splitBlank[0].replace(" ", "")
 
-                if (unit.lower() == "unit".lower() and types.lower() == "Type".lower()):
+                if unit.lower() == "unit".lower() and types.lower() == "Type".lower():
                     #                    print "unit:%s nUnit:%s types:%s ntype:%s"%(unit,nUnit,types,ntype)
                     TrnsysTypes.append(int(ntype))
                     TrnsysUnits.append(int(nUnit))
 
         except:
-            raise ValueError('Unit number of the following ddck-line cannot be changed: '+line)
+            raise ValueError("Unit number of the following ddck-line cannot be changed: " + line)
 
     # We need to sort them for units. Otherwise when we change unit numbers we can change something already changed
     # for example we replace UNIT 400 for UNIT 20 and at the end we have UNIT 20 again and we change it for UNIT 100
 
-    if(sort==False):
-        TrnsysTypesSorted=TrnsysTypes
-        TrnsysUnitsSorted=TrnsysUnits
+    if sort == False:
+        TrnsysTypesSorted = TrnsysTypes
+        TrnsysUnitsSorted = TrnsysUnits
     else:
         TrnsysTypesSorted = []
         TrnsysUnitsSorted = []
@@ -125,9 +130,10 @@ def readAllTypes(lines,sort=True):
             TrnsysUnitsSorted.append(TrnsysUnits[k])
             TrnsysTypesSorted.append(TrnsysTypes[k])
 
-    #Check if any value is repeated.
+    # Check if any value is repeated.
 
-    return TrnsysUnitsSorted,TrnsysTypesSorted,filesUsedInDdck,filesUnitUsedInDdck
+    return TrnsysUnitsSorted, TrnsysTypesSorted, filesUsedInDdck, filesUnitUsedInDdck
+
 
 def ireplace(old, new, text):
     """
@@ -147,30 +153,27 @@ def ireplace(old, new, text):
         index_l = text.lower().find(old.lower(), idx)
         if index_l == -1:
             return text
-        text = text[:index_l] + new + text[index_l + len(old):]
+        text = text[:index_l] + new + text[index_l + len(old) :]
         idx = index_l + len(new)
     return text
 
 
-
-def replaceUnitNumber(linesRead,oldUnit,newUnit):
+def replaceUnitNumber(linesRead, oldUnit, newUnit):
     """
     Check if the lines contain more than one [XX,XX] and make it crash. It will not work
     """
     lines = linesRead
 
-    unitFromTypeChanged=False
+    unitFromTypeChanged = False
 
-
-
-    if(oldUnit==newUnit):
+    if oldUnit == newUnit:
         pass
     else:
 
         oldString = "UNIT %d" % (oldUnit)
         newString = "UNIT %s" % (newUnit)
 
-        if(oldUnit==32):
+        if oldUnit == 32:
             pass
         else:
             pass
@@ -181,20 +184,19 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
 
             mySplit = lines[i].split("!")
 
-            if(unitFromTypeChanged==False):
+            if unitFromTypeChanged == False:
 
                 # newLine= lines[i].replace(oldString, newString)
-                newLine= ireplace(oldString, newString,lines[i])
+                newLine = ireplace(oldString, newString, lines[i])
 
-                if(newLine!=lines[i]):
-                    unitFromTypeChanged=True
-                    logger.debug("replacement SUCCESS from %s to %s"%(oldString,newString))
+                if newLine != lines[i]:
+                    unitFromTypeChanged = True
+                    logger.debug("replacement SUCCESS from %s to %s" % (oldString, newString))
                     splitLine = newLine.split("!")
-                    splitLineNoBreak = splitLine[0].replace("\n","")
-                    lines[i]=splitLineNoBreak+" !"+myAddText
+                    splitLineNoBreak = splitLine[0].replace("\n", "")
+                    lines[i] = splitLineNoBreak + " !" + myAddText
 
-
-        if (unitFromTypeChanged == False):
+        if unitFromTypeChanged == False:
             logger.warning("replacement FAILURE from %s to %s" % (oldUnit, newUnit))
         else:
             for i in range(len(lines)):
@@ -208,21 +210,21 @@ def replaceUnitNumber(linesRead,oldUnit,newUnit):
                 mySplit = lines[i].split("!")
 
                 if oldString in mySplit[0]:
-                    newLine = mySplit[0].replace('['+oldString, '['+newString)
-                    if mySplit[0][len(oldString)-1]==',':
+                    newLine = mySplit[0].replace("[" + oldString, "[" + newString)
+                    if mySplit[0][len(oldString) - 1] == ",":
                         newLine = mySplit[0].replace(oldString, newString)
 
                 else:
                     newLine = mySplit[0]
 
-                replaced=False
-                if(newLine!=mySplit[0]):
+                replaced = False
+                if newLine != mySplit[0]:
                     myNewSplit = newLine.split("!")
                     lineWithoutBreak = myNewSplit[0].replace("\n", "")
-                    lines[i] = lineWithoutBreak +" !" + myAddText
+                    lines[i] = lineWithoutBreak + " !" + myAddText
 
 
-def getTypeFromUnit(myUnit,linesReadedNoComments):
+def getTypeFromUnit(myUnit, linesReadedNoComments):
 
     for i in range(len(linesReadedNoComments)):
 
@@ -234,53 +236,52 @@ def getTypeFromUnit(myUnit,linesReadedNoComments):
             types = splitEquality[2].replace(" ", "")
             ntype = splitEquality[3].replace(" ", "")
 
-            if (unit.lower() == "unit".lower() and types.lower() == "Type".lower()):
+            if unit.lower() == "unit".lower() and types.lower() == "Type".lower():
 
-                if (nUnit.lower() == myUnit.lower()):
-                    print ("UNIT FOUND myUnit:%s type:%s" % (myUnit, ntype))
+                if nUnit.lower() == myUnit.lower():
+                    print("UNIT FOUND myUnit:%s type:%s" % (myUnit, ntype))
                     return ntype
         except:
             pass
 
     return None
 
+
 def getDataFromDeck(linesReadedNoComments, myName, typeValue="string"):
 
-    value = getMyDataFromDeck(linesReadedNoComments,myName)
+    value = getMyDataFromDeck(linesReadedNoComments, myName)
 
-    if (value == None):
+    if value == None:
         return None
 
-    if (typeValue == "double"):
+    if typeValue == "double":
         try:
             return float(value)
         except:
-            raise ValueError("getDataFromDeck tried to get a float but it most likely be a string:%s."%value)
+            raise ValueError("getDataFromDeck tried to get a float but it most likely be a string:%s." % value)
 
-    elif (typeValue == "int"):
+    elif typeValue == "int":
         return int(value)
-    elif (typeValue == "string"):
+    elif typeValue == "string":
         return value
     else:
         raise ValueError("typeValue must be double,int or string")
 
 
-
-def getMyDataFromDeck(linesReadedNoComments,myName):
-
+def getMyDataFromDeck(linesReadedNoComments, myName):
 
     for i in range(len(linesReadedNoComments)):
 
-        splitEquality = linesReadedNoComments[i].split('=')
+        splitEquality = linesReadedNoComments[i].split("=")
 
-        found=False
+        found = False
         try:
             name = splitEquality[0].replace(" ", "")
             value = splitEquality[1].replace(" ", "")
             value = splitEquality[1].replace("\n", "")
 
-            if (name.lower() == myName.lower()):
-                found=True
+            if name.lower() == myName.lower():
+                found = True
                 return value
 
         except:
@@ -289,7 +290,7 @@ def getMyDataFromDeck(linesReadedNoComments,myName):
     return None
 
 
-def loadDeck(nameDck,eraseBeginComment=True,eliminateComments=True):
+def loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True):
     """
     Parameters
     ----------
@@ -304,131 +305,144 @@ def loadDeck(nameDck,eraseBeginComment=True,eliminateComments=True):
         list of lines obateined form the deck without the comments
     """
 
-    infile = open(nameDck, 'r')
+    infile = open(nameDck, "r")
 
     lines = infile.readlines()
 
     #        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
-    if (eraseBeginComment == True):
-        skypChar = ['*', '!', '      \n']  # ['*'] #This will eliminate the lines starting with skypChar
+    if eraseBeginComment == True:
+        skypChar = ["*", "!", "      \n"]  # ['*'] #This will eliminate the lines starting with skypChar
     else:
-        skypChar = ['!', '      \n']  # ['*'] #This will eliminate the lines starting with skypChar
+        skypChar = ["!", "      \n"]  # ['*'] #This will eliminate the lines starting with skypChar
 
-    replaceChar =  None #[',','\''] #This characters will be eliminated, so replaced by nothing
+    replaceChar = None  # [',','\''] #This characters will be eliminated, so replaced by nothing
 
     linesChanged = spfUtils.purgueLines(lines, skypChar, replaceChar, removeBlankLines=True)
 
     # Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
-    if (eliminateComments == True):
-        linesChanged = spfUtils.purgueComments(linesChanged, ['!'])
+    if eliminateComments == True:
+        linesChanged = spfUtils.purgueComments(linesChanged, ["!"])
 
     return linesChanged
 
 
-def checkEquationsAndConstants(lines,nameDck):
+def checkEquationsAndConstants(lines, nameDck):
     # lines=linesChanged
     for i in range(len(lines)):
 
         splitBlank = lines[i].split()
 
-        if (splitBlank[0].lower() == "EQUATIONS".lower() or splitBlank[0].lower() == "CONSTANTS".lower()):
+        if splitBlank[0].lower() == "EQUATIONS".lower() or splitBlank[0].lower() == "CONSTANTS".lower():
 
             lineError = i + 1
             try:
                 numberOfValues = int(splitBlank[1])
             except:
                 raise ValueError(
-                    "checkEquationsAndConstants %s can't be split in line i:%d (missing number?)" % (splitBlank, i))
+                    "checkEquationsAndConstants %s can't be split in line i:%d (missing number?)" % (splitBlank, i)
+                )
 
             countedValues = 0  # start counting
             error = 0
-            while (error == 0):
+            while error == 0:
                 i = i + 1
 
-                splitEquality = lines[i].split('=')
+                splitEquality = lines[i].split("=")
                 error = 1
                 #                    print "count=%d"%countedValues
                 #                    print splitEquality
 
-                if (len(splitEquality) >= 2):
+                if len(splitEquality) >= 2:
                     #                        print "counting at %s"%(self.linesChanged[i])
                     error = 0
                     countedValues = countedValues + 1
 
-            if (countedValues != numberOfValues):
+            if countedValues != numberOfValues:
                 parsedFile = "%s.parse" % nameDck
-                outfile = open(parsedFile, 'w')
+                outfile = open(parsedFile, "w")
                 outfile.writelines(lines)
                 outfile.close()
 
-                raise ValueError("FATAL Error in : ", splitBlank[0], " at line ", lineError, " of parsed file =", \
-                                 parsedFile, ". Number set is ", numberOfValues, " and there are ", countedValues)
+                raise ValueError(
+                    "FATAL Error in : ",
+                    splitBlank[0],
+                    " at line ",
+                    lineError,
+                    " of parsed file =",
+                    parsedFile,
+                    ". Number set is ",
+                    numberOfValues,
+                    " and there are ",
+                    countedValues,
+                )
+
 
 def getTypeName(typeNum):
 
-    if (typeNum == 888):
+    if typeNum == 888:
         return "General Controller (SPF)"
-    if (typeNum == 65):
+    if typeNum == 65:
         return "Online plotter (TRNSYS)"
-    elif (typeNum == 816):
+    elif typeNum == 816:
         return "Averaging"
-    elif (typeNum == 862):
+    elif typeNum == 862:
         return "TColl control expected for switch (SPF)"
-    elif (typeNum == 817):
+    elif typeNum == 817:
         return "Time delay"
-    elif (typeNum == 863):
+    elif typeNum == 863:
         return "Ice controller (SPF)"
-    elif (typeNum == 993):
+    elif typeNum == 993:
         return "Recall"
-    elif (typeNum == 46):
+    elif typeNum == 46:
         return "Monthly integrator (TRNSYS)"
-    elif (typeNum == 9):
+    elif typeNum == 9:
         return "Data reader (TRNSYS)"
-    elif (typeNum == 109):
+    elif typeNum == 109:
         return "Weather data processor (TRNSYS)"
-    elif (typeNum == 33):
+    elif typeNum == 33:
         return "Psychrometrics"
-    elif (typeNum == 69):
+    elif typeNum == 69:
         return "Sky temperature"
-    elif (typeNum == 194):
+    elif typeNum == 194:
         return "PV module (TRNSYS)"
-    elif (typeNum == 320):
+    elif typeNum == 320:
         return "PID controller"
-    elif (typeNum == 861):
+    elif typeNum == 861:
         return "Ice Storage non-deiceable (SPF)"
-    elif (typeNum == 25):
+    elif typeNum == 25:
         return "User defined printer (TRNSYS)"
-    elif (typeNum == 889):
+    elif typeNum == 889:
         return "Adapted PD-controller"
-    elif (typeNum == 833):
+    elif typeNum == 833:
         return "Collector with condensation (SPF)"
-    elif (typeNum == 951):
+    elif typeNum == 951:
         return "EWS with integrated g-functions (SPF)"
-    elif (typeNum == 977):
+    elif typeNum == 977:
         return "Parameter fit heat pump (SPF)"
-    elif (typeNum == 1925 or typeNum == 1924):
+    elif typeNum == 1925 or typeNum == 1924:
         return "Plug-flow TES (SPF)"
-    elif (typeNum == 811):
+    elif typeNum == 811:
         return "Tempering valve (SPF)"
-    elif (typeNum == 929):
+    elif typeNum == 929:
         return "TeePiece (SPF)"
-    elif (typeNum == 931):
+    elif typeNum == 931:
         return "Type 931 CHECK (SPF)"
-    elif (typeNum == 1792):
+    elif typeNum == 1792:
         return "Radiant floor (SPF)"
-    elif (typeNum == 5998):
+    elif typeNum == 5998:
         return "Building ISO (SPF)"
-    elif (typeNum == 2):
+    elif typeNum == 2:
         return "Collector controller (TRNSYS)"
-    elif (typeNum == 935):
+    elif typeNum == 935:
         return "Flow solver (SPF)"
-    elif (typeNum == 711):
+    elif typeNum == 711:
         return "2D Ground model (SPF)"
-    elif (typeNum == 979):
+    elif typeNum == 979:
         return "Low temperature Al-reactor (SPF)"
 
     else:
         return "Unknown"
+
 
 def readEnergyBalanceVariablesFromDeck(lines):
     """
@@ -451,63 +465,89 @@ def readEnergyBalanceVariablesFromDeck(lines):
         a list with all energy balance terms
     """
 
-
     eBalance = []
     for i in range(len(lines)):
 
-        if(len(lines[i].split("qSysIn_"))>1 or len(lines[i].split("qSysOut_"))>1 or len(lines[i].split("elSysIn_"))>1 or len(lines[i].split("elSysOut_"))>1):
+        if (
+            len(lines[i].split("qSysIn_")) > 1
+            or len(lines[i].split("qSysOut_")) > 1
+            or len(lines[i].split("elSysIn_")) > 1
+            or len(lines[i].split("elSysOut_")) > 1
+        ):
             myEqualSplit = lines[i].split("=")
 
-            if(len(myEqualSplit)>1): #Otherwise if we add one of this variables in a printer it will copy the whole printer line here.
+            if (
+                len(myEqualSplit) > 1
+            ):  # Otherwise if we add one of this variables in a printer it will copy the whole printer line here.
                 varBalance = myEqualSplit[0]
-                eBalance.append(varBalance.replace(" ",""))
-
+                eBalance.append(varBalance.replace(" ", ""))
 
     return eBalance
 
-def addEnergyBalanceMonthlyPrinter(unit,eBalance):
+
+def addEnergyBalanceMonthlyPrinter(unit, eBalance):
     """
-        Adds a monthly printer in the deck using the energy balance variables.
-        It also calulates the most common KPI such as monthly and yearly SPF
-        
-        Change JS: Calculate Energy Balance on monthly basis.
+    Adds a monthly printer in the deck using the energy balance variables.
+    It also calulates the most common KPI such as monthly and yearly SPF
+
+    Change JS: Calculate Energy Balance on monthly basis.
     """
 
     # size = len(self.qBalanceIn)+len(self.qBalanceOut)+len(self.elBalanceIn)+len(self.elBalanceOut)
-    
-    ImbalanceString = 'qImb = '
+
+    ImbalanceString = "qImb = "
 
     for q in eBalance:
-        if 'qSysOut' in q:
-            ImbalanceString += ' - ' + q
+        if "qSysOut" in q:
+            ImbalanceString += " - " + q
 
-        elif 'qSysIn' in q or 'elSysIn_Q' in q:
-            ImbalanceString += ' + ' + q
-    if ImbalanceString=='qImb = ':
-        ImbalanceString += '0'
+        elif "qSysIn" in q or "elSysIn_Q" in q:
+            ImbalanceString += " + " + q
+    if ImbalanceString == "qImb = ":
+        ImbalanceString += "0"
 
     lines = []
-    line = "***************************************************************\n";lines.append(line)
-    line = "**BEGIN Monthly Energy Balance printer automatically generated from DDck files\n";lines.append(line)
-    line = "***************************************************************\n";lines.append(line)
-    line = "EQUATIONS 1\n";lines.append(line)
-    line = ImbalanceString + '\n';lines.append(line)
-    line = "CONSTANTS 1\n";lines.append(line)
-    line = "unitPrintEBal=%d\n"%unit;lines.append(line)
-    line = "ASSIGN temp\ENERGY_BALANCE_MO.Prt unitPrintEBal\n";lines.append(line)
-    line = "UNIT %d Type 46\n"%unit;lines.append(line)
-    line = "PARAMETERS 6\n";lines.append(line)
-    line = "unitPrintEBal !1: Logical unit number\n";lines.append(line)
-    line = "-1 !2: for monthly summaries\n";lines.append(line)
-    line = "1  !3: 1:print at absolute times\n";lines.append(line)
-    line = "-1 !4 -1: monthly integration\n";lines.append(line)
-    line = "1  !5 number of outputs to avoid integration\n";lines.append(line)
-    line = "1  !6 output number to avoid integration\n";lines.append(line)
-    line = "INPUTS %d\n"%(len(eBalance)+2);lines.append(line)
-    allvars = "TIME "+" ".join(eBalance) + ' qImb'
-    line = "%s\n"%allvars;lines.append(line)
-    line = "*******************************\n";lines.append(line)
-    line = "%s\n"%allvars;lines.append(line)
+    line = "***************************************************************\n"
+    lines.append(line)
+    line = "**BEGIN Monthly Energy Balance printer automatically generated from DDck files\n"
+    lines.append(line)
+    line = "***************************************************************\n"
+    lines.append(line)
+    line = "EQUATIONS 1\n"
+    lines.append(line)
+    line = ImbalanceString + "\n"
+    lines.append(line)
+    line = "CONSTANTS 1\n"
+    lines.append(line)
+    line = "unitPrintEBal=%d\n" % unit
+    lines.append(line)
+    line = "ASSIGN temp\ENERGY_BALANCE_MO.Prt unitPrintEBal\n"
+    lines.append(line)
+    line = "UNIT %d Type 46\n" % unit
+    lines.append(line)
+    line = "PARAMETERS 6\n"
+    lines.append(line)
+    line = "unitPrintEBal !1: Logical unit number\n"
+    lines.append(line)
+    line = "-1 !2: for monthly summaries\n"
+    lines.append(line)
+    line = "1  !3: 1:print at absolute times\n"
+    lines.append(line)
+    line = "-1 !4 -1: monthly integration\n"
+    lines.append(line)
+    line = "1  !5 number of outputs to avoid integration\n"
+    lines.append(line)
+    line = "1  !6 output number to avoid integration\n"
+    lines.append(line)
+    line = "INPUTS %d\n" % (len(eBalance) + 2)
+    lines.append(line)
+    allvars = "TIME " + " ".join(eBalance) + " qImb"
+    line = "%s\n" % allvars
+    lines.append(line)
+    line = "*******************************\n"
+    lines.append(line)
+    line = "%s\n" % allvars
+    lines.append(line)
 
     # self.linesChanged=self.linesChanged+lines
     return lines
@@ -515,12 +555,12 @@ def addEnergyBalanceMonthlyPrinter(unit,eBalance):
 
 def addEnergyBalanceHourlyPrinter(unit, eBalance):
     """
-        Adds a hourly printer in the deck using the energy balance variables.
-        It also calulates the most common KPI such as monthly and yearly SPF
+    Adds a hourly printer in the deck using the energy balance variables.
+    It also calulates the most common KPI such as monthly and yearly SPF
 
-        based on addEnergyBalanceMonthlyPrinter
+    based on addEnergyBalanceMonthlyPrinter
 
-        1st version: JS, 17.08.2020
+    1st version: JS, 17.08.2020
 
     """
 
@@ -538,53 +578,53 @@ def addEnergyBalanceHourlyPrinter(unit, eBalance):
     #     ImbalanceString += '0'
 
     lines = []
-    line = "***************************************************************\n";
+    line = "***************************************************************\n"
     lines.append(line)
-    line = "**BEGIN Hourly Energy Balance printer automatically generated from DDck files\n";
+    line = "**BEGIN Hourly Energy Balance printer automatically generated from DDck files\n"
     lines.append(line)
-    line = "***************************************************************\n";
+    line = "***************************************************************\n"
     lines.append(line)
     # line = "EQUATIONS 1\n";
     # lines.append(line)
     # line = ImbalanceString + '\n';
     # lines.append(line)
-    line = "CONSTANTS 1\n";
+    line = "CONSTANTS 1\n"
     lines.append(line)
-    line = "unitPrintEBal_h=%d\n" % unit;
+    line = "unitPrintEBal_h=%d\n" % unit
     lines.append(line)
-    line = "ASSIGN temp\ENERGY_BALANCE_HR.Prt unitPrintEBal_h\n";
+    line = "ASSIGN temp\ENERGY_BALANCE_HR.Prt unitPrintEBal_h\n"
     lines.append(line)
-    line = "UNIT %d Type 46\n" % unit;
+    line = "UNIT %d Type 46\n" % unit
     lines.append(line)
-    line = "PARAMETERS 6\n";
+    line = "PARAMETERS 6\n"
     lines.append(line)
-    line = "unitPrintEBal_h !1: Logical unit number\n";
+    line = "unitPrintEBal_h !1: Logical unit number\n"
     lines.append(line)
-    line = "-1 !2: for monthly summaries\n";
+    line = "-1 !2: for monthly summaries\n"
     lines.append(line)
-    line = "1  !3: 1:print at absolute times\n";
+    line = "1  !3: 1:print at absolute times\n"
     lines.append(line)
-    line = "1 !4 1: hourly integration\n";
+    line = "1 !4 1: hourly integration\n"
     lines.append(line)
-    line = "1  !5 number of outputs to avoid integration\n";
+    line = "1  !5 number of outputs to avoid integration\n"
     lines.append(line)
-    line = "1  !6 output number to avoid integration\n";
+    line = "1  !6 output number to avoid integration\n"
     lines.append(line)
-    line = "INPUTS %d\n" % (len(eBalance) + 2);
+    line = "INPUTS %d\n" % (len(eBalance) + 2)
     lines.append(line)
-    allvars = "TIME " + " ".join(eBalance) + ' qImb'
-    line = "%s\n" % allvars;
+    allvars = "TIME " + " ".join(eBalance) + " qImb"
+    line = "%s\n" % allvars
     lines.append(line)
-    line = "*******************************\n";
+    line = "*******************************\n"
     lines.append(line)
-    line = "%s\n" % allvars;
+    line = "%s\n" % allvars
     lines.append(line)
 
     # self.linesChanged=self.linesChanged+lines
     return lines
 
 
-def changeAssignPath(lines,key, rootPath):
+def changeAssignPath(lines, key, rootPath):
     """
 
     Parameters
@@ -605,20 +645,18 @@ def changeAssignPath(lines,key, rootPath):
         for i in range(len(lines)):
             splitBlank = lines[i].split()
 
-
-            if (splitBlank[0] == "ASSIGN"):
+            if splitBlank[0] == "ASSIGN":
                 splitPath = splitBlank[1].split("\\")
                 lineChanged = False
                 for j in range(len(splitPath)):
                     if splitPath[j].lower() == key:
-                        name = os.path.join(*splitPath[j + 1:])
+                        name = os.path.join(*splitPath[j + 1 :])
                         if len(splitBlank) > 2:
-                            lineChanged = "ASSIGN \"%s\" %s \n" % (
-                                os.path.join(rootPath, name), splitBlank[2])
+                            lineChanged = 'ASSIGN "%s" %s \n' % (os.path.join(rootPath, name), splitBlank[2])
                         else:
-                            lineChanged = "ASSIGN \"%s\" \n" % (os.path.join(rootPath, name))
-                if (lineChanged != False):
+                            lineChanged = 'ASSIGN "%s" \n' % (os.path.join(rootPath, name))
+                if lineChanged != False:
                     lines[i] = lineChanged
         return lines
     except:
-        raise ValueError('Unable to replace path$ in ddck' + name + 'with corresponding root directory')
+        raise ValueError("Unable to replace path$ in ddck" + name + "with corresponding root directory")

@@ -16,10 +16,11 @@ import matplotlib.pyplot as plt
 import pytrnsys.report.latexReport as latex
 
 
-class ResultsProcessedFile():
+class ResultsProcessedFile:
     """
     class for analysis of simulation data to facilitate debugging
     """
+
     def __init__(self, _path):
 
         self.path = _path
@@ -28,16 +29,19 @@ class ResultsProcessedFile():
 
     def get(self, name, resultList):
         for lines in resultList:
-            if (lines.split("\t")[0] == name):
+            if lines.split("\t")[0] == name:
                 return float(lines.split("\t")[1])
 
-    def readResultsData(self, resultType='dat', completeFolder=True, fileNameList=None):
+    def readResultsData(self, resultType="dat", completeFolder=True, fileNameList=None):
 
         pathFolder = self.path
 
         if completeFolder:
-            self.fileName = [p.relative_to(pathFolder) for p in pl.Path(pathFolder).iterdir()
-                             if p.is_dir() and p.name[0] != "." and p.name not in self.filteredfolder]
+            self.fileName = [
+                p.relative_to(pathFolder)
+                for p in pl.Path(pathFolder).iterdir()
+                if p.is_dir() and p.name[0] != "." and p.name not in self.filteredfolder
+            ]
         else:
             self.fileName = fileNameList
 
@@ -47,20 +51,20 @@ class ResultsProcessedFile():
 
             dictRes = {}
 
-            if resultType == 'dat':
+            if resultType == "dat":
                 nameWithPath = os.path.join(pathFolder, "%s\\%s-results.dat" % (name, name))
 
-                resultFile = open(nameWithPath, 'r')
+                resultFile = open(nameWithPath, "r")
                 resultList = resultFile.readlines()
                 for lines in resultList:
                     split = lines.split("\t")
-                    if(len(split)==2):
+                    if len(split) == 2:
                         try:
                             dictRes[split[0]] = float(split[1][:-1])
                         except:
                             dictRes[split[0]] = split[1][:-1]
 
-                    elif(len(split)>12):
+                    elif len(split) > 12:
                         monthVal = split[1:12]
                         dictRes[split[0]] = monthVal
                     else:
@@ -71,7 +75,7 @@ class ResultsProcessedFile():
 
                 resultFile.close()
 
-            elif resultType == 'json':
+            elif resultType == "json":
                 nameWithPath = os.path.join(pathFolder, "%s\\%s-results.json" % (name, name))
 
                 with open(nameWithPath) as json_file:
@@ -79,10 +83,10 @@ class ResultsProcessedFile():
 
             self.results.append(dictRes)
 
-    #to be moved to a child class since it is case dependent.
+    # to be moved to a child class since it is case dependent.
     def plotSPfVsAcolViceDeprecated(self):
 
-        spf  = []
+        spf = []
         aCol = []
         vIce = []
 
@@ -91,13 +95,13 @@ class ResultsProcessedFile():
             aCol.append(self.results[i]["Aunc"])
             vIce.append(self.results[i]["VIce"])
 
-        spfSorted = [x for y, x in sorted(zip(aCol,spf))]
+        spfSorted = [x for y, x in sorted(zip(aCol, spf))]
         aColSorted = sorted(aCol)
 
         fig, ax = plt.subplots(figsize=(8, 8))
         ax1 = plt.subplot()
-        ax1.plot(aColSorted,spfSorted)
-        ax1.set(ylabel='$SPF_{SHP+}$', xlabel='$A_{col}$')
+        ax1.plot(aColSorted, spfSorted)
+        ax1.set(ylabel="$SPF_{SHP+}$", xlabel="$A_{col}$")
         ax1.grid()
 
         extension = "pdf"
@@ -107,7 +111,6 @@ class ResultsProcessedFile():
 
         fig.savefig(self.spfVsAcolPdf)
 
-
     def createLatexSimulationReport(self):
 
         self.plotT = False
@@ -116,11 +119,11 @@ class ResultsProcessedFile():
 
         nameLatex = "ResultsFile"
 
-        doc = latex.LatexReport(self.path,nameLatex)
+        doc = latex.LatexReport(self.path, nameLatex)
         doc.setCleanMode(True)
 
         doc.setTitle("Processed results")
-        doc.setSubTitle("%s"%self.path.split("\\")[-1])
+        doc.setSubTitle("%s" % self.path.split("\\")[-1])
 
         doc.addBeginDocument()
 
@@ -131,6 +134,3 @@ class ResultsProcessedFile():
 
         doc.addEndDocumentAndCreateTexFile()
         doc.executeLatexFile()
-
-
-

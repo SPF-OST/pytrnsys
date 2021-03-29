@@ -14,8 +14,8 @@ import os
 import pytrnsys.plot.plotMatplotlib as plotMatplotlib
 import numpy as num
 
-class PlotTrnsysUtils():
 
+class PlotTrnsysUtils:
     def __init__(self, _path):
         self.path = _path
         self.readTrnsysFiles = readTrnsysFiles.ReadTrnsysFiles(_path)
@@ -24,13 +24,13 @@ class PlotTrnsysUtils():
         self.sizeFigX = 12
         self.sizeFigY = 6
 
-        self.color = ['k', 'b', 'g', 'r', 'c', 'm', 'y']
+        self.color = ["k", "b", "g", "r", "c", "m", "y"]
         self.i = 0
-        self.yLabel=False
+        self.yLabel = False
         self.clean()
 
-        self.printData=True
-        self.printEvery=100
+        self.printData = True
+        self.printEvery = 100
 
     #        b: blue
     #        g: green
@@ -54,11 +54,12 @@ class PlotTrnsysUtils():
     def load(self, _name):
         self.readTrnsysFiles.readUserDefinedFiles(_name)
 
-    def loadHourly(self, _name,firstConsideredTime=8760):
-        self.readTrnsysFiles.readHourlyFiles(_name,firstConsideredTime=firstConsideredTime)
+    def loadHourly(self, _name, firstConsideredTime=8760):
+        self.readTrnsysFiles.readHourlyFiles(_name, firstConsideredTime=firstConsideredTime)
 
-    def setYLabel(self,ylabel):
+    def setYLabel(self, ylabel):
         self.yLabel = ylabel
+
     def add(self, nameX, nameY, scale=1.0):
         self.i = self.i + 1
 
@@ -77,60 +78,66 @@ class PlotTrnsysUtils():
     def scaleY(self, scale):
         self.y[self.i - 1] = self.y[self.i - 1] * scale
 
-    def scaleAllX(self,scale):
+    def scaleAllX(self, scale):
         for i in range(len(self.x)):
             self.x[i] = self.x[i] * scale
 
-    def scaleAllY(self,scale):
+    def scaleAllY(self, scale):
         for i in range(len(self.y)):
             self.y[i] = self.y[i] * scale
 
-    def moveAllX(self,move):
+    def moveAllX(self, move):
         for i in range(len(self.x)):
             self.x[i] = self.x[i] + move
 
     def integrateCumulative(self):
-        dTime = (self.x[self.i - 1][2] - self.x[self.i - 1][1]) / 3600.  # Assume constant time step in hours
+        dTime = (self.x[self.i - 1][2] - self.x[self.i - 1][1]) / 3600.0  # Assume constant time step in hours
         y = num.cumsum(self.y[self.i - 1]) * dTime
         self.y[self.i - 1] = y
 
-    def plot(self,name=None):
+    def plot(self, name=None):
 
         myLegend = []
 
         for i in range(len(self.x)):
             myLegend.append(self.nameY[i])
 
-
-
-        self.myPlot.plotDynamic(self.x[0],self.y,myLegend,nameFile=name,xLabel=self.nameX[0],printData=self.printData,printEvery=self.printEvery)
+        self.myPlot.plotDynamic(
+            self.x[0],
+            self.y,
+            myLegend,
+            nameFile=name,
+            xLabel=self.nameX[0],
+            printData=self.printData,
+            printEvery=self.printEvery,
+        )
         # self.myPlot.plotDynamicOneVar(self.x[0],self.y[0],myLegend,name)
 
-    def show(self,name=False):
+    def show(self, name=False):
         fig = plt.figure(1, figsize=(self.sizeFigX, self.sizeFigY))
 
         axes = fig.add_subplot(111)
 
         myLegend = []
-        matplotlib.rcParams.update({'font.size': 15})
+        matplotlib.rcParams.update({"font.size": 15})
 
         myLegend = []
         for i in range(len(self.x)):
-            axes.plot(self.x[i], self.y[i], '-', color=self.color[i])
+            axes.plot(self.x[i], self.y[i], "-", color=self.color[i])
             myLegend.append(self.nameY[i])
 
         #            axes.set_ylabel(self.nameY[i],fontsize=20)
 
-        axes.legend(myLegend, loc='upper right', borderaxespad=0.)
+        axes.legend(myLegend, loc="upper right", borderaxespad=0.0)
 
         #        plt.legend( myLegend,bbox_to_anchor=(1.1,1),loc=2, borderaxespad=0.,fontsize=8)
 
         axes.set_xlabel(self.nameX[0], fontsize=10)
-        if(self.yLabel!=False):
+        if self.yLabel != False:
             axes.set_ylabel(self.yLabel, fontsize=10)
 
-        if(name==False):
+        if name == False:
             plt.show()
         else:
-            nameWithPath = os.path.join(self.path,name)
+            nameWithPath = os.path.join(self.path, name)
             plt.savefig(nameWithPath)

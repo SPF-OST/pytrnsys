@@ -1,6 +1,4 @@
-__all__ = ['ComponentGroup',
-           'Component',
-           'Variable']
+__all__ = ["ComponentGroup", "Component", "Variable"]
 
 import dataclasses as _dc
 import dataclasses_jsonschema as _dcj
@@ -11,7 +9,10 @@ import pytrnsys.utils.uncertainFloat as _uf
 from . import common as _common
 
 
-@_dc.dataclass(frozen=True, eq=True, )
+@_dc.dataclass(
+    frozen=True,
+    eq=True,
+)
 class Input(_dcj.JsonSchemaMixin):
     componentGroups: _tp.Sequence["ComponentGroup"]
     yearlyCosts: _tp.Sequence["YearlyCost"]

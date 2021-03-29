@@ -24,10 +24,9 @@ def getCityFromConfig(lines):
             city = weatherFile.split("_")[0]
             break
         else:
-            weatherFile = 'NoCity'
-            city = 'NoCity'
+            weatherFile = "NoCity"
+            city = "NoCity"
             pass
-
 
     return weatherFile, city
 
@@ -42,86 +41,86 @@ def getHydFromConfig(lines):
     hyd = hydLine.split("Hydraulics\\")[1]
     return hyd
 
-class ReadConfigTrnsys():
 
+class ReadConfigTrnsys:
     def __init__(self):
         pass
 
-    def str2bool(self,v):
+    def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
 
-    def readFile(self,path,name,inputs,parseFileCreated=True,controlDataType=True):
+    def readFile(self, path, name, inputs, parseFileCreated=True, controlDataType=True):
 
         skypChar = "#"
         configFile = os.path.join(path, name)
 
-        infile = open(configFile, 'r')
+        infile = open(configFile, "r")
         lines = infile.readlines()
 
-        lines = processFiles.purgueLines(lines, skypChar, None,removeBlankLines=True, removeBlankSpaces=False)
+        lines = processFiles.purgueLines(lines, skypChar, None, removeBlankLines=True, removeBlankSpaces=False)
         lines = processFiles.purgueComments(lines, skypChar)
 
         if "calcMonthly" not in inputs:
-            inputs["calcMonthly"]=[]
+            inputs["calcMonthly"] = []
 
         if "calcMonthlyTest" not in inputs:
-            inputs["calcMonthlyTest"]=[]
+            inputs["calcMonthlyTest"] = []
 
         if "calcMonthlyMax" not in inputs:
-            inputs["calcMonthlyMax"]=[]
+            inputs["calcMonthlyMax"] = []
 
         if "calcMonthlyMin" not in inputs:
-            inputs["calcMonthlyMin"]=[]
+            inputs["calcMonthlyMin"] = []
 
         if "calcHourly" not in inputs:
-            inputs["calcHourly"]=[]
+            inputs["calcHourly"] = []
 
         if "calcMonthlyFromHourly" not in inputs:
             inputs["calcMonthlyFromHourly"] = []
 
         if "calcDaily" not in inputs:
-            inputs["calcDaily"]=[]
+            inputs["calcDaily"] = []
 
         if "calc" not in inputs:
-            inputs["calc"]=[]
+            inputs["calc"] = []
 
         if "calcTest" not in inputs:
-            inputs["calcTest"]=[]
+            inputs["calcTest"] = []
 
         if "calcCumSumHourly" not in inputs:
-            inputs["calcCumSumHourly"]=[]
+            inputs["calcCumSumHourly"] = []
 
-        if "calcHourlyTest" not in inputs: #dirty trick to calculate after calcCumSumHourly DC
-            inputs["calcHourlyTest"]=[]
+        if "calcHourlyTest" not in inputs:  # dirty trick to calculate after calcCumSumHourly DC
+            inputs["calcHourlyTest"] = []
 
         if "calcTimeStep" not in inputs:
-            inputs["calcTimeStep"]=[]
+            inputs["calcTimeStep"] = []
 
         if "calcTimeStepTest" not in inputs:
-            inputs["calcTimeStepTest"]=[]
+            inputs["calcTimeStepTest"] = []
 
         if "calcCumSumTimeStep" not in inputs:
-            inputs["calcCumSumTimeStep"]=[]
+            inputs["calcCumSumTimeStep"] = []
 
-        if (parseFileCreated):
+        if parseFileCreated:
             parsedFile = "%s.parse.dat" % configFile
-            outfile = open(parsedFile, 'w')
+            outfile = open(parsedFile, "w")
             outfile.writelines(lines)
             outfile.close()
 
         for i in range(len(lines)):
 
-            if (lines[i][-1:] == "\n"):
+            if lines[i][-1:] == "\n":
                 lines[i] = lines[i][0:-1]
 
             splitLine = lines[i].split()
 
-            if (splitLine[0] == "bool"):
+            if splitLine[0] == "bool":
                 inputs[splitLine[1]] = self.str2bool(splitLine[2])
-            elif (splitLine[0] == "int"):
+            elif splitLine[0] == "int":
                 inputs[splitLine[1]] = int(splitLine[2])
-            elif (splitLine[0] == "string"):
-                if(len(splitLine)!=3):
+            elif splitLine[0] == "string":
+                if len(splitLine) != 3:
                     splitString = ""
                     for i in range(len(splitLine) - 2):
                         if i == 0:
@@ -135,70 +134,68 @@ class ReadConfigTrnsys():
                     inputs[splitLine[1]] = splitString
                     # raise ValueError("Error in string : %s"%lines[i])
                 else:
-                    inputs[splitLine[1]] = splitLine[2][1:-1] #I delete the "
-            elif (splitLine[0] == "stringArray"):
-                if splitLine[1]  not in inputs.keys():
+                    inputs[splitLine[1]] = splitLine[2][1:-1]  # I delete the "
+            elif splitLine[0] == "stringArray":
+                if splitLine[1] not in inputs.keys():
                     inputs[splitLine[1]] = []
 
                 newElement = []
-                for i in range(len(splitLine)-2):
-                    strEl = splitLine[i+2][1:-1] #I delete the "
+                for i in range(len(splitLine) - 2):
+                    strEl = splitLine[i + 2][1:-1]  # I delete the "
                     newElement.append(strEl)
                 inputs[splitLine[1]].append(newElement)
 
                 # if len(inputs[splitLine[1]])==1:
                 #     inputs[splitLine[1]]=inputs[splitLine[1]][0]
-                    
 
-            elif (splitLine[0]== "calcMonthly"):
+            elif splitLine[0] == "calcMonthly":
                 inputs["calcMonthly"].append(" ".join(splitLine[1:]))
-            elif (splitLine[0]== "calcMonthlyTest"):
+            elif splitLine[0] == "calcMonthlyTest":
                 inputs["calcMonthlyTest"].append(" ".join(splitLine[1:]))
 
-            elif (splitLine[0]== "calcMonthlyMax"):
+            elif splitLine[0] == "calcMonthlyMax":
                 inputs["calcMonthlyMax"].append(" ".join(splitLine[1:]))
 
-            elif (splitLine[0]== "calcMonthlyMin"):
+            elif splitLine[0] == "calcMonthlyMin":
                 inputs["calcMonthlyMin"].append(" ".join(splitLine[1:]))
 
-            elif (splitLine[0]== "calc"):
+            elif splitLine[0] == "calc":
                 inputs["calc"].append(" ".join(splitLine[1:]))
-            elif (splitLine[0] == "calcHourly"):
+            elif splitLine[0] == "calcHourly":
                 inputs["calcHourly"].append(" ".join(splitLine[1:]))
-            elif (splitLine[0] == "calcMonthlyFromHourly"):
+            elif splitLine[0] == "calcMonthlyFromHourly":
                 inputs["calcMonthlyFromHourly"].append(" ".join(splitLine[1:]))
-            elif (splitLine[0] == "calcDaily"):
+            elif splitLine[0] == "calcDaily":
                 inputs["calcDaily"].append(" ".join(splitLine[1:]))
-            elif (splitLine[0] == "calcHourlyTest"):
+            elif splitLine[0] == "calcHourlyTest":
                 inputs["calcHourlyTest"].append(" ".join(splitLine[1:]))
-            elif (splitLine[0] == "calcTimeStep"):
+            elif splitLine[0] == "calcTimeStep":
                 inputs["calcTimeStep"].append(" ".join(splitLine[1:]))
-            elif (splitLine[0] == "calcTimeStepTest"): #dirty trick to have it after the calcCumSumTimeStep DC
+            elif splitLine[0] == "calcTimeStepTest":  # dirty trick to have it after the calcCumSumTimeStep DC
                 inputs["calcTimeStepTest"].append(" ".join(splitLine[1:]))
 
             # elif (splitLine[0] == "calcHourlyTest"):
             #     inputs["calcHourlyTest"].append(" ".join(splitLine[1:]))
 
-            elif (splitLine[0] == "calcCumSumHourly"):
-                if(len(splitLine)==2):
+            elif splitLine[0] == "calcCumSumHourly":
+                if len(splitLine) == 2:
                     inputs["calcCumSumHourly"].append(splitLine[1])
                 else:
                     inputs["calcCumSumHourly"].append(splitLine[1:])
 
-            elif (splitLine[0] == "calcCumSumTimeStep"):
-                if(len(splitLine)==2):
+            elif splitLine[0] == "calcCumSumTimeStep":
+                if len(splitLine) == 2:
                     inputs["calcCumSumTimeStep"].append(splitLine[1])
                 else:
                     inputs["calcCumSumTimeStep"].append(splitLine[1:])
 
-            elif (splitLine[0]== "calcTest"):
+            elif splitLine[0] == "calcTest":
                 inputs["calcTest"].append(" ".join(splitLine[1:]))
 
             else:
-                if(controlDataType):
+                if controlDataType:
                     raise ValueError("type of data %s unknown" % splitLine[0])
                 else:
                     pass
 
         return lines
-

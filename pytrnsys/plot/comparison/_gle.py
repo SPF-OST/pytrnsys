@@ -1,4 +1,4 @@
-__all__ = ['writeData']
+__all__ = ["writeData"]
 
 import pathlib as _pl
 import typing as _tp
@@ -6,8 +6,16 @@ import typing as _tp
 from . import _common
 
 
-def writeData(pathFolder, fileName, allSeries: _tp.Sequence[_common.Series], abscissaVariable,
-              ordinateVariable, seriesVariable, chunkVariable,  shallPlotUncertainties):
+def writeData(
+    pathFolder,
+    fileName,
+    allSeries: _tp.Sequence[_common.Series],
+    abscissaVariable,
+    ordinateVariable,
+    seriesVariable,
+    chunkVariable,
+    shallPlotUncertainties,
+):
     columnHeadersLegend = _getColumnHeadersLegend(abscissaVariable, ordinateVariable, seriesVariable, chunkVariable)
     columnHeaders = "\t".join(f"{s.getAbscissaHeader()}\t{s.getOrdinateHeader()}" for s in allSeries)
 
