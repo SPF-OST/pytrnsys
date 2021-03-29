@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as num
 import pandas as pd
 import seaborn as _seb
+import dataclasses_jsonschema as _dcj
 
 import pytrnsys.plot.plotMatplotlib as plot
 import pytrnsys.psim.debugProcess as debugProcess
@@ -25,6 +26,7 @@ import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.cost_calculation as _cc
 import pytrnsys.plot.comparison as _pc
 import pytrnsys.psim.conditions as _conds
+import pytrnsys.utils.uncertainFloat as _uf
 
 try:
     import pytrnsys_examples
@@ -946,24 +948,22 @@ class ProcessParallelTrnsys():
     def _plotBoxOrViolin(self, plotVariables, shallPlotViolin):
         pathFolder = self.inputs["pathBase"]
 
-        if len(plotVariables) < 2:
+        if len(plotVariables) == 0:
             raise ValueError(
-                'You did not specify variable names and labels for the x and the y Axis in a compare Plot line')
-        xAxisVariable = plotVariables[0]
-        yAxisVariable = plotVariables[1]
+                'You must specify a variable name for the values for the box plot.')
+        yAxisVariable = plotVariables[0]
         chunkVariable = ''
         seriesVariable = ''
-        serializedConditions = plotVariables[2:]
+        serializedConditions = plotVariables[1:]
+        if len(plotVariables) >= 2 and not _conds.mayBeSerializedCondition(plotVariables[1]):
+            seriesVariable = plotVariables[1]
+            serializedConditions = plotVariables[2:]
         if len(plotVariables) >= 3 and not _conds.mayBeSerializedCondition(plotVariables[2]):
-            seriesVariable = plotVariables[2]
+            chunkVariable = plotVariables[2]
             serializedConditions = plotVariables[3:]
-        if len(plotVariables) >= 4 and not _conds.mayBeSerializedCondition(plotVariables[3]):
-            chunkVariable = plotVariables[3]
-            serializedConditions = plotVariables[4:]
 
         conditions = _conds.createConditions(serializedConditions)
 
-        plotXDict = {}
         plotYDict = {}
 
         seriesColors = {}
@@ -993,28 +993,23 @@ class ProcessParallelTrnsys():
                     colorsCounter += 1
                     colorsCounter = colorsCounter % len(colors)
 
-                if '[' not in xAxisVariable:
-                    xAxis = resultsDict[xAxisVariable]
-                else:
-                    name, index = str(xAxisVariable).split('[')
-                    index = int(index.replace(']', ''))
-                    xAxis = resultsDict[name][index]
                 if '[' not in yAxisVariable:
                     yAxis = resultsDict[yAxisVariable]
                 else:
                     name, index = str(yAxisVariable).split('[')
                     index = int(index.replace(']', ''))
                     yAxis = resultsDict[name][index]
-                if resultsDict[chunkVariable] not in plotXDict.keys():
-                    plotXDict[resultsDict[chunkVariable]] = {}
+
+                if isinstance(yAxis, dict):
+                    uncertainFloat: _uf.UncertainFloat = _uf.UncertainFloat.from_dict(yAxis)
+                    yAxis = uncertainFloat.mean
+
+                if resultsDict[chunkVariable] not in plotYDict.keys():
                     plotYDict[resultsDict[chunkVariable]] = {}
-                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [xAxis]
                     plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
-                elif resultsDict[seriesVariable] not in plotXDict[resultsDict[chunkVariable]].keys():
-                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [xAxis]
+                elif resultsDict[seriesVariable] not in plotYDict[resultsDict[chunkVariable]].keys():
                     plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]] = [yAxis]
                 else:
-                    plotXDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(xAxis)
                     plotYDict[resultsDict[chunkVariable]][resultsDict[seriesVariable]].append(yAxis)
 
             else:
@@ -1058,9 +1053,9 @@ class ProcessParallelTrnsys():
 
         dummy_lines = []
         chunkLabels = []
-        lines = "!%s\t" % seriesVariable
 
-        for chunk, style in zip(plotXDict.keys(), styles):
+        myY = []
+        for chunk, style in zip(plotYDict.keys(), styles):
             dummy_lines.append(ax1.plot([], [], style, c='black'))
             if chunk is not None:
                 if not isinstance(chunk, str):
@@ -1069,39 +1064,19 @@ class ProcessParallelTrnsys():
                 else:
                     chunkLabels.append(chunk)
 
-            counter = 0
-            myX = []
-            myY = []
-            mySize = 0
-            for key in plotXDict[chunk].keys():
-                index = num.argsort(plotXDict[chunk][key])
+            for key in plotYDict[chunk].keys():
+                sortedSeriesYs = num.sort(plotYDict[chunk][key])
 
-                sortedSeriesXs = num.array(plotXDict[chunk][key])[index]
-                sortedSeriesYs = num.array(plotYDict[chunk][key])
+                myY.append(sortedSeriesYs)
 
-                myX.append(sortedSeriesXs)
-                myY.append(sortedSeriesYs[index])
-
-                counter = counter + 1
-                mySize = max(len(sortedSeriesXs), mySize)
-
-        counter = 0
         cityName = []
-        for chunk, style in zip(plotXDict.keys(), styles):
-            for key in plotXDict[chunk].keys():
+        for chunk, style in zip(plotYDict.keys(), styles):
+            for key in plotYDict[chunk].keys():
                 if type(key) == str:
                     keyNice = self.doc.getNiceLatexNames(key)
-                    entry = "%s\t" % self.doc.getNiceLatexNames(key)
-                    lines = lines + entry
                     cityName.append(keyNice)
                 else:
-                    entry = "%s\t" % key
-                    lines = lines + entry
                     cityName.append(key)
-                counter = counter + 1
-
-            entry = "\n"
-            lines = lines + entry
 
         if shallPlotViolin:
             _seb.violinplot(data=myY, split=True, scale="area", inner="quartile", ax=ax1)
@@ -1110,31 +1085,6 @@ class ProcessParallelTrnsys():
 
         ax1.set_xticklabels(cityName)
 
-        for i in range(mySize):
-            for chunk, style in zip(plotXDict.keys(), styles):
-
-                for key in plotXDict[chunk].keys():  # the varables that appear in the legend
-                    index = num.argsort(plotXDict[chunk][key])
-                    myX = num.array(plotXDict[chunk][key])[index]
-                    myY = num.array(plotYDict[chunk][key])[index]
-
-                    if len(myX) > i:
-                        if type(myX[i]) == num.str_ and type(myY[i]) == num.str_:
-                            entry = myX[i] + "\t" + myY[i] + "\t"
-                        elif type(myX[i]) == num.str_:
-                            entry = myX[i] + "\t" + "%8.4f\t" % myY[i]
-                        elif type(myY[i]) == num.str_:
-                            entry = "%8.4f\t" % myX[i] + myY[i] + "\t"
-                        else:
-                            entry = "%8.4f\t%8.4f\t" % (myX[i], myY[i])
-                    else:
-                        entry = "-\t-\t"
-                    lines = lines + entry
-
-            entry = "\n"
-            lines = lines + entry
-
-        ax1.set_xlabel(self.doc.getNiceLatexNames(xAxisVariable))
         ax1.set_ylabel(self.doc.getNiceLatexNames(yAxisVariable))
 
         conditionsFileName = ''
@@ -1161,7 +1111,6 @@ class ProcessParallelTrnsys():
         ax1.set_title(conditionsTitle)
 
         possibleFileNameComponents = [
-            xAxisVariable,
             yAxisVariable,
             seriesVariable,
             chunkVariable,
@@ -1174,11 +1123,6 @@ class ProcessParallelTrnsys():
 
         fig1.savefig(os.path.join(pathFolder, f"{fileNamePrefix}_{fileName}"), bbox_inches='tight')
         plt.close()
-
-        if self.inputs["setPrintDataForGle"]:
-            outfile = open(os.path.join(pathFolder, f"{fileNamePrefix}_{fileName}.dat"), 'w')
-            outfile.writelines(lines)
-            outfile.close()
 
     def plotCalculationsAcrossSets(self):
         pathFolder = self.inputs["pathBase"]
