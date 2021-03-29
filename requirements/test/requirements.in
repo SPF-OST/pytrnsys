@@ -2,6 +2,7 @@ wheel
 
 pytest
 pytest-cov
+pytest-html
 mypy
 pylint
 
