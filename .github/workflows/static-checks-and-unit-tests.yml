@@ -31,4 +31,14 @@ jobs:
       continue-on-error: true
     - name: Test with pytest
       run: |
-        pytest -m "not manual" tests
+        pytest
+            --cov=pytrnsys --cov-report html:test-results/coverage --cov-report term
+            --html=test-results/report/report.html
+            -m "not manual"
+    - name: Upload test results and coverage reports
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results-and-coverage-report
+        path: test-results
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
