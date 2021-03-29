@@ -111,8 +111,10 @@ class _IntervalConditionFactory:
             return None, _Bound(bound, isInclusive=True)
         elif op == ">":
             return _Bound(bound, isInclusive=False), None
-        elif op == "<=":
+        elif op == ">=":
             return _Bound(bound, isInclusive=True), None
+        else:
+            raise AssertionError(f"Unknown operator: {op}.")
 
     @classmethod
     def _createBoundedInterval(cls, match: _tp.Match, serializedCondition: str) -> "_IntervalCondition":
