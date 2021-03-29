@@ -25,7 +25,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install wheel
         pip install -r requirements/test/requirements.txt
-    - name Static type checking with mypy
+    - name: Static type checking with mypy
       run: |
         mypy pytrnsys tests
       continue-on-error: true
