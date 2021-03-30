@@ -1000,8 +1000,7 @@ class ProcessParallelTrnsys:
         pathFolder = self.inputs["pathBase"]
 
         if len(plotVariables) == 0:
-            raise ValueError(
-                "You must specify a variable name for the values for the box plot.")
+            raise ValueError("You must specify a variable name for the values for the box plot.")
 
         yAxisVariable = plotVariables[0]
         chunkVariable = ""
