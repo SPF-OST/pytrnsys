@@ -1,4 +1,4 @@
-__all__ = ['ResultsWriter']
+__all__ = ["ResultsWriter"]
 
 import json
 import logging
@@ -13,7 +13,7 @@ from . import _createCostCalculations as _co
 from ._models import input as _input
 from ._models import output as _output
 
-logger = logging.getLogger('root')
+logger = logging.getLogger("root")
 
 
 class ResultsWriter:
@@ -45,13 +45,13 @@ class ResultsWriter:
         MEDIUM_SIZE = SMALL_SIZE + 2
         BIGGER_SIZE = MEDIUM_SIZE + 2
 
-        plt.rc('font', size=SMALL_SIZE)  # controls default text sizes
-        plt.rc('axes', titlesize=SMALL_SIZE)  # fontsize of the axes title
-        plt.rc('axes', labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
-        plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
-        plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
-        plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
-        plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+        plt.rc("font", size=SMALL_SIZE)  # controls default text sizes
+        plt.rc("axes", titlesize=SMALL_SIZE)  # fontsize of the axes title
+        plt.rc("axes", labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+        plt.rc("xtick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+        plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+        plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
+        plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
     def _addCostsToResultsJson(self, output: _output.Output, resultsJsonFilePath: _pl.Path):
         serializedResults = resultsJsonFilePath.read_text()
@@ -65,8 +65,9 @@ class ResultsWriter:
 
     @staticmethod
     def _createCostsDict(output: _output.Output):
-        collectorComponents = [c for g in output.componentGroups.groups
-                               for c in g.components.factors if c.name == "Collector"]
+        collectorComponents = [
+            c for g in output.componentGroups.groups for c in g.components.factors if c.name == "Collector"
+        ]
         if not collectorComponents:
             raise RuntimeError("No `Collector' component found.")
 
@@ -84,7 +85,7 @@ class ResultsWriter:
             "investment": totalCost.to_dict(),
             "energyCost": output.heatGenerationCost.to_dict(),
             "investmentPerM2": totalCostPerM2.to_dict(),
-            "investmentPerMWh": totalCostPerMwh.to_dict()
+            "investmentPerMWh": totalCostPerMwh.to_dict(),
         }
 
     # plots
@@ -94,10 +95,9 @@ class ResultsWriter:
 
         groupNames, groupCosts = zip(*groupNamesWithCost)
         simulationName = self._getSimulationName(resultsJsonFilePath)
-        self.nameCostPdf = self._plotCostShare(groupCosts, groupNames,
-                                               resultsJsonFilePath.parent,
-                                               fileName="costShare" + "-" + simulationName,
-                                               plotSize=15)
+        self.nameCostPdf = self._plotCostShare(
+            groupCosts, groupNames, resultsJsonFilePath.parent, fileName="costShare" + "-" + simulationName, plotSize=15
+        )
 
     def _doPlotsAnnuity(self, output: _output.Output, resultsJsonFilePath: _pl.Path):
         legends = []
@@ -128,16 +128,14 @@ class ResultsWriter:
                     legends.append(name)
 
         simulationName = self._getSimulationName(resultsJsonFilePath)
-        self.nameCostAnnuityPdf = self._plotCostShare(inVar,
-                                                      legends,
-                                                      resultsJsonFilePath.parent,
-                                                      fileName="costShareAnnuity" + "-" + simulationName,
-                                                      plotSize=17)
+        self.nameCostAnnuityPdf = self._plotCostShare(
+            inVar, legends, resultsJsonFilePath.parent, fileName="costShareAnnuity" + "-" + simulationName, plotSize=17
+        )
 
     def _plotCostShare(self, inVar, legends, outputPath: _pl.Path, fileName, plotSize):
         sizeFont = 30
 
-        mpl.rcParams['font.size'] = sizeFont
+        mpl.rcParams["font.size"] = sizeFont
 
         fig = plt.figure(1, figsize=(plotSize, plotSize))
 
@@ -145,8 +143,18 @@ class ResultsWriter:
 
         total = sum(inVar)
 
-        myColors = ['#66CCFF', '#336699', '#FFCC00', '#3366CC', '#66FF66', '#FF9966', '#FF9933', '#CCFF33', '#CCFFFF',
-                    '#FF9933']
+        myColors = [
+            "#66CCFF",
+            "#336699",
+            "#FFCC00",
+            "#3366CC",
+            "#66FF66",
+            "#FF9966",
+            "#FF9933",
+            "#CCFF33",
+            "#CCFFFF",
+            "#FF9933",
+        ]
 
         fracs = []
         colors = []
@@ -154,17 +162,18 @@ class ResultsWriter:
         for i in range(len(inVar)):
             fracs.append(inVar[i] / total)
             colors.append(myColors[i])
-            explode.append(0.)  # (0.05)
+            explode.append(0.0)  # (0.05)
 
-        patches, texts, autotexts = plt.pie(fracs, labels=legends, explode=explode, colors=colors, autopct='%1.1f%%',
-                                            shadow=False, startangle=0)
+        patches, texts, autotexts = plt.pie(
+            fracs, labels=legends, explode=explode, colors=colors, autopct="%1.1f%%", shadow=False, startangle=0
+        )
 
         for i in range(len(texts)):
             texts[i].set_fontsize(sizeFont)
 
-        plt.title("", bbox={'facecolor': '0.9', 'pad': 10}, fontsize=sizeFont)
+        plt.title("", bbox={"facecolor": "0.9", "pad": 10}, fontsize=sizeFont)
 
-        namePdf = f'{fileName}.pdf'
+        namePdf = f"{fileName}.pdf"
         nameWithPath = outputPath / namePdf
 
         plt.savefig(nameWithPath)
@@ -195,17 +204,16 @@ class ResultsWriter:
 
     @staticmethod
     def _getSimulationName(resultsJsonFilePath):
-        suffix = '-results'
+        suffix = "-results"
         stem = resultsJsonFilePath.stem
         assert stem.endswith(suffix)
-        return stem[:-len(suffix)]
+        return stem[: -len(suffix)]
 
     def _getIsLatexCleanMode(self, parameters):
         return parameters.cleanModeLatex if self.cleanModeLatex is None else self.cleanModeLatex
 
     @staticmethod
-    def _addTableEconomicAssumptions(parameters: _input.Parameters,
-                                     output: _output.Output, doc: latex.LatexReport):
+    def _addTableEconomicAssumptions(parameters: _input.Parameters, output: _output.Output, doc: latex.LatexReport):
         caption = "Assumptions for calculation of heat generation costs"
         names = ["", "", "", ""]
         units = None

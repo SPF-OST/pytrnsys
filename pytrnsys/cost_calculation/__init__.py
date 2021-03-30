@@ -1,4 +1,4 @@
-__all__ = ['calculateCostsAndWriteReports', 'CasesDefined', 'OTHER']
+__all__ = ["calculateCostsAndWriteReports", "CasesDefined", "OTHER"]
 
 import pathlib as _pl
 import json as _json
@@ -13,8 +13,9 @@ CasesDefined = _pt.CasesDefined
 OTHER = _pt.OTHER
 
 
-def calculateCostsAndWriteReports(configFilePath: _pl.Path, resultsDirPath: _pl.Path,
-                                  processType: _pt.ProcessType) -> None:
+def calculateCostsAndWriteReports(
+    configFilePath: _pl.Path, resultsDirPath: _pl.Path, processType: _pt.ProcessType
+) -> None:
     config = _createConfig(configFilePath)
     costCalculations = _co.createCostCalculations(config, resultsDirPath, processType)
 
@@ -24,7 +25,7 @@ def calculateCostsAndWriteReports(configFilePath: _pl.Path, resultsDirPath: _pl.
 
 
 def _createConfig(configFilePath):
-    with configFilePath.open('r') as configFile:
+    with configFilePath.open("r") as configFile:
         serializedConfig = _json.load(configFile)
 
     config = _input.Input.from_dict(serializedConfig)

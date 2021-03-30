@@ -26,12 +26,9 @@ import subprocess as sp
 import sys
 import pathlib as pl
 
-baseArgs = ['pip-compile', *sys.argv[1:]]
+baseArgs = ["pip-compile", *sys.argv[1:]]
 
-DIRS = [
-    "requirements/dev",
-    "requirements/test"
-]
+DIRS = ["requirements/dev", "requirements/ci/test"]
 
 
 def getDirPaths():
@@ -39,7 +36,7 @@ def getDirPaths():
 
 
 for d in getDirPaths():
-    inFile = str(d / 'requirements.in')
+    inFile = str(d / "requirements.in")
     args = [*baseArgs, inFile]
     print(f"Calling \"{' '.join(args)}\":")
     sp.run(args)

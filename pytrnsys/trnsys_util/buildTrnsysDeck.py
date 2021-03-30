@@ -11,20 +11,25 @@ import os
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
 import numpy as num
+
 # import Tkinter as tk
 import tkinter as tk
+
 # import Tkinter.messagebox as tkMessageBox
 from tkinter import messagebox as tkMessageBox
-#from graphviz import Graph
+
+# from graphviz import Graph
 import logging
-logger = logging.getLogger('root')
+
+logger = logging.getLogger("root")
 # stop propagting to root logger
 logger.propagate = False
 """
 This class uses a list of ddck files to built a complete TRNSYS deck file
 """
 
-class BuildTrnsysDeck():
+
+class BuildTrnsysDeck:
 
     """
     Class used to built a deck file out of a list of ddck files
@@ -39,52 +44,47 @@ class BuildTrnsysDeck():
     _pathList : str
         the Base path of the ddck files
     """
-    def __init__(self,_pathDeck,_nameDeck,_nameList):
 
-      
+    def __init__(self, _pathDeck, _nameDeck, _nameList):
+
         self.pathDeck = _pathDeck
-        self.nameDeck  = self.pathDeck + "\%s.dck" % _nameDeck
-        
-        self.oneSheetList = []       
+        self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
+
+        self.oneSheetList = []
         self.nameList = _nameList
         self.deckText = []
 
-        self.overwriteForcedByUser=False
+        self.overwriteForcedByUser = False
         self.abortedByUser = False
         self.extOneSheetDeck = "ddck"
 
-        self.skypChar = ['*','!','      \n']    #['*'] #This will eliminate the lines starting with skypChar
+        self.skypChar = ["*", "!", "      \n"]  # ['*'] #This will eliminate the lines starting with skypChar
         self.eliminateComments = False
 
-        self.replaceAutomaticUnits=False
+        self.replaceAutomaticUnits = False
 
         self.existingDckUnchecked = True
         self.dckAlreadyExists = True
 
-    def loadDeck(self,_path,_name):        
-            
-        nameOneDck = _path + "\%s.%s" % (_name,self.extOneSheetDeck)
+    def loadDeck(self, _path, _name):
 
-        
-        infile=open(nameOneDck,'r')            
-        lines=infile.readlines()        
-       
-        
+        nameOneDck = _path + "\%s.%s" % (_name, self.extOneSheetDeck)
+
+        infile = open(nameOneDck, "r")
+        lines = infile.readlines()
+
         replaceChar = None
 
-        self.linesChanged = spfUtils.purgueLines(lines,self.skypChar,replaceChar,removeBlankLines=True)   
+        self.linesChanged = spfUtils.purgueLines(lines, self.skypChar, replaceChar, removeBlankLines=True)
 
-        if(self.eliminateComments==True):
-            self.linesChanged = spfUtils.purgueComments(self.linesChanged,['!'])
+        if self.eliminateComments == True:
+            self.linesChanged = spfUtils.purgueComments(self.linesChanged, ["!"])
 
-        
         infile.close()
-        
-        return lines[0:3] #only returns the caption with the info of the file
 
+        return lines[0:3]  # only returns the caption with the info of the file
 
-
-    def readDeckList(self,pathConfig,doAutoUnitNumbering=False,dictPaths=False,replaceLineList = []):
+    def readDeckList(self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]):
         """
 
         Parameters
@@ -100,85 +100,94 @@ class BuildTrnsysDeck():
 
         """
 
-        self.unitId=9 #I start at 10 becasue it seems thta UNIT 4 and 6 can't be used?
+        self.unitId = 9  # I start at 10 becasue it seems thta UNIT 4 and 6 can't be used?
 
         self.dependencies = {}
         self.definitions = {}
         for i in range(len(self.nameList)):
-            
+
             split = self.nameList[i].split("\\")
 
-            if(self.nameList[i][1]==":"): #absolute path
+            if self.nameList[i][1] == ":":  # absolute path
 
                 nameList = split[-1]
                 pathVec = split[:-1]
-                pathList =""
+                pathList = ""
                 for j in range(len(pathVec)):
-                    if(j==0):
-                        pathList =  pathVec[j]
+                    if j == 0:
+                        pathList = pathVec[j]
                     else:
-                        pathList =  pathList+"\\"+pathVec[j]
+                        pathList = pathList + "\\" + pathVec[j]
             else:
-                
+
                 nameList = split[-1]
                 pathVec = split[:-1]
                 pathList = pathConfig
                 for j in range(len(pathVec)):
                     pathList = pathList + "\\" + pathVec[j]
-                dictPaths[self.nameList[i]]=os.path.join(pathConfig,dictPaths[self.nameList[i]])
-                
-            firstThreeLines=self.loadDeck(pathList,nameList)
+                dictPaths[self.nameList[i]] = os.path.join(pathConfig, dictPaths[self.nameList[i]])
 
-            ddck = trnsysComponent.TrnsysComponent(pathList,nameList)
+            firstThreeLines = self.loadDeck(pathList, nameList)
+
+            ddck = trnsysComponent.TrnsysComponent(pathList, nameList)
             definedVariables, requiredVariables = ddck.getVariables()
-            if 'printer' not in nameList and 'Printer' not in nameList and 'Control' not in nameList and 'control' not in nameList and 'BigIceCoolingTwoStorages' not in nameList:
-                self.dependencies[nameList] = requiredVariables-definedVariables
-                self.definitions[nameList]=definedVariables
+            if (
+                "printer" not in nameList
+                and "Printer" not in nameList
+                and "Control" not in nameList
+                and "control" not in nameList
+                and "BigIceCoolingTwoStorages" not in nameList
+            ):
+                self.dependencies[nameList] = requiredVariables - definedVariables
+                self.definitions[nameList] = definedVariables
 
             self.replaceLines(replaceLineList)
-            self.linesChanged = deckUtils.changeAssignPath(self.linesChanged,'path$',dictPaths[os.path.join(self.nameList[i])])
-            addedLines = firstThreeLines+self.linesChanged
-            
-            caption = " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"%(nameList,pathList)
+            self.linesChanged = deckUtils.changeAssignPath(
+                self.linesChanged, "path$", dictPaths[os.path.join(self.nameList[i])]
+            )
+            addedLines = firstThreeLines + self.linesChanged
 
-            if(doAutoUnitNumbering):
-                (unit,types,fileAssign,fileAssignUnit)=deckUtils.readAllTypes(addedLines)
-                logger.debug("Replacemenet of Units of file:%s"%nameList)
-                self.unitId = deckUtils.replaceAllUnits(addedLines,self.unitId,unit,fileAssignUnit,fileAssign)
+            caption = (
+                " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
+                % (nameList, pathList)
+            )
 
-                unitModifiedLines = [line.replace('£','') for line in addedLines]
+            if doAutoUnitNumbering:
+                (unit, types, fileAssign, fileAssignUnit) = deckUtils.readAllTypes(addedLines)
+                logger.debug("Replacemenet of Units of file:%s" % nameList)
+                self.unitId = deckUtils.replaceAllUnits(addedLines, self.unitId, unit, fileAssignUnit, fileAssign)
+
+                unitModifiedLines = [line.replace("£", "") for line in addedLines]
                 addedLines = unitModifiedLines
 
             self.deckText.append(caption)
-            self.deckText =  self.deckText + addedLines
-        self.logger = logging.getLogger('root')
+            self.deckText = self.deckText + addedLines
+        self.logger = logging.getLogger("root")
         # stop propagting to root logger
         self.logger.propagate = False
         self.logger.debug("Replacemenet of Units done")
 
     def createDependencyGraph(self):
-        e = Graph('ER', filename='er.gv', node_attr={'color': 'lightblue2', 'style': 'filled'})
-        e.attr('node', shape='box')
-        variables_global = ['cpwat','rhowat','nix','tamb','dtsim','cpbri','rhobri','pi','stop','start','zero']
-        for (key,value) in self.dependencies.items():
+        e = Graph("ER", filename="er.gv", node_attr={"color": "lightblue2", "style": "filled"})
+        e.attr("node", shape="box")
+        variables_global = ["cpwat", "rhowat", "nix", "tamb", "dtsim", "cpbri", "rhobri", "pi", "stop", "start", "zero"]
+        for (key, value) in self.dependencies.items():
             e.node(key)
 
-        for (key,value) in self.dependencies.items():
+        for (key, value) in self.dependencies.items():
             for (keyDef, valueDef) in self.definitions.items():
-                edgelLabel = ''
+                edgelLabel = ""
                 for dependency in value:
                     if dependency in valueDef and dependency not in variables_global:
-                        edgelLabel+=dependency+'\n'
-                if edgelLabel!='':
-                    e.edge(key,keyDef,label=edgelLabel, style='bold')
+                        edgelLabel += dependency + "\n"
+                if edgelLabel != "":
+                    e.edge(key, keyDef, label=edgelLabel, style="bold")
 
-        e.attr(label=r'\n\nEntity Relation Diagram\ndrawn by NEATO')
-        e.attr(fontsize='1')
+        e.attr(label=r"\n\nEntity Relation Diagram\ndrawn by NEATO")
+        e.attr(fontsize="1")
 
-        e.render('er.gv', view=False)
+        e.render("er.gv", view=False)
 
-
-        
     def writeDeck(self, addedLines=None):
         """
         Writes the deck stored in self.deckText in the file self.nameDeck
@@ -200,20 +209,24 @@ class BuildTrnsysDeck():
 
         ok = True
 
-        if (self.dckAlreadyExists and self.overwriteForcedByUser==False):
+        if self.dckAlreadyExists and self.overwriteForcedByUser == False:
 
             window = tk.Tk()
             window.geometry("2x2+" + str(window.winfo_screenwidth()) + "+" + str(window.winfo_screenheight()))
-            ok = tkMessageBox.askokcancel(title="Processing Trnsys", message="Do you want override %s ?\n If parallel simulations most likely accepting this will ovrewrite all the rest too. Think of it twice !! " % tempName)
+            ok = tkMessageBox.askokcancel(
+                title="Processing Trnsys",
+                message="Do you want override %s ?\n If parallel simulations most likely accepting this will ovrewrite all the rest too. Think of it twice !! "
+                % tempName,
+            )
             window.destroy()
 
-            if(ok):
+            if ok:
                 self.overwriteForcedByUser = True
 
-        if(ok):
-            tempFile=open(tempName,'w')
-            if(addedLines != None):
-                text = addedLines+self.deckText
+        if ok:
+            tempFile = open(tempName, "w")
+            if addedLines != None:
+                text = addedLines + self.deckText
             else:
                 text = self.deckText
             tempFile.writelines(text)
@@ -222,34 +235,38 @@ class BuildTrnsysDeck():
             logger.warning("dck export cancelled by user")
             self.abortedByUser = True
 
-    def readTrnsyDeck(self,useDeckName=False):
+    def readTrnsyDeck(self, useDeckName=False):
         """
-         It reads the deck generated using the DeckTrnsys Class and saves it into self.myDeck class DeckTrnsys.
+        It reads the deck generated using the DeckTrnsys Class and saves it into self.myDeck class DeckTrnsys.
         """
         nameDeck = self.nameDeck.split(".")[0]
         nameDeck = nameDeck.split("\\")[-1]
-        self.myDeck = deck.DeckTrnsys(self.pathDeck,nameDeck)
+        self.myDeck = deck.DeckTrnsys(self.pathDeck, nameDeck)
 
-        self.linesDeckReaded = self.myDeck.loadDeck(useDeckName=useDeckName,eraseBeginComment=False,eliminateComments=False)
+        self.linesDeckReaded = self.myDeck.loadDeck(
+            useDeckName=useDeckName, eraseBeginComment=False, eliminateComments=False
+        )
 
         # self.myDeck.loadDeckWithoutComments()
         # self.linesDeckReaded = self.myDeck.linesReadedNoComments
 
-    def checkTrnsysDeck(self,nameDck,check=True):
+    def checkTrnsysDeck(self, nameDck, check=True):
 
         # self.readTrnsyDeck()
         # deckUtils.checkEquationsAndConstants(self.linesDeckReaded)
 
-        lines=deckUtils.loadDeck(nameDck,eraseBeginComment=True,eliminateComments=True)
-        if(check):
-            deckUtils.checkEquationsAndConstants(lines,self.nameDeck)
+        lines = deckUtils.loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True)
+        if check:
+            deckUtils.checkEquationsAndConstants(lines, self.nameDeck)
 
-        self.linesDeckReaded=lines
+        self.linesDeckReaded = lines
         # self.myDeck.checkEquationsAndConstants(self.deckText) #This does not need to read
 
     def saveUnitTypeFile(self):
 
-        (self.TrnsysUnits, self.TrnsysTypes,self.filesUsedInDdck,self.filesUnitUsedInDdck) = deckUtils.readAllTypes(self.deckText,sort=False)
+        (self.TrnsysUnits, self.TrnsysTypes, self.filesUsedInDdck, self.filesUnitUsedInDdck) = deckUtils.readAllTypes(
+            self.deckText, sort=False
+        )
 
         self.writeTrnsysTypesUsed("UnitsType.info")
 
@@ -260,16 +277,19 @@ class BuildTrnsysDeck():
         for i in range(len(self.TrnsysTypes)):
 
             line = "%4d\t%4d\t%s\n" % (
-            self.TrnsysUnits[i], self.TrnsysTypes[i], deckUtils.getTypeName(self.TrnsysTypes[i]))
+                self.TrnsysUnits[i],
+                self.TrnsysTypes[i],
+                deckUtils.getTypeName(self.TrnsysTypes[i]),
+            )
             lines = lines + line
 
         for i in range(len(self.filesUsedInDdck)):
-            nameUnitFile=deckUtils.getDataFromDeck(self.linesDeckReaded,self.filesUnitUsedInDdck[i])
+            nameUnitFile = deckUtils.getDataFromDeck(self.linesDeckReaded, self.filesUnitUsedInDdck[i])
 
-            if(nameUnitFile==None):
-                line = "%s\tNone\t%s\n" % (self.filesUnitUsedInDdck[i],self.filesUsedInDdck[i])
+            if nameUnitFile == None:
+                line = "%s\tNone\t%s\n" % (self.filesUnitUsedInDdck[i], self.filesUsedInDdck[i])
             else:
-                line = "%s\t%s\t%s\n" % (self.filesUnitUsedInDdck[i],nameUnitFile,self.filesUsedInDdck[i])
+                line = "%s\t%s\t%s\n" % (self.filesUnitUsedInDdck[i], nameUnitFile, self.filesUsedInDdck[i])
                 # line = "%s\t%s\t%s\n" % (self.filesUnitUsedInDdck[i],nameUnitFile[:-1],self.filesUsedInDdck[i])
 
             lines = lines + line
@@ -277,28 +297,27 @@ class BuildTrnsysDeck():
         nameFile = os.path.join(self.pathDeck, name)
 
         logger.debug("Type file %s created" % nameFile)
-        outfile = open(nameFile, 'w')
+        outfile = open(nameFile, "w")
         outfile.writelines(lines)
-
 
     def automaticEnegyBalanceStaff(self):
         """
-            It reads and generates a onthly printer for energy system calculations in an automatic way
-            It needs the data read by checkTrnsysDeck
+        It reads and generates a onthly printer for energy system calculations in an automatic way
+        It needs the data read by checkTrnsysDeck
         """
         eBalance = deckUtils.readEnergyBalanceVariablesFromDeck(self.deckText)
-        unitId=self.unitId+1
+        unitId = self.unitId + 1
 
-        lines = deckUtils.addEnergyBalanceMonthlyPrinter(unitId,eBalance)
+        lines = deckUtils.addEnergyBalanceMonthlyPrinter(unitId, eBalance)
         self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
 
-        unitId=self.unitId+2
-        lines = deckUtils.addEnergyBalanceHourlyPrinter(unitId,eBalance)
+        unitId = self.unitId + 2
+        lines = deckUtils.addEnergyBalanceHourlyPrinter(unitId, eBalance)
         self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
-        
-        self.writeDeck() # Deck rewritten with added printer
 
-    def replaceLines(self,replaceList):
+        self.writeDeck()  # Deck rewritten with added printer
+
+    def replaceLines(self, replaceList):
         """
         Replaces a deck lines with different lines
         Parameters
@@ -314,9 +333,5 @@ class BuildTrnsysDeck():
             newLine = tuple[1]
             for index, line in enumerate(self.linesChanged):
                 if oldLine in line:
-                    self.linesChanged[index] = newLine +'\n'
+                    self.linesChanged[index] = newLine + "\n"
                     changedLine = oldLine
-
-
-
-

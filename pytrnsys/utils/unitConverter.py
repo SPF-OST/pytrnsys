@@ -1,4 +1,3 @@
-
 #!/usr/bin/python
 
 """
@@ -10,122 +9,141 @@ ToDo :
 
 
 def getkPaToBar():
-    return 1./101.3
+    return 1.0 / 101.3
+
 
 def getPaToBar():
-    return 1./101300
-    
+    return 1.0 / 101300
+
+
 def getBarToPa():
-    return 101300.
+    return 101300.0
+
 
 def getPaToMmca():
-    return 1./9.80665
-    
+    return 1.0 / 9.80665
+
+
 def getPaToMca():
-    return 1./9806.65
+    return 1.0 / 9806.65
+
 
 def getBarToMmca():
-    return (101300./9.80665)
+    return 101300.0 / 9.80665
+
 
 def getPaTokgCm2():
-    return 1./98066.52
-    
+    return 1.0 / 98066.52
+
+
 def getkgCm2ToPa():
     return 98066.52
-    
-def getPsiToPa(): 
+
+
+def getPsiToPa():
     return 6894.757293178
 
-def getPaToPsi(): 
+
+def getPaToPsi():
     return 0.000145038
-    
-# Energy 
+
+
+# Energy
+
 
 def getJTokWh():
-    return 1e-6/3.6
-    
-def getkWhToJ(): 
-    return 3.6*1e6
+    return 1e-6 / 3.6
 
-def getkWhToMJ(): 
+
+def getkWhToJ():
+    return 3.6 * 1e6
+
+
+def getkWhToMJ():
     return 3.6
-    
-def getJToMWh(): 
-    return 1e-9/3.6
-    
-def getkJToMWh(): 
-    return 1e-6/3.6     
 
-def getMJTokWh(): 
-    return 1.0/3.6  
-    
-def getKJhToW(): 
-    return 1.0/3.6   
-    
-def getWToKJh(): 
-    return 3.6      
-    
-class UnitConverter():
 
+def getJToMWh():
+    return 1e-9 / 3.6
+
+
+def getkJToMWh():
+    return 1e-6 / 3.6
+
+
+def getMJTokWh():
+    return 1.0 / 3.6
+
+
+def getKJhToW():
+    return 1.0 / 3.6
+
+
+def getWToKJh():
+    return 3.6
+
+
+class UnitConverter:
     def __init__(self):
-    
+
         unit = ""
-        
+
     # PRESSURE
 
     def getkPaToBar(self):
-        return 1./101.3
-    
+        return 1.0 / 101.3
+
     def getPaToBar(self):
-        return 1./101300
-        
+        return 1.0 / 101300
+
     def getBarToPa(self):
-        return 101300.
-    
+        return 101300.0
+
     def getPaToMmca(self):
-        return 1./9.80665
-        
+        return 1.0 / 9.80665
+
     def getPaToMca(self):
-        return 1./9806.65
-    
+        return 1.0 / 9806.65
+
     def getBarToMmca(self):
-        return (101300./9.80665)
-    
+        return 101300.0 / 9.80665
+
     def getPaTokgCm2(self):
-        return 1./98066.52
-        
+        return 1.0 / 98066.52
+
     def getkgCm2ToPa(self):
         return 98066.52
-        
-    def getPsiToPa(self): 
+
+    def getPsiToPa(self):
         return 6894.757293178
-    
-    def getPaToPsi(self): 
+
+    def getPaToPsi(self):
         return 0.000145038
-        
-    # Energy 
+
+    # Energy
 
     def getJTokWh(self):
-        return 1e-6/3.6
-        
-    def getkWhToJ(self): 
-        return 3.6*1e6
-        
-    def getJToMWh(self): 
-        return 1e-9/3.6
-        
-    def getkJToMWh(self): 
-        return 1e-6/3.6     
+        return 1e-6 / 3.6
 
-    def getMJTokWh(self): 
-        return 1.0/3.6  
-        
-    def getKJhToW(self): 
-        return 1.0/3.6   
-        
-    def getWToKJh(self): 
-        return 3.6      
-        
+    def getkWhToJ(self):
+        return 3.6 * 1e6
+
+    def getJToMWh(self):
+        return 1e-9 / 3.6
+
+    def getkJToMWh(self):
+        return 1e-6 / 3.6
+
+    def getMJTokWh(self):
+        return 1.0 / 3.6
+
+    def getKJhToW(self):
+        return 1.0 / 3.6
+
+    def getWToKJh(self):
+        return 3.6
+
+
 #    /* Power */
 #
 #    inline double BtuHToW() const { return 0.29307107;};
@@ -141,7 +159,7 @@ class UnitConverter():
 #
 #    inline double inToM() const { return 0.0254;};
 #    inline double ftToM() const { return 0.3048;};
-#    
+#
 #    /* Mass Flow rate */
 #
 #    inline double GpmToM3s() const  { return 0.00006309;};
@@ -151,15 +169,10 @@ class UnitConverter():
 #
 #    /* volume */
 #
-#    inline double galToM3() const {return 0.003785412;}; 
+#    inline double galToM3() const {return 0.003785412;};
 #    inline double m3ToGal() const {return 264.172052358;};
 #
 #    /* temperature */
 #
 #    inline double FToC(double tF) const {return (tF-32.)/1.8;};
 #    inline double CToF(double tC)  const {return (tC*1.8+32.);};
-
-
-
-
-        

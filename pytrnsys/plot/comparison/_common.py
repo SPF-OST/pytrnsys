@@ -1,11 +1,11 @@
 __all__ = [
-    'createManySeriesOrManyChunksFromValues',
-    'ManySeries',
-    'ManyChunks',
-    'Series',
-    'Chunk',
-    'GroupingValue',
-    'AxisValues'
+    "createManySeriesOrManyChunksFromValues",
+    "ManySeries",
+    "ManyChunks",
+    "Series",
+    "Chunk",
+    "GroupingValue",
+    "AxisValues",
 ]
 
 import dataclasses as _dc
@@ -16,20 +16,26 @@ import numpy as _np
 from pytrnsys.utils import uncertainFloat as _uf
 
 
-def createManySeriesOrManyChunksFromValues(abscissaVariable, ordinateVariable, seriesVariable,
-                                           chunkVariable, values, shallPrintUncertainties) \
-        -> _tp.Union["ManySeries", "ManyChunks", None]:
+def createManySeriesOrManyChunksFromValues(
+    abscissaVariable, ordinateVariable, seriesVariable, chunkVariable, values, shallPrintUncertainties
+) -> _tp.Union["ManySeries", "ManyChunks", None]:
     if not values:
         return None
 
     if not seriesVariable:
         valuesForSeries = values[None][None]
 
-        abscissaValues, ordinateValues = \
-            _createAbscissaAndOrdinateAxisValues(abscissaVariable, ordinateVariable, valuesForSeries)
+        abscissaValues, ordinateValues = _createAbscissaAndOrdinateAxisValues(
+            abscissaVariable, ordinateVariable, valuesForSeries
+        )
 
-        series = Series(index=None, groupingValue=None, abscissa=abscissaValues,
-                        ordinate=ordinateValues, shallPrintUncertainties=shallPrintUncertainties)
+        series = Series(
+            index=None,
+            groupingValue=None,
+            abscissa=abscissaValues,
+            ordinate=ordinateValues,
+            shallPrintUncertainties=shallPrintUncertainties,
+        )
         return ManySeries([series])
 
     if not chunkVariable:
@@ -37,8 +43,9 @@ def createManySeriesOrManyChunksFromValues(abscissaVariable, ordinateVariable, s
         for seriesValue, valuesForSeries in values[None].items():
             i = len(allSeries) + 1
             seriesGroupingValue = GroupingValue(seriesVariable, seriesValue)
-            abscissaValues, ordinateValues = \
-                _createAbscissaAndOrdinateAxisValues(abscissaVariable, ordinateVariable, valuesForSeries)
+            abscissaValues, ordinateValues = _createAbscissaAndOrdinateAxisValues(
+                abscissaVariable, ordinateVariable, valuesForSeries
+            )
 
             series = Series(i, seriesGroupingValue, abscissaValues, ordinateValues, shallPrintUncertainties)
 
@@ -53,8 +60,9 @@ def createManySeriesOrManyChunksFromValues(abscissaVariable, ordinateVariable, s
             i = sum(len(c.allSeries) for c in chunks) + 1
             seriesGroupingValue = GroupingValue(seriesVariable, seriesValue)
 
-            abscissaValues, ordinateValues = \
-                _createAbscissaAndOrdinateAxisValues(abscissaVariable, ordinateVariable, valuesForSeries)
+            abscissaValues, ordinateValues = _createAbscissaAndOrdinateAxisValues(
+                abscissaVariable, ordinateVariable, valuesForSeries
+            )
 
             series = Series(i, seriesGroupingValue, abscissaValues, ordinateValues, shallPrintUncertainties)
             allSeriesForChunk.append(series)
@@ -107,10 +115,7 @@ def _haveValuesErrors(us):
 
 
 def _createAxisValues(variableName, means, errors):
-    xAxisValues = AxisValues(variableName,
-                             mins=means - errors[:, 0],
-                             means=means,
-                             maxs=means + errors[:, 1])
+    xAxisValues = AxisValues(variableName, mins=means - errors[:, 0], means=means, maxs=means + errors[:, 1])
     return xAxisValues
 
 
@@ -173,12 +178,16 @@ class Series:
             return [f"{self.ordinate.name}{sign}({self.abscissa.name})" for sign in self._signs]
 
         if not self.chunk:
-            return [f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.groupingValue.value})"
-                    for sign in self._signs]
+            return [
+                f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.groupingValue.value})"
+                for sign in self._signs
+            ]
 
-        return [f"{self.ordinate.name}{sign}({self._indexedAbscissaName},"
-                f"{self.groupingValue.value},{self.chunk.groupingValue.value})"
-                for sign in self._signs]
+        return [
+            f"{self.ordinate.name}{sign}({self._indexedAbscissaName},"
+            f"{self.groupingValue.value},{self.chunk.groupingValue.value})"
+            for sign in self._signs
+        ]
 
 
 @_dc.dataclass()
@@ -191,8 +200,8 @@ class GroupingValue:
 class AxisValues:
     name: str
     mins: _np.ndarray
-    means:  _np.ndarray
-    maxs:  _np.ndarray
+    means: _np.ndarray
+    maxs: _np.ndarray
 
     def __post_init__(self):
         self._ensureAlLengthsEqualOrValueError()
@@ -212,4 +221,3 @@ class AxisValues:
 
         if len(shape) != 1:
             raise ValueError("`mins`, `means` and `maxs` must all be same one-dimensional arrays.")
-

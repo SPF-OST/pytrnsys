@@ -1,8 +1,4 @@
-__all__ = ['Output',
-           'ComponentGroups',
-           'ComponentGroup',
-           'CostFactors',
-           'CostFactor']
+__all__ = ["Output", "ComponentGroups", "ComponentGroup", "CostFactors", "CostFactor"]
 
 import dataclasses as _dc
 import typing as _tp
@@ -28,24 +24,25 @@ class Output:
     def createOutput(config: _input.Input, values: Values):
         parameters = config.parameters
 
-        componentGroups = ComponentGroups.createFromValues(config.componentGroups,
-                                                           values,
-                                                           parameters.rate,
-                                                           parameters.analysisPeriod,
-                                                           parameters.maintenanceRate)
-        yearlyCosts = CostFactors.createForYearlyCosts(config.yearlyCosts,
-                                                       values,
-                                                       parameters.rate,
-                                                       parameters.analysisPeriod,
-                                                       parameters.maintenanceRate)
+        componentGroups = ComponentGroups.createFromValues(
+            config.componentGroups, values, parameters.rate, parameters.analysisPeriod, parameters.maintenanceRate
+        )
+        yearlyCosts = CostFactors.createForYearlyCosts(
+            config.yearlyCosts, values, parameters.rate, parameters.analysisPeriod, parameters.maintenanceRate
+        )
 
         costResidual = _uf.UncertainFloat.create(parameters.costResidual)
-        residualCost = ResidualCost(costResidual, parameters.rate, parameters.lifetimeResVal,
-                                    parameters.analysisPeriod)
+        residualCost = ResidualCost(costResidual, parameters.rate, parameters.lifetimeResVal, parameters.analysisPeriod)
 
         electricityDemand = values[parameters.elFromGridVariable]
-        electricity = Electricity(electricityDemand, parameters.costElecFix, parameters.costElecKWh,
-                                  parameters.increaseElecCost, parameters.rate, parameters.analysisPeriod)
+        electricity = Electricity(
+            electricityDemand,
+            parameters.costElecFix,
+            parameters.costElecKWh,
+            parameters.increaseElecCost,
+            parameters.rate,
+            parameters.analysisPeriod,
+        )
 
         heatingDemand = values[parameters.qDemandVariable]
 
@@ -55,19 +52,23 @@ class Output:
 
     @property
     def annuity(self) -> _uf.UncertainFloat:
-        return self.componentGroups.annuity \
-               + self.componentGroups.maintenanceCost \
-               + self.yearlyCosts.cost \
-               + self.electricity.annuity \
-               - self.residualCost.annuity
+        return (
+            self.componentGroups.annuity
+            + self.componentGroups.maintenanceCost
+            + self.yearlyCosts.cost
+            + self.electricity.annuity
+            - self.residualCost.annuity
+        )
 
     @property
     def npvCost(self) -> _uf.UncertainFloat:
-        return self.componentGroups.cost \
-               + self.componentGroups.npvMaintenanceCost \
-               + self.yearlyCosts.npvCost \
-               + self.electricity.npvCost \
-               - self.residualCost.npvResidualValue
+        return (
+            self.componentGroups.cost
+            + self.componentGroups.npvMaintenanceCost
+            + self.yearlyCosts.npvCost
+            + self.electricity.npvCost
+            - self.residualCost.npvResidualValue
+        )
 
     @property
     def heatGenerationCost(self) -> _uf.UncertainFloat:
@@ -79,11 +80,16 @@ class ComponentGroups:
     groups: _tp.Sequence["ComponentGroup"]
 
     @staticmethod
-    def createFromValues(definitions: _tp.Sequence[_input.ComponentGroup], values: Values,
-                         rate: _uf.UncertainFloat, analysisPeriod: float, maintenanceRate: _uf.UncertainFloat) \
-            -> "ComponentGroups":
-        componentGroups = [ComponentGroup.createFromValues(g, values, rate, analysisPeriod, maintenanceRate)
-                           for g in definitions]
+    def createFromValues(
+        definitions: _tp.Sequence[_input.ComponentGroup],
+        values: Values,
+        rate: _uf.UncertainFloat,
+        analysisPeriod: float,
+        maintenanceRate: _uf.UncertainFloat,
+    ) -> "ComponentGroups":
+        componentGroups = [
+            ComponentGroup.createFromValues(g, values, rate, analysisPeriod, maintenanceRate) for g in definitions
+        ]
         return ComponentGroups(componentGroups)
 
     @property
@@ -97,7 +103,7 @@ class ComponentGroups:
     @property
     def maintenanceCost(self) -> _uf.UncertainFloat:
         return sum(g.components.maintenanceCost for g in self.groups)
-    
+
     @property
     def npvMaintenanceCost(self) -> _uf.UncertainFloat:
         return sum(g.components.npvMaintenanceCost for g in self.groups)
@@ -109,9 +115,13 @@ class ComponentGroup:
     components: "CostFactors"
 
     @staticmethod
-    def createFromValues(definition: _input.ComponentGroup, values: Values,
-                         rate: _uf.UncertainFloat, analysisPeriod: float, maintenanceRate: _uf.UncertainFloat)\
-            -> "ComponentGroup":
+    def createFromValues(
+        definition: _input.ComponentGroup,
+        values: Values,
+        rate: _uf.UncertainFloat,
+        analysisPeriod: float,
+        maintenanceRate: _uf.UncertainFloat,
+    ) -> "ComponentGroup":
         costFactors = CostFactors.createForComponentGroup(definition, values, rate, analysisPeriod, maintenanceRate)
 
         return ComponentGroup(definition.name, costFactors)
@@ -122,21 +132,30 @@ class CostFactors:
     factors: _tp.Sequence["CostFactor"]
 
     @staticmethod
-    def createForYearlyCosts(definitions: _tp.Sequence[_input.YearlyCost], values: Values,
-                             rate: _uf.UncertainFloat, analysisPeriod: float,
-                             maintenanceRate: _uf.UncertainFloat) \
-            -> "CostFactors":
-        costFactors = [_createCostFactor(d, values, rate, analysisPeriod, analysisPeriod, maintenanceRate)
-                       for d in definitions]
+    def createForYearlyCosts(
+        definitions: _tp.Sequence[_input.YearlyCost],
+        values: Values,
+        rate: _uf.UncertainFloat,
+        analysisPeriod: float,
+        maintenanceRate: _uf.UncertainFloat,
+    ) -> "CostFactors":
+        costFactors = [
+            _createCostFactor(d, values, rate, analysisPeriod, analysisPeriod, maintenanceRate) for d in definitions
+        ]
         return CostFactors(costFactors)
 
     @staticmethod
-    def createForComponentGroup(definition: _input.ComponentGroup, values: Values,
-                                rate: _uf.UncertainFloat, analysisPeriod: float,
-                                maintenanceRate: _uf.UncertainFloat) \
-            -> "CostFactors":
-        yearlyCosts = [_createCostFactor(d, values, rate, d.lifetimeInYears, analysisPeriod, maintenanceRate)
-                       for d in definition.components]
+    def createForComponentGroup(
+        definition: _input.ComponentGroup,
+        values: Values,
+        rate: _uf.UncertainFloat,
+        analysisPeriod: float,
+        maintenanceRate: _uf.UncertainFloat,
+    ) -> "CostFactors":
+        yearlyCosts = [
+            _createCostFactor(d, values, rate, d.lifetimeInYears, analysisPeriod, maintenanceRate)
+            for d in definition.components
+        ]
         return CostFactors(yearlyCosts)
 
     @property
@@ -154,7 +173,7 @@ class CostFactors:
     @property
     def maintenanceCost(self) -> _uf.UncertainFloat:
         return sum(f.maintenanceCost for f in self.factors)
-    
+
     @property
     def npvMaintenanceCost(self) -> _uf.UncertainFloat:
         return sum(f.npvMaintenanceCost for f in self.factors)
@@ -269,7 +288,7 @@ class ResidualCost:
 
     @property
     def npvResidualValue(self) -> _uf.UncertainFloat:
-        discountFromEnd = (1 + self.rate) ** (-1. * self.analysisPeriod)
+        discountFromEnd = (1 + self.rate) ** (-1.0 * self.analysisPeriod)
         npvResidualValue = discountFromEnd * self.residualValue
         return npvResidualValue
 

@@ -11,11 +11,14 @@ import pytrnsys.cost_calculation as cc
 
 class TestCostCalculation:
     @pytest.mark.manual
-    @pytest.mark.parametrize(["costConfigFileName", "resultsDirName"], [
-        ['costSolarIce_HpSplit.json', 'results'],
-        ['costSolarIce_HpSplit_eYearly0.json', 'results_eYearly0'],
-        ['costSolarIce_HpSplit_typeOfProcess_json.json', 'results_json_files'],
-    ])
+    @pytest.mark.parametrize(
+        ["costConfigFileName", "resultsDirName"],
+        [
+            ["costSolarIce_HpSplit.json", "results"],
+            ["costSolarIce_HpSplit_eYearly0.json", "results_eYearly0"],
+            ["costSolarIce_HpSplit_typeOfProcess_json.json", "results_json_files"],
+        ],
+    )
     def test(self, costConfigFileName: str, resultsDirName: str, caplog: pytest.LogCaptureFixture):
         helper = Helper(costConfigFileName, resultsDirName, caplog)
         helper.setup()
@@ -32,14 +35,14 @@ class Helper:
     def __init__(self, costConfigFileName: str, resultsDirName: str, caplog: pytest.LogCaptureFixture):
         self._caplog = caplog
 
-        inputDir = pl.Path('input')
+        inputDir = pl.Path("input")
         self._resultsDir = inputDir / resultsDirName
         self.costParametersFilePath = inputDir / costConfigFileName
 
-        outputDir = pl.Path('output')
-        actualDir = outputDir / 'actual'
+        outputDir = pl.Path("output")
+        actualDir = outputDir / "actual"
         self.actualResultsDir = actualDir / resultsDirName
-        expectedDir = outputDir / 'expected'
+        expectedDir = outputDir / "expected"
         self._expectedResultsDir = expectedDir / resultsDirName
 
     def setup(self):
@@ -47,7 +50,7 @@ class Helper:
         self._setupActualDirectory()
 
     def _setupLogging(self):
-        self._caplog.set_level(log.DEBUG, 'root')
+        self._caplog.set_level(log.DEBUG, "root")
 
     def _setupActualDirectory(self):
         if self.actualResultsDir.exists():
@@ -65,7 +68,7 @@ class Helper:
 
     def _assertOutputFilesEqual(self):
         for resultsJsonFilePath in self._expectedResultsDir.rglob("*-results.json"):
-            simulationName = resultsJsonFilePath.name[:-len("-results.json")]
+            simulationName = resultsJsonFilePath.name[: -len("-results.json")]
             relativeContainingDirPath = resultsJsonFilePath.parent.relative_to(self._expectedResultsDir)
 
             costPlotName = f"costShare-{simulationName}.pdf"

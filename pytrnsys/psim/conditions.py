@@ -1,4 +1,4 @@
-__all__ = ['createConditions', 'Conditions', 'ConditionBase', 'VALUE', 'mayBeSerializedCondition']
+__all__ = ["createConditions", "Conditions", "ConditionBase", "VALUE", "mayBeSerializedCondition"]
 
 import typing as _tp
 import abc as _abc
@@ -29,9 +29,9 @@ class _Bound:
 
 
 class _IntervalCondition(ConditionBase):
-    def __init__(self, name: str,
-                 lowerBound: _tp.Optional[_Bound], upperBound: _tp.Optional[_Bound],
-                 serializedCondition: str):
+    def __init__(
+        self, name: str, lowerBound: _tp.Optional[_Bound], upperBound: _tp.Optional[_Bound], serializedCondition: str
+    ):
         super().__init__(name, serializedCondition)
         self.lowerBound = lowerBound
         self.upperBound = upperBound
@@ -75,8 +75,9 @@ class _CaseCondition(ConditionBase):
 
 class _IntervalConditionFactory:
     UNBOUNDED_PATTERN: _tp.Pattern = _re.compile(r"^(?P<variable>[^<=>]+)(?P<op>[<>]=?)(?P<bound>[^<=>]+)$")
-    BOUNDED_PATTERN: _tp.Pattern = \
-        _re.compile(r"^(?P<lower>[^<=>]+)(?P<op1><=?)(?P<variable>[^<=>]+)(?P<op2><=?)(?P<upper>[^<=>]+)?")
+    BOUNDED_PATTERN: _tp.Pattern = _re.compile(
+        r"^(?P<lower>[^<=>]+)(?P<op1><=?)(?P<variable>[^<=>]+)(?P<op2><=?)(?P<upper>[^<=>]+)?"
+    )
 
     @classmethod
     def create(cls, serializedCondition: str) -> "_IntervalCondition":
@@ -92,9 +93,9 @@ class _IntervalConditionFactory:
 
     @classmethod
     def _createUnboundedInterval(cls, match: _tp.Match, serializedCondition: str) -> "_IntervalCondition":
-        variableName = match.group('variable')
-        op = match.group('op')
-        bound = match.group('bound')
+        variableName = match.group("variable")
+        op = match.group("op")
+        bound = match.group("bound")
 
         bound = cls._convertToFloatOrThrow(bound, serializedCondition)
 
@@ -103,26 +104,25 @@ class _IntervalConditionFactory:
         return _IntervalCondition(variableName, lowerBound, upperBound, serializedCondition)
 
     @classmethod
-    def _createBoundsForUnbounded(cls, bound: float, op: str) \
-            -> _tp.Tuple[_tp.Optional[_Bound], _tp.Optional[_Bound]]:
-        if op == '<':
+    def _createBoundsForUnbounded(cls, bound: float, op: str) -> _tp.Tuple[_tp.Optional[_Bound], _tp.Optional[_Bound]]:
+        if op == "<":
             return None, _Bound(bound, isInclusive=False)
-        elif op == '<=':
+        elif op == "<=":
             return None, _Bound(bound, isInclusive=True)
-        elif op == '>':
+        elif op == ">":
             return _Bound(bound, isInclusive=False), None
-        elif op == '>=':
+        elif op == ">=":
             return _Bound(bound, isInclusive=True), None
         else:
             raise AssertionError(f"Unknown operator: {op}.")
 
     @classmethod
     def _createBoundedInterval(cls, match: _tp.Match, serializedCondition: str) -> "_IntervalCondition":
-        lower = match.group('lower')
-        op1 = match.group('op1')
-        variableName = match.group('variable')
-        op2 = match.group('op2')
-        upper = match.group('upper')
+        lower = match.group("lower")
+        op1 = match.group("op1")
+        variableName = match.group("variable")
+        op2 = match.group("op2")
+        upper = match.group("upper")
         lowerBound = cls._createBoundForBounded(lower, op1, serializedCondition)
         upperBound = cls._createBoundForBounded(upper, op2, serializedCondition)
         return _IntervalCondition(variableName, lowerBound, upperBound, serializedCondition)
@@ -131,7 +131,7 @@ class _IntervalConditionFactory:
     def _createBoundForBounded(cls, lower: str, op1: str, serializedCondition: str) -> _Bound:
         lower = cls._convertToFloatOrThrow(lower, serializedCondition)
 
-        isInclusive = (op1 == '<=')
+        isInclusive = op1 == "<="
 
         return _Bound(lower, isInclusive)
 
@@ -154,8 +154,8 @@ class _CaseConditionFactory:
         if not match:
             raise ValueError(f"Couldn't not parse condition {serializedCondition}")
 
-        variableName = match.group('name')
-        values = match.group('values').split('|')
+        variableName = match.group("name")
+        values = match.group("values").split("|")
 
         values = [cls._convertToFloatIfPossible(v) for v in values]
 

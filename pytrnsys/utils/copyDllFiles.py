@@ -2,6 +2,7 @@ import os
 import pkg_resources
 from shutil import copy2
 
+
 def dllCopy():
 
     dllDestinationDirectory = "C:\\Trnsys17\\UserLib\\ReleaseDLLs"
@@ -19,4 +20,4 @@ def dllCopy():
         print("Copying of dll-files was successful.")
 
     else:
-        raise ValueError("Cannot copy dll-files: %s does not exist." %dllDestinationDirectory)
+        raise ValueError("Cannot copy dll-files: %s does not exist." % dllDestinationDirectory)
