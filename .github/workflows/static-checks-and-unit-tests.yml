@@ -36,10 +36,10 @@ jobs:
     - name: Test with pytest
       run: >
         pytest
-            --cov=pytrnsys --cov-report html:test-results/coverage --cov-report term
-            --html=test-results/report/report.html
-            -m "not manual"
-            tests
+        --cov=pytrnsys --cov-report html:test-results/coverage --cov-report term
+        --html=test-results/report/report.html
+        -m "not manual"
+        tests
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
