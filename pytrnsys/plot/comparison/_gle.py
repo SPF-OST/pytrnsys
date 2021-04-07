@@ -33,7 +33,7 @@ def writeData(
             yMin, y, yMax = _getMinMeanMaxAt(series.ordinate, rowIndex)
             formattedY = _formatUncertainValue(yMin, y, yMax, shallPlotUncertainties)
 
-            lines += f"{formattedX}\t{formattedY}"
+            lines += f"{formattedX}\t{formattedY}\t"
 
         lines += "\n"
 
