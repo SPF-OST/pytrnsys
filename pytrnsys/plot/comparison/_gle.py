@@ -2,6 +2,7 @@ __all__ = ["writeData"]
 
 import pathlib as _pl
 import typing as _tp
+import pytrnsys.plot.plotGle as _gle
 
 from . import _common
 
@@ -43,6 +44,18 @@ def writeData(
         datFilePath = _pl.Path(pathFolder) / f"{fileName}.dat"
         datFilePath.write_text(lines)
 
+    columnHeadersList = []
+    for s in allSeries:
+        columnHeadersList.append(s.getAbscissaHeader())
+        columnHeadersList.append(s.getOrdinateHeader())
+
+    plot = _gle.PlotGle(pathFolder)
+    if(shallPlotUncertainties):
+        plot.getEasyErrorPlot(fileName, f"{fileName}.dat", columnHeadersList)
+    else:
+        plot.getEasyPlot(fileName,f"{fileName}.dat",columnHeadersList,inputsAsPairs=True)
+
+
 
 def _getMinMeanMaxAt(axisValues, rowIndex):
     uMin, u, uMax = axisValues.mins[rowIndex], axisValues.means[rowIndex], axisValues.maxs[rowIndex]
@@ -73,3 +86,4 @@ def _formatValue(u):
         return u
 
     return f"{u:8.4f}"
+

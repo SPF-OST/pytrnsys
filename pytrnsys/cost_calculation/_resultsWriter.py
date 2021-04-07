@@ -22,13 +22,16 @@ class ResultsWriter:
     def __init__(self):
         self.method = "VDI"
         self.cleanModeLatex = None
+        self.doLaTex = False
 
     def writeReportAndResults(self, parameters: _input.Parameters, costCalculation: _co.CostCalculation):
         resultsJsonFilePath = costCalculation.resultsJsonFilePath
 
-        self._doPlots(costCalculation.output.componentGroups, resultsJsonFilePath)
-        self._doPlotsAnnuity(costCalculation.output, resultsJsonFilePath)
-        self._createLatex(parameters, costCalculation.output, resultsJsonFilePath)
+        if(self.doLaTex):
+            self._doPlots(costCalculation.output.componentGroups, resultsJsonFilePath)
+            self._doPlotsAnnuity(costCalculation.output, resultsJsonFilePath)
+            self._createLatex(parameters, costCalculation.output, resultsJsonFilePath)
+
         self._addCostsToResultsJson(costCalculation.output, resultsJsonFilePath)
 
     @staticmethod

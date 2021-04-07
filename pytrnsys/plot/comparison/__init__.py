@@ -26,6 +26,7 @@ def createPlot(
     comparePlotUserName,
     setPrintDataForGle,
     shallPlotUncertainties,
+    extensionFig
 ):
     xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions = _separatePlotVariables(plotVariables)
 
@@ -88,6 +89,7 @@ def createPlot(
         allSeries,
         setPrintDataForGle,
         shallPlotUncertainties,
+        extensionFig,
     )
 
 
@@ -325,12 +327,13 @@ def _savePlotAndData(
     allSeries,
     setPrintDataForGle,
     shallPlotUncertainties,
+    extensionFig,
 ):
     fileName = _getFileName(
         xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileNamePart, comparePlotUserName
     )
 
-    fig.savefig(_os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
+    fig.savefig(_os.path.join(pathFolder, fileName + extensionFig), bbox_inches="tight")
     _plt.close()
 
     if setPrintDataForGle:

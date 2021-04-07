@@ -168,6 +168,7 @@ class ProcessParallelTrnsys:
         self.inputs["calculateSPF"] = True
         self.inputs["addWeightedSPF"] = False
         self.inputs["calculateElectricDemand"] = True
+        self.inputs["extensionFig"] = '.png'
 
         self.inputs["comparePlotUserName"] = ""  # don't change this default value
 
@@ -628,6 +629,7 @@ class ProcessParallelTrnsys:
         plotStyle = self.inputs["plotStyle"]
         comparePlotUserName = self.inputs["comparePlotUserName"]
         setPrintDataForGle = self.inputs["setPrintDataForGle"]
+        extensionFig = self.inputs["extensionFig"]
 
         for plotVariables in commands:
             _pc.createPlot(
@@ -642,6 +644,7 @@ class ProcessParallelTrnsys:
                 comparePlotUserName,
                 setPrintDataForGle,
                 shallPlotUncertainties,
+                extensionFig,
             )
 
     def plotBarplotConditional(self):
@@ -1419,6 +1422,7 @@ class ProcessParallelTrnsys:
             fileName += "_" + conditionsFileName
 
             fig1.savefig(os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
+
             plt.close()
 
             if self.inputs["setPrintDataForGle"]:
