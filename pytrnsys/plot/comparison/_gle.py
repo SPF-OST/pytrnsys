@@ -69,4 +69,4 @@ def _formatValue(u):
     if isinstance(u, str):
         return u
 
-    return f"{u:08.4f}"
+    return f"{u:8.4f}"
