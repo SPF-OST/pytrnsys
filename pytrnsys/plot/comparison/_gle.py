@@ -16,13 +16,15 @@ def writeData(
     chunkVariable,
     shallPlotUncertainties,
 ):
+    allSeriesSorted = list(sorted(allSeries, key=lambda s: s.index))
+
     columnHeadersLegend = _getColumnHeadersLegend(abscissaVariable, ordinateVariable, seriesVariable, chunkVariable)
-    columnHeaders = "\t".join(f"{s.getAbscissaHeader()}\t{s.getOrdinateHeader()}" for s in allSeries)
+    columnHeaders = "\t".join(f"{s.getAbscissaHeader()}\t{s.getOrdinateHeader()}" for s in allSeriesSorted)
 
     lines = f"! {columnHeadersLegend}\n! {columnHeaders}\n"
-    maxSeriesLength = max(s.length for s in allSeries)
+    maxSeriesLength = max(s.length for s in allSeriesSorted)
     for rowIndex in range(maxSeriesLength):
-        for series in allSeries:
+        for series in allSeriesSorted:
             if series.length <= rowIndex:
                 lines += "-\t"
                 continue
