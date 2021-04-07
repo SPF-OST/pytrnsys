@@ -151,7 +151,7 @@ class Series:
         self.length = self.abscissa.length
 
         if self.groupingValue and self.index is None:
-            raise ValueError("If you specify a `series` you also need to provide an `index`.")
+            raise ValueError("If you specify a `groupingValue` you also need to provide an `index`.")
 
         self.chunk: _tp.Optional[Chunk] = None
 
