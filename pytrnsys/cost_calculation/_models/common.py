@@ -1,4 +1,4 @@
-__all__ = ['LinearCoefficients']
+__all__ = ["LinearCoefficients"]
 
 import dataclasses as _dc
 

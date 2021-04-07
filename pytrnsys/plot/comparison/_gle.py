@@ -1,4 +1,4 @@
-__all__ = ['writeData']
+__all__ = ["writeData"]
 
 import pathlib as _pl
 import typing as _tp
@@ -7,8 +7,16 @@ import pytrnsys.plot.plotGle as _gle
 from . import _common
 
 
-def writeData(pathFolder, fileName, allSeries: _tp.Sequence[_common.Series], abscissaVariable,
-              ordinateVariable, seriesVariable, chunkVariable,  shallPlotUncertainties):
+def writeData(
+    pathFolder,
+    fileName,
+    allSeries: _tp.Sequence[_common.Series],
+    abscissaVariable,
+    ordinateVariable,
+    seriesVariable,
+    chunkVariable,
+    shallPlotUncertainties,
+):
     columnHeadersLegend = _getColumnHeadersLegend(abscissaVariable, ordinateVariable, seriesVariable, chunkVariable)
     columnHeaders = "\t".join(f"{s.getAbscissaHeader()}\t{s.getOrdinateHeader()}" for s in allSeries)
 
@@ -26,7 +34,7 @@ def writeData(pathFolder, fileName, allSeries: _tp.Sequence[_common.Series], abs
             yMin, y, yMax = _getMinMeanMaxAt(series.ordinate, rowIndex)
             formattedY = _formatUncertainValue(yMin, y, yMax, shallPlotUncertainties)
 
-            lines += f"{formattedX}\t{formattedY}"
+            lines += f"{formattedX}\t{formattedY}\t"
 
         lines += "\n"
 

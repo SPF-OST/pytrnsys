@@ -2,24 +2,22 @@ import pytrnsys.pdata.processFiles as spfUtils
 import os, re
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 
-class TrnsysComponent():
-    def __init__(self, _path, _name,extension='ddck', eliminateComments = True):
+
+class TrnsysComponent:
+    def __init__(self, _path, _name, extension="ddck", eliminateComments=True):
 
         self.extension = extension
 
         self._name = _name
         self._path = _path
-        self.nameWithPath = os.path.join(self._path,self._name+'.'+self.extension)
+        self.nameWithPath = os.path.join(self._path, self._name + "." + self.extension)
 
         self.linesDeck = None
-
 
         self._eliminateComments = eliminateComments
         self.loadFile()
 
-
-
-    def loadFile(self,useDeckName=False,eraseBeginComment=True,eliminateComments=True,useDeckOutputPath=False):
+    def loadFile(self, useDeckName=False, eraseBeginComment=True, eliminateComments=True, useDeckOutputPath=False):
         """
         It reads the deck  removing files starting with \*\*\*.
 
@@ -29,47 +27,84 @@ class TrnsysComponent():
             list containing the lines of the deck from the read deck.
         """
 
-
-        lines=deckUtils.loadDeck(self.nameWithPath,eraseBeginComment=self._eliminateComments,eliminateComments=self._eliminateComments)
+        lines = deckUtils.loadDeck(
+            self.nameWithPath, eraseBeginComment=self._eliminateComments, eliminateComments=self._eliminateComments
+        )
 
         self.linesDeck = [line.lower() for line in lines]
 
         self.ignoreOnlinePlotter()
 
-    def setEliminateComments(self,newValue):
+    def setEliminateComments(self, newValue):
         self._eliminateComments == True
         if newValue == True:
-            self.linesDeck = deckUtils.loadDeck(nameDck, eraseBeginComment=self._eliminateComments,
-                                       eliminateComments=self._eliminateComments)
-
-
+            self.linesDeck = deckUtils.loadDeck(
+                nameDck, eraseBeginComment=self._eliminateComments, eliminateComments=self._eliminateComments
+            )
 
     def getVariables(self):
         definedVariables = set()
         requiredVariables = set()
         for line in self.linesDeck:
-            line = line.replace('\n','')
-            if '=' in line:
-                splitEquality = line.split('=')
+            line = line.replace("\n", "")
+            if "=" in line:
+                splitEquality = line.split("=")
 
                 definedVariables.add(splitEquality[0].replace(" ", ""))
-                myValue = splitEquality[1].replace(" ", "").replace("^","**")
-                replace_list= ['not(','le(','lt(','ge(','gt(','eq(','mod(',')','max(','min(','abs(','and(','or(','(',r'\t']
-                parts = re.split(r'[+-/*,]', re.sub(r'|'.join(map(re.escape, replace_list)), '', myValue))
+                myValue = splitEquality[1].replace(" ", "").replace("^", "**")
+                replace_list = [
+                    "not(",
+                    "le(",
+                    "lt(",
+                    "ge(",
+                    "gt(",
+                    "eq(",
+                    "mod(",
+                    ")",
+                    "max(",
+                    "min(",
+                    "abs(",
+                    "and(",
+                    "or(",
+                    "(",
+                    r"\t",
+                ]
+                parts = re.split(r"[+-/*,]", re.sub(r"|".join(map(re.escape, replace_list)), "", myValue))
 
-                parts = [part for part in parts if not part == '']
-                requiredVariables.update([part for part in parts if not (part[0].isdigit() or part[0]=='[')])
+                parts = [part for part in parts if not part == ""]
+                requiredVariables.update([part for part in parts if not (part[0].isdigit() or part[0] == "[")])
 
-            elif any(x in line.lower() for x in ['simulation','tolerances','limits','dfq','width','list','solver','nan_check','overwrite_check','eqsolver','time_report']):
-                splitLine = re.split(r'[\s*+]',line)
-                splitLine = [part for part in splitLine[1:] if not part=='']
+            elif any(
+                x in line.lower()
+                for x in [
+                    "simulation",
+                    "tolerances",
+                    "limits",
+                    "dfq",
+                    "width",
+                    "list",
+                    "solver",
+                    "nan_check",
+                    "overwrite_check",
+                    "eqsolver",
+                    "time_report",
+                ]
+            ):
+                splitLine = re.split(r"[\s*+]", line)
+                splitLine = [part for part in splitLine[1:] if not part == ""]
                 requiredVariables.update([part for part in splitLine if not part[0].isdigit()])
-            elif not any(x in line.lower() for x in ['unit','assign','parameters','equations','inputs','constants','version']) and not line[0].isdigit():
-                splitLine = re.split(r'[\s*+]', line)
-                splitLine = [part for part in splitLine if not part == '']
-                requiredVariables.update([part for part in splitLine if not (part[0].isdigit() or part[0]=='-')])
+            elif (
+                not any(
+                    x in line.lower()
+                    for x in ["unit", "assign", "parameters", "equations", "inputs", "constants", "version"]
+                )
+                and not line[0].isdigit()
+            ):
+                splitLine = re.split(r"[\s*+]", line)
+                splitLine = [part for part in splitLine if not part == ""]
+                requiredVariables.update([part for part in splitLine if not (part[0].isdigit() or part[0] == "-")])
 
-        return definedVariables,requiredVariables
+        return definedVariables, requiredVariables
 
     def ignoreOnlinePlotter(self):
 
@@ -88,12 +123,12 @@ class TrnsysComponent():
 
             #            print "check line i:%d"%i
 
-            if (found == True):
+            if found == True:
                 try:
 
                     #                  print splitBlank[0].replace(" ","").lower()
 
-                    if (splitBlank[0].replace(" ", "").lower() == "LABELS".lower()):
+                    if splitBlank[0].replace(" ", "").lower() == "LABELS".lower():
 
                         nLabelString = splitBlank[1].replace(" ", "")
                         nLabel = int(nLabelString)
@@ -111,7 +146,6 @@ class TrnsysComponent():
                         found = False
                         i = jEnd  # it does nothing !!!
 
-
                 except:
                     #                print "COMMENT (3) FROM i:%d"%(i)
                     self.linesDeck[i] = " \n"
@@ -124,7 +158,7 @@ class TrnsysComponent():
                     types = splitBlank[2].replace(" ", "")
                     ntype = splitBlank[3].replace(" ", "")
 
-                    if (unit.lower() == "unit".lower() and types.lower() == "Type".lower() and ntype == "65"):
+                    if unit.lower() == "unit".lower() and types.lower() == "Type".lower() and ntype == "65":
                         jBegin = i
                         found = True
                         self.linesDeck[i] = " \n"
@@ -135,4 +169,3 @@ class TrnsysComponent():
 
                 except:
                     pass
-

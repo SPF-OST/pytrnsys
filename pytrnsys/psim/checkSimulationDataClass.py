@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 
 """
@@ -17,13 +16,14 @@ import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import pytrnsys.psim.resultsProcessedFile as results
 import logging
-logger = logging.getLogger('root')
+
+logger = logging.getLogger("root")
+
 
 class checkSimulationDataClass(results.ResultsProcessedFile):
-
     def __init__(self, _path):
 
-        results.ResultsProcessedFile.__init__(self,_path)
+        results.ResultsProcessedFile.__init__(self, _path)
         self.version = "checkSimulationData v1 2019-01-22"
 
         self.path = _path
@@ -44,10 +44,10 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
         for case in cases:
             # resultFile = open(path + "\\" + case + "\\temp\\BUILDING_MO.Prt", "r")
             try:
-                resultFile = open(path + "\\" + case + "\\"+ case + ".log", "r")
+                resultFile = open(path + "\\" + case + "\\" + case + ".log", "r")
                 resultList = resultFile.readlines()
                 resultFile.close()
-                k=0
+                k = 0
 
                 for line in resultList:
                     words = line.split()
@@ -56,8 +56,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
                             k += 1
                 if k != 1:
                     failedCases.append(case + "\n")
-                    logger.warning(case + " failed, number of Fatal errors = " +str(k-1))
-
+                    logger.warning(case + " failed, number of Fatal errors = " + str(k - 1))
 
                 else:
                     successfulCases.append(case + "\n")
@@ -65,11 +64,11 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
             except:
                 failedCases.append(case + "\n")
 
-        outfile = open(path + "\\FailedCases.txt", 'w')
+        outfile = open(path + "\\FailedCases.txt", "w")
         outfile.writelines(failedCases)
         outfile.close
 
-        outfile = open(path + "\\SuccessfulCases.txt", 'w')
+        outfile = open(path + "\\SuccessfulCases.txt", "w")
         outfile.writelines(successfulCases)
         outfile.close
 
@@ -94,7 +93,6 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
 
             logger.debug("moved failed cases from " + self.path + " to " + dstFolder)
 
-
     def checkNumberOfMonthsSimulated(self):
 
         dataPath = self.path
@@ -106,11 +104,11 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
             resultList = resultFile.readlines()
             resultFile.close
             for line in resultList:
-                if (line.split("\t")[0] == "numberOfMonthSimulated"):
+                if line.split("\t")[0] == "numberOfMonthSimulated":
                     numberOfMonths.append(line.split("\t")[1])
         return numberOfMonths
 
-    def doTableErrors(self,doc,sortBy="spf",useLineForGroups=False):
+    def doTableErrors(self, doc, sortBy="spf", useLineForGroups=False):
         pass
 
     def plots(self):
@@ -121,7 +119,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
         fig, ax = plt.subplots(figsize=(8, 8))
         ax1 = plt.subplot()
         ax1.plot(spfSorted, imbSorted)
-        ax1.set(ylabel='$Q_{imb}$ [\%]', xlabel='$SPF_{SHP+}$')
+        ax1.set(ylabel="$Q_{imb}$ [\%]", xlabel="$SPF_{SHP+}$")
         ax1.grid()
 
         extension = "pdf"
@@ -131,7 +129,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
 
         fig.savefig(imbSpfPdf)
 
-        self.imbSpfPdf=figureName + ".%s" % extension
+        self.imbSpfPdf = figureName + ".%s" % extension
 
         itSorted = [x for y, x in sorted(zip(self.imb, self.itProblems))]
         imbSorted = sorted(self.imb)
@@ -139,7 +137,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
         fig, ax = plt.subplots(figsize=(8, 8))
         ax1 = plt.subplot()
         ax1.plot(imbSorted, itSorted)
-        ax1.set(xlabel='$Q_{imb}$ [\%]', ylabel='$It_{prob}$')
+        ax1.set(xlabel="$Q_{imb}$ [\%]", ylabel="$It_{prob}$")
         ax1.grid()
 
         extension = "pdf"
@@ -158,22 +156,19 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
 
         nameLatex = "SimulationsErrorCheck"
 
-        doc = latex.LatexReport(self.path,nameLatex)
+        doc = latex.LatexReport(self.path, nameLatex)
         doc.setCleanMode(True)
 
         doc.setTitle("Errors in simulations")
-        doc.setSubTitle("%s"%self.path.split("\\")[-1])
+        doc.setSubTitle("%s" % self.path.split("\\")[-1])
 
         doc.addBeginDocument()
 
-        self.doTableErrors(doc, sortBy = sortBy)
-        self.doTableErrors(doc,sortBy="imb")
+        self.doTableErrors(doc, sortBy=sortBy)
+        self.doTableErrors(doc, sortBy="imb")
 
-        doc.addPlot(self.imbSpfPdf,"","",12)
-        doc.addPlot(self.imbItPdf,"","",12)
+        doc.addPlot(self.imbSpfPdf, "", "", 12)
+        doc.addPlot(self.imbItPdf, "", "", 12)
 
         doc.addEndDocumentAndCreateTexFile()
         doc.executeLatexFile()
-
-
-

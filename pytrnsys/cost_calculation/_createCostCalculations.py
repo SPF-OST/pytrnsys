@@ -1,4 +1,4 @@
-__all__ = ['CostCalculation', 'createCostCalculations']
+__all__ = ["CostCalculation", "createCostCalculations"]
 
 import pathlib as _pl
 import typing as _tp
@@ -27,9 +27,9 @@ class _PathAndResult:
     result: _Result
 
 
-def createCostCalculations(config: _input.Input, resultsDirPath: _pl.Path,
-                           processType: _pt.ProcessType) \
-        -> _tp.Iterable["CostCalculation"]:
+def createCostCalculations(
+    config: _input.Input, resultsDirPath: _pl.Path, processType: _pt.ProcessType
+) -> _tp.Iterable["CostCalculation"]:
     pathAndResults = _loadResults(resultsDirPath, processType)
 
     for pathAndResult in pathAndResults:
@@ -39,8 +39,7 @@ def createCostCalculations(config: _input.Input, resultsDirPath: _pl.Path,
         yield costCalculation
 
 
-def _loadResults(resultsDirPath: _pl.Path, processType: _pt.ProcessType) \
-        -> _tp.Iterable[_PathAndResult]:
+def _loadResults(resultsDirPath: _pl.Path, processType: _pt.ProcessType) -> _tp.Iterable[_PathAndResult]:
     resultJsonFilePaths = _getResultJsonFilePaths(resultsDirPath, processType)
 
     for resultsJsonFilePath in resultJsonFilePaths:
@@ -53,7 +52,7 @@ def _getResultJsonFilePaths(resultsDirPath: _pl.Path, processType: _pt.ProcessTy
     if isinstance(processType, _pt.CasesDefined):
         return [resultsDirPath / case / f"{case}-results.json" for case in processType.cases]
     elif processType == _pt.OTHER:
-        return resultsDirPath.rglob('*-results.json')
+        return resultsDirPath.rglob("*-results.json")
     else:
         raise AssertionError(f"Unknown processType: {processType}")
 

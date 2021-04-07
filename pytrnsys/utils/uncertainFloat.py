@@ -1,4 +1,4 @@
-__all__ = ['FloatLike', 'UncertainFloat']
+__all__ = ["FloatLike", "UncertainFloat"]
 
 import dataclasses as _dc
 import operator as _op
