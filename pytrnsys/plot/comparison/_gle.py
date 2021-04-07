@@ -47,7 +47,12 @@ def writeData(
         columnHeadersList.append(s.getOrdinateHeader())
 
     plot = _gle.PlotGle(pathFolder)
-    plot.getEasyPlot(fileName,f"{fileName}.dat",columnHeadersList,inputsAsPairs=True)
+    if(shallPlotUncertainties):
+        plot.getEasyErrorPlot(fileName, f"{fileName}.dat", columnHeadersList)
+    else:
+        plot.getEasyPlot(fileName,f"{fileName}.dat",columnHeadersList,inputsAsPairs=True)
+
+
 
 def _getMinMeanMaxAt(axisValues, rowIndex):
     uMin, u, uMax = axisValues.mins[rowIndex], axisValues.means[rowIndex], axisValues.maxs[rowIndex]
