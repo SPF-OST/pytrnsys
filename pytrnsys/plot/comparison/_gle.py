@@ -26,7 +26,8 @@ def writeData(
     for rowIndex in range(maxSeriesLength):
         for series in allSeriesSorted:
             if series.length <= rowIndex:
-                lines += "-\t"
+                line = "-\t-\t-\t-\t-\t-\t" if shallPlotUncertainties else "-\t-\t"
+                lines += line
                 continue
 
             x, xMax, xMin = _getMinMeanMaxAt(series.abscissa, rowIndex)
