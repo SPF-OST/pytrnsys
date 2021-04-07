@@ -102,11 +102,12 @@ class TestGle:
   2.5000	  2.5000	  2.5000	  0.1466	  0.1519	  0.1569	  2.5000	  2.5000	  2.5000	  0.1506	  0.1577	  0.1641	  2.5000	  2.5000	  2.5000	  0.1548	  0.1635	  0.1714	  2.5000	  2.5000	  2.5000	  0.1589	  0.1694	  0.1787	  2.5000	  2.5000	  2.5000	  0.1630	  0.1752	  0.1861	
 """
 
+        outputFileStem = "test"
         _gle.writeData(
-            tmp_path, "test.gle", allSeries, "AcollR", "energyCost", "ViceR", None, True
+            tmp_path, outputFileStem, allSeries, "AcollR", "energyCost", "ViceR", None, True
         )
 
-        actualOutputPath = list(tmp_path.iterdir())[0]
+        actualOutputPath = tmp_path / f"{outputFileStem}.dat"
         actualOutput = actualOutputPath.read_text()
 
         assert actualOutput == expectedOutput
