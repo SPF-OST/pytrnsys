@@ -347,7 +347,7 @@ class TestGle:
     def test(self, testCase: TestCase, tmp_path: _pl.Path):
         outputFileStem = "test"
         _gle.writeData(
-            tmp_path,
+            str(tmp_path),
             outputFileStem,
             testCase.allSeries,
             "AcollR",
