@@ -350,10 +350,6 @@ class TestGle:
             str(tmp_path),
             outputFileStem,
             testCase.allSeries,
-            "AcollR",
-            "energyCost",
-            "ViceR",
-            testCase.chunkVariable,
             testCase.shallPlotUncertainties,
         )
 

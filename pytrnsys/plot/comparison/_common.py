@@ -157,37 +157,46 @@ class Series:
 
         self._indexedAbscissaName = f"{self.abscissa.name}_{self.index}"
 
-        self._signs = ["-", "=", "+"] if self.shallPrintUncertainties else [""]
-
-    def getAbscissaHeader(self):
-        parts = self._getAbscissaHeaderParts()
+    def getAbscissaHeader(self, shallPrintUncertainties: bool):
+        parts = self._getAbscissaHeaderParts(shallPrintUncertainties)
         return "\t".join(parts)
 
-    def getOrdinateHeader(self):
-        parts = self._getOrdinateHeaderParts()
+    def getOrdinateHeader(self, shallPrintUncertainties: bool):
+        parts = self._getOrdinateHeaderParts(shallPrintUncertainties)
         return "\t".join(parts)
 
-    def _getAbscissaHeaderParts(self):
-        if not self.groupingValue:
-            return [f"{self.abscissa.name}{sign}" for sign in self._signs]
+    def _getAbscissaHeaderParts(self, shallPrintUncertainties: bool) -> _tp.Sequence[str]:
+        signs = self._getSigns(shallPrintUncertainties)
 
-        return [f"{self._indexedAbscissaName}{sign}" for sign in self._signs]
-
-    def _getOrdinateHeaderParts(self):
         if not self.groupingValue:
-            return [f"{self.ordinate.name}{sign}({self.abscissa.name})" for sign in self._signs]
+            return [f"{self.abscissa.name}{sign}" for sign in signs]
+
+        return [f"{self._indexedAbscissaName}{sign}" for sign in signs]
+
+    def _getOrdinateHeaderParts(self, shallPrintUncertainties: bool) -> _tp.Sequence[str]:
+        signs = self._getSigns(shallPrintUncertainties)
+
+        if not self.groupingValue:
+            return [f"{self.ordinate.name}{sign}({self.abscissa.name})" for sign in signs]
 
         if not self.chunk:
             return [
                 f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.groupingValue.value})"
-                for sign in self._signs
+                for sign in signs
             ]
 
         return [
             f"{self.ordinate.name}{sign}({self._indexedAbscissaName},"
             f"{self.groupingValue.value},{self.chunk.groupingValue.value})"
-            for sign in self._signs
+            for sign in signs
         ]
+
+    @staticmethod
+    def _getSigns(shallPrintUncertainties):
+        if not shallPrintUncertainties:
+            return [""]
+
+        return ["-", "=", "+"]
 
 
 @_dc.dataclass()

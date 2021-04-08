@@ -341,10 +341,6 @@ def _savePlotAndData(
             pathFolder,
             fileName,
             allSeries,
-            xAxisVariable,
-            yAxisVariable,
-            seriesVariable,
-            chunkVariable,
             shallPlotUncertainties,
         )
 
