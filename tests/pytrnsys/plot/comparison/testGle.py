@@ -346,7 +346,7 @@ class TestGle:
     @_pt.mark.parametrize("testCase", generateTestCases())
     def test(self, testCase: TestCase, tmp_path: _pl.Path):
         outputFileStem = "test"
-        _gle.writeData(
+        _gle.writeFiles(
             str(tmp_path),
             outputFileStem,
             testCase.allSeries,

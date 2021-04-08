@@ -337,7 +337,7 @@ def _savePlotAndData(
     _plt.close()
 
     if setPrintDataForGle:
-        _gle.writeData(
+        _gle.writeFiles(
             pathFolder,
             fileName,
             allSeries,

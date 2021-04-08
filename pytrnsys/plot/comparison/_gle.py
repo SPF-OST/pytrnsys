@@ -1,4 +1,4 @@
-__all__ = ["writeData"]
+__all__ = ["writeFiles"]
 
 import pathlib as _pl
 import typing as _tp
@@ -7,7 +7,7 @@ import pytrnsys.plot.plotGle as _gle
 from . import _common
 
 
-def writeData(
+def writeFiles(
     pathFolder: str,
     fileName: str,
     allSeries: _tp.Sequence[_common.Series],
@@ -17,15 +17,37 @@ def writeData(
     chunkVariable: _tp.Optional[str],
     shallPlotUncertainties: bool,
 ):
-    allSeriesSorted = list(sorted(allSeries, key=lambda s: s.index))
+    _writeDataFile(
+        pathFolder,
+        fileName,
+        allSeries,
+        abscissaVariable,
+        ordinateVariable,
+        seriesVariable,
+        chunkVariable,
+        shallPlotUncertainties,
+    )
 
+    _writeScriptFile(allSeries, fileName, pathFolder, shallPlotUncertainties)
+
+
+def _writeDataFile(
+    pathFolder,
+    fileName,
+    allSeries,
+    abscissaVariable,
+    ordinateVariable,
+    seriesVariable,
+    chunkVariable,
+    shallPlotUncertainties,
+):
+    allSeriesSorted = list(sorted(allSeries, key=lambda s: s.index))
     columnHeadersLegend = _getColumnHeadersLegend(
         abscissaVariable, ordinateVariable, seriesVariable, chunkVariable
     )
     columnHeaders = "\t".join(
         f"{s.getAbscissaHeader()}\t{s.getOrdinateHeader()}" for s in allSeriesSorted
     )
-
     lines = f"! {columnHeadersLegend}\n! {columnHeaders}\n"
     maxSeriesLength = max(s.length for s in allSeriesSorted)
     for rowIndex in range(maxSeriesLength):
@@ -48,19 +70,6 @@ def writeData(
 
         datFilePath = _pl.Path(pathFolder) / f"{fileName}.dat"
         datFilePath.write_text(lines)
-
-    columnHeadersList = []
-    for s in allSeries:
-        columnHeadersList.append(s.getAbscissaHeader())
-        columnHeadersList.append(s.getOrdinateHeader())
-
-    plot = _gle.PlotGle(pathFolder)
-    if shallPlotUncertainties:
-        plot.getEasyErrorPlot(fileName, f"{fileName}.dat", columnHeadersList)
-    else:
-        plot.getEasyPlot(
-            fileName, f"{fileName}.dat", columnHeadersList, inputsAsPairs=True
-        )
 
 
 def _formatMissingValue(shallPlotUncertainties: bool):
@@ -105,3 +114,19 @@ def _formatValue(u):
         return u
 
     return f"{u:8.4f}"
+
+
+def _writeScriptFile(allSeries, fileName, pathFolder, shallPlotUncertainties):
+    columnHeaders = []
+    for s in allSeries:
+        columnHeaders.append(s.getAbscissaHeader())
+        columnHeaders.append(s.getOrdinateHeader())
+
+    plot = _gle.PlotGle(pathFolder)
+
+    if shallPlotUncertainties:
+        plot.getEasyErrorPlot(fileName, f"{fileName}.dat", columnHeaders)
+    else:
+        plot.getEasyPlot(
+            fileName, f"{fileName}.dat", columnHeaders, inputsAsPairs=True
+        )
