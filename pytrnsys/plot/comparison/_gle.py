@@ -8,26 +8,31 @@ from . import _common
 
 
 def writeData(
-    pathFolder,
-    fileName,
+    pathFolder: str,
+    fileName: str,
     allSeries: _tp.Sequence[_common.Series],
-    abscissaVariable,
-    ordinateVariable,
-    seriesVariable,
-    chunkVariable,
-    shallPlotUncertainties,
+    abscissaVariable: str,
+    ordinateVariable: str,
+    seriesVariable: _tp.Optional[str],
+    chunkVariable: _tp.Optional[str],
+    shallPlotUncertainties: bool,
 ):
     allSeriesSorted = list(sorted(allSeries, key=lambda s: s.index))
 
-    columnHeadersLegend = _getColumnHeadersLegend(abscissaVariable, ordinateVariable, seriesVariable, chunkVariable)
-    columnHeaders = "\t".join(f"{s.getAbscissaHeader()}\t{s.getOrdinateHeader()}" for s in allSeriesSorted)
+    columnHeadersLegend = _getColumnHeadersLegend(
+        abscissaVariable, ordinateVariable, seriesVariable, chunkVariable
+    )
+    columnHeaders = "\t".join(
+        f"{s.getAbscissaHeader()}\t{s.getOrdinateHeader()}" for s in allSeriesSorted
+    )
 
     lines = f"! {columnHeadersLegend}\n! {columnHeaders}\n"
     maxSeriesLength = max(s.length for s in allSeriesSorted)
     for rowIndex in range(maxSeriesLength):
         for series in allSeriesSorted:
             if series.length <= rowIndex:
-                line = "-\t-\t-\t-\t-\t-\t" if shallPlotUncertainties else "-\t-\t"
+                missingValue = _formatMissingValue(shallPlotUncertainties)
+                line = f"{missingValue}\t{missingValue}\t"
                 lines += line
                 continue
 
@@ -50,19 +55,33 @@ def writeData(
         columnHeadersList.append(s.getOrdinateHeader())
 
     plot = _gle.PlotGle(pathFolder)
-    if(shallPlotUncertainties):
+    if shallPlotUncertainties:
         plot.getEasyErrorPlot(fileName, f"{fileName}.dat", columnHeadersList)
     else:
-        plot.getEasyPlot(fileName,f"{fileName}.dat",columnHeadersList,inputsAsPairs=True)
+        plot.getEasyPlot(
+            fileName, f"{fileName}.dat", columnHeadersList, inputsAsPairs=True
+        )
 
+
+def _formatMissingValue(shallPlotUncertainties: bool):
+    if not shallPlotUncertainties:
+        return "-"
+
+    return "-\t-\t-"
 
 
 def _getMinMeanMaxAt(axisValues, rowIndex):
-    uMin, u, uMax = axisValues.mins[rowIndex], axisValues.means[rowIndex], axisValues.maxs[rowIndex]
+    uMin, u, uMax = (
+        axisValues.mins[rowIndex],
+        axisValues.means[rowIndex],
+        axisValues.maxs[rowIndex],
+    )
     return uMin, u, uMax
 
 
-def _getColumnHeadersLegend(abscissaVariable, ordinateVariable, seriesVariable, chunkVariable):
+def _getColumnHeadersLegend(
+    abscissaVariable, ordinateVariable, seriesVariable, chunkVariable
+):
     if not seriesVariable:
         return f"{ordinateVariable}={ordinateVariable}({abscissaVariable})"
 
@@ -86,4 +105,3 @@ def _formatValue(u):
         return u
 
     return f"{u:8.4f}"
-
