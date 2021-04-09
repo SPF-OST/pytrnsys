@@ -978,7 +978,7 @@ class ProcessParallelTrnsys:
                     + "_"
                     + conditionsFileName
                 )
-            fig1.savefig(os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
+            fig1.savefig(os.path.join(pathFolder, fileName + e), bbox_inches="tight")
             plt.close()
 
             fig2.savefig(os.path.join(pathFolder, "diffPlot" + fileName + ".png"), bbox_inches="tight")
@@ -1001,7 +1001,8 @@ class ProcessParallelTrnsys:
 
     def _plotBoxOrViolin(self, plotVariables, shallPlotViolin):
         pathFolder = self.inputs["pathBase"]
-
+        extensionFig = self.inputs["extensionFig"]
+        
         if len(plotVariables) == 0:
             raise ValueError("You must specify a variable name for the values for the box plot.")
 
@@ -1169,7 +1170,7 @@ class ProcessParallelTrnsys:
 
         fileNamePrefix = "ViolinPlot" if shallPlotViolin else "BoxPlot"
 
-        fig1.savefig(os.path.join(pathFolder, f"{fileNamePrefix}_{fileName}"), bbox_inches="tight")
+        fig1.savefig(os.path.join(pathFolder, f"{fileNamePrefix}_{fileName}_{extensionFig}"), bbox_inches="tight")
         plt.close()
 
     def plotCalculationsAcrossSets(self):
@@ -1583,7 +1584,7 @@ class ProcessParallelTrnsys:
 
             for equation in self.inputs["jsonCalc"][0]:
                 if "=" not in equation:
-                    info.error("Invalid equation statement in `jsonCalc`")
+                    self.logger.error("Invalid equation statement in `jsonCalc`")
                     return -1
                 else:
                     for variable in re.split("\W", equation):

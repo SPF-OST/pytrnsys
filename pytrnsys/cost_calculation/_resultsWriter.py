@@ -234,7 +234,7 @@ class ResultsWriter:
         lines += line + "\n"
         line = rf" & Variable costs:  {parameters.costElecKWh:2.2f} $Fr.$ $per$ $kWh$ \\"
         lines += line + "\n"
-        line = rf"Increase of electricity costs & {parameters.increaseElecCost:2.1f} \% $per$ $year$ \\"
+        line = rf"Increase of electricity costs & {parameters.increaseElecCost * 100:2.1f} \% $per$ $year$ \\"
         lines += line + "\n"
         line = rf"Electricity costs year 1 & {output.electricity.cost:2.0f} Fr. in year 1 \\"
         lines += line + "\n"
