@@ -71,26 +71,51 @@ class ResultsWriter:
         collectorComponents = [
             c for g in output.componentGroups.groups for c in g.components.factors if c.name == "Collector"
         ]
+        collectorFound=True
         if not collectorComponents:
-            raise RuntimeError("No `Collector' component found.")
+            collectorFound=False
+
+        hpComponents = [
+            c for g in output.componentGroups.groups for c in g.components.factors if c.name == "Heat pump"
+        ]
+        hpFound=True
+        if not hpComponents:
+            hpFound=False
+
+            # raise RuntimeError("No `Collector' component found.")
 
         if len(collectorComponents) > 1:
             raise RuntimeError("More than one `Collector' component found.")
 
-        collectorComponent = collectorComponents[0]
-        size = collectorComponent.value
+        if len(hpComponents) > 1:
+            raise RuntimeError("More than one `Heat pump' component found.")
 
         totalCost = output.componentGroups.cost
-        totalCostPerM2 = totalCost / size.value
         totalCostPerMwh = totalCost / (output.heatingDemandInKWh / 1000)
 
-        return {
+        myDict={}
+
+        myDict={
             "investment": totalCost.to_dict(),
             "energyCost": output.heatGenerationCost.to_dict(),
-            "investmentPerM2": totalCostPerM2.to_dict(),
             "investmentPerMWh": totalCostPerMwh.to_dict(),
         }
+        if(collectorFound):
+            collectorComponent = collectorComponents[0]
+            size = collectorComponent.value
+            totalCostPerM2 = totalCost / size.value
+            myDict={
+                "investmentPerM2": totalCostPerM2.to_dict(),
+            }
+        if(hpFound):
+            hpComponent = hpComponents[0]
+            size = hpComponent.value
+            totalCostPerkW = totalCost / size.value
 
+            myDict={
+                "investmentPerkW": totalCostPerkW.to_dict(),
+            }
+        return myDict
     # plots
 
     def _doPlots(self, componentGroups: _output.ComponentGroups, resultsJsonFilePath: _pl.Path) -> None:

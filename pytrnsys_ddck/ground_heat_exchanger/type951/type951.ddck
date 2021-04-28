@@ -10,7 +10,7 @@
 
 ***************************************************************************
 ** Description: 
-** Ground source heate xchanger model using the EWS model
+** Ground source heat exchanger model using the EWS model
 ** extended to include user defined g-functions
 ** TODO: online plotter and user defined printer should be moved away
 ***************************************************************************
@@ -44,8 +44,10 @@ qSysIn_Ghx = Qghx_kW
 ** Dependencies with other ddck
 ***********************************
 
-CONSTANTS 1
+CONSTANTS 3
 MfrGhxNom = MfrHpEvapNom
+lBorePerkW = 15
+lGhxProbes = lBorePerkW*sizeHpUsed
 
 ** Re-assing here the variables necessary from other types
 ** variableInternal = variableExternal
@@ -87,8 +89,6 @@ lambdaBrine = 0.449 !1.6164  ! 18: lambda of the brine, kJ/hmK JS: According to 
 muBrine = 0.00000646     ! 19: kinematic viscosity of the brine, m2/sec
 dTSoilAir = 1     ! delta-T between soil-surface and air, K
 
-CONSTANTS 1
-lBorePerkW = 15
 
 
 CONSTANTS 21
