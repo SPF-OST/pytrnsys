@@ -356,7 +356,6 @@ class ProcessTrnsysDf:
                     firstMonth=self.firstMonth,
                     year=self.yearReadedInMonthlyFile,
                 )
-        # self.monData = self.loader.monData
         self.monDataDf = self.loader.monDataDf
         self.houDataDf = self.loader.houDataDf
         self.steDataDf = self.loader.steDataDf
@@ -397,13 +396,6 @@ class ProcessTrnsysDf:
         for column in self.monDataDf.columns:
             self.monDataDf["Cum_" + column] = self.monDataDf[column].cumsum()
         self.calcConfigEquations()
-
-        # This recalculated all, we should only recalculated what was done in caclConfigEquations. DC or it is so fast we don't care ?
-
-        self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
-        self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
-        self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-        self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
 
         try:
             self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
