@@ -122,14 +122,14 @@ It is recommended to duplicate the internal TRNSYS name in the header of the pri
     of the printer file or the TRNSYS name of the static parameter in the dck-file,
     pytrnsys will not be able to find the value and throw a key-error.
 
-By default, pytrnsys also calculates the following values:
+When TRNSYS data is read in, pytrnsys will automatically create some variables. These are:
 
-4.  Total yearly sum of the monthly printed values. The yearly sum of a monthly
-    printed variable with the name ``foo`` can be accessed for further processing
-    by ``foo_Tot``.
+4.  From monthly values of ``foo`` the total sum over the simulated period is calculated and can be called by
+    ``foo_Tot``. Furthermore, ``Cum_foo`` is created, which is an array of the accumulated values of ``foo`` over the
+    months.
 
-5.  The maximum hourly value of an hourly printed file. The hourly maximum of an hourly
-    printed variable with the name ``bar`` can be accessed by ``bar_Max``.
+5.  From hourly values of ``bar`` the minimum, maximum and average values over the simulated period are calculated,
+    which can be called by ``bar_Min``, ``bar_Max`` and ``bar_Avg``.
 
 .. _ref-generic:
 Processing generic data
