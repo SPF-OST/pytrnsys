@@ -124,11 +124,12 @@ It is recommended to duplicate the internal TRNSYS name in the header of the pri
 
 When TRNSYS data is read in, pytrnsys will automatically create some variables. These are:
 
-4.  From monthly values of ``foo`` the total sum is calculated and can be called by ``foo_Tot``. Furthermore,
-    ``Cum_foo`` is created, which is an array of the accumulated values of ``foo`` over the months.
+4.  From monthly values of ``foo`` the total sum over the simulated period is calculated and can be called by
+    ``foo_Tot``. Furthermore, ``Cum_foo`` is created, which is an array of the accumulated values of ``foo`` over the
+    months.
 
-5.  From hourly values of ``bar`` the minimum, maximum and average values are calculated, which can be called by
-    ``bar_Min``, ``bar_Max`` and ``bar_Avg``.
+5.  From hourly values of ``bar`` the minimum, maximum and average values over the simulated period are calculated,
+    which can be called by ``bar_Min``, ``bar_Max`` and ``bar_Avg``.
 
 .. _ref-generic:
 Processing generic data
