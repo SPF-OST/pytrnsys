@@ -351,13 +351,13 @@ USideAvOut= [130,71]
 UTopOut   = [130,72]      
     
 ****All these should be out and done by the hydraulic part.  DC
-EQUATIONS 6     ! Electric pump power PCM-Aux loop
-dpPCMAuxNom_bar = 0.4     ! pressure-drop of loop at nominal mass flow, bar
-frMfrEvapIn = MfrEvapIn/MfrHpEvapNom     ! Flow rate fraction of nominal flow rate
-dpPCMAux_bar = (frMfrEvapIn)^2*dpPCMAuxNom_bar     ! pressure drop at actual mass flow rate, bar
-PflowPCMAux_W = ((MfrEvapIn/3600)/RhoBRI)*dpPCMAux_bar*100000     ! required power to drive the flow, W
-etaPuPCMAux = 0.12-0.00*(1-frMfrEvapIn)     ! pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
-PelPuPCMAux_kW = (PflowPCMAux_W/1000)/etaPuPCMAux     ! required pump electric power, kW
+**EQUATIONS 6     ! Electric pump power PCM-Aux loop
+**dpPCMAuxNom_bar = 0.4     ! pressure-drop of loop at nominal mass flow, bar
+**frMfrEvapIn = MfrEvapIn/MfrHpEvapNom     ! Flow rate fraction of nominal flow rate
+**dpPCMAux_bar = (frMfrEvapIn)^2*dpPCMAuxNom_bar     ! pressure drop at actual mass flow rate, bar
+**PflowPCMAux_W = ((MfrEvapIn/3600)/RhoBRI)*dpPCMAux_bar*100000     ! required power to drive the flow, W
+**etaPuPCMAux = 0.12-0.00*(1-frMfrEvapIn)     ! pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+**PelPuPCMAux_kW = (PflowPCMAux_W/1000)/etaPuPCMAux     ! required pump electric power, kW
      
 	 
 EQUATIONS 9    ! Converted values for outputs

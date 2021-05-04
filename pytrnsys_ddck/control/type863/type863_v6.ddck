@@ -212,8 +212,8 @@ timeDefrostCol   = 1
 tDefrostWithWs   = -2
 WsWarm = GT(TsensorTesSh,8)     
 **timeDefrostWs = WsWarm*Max(0.7,(NHx1*AHx1*iceThickToDeIce*RhoIce*333000.*3/((MfrCPriNom*(TsensorTesSh-5)*CPBRI_SI)+0.000001)))+Not(WsWarm)*timeDfAux     	
-timeDfWs = Max(0.7,(NHx1*AHx1*iceThickToDeIce*RHOWAT*333000.*3/((MfrCPriNom*(TsensorTesSh-5)*CPBRI*1000)+0.000001)))    	
-
+**timeDfWs = Max(0.7,(NHx1*AHx1*iceThickToDeIce*RHOWAT*333000.*3/((MfrCPriNom*(TsensorTesSh-5)*CPBRI*1000)+0.000001)))    	
+timeDfWs = 0
 
 *********************************************************************
 ******** Controller of primary loop : solar, ice and source heat pump 

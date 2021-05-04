@@ -206,7 +206,7 @@ timeHpBlock   ! 4: lenght of time for timer 1 [h]
 INPUTS 5    
 BrineTooCold Nix  Nix  Nix Nix
 0.0 0.0 0.0 0.0 0.0
-EQUATIONS 2
+EQUATIONS 1
 BrineTooColdTimer = [163,1]
 
 EQUATIONS 2
@@ -230,16 +230,16 @@ HpStartPerH = BoHpStart/dtsim
 
  
 ** TO BE DELETED. Pump consumption should come from GUI export 
-EQUATIONS 9 ! 16     
-dpAuxSH_bar = 0.2     ! according to MacSheep report 7.2 
-PflowAuxSH_W = ((MfrAuxOut/3600)/RhoWat)*dpAuxSH_bar*100000     ! required power to drive the flow, W
-etaPuAuxSh = 0.35     ! Assumption
-PelPuAuxSH_kW = (PflowAuxSH_W/1000)/etaPuAuxSH     ! required pump electric power, kW
-dpAuxBrine_bar = 0.3     ! assumption (pressure drop is a mix between SH- and Borehole-Loop according to MacSheep report 7.2)
-PflowAuxBrine_W = ((MfrAuxEvapOut/3600)/RhoBri)*dpAuxBrine_bar*100000     ! required power to drive the flow, W
-etaPuAuxBrine = 0.35     ! Assumption
-PelPuAuxBrine_kW = (PflowAuxBrine_W/1000)/etaPuAuxBrine     ! required pump electric power, kW
-PelPuAuxBri_kW=GT(MfrEvapIn,0.1)*PelPuAuxBrine_kW     ! GT(MfrcondIn,0.1)*PelPuAuxBrine_kW          ! naming could be better�
+**EQUATIONS 9 ! 16     
+**dpAuxSH_bar = 0.2     ! according to MacSheep report 7.2 
+**PflowAuxSH_W = ((MfrAuxOut/3600)/RhoWat)*dpAuxSH_bar*100000     ! required power to drive the flow, W
+**etaPuAuxSh = 0.35     ! Assumption
+**PelPuAuxSH_kW = (PflowAuxSH_W/1000)/etaPuAuxSH     ! required pump electric power, kW
+**dpAuxBrine_bar = 0.3     ! assumption (pressure drop is a mix between SH- and Borehole-Loop according to MacSheep report 7.2)
+**PflowAuxBrine_W = ((MfrAuxEvapOut/3600)/RhoBri)*dpAuxBrine_bar*100000     ! required power to drive the flow, W
+**etaPuAuxBrine = 0.35     ! Assumption
+**PelPuAuxBrine_kW = (PflowAuxBrine_W/1000)/etaPuAuxBrine     ! required pump electric power, kW
+**PelPuAuxBri_kW=GT(MfrEvapIn,0.1)*PelPuAuxBrine_kW     ! GT(MfrcondIn,0.1)*PelPuAuxBrine_kW          ! naming could be better�
 	 
 EQUATIONS 2
 dtEvap = ThpEvapIn-THpEvapOut
@@ -263,9 +263,9 @@ unitPrintHp ! 1: Logical unit number, -
 1            ! 5: Number of inputs to avoid integration, -
 1            ! 6: Output number to avoid integration
 INPUTS 5
-Time  PauxEvap_kW  PauxCond_kW  PelAuxComp_kW PelAuxTot_kW
+Time  QHpEvap_kW  QHpCond_kW  PelHpComp_kW PelHpTot_kW
 **
-Time  PauxEvap_kW  PauxCond_kW  PelAuxComp_kW PelAuxTot_kW
+Time  QHpEvap_kW  QHpCond_kW PelHpComp_kW PelHpTot_kW
 
 ***********************************
 ** Hourly printer
@@ -288,9 +288,9 @@ unitHourlyHp ! 1: Logical unit number, -
 8             ! 8: Output number to avoid integration
 9             ! 9: Output number to avoid integration
 INPUTS 9
-Time  PauxEvap_kW  PauxCond_kW  PelAuxComp_kW PelAuxTot_kW ThpEvapIn THpEvapOut THpCondIn THpCondOut
+Time  QHpEvap_kW  QHpCond_kW  PelHpComp_kW PelHpTot_kW ThpEvapIn THpEvapOut THpCondIn THpCondOut
 **
-Time  PauxEvap_kW  PauxCond_kW  PelAuxComp_kW PelAuxTot_kW ThpEvapIn THpEvapOut THpCondIn THpCondOut
+Time  QHpEvap_kW  QHpCond_kW  PelHpComp_kW PelHpTot_kW ThpEvapIn THpEvapOut THpCondIn THpCondOut
 
 
 UNIT 89 TYPE 65     ! Online Plotter Auxiliary (Element Hp)
