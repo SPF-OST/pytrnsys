@@ -7,7 +7,7 @@
 ** Creation date  : 29.04.2020
 ** Last changes   : 29.04.2020, MB 
 **				 	20.10.2020, SCJ - move air exchange to type5998.ddck 
-**					10.05.2021, MS
+**					10.05.2021, MAI
 *****************************************
 
 ***************************************************************************
@@ -68,10 +68,10 @@ EQUATIONS 1
 VfrInf = 6.656*isSummer*isNight + 0.083*OR(NOT(isSummer),NOT(isNight)) !(summer at night 4 air exchanges per h, non-summer values fitted to match the losses)6.656*isSummer*isNight + 0.083		! Infiltration  [m3/s](from ACPH/m3) for windows open in summer at night
 
 CONSTANTS 4
-alphaWindow = 2.5
-heightWindow = 1.5
-widthWindow = 2
-numberWindows = 150
+alphaWindow = 7.5		** this values are only for assumptions about opened windows (not fully open but partly)
+heightWindow = 1.3
+widthWindow = 0.88
+numberWindows = 33
 
 
 CONSTANTS 6
