@@ -29,7 +29,7 @@ Precond = NIX      ! Extracted mean ground preconditioning power
 PheatBuiD = 15*3600
 
 EQUATIONS 6	! Shading Factor (Blinds, other Buildings etc.)
-win_g = 0.45	! g-value windows
+win_g = 0.35	! g-value windows
 win_g_shd = 0.063	! g-value of the window when shaded with blinds
 shd_fix_N = 0.89	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
 shd_fix_S = 0.43	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
@@ -59,16 +59,16 @@ ScaleVfrVent = 0.6542
 **VfrInfRealnoAHU=0.15 * AreaBui / 3600	! Infiltration  [m3/s](from m3/hm2) for real user behavior and no AHU
 **VfrInfIdealAHU=0.165* AreaBui / 3600	! Infiltration  [m3/s](from m3/hm2) for ideal user behavior and AHU
 **VfrInfIdealnoAHU=0.7*0.94* AreaBui / 3600	! Infiltration  [m3/s](from m3/hm2)for ideal user behavior and no AHU
-VfrVent = 0.005	! Ventilation  [m3/s] according to D1.1: 0.05 air exchange/h, building volume 5990m3, 
+VfrVent = 0.083	! Ventilation  [m3/s] according to mail 0.247 ACPH except summer nights, building volume 5990m3, 
 **VfrVent = 0.33*ScaleVfrVent*scaleBuilding	! Ventilation  [m3/s] Fit Mattia
 isSummer = GE(MOD(time,8760),3648)*LE(MOD(time,8760),6552)! 
 isNight = GT(MOD(time,24),23)+LE(MOD(time,24),8) 
 
 EQUATIONS 1
-VfrInf = 6.656*isSummer*isNight + 0.083*OR(NOT(isSummer),NOT(isNight)) !(summer at night 4 air exchanges per h, non-summer values fitted to match the losses)6.656*isSummer*isNight + 0.083		! Infiltration  [m3/s](from ACPH/m3) for windows open in summer at night
+VfrInf = 6.656*isSummer*isNight+0.45!*OR(NOT(isSummer),NOT(isNight)) !(summer at night 4 air exchanges per h, 0.05ACPH always on)6.656*isSummer*isNight + 0.083		! Infiltration  [m3/s](from ACPH/m3) for windows open in summer at night
 
 CONSTANTS 4
-alphaWindow = 7.5		** this values are only for assumptions about opened windows (not fully open but partly)
+alphaWindow = 7.5   ! this values are only for assumptions about opened windows (not fully open but partly)
 heightWindow = 1.3
 widthWindow = 0.88
 numberWindows = 33
