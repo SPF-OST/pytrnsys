@@ -222,10 +222,10 @@ nIceCool     ! 33: nUserDefined COOLING if we set to 0 Churchill equation is emp
 nEnhanceNu    
 *** HEAT EXCHANGER 3     (used as HX for loading the ice storage with waste water)
 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
-RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
+RHOWAT CPWAT_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
 *** HEAT EXCHANGER 4
 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
-RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
+RHOWAT CPWAT_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
 *** U-values 
 UBotCv     ! 84 Additional U-value for node-1      [W/m^2K]
 UTopCv     ! 84 Additional U-value for node-1      [W/m^2K]
