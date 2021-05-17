@@ -38,7 +38,7 @@ elSysOut_InvLoss = PelLossesDCAC
 *************************************************************************************************
 **PelPVAC_kW,FCellToBat_kW,PelFuelCellToBui_kW
 EQUATIONS 1
-myPelSystem_kW = (PelHpTot_kW+PelContr_kW+PelPuSH_kW+PelPuDHW_kW+qAuxStoreDHW_KW+qAuxStoreSH_KW)
+myPelSystem_kW = (PelHpTot_kW+PelContr_kW+elSysOut_PuTot+qAuxStoreDHW_KW+qAuxStoreSH_KW)
 
 **********************************************
 ** Dependencies with overall variables 
