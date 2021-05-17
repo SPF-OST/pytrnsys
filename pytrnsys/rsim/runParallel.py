@@ -37,42 +37,8 @@ def getNumberOfCPU():
     return num
 
 
-def getCpuHexadecimal(cpu):
-
-    #    Core # = Decimal = Hexadecimal = BitMask
-    #    Core 1 = 1 = 01 = 00000001
-    #    Core 2 = 2 = 02 = 00000010
-    #    Core 3 = 4 = 04 = 00000100
-    #    Core 4 = 8 = 08 = 00001000
-    #    Core 5 = 16 = 10 = 00010000
-    #    Core 6 = 32 = 20 = 00100000
-    #    Core 7 = 64 = 40 = 01000000
-    #    Core 8 = -128 = 80 = 10000000
-
-    if cpu == 1:
-        return 1
-    elif cpu == 2:
-        return 2
-    elif cpu == 3:
-        return 4
-    elif cpu == 4:
-        return 8
-    elif cpu == 5:
-        return 10
-    elif cpu == 6:
-        return 20
-    elif cpu == 7:
-        return 40
-    elif cpu == 8:
-        return 80
-    elif cpu == 9:
-        return 100
-    elif cpu == 10:
-        return 200
-    elif cpu == 11:
-        return 400
-    else:
-        raise ValueError("CPU not existent:%d" % cpu)
+def getExclusiveAffinityMask(cpu):
+    return 2**(cpu-1)
 
 
 def runParallel(
@@ -136,7 +102,7 @@ def runParallel(
         #        newCmds.append("%s start /affinity %s "%(cmdExe,getCpuHexadecimal(cpu)) + cmd)
         #        newCmds.append("start /affinity %s "%(getCpuHexadecimal(cpu)) + cmd)
 
-        newTask = "start /wait /affinity %s " % (getCpuHexadecimal(cpu)) + cmd
+        newTask = "start /wait /affinity %s " % (getExclusiveAffinityMask(cpu)) + cmd
 
         newCmds.append(newTask)
 
@@ -166,7 +132,7 @@ def runParallel(
     for core in cP.keys():
         # print cP[core]
 
-        cP[core]["cmd"] = "start /wait /affinity %s " % (getCpuHexadecimal(cP[core]["cpu"])) + openCmds.pop(0)
+        cP[core]["cmd"] = "start /wait /affinity %s " % (getExclusiveAffinityMask(cP[core]["cpu"])) + openCmds.pop(0)
         cP[core]["case"] = caseNr
         caseNr += 1
 
@@ -342,7 +308,7 @@ def runParallel(
 
                         if openCmds:
                             cP[core]["cmd"] = "start /wait /affinity %s " % (
-                                getCpuHexadecimal(cP[core]["cpu"])
+                                getExclusiveAffinityMask(cP[core]["cpu"])
                             ) + openCmds.pop(0)
                             cP[core]["case"] = caseNr
                             caseNr += 1
