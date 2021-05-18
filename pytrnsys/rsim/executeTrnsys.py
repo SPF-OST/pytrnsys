@@ -163,9 +163,9 @@ class ExecuteTrnsys:
         logger.debug("PathOutput %s" % self.pathOutput)
 
         if len(fileSource) >= 260:
-            raise Exception("fileSource has a length of %d >= 260 exceeding the path lenght limit." % len(fileSource))
-        elif len(fileEnd) >= 260:
-            raise Exception("fileEnd has a length of %d >= 260 exceeding the path lenght limit." % len(fileEnd))
+            raise Exception("fileSource has a length of %d >= 260 exceeding Windows path length limit." % len(fileSource))
+        if len(fileEnd) >= 260:
+            raise Exception("fileEnd has a length of %d >= 260 exceeding Windows path length limit." % len(fileEnd))
 
         try:
             shutil.move(fileSource, fileEnd)
