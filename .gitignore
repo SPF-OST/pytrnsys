@@ -1,5 +1,4 @@
 *pyc
-/build/
 /docs/_static/
 /docs/_build/
 /docs/_templates
@@ -16,4 +15,10 @@ docs/README.md
 /ddck/building/type56/database/files/T44A38sfh100.inf
 
 venv
+
+# setuptools' setup.py and twine/PyPI related stuff
+/.eggs/
+/build/
+/dist/
+/pytrnsys.egg-info/
 
