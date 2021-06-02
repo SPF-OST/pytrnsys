@@ -1,39 +1,55 @@
-import setuptools
-from glob import glob
-import os
+import dataclasses as _dc
+import pathlib as _pl
+import itertools as _it
+
+import setuptools as _st
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
-setuptools.setup(
+
+@_dc.dataclass
+class _DestDirSourceFilePath:
+    destDir: str
+    sourceFilePath: str
+
+
+def _getDataFilePairs():
+    dataDirPath = _pl.Path(__file__).parent / "data"
+
+    dataFilePaths = [
+        p.relative_to(dataDirPath) for p in dataDirPath.rglob("*") if p.is_file()
+    ]
+
+    destDirSourcePathPairs = [
+        _DestDirSourceFilePath(str(p.parent), str("data" / p)) for p in dataFilePaths
+    ]
+
+    sortedPairs = sorted(destDirSourcePathPairs, key=lambda dp: dp.destDir)
+
+    dataFilePairs = [
+        (d, [dp.sourceFilePath for dp in dps])
+        for d, dps in _it.groupby(sortedPairs, key=lambda dp: dp.destDir)
+    ]
+
+    return dataFilePairs
+
+
+_st.setup(
     name="pytrnsys",
-    packages=setuptools.find_packages(),
-    version="0.4",
+    packages=_st.find_packages(),
     author="Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Martin Neugebauer",
     author_email="martin.neugebauer@spf.ch",
     description="pytrnsys simulation framework",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://pytrnsys.readthedocs.io",
-    # project_urls={
-    #     "Documentation": "https://pytrnsys.readthedocs.io",
-    #     "Source Code": "https://github.com/dcarbonellsanchez/pytrnsys",
-    # },
-    download_url="https://github.com/SPF-OST/pytrnsys/archive/0.4.tar.gz",
     include_package_data=True,
     install_requires=["numpy", "scipy", "pandas", "matplotlib", "seaborn", "bokeh", "dataclasses-jsonschema"],
     package_data={
-        "pytrnsys_examples": ["./*.*", "./**/*.*", "./**/**/*.*"],
-        "pytrnsys_ddck": [
-            "./*.*",
-            "./**/*.*",
-            "./**/**/*.*",
-            "./**/**/**/*.*",
-            "./**/**/**/**/*.*",
-            "./**/**/**/**/**/*.*",
-        ],
         "pytrnsys": ["./plot/stylesheets/*.*", "./report/latex_doc/*.*"],
     },
+    data_files=_getDataFilePairs(),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
