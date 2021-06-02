@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 """This script compiles the requirements.txt files corresponding to all known requirements.in files.
 
 If you want to add a dependency to pytrnsys add it to the relevant requirement.in file(s). Then invoke
@@ -26,17 +29,23 @@ import subprocess as sp
 import sys
 import pathlib as pl
 
-baseArgs = ["pip-compile", *sys.argv[1:]]
 
-DIRS = ["requirements/dev", "requirements/ci/test"]
+def main():
+    baseArgs = ["pip-compile", *sys.argv[1:]]
+
+    for d in getDirPaths():
+        inFile = str(d / "requirements.in")
+        args = [*baseArgs, inFile]
+        print(f"Calling \"{' '.join(args)}\":")
+        sp.run(args)
 
 
 def getDirPaths():
-    return [pl.Path(d) for d in DIRS]
+    requirementsDirPath = pl.Path("requirements")
+    requirementInPaths = requirementsDirPath.rglob("requirements.in")
+
+    return [p.parent for p in requirementInPaths]
 
 
-for d in getDirPaths():
-    inFile = str(d / "requirements.in")
-    args = [*baseArgs, inFile]
-    print(f"Calling \"{' '.join(args)}\":")
-    sp.run(args)
+if __name__ == "__main__":
+    main()
