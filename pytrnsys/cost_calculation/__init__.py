@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["calculateCostsAndWriteReports", "CasesDefined", "OTHER"]
 
 import pathlib as _pl

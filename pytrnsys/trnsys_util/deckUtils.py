@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import numpy as num
 import pytrnsys.pdata.processFiles as spfUtils
 import os

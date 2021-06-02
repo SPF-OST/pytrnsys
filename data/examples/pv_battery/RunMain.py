@@ -1,5 +1,9 @@
-import pytrnsys.rsim.runParallelTrnsys as runTrnsys
+# pylint: skip-file
+# type: ignore
 
-pathConfig = "solar_dhw"
-configFile = "run_solar_dhw.config"
+import pytrnsys.rsim.runParallelTrnsys as runTrnsys
+import os
+
+pathConfig = os.getcwd()
+configFile = "run_pv_battery.config"
 runTool = runTrnsys.RunParallelTrnsys(pathConfig, configFile=configFile)

@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import filecmp
 import pathlib as pl
 import shutil
