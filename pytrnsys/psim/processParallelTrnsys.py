@@ -458,7 +458,7 @@ class ProcessParallelTrnsys:
         if self.inputs["calculateCost"] and "cost" in self.inputs:
             fileNameList = [self.inputs["fileName"]] if typeOfProcess == "casesDefined" else None
 
-            self.calcCost(typeOfProcess, fileNameList)
+            self.calcCost(fileNameList)
 
         if "acrossSetsCalc" in self.inputs.keys():
             self.logger.info("Calculating across sets")
@@ -1746,13 +1746,12 @@ class ProcessParallelTrnsys:
         if found == False:
             self.logger.warning("changeFile was not able to change %s by %s" % (source, end))
 
-    def calcCost(self, typeOfProcess: str, fileNamesToRead=None):
+    def calcCost(self, fileNamesToRead=None):
         resultsDirPath = _pl.Path(self.inputs["pathBase"])
         configFilePath = _pl.Path(self.inputs["cost"])
-
+        shallWriteReport = False
         processType = _cc.OTHER if not fileNamesToRead else _cc.CasesDefined(fileNamesToRead)
-
-        _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, processType)
+        _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, shallWriteReport, processType)
 
 
 def process():

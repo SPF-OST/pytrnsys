@@ -14,14 +14,14 @@ OTHER = _pt.OTHER
 
 
 def calculateCostsAndWriteReports(
-    configFilePath: _pl.Path, resultsDirPath: _pl.Path, processType: _pt.ProcessType
+    configFilePath: _pl.Path, resultsDirPath: _pl.Path, shallWriteReport: bool, processType: _pt.ProcessType
 ) -> None:
     config = _createConfig(configFilePath)
     costCalculations = _co.createCostCalculations(config, resultsDirPath, processType)
 
     reportWriter = _resultsWriter.ResultsWriter()
     for costCalculation in costCalculations:
-        reportWriter.writeReportAndResults(config.parameters, costCalculation)
+        reportWriter.writeReportAndResults(config.parameters, costCalculation, shallWriteReport)
 
 
 def _createConfig(configFilePath):
