@@ -40,6 +40,7 @@ def _getDataFilePairs():
 
 _st.setup(
     name="pytrnsys",
+    version_config=True,
     packages=_st.find_packages(),
     author="Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Martin Neugebauer",
     author_email="martin.neugebauer@spf.ch",
