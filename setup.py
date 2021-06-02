@@ -62,5 +62,6 @@ _st.setup(
     pytrnsys-process = pytrnsys.psim.processParallelTrnsys:process
     pytrnsys-load = pytrnsys.utils.loadExamplesAndDdcks:load
     """,
+    setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.5",
 )
