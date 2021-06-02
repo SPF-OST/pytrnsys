@@ -5,10 +5,9 @@ on:
     types: [created]
 
 jobs:
-  deploy:
-
+  release:
     runs-on: ubuntu-latest
-
+    environment: PyPI
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
