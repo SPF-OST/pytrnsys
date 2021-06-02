@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import typing as _tp
 import dataclasses as _dc
 import pathlib as _pl

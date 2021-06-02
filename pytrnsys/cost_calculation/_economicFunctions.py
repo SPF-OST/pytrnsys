@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import pytrnsys.utils.uncertainFloat
 from ._models import common as _common
 

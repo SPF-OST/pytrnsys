@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 # Run from top-level directory
 
 import pathlib as pl

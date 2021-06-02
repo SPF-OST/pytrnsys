@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["Output", "ComponentGroups", "ComponentGroup", "CostFactors", "CostFactor"]
 
 import dataclasses as _dc

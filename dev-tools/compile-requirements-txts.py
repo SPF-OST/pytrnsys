@@ -1,6 +1,9 @@
 # pylint: skip-file
 # type: ignore
 
+# pylint: skip-file
+# type: ignore
+
 """This script compiles the requirements.txt files corresponding to all known requirements.in files.
 
 If you want to add a dependency to pytrnsys add it to the relevant requirement.in file(s). Then invoke

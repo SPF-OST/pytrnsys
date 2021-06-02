@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import pytrnsys.pdata.processFiles as spfUtils
 import os, re
 import pytrnsys.trnsys_util.deckUtils as deckUtils

@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import pytrnsys.rsim.runParallelTrnsys as runTrnsys
 import os
 
