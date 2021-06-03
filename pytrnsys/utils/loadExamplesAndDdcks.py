@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import pkg_resources
 import shutil
 import os

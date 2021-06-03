@@ -1,0 +1,222 @@
+*******************************
+**BEGIN battery.ddck
+*******************************
+    
+	
+*****************************************
+** Electrical battery data section. 
+** Author : Robert Haberl (RH)
+** History: 
+**** DC adapted to TriHp
+**** DC first version in ddck format 25.02.2019
+******************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** None
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 4
+elSysOut_BatLoss   = PelBatLoss_kW
+elSysIn_Grid = PelFromGrid_kW
+elSysOut_PvToGrid  = PvToGrid_kW
+elSysOut_InvLoss = PelLossesDCAC
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+**PelPVAC_kW,FCellToBat_kW,PelFuelCellToBui_kW
+EQUATIONS 1
+myPelSystem_kW = (PelHpTot_kW+PelContr_kW+elSysOut_PuTot+qAuxStoreDHW_KW+qAuxStoreSH_KW)
+
+**********************************************
+** Dependencies with overall variables 
+** Tamb HT cpWat
+** 
+**********************************************
+**None
+
+
+EQUATIONS 2    ! Stromverbrauch und Stromnetzbilanz THIS WILL BE ELIMINATED           ! System electricity consumption [kW]
+PelHeatSys_kW = myPelSystem_kW
+PelUsedTotal_kW = PelHeatSys_kW + PelHH_kW + PelBatStandby_kW    !kW, Total konsumierter Strom des Geb√§udes [kW]
+
+**********************************
+** Generic constants
+**********************************
+
+CONSTANTS 3 !Needed to run but no need here
+PelFuelCell_kW = 0
+PelFuelCellToBat_kW = 0
+PelFuelCellToBui_kW = 0
+
+CONSTANTS 12   ! Battery
+minElBatFactor = 0.02
+CapBatMaxT0_kWh = 50    !kWh, Maximale Batteriekapazit‰t zur Zeit 0 [kWh]
+maxBatteryPower_kW = CapBatMaxT0_kWh * 12./50.    !kW, Maximum battery charging power [kW]
+MinPelFromToBat_kW = minElBatFactor*CapBatMaxT0_kWh    !kW, Minimum delivered power from the battery
+BeginkWhBattery = CapBatMaxT0_kWh*0.2
+PelBatStandby_kW = 0.005    !kW, Standbyverluste + Reglerverbrauch Batterie
+CapBatMax_kWh = CapBatMaxT0_kWh    !kW, Zeitabh‰ngige Batteriekapazit‰t [kWh]
+FrBatSOCmin = 0.1    !0-1, Minimaler Ladeanteil der Batterie
+SocBatMin_kWh = FrBatSOCmin*CapBatMax_kWh    !kWh, Minimale Ladekapazit‰t der Batterie
+**inverterEffDCAC = 0.9
+frBatWRloss = 0.1 !0.08
+effBatDischarge = 1-frBatWRloss
+effBatCharge = 1-frBatWRloss
+
+**maxInverterPower = 12 !kW maximum AC from DC coming from PV or battery
+**maxELizer_kW = 4.6
+**minELizer_kW = maxELizer_kW/4.*0.4 !there are 4 electrolizers and they can work at 40% part load
+
+
+
+EQUATIONS 21
+
+** Detect if battery is full or empty
+** what is this 0.25 ????
+BoBatFull = GT(SOCBatRc_kWh,CapBatMax_kWh)*Not(BoBatFullRc)+GT(SOCBatRc_kWh,CapBatMax_kWh-0.25)*BoBatFullRc    !0/1, Batterie ist Full
+BoBatEmpty = LT(SOCBatRc_kWh,SocBatMin_kWh)    !0/1, Batterie ist Empty
+
+** decide whether to charge or discharge and calculate charing / discharging
+**BoLoadBat = GT(PelPVDC_kW*inverterEffDCAC+PelFuelCell_kW,PelUsedTotal_kW+MinPelFromToBat_kW)*Not(BoBatFull)    !0/1, Batterie wird geladen
+** It is assumed here that the FC can go directly to the HH, which is not clear to me
+BoLoadBat = GT(PelPVAC_kW+PelFuelCell_kW,PelUsedTotal_kW+MinPelFromToBat_kW)*Not(BoBatFull)
+BoUnloadBat = GT(PelUsedTotal_kW+MinPelFromToBat_kW,PelPVAC_kW+PelFuelCell_kW)*Not(BoBatEmpty)    !0/1, Batterie wird entladen
+
+**State of charge (SOC) 
+**SOCBat_kWh = LT(TIME,dTSim*2)*BeginkWhBattery +SOCBatRc_kWh + (PvToBat_kW+FuelCellToBat_kW-PelFromBat_kW*(1+(1-inverterEffDCAC))-PelBatTimeLoss_kW)*dtSim    !kWh, State of Charge of Battery
+** SOCBat_kWh = LT(TIME,dTSim*2)*BeginkWhBattery + SOCBatRc_kWh + (PvToBatDC_kW+PelFuelCellToBat_kW-PelFromBat_kW-PelBatTimeLoss_kW)*dtSim
+SOCBat_kWh = LT(TIME,dTSim*2)*BeginkWhBattery + SOCBatRc_kWh + (PvToBatDC_kW+PelFuelCellToBat_kW-PelFromBat_kW*(1+(1-effBatDischarge))-PelBatTimeLoss_kW)*dtSim !JS: include battery discharge losses
+
+**SOCBat_kWh = SOCBatRc_kWh + (PelToBatDC_kW-PelFromBatDC_kW-PelBatTimeLoss_kW)*dtSim
+SOCBat = SOCBat_kWh/CapBatMax_kWh ! 0-1 State of charge 
+
+** PV electricity to battery
+** Why AC? PV to
+PvToHH_kW      = MIN(PelPVAC_kW,PelHH_kW+PelBatStandby_kW)
+PvToHeatSys_KW = MIN(PelPVAC_kW-PvToHH_kW,PelHeatSys_kW)
+BoPvBatCharge  = GT(PelPVAC_kW-PvToHH_kW-PvToHeatSys_kW,0)*Not(BoBatFull)
+
+
+** I use the AC as control to know how much I can bring with DC = AC/inverterLoss
+PvToBatDC_kW   = MAX(MIN(BoPvBatCharge*effBatCharge*(PelPVAC_kW-PvToHH_kW-PvToHeatSys_kW)/inverterEffDCAC,maxBatteryPower_kW),0)
+PvToBat_kW     = PvToBatDC_kW
+PvExcess_kW    = MAX(PelPVAC_kW-PvToHH_kW-PvToHeatSys_KW-PvToBat_kW*inverterEffDCAC,0)
+PvToGrid_kW = PvExcess_kW
+** El from Battery to system. No efficiency to discharge? Yes but if used here then we always need the grid, what we need to do is to decrease the SOC
+PelFromBat_kW  = Max(0.0,Min(maxBatteryPower_kW,(PelUsedTotal_kW-PvToHH_kW-PvToHeatSys_kW-PelFuelCellToBui_kW)/inverterEffDCAC*BoUnloadBat))    !kW, El. Leistung von der Batterie ans Geb‰ude  JS: Include inverter efficiency, as Battery provides DC Power
+PelFromGrid_kW = MAX(PelUsedTotal_kW-PvToHH_kW-PvToHeatSys_KW-PelFromBat_kW-PelFuelCellToBui_kW,0.0)
+
+** El from battery to Household and thermal system
+
+PelFromBatToHH_kW  = MIN(PelFromBat_kW,PelHH_kW)
+PelBatToHeatSys_kW = MIN(PelFromBat_kW-PelFromBatToHH_kW,PelHeatSys_kW)
+
+** Loss calculations
+** PelBatWRLoss_kW = (PelToBatAC_kW-PelToBatDC_kW) + (PelFromBatDC_kW-PelFromBatAC_kW)    !kW, Batteriewechselrichterverluste
+
+PelBatWRLoss_kW   = 0 !PvToBat_kW+PelFuelCellToBat_kW-PelFromBat_kW    !kW, Inverter losses in battery . All included in BatLoss
+PelBatTimeLoss_kW = CapBatMax_kWh*0.05/(30*24)/dtSim  ! kW, Batterie-Ladungsverluste (5% pro Monat)
+PelBatLoss_kW     = PvToBat_kW+PelFuelCellToBat_kW-PelFromBat_kW  ! PelBatWRLoss_kW + PelBatTimeLoss_kW   ! kW  !This variable only makes sense when integrated...
+
+** Calculate ACDC inverter losses
+PelLossesDCAC =  (elSysIn_PV - PvToBatDC_kW + PelFromBat_kW)*(1-inverterEffDCAC)
+
+
+UNIT 98 TYPE 993    !Type993-release.dll, Input value recall for Controller Values
+PARAMETERS 1
+3   !, 1, number of variables to be remembered
+INPUTS 3
+SOCBat_kWh  BoBatFull  SOCBat  
+SocBatMin_kWh    0.0    0     0 !, 1-10
+
+EQUATIONS 3   !, Recalled values for collector control
+SOCBatRc_kWh = [98,1] !kWh
+BoBatFullRc = [98,2]  !0/1
+SOCBatRc = [98,3]     !0/1
+
+
+*******************************
+**Monthly printer
+*******************************
+
+CONSTANTS 1
+unitPrinterBat=308
+
+ASSIGN    temp\ELECTRIC_BAT_PV_MO.Prt      unitPrinterBat
+
+UNIT 308 Type 46    !, Printegrator Monthly Values for Electricity
+PARAMETERS 6
+unitPrinterBat  !, 1, Logical unit number, -
+-1   !, 2, Logical unit for monthly summaries, -
+1    !, 3, Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1   !, 4, Printing & integrating interval, h. -1 for monthly integration
+1    !, 5, Number of inputs to avoid integration, -
+1    !, 6, Output number to avoid integration
+INPUTS 19
+Time  PelHH_kW PelPVDC_kW  PelPVRoof_kW PvToBat_kW  PvToHeatSys_kW PvToHH_kW PelFromBat_kW   PelBatWRLoss_kW  PelFromGrid_kW PelBatLoss_kW
+PelBatTimeLoss_kW  PelBatStandby_kW PelFromBatToHH_kW PelBatToHeatSys_kW  PelFuelCellToBat_kW PvToGrid_kW PvInverterLoss_kW PelHeatSys_kW     
+*******
+Time  PelHH_kW PelPVDC_kW  PelPVRoof_kW PvToBat_kW  PvToHeatSys_kW PvToHH_kW PelFromBat_kW   PelBatWRLoss_kW  PelFromGrid_kW PelBatLoss_kW
+PelBatTimeLoss_kW  PelBatStandby_kW PelFromBatToHH_kW PelBatToHeatSys_kW PelFuelCellToBat_kW PvToGrid_kW PvInverterLoss_kW PelHeatSys_kW
+
+
+*******************************
+**Hourly Battery printer
+*******************************
+
+CONSTANTS 1
+unitPrinterBat_h=309
+
+ASSIGN    temp\ELECTRIC_BAT_HR.Prt      unitPrinterBat_h
+
+UNIT 308 Type 46    !, Printegrator Monthly Values for Electricity
+PARAMETERS 6
+unitPrinterBat_h  !, 1, Logical unit number, -
+-1   !, 2, Logical unit for monthly summaries, -
+1    !, 3, Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1   !, 4, Printing & integrating interval, h. -1 for monthly integration
+1    !, 5, Number of inputs to avoid integration, -
+1    !, 6, Output number to avoid integration
+INPUTS 11
+Time  SOCBat_kWh SOCBat   PvToBat_kW  PelFromBat_kW  PelBatWRLoss_kW  PelBatLoss_kW  PelBatTimeLoss_kW  PelBatStandby_kW  PelFromBatToHH_kW PelBatToHeatSys_kW
+*******
+Time  SOCBat_kWh SOCBat   PvToBat_kW  PelFromBat_kW  PelBatWRLoss_kW  PelBatLoss_kW  PelBatTimeLoss_kW  PelBatStandby_kW  PelFromBatToHH_kW PelBatToHeatSys_kW
+
+
+
+UNIT 155 TYPE 65     ! Online Plotter PV
+PARAMETERS 12     
+5     ! 1 Nb. of left-axis variables
+3     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+1000     ! 4 Left axis maximum
+0    ! 5 Right axis minimum
+1000     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 8
+elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  nix  nix  SOCBat_kWh  BoBatFull  SOCBat  
+**     
+elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  nix  nix  SOCBat_kWh  BoBatFull  SOCBat 
+LABELS  3    
+Pel
+SoC
+Battery     
+		

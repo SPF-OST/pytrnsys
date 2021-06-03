@@ -1,0 +1,425 @@
+*******************************
+**BEGIN Control-863-minimal.ddck 
+*******************************
+    
+*****************************************
+** Contact person : Dani Carbonell    
+** Creation date  : 23.04.2018
+** Last changes   : 02.2021 Be carefull, change of outputs for TYPE863 with V6 added ProDoubleHpCs
+*****************************************
+
+***************************************************************************
+** Description: 
+** Simplified control solar-ice (de-ice capabilities included)
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+***********************************
+** outputs to other ddck
+***********************************
+
+
+EQUATIONS 20
+ProHp = GT([100,1],0.5)     
+ProSeries = GT([100,2],0.5)     
+ProWs = GT([100,3],0.5)     
+ProCs = GT([100,4],0.5)     
+ProPar = GT([100,5],0.5) 
+ProDfCol = GT([100,6],0.5)     
+ProDfWs = GT([100,7],0.5)     
+ProDoubleHpCs = GT([100,8],0.5) 
+ProNoPro = GT([100,15],0.5)
+      
+actualMonth=[100,17]  !Starts at 1=January
+auxStoreDHWIsOn = GT([100,18],0.5) 
+auxStoreSHIsOn  = GT([100,19],0.5) 
+
+*****************************************************************************
+** BLOCK OUTPUTS (to check if something was blocked internally***************
+*****************************************************************************
+
+BlockHpType = GT([100,20],0.5)     
+BlockSeriesType = GT([100,21],0.5)     
+BlockWsType = GT([100,22],0.5)     
+BlockCsType = GT([100,23],0.5)     
+BlockParType = GT([100,24],0.5) 
+BlockDfColType = GT([100,25],0.5)     
+BlockDfWsType = GT([100,26],0.5)     
+ProDfAux = 0 ! Assuming now Tes has a backup and it will activate it anyway
+
+***********************************
+** Begin constants
+***********************************
+
+CONSTANTS 9
+BlockOff = 0
+BlockOn  = 1     
+TtesForcePriorWs = 10   
+TmaxSensibleTes = Tmax_Tes1   
+TmaxIceTes      = 50
+tempColAboveHpLimit = 3   
+nBeginCsPriority = 11 !DC-CLEAN check what it does internally, we should erase this 
+nEndCsPriority   = 2  
+DeIcePossible    = 0
+
+***************************************************
+******** Deadbands*********************************
+***************************************************
+
+CONSTANTS 15   
+UdbProHp = 5     ! Upper deadband ProHp
+LdbProHp = 2     ! Lower deadband ProHp 
+UdbProWs = 7     ! Upper deadband ProWs 
+LdbProWs = 2     ! Lower deadband ProWs 
+UdbProCs = 6     ! Upper deadband ProCs
+LdbProCs = 2     ! Lower deadband ProCs 
+UdbProSeries = 4  ! -8 (PriorRoof) Upper deadband ProSeries with uncovered
+LdbProSeries = 1  ! -15(PriorRoof) Lower deadband ProSeries with uncovered
+coefTaSeries = 3  ! 1  (PriorRoof) T_{ldb,udb} - Ta/coefTaSeriesUnc
+LdbBkpDhw = 2           ! starts at Tset+LdbBkpDhw
+UdbBkpDhw = LdbBkpDhw+3 ! ends at   Tset+UdbBkpDhw
+LdbBkpSh  = 0
+UdbBkpSh  = LdbBkpSh+2
+dTOnPriorWs  = 0     
+dTOffPriorWs = -2     
+
+
+*****************************************************************************
+****** CALCULATING TOUT COLL IF WE WOULD STOP LOADING THE ICE STORAGE *******
+*****************************************************************************
+
+CONSTANTS 6
+MoveDb = -3 ! We allow to switch when UdbProWs - 3 because we usually predict too low TColOut wiht the 862Type    
+dtColOnCalc  = MoveDb + UdbProWs ! Upper dead band coll. pump ON
+dtColOffCalc = MoveDb            ! Lower dead band coll. pump OFF
+waitingTimeForceWs = 1 !hour
+isTempUsedToSwitch = 1
+itForceWs_UpDeadBand = 800 ! W/m2 
+
+UNIT 120 TYPE 862
+PARAMETERS 9
+eta0 
+a1    
+a2   
+AcollAp      
+cpBri_SI
+dtColOnCalc ! tUpDeadBand         
+waitingTimeForceWs
+isTempUsedToSwitch 
+itForceWs_UpDeadBand  
+INPUTS 5
+MfrCollRc
+tCollInRc   ! DC
+tcollOutRc  ! DC 
+TCollectorOn
+IT_Coll_Wm2
+**** 
+0 10 20 50 100
+
+EQUATIONS 4
+tCollExpected = [120,1]    ! Expected collector output temperature if inlet would be tSensorTesSh
+qcolCalcM2    = [120,2]    ! W/m2 theoretical gain
+ProWsOnCalc   = [120,3]    ! switchToWsPossible
+dtSwitchPossible = tCollExpected-TCollectorOn
+
+*****************************************************************************
+****** TIMERS FOR PROGRAMS **************************************************
+*****************************************************************************
+
+EQUATIONS 3
+hoursColAreBlocked = timeHpBlock     
+TMinUncHp          = TMinEvapTin+tempColAboveHPLimit       
+SourceColTooCold   = LT(TPIHpEvapInRc,TMinUncHp)    
+     
+Unit 186 Type 817     ! Timer or time delay FIXED TO 5 VARIABLES. WE CAN'T CHANGE IT !!
+PARAMETERS 10    
+1      ! 3: mode of timer 1: 1= from first trigger on; 2 = from last trigger on
+0.5    ! 4: lenght of time for timer 1 [h]
+1      ! 5: mode of timer 2: 1= from first trigger on; 2 = from last trigger on
+0.5    ! 6: lenght of time for timer 2 [h]
+1      ! 7: mode of timer 3: 1= from first trigger on; 2 = from last trigger on
+2      ! 8: lenght of time for timer 3 [h]
+1      ! 9: mode of timer 4: 1= from first trigger on; 2 = from last trigger on
+0     ! 10: lenght of time for timer 4 [h]
+0
+0
+INPUTS 5    
+ProWsOnCalc ProWs  SourceColTooCold Nix  Nix
+*** INITIAL VALUES
+0.0 0.0 0.0 0.0 0.0
+     
+EQUATIONS 3
+ProWsOnCalcTimer  = [186,1]
+ProWsTimer        = [186,2]
+ColTooColdTimer   = [186,3]      ! If power Unc is negative or brine input Hp drops too low, Unc as source are blocked for 1 h
+
+*****************************************************************************
+****** ONLY FOR DE-ICING*******************************************
+****** FORCING TO LOAD WS IN WINTER WHEN IT HAS TOO LOW TEMPERATURE**********
+*****************************************************************************
+      
+**UNIT 188 TYPE 2 ! Calculation Forcing ProWS depending on TEMPEARATURE OF TES
+**PARAMETERS 2     
+**5     ! 1 No. of oscillations
+**300   ! 2 High limit cut-out
+**INPUTS 6     
+**TtesForcePriorWs     ! Upper input temperature Th
+**TsensorTesSh     ! Lower input temperature Tl
+**TsensorTesSh     ! Monitoring temperature Tin
+**PriorWsActive     ! Input control function
+**dTOnPriorWs     ! Upper dead band dT
+**dTOffPriorWs     ! Lower dead band dT
+*** INITIAL INPUT VALUES     
+**0.0 20.0 0.0 0 dTOnPriorWs dTOffPriorWs     
+     
+**EQUATIONS 1     
+**PriorWsActive = [188,1]     ! output of controllers for collector normal operation and collector High Flow (TES view)
+   
+*****************************************************************************
+****** PRIORITY TO LOAD WS IN WINTER WHEN IT HAS TOO LOW TEMPERATURE**********
+*****************************************************************************
+
+EQUATIONS 2
+**ProWs goes off and lower part TES is still cold. This is for cold conditions.
+**If f it was sunny and a cloud passes by, we stop it but we wait until the clouds goes away for 0.5 h
+**BoProWsGoesOff =  ProWsTimer*LT(TsensorTesSh,50) ASK DP?
+switchPossible = ProWsOnCalcTimer !OR(ProWsOnCalcTimer,BoProWsGoesOff)    
+PriorWs        = switchPossible*NOT(OR(TesOverheat,BlockWs))
+       
+EQUATIONS 2
+TProCs   = GT(VIceRatio,5)*0+NOT(GT(VIceRatio,5))*TsensorPcmControl 
+iceOnHx  = GT(iceThick,0.00001)  
+
+EQUATIONS 5
+tDefrostWithCol  = -0.5 
+timeDefrostCol   = 1               
+tDefrostWithWs   = -2
+WsWarm = GT(TsensorTesSh,8)     
+**timeDefrostWs = WsWarm*Max(0.7,(NHx1*AHx1*iceThickToDeIce*RhoIce*333000.*3/((MfrCPriNom*(TsensorTesSh-5)*CPBRI_SI)+0.000001)))+Not(WsWarm)*timeDfAux     	
+**timeDfWs = Max(0.7,(NHx1*AHx1*iceThickToDeIce*RHOWAT*333000.*3/((MfrCPriNom*(TsensorTesSh-5)*CPBRI*1000)+0.000001)))    	
+timeDfWs = 0
+
+*********************************************************************
+******** Controller of primary loop : solar, ice and source heat pump 
+******** outputs : position valves and on/off pumps
+*********************************************************************
+
+CONSTANTS 2
+priorProgramm    = -1
+allowMultipleProg = 0
+
+UNIT 100 TYPE 863     ! NEW VERSION INCLUDE DE-ICING CAPABILITIES Controller
+PARAMETERS 23   
+UdbProHp     ! Upper death band ProHp 
+LdbProHp     ! Lower death band ProHp
+UdbProWs     ! Upper death band ProWs 
+LdbProWs     ! Lower death band ProWs 
+UdbProCs     ! Upper death band ProCs 
+LdbProCs     ! Lower death band ProCs 
+UdbProSeries     ! Upper dead band ProSeries with covered
+LdbProSeries     ! Lower dead band ProSeries with covered
+coefTaSeries ! T_{ldb,udb} - Ta/coefTaSeriesColl
+0 ! Winter cs Priority
+nBeginCsPriority  ! nBeginCsPriority starting month of Cs priority
+nEndCsPriority    ! nEndCsPriority ending month of Cs priority
+TmaxSensibleTes     
+TmaxIceTes   
+UdbBkpDhw         
+LdbBkpDhw
+UdbBkpSh
+LdbBkpSh
+tDefrostWithCol   
+timeDefrostCol                  
+tDefrostWithWs
+allowMultipleProg
+DeIcePossible
+INPUTS 23  ! All the T inputs are used from previous time step in the Control itself, so dont need to use Recall values   
+TCollOut     ! Temp 1 Tcout
+TPiColIn     ! Temp 2 TPiColIn
+TProAuxDhwTes   ! 3 Used for Auxiliar in DHW height
+TProWs          ! 4 Used for ProWs 
+TProCs          ! 5 Used for ProCs
+TProAuxShTes    ! 6 Used Auxiliar SH height
+Tamb            ! 7 Temp 7 Tamb USed for ProSeries
+TPiHpEvapIn     ! Temp 8 Inlet Temp evaporator
+TPiHpEvapOut    ! Temp 9 Outlet Temp of the Evaporator
+TdhwSet         ! Temp 10 Tset for DHW. If HpIsOff switch on back up
+Trdset          ! Temp 11 Tset for SH. If HpIsOff switch on back up  
+******************* BLOCK 7 programms (programm 8 is off so cant be blocked).
+BlockHp    !       p 1  / ProHp  Heat pump is running, lower Hx in Pcm, ice is formed on HX
+BlockSeries    !       p 2  / ProSeries analog to p 3 according to Hx in pcmtes, with Sol. col. running S(5)
+BlockWs    !       p 3  / ProWs  col. charging tes   if T(1) is hot enough for upper part in tes T(4)
+BlockCs    !       p 4  / ProCs  col. charging pcmtes if T(1) is hot enough for upper part in pcm T(6)  
+BlockPar    !       p 5  / Parallel mode : solar to Tes and heat pump with Pcm at same   
+BlockDfCol    !       p 6  / Not used (to be added if necessary)
+BlockDfWs   !       p 7  / Not used (to be added if necessary)
+BlockDoubleCsHp
+*********************SPECIAL BLOKCS*********************
+priorProgramm
+HpIsOn
+HpIsBlock     !       used to block all hp related programms
+timeDfWs
+*** INITIAL INPUT VALUES     
+0 0 0 0 0 0 0 0 0 0       
+0 0 0 0 0 0 0 0 0 0
+0 0 0          
+
+
+**isWinterMonth=OR(GE(actualMonth,nBeginCsPriority),LE(actualMonth,nEndCsPriority))     
+         
+*********************************************************************
+******** RECALL VALUES ********************************************** 
+*********************************************************************
+
+UNIT 903 TYPE 993     ! Input value recall (element RcB)
+PARAMETERS 1     
+6   ! 1: number of variables to be remembered    
+INPUTS 6     
+**  1      2      3      4      5      6      7      8      9      10      
+TPCM2 TPiHPEvapOut vIceRatio TsensorTesSh TPiHpEvapIn   tCollExpected   
+0.0  0.0 1 0 0  0    0
+EQUATIONS 6    ! outputs of Input Value Recall
+TPCM2Rc = [903,1]     !
+TPiHPEvapOutRc = [903,2]     !
+vIceRatioRc = [903,3]     !this
+TsensorTesShRc = [903,4]     
+TPiHpEvapInRc = [903,5]     !this
+tCollExpectedRc = [903,5]
+
+UNIT 126 TYPE 993     ! Input value recall (element RcB)
+PARAMETERS 1     
+8     ! 1: number of variables to be remembered     
+INPUTS 8
+ProHp ProSeries ProWs ProCs ProPar ProDfCol ProDfWs CoolingOn 
+0.0  0.0  0.0   0.0  0.0  0.0  0.0 0.0 0.0
+     
+EQUATIONS 8    ! outputs of Input Value Recall
+ProHpRc = [126,1]     
+ProSeriesRc = [126,2]     
+ProWsRc = [126,3]     
+ProCsRc = [126,4]     
+ProParRc = [126,5]     
+ProDfColRc = [126,6]
+ProDfWsRc = [126,7]
+CoolingOnRc = [126,8]
+
+*******************************
+** PROGRAMM COUNTERS **********
+*******************************
+
+** EQUATIONS 7   !  Programm Start Counter 
+** ProHpStarts = (GT(ProHp,0.5)*LT(ProHpRc,0.5))/dtSim     
+** ProSeriesStarts = (GT(ProSeries,0.5)*LT(ProSeriesRc,0.5))/dtSim     
+** ProWsStarts = (GT(ProWs,0.5)*LT(ProWsRc,0.5))/dtSim     
+** ProCsStarts = (GT(ProCs,0.5)*LT(ProCsRc,0.5))/dtSim     
+** ProParStarts = (GT(ProPar,0.5)*LT(ProParRc,0.5))/dtSim   
+** ProDfColStarts = (GT(ProDfCol,0.5)*LT(ProDfColRc,0.5))/dtSim   
+** ProDfWsStarts = (GT(ProDfWs,0.5)*LT(ProDfWsRc,0.5))/dtSim   
+
+*******************************
+** Online plotters************
+*******************************
+
+UNIT 127 TYPE 65     ! Online Plotter Auxiliary (Element OpA)
+PARAMETERS 12     
+10     ! 1 Nb. of left-axis variables
+10     ! 2 Nb. of right-axis variables
+-10     ! 3 Left axis minimum
+50     ! 4 Left axis maximum
+-0.5     ! 5 Right axis minimum
+1.5     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 20    
+**TCollOut TPiColIn TPcmTopUsed TPiHpEvapIn TPcmIceHx tSetDHW tSetSH  TrdSet   TsensorTesDhw TsensorTesSh 
+TCollOut TPiColIn TProCs TPiHpEvapIn  auxStoreDHWIsOn TTesDhwAuxOn  BoAuxWWOn   TTesDhwAuxOff TsensorTesSh BoAuxSHon
+HpIsOn HpIsBlock ProDoubleHpCs PriorWs ProHp ProSeries ProWs ProCs ProPar switchPossible
+****LABELS
+TCollOut TPiColIn TProCs TPiHpEvapIn  auxStoreDHWIsOn TTesDhwAuxOn  BoAuxWWOn   TTesDhwAuxOff TsensorTesSh BoAuxSHon
+HpIsOn HpIsBlock ProDoubleHpCs PriorWs ProHp ProSeries ProWs ProCs ProPar switchPossible
+LABELS 3     
+Temperatures     
+On-Off     
+Control
+
+
+** UNIT 128 TYPE 65     ! Online Plotter Auxiliary 
+** PARAMETERS 12     
+** 10     ! 1 Nb. of left-axis variables
+** 10     ! 2 Nb. of right-axis variables
+** -0.5     ! 3 Left axis minimum
+** 1.5     ! 4 Left axis maximum
+** -1.5     ! 5 Right axis minimum
+** 1.5     ! 6 Right axis maximum
+** nPlotsPerSim     ! 7 Number of plots per simulation
+** 12     ! 8 X-axis gridpoints
+** 1     ! 9 Shut off Online w/o removing
+** -1     ! 10 Logical unit for output file
+** 0     ! 11 Output file units
+** 0     ! 12 Output file delimiter
+
+** INPUTS 20    
+** ProHp   ProSeries   proPar  proWs  proCs  nix ProDfWs ProDfAux PriorWs BoAuxWWOn
+** BlockWs BlockWsType BlockCs TwwStAuxON  BlockHp  TwwStAuxOFF THpEvapIn TCollOut TPiIceIn TPiIceOut
+**LABELS
+** ProHp   ProSeries   proPar  proWs  proCs  nix ProDfWs ProDfAux PriorWs BoAuxWWOn
+** BlockWs BlockWsType BlockCs TwwStAuxON  BlockHp  TwwStAuxOFF THpEvapIn TCollOut TPiIceIn TPiIceOut
+
+***
+** LABELS 3     
+** Temperatures     
+** On-Off     
+** Control-pri
+
+**UNIT 128 TYPE 65     ! Online Plotter Auxiliary 
+**PARAMETERS 12     
+**10     ! 1 Nb. of left-axis variables
+**10     ! 2 Nb. of right-axis variables
+**-0.5     ! 3 Left axis minimum
+**1.5     ! 4 Left axis maximum
+**-1.5     ! 5 Right axis minimum
+**1.5     ! 6 Right axis maximum
+**nPlotsPerSim     ! 7 Number of plots per simulation
+**12     ! 8 X-axis gridpoints
+**1     ! 9 Shut off Online w/o removing
+**-1     ! 10 Logical unit for output file
+**0     ! 11 Output file units
+**0     ! 12 Output file delimiter
+**INPUTS 20    
+**ProHp   ProSeries   proPar  proWs  proCs  blockWs    storeIsCollapsed  PriorWs  PriorWs Nix
+**!*HpIsBlock BlockIceStore BlockHp  BlockIceStore BlockSeries BlockWs BlockCs  BlockPar ProWsOnCalc ProWsOnCalcTimer
+**!*tCollExpected ProWsOnCalc HpIsBlock BlockIceStore BlockHp  BlockIceStore BlockSeries BlockWs BlockCs BlockPar
+**xFracMixHxTes  xFracDivHpEvap  MfrPuHpEvap MFrPuCol TCollIn TCollOut THpEvapIn THpEvapOut TPiIceIn TPiIceOut
+******
+**ProHp   ProSeries   proPar  proWs  proCs  blockWs    storeIsCollapsed  PriorWs  PriorWs Nix
+**!*tCollExpected ProWsOnCalc HpIsBlock BlockIceStore BlockHp  BlockIceStore BlockSeries BlockWs BlockCs BlockPar
+**xFracMixHxTes  xFracDivHpEvap  MfrPuHpEvap MFrPuCol TCollIn TCollOut THpEvapIn THpEvapOut TPiIceIn TPiIceOut
+*******
+**LABELS 3     
+**Temperatures     
+**On-Off     
+**Control-pri
+  
+*******************************
+**END Control-863.ddck
+*******************************

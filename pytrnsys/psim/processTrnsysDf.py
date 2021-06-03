@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 #!/usr/bin/python
 
 """
@@ -356,7 +359,6 @@ class ProcessTrnsysDf:
                     firstMonth=self.firstMonth,
                     year=self.yearReadedInMonthlyFile,
                 )
-        # self.monData = self.loader.monData
         self.monDataDf = self.loader.monDataDf
         self.houDataDf = self.loader.houDataDf
         self.steDataDf = self.loader.steDataDf
@@ -398,7 +400,8 @@ class ProcessTrnsysDf:
             self.monDataDf["Cum_" + column] = self.monDataDf[column].cumsum()
         self.calcConfigEquations()
 
-        # This recalculated all, we should only recalculated what was done in caclConfigEquations. DC or it is so fast we don't care ?
+        # We recalculate all to capture also variables that were calculated from equations, while at the same time
+        # having all read-in variables feature _Tot, _Min, _Max and _Avg; should be improved
 
         self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
         self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}

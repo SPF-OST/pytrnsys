@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 
 os.system("sphinx-apidoc -f -o . ../pytrnsys")

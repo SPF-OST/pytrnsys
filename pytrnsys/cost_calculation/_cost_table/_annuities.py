@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["createLines"]
 
 from .._models import output as _output
