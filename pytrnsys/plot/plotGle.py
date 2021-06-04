@@ -505,14 +505,14 @@ class PlotGle:
         outfile.writelines(lines)
         outfile.close()
 
-    def executeGLE(self, fileName):
+    def executeGLE(self, fileName,fileExtension="pdf"):
 
-        gleExe = r"%s" % os.getenv("GLE_EXE")
-        if os.path.exists(gleExe):
-            cmd = r"%s -vb 0 -d pdf %s\%s" % (os.getenv("GLE_EXE"), self.path, fileName)
-        else:
-            cmd = "%s -vb 0 -d pdf %s\%s" % ("gle.exe", self.path, fileName)
-        logger.debug(cmd)
+
+        gleExe = os.getenv("GLE_EXE")
+        if not os.path.exists(gleExe):
+            gleExe = "gle.exe"
+        cmd = [gleExe, "-vb", "0", "-d", fileExtension, rf"{self.path}\{fileName}"]
+        logger.debug(" ".join(cmd))
 
         subprocessOutput = subprocess.run(cmd, shell=True, capture_output=True)
         errorMessage = subprocessOutput.stderr.decode("utf-8")
