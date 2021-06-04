@@ -274,7 +274,7 @@ class LatexReport:
         self.lines = self.lines + line
         line = "\\begin{center}\n"
         self.lines = self.lines + line
-        line = "\\includegraphics[width=1\\textwidth]{%s/%s}\n" % (utils.filterPath(self.outputPath), namePdf)
+        line = "\\includegraphics[width=1\\textwidth]{s}\n" % namePdf
         self.lines = self.lines + line
         line = "\\caption{%s}\n" % caption
         self.lines = self.lines + line
@@ -308,8 +308,8 @@ class LatexReport:
         self.lines = self.lines + line
         line = "\\begin{center}\n"
         self.lines = self.lines + line
-        if overWritePath == False:
-            line = "\\includegraphics[width=1\\textwidth]{%s/%s}\n" % (utils.filterPath(self.outputPath), namePdf)
+        if not overWritePath:
+            line = "\\includegraphics[width=1\\textwidth]{%s}\n" % namePdf
             self.lines = self.lines + line
         else:
             line = "\\includegraphics[width=1\\textwidth]{%s}\n" % (utils.filterPath(overWritePath))
