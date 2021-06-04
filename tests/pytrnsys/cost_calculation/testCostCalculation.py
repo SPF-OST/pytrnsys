@@ -17,7 +17,7 @@ class TestCostCalculation:
     ]
 
     @pytest.mark.parametrize(
-        ["costConfigFileName", "resultsDirName", "shallWriteReport"],
+        ["costConfigFileName", "resultsDirName", "shallComparePdfs"],
         [
             *[
                 pytest.param(f, d, True, marks=pytest.mark.manual)
@@ -33,10 +33,10 @@ class TestCostCalculation:
         self,
         costConfigFileName: str,
         resultsDirName: str,
-        shallWriteReport,
+        shallComparePdfs,
         caplog: pytest.LogCaptureFixture,
     ):
-        helper = Helper(costConfigFileName, resultsDirName, shallWriteReport, caplog)
+        helper = Helper(costConfigFileName, resultsDirName, shallComparePdfs, caplog)
         helper.setup()
 
         actualResultsDir = helper.actualResultsDir
@@ -45,7 +45,7 @@ class TestCostCalculation:
         cc.calculateCostsAndWriteReports(
             costParametersFilePath,
             actualResultsDir,
-            shallWriteReport,
+            shallWriteReport=True,
             processType=cc.OTHER,
         )
 
@@ -57,7 +57,7 @@ class Helper:
         self,
         costConfigFileName: str,
         resultsDirName: str,
-        shallWriteReport: bool,
+        shallComparePdfs: bool,
         caplog: pytest.LogCaptureFixture,
     ):
         self._caplog = caplog
@@ -74,7 +74,7 @@ class Helper:
         expectedDir = outputDir / "expected"
         self._expectedResultsDir = expectedDir / resultsDirName
 
-        self._shallWriteReport = shallWriteReport
+        self._shallComparePdfs = shallComparePdfs
 
     def setup(self):
         self._setupLogging()
@@ -95,20 +95,9 @@ class Helper:
     def _assertFileStructureEqual(self):
         dircmp = filecmp.dircmp(self.actualResultsDir, self._expectedResultsDir)
 
-        if self._shallWriteReport:
+        if True:
             assert not dircmp.left_only
             assert not dircmp.right_only
-        else:
-            assert not dircmp.left_only
-
-            generatedPdfs = list(self.actualResultsDir.rglob("*.pdf"))
-            assert not generatedPdfs
-
-            generatedTexs = list(self.actualResultsDir.rglob("*.tex"))
-            assert not generatedTexs
-
-            for path in [pl.Path(f) for f in dircmp.right_only]:
-                assert path.suffix in ["pdf", "tex"]
 
     def _assertOutputFilesEqual(self):
         for resultsJsonFilePath in self._expectedResultsDir.rglob("*-results.json"):
@@ -117,15 +106,15 @@ class Helper:
                 self._expectedResultsDir
             )
 
-            if self._shallWriteReport:
+            if self._shallComparePdfs:
                 costPlotName = f"costShare-{simulationName}.pdf"
                 self._assertPdfEqual(relativeContainingDirPath, costPlotName)
 
                 annuityPlotName = f"costShareAnnuity-{simulationName}.pdf"
                 self._assertPdfEqual(relativeContainingDirPath, annuityPlotName)
 
-                reportTexName = f"{simulationName}-cost.tex"
-                self._assertTextFileEqual(relativeContainingDirPath, reportTexName)
+            reportTexName = f"{simulationName}-cost.tex"
+            self._assertTextFileEqual(relativeContainingDirPath, reportTexName)
 
             resultJsonName = f"{simulationName}-results.json"
             self._assertTextFileEqual(relativeContainingDirPath, resultJsonName)
