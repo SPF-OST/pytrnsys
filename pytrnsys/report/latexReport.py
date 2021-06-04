@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 #!/usr/bin/python
 
 """
@@ -25,7 +28,11 @@ class LatexReport:
 
         self.outputPath = _outputPath
         self.fileName = _name + "-report"
+
+
         self.fileNameTex = "%s.tex" % self.fileName
+
+
         self.fileNameTexWithPath = "%s\\%s" % (self.outputPath, self.fileNameTex)
 
         self.lines = ""
@@ -123,6 +130,7 @@ class LatexReport:
     ):
         'function to execute latex file, the function can use either "pdflatex" or "texify" to create pdf.'
 
+
         logFile = "%s\%s.log" % (self.outputPath, self.fileName)
         logFileEnd = logFile
 
@@ -191,10 +199,11 @@ class LatexReport:
             except:
                 logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
 
-        if os.path.isfile(self.outputPath + "\\" + self.fileName + ".pdf"):
-            logger.info("Successfully created %s.pdf" % self.fileName)
-        else:
-            raise ValueError("PDF was not generated, or not saved in the right directory")
+        if(True):
+            if os.path.isfile(self.outputPath + "\\" + self.fileName + ".pdf"):
+                logger.info("Successfully created %s.pdf" % self.fileName)
+            else:
+                raise ValueError("PDF was not generated, or not saved in the right directory")
 
         if self.cleanMode:
             logger.info("Eraising plots because cleanMode is True")

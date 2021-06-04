@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["FloatLike", "UncertainFloat"]
 
 import dataclasses as _dc

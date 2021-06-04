@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from pytrnsys.psim import processParallelTrnsys as pParallelTrnsys
 import os
 

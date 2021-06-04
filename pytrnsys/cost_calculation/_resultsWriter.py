@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["ResultsWriter"]
 
 import json
@@ -83,7 +86,7 @@ class ResultsWriter:
         costsDict = {
             "investment": totalCost.to_dict(),
             "energyCost": output.heatGenerationCost.to_dict(),
-            "investmentPerMWh": totalCostPerMwh.to_dict(),
+            "investmentPerMWh": totalCostPerMwh.to_dict()
         }
 
         collectorComponents = [
@@ -250,7 +253,10 @@ class ResultsWriter:
         simulationName = self._getSimulationName(resultsJsonFilePath)
 
         doc = latex.LatexReport(str(resultsJsonFilePath.parent), simulationName)
-        doc.resetTexName(simulationName + "-cost")
+        # doc.resetTexName(simulationName + "-cost")
+        doc.resetTexName(simulationName + "-cost-TesAux")
+        # doc.resetTexName(simulationName + "-cost-Tes")
+
         doc.setSubTitle("Energy generation costs")
         doc.setTitle(simulationName)
         doc.setCleanMode(self._getIsLatexCleanMode(parameters))
@@ -292,24 +298,29 @@ class ResultsWriter:
         units = None
 
         lines = ""
-        line = rf"Rate & {parameters.rate * 100:2.1f} \% $per$ $annum$\\"
+        line = rf"Rate & {parameters.rate * 100:2.1f} \% per annum\\"
         lines += line + "\n"
-        line = rf"Analysis period & {parameters.analysisPeriod:2.0f} $years$\\"
+        line = rf"Analysis period & {parameters.analysisPeriod:2.0f} years\\"
         lines += line + "\n"
-        line = rf"Maintenance & {parameters.maintenanceRate * 100:2.1f} \% $of$ $Investment$ $costs$ $per$ $year$ \\"
+        line = rf"Maintenance & {parameters.maintenanceRate * 100:2.1f} \% of Investment costs per year \\"
         lines += line + "\n"
         line = r"\hline \\"
         lines += line + "\n"
-        line = rf"Electricity & Fix costs: {parameters.costElecFix:2.0f}  $Fr.$ $per$ $year$ \\"
+        line = rf"Electricity & Fix costs: {parameters.costElecFix:2.0f}  Fr. per year \\"
         lines += line + "\n"
         line = (
             rf" & Variable costs:  {parameters.costElecKWh:2.2f} $Fr.$ $per$ $kWh$ \\"
         )
         lines += line + "\n"
-        line = rf"Increase of electricity costs & {parameters.increaseElecCost * 100:2.1f} \% $per$ $year$ \\"
+        line = rf"Increase of electricity costs & {parameters.increaseElecCost * 100:2.1f} \% per year \\"
         lines += line + "\n"
         line = rf"Electricity costs year 1 & {output.electricity.cost:2.0f} Fr. in year 1 \\"
         lines += line + "\n"
+        line = rf"Energy demand per year & {output.heatingDemandInKWh:2.0f} kWh \\"
+        lines += line + "\n"
+
+
+
 
         label = "definitionTable"
 

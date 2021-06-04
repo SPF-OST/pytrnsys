@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """

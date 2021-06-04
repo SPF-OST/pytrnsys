@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 def getNPV(rate: float, analysisPeriod: float) -> float:
     npv = ((1.0 + rate) ** analysisPeriod - 1.0) / (
         rate * (1.0 + rate) ** analysisPeriod
