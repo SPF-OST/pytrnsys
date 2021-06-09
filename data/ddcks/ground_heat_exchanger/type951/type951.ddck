@@ -1,0 +1,281 @@
+*******************************
+**BEGIN type951.ddck
+*******************************
+    
+*****************************************
+** Contact person : Dani Carbonell  
+** Creation date  : 05.02.19   
+** Last changes   : 16.04.20 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Ground source heat exchanger model using the EWS model
+** extended to include user defined g-functions
+** TODO: online plotter and user defined printer should be moved away
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS 3
+TGhxIn  = TPiGhxIn   
+myMfrGhx = ABS(MfrPiGhxIn) !not possible to revert the flow
+** 
+MfrGhx = EQL(calcRand,1)*ABS(myMfrGhx)/nGhxProbes+NOT(EQL(calcRand,1))*ABS(myMfrGhx)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+EQUATIONS 1
+TGhxOut = [85,1]     
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+EQUATIONS 1
+qSysIn_Ghx = Qghx_kW
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+CONSTANTS 3
+MfrGhxNom = MfrHpEvapNom
+lBorePerkW = 15
+lGhxProbes = lBorePerkW*sizeHpUsed
+
+** Re-assing here the variables necessary from other types
+** variableInternal = variableExternal
+** Exception: those from general variables
+
+***********************************
+** outputs to other ddck
+***********************************
+
+** Add here the outputs of the TYPE or TYPES that will be used in other types
+** Exception: those for printers and so on dont need to be here.
+
+***********************************
+** Begin CONSTANTS
+***********************************
+
+CONSTANTS 5  
+PrecondON  = 0   
+QDemandPre = 40/8.76 ! 40 MWh* 1000 kW/8760 MWh ! JS: this could be wrong, because in the fortran code is a comment, that this value is in W, not kW
+nYearsPre  = 5
+Wprecond   = 52*nYearsPre*1*PrecondON  
+Pprecond   = PrecondON * QDemandPre    
+
+CONSTANTS 16
+calcBTR  = 4 ! 1: calculate R1 and R2 internally 2: R1 input; R2 calculated internally 3: Rb input; R1=f(Rb), R2 calculated internally  4: Ra, Rb input; R1=f(Ra), R2=f(Ra,Rb) calculated internally
+R1RbRa = 0.1     !  mK/W R1 for calBTR = 2, Rb for calcBTR = 3, Ra for calcBTR = 4, unused for calcBTR = 1
+Rb     = 0.35     ! mK/W Rb for calcBTR = 4, otherwise unused
+nYearsPrinted=1     ! nYearsPrintedGFunction
+SteadyStateBrineGshx=1 ! (1) steady state or (0) transient calculation of brine 
+rGroundOut=2
+rAvgGround=1
+gridFactor=2.5
+dBorehole = 0.18
+axialTGradient = 0.025 !K/m 
+cpFill=1.65     ! 15: specific heat capacity of the filling material, kJ/kgK
+rhoFill=2000     ! 16: density of the filling material, kg/m3
+lambdaFill= 2 !7.2     ! 17: lambda of the filling material, kJ/hmK JS: According to fortran code this value is in W/mK
+lambdaBrine = 0.449 !1.6164  ! 18: lambda of the brine, kJ/hmK JS: According to fortran code this value is in W/mK
+muBrine = 0.00000646     ! 19: kinematic viscosity of the brine, m2/sec
+dTSoilAir = 1     ! delta-T between soil-surface and air, K
+
+
+
+CONSTANTS 21
+nRadial = 6      ! 24: Nb. Of radial layers
+nAxial  = 5      !25: Nb. Of axial layers
+cpGround=0.8     !26: Ground specific heat, axial layer-1
+rhoGround=2500   !27: Ground density, axial layer-1
+lambdaGround= 2 !7.2 !28: Ground thermal conductivity, axial layer-1 JS: According to fortran code this value is in W/mK
+**as many as nAxial
+cpGroundLayer1    = cpGround       !26: Ground specific heat, axial layer-1
+rhoGroundLayer1   = rhoGround      !27: Ground density, axial layer-1
+lambdaGroundLayer1= lambdaGround   !28: Ground thermal conductivity, axial layer-1
+cpGroundLayer2    = cpGround       !29: Ground specific heat, axial layer-2
+rhoGroundLayer2   = rhoGround      !30: Ground density, axial layer-2
+lambdaGroundLayer2= lambdaGround   !31: Ground thermal conductivity, axial layer-2
+cpGroundLayer3    = cpGround       !32: Ground specific heat, axial layer-3
+rhoGroundLayer3   = rhoGround      !33: Ground density, axial layer-3
+lambdaGroundLayer3= lambdaGround   !34: Ground thermal conductivity, axial layer-3
+cpGroundLayer4    = cpGround       !35: Ground specific heat, axial layer-4
+rhoGroundLayer4   = rhoGround      !36: Ground density, axial layer-4
+lambdaGroundLayer4= lambdaGround   !37: Ground thermal conductivity, axial layer-4
+cpGroundLayer5    = cpGround       !38: Ground specific heat, axial layer-5
+rhoGroundLayer5   = rhoGround      !39: Ground density, axial layer-5
+lambdaGroundLayer5= lambdaGround   !40: Ground thermal conductivity, axial layer-5
+nParType951 = 38+nAxial
+
+
+***********************************
+** Begin TYPE 
+***********************************
+
+UNIT 85 TYPE 951     ! EWS model Ground Heat Exchanger modified by SPF
+PARAMETERS nParType951    
+steadyStateBrineGshx     ! 1: steady state (1) or transient (0) calculation of brine 
+calcBTR      ! 2: calculation of thermal resistance: 1: calculate R1 and R2 internally, 2: R1 is an input, R2 internally, 3: R1 = f(Rb), R2 internally, 4: R1 = f(Ra), R2 = f(Ra, Rb)
+calcRand     ! 3: old Randaussen approach of EWS, 2: Lamarche-g-Functions, 3: read-in g-function
+unitGHXGfunc ! 4: logical unit number for g-function
+MfrGHXNOM    ! 5: mass flow rate of the brine used to calculate the heat transfer coefficient alpha1, kg/h
+rGroundOut        ! 6: radius of outer boundary r_m of simulation area, m
+rAvgGRound   ! 7 radius for average temperature
+gridFactor   ! 8: grid factor f, -
+lghxProbes   ! 9: length of heat exchanger probe (Sondenlänge), m
+dghxProbes   ! 10: inner diameter of the pipes, m
+dBorehole         ! 11: borehole diameter, m
+axialTGradient        ! 12: axial temperature gradient (downward) in the earth at the start of the simulation, K/m
+TambAvg     ! 13: average annual air temperature, °C
+dTsoilAir     ! 14: average yearly temperature difference between soil surface and air, K
+cpFill            !15
+rhoFill      !16
+lambdaFill   !17
+CpBRI     ! 18: specific heat of the brine, kJ/kgK
+RhoBRI     ! 19: density of the brine, kg/m3
+lambdaBrine     ! 20: lambda of the brine, kJ/hmK
+muBrine       !21 
+Wprecond     ! 22: Number of weeks of ground preconditionning
+Pprecond     ! 23: Extraction power during preconditionning
+nRadial    ! 24: Nb. Of radial layers
+nAxial     !25: Nb. Of axial layers
+cpGroundLayer1      !26: Ground specific heat, axial layer-1
+rhoGroundLayer1     !27: Ground density, axial layer-1
+lambdaGroundLayer1  !28: Ground thermal conductivity, axial layer-1
+cpGroundLayer2      !29: Ground specific heat, axial layer-2
+rhoGroundLayer2     !30: Ground density, axial layer-2
+lambdaGroundLayer2  !31: Ground thermal conductivity, axial layer-2
+cpGroundLayer3      !32: Ground specific heat, axial layer-3
+rhoGroundLayer3     !33: Ground density, axial layer-3
+lambdaGroundLayer3  !34: Ground thermal conductivity, axial layer-3
+cpGroundLayer4      !35: Ground specific heat, axial layer-4
+rhoGroundLayer4     !36: Ground density, axial layer-4
+lambdaGroundLayer4  !37: Ground thermal conductivity, axial layer-4
+cpGroundLayer5      !38: Ground specific heat, axial layer-5
+rhoGroundLayer5     !39: Ground density, axial layer-5
+lambdaGroundLayer5  !40: Ground thermal conductivity, axial layer-5
+R1RbRa     ! R1 for calBTR = 2, Rb for calcBTR = 3, Ra for calcBTR = 4, unused for calcBTR = 1
+Rb     ! Rb for calcBTR = 4, otherwise unused
+nYearsPrinted     ! nYearsPrintedGFunction
+INPUTS 2     
+TGhxIn     ! Temperature of GHX inlet, °C
+MfrGHX    ! Mass flow rate for all borehole heat exchanger, kg/h
+0.0    0.0 
+    
+EQUATIONS 5
+MfrGhxOut = [85,2]     
+QGhx_kW = [85,3]     ! Power extracted [kW]
+QGhx_kWExt = GT(QGhx_kW,0)* QGhx_kW     !Changed automatically
+QGhx_kWReg = LT(QGhx_kW,0)* QGhx_kW     !Changed automatically
+TRT = [85,6]     ! K temp. drop at RANDAUSSEN
+
+!the whole radial profile (6 values + boundary) at the center of the borehole lenght (axial 6 values, so at 3) (T(3,1)-T(3,2)...T(3,boundary condition)
+!TGHXmon1 = [59,19]     ! T(indexAxial,1)
+!TGHXmon2 = [59,24]     ! T(indexAxial,2)
+!TGHXmon3 = [59,29]     ! T(indexAxial,3)
+!TGHXmon4 = [59,34]     ! T(indexAxial,4)
+!TGHXmon5 = [59,39]     ! T(indexAxial,5)
+!TGHXmon6 = [59,44]     ! T(indexAxial,dimRad=6)
+!TGHXmon7 = [59,49]     ! T(indexAxial,boco)
+
+EQUATIONS 5
+
+TGhxMon1 = [85,47]     ! T(1,boco)
+TGhxMon2 = [85,48]     ! T(2,boco)
+TGhxMon3 = [85,49]     ! T(3,boco)
+TGhxMon4 = [85,50]     ! T(4,boco
+TGhxMon5 = [85,51]     ! T(5,boco)
+
+***********************************
+** Monthly printer
+***********************************
+
+CONSTANTS 1
+unitPrinterGhx=88
+
+ASSIGN    temp\GHX_MO.Prt      unitPrinterGhx     
+UNIT 88 Type 46     ! Printegrator Monthly Values for System
+PARAMETERS 7    
+unitPrinterGhx     ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+2     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+2     ! 7: Output number to avoid integration 
+INPUTS 5     
+Time  TRT QGhx_kW   QGhx_kWExt	QGhx_kWReg    
+**  
+Time  TRT QGhx_kW   QGhx_kWExt	QGhx_kWReg
+
+***********************************
+** hourly printer
+***********************************
+
+CONSTANTS 1
+unitPrinterGhxHr = 33
+
+ASSIGN    temp\GHX_HR.Prt    unitPrinterGhxHr     
+
+UNIT 34 TYPE 46     ! Printegrator Monthly Values for System
+PARAMETERS 13    
+unitPrinterGhxHr ! 1: Logical unit number, -
+-1            ! 2: Logical unit for monthly summaries, -
+1             ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1             ! 4: Printing & integrating interval, h. -1 for monthly integration
+8             ! 5: Number of inputs to avoid integration, -
+1             ! 6: Output number to avoid integration
+2             ! 7: Output number to avoid integration
+3             ! 8: Output number to avoid integration
+4             ! 9: Output number to avoid integration
+5             ! 10: Output number to avoid integration
+6             ! 11: Output number to avoid integration
+7             ! 12: Output number to avoid integration
+8             ! 13: Output number to avoid integration
+INPUTS 11
+TGHXout TRT TGhxIn   TGHXmon1   TGHXmon2  TGHXmon3  TGHXmon4  TGHXmon5   Qghx_kW 	QGhx_kWExt	QGhx_kWReg
+**  Labels     
+TGHXout TRT TGhxIn   TGHXmon1   TGHXmon2  TGHXmon3  TGHXmon4  TGHXmon5   Qghx_kW    QGhx_kWExt	QGhx_kWReg
+
+***********************************
+** Online plotter
+***********************************
+
+UNIT 86 TYPE 65     ! Onlint Plotter Ground Heat Exchanger
+**       
+PARAMETERS 12     
+5   ! 1 Nb. of left-axis variables
+3     ! 2 Nb. of right-axis variables
+-20     ! 3 Left axis minimum
+60     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+4000     ! 6 Right axis maximum
+24     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 8
+**  1     2     3       4      5          
+TGHXout TRT TGhxIn   TGHXmon1  TGHXmon5 MfrGHX  MfrGHXout Qghx_kW  
+****
+TGHXout TRT TGhxIn   TGHXmon1  TGHXmon5 MfrGHX  MfrGHXout Qghx_kW  
+** INPUT LABELS     
+LABELS  3
+Temperatures     
+MassFlow 
+GHX    
+
+
+
+ 
+

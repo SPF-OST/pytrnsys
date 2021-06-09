@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["createConditions", "Conditions", "ConditionBase", "VALUE", "mayBeSerializedCondition"]
 
 import typing as _tp

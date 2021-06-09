@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 """
 Author : Dani Carbonell
 Date   : 09.05.2018

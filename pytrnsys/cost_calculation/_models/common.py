@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["LinearCoefficients"]
 
 import dataclasses as _dc

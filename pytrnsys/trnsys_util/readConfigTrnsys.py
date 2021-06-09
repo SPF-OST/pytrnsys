@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 #!/usr/bin/python
 """
 Main class to read the config file for running and processing

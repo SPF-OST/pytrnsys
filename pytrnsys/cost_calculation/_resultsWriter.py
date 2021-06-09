@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["ResultsWriter"]
 
 import json
@@ -24,10 +27,15 @@ class ResultsWriter:
         self.cleanModeLatex = None
         self.doLaTex = False
 
-    def writeReportAndResults(self, parameters: _input.Parameters, costCalculation: _co.CostCalculation):
+    def writeReportAndResults(
+        self,
+        parameters: _input.Parameters,
+        costCalculation: _co.CostCalculation,
+        shallWriteReport: bool,
+    ):
         resultsJsonFilePath = costCalculation.resultsJsonFilePath
 
-        if(self.doLaTex):
+        if shallWriteReport:
             self._doPlots(costCalculation.output.componentGroups, resultsJsonFilePath)
             self._doPlotsAnnuity(costCalculation.output, resultsJsonFilePath)
             self._createLatex(parameters, costCalculation.output, resultsJsonFilePath)
@@ -56,50 +64,89 @@ class ResultsWriter:
         plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
         plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-    def _addCostsToResultsJson(self, output: _output.Output, resultsJsonFilePath: _pl.Path):
+    def _addCostsToResultsJson(
+        self, output: _output.Output, resultsJsonFilePath: _pl.Path
+    ):
         serializedResults = resultsJsonFilePath.read_text()
         results = json.loads(serializedResults)
 
         costsDict = self._createCostsDict(output)
         resultsWithCosts = {**results, **costsDict}
 
-        serializedResultsWithCosts = json.dumps(resultsWithCosts, indent=2, sort_keys=True)
+        serializedResultsWithCosts = json.dumps(
+            resultsWithCosts, indent=2, sort_keys=True
+        )
         resultsJsonFilePath.write_text(serializedResultsWithCosts)
 
     @staticmethod
     def _createCostsDict(output: _output.Output):
+        totalCost = output.componentGroups.cost
+        totalCostPerMwh = totalCost / (output.heatingDemandInKWh / 1000)
+
+        costsDict = {
+            "investment": totalCost.to_dict(),
+            "energyCost": output.heatGenerationCost.to_dict(),
+            "investmentPerMWh": totalCostPerMwh.to_dict()
+        }
+
         collectorComponents = [
-            c for g in output.componentGroups.groups for c in g.components.factors if c.name == "Collector"
+            c
+            for g in output.componentGroups.groups
+            for c in g.components.factors
+            if c.name == "Collector"
         ]
-        if not collectorComponents:
-            raise RuntimeError("No `Collector' component found.")
 
         if len(collectorComponents) > 1:
             raise RuntimeError("More than one `Collector' component found.")
 
-        collectorComponent = collectorComponents[0]
-        size = collectorComponent.value
+        if collectorComponents:
+            collectorComponent = collectorComponents[0]
+            size = collectorComponent.value
+            totalCostPerM2 = totalCost / size.value
+            costsDict = {
+                **costsDict,
+                "investmentPerM2": totalCostPerM2.to_dict(),
+            }
 
-        totalCost = output.componentGroups.cost
-        totalCostPerM2 = totalCost / size.value
-        totalCostPerMwh = totalCost / (output.heatingDemandInKWh / 1000)
+        hpComponents = [
+            c
+            for g in output.componentGroups.groups
+            for c in g.components.factors
+            if c.name == "Heat pump"
+        ]
 
-        return {
-            "investment": totalCost.to_dict(),
-            "energyCost": output.heatGenerationCost.to_dict(),
-            "investmentPerM2": totalCostPerM2.to_dict(),
-            "investmentPerMWh": totalCostPerMwh.to_dict(),
-        }
+        if len(hpComponents) > 1:
+            raise RuntimeError("More than one `Heat pump' component found.")
+
+        if hpComponents:
+            hpComponent = hpComponents[0]
+            size = hpComponent.value
+            totalCostPerkW = totalCost / size.value
+
+            costsDict = {
+                **costsDict,
+                "investmentPerkW": totalCostPerkW.to_dict(),
+            }
+
+        return costsDict
 
     # plots
 
-    def _doPlots(self, componentGroups: _output.ComponentGroups, resultsJsonFilePath: _pl.Path) -> None:
-        groupNamesWithCost = [(g.name, g.components.cost.mean) for g in componentGroups.groups]
+    def _doPlots(
+        self, componentGroups: _output.ComponentGroups, resultsJsonFilePath: _pl.Path
+    ) -> None:
+        groupNamesWithCost = [
+            (g.name, g.components.cost.mean) for g in componentGroups.groups
+        ]
 
         groupNames, groupCosts = zip(*groupNamesWithCost)
         simulationName = self._getSimulationName(resultsJsonFilePath)
         self.nameCostPdf = self._plotCostShare(
-            groupCosts, groupNames, resultsJsonFilePath.parent, fileName="costShare" + "-" + simulationName, plotSize=15
+            groupCosts,
+            groupNames,
+            resultsJsonFilePath.parent,
+            fileName="costShare" + "-" + simulationName,
+            plotSize=15,
         )
 
     def _doPlotsAnnuity(self, output: _output.Output, resultsJsonFilePath: _pl.Path):
@@ -132,7 +179,11 @@ class ResultsWriter:
 
         simulationName = self._getSimulationName(resultsJsonFilePath)
         self.nameCostAnnuityPdf = self._plotCostShare(
-            inVar, legends, resultsJsonFilePath.parent, fileName="costShareAnnuity" + "-" + simulationName, plotSize=17
+            inVar,
+            legends,
+            resultsJsonFilePath.parent,
+            fileName="costShareAnnuity" + "-" + simulationName,
+            plotSize=17,
         )
 
     def _plotCostShare(self, inVar, legends, outputPath: _pl.Path, fileName, plotSize):
@@ -168,7 +219,13 @@ class ResultsWriter:
             explode.append(0.0)  # (0.05)
 
         patches, texts, autotexts = plt.pie(
-            fracs, labels=legends, explode=explode, colors=colors, autopct="%1.1f%%", shadow=False, startangle=0
+            fracs,
+            labels=legends,
+            explode=explode,
+            colors=colors,
+            autopct="%1.1f%%",
+            shadow=False,
+            startangle=0,
         )
 
         for i in range(len(texts)):
@@ -187,11 +244,19 @@ class ResultsWriter:
 
     # latex
 
-    def _createLatex(self, parameters: _input.Parameters, output: _output.Output, resultsJsonFilePath: _pl.Path):
+    def _createLatex(
+        self,
+        parameters: _input.Parameters,
+        output: _output.Output,
+        resultsJsonFilePath: _pl.Path,
+    ):
         simulationName = self._getSimulationName(resultsJsonFilePath)
 
         doc = latex.LatexReport(str(resultsJsonFilePath.parent), simulationName)
-        doc.resetTexName(simulationName + "-cost")
+        # doc.resetTexName(simulationName + "-cost")
+        doc.resetTexName(simulationName + "-cost-TesAux")
+        # doc.resetTexName(simulationName + "-cost-Tes")
+
         doc.setSubTitle("Energy generation costs")
         doc.setTitle(simulationName)
         doc.setCleanMode(self._getIsLatexCleanMode(parameters))
@@ -200,7 +265,12 @@ class ResultsWriter:
         self._addTableEconomicAssumptions(parameters, output, doc)
         self._addTableCosts(output, doc)
         doc.addPlot(self.nameCostPdf, "System cost", "systemCost", size=13)
-        doc.addPlot(self.nameCostAnnuityPdf, "System cost annuity share", "systemCostannuity", size=13)
+        doc.addPlot(
+            self.nameCostAnnuityPdf,
+            "System cost annuity share",
+            "systemCostannuity",
+            size=13,
+        )
         doc.addEndDocumentAndCreateTexFile()
 
         doc.executeLatexFile()
@@ -213,31 +283,44 @@ class ResultsWriter:
         return stem[: -len(suffix)]
 
     def _getIsLatexCleanMode(self, parameters):
-        return parameters.cleanModeLatex if self.cleanModeLatex is None else self.cleanModeLatex
+        return (
+            parameters.cleanModeLatex
+            if self.cleanModeLatex is None
+            else self.cleanModeLatex
+        )
 
     @staticmethod
-    def _addTableEconomicAssumptions(parameters: _input.Parameters, output: _output.Output, doc: latex.LatexReport):
+    def _addTableEconomicAssumptions(
+        parameters: _input.Parameters, output: _output.Output, doc: latex.LatexReport
+    ):
         caption = "Assumptions for calculation of heat generation costs"
         names = ["", "", "", ""]
         units = None
 
         lines = ""
-        line = rf"Rate & {parameters.rate * 100:2.1f} \% $per$ $annum$\\"
+        line = rf"Rate & {parameters.rate * 100:2.1f} \% per annum\\"
         lines += line + "\n"
-        line = rf"Analysis period & {parameters.analysisPeriod:2.0f} $years$\\"
+        line = rf"Analysis period & {parameters.analysisPeriod:2.0f} years\\"
         lines += line + "\n"
-        line = rf"Maintenance & {parameters.maintenanceRate * 100:2.1f} \% $of$ $Investment$ $costs$ $per$ $year$ \\"
+        line = rf"Maintenance & {parameters.maintenanceRate * 100:2.1f} \% of Investment costs per year \\"
         lines += line + "\n"
         line = r"\hline \\"
         lines += line + "\n"
-        line = rf"Electricity & Fix costs: {parameters.costElecFix:2.0f}  $Fr.$ $per$ $year$ \\"
+        line = rf"Electricity & Fix costs: {parameters.costElecFix:2.0f}  Fr. per year \\"
         lines += line + "\n"
-        line = rf" & Variable costs:  {parameters.costElecKWh:2.2f} $Fr.$ $per$ $kWh$ \\"
+        line = (
+            rf" & Variable costs:  {parameters.costElecKWh:2.2f} $Fr.$ $per$ $kWh$ \\"
+        )
         lines += line + "\n"
-        line = rf"Increase of electricity costs & {parameters.increaseElecCost * 100:2.1f} \% $per$ $year$ \\"
+        line = rf"Increase of electricity costs & {parameters.increaseElecCost * 100:2.1f} \% per year \\"
         lines += line + "\n"
         line = rf"Electricity costs year 1 & {output.electricity.cost:2.0f} Fr. in year 1 \\"
         lines += line + "\n"
+        line = rf"Energy demand per year & {output.heatingDemandInKWh:2.0f} kWh \\"
+        lines += line + "\n"
+
+
+
 
         label = "definitionTable"
 
