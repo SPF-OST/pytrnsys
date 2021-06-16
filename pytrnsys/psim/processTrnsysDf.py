@@ -1702,6 +1702,11 @@ class ProcessTrnsysDf:
         Prepare input for and call pytrnsys.plot.plotMatplotlib.plotHeatingLimitFit. The fitting parameters from calling
         this function are then saved into the respective results.json.
 
+        author: mneugeba
+        last changes: jschmidl june 2021
+
+        This Function is KliKo specific and should not be included in the general pytrnsys package
+
         Parameters
         ---------
 
@@ -1711,9 +1716,20 @@ class ProcessTrnsysDf:
         """
         if "fitHeatingLimit" in self.inputs.keys():
 
-            yAxisVariableName, timeStep = self.inputs["fitHeatingLimit"][0]
+            inputs = self.inputs["fitHeatingLimit"][0]
 
-            climate = self.deckData["Umgebungstemperatur"]
+            yAxisVariableName = inputs[0]
+            timeStep = inputs[1]
+
+            doPlot = True
+
+            if 'noPlot' in inputs:
+                doPLot = False
+
+            if self.inputs["isTrnsys"]:
+                climate = os.path.split(self.executingPath)[-1].split('_')[-1]
+            else:
+                climate = self.deckData["Umgebungstemperatur"]
             climateDataPath = (
                 "R:\\Projekte\\BFE_KliKo\\02_AP2_Simulationen\\IDA_ICE_HSLU\\Simulation_MFH_Resultate\\KlimaDaten\\Luzern_"
                 + climate
@@ -1729,7 +1745,14 @@ class ProcessTrnsysDf:
                 yAxisVariable = self.houDataDf[yAxisVariableName][0:8760]
                 fileName = "HeatingLimit_hourly"
 
-            titleOfPlot = self.deckData["Simulation_MFH"] + " (" + self.deckData["Umgebungstemperatur"] + ")"
+
+            if self.inputs["isTrnsys"]:
+                titleOfPlot = self.fileName + " (" + climate + ")"
+            else:
+                titleOfPlot = self.deckData["Simulation_MFH"] + " (" + climate + ")"
+
+            if yAxisVariableName == 'qSysIn_Heat':
+                yAxisVariableName = '$P_H$ [W]'
 
             if timeStep == "hourly":
                 namePdf = self.plot.plotHeatingLimitFit(
@@ -1739,6 +1762,7 @@ class ProcessTrnsysDf:
                     timeStep,
                     title=titleOfPlot,
                     yLabel=yAxisVariableName,
+                    doPlot=doPlot
                 )
             elif timeStep == "daily":
                 namePdf, fitted_H, fitted_HG, RSquared = self.plot.plotHeatingLimitFit(
@@ -1748,7 +1772,8 @@ class ProcessTrnsysDf:
                     timeStep,
                     title=titleOfPlot,
                     yLabel=yAxisVariableName,
-                )
+                    doPlot=doPlot
+                    )
 
                 pathResultsJson = os.path.join(self.outputPath, self.fileName + "-results.json")
                 if os.path.isfile(pathResultsJson):
