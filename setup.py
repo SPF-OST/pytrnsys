@@ -7,7 +7,7 @@ import itertools as _it
 
 import setuptools as _st
 
-with open("README.rst", "r") as fh:
+with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
