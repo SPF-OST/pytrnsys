@@ -74,7 +74,7 @@ pytrnsys can now be used from a python editor of your choice within the virtual 
     `https://github.com/SPF-OST/pytrnsys.git`
 
 ##### Recommended
-* [PyCharm Community IDE](https://www.jetbrains.com/pycharm/downloa)
+* [PyCharm Community IDE](https://www.jetbrains.com/pycharm/download/)
 
 #### Getting started
 
