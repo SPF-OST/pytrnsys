@@ -46,7 +46,7 @@ _st.setup(
     author_email="martin.neugebauer@spf.ch",
     description="pytrnsys simulation framework",
     long_description=long_description,
-    long_description_content_type="text/x-rst",
+    long_description_content_type="text/markdown",
     url="https://pytrnsys.readthedocs.io",
     include_package_data=True,
     install_requires=["numpy", "scipy", "pandas", "matplotlib", "seaborn", "bokeh", "dataclasses-jsonschema"],
