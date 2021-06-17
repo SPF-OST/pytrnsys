@@ -6,6 +6,11 @@ Getting Started
 Installation
 ------------
 
+For the installation of the pytrnsys python package, please follow the installation guide on the respective `PyPi page <https://pypi.org/project/pytrnsys/>`_.
+
+Prerequesites
+-------------
+
 Up to now, only TRNSYS17 is fully supported in all the example projects. In order to use pytrnsys, you need the
 following prerequisites on your machine:
 
@@ -16,16 +21,14 @@ TRNSYS17 should be installed under::
 
     C:/Trnsys17
 
-If the path to your TRNSYS17 installation is different from that you will need to manually copy dll-files (see below)
-and adjust the TRNSYS-path in the config-file.
+If the path to your TRNSYS17 installation is different from that you will need to adjust the TRNSYS-path in the
+config-file.
 
 Additional optional prerequisites are:
 
 - Automated plotting is done by matplotlib. `GLE <http://glx.sourceforge.net/>`_  is needed to create Q-vs-T plots using the commands :ref:`plotHourlyQvsT <ref-plotHourlyQvsT>` or :ref:`plotTimestepQvsT <ref-plotTimestepQvsT>`
 - `GLE <http://glx.sourceforge.net/>`_ is also supported by the configuration file keyword :ref:`setPrintDataForGle <ref-setPrintDataForGle>` which exports a .gle file which can be used for further plotting in GLE.
 - `Inkscape <https://inkscape.org/>`_ can be used to save the plots in the enhanced meta file format by using the :ref:`plotEmf keyword <ref-plotEmf>` in the processing.
-
-For the installation of the pytrnsys python package, please follow the installation guide on the respective `PyPi page <https://pypi.org/project/pytrnsys/>`_.
 
 You need to manually copy all
 dll-files from::
