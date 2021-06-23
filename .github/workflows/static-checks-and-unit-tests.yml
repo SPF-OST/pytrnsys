@@ -19,7 +19,7 @@ jobs:
     - name: Install Latex
       run: |
         sudo apt-get update
-        sudo apt-get install texlive
+        sudo apt-get install texlive-latex-extra
         pdflatex -version
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -33,11 +33,9 @@ jobs:
     - name: Static type checking with mypy
       run: |
         mypy pytrnsys tests
-      continue-on-error: true
     - name: Lint with pylint
       run: |
-        pylint pytrnsys pytrnsys_examples tests
-      continue-on-error: true
+        pylint pytrnsys tests
     - name: Test with pytest
       run: >
         pytest
