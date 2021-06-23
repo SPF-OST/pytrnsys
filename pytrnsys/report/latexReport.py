@@ -45,14 +45,30 @@ class LatexReport:
 
         self.pathReport = os.path.join(os.path.dirname(__file__), "latex_doc")
 
-        texInputs = os.environ["TEXINPUTS"].split(os.pathsep) if "TEXINPUTS" in os.environ else []
-        if self.pathReport not in texInputs:
-            texInputs.append(self.pathReport)
-
-        os.environ["TEXINPUTS"] = os.pathsep.join(texInputs)
+        texInputs = self._getTexInputs()
+        os.environ["TEXINPUTS"] = texInputs
 
         self.cleanMode = False
         self.plotsAdded = []
+
+    def _getTexInputs(self):
+        newPaths = self._getTexInputsPaths()
+        return os.pathsep.join(newPaths)
+
+    def _getTexInputsPaths(self):
+        # A lagging empty ("") path will be filled in by tex with the default paths
+        if "TEXINPUTS" not in os.environ:
+            return [".", self.pathReport, ""]
+
+        previousPaths = os.environ["TEXINPUTS"].split(os.pathsep)
+        if self.pathReport in previousPaths:
+            return previousPaths
+
+        first, *rest = previousPaths
+        if first == ".":
+            return [".", self.pathReport, *rest]
+
+        return [self.pathReport, first, *rest]
 
     def getLatexNamesDict(self, file="latexNames.json"):
         if file == "latexNames.json":
@@ -156,13 +172,13 @@ class LatexReport:
                 "--silent",
                 self.fileNameTexWithPath]
         elif LatexPackage == "pdflatex":
-            cmd = ["pdflatex", "--silent", f"--output-directory={self.outputPath}", self.fileNameTexWithPath]
+            cmd = ["pdflatex", "--silent", self.fileNameTex]
         else:
             raise ValueError('The specified LatexPackage "%s" is not implemented yet or does not exist.' % LatexPackage)
 
         logger.debug("About to run '%s' (cwd = %s)", " ".join(cmd), os.getcwd())
 
-        subprocessOutput = subprocess.run(cmd, capture_output=True)
+        subprocessOutput = subprocess.run(cmd, capture_output=True, cwd=self.outputPath)
         errorMessage = subprocessOutput.stderr.decode("utf-8")
         outputMessage = subprocessOutput.stdout.decode("utf-8")
         if errorMessage != "":
@@ -170,7 +186,7 @@ class LatexReport:
         logger.debug(outputMessage)
 
         if runTwice:  # necessary to generate table of contents
-            subprocess.run(cmd)
+            subprocess.run(cmd, cwd=self.outputPath)
 
         if moveToTrnsysLogFile == True and removeAuxFiles:
             os.remove(logFileEnd)
@@ -195,11 +211,11 @@ class LatexReport:
             except:
                 logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
 
-        if(True):
-            if os.path.isfile(self.outputPath + "\\" + self.fileName + ".pdf"):
-                logger.info("Successfully created %s.pdf" % self.fileName)
-            else:
-                raise ValueError("PDF was not generated, or not saved in the right directory")
+        pdfFilePath = _pl.Path(self.outputPath) / f"{self.fileName}.pdf"
+        if pdfFilePath.is_file():
+            logger.info("Successfully created %s.pdf" % self.fileName)
+        else:
+            raise ValueError("PDF was not generated, or not saved in the right directory")
 
         if self.cleanMode:
             logger.info("Eraising plots because cleanMode is True")
