@@ -45,12 +45,11 @@ class LatexReport:
 
         self.pathReport = os.path.join(os.path.dirname(__file__), "latex_doc")
 
-        if "TEXINPUTS" in os.environ:
-            texinputs = os.environ["TEXINPUTS"]
-            if self.pathReport not in texinputs:
-                os.environ["TEXINPUTS"] += os.pathsep + self.pathReport
-        else:
-            os.environ["TEXINPUTS"] = self.pathReport
+        texInputs = os.environ["TEXINPUTS"].split(os.pathsep) if "TEXINPUTS" in os.environ else []
+        if self.pathReport not in texInputs:
+            texInputs.append(self.pathReport)
+
+        os.environ["TEXINPUTS"] = os.pathsep.join(texInputs)
 
         self.cleanMode = False
         self.plotsAdded = []
@@ -125,7 +124,6 @@ class LatexReport:
     ):
         'function to execute latex file, the function can use either "pdflatex" or "texify" to create pdf.'
 
-
         logFile = "%s\%s.log" % (self.outputPath, self.fileName)
         logFileEnd = logFile
 
@@ -179,7 +177,8 @@ class LatexReport:
         name = "%s\%s.log" % (self.outputPath, self.fileName)
 
         try:
-            os.remove(name)
+            # os.remove(name)
+            pass
         except:
             logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
 
