@@ -1,3 +1,5 @@
+#!/usr/bin/python3.9
+
 # pylint: skip-file
 # type: ignore
 
@@ -26,10 +28,10 @@ def main():
         sh.rmtree(testResultsDirPath)
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallTypeCheck:
-        sp.run("mypy pytrnsys tests dev-tools")
+        sp.run(["mypy", "pytrnsys", "tests",  "dev-tools"])
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallLint:
-        sp.run("pylint pytrnsys pytrnsys_examples tests dev-tools")
+        sp.run(["pylint", "pytrnsys", "tests", "dev-tools"])
 
     if (
         arguments.shallRunAll
