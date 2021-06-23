@@ -193,8 +193,7 @@ class LatexReport:
         name = "%s\%s.log" % (self.outputPath, self.fileName)
 
         try:
-            # os.remove(name)
-            pass
+            os.remove(name)
         except:
             logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
 
