@@ -1,10 +1,7 @@
-# pylint: skip-file
-# type: ignore
-
 import typing as _tp
 import dataclasses as _dc
 
-ProcessType = _tp.Union["CasesDefined", "Other", "OTHER"]
+ProcessType = _tp.Union["CasesDefined", "OTHER"]
 
 
 @_dc.dataclass()

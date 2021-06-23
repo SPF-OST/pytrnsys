@@ -36,13 +36,16 @@ def main():
         or arguments.shallRunTests
         or not (arguments.shallPerformStaticChecks or arguments.shallTypeCheck or arguments.shallLint)
     ):
-        pytestCommand = (
-            "pytest "
-            "--cov=pytrnsys --cov-report html:test-results/coverage --cov-report term "
-            "--html=test-results/report/report.html "
-            '-m "not manual" '
+        pytestCommand = [
+            "pytest",
+            "--cov=pytrnsys",
+            "--cov-report=html:test-results/coverage",
+            "--cov-report=term",
+            "--html=test-results/report/report.html",
+            "-m",
+            "not manual",
             "tests"
-        )
+        ]
         sp.run(pytestCommand)
 
 

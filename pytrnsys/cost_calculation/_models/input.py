@@ -42,6 +42,8 @@ class Parameters(_dcj.JsonSchemaMixin):
     costResidual: _uf.UncertainFloat
     lifetimeResVal: int
     cleanModeLatex: bool
+    reportAuthor: str = "<not-set>"
+    reportEmail: str = "<not-set>"
 
 
 @_dc.dataclass(frozen=True)

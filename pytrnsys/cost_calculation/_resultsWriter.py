@@ -257,6 +257,8 @@ class ResultsWriter:
 
         doc.setSubTitle("Energy generation costs")
         doc.setTitle(simulationName)
+        doc.setAuthor(parameters.reportAuthor)
+        doc.setEMail(parameters.reportEmail)
         doc.setCleanMode(self._getIsLatexCleanMode(parameters))
 
         doc.addBeginDocument()
