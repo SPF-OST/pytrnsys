@@ -31,12 +31,7 @@ class TestCostCalculation:
                     f,
                     d,
                     False,
-                    marks=[
-                        pytest.mark.ci,
-                        pytest.mark.skip(
-                            "Giving up, can't fix this before my holidays."
-                        ),
-                    ],
+                    marks=pytest.mark.ci,
                 )
                 for f, d in CONFIG_FILE_RESULTS_DIR_PAIRS
             ],
