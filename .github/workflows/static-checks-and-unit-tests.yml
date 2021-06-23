@@ -38,6 +38,8 @@ jobs:
       run: |
         pylint pytrnsys pytrnsys_examples tests
       continue-on-error: true
+    - name: Show environment variables
+      run: env
     - name: Test with pytest
       run: >
         pytest
