@@ -153,19 +153,21 @@ class LatexReport:
 
         #        fileNameTexWithPath = '"%s\\%s"'%(self.outputPath,self.fileNameTex)
         if LatexPackage == "texify":
-            cmd = (
-                '%s --pdf  --tex-option=-synctex=1 --tex-option=-aux-directory="%s" --clean --tex-option=-output-directory="%s" --silent "%s"'
-                % (latexExe, self.outputPath, self.outputPath, self.fileNameTexWithPath)
-            )
+            cmd = [
+                latexExe,
+                "--pdf",
+                "--tex-option=-synctex=1",
+                f"--tex-option=-aux-directory={self.outputPath}",
+                "--clean",
+                f"--tex-option=-output-directory={self.outputPath}",
+                "--silent",
+                self.fileNameTexWithPath]
         elif LatexPackage == "pdflatex":
-            #            cmd = "pdflatex --silent --output-directory=\"%s\" %s.tex" %(self.outputPath, self.fileName)
-            cmd = 'pdflatex --silent --output-directory="%s" %s' % (self.outputPath, self.fileNameTex)
+            cmd = ["pdflatex", "--silent", f"--output-directory={self.outputPath}", self.fileNameTex]
         else:
             raise ValueError('The specified LatexPackage "%s" is not implemented yet or does not exist.' % LatexPackage)
 
-        myCmd = '"%s"' % cmd  # for blank spaces in paths
-
-        logger.debug("About to run '%s' (cwd = %s)", myCmd, os.getcwd())
+        logger.debug("About to run '%s' (cwd = %s)", " ".join(cmd), os.getcwd())
 
         subprocessOutput = subprocess.run(cmd, capture_output=True)
         errorMessage = subprocessOutput.stderr.decode("utf-8")
@@ -175,7 +177,7 @@ class LatexReport:
         logger.debug(outputMessage)
 
         if runTwice:  # necessary to generate table of contents
-            os.system(myCmd)
+            subprocess.run(cmd)
 
         if moveToTrnsysLogFile == True and removeAuxFiles:
             os.remove(logFileEnd)
@@ -283,7 +285,7 @@ class LatexReport:
         self.lines = self.lines + line
         line = "\\begin{center}\n"
         self.lines = self.lines + line
-        line = "\\includegraphics[width=1\\textwidth]{%s/%s}\n" % (utils.filterPath(self.outputPath), namePdf)
+        line = "\\includegraphics[width=1\\textwidth]{s}\n" % namePdf
         self.lines = self.lines + line
         line = "\\caption{%s}\n" % caption
         self.lines = self.lines + line
@@ -317,8 +319,8 @@ class LatexReport:
         self.lines = self.lines + line
         line = "\\begin{center}\n"
         self.lines = self.lines + line
-        if overWritePath == False:
-            line = "\\includegraphics[width=1\\textwidth]{%s/%s}\n" % (utils.filterPath(self.outputPath), namePdf)
+        if not overWritePath:
+            line = "\\includegraphics[width=1\\textwidth]{%s}\n" % namePdf
             self.lines = self.lines + line
         else:
             line = "\\includegraphics[width=1\\textwidth]{%s}\n" % (utils.filterPath(overWritePath))

@@ -31,13 +31,13 @@ class Input(_dcj.JsonSchemaMixin):
 
 @_dc.dataclass(frozen=True)
 class Parameters(_dcj.JsonSchemaMixin):
-    rate: _uf.UncertainFloat
+    rate: float
     analysisPeriod: int
     qDemandVariable: "Variable"
     elFromGridVariable: "Variable"
     costElecFix: _uf.UncertainFloat
     costElecKWh: _uf.UncertainFloat
-    increaseElecCost: _uf.UncertainFloat
+    increaseElecCost: float
     maintenanceRate: _uf.UncertainFloat
     costResidual: _uf.UncertainFloat
     lifetimeResVal: int

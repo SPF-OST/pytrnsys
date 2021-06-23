@@ -253,9 +253,7 @@ class ResultsWriter:
         simulationName = self._getSimulationName(resultsJsonFilePath)
 
         doc = latex.LatexReport(str(resultsJsonFilePath.parent), simulationName)
-        # doc.resetTexName(simulationName + "-cost")
-        doc.resetTexName(simulationName + "-cost-TesAux")
-        # doc.resetTexName(simulationName + "-cost-Tes")
+        doc.resetTexName(simulationName + "-cost")
 
         doc.setSubTitle("Energy generation costs")
         doc.setTitle(simulationName)
