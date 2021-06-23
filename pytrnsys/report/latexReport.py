@@ -17,6 +17,7 @@ import os
 import shutil
 import subprocess
 from string import ascii_letters, digits
+import pathlib as _pl
 
 import pytrnsys.utils.utilsSpf as utils
 
@@ -29,11 +30,8 @@ class LatexReport:
         self.outputPath = _outputPath
         self.fileName = _name + "-report"
 
-
         self.fileNameTex = "%s.tex" % self.fileName
-
-
-        self.fileNameTexWithPath = "%s\\%s" % (self.outputPath, self.fileNameTex)
+        self.fileNameTexWithPath = str(_pl.Path(self.outputPath) / self.fileNameTex)
 
         self.lines = ""
         self.nameAuthor = utils.getNameFromUserName()
