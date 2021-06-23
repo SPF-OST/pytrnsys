@@ -163,7 +163,7 @@ class LatexReport:
                 "--silent",
                 self.fileNameTexWithPath]
         elif LatexPackage == "pdflatex":
-            cmd = ["pdflatex", "--silent", f"--output-directory={self.outputPath}", self.fileNameTex]
+            cmd = ["pdflatex", "--silent", f"--output-directory={self.outputPath}", self.fileNameTexWithPath]
         else:
             raise ValueError('The specified LatexPackage "%s" is not implemented yet or does not exist.' % LatexPackage)
 
