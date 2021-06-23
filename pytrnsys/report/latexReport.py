@@ -26,12 +26,10 @@ logger = logging.getLogger("root")
 
 class LatexReport:
     def __init__(self, _outputPath, _name):
-
         self.outputPath = _outputPath
-        self.fileName = _name + "-report"
 
-        self.fileNameTex = "%s.tex" % self.fileName
-        self.fileNameTexWithPath = str(_pl.Path(self.outputPath) / self.fileNameTex)
+        fileName = _name + "-report"
+        self.resetTexName(fileName)
 
         self.lines = ""
         self.nameAuthor = utils.getNameFromUserName()
@@ -82,10 +80,9 @@ class LatexReport:
         return None
 
     def resetTexName(self, name):
-
         self.fileName = name
-        self.fileNameTex = "%s.tex" % self.fileName
-        self.fileNameTexWithPath = "%s\\%s" % (self.outputPath, self.fileNameTex)
+        self.fileNameTex = f"{self.fileName}.tex"
+        self.fileNameTexWithPath = str(_pl.Path(self.outputPath) / self.fileNameTex)
 
     def setCleanMode(self, _mode):
         self.cleanMode = _mode
