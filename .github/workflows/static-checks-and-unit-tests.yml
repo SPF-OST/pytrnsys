@@ -31,18 +31,11 @@ jobs:
         python -m pip install wheel
         pip install -r requirements/ci/test/requirements.txt
     - name: Static type checking with mypy
-      run: |
-        mypy pytrnsys tests
+      run: dev-tools/run-static-checks-and-unit-tests.py --static-checks
     - name: Lint with pylint
-      run: |
-        pylint pytrnsys tests
+      run: dev-tools/run-static-checks-and-unit-tests.py --lint
     - name: Test with pytest
-      run: >
-        pytest
-        --cov=pytrnsys --cov-report html:test-results/coverage --cov-report term
-        --html=test-results/report/report.html
-        -m "not manual"
-        tests
+      run: dev-tools/run-static-checks-and-unit-tests.py --unit
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
