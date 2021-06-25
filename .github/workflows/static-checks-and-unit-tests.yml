@@ -33,11 +33,11 @@ jobs:
         python -m pip install wheel
         pip install -r requirements/ci/test/requirements.txt
     - name: Static type checking with mypy
-      run: dev-tools/run-static-checks-and-unit-tests.py --static-checks
+      run: python dev-tools/run-static-checks-and-unit-tests.py --static-checks
     - name: Lint with pylint
-      run: dev-tools/run-static-checks-and-unit-tests.py --lint
+      run: python dev-tools/run-static-checks-and-unit-tests.py --lint
     - name: Test with pytest
-      run: dev-tools/run-static-checks-and-unit-tests.py --unit
+      run: python dev-tools/run-static-checks-and-unit-tests.py --unit
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
