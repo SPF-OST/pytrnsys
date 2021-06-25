@@ -20,31 +20,16 @@ class TestCostCalculation:
     ]
 
     @pytest.mark.parametrize(
-        ["costConfigFileName", "resultsDirName", "shallComparePdfs"],
-        [
-            *[
-                pytest.param(f, d, True, marks=pytest.mark.manual)
-                for f, d in CONFIG_FILE_RESULTS_DIR_PAIRS
-            ],
-            *[
-                pytest.param(
-                    f,
-                    d,
-                    False,
-                    marks=pytest.mark.ci,
-                )
-                for f, d in CONFIG_FILE_RESULTS_DIR_PAIRS
-            ],
-        ],
+        ["costConfigFileName", "resultsDirName"],
+        CONFIG_FILE_RESULTS_DIR_PAIRS
     )
     def test(
         self,
         costConfigFileName: str,
         resultsDirName: str,
-        shallComparePdfs,
         caplog: pytest.LogCaptureFixture,
     ):
-        helper = Helper(costConfigFileName, resultsDirName, shallComparePdfs, caplog)
+        helper = Helper(costConfigFileName, resultsDirName, caplog)
         helper.setup()
 
         actualResultsDir = helper.actualResultsDir
@@ -65,7 +50,6 @@ class Helper:
         self,
         costConfigFileName: str,
         resultsDirName: str,
-        shallComparePdfs: bool,
         caplog: pytest.LogCaptureFixture,
     ):
         self._caplog = caplog
@@ -81,8 +65,6 @@ class Helper:
         self.actualResultsDir = actualDir / resultsDirName
         expectedDir = outputDir / "expected"
         self._expectedResultsDir = expectedDir / resultsDirName
-
-        self._shallComparePdfs = shallComparePdfs
 
     def setup(self):
         self._setupLogging()
@@ -114,12 +96,11 @@ class Helper:
                 self._expectedResultsDir
             )
 
-            if self._shallComparePdfs:
-                costPlotName = f"costShare-{simulationName}.pdf"
-                self._assertPdfEqual(relativeContainingDirPath, costPlotName)
+            costPlotName = f"costShare-{simulationName}.pdf"
+            self._assertPdfEqual(relativeContainingDirPath, costPlotName)
 
-                annuityPlotName = f"costShareAnnuity-{simulationName}.pdf"
-                self._assertPdfEqual(relativeContainingDirPath, annuityPlotName)
+            annuityPlotName = f"costShareAnnuity-{simulationName}.pdf"
+            self._assertPdfEqual(relativeContainingDirPath, annuityPlotName)
 
             reportTexName = f"{simulationName}-cost.tex"
             self._assertTextFileEqual(relativeContainingDirPath, reportTexName)
