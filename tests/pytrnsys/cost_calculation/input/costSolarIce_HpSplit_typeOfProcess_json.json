@@ -195,8 +195,9 @@
       "mean": 0
     },
     "lifetimeResVal": 30,
-    "cleanModeLatex": false
+    "cleanModeLatex": false,
+    "reportAuthor": "Test Author",
+    "reportEmail": "test.author@test.com"
   }
 }
-		
-	
+
