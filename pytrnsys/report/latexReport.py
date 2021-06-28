@@ -294,7 +294,7 @@ class LatexReport:
         self.lines = self.lines + line
         line = "\\begin{center}\n"
         self.lines = self.lines + line
-        line = "\\includegraphics[width=1\\textwidth]{s}\n" % namePdf
+        line = "\\includegraphics[width=1\\textwidth]{%s}\n" % namePdf
         self.lines = self.lines + line
         line = "\\caption{%s}\n" % caption
         self.lines = self.lines + line
