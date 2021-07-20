@@ -7,6 +7,7 @@ import shutil as sh
 import subprocess as sp
 import argparse as ap
 import time
+import sys
 
 
 def main():
@@ -61,8 +62,11 @@ def main():
     arguments = parser.parse_args()
 
     testResultsDirPath = pl.Path("test-results")
-    if not arguments.shallKeepResults:
-        _deleteStaleAndCreateEmptyDirectory(testResultsDirPath)
+    if testResultsDirPath.exists() and not testResultsDirPath.is_dir():
+        print("ERROR: `test-results` exists but is not a directory", file=sys.stderr)
+        sys.exit(2)
+
+    _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
 
     if (
         arguments.shallRunAll
@@ -107,18 +111,16 @@ def main():
         sp.run(args, check=True)
 
 
-def _deleteStaleAndCreateEmptyDirectory(directoryPath: pl.Path) -> None:
-    if directoryPath.exists():
-        sh.rmtree(directoryPath)
+def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: bool) -> None:
+    if not shallKeepResults and testResultsDirPath.is_dir():
+        sh.rmtree(testResultsDirPath)
 
     # Sometimes we need to give Windows a bit of time so that it can realize that
     # the directory is gone and it allows us to create it again.
-    while True:
-        try:
-            directoryPath.mkdir()
-            break
-        except PermissionError:
-            time.sleep(0.5)
+    time.sleep(1)
+
+    if not testResultsDirPath.is_dir():
+        testResultsDirPath.mkdir()
 
 
 if __name__ == "__main__":
