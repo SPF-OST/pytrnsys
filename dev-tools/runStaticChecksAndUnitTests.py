@@ -61,20 +61,20 @@ def main():
         or arguments.shallPerformStaticChecks
         or arguments.shallTypeCheck
     ):
-        args = "mypy pytrnsys tests dev-tools"
-        _runAndAppendToCompleted(args.split(), completedProcesses)
+        cmd = "mypy pytrnsys tests dev-tools"
+        sp.run(cmd.split(), check=True)
 
     if (
         arguments.shallRunAll
         or arguments.shallPerformStaticChecks
         or arguments.shallLint
     ):
-        args = "pylint pytrnsys tests dev-tools"
-        _runAndAppendToCompleted(args.split(), completedProcesses)
+        cmd = "pylint pytrnsys tests dev-tools"
+        sp.run(cmd.split(), check=True)
 
     if arguments.shallRunAll or arguments.shallCreateDiagrams:
         args = [*"pyreverse -k -o pdf -p pytrnsys -d".split(), testResultsDirectory, "pytrnsys"]
-        _runAndAppendToCompleted(args, completedProcesses)
+        sp.run(args, check=True)
 
     if (
         arguments.shallRunAll
@@ -96,15 +96,10 @@ def main():
             "not manual",
             "tests",
         ]
-        _runAndAppendToCompleted(args, completedProcesses)
+        sp.run(args, check=True)
 
     for completedProcess in completedProcesses:
         completedProcess.check_returncode()
-
-
-def _runAndAppendToCompleted(args, completedProcesses):
-    completedProcess = sp.run(args, check=False)
-    completedProcesses.append(completedProcess)
 
 
 def _deleteStaleAndCreateEmptyTestResultsDirectory() -> pl.Path:
