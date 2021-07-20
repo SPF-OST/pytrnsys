@@ -16,14 +16,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install Latex
-      run: |
-        sudo apt-get update
-        sudo apt-get install texlive-latex-extra
-        pdflatex -version
-    - name: Install ImageMagick
-      run: sudo apt-get install imagemagick
-    - name: Install graphviz
+    - name: Update APT cache
+      run: sudo apt-get update
+    - name: Install dependencies to do with report generation and comparison
+      run: sudo apt-get install texlive-latex-extra imagemagick poppler-utils
+    - name: Install graphviz for class and package diagrams
       run: sudo apt-get install graphviz
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
