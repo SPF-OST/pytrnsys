@@ -6,7 +6,6 @@ import pathlib as pl
 import shutil as sh
 import subprocess as sp
 import argparse as ap
-import typing as tp
 import time
 
 
@@ -52,7 +51,7 @@ def main():
     )
     arguments = parser.parse_args()
 
-    testResultsDirectory = _deleteStaleAndCreateEmptyTestResultsDirectory()
+    testResultsDirPath = _deleteStaleAndCreateEmptyTestResultsDirectory()
 
     if (
         arguments.shallRunAll
@@ -71,8 +70,13 @@ def main():
         sp.run(cmd.split(), check=True)
 
     if arguments.shallRunAll or arguments.shallCreateDiagrams:
-        args = [*"pyreverse -k -o pdf -p pytrnsys -d".split(), testResultsDirectory, "pytrnsys"]
-        sp.run(args, check=True)
+        absolutePytrnsysDirPath = pl.Path("pytrnsys").absolute()
+
+        args = [*"pyreverse -k -o pdf -p pytrnsys".split(), str(absolutePytrnsysDirPath)]
+
+        # cannot use the `-d` option to specify output directory
+        # as it doesn't seem to exist on all OSs/distros
+        sp.run(args, check=True, cwd=testResultsDirPath)
 
     if (
         arguments.shallRunAll
@@ -87,9 +91,9 @@ def main():
         args = [
             "pytest",
             "--cov=pytrnsys",
-            f"--cov-report=html:{testResultsDirectory / 'coverage'}",
+            f"--cov-report=html:{testResultsDirPath / 'coverage'}",
             "--cov-report=term",
-            f"--html={testResultsDirectory / 'report' / 'report.html'}",
+            f"--html={testResultsDirPath / 'report' / 'report.html'}",
             "-m",
             "not manual",
             "tests",
@@ -103,13 +107,13 @@ def _deleteStaleAndCreateEmptyTestResultsDirectory() -> pl.Path:
     if testResultsDirPath.exists():
         sh.rmtree(testResultsDirPath)
 
-        # Sometimes we need to give Windows a bit of time so that it can realize that
-        # the directory is gone and it allows us to create it again.
-        while not testResultsDirPath.exists():
-            try:
-                testResultsDirPath.mkdir()
-            except PermissionError:
-                time.sleep(0.5)
+    # Sometimes we need to give Windows a bit of time so that it can realize that
+    # the directory is gone and it allows us to create it again.
+    while not testResultsDirPath.exists():
+        try:
+            testResultsDirPath.mkdir()
+        except PermissionError:
+            time.sleep(0.5)
 
     return testResultsDirPath
 
