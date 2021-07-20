@@ -1,15 +1,13 @@
 #!/usr/bin/python3.9
 
-# pylint: skip-file
-# type: ignore
-
 # Run from top-level directory
 
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
 import argparse as ap
-import time as _time
+import typing as tp
+import time
 
 
 def main():
@@ -56,34 +54,27 @@ def main():
 
     testResultsDirectory = _deleteStaleAndCreateEmptyTestResultsDirectory()
 
+    completedProcesses: tp.List[sp.CompletedProcess] = []
+
     if (
         arguments.shallRunAll
         or arguments.shallPerformStaticChecks
         or arguments.shallTypeCheck
     ):
-        sp.run(["mypy", "pytrnsys", "tests", "dev-tools"])
+        args = "mypy pytrnsys tests dev-tools"
+        _runAndAppendToCompleted(args.split(), completedProcesses)
 
     if (
         arguments.shallRunAll
         or arguments.shallPerformStaticChecks
         or arguments.shallLint
     ):
-        sp.run(["pylint", "pytrnsys", "tests", "dev-tools"])
+        args = "pylint pytrnsys tests dev-tools"
+        _runAndAppendToCompleted(args.split(), completedProcesses)
 
     if arguments.shallRunAll or arguments.shallCreateDiagrams:
-        sp.run(
-            [
-                "pyreverse",
-                "-k",
-                "-o",
-                "pdf",
-                "-p",
-                "pytrnsys",
-                "-d",
-                testResultsDirectory,
-                "pytrnsys",
-            ]
-        )
+        args = [*"pyreverse -k -o pdf -p pytrnsys -d".split(), testResultsDirectory, "pytrnsys"]
+        _runAndAppendToCompleted(args, completedProcesses)
 
     if (
         arguments.shallRunAll
@@ -95,7 +86,7 @@ def main():
             or arguments.shallCreateDiagrams
         )
     ):
-        pytestCommand = [
+        args = [
             "pytest",
             "--cov=pytrnsys",
             f"--cov-report=html:{testResultsDirectory / 'coverage'}",
@@ -105,7 +96,15 @@ def main():
             "not manual",
             "tests",
         ]
-        sp.run(pytestCommand)
+        _runAndAppendToCompleted(args, completedProcesses)
+
+    for completedProcess in completedProcesses:
+        completedProcess.check_returncode()
+
+
+def _runAndAppendToCompleted(args, completedProcesses):
+    completedProcess = sp.run(args, check=False)
+    completedProcesses.append(completedProcess)
 
 
 def _deleteStaleAndCreateEmptyTestResultsDirectory() -> pl.Path:
@@ -120,7 +119,7 @@ def _deleteStaleAndCreateEmptyTestResultsDirectory() -> pl.Path:
             try:
                 testResultsDirPath.mkdir()
             except PermissionError:
-                _time.sleep(0.5)
+                time.sleep(0.5)
 
     return testResultsDirPath
 
