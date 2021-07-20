@@ -70,13 +70,8 @@ def main():
         sp.run(cmd.split(), check=True)
 
     if arguments.shallRunAll or arguments.shallCreateDiagrams:
-        absolutePytrnsysDirPath = pl.Path("pytrnsys").absolute()
-
-        args = [*"pyreverse -k -o pdf -p pytrnsys".split(), str(absolutePytrnsysDirPath)]
-
-        # cannot use the `-d` option to specify output directory
-        # as it doesn't seem to exist on all OSs/distros
-        sp.run(args, check=True, cwd=testResultsDirPath)
+        cmd = "pyreverse -k -o pdf -p pytrnsys -d test-results pytrnsys"
+        sp.run(cmd.split(), check=True)
 
     if (
         arguments.shallRunAll
