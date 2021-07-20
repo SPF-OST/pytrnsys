@@ -54,8 +54,6 @@ def main():
 
     testResultsDirectory = _deleteStaleAndCreateEmptyTestResultsDirectory()
 
-    completedProcesses: tp.List[sp.CompletedProcess] = []
-
     if (
         arguments.shallRunAll
         or arguments.shallPerformStaticChecks
@@ -97,9 +95,6 @@ def main():
             "tests",
         ]
         sp.run(args, check=True)
-
-    for completedProcess in completedProcesses:
-        completedProcess.check_returncode()
 
 
 def _deleteStaleAndCreateEmptyTestResultsDirectory() -> pl.Path:
