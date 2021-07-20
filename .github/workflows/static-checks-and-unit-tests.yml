@@ -36,6 +36,8 @@ jobs:
       run: python dev-tools/run-static-checks-and-unit-tests.py --static-checks
     - name: Lint with pylint
       run: python dev-tools/run-static-checks-and-unit-tests.py --lint
+    - name: Generate class and package diagrams
+      run: python dev-tools/run-static-checks-and-unit-tests.py --diagram
     - name: Test with pytest
       run: python dev-tools/run-static-checks-and-unit-tests.py --unit
     - name: Upload test results and coverage reports
