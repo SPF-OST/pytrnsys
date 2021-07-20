@@ -39,6 +39,8 @@ jobs:
       run: |
         pyreverse -h
         python dev-tools/runStaticChecksAndUnitTests.py --diagram
+        ls
+        ls test-results
     - name: Test with pytest
       run: python dev-tools/runStaticChecksAndUnitTests.py --unit
     - name: Upload test results and coverage reports
