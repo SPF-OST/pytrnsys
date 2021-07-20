@@ -11,6 +11,15 @@ import time
 
 def main():
     parser = ap.ArgumentParser()
+
+    parser.add_argument(
+        "-k",
+        "--keep-results",
+        help="Don't clean test results",
+        action="store_true",
+        dest="shallKeepResults",
+    )
+
     parser.add_argument(
         "-s",
         "--static-checks",
@@ -51,7 +60,9 @@ def main():
     )
     arguments = parser.parse_args()
 
-    testResultsDirPath = _deleteStaleAndCreateEmptyTestResultsDirectory()
+    testResultsDirPath = pl.Path("test-results")
+    if not arguments.shallKeepResults:
+        _deleteStaleAndCreateEmptyDirectory(testResultsDirPath)
 
     if (
         arguments.shallRunAll
@@ -96,22 +107,18 @@ def main():
         sp.run(args, check=True)
 
 
-def _deleteStaleAndCreateEmptyTestResultsDirectory() -> pl.Path:
-    testResultsDirPath = pl.Path("test-results")
-
-    if testResultsDirPath.exists():
-        sh.rmtree(testResultsDirPath)
+def _deleteStaleAndCreateEmptyDirectory(directoryPath: pl.Path) -> None:
+    if directoryPath.exists():
+        sh.rmtree(directoryPath)
 
     # Sometimes we need to give Windows a bit of time so that it can realize that
     # the directory is gone and it allows us to create it again.
     while True:
         try:
-            testResultsDirPath.mkdir()
+            directoryPath.mkdir()
             break
         except PermissionError:
             time.sleep(0.5)
-
-    return testResultsDirPath
 
 
 if __name__ == "__main__":

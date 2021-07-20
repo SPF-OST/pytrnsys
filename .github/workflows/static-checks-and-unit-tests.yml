@@ -32,17 +32,14 @@ jobs:
         python -m pip install wheel
         pip install -r requirements/ci/test/requirements.txt
     - name: Static type checking with mypy
-      run: python dev-tools/runStaticChecksAndUnitTests.py --static-checks
+      run: python dev-tools/runStaticChecksAndUnitTests.py --static-checks --keep-results
     - name: Lint with pylint
-      run: python dev-tools/runStaticChecksAndUnitTests.py --lint
+      run: python dev-tools/runStaticChecksAndUnitTests.py --lint --keep-results
     - name: Generate class and package diagrams
       run: |
-        pyreverse -h
-        python dev-tools/runStaticChecksAndUnitTests.py --diagram
-        ls
-        ls test-results
+        python dev-tools/runStaticChecksAndUnitTests.py --diagram --keep-results
     - name: Test with pytest
-      run: python dev-tools/runStaticChecksAndUnitTests.py --unit
+      run: python dev-tools/runStaticChecksAndUnitTests.py --unit --keep-results
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
