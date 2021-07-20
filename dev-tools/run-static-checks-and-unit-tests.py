@@ -9,46 +9,120 @@ import pathlib as pl
 import shutil as sh
 import subprocess as sp
 import argparse as ap
+import time as _time
 
 
 def main():
     parser = ap.ArgumentParser()
     parser.add_argument(
-        "-s", "--static-checks", help="Also perform static checks", action="store_true", dest="shallPerformStaticChecks"
+        "-s",
+        "--static-checks",
+        help="Also perform static checks",
+        action="store_true",
+        dest="shallPerformStaticChecks",
     )
-    parser.add_argument("-l", "--lint", help="Perform linting", action="store_true", dest="shallLint")
-    parser.add_argument("-t", "--type", help="Perform type checking", action="store_true", dest="shallTypeCheck")
-    parser.add_argument("-u", "--unit", help="Perform unit tests", action="store_true", dest="shallRunTests")
-    parser.add_argument("-a", "--all", help="Perform all checks", action="store_true", dest="shallRunAll")
+    parser.add_argument(
+        "-l", "--lint", help="Perform linting", action="store_true", dest="shallLint"
+    )
+    parser.add_argument(
+        "-t",
+        "--type",
+        help="Perform type checking",
+        action="store_true",
+        dest="shallTypeCheck",
+    )
+    parser.add_argument(
+        "-u",
+        "--unit",
+        help="Perform unit tests",
+        action="store_true",
+        dest="shallRunTests",
+    )
+    parser.add_argument(
+        "-d",
+        "--diagram",
+        help="Create package and class diagrams",
+        action="store_true",
+        dest="shallCreateDiagrams",
+    )
+    parser.add_argument(
+        "-a",
+        "--all",
+        help="Perform all checks",
+        action="store_true",
+        dest="shallRunAll",
+    )
     arguments = parser.parse_args()
 
+    testResultsDirectory = _deleteStaleAndCreateEmptyTestResultsDirectory()
+
+    if (
+        arguments.shallRunAll
+        or arguments.shallPerformStaticChecks
+        or arguments.shallTypeCheck
+    ):
+        sp.run(["mypy", "pytrnsys", "tests", "dev-tools"])
+
+    if (
+        arguments.shallRunAll
+        or arguments.shallPerformStaticChecks
+        or arguments.shallLint
+    ):
+        sp.run(["pylint", "pytrnsys", "tests", "dev-tools"])
+
+    if arguments.shallRunAll or arguments.shallCreateDiagrams:
+        sp.run(
+            [
+                "pyreverse",
+                "-k",
+                "-o",
+                "pdf",
+                "-p",
+                "pytrnsys",
+                "-d",
+                testResultsDirectory,
+                "pytrnsys",
+            ]
+        )
+
+    if (
+        arguments.shallRunAll
+        or arguments.shallRunTests
+        or not (
+            arguments.shallPerformStaticChecks
+            or arguments.shallTypeCheck
+            or arguments.shallLint
+            or arguments.shallCreateDiagrams
+        )
+    ):
+        pytestCommand = [
+            "pytest",
+            "--cov=pytrnsys",
+            f"--cov-report=html:{testResultsDirectory / 'coverage'}",
+            "--cov-report=term",
+            f"--html={testResultsDirectory / 'report' / 'report.html'}",
+            "-m",
+            "not manual",
+            "tests",
+        ]
+        sp.run(pytestCommand)
+
+
+def _deleteStaleAndCreateEmptyTestResultsDirectory() -> pl.Path:
     testResultsDirPath = pl.Path("test-results")
 
     if testResultsDirPath.exists():
         sh.rmtree(testResultsDirPath)
 
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallTypeCheck:
-        sp.run(["mypy", "pytrnsys", "tests",  "dev-tools"])
+        # Sometimes we need to give Windows a bit of time so that it can realize that
+        # the directory is gone and it allows us to create it again.
+        while not testResultsDirPath.exists():
+            try:
+                testResultsDirPath.mkdir()
+            except PermissionError:
+                _time.sleep(0.5)
 
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallLint:
-        sp.run(["pylint", "pytrnsys", "tests", "dev-tools"])
-
-    if (
-        arguments.shallRunAll
-        or arguments.shallRunTests
-        or not (arguments.shallPerformStaticChecks or arguments.shallTypeCheck or arguments.shallLint)
-    ):
-        pytestCommand = [
-            "pytest",
-            "--cov=pytrnsys",
-            "--cov-report=html:test-results/coverage",
-            "--cov-report=term",
-            "--html=test-results/report/report.html",
-            "-m",
-            "not manual",
-            "tests"
-        ]
-        sp.run(pytestCommand)
+    return testResultsDirPath
 
 
 if __name__ == "__main__":
