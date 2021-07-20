@@ -23,6 +23,8 @@ jobs:
         pdflatex -version
     - name: Install ImageMagick
       run: sudo apt-get install imagemagick
+    - name Install graphviz
+      run: sudo apt-get install graphviz
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
