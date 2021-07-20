@@ -109,9 +109,10 @@ def _deleteStaleAndCreateEmptyTestResultsDirectory() -> pl.Path:
 
     # Sometimes we need to give Windows a bit of time so that it can realize that
     # the directory is gone and it allows us to create it again.
-    while not testResultsDirPath.exists():
+    while True:
         try:
             testResultsDirPath.mkdir()
+            break
         except PermissionError:
             time.sleep(0.5)
 
