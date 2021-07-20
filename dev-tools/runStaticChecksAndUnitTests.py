@@ -62,9 +62,6 @@ def main():
     arguments = parser.parse_args()
 
     testResultsDirPath = pl.Path("test-results")
-    if testResultsDirPath.exists() and not testResultsDirPath.is_dir():
-        print("ERROR: `test-results` exists but is not a directory", file=sys.stderr)
-        sys.exit(2)
 
     _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
 
@@ -112,6 +109,10 @@ def main():
 
 
 def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: bool) -> None:
+    if testResultsDirPath.exists() and not testResultsDirPath.is_dir():
+        print("ERROR: `test-results` exists but is not a directory", file=sys.stderr)
+        sys.exit(2)
+
     if not shallKeepResults and testResultsDirPath.is_dir():
         sh.rmtree(testResultsDirPath)
 
