@@ -32,7 +32,7 @@ jobs:
         python -m pip install wheel
         pip install -r requirements/ci/test/requirements.txt
     - name: Static type checking with mypy
-      run: python dev-tools/runStaticChecksAndUnitTests.py --static-checks
+      run: python dev-tools/runStaticChecksAndUnitTests.py --type
     - name: Lint with pylint
       run: python dev-tools/runStaticChecksAndUnitTests.py --lint --keep-results
     - name: Generate class and package diagrams

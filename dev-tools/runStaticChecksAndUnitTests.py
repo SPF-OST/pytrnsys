@@ -24,7 +24,7 @@ def main():
     parser.add_argument(
         "-s",
         "--static-checks",
-        help="Also perform static checks",
+        help="Perform type checking and linting",
         action="store_true",
         dest="shallPerformStaticChecks",
     )
