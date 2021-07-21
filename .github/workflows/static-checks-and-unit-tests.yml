@@ -16,13 +16,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install Latex
-      run: |
-        sudo apt-get update
-        sudo apt-get install texlive-latex-extra
-        pdflatex -version
-    - name: Install ImageMagick
-      run: sudo apt-get install imagemagick
+    - name: Update APT cache
+      run: sudo apt-get update
+    - name: Install dependencies to do with report generation and comparison
+      run: sudo apt-get install texlive-latex-extra imagemagick poppler-utils
+    - name: Install graphviz for class and package diagrams
+      run: sudo apt-get install graphviz
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -33,11 +32,14 @@ jobs:
         python -m pip install wheel
         pip install -r requirements/ci/test/requirements.txt
     - name: Static type checking with mypy
-      run: python dev-tools/run-static-checks-and-unit-tests.py --static-checks
+      run: python dev-tools/runStaticChecksAndUnitTests.py --static-checks
     - name: Lint with pylint
-      run: python dev-tools/run-static-checks-and-unit-tests.py --lint
+      run: python dev-tools/runStaticChecksAndUnitTests.py --lint --keep-results
+    - name: Generate class and package diagrams
+      run: |
+        python dev-tools/runStaticChecksAndUnitTests.py --diagram --keep-results
     - name: Test with pytest
-      run: python dev-tools/run-static-checks-and-unit-tests.py --unit
+      run: python dev-tools/runStaticChecksAndUnitTests.py --unit --keep-results
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:

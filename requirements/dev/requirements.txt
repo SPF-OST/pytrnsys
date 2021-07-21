@@ -10,7 +10,7 @@ alabaster==0.7.12
     # via sphinx
 appdirs==1.4.4
     # via black
-astroid==2.5.1
+astroid==2.6.4
     # via pylint
 atomicwrites==1.4.0
     # via pytest
@@ -114,7 +114,7 @@ py==1.10.0
     # via pytest
 pygments==2.8.1
     # via sphinx
-pylint==2.7.2
+pylint==2.9.3
     # via -r requirements\dev\../ci/test/requirements.in
 pyparsing==2.4.7
     # via
