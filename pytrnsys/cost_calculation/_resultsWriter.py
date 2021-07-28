@@ -25,7 +25,7 @@ class ResultsWriter:
     def __init__(self):
         self.method = "VDI"
         self.cleanModeLatex = None
-        self.doLaTex = False
+        # self.doLaTex = True
 
     def writeReportAndResults(
         self,
@@ -253,8 +253,8 @@ class ResultsWriter:
         simulationName = self._getSimulationName(resultsJsonFilePath)
 
         doc = latex.LatexReport(str(resultsJsonFilePath.parent), simulationName)
-        # doc.resetTexName(simulationName + "-cost")
-        doc.resetTexName(simulationName + "-cost-TesAux")
+        doc.resetTexName(simulationName + "-cost")
+        # doc.resetTexName(simulationName + "-cost-TesAux")
         # doc.resetTexName(simulationName + "-cost-Tes")
 
         doc.setSubTitle("Energy generation costs")
