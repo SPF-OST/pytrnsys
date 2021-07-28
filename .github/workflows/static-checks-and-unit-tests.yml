@@ -16,6 +16,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Update APT cache
+      run: sudo apt-get update
+    - name: Install dependencies to do with report generation and comparison
+      run: sudo apt-get install texlive-latex-extra imagemagick poppler-utils
+    - name: Install graphviz for class and package diagrams
+      run: sudo apt-get install graphviz
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -26,20 +32,14 @@ jobs:
         python -m pip install wheel
         pip install -r requirements/ci/test/requirements.txt
     - name: Static type checking with mypy
-      run: |
-        mypy pytrnsys tests
-      continue-on-error: true
+      run: python dev-tools/runStaticChecksAndUnitTests.py --type
     - name: Lint with pylint
+      run: python dev-tools/runStaticChecksAndUnitTests.py --lint --keep-results
+    - name: Generate class and package diagrams
       run: |
-        pylint pytrnsys pytrnsys_examples tests
-      continue-on-error: true
+        python dev-tools/runStaticChecksAndUnitTests.py --diagram --keep-results
     - name: Test with pytest
-      run: >
-        pytest
-        --cov=pytrnsys --cov-report html:test-results/coverage --cov-report term
-        --html=test-results/report/report.html
-        -m "not manual"
-        tests
+      run: python dev-tools/runStaticChecksAndUnitTests.py --unit --keep-results
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:

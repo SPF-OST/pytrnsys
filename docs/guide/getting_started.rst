@@ -6,6 +6,11 @@ Getting Started
 Installation
 ------------
 
+For the installation of the pytrnsys python package, please follow the installation guide on the respective `PyPi page <https://pypi.org/project/pytrnsys/>`_.
+
+Prerequesites
+-------------
+
 Up to now, only TRNSYS17 is fully supported in all the example projects. In order to use pytrnsys, you need the
 following prerequisites on your machine:
 
@@ -16,8 +21,8 @@ TRNSYS17 should be installed under::
 
     C:/Trnsys17
 
-If the path to your TRNSYS17 installation is different from that you will need to manually copy dll-files (see below)
-and adjust the TRNSYS-path in the config-file.
+If the path to your TRNSYS17 installation is different from that you will need to adjust the TRNSYS-path in the
+config-file.
 
 Additional optional prerequisites are:
 
@@ -25,45 +30,14 @@ Additional optional prerequisites are:
 - `GLE <http://glx.sourceforge.net/>`_ is also supported by the configuration file keyword :ref:`setPrintDataForGle <ref-setPrintDataForGle>` which exports a .gle file which can be used for further plotting in GLE.
 - `Inkscape <https://inkscape.org/>`_ can be used to save the plots in the enhanced meta file format by using the :ref:`plotEmf keyword <ref-plotEmf>` in the processing.
 
-The pytrnsys package is available for python>3.5 through pip::
-
-	pip install pytrnsys
-
-Along the main pytrnsys-package two additional packages will be installed. The package pytrnsys_examples contains
-different example projects that can be used out of the box to investigate different parametrizations of the represented
-systems. Up to now, the example projects contain a solar thermal system for domestic hot water preparation and a pv
-battery system. The other package pytrnsys_ddck contains the ddck-repository.
-
-Before you can run the example, you need to copy dll-files to your TRNSYS17-installation. This is done by executing::
-
-    pytrnsys-dll
-
-If the path of your TRNSYS17-installation is different from the one specified above you need to manually copy all
+You need to manually copy all
 dll-files from::
 
-    ptrnsys_ddck/dlls
+    pytrnsys/ddcks/dlls
 
 to::
 
     Trnsys17/UserLib/ReleaseDLLs
-
-You can now test the setup by executing one of the example projects.
-The default solar domestic hot water system can be run by executing::
-
-	pytrnsys-run
-	
-in the python environment in which pytrnsys was installed. The command will launch a parametric study of different
-solar collector areas that aims to determine the solar fraction of the domestic hot water system. It will
-run on multiple cores in parallel using the total amount of cores of your machine minus 4. The simulations will be
-executed in a new folder called solar_dhw_simulaions that will be created in the current working directory.
-
-Once the simulations are finished the simulation results can be processed using the following command inside the newly
-created simulation folder solar_dhw::
-
-	pytrnsys-process
-	
-The most important files created by the processing are a results pdf-file in each subfolder
-of the parametric runs as well as comparison plots in the main folder.
 
 The philosophy of pytrnsys
 --------------------------

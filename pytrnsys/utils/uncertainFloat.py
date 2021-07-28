@@ -14,6 +14,10 @@ FloatLike = _tp.Union["UncertainFloat", _tp.SupportsFloat]
 
 @_dc.dataclass(frozen=True)
 class UncertainFloat(_dcj.JsonSchemaMixin):
+    """
+    BEWARE: This class does *not* handle correlation, i.e. 2x-x != x and
+    it assumes extrema are attained at the input values' extrema.
+    """
     mean: float
     toLowerBound: float = 0
     toUpperBound: float = 0
@@ -103,16 +107,6 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
 
     def __rtruediv__(self, other: FloatLike) -> "UncertainFloat":
         return _doOp(_op.truediv, other, self)
-
-    def __pow__(self, power: FloatLike, modulo=None):
-        raiser = ModuloRaiser(modulo)
-
-        return _doOp(raiser.pow, self, power)
-
-    def __rpow__(self, power: FloatLike, modulo=None):
-        raiser = ModuloRaiser(modulo)
-
-        return _doOp(raiser.pow, power, self)
 
     def __gt__(self, other: FloatLike) -> bool:
         other = self.create(other)

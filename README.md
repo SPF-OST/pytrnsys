@@ -11,20 +11,72 @@ to post-process simulation results in one shot.
 
 The documentation can be found on [pytrnsys.readthedocs.io](https://pytrnsys.readthedocs.io).
 
-## Developer Installation
+## Installation
 
-### Prerequisites
+In the following all commands should be run from the `pytrnsys` directory. The command should be run in a 
+"Windows Command Prompt" for Windows environment. The commands should be very similar should you wish to install on
+Linux.
 
-#### Required:
+If you want to install pytrnsys as a python package, follow the "Binary installation / User installation". If you want 
+to develop the code, you will need git. Then you should follow the "Installation from source / Developer installation". 
+
+### Binary installation / User installation
+
+#### Prerequisites
+
+##### Required
 
 1. [Python 3.9](https://www.python.org/downloads/)
-1. A local clone of this GIT repository (`https://github.com/SPF-OST/pytrnsys.git`) into
-a folder called `pytrnsys`.
 
-#### Recommended
-* [PyCharm Community IDE](https://www.jetbrains.com/pycharm/downloa)
+#### Getting started
 
-### Getting started
+1. Open a command prompt (e.g. by hitting the Windows-key, then typing "cmd" 
+   into the search box and hitting enter). The following commands should be entered
+   into the command prompt just opened.
+
+1. Navigate to the directory which should contain the `pytrnsys` directory:
+    ```commandline
+    cd [your-directory]
+    ```
+   Replace `[your-directory]` (including the brackets []) with your directory of choice: if your
+directory is called `foo` then `pytrnsys` will be installed to `foo\pytrnsys`.
+   
+1. Create a virtual environment:
+    ```commandline
+    py -3.9 -m venv pytrnsys
+    ```
+1. Activate it:
+    ```commandline
+    pytrnsys\Scripts\activate
+    ```
+1. Install the `wheel` package:
+    ```commandline
+    pip install wheel
+    ```
+         
+1. Install `pytrnsys` and its requirements:
+    ```commandline
+    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys/master/requirements/releases/v0.5a4/requirements.txt
+    ```
+You can now close the command prompt opened in the first step.
+
+pytrnsys can now be used from a python editor of your choice within the virtual environment you created.
+
+
+### Installation from source / Developer installation
+
+#### Prerequisites
+
+##### Required
+
+1. [Python 3.9](https://www.python.org/downloads/)
+1. A local clone of the following GIT repository:
+    `https://github.com/SPF-OST/pytrnsys.git`
+
+##### Recommended
+* [PyCharm Community IDE](https://www.jetbrains.com/pycharm/download/)
+
+#### Getting started
 
 All the following commands should be run from the `pytrnsys` directory. The commands
 specified are for a Windows environment. They are very similar for Linux.

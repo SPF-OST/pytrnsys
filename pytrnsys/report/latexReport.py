@@ -17,6 +17,7 @@ import os
 import shutil
 import subprocess
 from string import ascii_letters, digits
+import pathlib as _pl
 
 import pytrnsys.utils.utilsSpf as utils
 
@@ -25,15 +26,10 @@ logger = logging.getLogger("root")
 
 class LatexReport:
     def __init__(self, _outputPath, _name):
-
         self.outputPath = _outputPath
-        self.fileName = _name + "-report"
 
-
-        self.fileNameTex = "%s.tex" % self.fileName
-
-
-        self.fileNameTexWithPath = "%s\\%s" % (self.outputPath, self.fileNameTex)
+        fileName = _name + "-report"
+        self.resetTexName(fileName)
 
         self.lines = ""
         self.nameAuthor = utils.getNameFromUserName()
@@ -49,15 +45,30 @@ class LatexReport:
 
         self.pathReport = os.path.join(os.path.dirname(__file__), "latex_doc")
 
-        if "TEXINPUTS" in os.environ:
-            texinputs = os.environ["TEXINPUTS"]
-            if self.pathReport not in texinputs:
-                os.environ["TEXINPUTS"] += os.pathsep + self.pathReport
-        else:
-            os.environ["TEXINPUTS"] = self.pathReport
+        texInputs = self._getTexInputs()
+        os.environ["TEXINPUTS"] = texInputs
 
         self.cleanMode = False
         self.plotsAdded = []
+
+    def _getTexInputs(self):
+        newPaths = self._getTexInputsPaths()
+        return os.pathsep.join(newPaths)
+
+    def _getTexInputsPaths(self):
+        # A lagging empty ("") path will be filled in by tex with the default paths
+        if "TEXINPUTS" not in os.environ:
+            return [".", self.pathReport, ""]
+
+        previousPaths = os.environ["TEXINPUTS"].split(os.pathsep)
+        if self.pathReport in previousPaths:
+            return previousPaths
+
+        first, *rest = previousPaths
+        if first == ".":
+            return [".", self.pathReport, *rest]
+
+        return [self.pathReport, first, *rest]
 
     def getLatexNamesDict(self, file="latexNames.json"):
         if file == "latexNames.json":
@@ -84,10 +95,9 @@ class LatexReport:
         return None
 
     def resetTexName(self, name):
-
         self.fileName = name
-        self.fileNameTex = "%s.tex" % self.fileName
-        self.fileNameTexWithPath = "%s\\%s" % (self.outputPath, self.fileNameTex)
+        self.fileNameTex = f"{self.fileName}.tex"
+        self.fileNameTexWithPath = str(_pl.Path(self.outputPath) / self.fileNameTex)
 
     def setCleanMode(self, _mode):
         self.cleanMode = _mode
@@ -130,7 +140,6 @@ class LatexReport:
     ):
         'function to execute latex file, the function can use either "pdflatex" or "texify" to create pdf.'
 
-
         logFile = "%s\%s.log" % (self.outputPath, self.fileName)
         logFileEnd = logFile
 
@@ -153,21 +162,23 @@ class LatexReport:
 
         #        fileNameTexWithPath = '"%s\\%s"'%(self.outputPath,self.fileNameTex)
         if LatexPackage == "texify":
-            cmd = (
-                '%s --pdf  --tex-option=-synctex=1 --tex-option=-aux-directory="%s" --clean --tex-option=-output-directory="%s" --silent "%s"'
-                % (latexExe, self.outputPath, self.outputPath, self.fileNameTexWithPath)
-            )
+            cmd = [
+                latexExe,
+                "--pdf",
+                "--tex-option=-synctex=1",
+                f"--tex-option=-aux-directory={self.outputPath}",
+                "--clean",
+                f"--tex-option=-output-directory={self.outputPath}",
+                "--silent",
+                self.fileNameTexWithPath]
         elif LatexPackage == "pdflatex":
-            #            cmd = "pdflatex --silent --output-directory=\"%s\" %s.tex" %(self.outputPath, self.fileName)
-            cmd = 'pdflatex --silent --output-directory="%s" %s' % (self.outputPath, self.fileNameTex)
+            cmd = ["pdflatex", "--silent", self.fileNameTex]
         else:
             raise ValueError('The specified LatexPackage "%s" is not implemented yet or does not exist.' % LatexPackage)
 
-        myCmd = '"%s"' % cmd  # for blank spaces in paths
+        logger.debug("About to run '%s' (cwd = %s)", " ".join(cmd), os.getcwd())
 
-        logger.debug("About to run '%s' (cwd = %s)", myCmd, os.getcwd())
-
-        subprocessOutput = subprocess.run(cmd, capture_output=True)
+        subprocessOutput = subprocess.run(cmd, capture_output=True, cwd=self.outputPath)
         errorMessage = subprocessOutput.stderr.decode("utf-8")
         outputMessage = subprocessOutput.stdout.decode("utf-8")
         if errorMessage != "":
@@ -175,7 +186,7 @@ class LatexReport:
         logger.debug(outputMessage)
 
         if runTwice:  # necessary to generate table of contents
-            os.system(myCmd)
+            subprocess.run(cmd, cwd=self.outputPath)
 
         if moveToTrnsysLogFile == True and removeAuxFiles:
             os.remove(logFileEnd)
@@ -199,11 +210,11 @@ class LatexReport:
             except:
                 logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
 
-        if(True):
-            if os.path.isfile(self.outputPath + "\\" + self.fileName + ".pdf"):
-                logger.info("Successfully created %s.pdf" % self.fileName)
-            else:
-                raise ValueError("PDF was not generated, or not saved in the right directory")
+        pdfFilePath = _pl.Path(self.outputPath) / f"{self.fileName}.pdf"
+        if pdfFilePath.is_file():
+            logger.info("Successfully created %s.pdf" % self.fileName)
+        else:
+            raise ValueError("PDF was not generated, or not saved in the right directory")
 
         if self.cleanMode:
             logger.info("Eraising plots because cleanMode is True")
@@ -283,7 +294,7 @@ class LatexReport:
         self.lines = self.lines + line
         line = "\\begin{center}\n"
         self.lines = self.lines + line
-        line = "\\includegraphics[width=1\\textwidth]{%s/%s}\n" % (utils.filterPath(self.outputPath), namePdf)
+        line = "\\includegraphics[width=1\\textwidth]{%s}\n" % namePdf
         self.lines = self.lines + line
         line = "\\caption{%s}\n" % caption
         self.lines = self.lines + line
@@ -317,8 +328,8 @@ class LatexReport:
         self.lines = self.lines + line
         line = "\\begin{center}\n"
         self.lines = self.lines + line
-        if overWritePath == False:
-            line = "\\includegraphics[width=1\\textwidth]{%s/%s}\n" % (utils.filterPath(self.outputPath), namePdf)
+        if not overWritePath:
+            line = "\\includegraphics[width=1\\textwidth]{%s}\n" % namePdf
             self.lines = self.lines + line
         else:
             line = "\\includegraphics[width=1\\textwidth]{%s}\n" % (utils.filterPath(overWritePath))

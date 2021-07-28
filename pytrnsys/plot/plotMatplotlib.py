@@ -1349,7 +1349,7 @@ class PlotMatplotlib:
 
         return namePdf
 
-    def plotHeatingLimitFit(self, dailyTemperature, heatingPower, fileName, timeStep, title="", yLabel=""):
+    def plotHeatingLimitFit(self, dailyTemperature, heatingPower, fileName, timeStep, title="", yLabel="",doPlot=True):
         """
         Generate a plot of heating power values in dependence of average daily temperature. If timeStep == 'daily' a
         linear fit over these data will be done to obtain values for H and HG (heating limit). Only heating power values
@@ -1486,7 +1486,8 @@ class PlotMatplotlib:
 
                 logger.debug("PlotMonthlyBalance name:%s" % nameWithPath)
 
-                plt.savefig(nameWithPath)  # , bbox_extra_artists=(lgd,), bbox_inches='tight')
+                if doPlot:
+                    plt.savefig(nameWithPath)  # , bbox_extra_artists=(lgd,), bbox_inches='tight')
 
                 plt.close()
 

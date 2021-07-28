@@ -17,8 +17,8 @@
   "Vol_Tes2": 1.0,
   "energyCost": {
     "mean": 0.26347167052081305,
-    "toLowerBound": -0.03440319143080328,
-    "toUpperBound": 0.050209784979997285
+    "toLowerBound": -0.006560942231822242,
+    "toUpperBound": 0.016092877172394215
   },
   "investment": {
     "mean": 134767.4,
