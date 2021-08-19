@@ -433,7 +433,7 @@ BoHS shadingConTemp f_win  Tamb24above18  VfrWindowWeber VfrWindowHallFloor VfrW
 ****
 LABELS  3     
 Temperatures     
-Control     
+Boolean     
 Building
 
 

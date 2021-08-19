@@ -171,9 +171,7 @@
   "yearlyCosts": [
   ],
   "parameters": {
-    "rate": {
-      "mean": 0.03
-    },
+    "rate": 0.03,
     "analysisPeriod": 30,
     "qDemandVariable": {
       "name": "yearQDemand",
@@ -189,9 +187,7 @@
     "costElecKWh": {
       "mean": 0.2
     },
-    "increaseElecCost": {
-      "mean": 0
-    },
+    "increaseElecCost": 0,
     "maintenanceRate": {
       "mean": 0.01
     },
@@ -199,8 +195,9 @@
       "mean": 0
     },
     "lifetimeResVal": 30,
-    "cleanModeLatex": false
+    "cleanModeLatex": false,
+    "reportAuthor": "Test Author",
+    "reportEmail": "test.author@test.com"
   }
 }
-		
-	
+

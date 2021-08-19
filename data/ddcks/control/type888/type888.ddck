@@ -1,5 +1,5 @@
 *******************************
-**BEGIN Control-868-minimal.ddck 
+**BEGIN Control-888.ddck 
 *******************************
     
 *****************************************
@@ -29,9 +29,19 @@
 EQUATIONS 1
 elSysOut_CtrlDemand  = PelContr_kW 
 
-***********************************
+*******************************************
 ** Dependencies with other ddck
-***********************************
+** These need to be defined by another ddck
+*******************************************
+
+EQUATIONS 1
+TretSHtype888 = THpCondIn !For compatibility this must be defined in the control !!!
+
+**TTesDhwAuxOn    ! 2: TwwStUp: upper Store temperature measurement for Warm water
+**TTesDhwAuxOff    ! 3: TwwStLo: lower store temperature measurement for Warm water
+**tDhwSet
+**TsensorTesSh    ! 6: TrhStUp:upper temperature measured for room heating (on)
+**TretSHtype888    ! 7 : THpsCondIn    11: TrhStLo: lower temperature measured for room heating (off)
 
 ***********************************
 ** outputs to other ddck
@@ -127,7 +137,7 @@ TTesDhwAuxOff    ! 3: TwwStLo: lower store temperature measurement for Warm wate
 TwwStAuxON  ! 4: TwwON: temperature of store (upper) below which auxiliary is on for WW-Mode
 TwwStauxOff ! 5: TwwOFF: temperature of store (lower) above which auxiliary is off for WW-Mode
 TsensorTesSh    ! 6: TrhStUp:upper temperature measured for room heating (on)
-THpCondIn    ! 7 : THpsCondIn    11: TrhStLo: lower temperature measured for room heating (off)
+TretSHtype888    ! 7 : THpsCondIn    11: TrhStLo: lower temperature measured for room heating (off)
 dt_rh_on    ! 8: TrhON: temperature (difference) for room heating on
 dt_rh_off   ! 9: TrhOFF: temperature (difference) for room heating off
 tRoomSet    ! 10: TroomSet: room set-point for heating curve calculation
@@ -151,6 +161,9 @@ Tamb     ! T_ambient
 EQUATIONS 1     
 Tamb24 = [4,1]      ! 24h average of Tamb, �C
 
+CONSTANTS 1
+addPrinterType888 = 1  ! -1: removing , 1 : add
+
 UNIT 89 TYPE 65     ! Online Plotter Control (Element Hp)
 PARAMETERS 12     
 10    ! 1 Nb. of left-axis variables
@@ -161,7 +174,7 @@ PARAMETERS 12
 2   ! 6 Right axis maximum
 nPlotsPerSim ! 7 Number of plots per simulation
 12    ! 8 X-axis gridpoints
--1     ! 9 Shut off Online w/o removing
+addPrinterType888     ! 9 Shut off Online w/o removing
 -1    ! 10 Logical unit for output file
 0     ! 11 Output file units
 0     ! 12 Output file delimiter

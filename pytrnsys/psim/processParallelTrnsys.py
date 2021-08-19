@@ -163,6 +163,7 @@ class ProcessParallelTrnsys:
         self.inputs["outputLevel"] = "INFO"
         self.inputs["createLatexPdf"] = True
         self.inputs["calculateCost"] = False
+        self.inputs["costPdf"] = False
         self.inputs["dailyBalance"] = False
         self.inputs["hourlyBalance"] = False
         # self.inputs['daysSelected'] = "2019,2,30" "2019,4,30" "2019,8,30"
@@ -1752,7 +1753,7 @@ class ProcessParallelTrnsys:
     def calcCost(self, fileNamesToRead=None):
         resultsDirPath = _pl.Path(self.inputs["pathBase"])
         configFilePath = _pl.Path(self.inputs["cost"])
-        shallWriteReport = False
+        shallWriteReport = self.inputs["costPdf"]
         processType = _cc.OTHER if not fileNamesToRead else _cc.CasesDefined(fileNamesToRead)
         _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, shallWriteReport, processType)
 
