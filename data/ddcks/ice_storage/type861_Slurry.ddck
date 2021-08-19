@@ -89,7 +89,7 @@ hFusion =332500.00    ! [J/kg]
 CONSTANTS 5
 VIceS = 2     ! Volume filed with water
 iceStorageGeometry = 0 !0  box, 1 cilinder
-Tankheight = 2.5     ! Tank height    [m]
+Tankheight = 4     ! Tank height    [m]
 Tankwidth = (VIceS/Tankheight)^(0.5)     ! Tank width    [m]
 Lstore = ViceS/Tankheight/TankWidth 
     
