@@ -335,7 +335,8 @@ def checkEquationsAndConstants(lines, nameDck):
 
         splitBlank = lines[i].split()
 
-        if splitBlank[0].lower() == "EQUATIONS".lower() or splitBlank[0].lower() == "CONSTANTS".lower():
+        keyWord = splitBlank[0].upper()
+        if keyWord == "EQUATIONS" or keyWord == "CONSTANTS":
 
             lineError = i + 1
             try:
@@ -367,16 +368,8 @@ def checkEquationsAndConstants(lines, nameDck):
                 outfile.close()
 
                 raise ValueError(
-                    "FATAL Error in : ",
-                    splitBlank[0],
-                    " at line ",
-                    lineError,
-                    " of parsed file =",
-                    parsedFile,
-                    ". Number set is ",
-                    numberOfValues,
-                    " and there are ",
-                    countedValues,
+                    f"FATAL Error at {parsedFile}:{lineError}."
+                    f" Number of expected {keyWord} was {numberOfValues} but got {countedValues}."
                 )
 
 
