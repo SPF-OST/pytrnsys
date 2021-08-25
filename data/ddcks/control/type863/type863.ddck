@@ -246,7 +246,7 @@ timeDefrostCol
 tDefrostWithWs
 allowMultipleProg
 DeIcePossible
-INPUTS 22  ! All the T inputs are used from previous time step in the Control itself, so dont need to use Recall values   
+INPUTS 23  ! All the T inputs are used from previous time step in the Control itself, so dont need to use Recall values   
 TCollOut     ! Temp 1 Tcout
 TPiColIn     ! Temp 2 TPiColIn
 TProAuxDhwTes   ! 3 Used for Auxiliar in DHW height
@@ -266,6 +266,7 @@ BlockCs    !       p 4  / ProCs  col. charging pcmtes if T(1) is hot enough for 
 BlockPar    !       p 5  / Parallel mode : solar to Tes and heat pump with Pcm at same   
 BlockDfCol    !       p 6  / Not used (to be added if necessary)
 BlockDfWs   !       p 7  / Not used (to be added if necessary)
+BlockDoubleCsHp
 *********************SPECIAL BLOKCS*********************
 priorProgramm
 HpIsOn
@@ -274,7 +275,7 @@ timeDfWs
 *** INITIAL INPUT VALUES     
 0 0 0 0 0 0 0 0 0 0       
 0 0 0 0 0 0 0 0 0 0
-0 0           
+0 0 0          
 
 
 **isWinterMonth=OR(GE(actualMonth,nBeginCsPriority),LE(actualMonth,nEndCsPriority))     

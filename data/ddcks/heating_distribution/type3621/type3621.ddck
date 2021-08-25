@@ -217,8 +217,7 @@ BoHS  PIDRadBui MfrBuiRd   PRdIn_KW  ImbRad
 LABELS  3     
 Temperatures     
 Power     
-Building
-
+HeatDist
 *******************************
 **END Building.dck
 *******************************

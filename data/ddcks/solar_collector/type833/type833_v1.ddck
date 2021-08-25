@@ -341,11 +341,11 @@ unitPrintSol     ! 1: Logical unit number, -
 -1     ! 4: Printing & integrating interval, h. -1 for monthly integration
 1     ! 5: Number of inputs to avoid integration, -
 1     ! 6: Output number to avoid integration
-INPUTS 17
-Time  Pcoll_kW  BoCst P_IRRAD_kW    PColl_kWm2  PCollOff_kW     PCollCondens_kW IT_Coll_kWm2
+INPUTS 20
+Time  QPcmFromCol_kW QColToPcm_kW QColToTes_kW Pcoll_kW  BoCst P_IRRAD_kW    PColl_kWm2  PCollOff_kW     PCollCondens_kW IT_Coll_kWm2
 PCollHeatGain_kW  PRad_kW  PGainAmbient_kW  PCollNeg_kW  PCollPos_kW  PCollAmbPos_kW PCollAmbNeg_kW  Pcoll_kW  IT_Coll_kW   
 *****   
-Time  Pcoll_kW  BoCst P_IRRAD_kW    PColl_kWm2 PCollOff_kW     PCollCondens_kW IT_Coll_kWm2
+Time QPcmFromCol_kW QColToPcm_kW QColToTes_kW Pcoll_kW  BoCst P_IRRAD_kW    PColl_kWm2 PCollOff_kW     PCollCondens_kW IT_Coll_kWm2
 PCollHeatGain_kW  PRad_kW  PGainAmbient_kW  PCollNeg_kW  PCollPos_kW  PCollAmbPos_kW PCollAmbNeg_kW  Pcoll_kW  IT_Coll_kW  
 
 

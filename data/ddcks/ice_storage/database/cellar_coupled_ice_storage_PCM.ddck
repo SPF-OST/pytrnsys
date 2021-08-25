@@ -20,7 +20,7 @@
 	
  			
 
-CONSTANTS 7     ! do not remove this line, it marks the start/end of a constants or equations block
+CONSTANTS 8     ! do not remove this line, it marks the start/end of a constants or equations block
 qEGroundKW =0      
 qWGroundKW =0      
 qNGroundKW =0     
@@ -28,6 +28,7 @@ qSGroundKW =0
 qVGroundKW =0     
 qAcumGroundKW =0     
 qImbGroundKW =0 
+TRoomStorePCM = 20
          
 EQUATIONS 12
 TGBot = TRoomStorePCM     

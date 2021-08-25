@@ -53,20 +53,20 @@ Htr_op = 306.1*scaleBuilding ! Igor W/K, UA value of walls
 PGainPer = 1478*scaleBuilding	! Maximale Wärmeeintrag durch Personen [W] Mattia:1440
 PGainEquip = 7852*scaleBuilding	! Maximaler Wärmeeintrag durch Geräte [W] Mattia:7649.2
 PGainLight = 0!  7649.2*0.75	Maximaler Wärmeeintrag durch Beleuchtung [W]
-ScaleVfrVent = 0.6542
-VfrInfRealAHU=0* AreaBui / 3600			! Infiltration  [m3/s](from m3/hm2) for real user behavior and AHU 
-VfrInfRealnoAHU=0.15 * AreaBui / 3600	! Infiltration  [m3/s](from m3/hm2) for real user behavior and no AHU
-VfrInfIdealAHU=0.165* AreaBui / 3600	! Infiltration  [m3/s](from m3/hm2) for ideal user behavior and AHU
-VfrInfIdealnoAHU=0.7*0.94* AreaBui / 3600	! Infiltration  [m3/s](from m3/hm2)for ideal user behavior and no AHU
+ScaleVfrVent = 0.6542*scaleBuilding
+VfrInfRealAHU=0* AreaBui*scaleBuilding / 3600			! Infiltration  [m3/s](from m3/hm2) for real user behavior and AHU 
+VfrInfRealnoAHU=0.15 * AreaBui*scaleBuilding / 3600	! Infiltration  [m3/s](from m3/hm2) for real user behavior and no AHU
+VfrInfIdealAHU=0.165* AreaBui*scaleBuilding / 3600	! Infiltration  [m3/s](from m3/hm2) for ideal user behavior and AHU
+VfrInfIdealnoAHU=0.7*0.94* AreaBui*scaleBuilding / 3600	! Infiltration  [m3/s](from m3/hm2)for ideal user behavior and no AHU
 
-VfrVent = 0.25	! Ventilation  [m3/s]
+VfrVent = 0.25*scaleBuilding	! Ventilation  [m3/s]
 **VfrVent = 0.33*ScaleVfrVent*scaleBuilding	! Ventilation  [m3/s] Fit Mattia
 
 CONSTANTS 4
 alphaWindow = 7.5
-heightWindow = 1.43
-widthWindow = 0.88
-numberWindows = 33
+heightWindow = 1.43*scaleBuilding
+widthWindow = 0.88*scaleBuilding
+numberWindows = 33*scaleBuilding
 
 
 CONSTANTS 6

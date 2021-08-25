@@ -25,7 +25,7 @@ class ResultsWriter:
     def __init__(self):
         self.method = "VDI"
         self.cleanModeLatex = None
-        self.doLaTex = False
+        # self.doLaTex = True
 
     def writeReportAndResults(
         self,
