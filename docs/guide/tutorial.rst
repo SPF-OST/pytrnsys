@@ -340,14 +340,3 @@ After you created your new ddck file you can add your custom ddck repository to 
 run config file and add replace the the domestic hot water line::
 
     CUSTOMREPOSITORY$ demands\dhw\dhw_your_file
-
-Get access to the pytrnsys GUI
-------------------------------
-
-Pytrnsys is still under development by the SPF Institute for Solar Technology. Therefore, up to this point
-the pytrnsys GUI is not available for the public. If you would like to use pytrnsys
-to create you own new system hydraulics please contact dani.carbonell@spf.ch.
-
-
-
-

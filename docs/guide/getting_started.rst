@@ -6,7 +6,15 @@ Getting Started
 Installation
 ------------
 
-For the installation of the pytrnsys python package, please follow the installation guide on the respective `PyPi page <https://pypi.org/project/pytrnsys/>`_.
+For the installation of the pytrnsys python package, please follow the installation guide on
+`GitHub <https://github.com/SPF-OST/pytrnsys/>`_.
+
+Graphical user interface
+------------------------
+
+pytrnsys can be combined with a graphical user interface (GUI). This GUI is a separate package that includes pytrnsys
+as a requirement. For further information on the GUI and on how to install it, please visit its
+`GitHub page <https://github.com/SPF-OST/pytrnsys_gui/>`_.
 
 Prerequesites
 -------------
