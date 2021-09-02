@@ -1,0 +1,181 @@
+*******************************
+**BEGIN Control-868-minimal.ddck 
+*******************************
+    
+*****************************************
+** Contact person : Dani Carbonell    
+** Creation date  : 23.04.2018
+** Last changes   : 04.2020 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Control of heating system. 
+** Heating curve and auxiliary on/off for DHW ans SH
+***************************************************************************
+
+***********************************
+** Connectors with hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 1
+elSysOut_CtrlDemand  = PelContr_kW 
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS 7
+BoHS = [2,1]!*NOT(isSummer)     ! Boolean for heating season on, 0/1
+isSummer = GE(MOD(time,8760),4344)*LE(MOD(time,8760),5832)! 
+HpForDHWIsNeeded = [2,2]
+HpForSHIsNeeded  = [2,3]
+TRdSet = Max([2,4],Troom) !CHANGED DC      ! space heating flow setpoint,  �C
+tScSet  = [2,5]
+TSetSh  = [2,7]
+
+*************************************************
+**********To be modified at python level ********
+*************************************************
+
+
+CONSTANTS 12
+tavgTamb = 1  ! time for averaging of outdoor temperature for the evaluation of heating season or no heating season, h
+offsetDhw = 6  ! Usually we had it at 7.5 . This means the heat pump would need to reach TdhwSet+7.5 !!
+onsetDhw  = 2 !
+TwwStAuxOFF = tDhwSet+offsetDhw  ! Stop heating DHW if TStoreUp > TWWStAuxOFF
+TwwStAuxON  = tDhwSet+onsetDhw   ! Start heating DHW if TStoreDhwBot < TwwStAuxON
+dt_rh_on = 0     ! start heating the store if the sh-store temp is below the flow temperature of the heating season + this value, K
+dt_rh_off = 3     ! end heating the store if the sh-store temp is below the setpoint of the heating curve + this value, K
+PelContr_kW = 0.005     ! Electricity consumption of additional controller to burner controller [kW]
+nightSetBack = NIX     
+TScSetWW = 0.
+TScSetRH = 0.	 
+dTdbHS = 1 ! heating season stops when outdoor temp. rises above TstartHS + dTdbHS
+**BoSH=LT(TsensorTesSh,45)
+**BoWW=GT(TwwStAuxON+5,TsensorTesDhw)     
+
+CONSTANTS 2   ! Building
+TambHS = 14     ! temperature below which heating season is activated, �C
+m_Rd   = 1.0    ! heating curve exponent 1:linear 1.4 getting flatter at low T
+
+CONSTANTS 6
+
+MoWW = 1 !0 = room heating and warm water may be done at the same time
+**		 !1 = Warm water priority disables room heating mode
+**		 
+MoRH = 3 !1 = ON if Heating Season is on and not blocked by WWMode; 
+**		 !2 = Additional criterion of store temperature based on absolute values;
+**		 !3 = additional criterion of store temperature based on values relative to the flow temperature setpoint of the heating system
+		 
+MoHCcalc=3  !mode for heat curve calculation: 
+**			!1 = very simple
+**			!2 = simplified
+**			!3 = detailed   
+			
+MoScOn = 2  ! 1 = Heat at least to minimum setpoint whenever Heating season is on OR WW-preparation mode is on; 
+**			! 2 = Auxiliary enabled only when WW-mode is on or RH-mode is on
+
+MoScTww = 1 ! Mode of temperature setpoint for warm water heating: 
+**			! 1 = absolute; 
+**			! 2 = relative to TwwOFF; 
+**			! 3 = relative to TwwON
+MoScTrh = 1 ! Mode of temperature setpoint for room heating:
+**			! 1 = absolute; 
+**			! 2 = relative to flow temperature setpoint of the heating system; 
+**			! 3 = relative ot TrhOFF; 
+**			! 4 = relative to TrhON
+
+*********************************************************************
+******** Controller Heating System and Heat Pump
+*********************************************************************
+
+UNIT 2 TYPE 888  ! version v0 
+PARAMETERS 16     
+TambHS     ! 1 TstartHS: temperature below which heating season starts
+dTdbHS       ! 2 dTdbHS: heating season stops when outdoor temp. rises above TstartHS + dTdbHS
+MoWW     ! 6 MoWW: 
+MoRH     ! 7 
+MoHCcalc     ! 11 MoHCcalc: 
+m_Rd     ! 12 mrad: radiator exponent
+0     ! 13 slopeHC: slope of heating curve: only active for MoHCcalc = 1 or 2
+TambD     ! 14 TambHCref: reference (design) ambient temperature. At TambD, e.g -10 the flowT is at TBuiFlNom 35
+TBuiFlNom     ! 15 TflowRef: reference (design) flow temperature
+TBuiRtNom     ! 16 TretRef: reference (design) return temperature
+0     ! 21 TScMin: minimum setpoint temperature for heat source
+90     ! 22 TScMaxWW: maximum setpoint temperature for heat source in WW mode
+90     ! 23 TScMaxRH: maximum setpoint for heat source temperature in space heating mode
+MoScOn     ! 24 MoScOn:  1 = heat at least to minimum setpoint whenever heat-season is on or WW-Mode is on; 2 = heat at least to minimum setpoint only when RH-Mode is on or WW-Mode is on; 3 = always heat to minimum setpoint at least
+MoScTww     ! 25 MoScTww: 
+MoScTrh     ! 26 MoScTrh: 
+INPUTS 14     
+Tamb24      ! 1: Tamb ->TambHS is used for determination of heating season
+TTesDhwAuxOn    ! 2: TwwStUp: upper Store temperature measurement for Warm water
+TTesDhwAuxOff    ! 3: TwwStLo: lower store temperature measurement for Warm water
+TwwStAuxON  ! 4: TwwON: temperature of store (upper) below which auxiliary is on for WW-Mode
+TwwStauxOff ! 5: TwwOFF: temperature of store (lower) above which auxiliary is off for WW-Mode
+TsensorTesSh    ! 6: TrhStUp:upper temperature measured for room heating (on)
+THpCondIn    ! 7 : THpsCondIn    11: TrhStLo: lower temperature measured for room heating (off)
+dt_rh_on    ! 8: TrhON: temperature (difference) for room heating on
+dt_rh_off   ! 9: TrhOFF: temperature (difference) for room heating off
+tRoomSet    ! 10: TroomSet: room set-point for heating curve calculation
+Tamb24      ! 11: Tamb: is used for flow temperature calculation according to heating curve
+nightSetBack ! 12: dTnight: night-time room set-point reduction
+TScSetWW     ! 13: TScSetWW: Set-point temperature for the heat source in warm water mode. Absolute value in �C if temperature setpoint mode for warm water MoTww = 1, relative value in K if MoTww = 2 or 3
+TScSetRH     ! 14: TScSetRH:Set-point temperature for the heat source in room heating mode. Absolute value in �C if temperature setpoint mode for room heating MoTrh = 1, relative value if MoTrh = 2, 3 or 4
+*** INITIAL INPUT VALUES     
+0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+			
+UNIT 4 Type 816     ! Transient Value Averaging for ambient temperature (heating system control)
+PARAMETERS 2     
+1     !  1: number of values for input
+tavgTamb     !  2: time of averaging (dt in hours)
+     
+INPUTS 1     
+Tamb     ! T_ambient
+*** INITIAL INPUT VALUES     
+21     
+EQUATIONS 1     
+Tamb24 = [4,1]      ! 24h average of Tamb, �C
+
+UNIT 89 TYPE 65     ! Online Plotter Control (Element Hp)
+PARAMETERS 12     
+10    ! 1 Nb. of left-axis variables
+10    ! 2 Nb. of right-axis variables
+-10   ! 3 Left axis minimum
+70    ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+2   ! 6 Right axis maximum
+nPlotsPerSim ! 7 Number of plots per simulation
+12    ! 8 X-axis gridpoints
+-1     ! 9 Shut off Online w/o removing
+-1    ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 20     
+TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn Nix Nix  Nix Nix
+HpForDHWIsNeeded HpForSHIsNeeded BoHs Nix Nix Nix  Nix Nix Nix Nix
+**
+TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn Nix Nix  Nix Nix
+HpForDHWIsNeeded HpForSHIsNeeded BoHs Nix Nix Nix  Nix Nix Nix Nix
+LABELS  3     
+Temperatures     
+Boolean     
+Control    
+
+*******************************
+**END Control-Cooling-888.ddck
+*******************************
