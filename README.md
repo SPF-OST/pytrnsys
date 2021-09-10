@@ -56,7 +56,7 @@ directory is called `foo` then `pytrnsys` will be installed to `foo\pytrnsys`.
          
 1. Install `pytrnsys` and its requirements:
     ```commandline
-    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys/master/requirements/releases/v0.5a4/requirements.txt
+    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys/master/requirements/releases/v0.5a8/requirements.txt
     ```
 You can now close the command prompt opened in the first step.
 
