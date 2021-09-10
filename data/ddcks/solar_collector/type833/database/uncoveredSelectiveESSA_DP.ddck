@@ -1,0 +1,61 @@
+******************************
+**BEGIN uncoveredSelectveESSA.dck
+*******************************
+    
+*****************************************
+** Solar Thermal Data for ESSA uncovered selective collector.
+** Version : v0.0
+** Last Changes: Dani Carbonell        
+** Date: 30.09.2016    
+******************************************
+
+
+CONSTANTS 12 
+N_Coll = 1     ! Collector Nummer
+IAMdfu = 0.99     ! IAM of diffuse irradiation
+Eta0= 0.954    ! Eta0 (a0) of collector (zero heat loss efficiency)
+a1 = 12.1    ! linear heat loss coefficient of collector [W/m2K] changed according to PuD-EWJR report ungedämmte Rückseite
+a2 = 0.     ! quadratic heat loss coefficient of collector [W/m2K2]
+Par_b0 = 0.018     ! b0 for first order Incident angle modifier term
+PAR_B1 = 0
+Omode = 1     ! Optical mode for Type 832 calculations
+CeffColl = 14000   ! 15000 heat capacitance of the collector [J/m2K] changed according to PuD-EWJR report ungedämmte Rückseite
+CeffColl_kJ =  15.00  ! heat capacitance of the collector [kJ/m2K]
+cw_Eta0 = 0.01    ! wind speed dependency of Eta0 [-]
+cIr_1 = 0.116388
+
+CONSTANTS 12
+
+cw_a1 = 5     ! wind speed dependency of a1 [-] changed according to PuD-EWJR report ungedämmte Rückseite
+cw_Eta0_fc = cw_Eta0     ! u-value of the absorber or material between fluid and surface of the absorber to ambient boundary for condesation gain calculation according to Bertram [W/(m^2K)]
+cCondPerers =  0.5     !changed according to PuD-EWJR report ungedämmte Rückseite
+BoFrostGains = 1     
+eta0Wet = eta0      
+a1Wet =  a1     
+a2Wet = a2      
+tSelLoss = 2 !7     ! time during condensation that is needed to loose selectivity totally [h]
+CoHTransMode = -1     ! -1 = interneal calc
+MoCond = 1     
+MoCond_fc = 1     
+cIr_2 = 0.730764
+
+CONSTANTS 5
+
+ColHeightBrutto = 0.865     ! Bruttoheight collector [m]
+ColWithBrutto = 2.37     ! Bruttowith collector [m]
+ColHeightAper = 0.845     ! Aperturheight collecltor [m]
+ColWithAper = 2.35     ! Aperturwith collector [m]
+ColAperArea = ColHeightAper*ColWithAper
+
+CONSTANTS 4    
+alphaColl = 0.95     ! Absorption
+epsilonColl = 0.15     ! Emission
+UvalueAbs_Fluid = 280     ! u-value of the absorber or material between fluid and surface of the absorber to ambient boundary for condesation gain calculation according to Bertram [W/(m^2K)]
+vwindfactor = 0.5     ! Task 44 anpassung der Windgeschwindikeit auf den Kollektor
+
+
+
+
+*******************************
+**END Collector.dck
+*******************************
