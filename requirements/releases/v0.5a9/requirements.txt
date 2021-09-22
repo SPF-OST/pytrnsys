@@ -38,7 +38,7 @@ pandas==1.2.3
     # via
     #   pytrnsys
     #   seaborn
-pillow==8.1.1
+pillow==8.3.2
     # via
     #   bokeh
     #   matplotlib
@@ -55,7 +55,7 @@ python-dateutil==2.8.1
     #   matplotlib
     #   pandas
 pytrnsys==0.5a9
-    # via -r requirements\releases\v0.5a9\requirements.in
+    # via -r requirements.in
 pytz==2021.1
     # via pandas
 pyyaml==5.4.1
