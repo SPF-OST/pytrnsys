@@ -61,8 +61,8 @@ def setup(app):
 # -- Project information -----------------------------------------------------
 
 project = "pytrnsys"
-copyright = "2019, Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, Maike Schubert, Martin Neugebauer"
-author = "Dani Carbonell, Mattia Battaglia, Jeremias Schmidli \n Maike Schubert, Martin Neugebauer"
+copyright = "2021, Institute for Solar Technology (SPF), OST Rapperswil"
+author = "Dani Carbonell, Martin Neugebauer, Damian Birchler, Jeremias Schmidli, Maike Schubert,"
 
 
 # -- General configuration ---------------------------------------------------
