@@ -200,21 +200,21 @@ Time  SOCBat_kWh SOCBat   PvToBat_kW  PelFromBat_kW  PelBatWRLoss_kW  PelBatLoss
 UNIT 155 TYPE 65     ! Online Plotter PV
 PARAMETERS 12     
 5     ! 1 Nb. of left-axis variables
-3     ! 2 Nb. of right-axis variables
+5     ! 2 Nb. of right-axis variables
 0     ! 3 Left axis minimum
 1000     ! 4 Left axis maximum
 0    ! 5 Right axis minimum
 1000     ! 6 Right axis maximum
 nPlotsPerSim     ! 7 Number of plots per simulation
 12     ! 8 X-axis gridpoints
-1     ! 9 Shut off Online w/o removing
+-1     ! 9 Shut off Online w/o removing
 -1     ! 10 Logical unit for output file
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
-INPUTS 8
-elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  nix  nix  SOCBat_kWh  BoBatFull  SOCBat  
+INPUTS 10
+elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  nix  nix  SOCBat_kWh  BoBatFull  SOCBat  nix   nix
 **     
-elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  nix  nix  SOCBat_kWh  BoBatFull  SOCBat 
+elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  nix  nix  SOCBat_kWh  BoBatFull  SOCBat   nix   nix
 LABELS  3    
 Pel
 SoC

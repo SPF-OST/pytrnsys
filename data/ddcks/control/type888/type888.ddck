@@ -179,11 +179,11 @@ addPrinterType888     ! 9 Shut off Online w/o removing
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 20     
-TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn Nix Nix  Nix Nix
-HpForDHWIsNeeded HpForSHIsNeeded BoHs Nix Nix Nix  Nix Nix Nix Nix
+TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn HpIsBlock BlockHp  Nix Nix
+HpForDHWIsNeeded HpForSHIsNeeded BoHS auxStoreDHWIsOn auxStoreSHIsOn  tScSet TSetSh TRdSet Nix Nix
 **
-TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn Nix Nix  Nix Nix
-HpForDHWIsNeeded HpForSHIsNeeded BoHs Nix Nix Nix  Nix Nix Nix Nix
+TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn HpIsBlock BlockHp  Nix Nix
+HpForDHWIsNeeded HpForSHIsNeeded BoHs auxStoreDHWIsOn auxStoreSHIsOn tScSet TSetSh TRdSet Nix Nix
 LABELS  3     
 Temperatures     
 Boolean     
