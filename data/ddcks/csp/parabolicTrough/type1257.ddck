@@ -1,0 +1,121 @@
+******************************************************************************************
+** BEGIN type1257.ddck
+******************************************************************************************
+ 
+******************************************************************************************
+** Contact person : M. Neugebauer  
+** Creation date  : 19.10.2021 
+** Last changes   : 
+******************************************************************************************
+
+******************************************************************************************
+** Description: 
+** parabolic trough field based on type1257 of High Temperature Solar (TESS)
+******************************************************************************************
+
+******************************************************************************************
+** inputs from hydraulic solver
+******************************************************************************************
+
+EQUATIONS 2
+TParaTroughIn = TPiParaTroughIn				! 1: Inlet fluid temperature, deg C
+MfrParaTroughIn = ABS(MfrPiParaTroughIn)	! 2: Inlet mass flow rate, kg/h
+
+******************************************************************************************
+** outputs to hydraulic solver
+******************************************************************************************
+
+EQUATIONS 1
+TParaTroughOut = [2,1]						! 1: Outlet fluid temperature, deg C 
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 1
+qSysIn_paraTrough = [2,7]					! 7: Collector outlet energy rate, kJ/h
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+
+EQUATIONS 2
+tAmbParaTrough = Tamb						! in 3: Ambient temperature, deg C
+radOnTiltedSurf = 0,0						! in 4: Beam radiation on the tilted surface, kJ/h.m^2
+
+*************************************************************************************************
+** outputs to other ddck
+*************************************************************************************************
+
+
+*************************************************************************************************
+** type1257
+*************************************************************************************************
+UNIT 2 TYPE 1257
+PARAMETERS 31
+paraWidth			! 1: Width of Collector Aperture, m
+paraCollL			! 2: Length of single collector, m
+inDiaParaAbs		! 3: Inner diameter of absorber tube, m
+paraCollF			! 4: Focal length for collector, m
+paraMirrAcc			! 5: Mirror accuracy
+paraMirrRef			! 6: Reflectivity of mirror
+paraEnvT			! 7: Envelope transmittance
+paraRecAbs			! 8: Absorptance of receiver coating
+paraInitT			! 9: Initial temperature, deg C
+nrParaSeries		! 10: Number in collectors in series
+nrParaNodes			! 11: Number of collector nodes
+nrParaRKSteps 		! 12: Number of Runge Kutta steps
+paraMassCalcMode	! 13: Mass calculation mode
+IAMCoeff_b0			! 14: IAM coefficient b0
+IAMCoeff_b1			! 15: IAM coefficient b1
+IAMCoeff_b2			! 16: IAM coefficient b2
+paraQLoss_a0		! 17: Heat loss coefficient a0 (kJ/h.m)
+paraQLoss_a1		! 18: Heat loss coefficient a1 (kJ/h.m.K)
+paraQLoss_a2		! 19: Heat loss coefficient a2 (kJ/h.m.K^2)
+paraQLoss_a3 		! 20: Heat loss coefficient a3 (kJ/h.m.K^3)
+paraQLoss_a4		! 21: Heat loss coefficient a4 (m)
+paraQLoss_a5 		! 22: Heat loss coefficient a5 (m/K^2)
+paraFluidDens_r0	! 23: Fluid density coefficient r0 (kg/m3)
+paraFluidDens_r1	! 24: Fluid density coefficient r1 (kg/m3.K)
+paraFluidDens_r2	! 25: Fluid density coefficient r2 (kg/m3.K^2)
+paraFluidEnt_h0		! 26: Fluid enthalpy coefficient h0 (kJ/kg)
+paraFluidEnt_h1		! 27: Fluid enthalpy coefficient h1 (kJ/kg.K)
+paraFluidEnt_h2 	! 28: Fluid enthalpy coefficient h2 (kJ/kg.K2)
+paraFluidIntE_u01	! 29: Fluid internal energy coefficient u0 (kJ/kg)
+paraFluidIntE_u1	! 30: Fluid internal energy coefficient u1 (kJ/kg.K)
+paraFluidIntE_u2	! 31: Fluid internal energy coefficient u2 (kJ/kg)
+INPUTS 10
+TParaTroughIn		! 1: Inlet fluid temperature, deg C
+MfrParaTroughIn		! 2: Inlet mass flow rate, kg/h
+tAmbParaTrough		! 3: Ambient temperature, deg C
+radOnTiltedSurf		! 4: Beam radiation on the tilted surface, kJ/h.m^2
+paraAoI				! 5: Incidence angle, deg
+paraTrackEff		! 6: Tracking efficiency factor
+paraMirrClean		! 7: Mirror cleanliness factor
+paraRecDust			! 8: Receiver glass dusting factor
+paraBellShade		! 9: Bellows shading factor
+paraMiscEff			! 10: Miscellaneous efficiency factor
+*** INITIAL INPUT VALUES
+293.0 0. 10.0 0.0 0. 0.99 0.95 0.98 0.97 0.96 
+
+*************************************************************************************************
+** remaining outputs
+*************************************************************************************************
+EQUATIONS 15
+MfrParaTroughOut = [2,2]	! 2: Outlet mass flow rate, kg/h
+paraAbsSolEn = [2,3]		! 3: Absorbed solar energy, kJ/h
+paraQLosses = [2,4] 		! 4: Collector thermal losses, kJ/h
+paraUseEnGain = [2,5] 		! 5: Collector useful energy gain, kJ/h
+paraEnInRate = [2,6] 		! 6: Collector inlet energy rate, kJ/h
+paraEnStoreRate = [2,8] 	! 8: Energy store rate, kJ/h
+paraEnBal = [2,9] 			! 9: Energy balance, %
+paraColl1T = [2,10]			! 10: Average temperature of collector 1, deg C
+paraColl2T = [2,11]			! 11: Average temperature of collector 2, deg C
+paraColl3T = [2,12]			! 12: Average temperature of collector 3, deg C
+paraColl4T = [2,13]			! 13: Average temperature of collector 4, deg C
+paraColl5T = [2,14]			! 14: Average temperature of collector 5, deg C
+paraColl6T = [2,15]			! 15: Average temperature of collector 6, deg C
+paraColl7T = [2,16]			! 16: Average temperature of collector 7, deg C
+paraColl8T = [2,17]			! 17: Average temperature of collector 8, deg C
