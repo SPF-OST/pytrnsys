@@ -16,7 +16,6 @@
 ******************************************************************************************
 ** inputs from hydraulic solver
 ******************************************************************************************
-
 EQUATIONS 2
 TParaTroughIn = TPiParaTroughIn				! 1: Inlet fluid temperature, deg C
 MfrParaTroughIn = ABS(MfrPiParaTroughIn)	! 2: Inlet mass flow rate, kg/h
@@ -24,7 +23,6 @@ MfrParaTroughIn = ABS(MfrPiParaTroughIn)	! 2: Inlet mass flow rate, kg/h
 ******************************************************************************************
 ** outputs to hydraulic solver
 ******************************************************************************************
-
 EQUATIONS 1
 TParaTroughOut = [2,1]						! 1: Outlet fluid temperature, deg C 
 
@@ -40,10 +38,9 @@ qSysIn_paraTrough = [2,7]					! 7: Collector outlet energy rate, kJ/h
 ** If only one dependency defined here. 
 ** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
 *************************************************************************************************
-
 EQUATIONS 2
-tAmbParaTrough = Tamb						! in 3: Ambient temperature, deg C
-radOnTiltedSurf = 0,0						! in 4: Beam radiation on the tilted surface, kJ/h.m^2
+tAmbParaTrough = tAmb						! in 3: Ambient temperature, deg C, from weather_data_base.ddck
+radOnTiltedSurf = IB_H						! in 4: Beam radiation on the tilted surface, kJ/h.m^2, from weather_data_base.ddck
 
 *************************************************************************************************
 ** outputs to other ddck
