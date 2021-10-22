@@ -31,7 +31,7 @@ TParaTroughOut = [2,1]						! 1: Outlet fluid temperature, deg C
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
 EQUATIONS 1
-qSysIn_paraTrough = [2,7]					! 7: Collector outlet energy rate, kJ/h
+qSysIn_paraTrough = [2,7]/3600				! 7: Collector outlet energy rate, kW
 
 *************************************************************************************************
 ** Dependencies with other types
@@ -80,7 +80,7 @@ paraFluidDens_r2	! 25: Fluid density coefficient r2 (kg/m3.K^2)
 paraFluidEnt_h0		! 26: Fluid enthalpy coefficient h0 (kJ/kg)
 paraFluidEnt_h1		! 27: Fluid enthalpy coefficient h1 (kJ/kg.K)
 paraFluidEnt_h2 	! 28: Fluid enthalpy coefficient h2 (kJ/kg.K2)
-paraFluidIntE_u01	! 29: Fluid internal energy coefficient u0 (kJ/kg)
+paraFluidIntE_u0	! 29: Fluid internal energy coefficient u0 (kJ/kg)
 paraFluidIntE_u1	! 30: Fluid internal energy coefficient u1 (kJ/kg.K)
 paraFluidIntE_u2	! 31: Fluid internal energy coefficient u2 (kJ/kg)
 INPUTS 10
@@ -102,8 +102,8 @@ paraMiscEff			! 10: Miscellaneous efficiency factor
 *************************************************************************************************
 EQUATIONS 15
 MfrParaTroughOut = [2,2]	! 2: Outlet mass flow rate, kg/h
-paraAbsSolEn = [2,3]		! 3: Absorbed solar energy, kJ/h
-paraQLosses = [2,4] 		! 4: Collector thermal losses, kJ/h
+paraAbsSolEn = [2,3]/3600	! 3: Absorbed solar energy, kW
+paraQLosses = [2,4]/3600 	! 4: Collector thermal losses, kW
 paraUseEnGain = [2,5] 		! 5: Collector useful energy gain, kJ/h
 paraEnInRate = [2,6] 		! 6: Collector inlet energy rate, kJ/h
 paraEnStoreRate = [2,8] 	! 8: Energy store rate, kJ/h
@@ -116,3 +116,31 @@ paraColl5T = [2,14]			! 14: Average temperature of collector 5, deg C
 paraColl6T = [2,15]			! 15: Average temperature of collector 6, deg C
 paraColl7T = [2,16]			! 16: Average temperature of collector 7, deg C
 paraColl8T = [2,17]			! 17: Average temperature of collector 8, deg C
+
+*************************************************************************************************
+** online plotter type1257.ddck
+*************************************************************************************************
+UNIT 89 TYPE 65     
+PARAMETERS 12     
+10    			! 1: Nb. of left-axis variables
+10    			! 2: Nb. of right-axis variables
+-10   			! 3: Left axis minimum
+600    			! 4: Left axis maximum
+0     			! 5: Right axis minimum
+4000   			! 6: Right axis maximum
+nPlotsPerSim 	! 7: Number of plots per simulation
+12    			! 8: X-axis gridpoints
+1     			! 9: Shut off Online w/o removing
+-1    			! 10: Logical unit for output file
+0     			! 11: Output file units
+0     			! 12: Output file delimiter
+INPUTS 20     
+TParaTroughOut TParaTroughIn Nix Nix Nix Nix Nix Nix Nix Nix
+radOnTiltedSurf qSysIn_paraTrough paraAbsSolEn paraQLosses Nix Nix Nix Nix Nix Nix
+**
+TParaTroughOut TParaTroughIn Nix Nix Nix Nix Nix Nix Nix Nix
+radOnTiltedSurf qSysIn_paraTrough paraAbsSolEn paraQLosses Nix Nix Nix Nix Nix Nix
+LABELS  3     
+Temperatures     
+Radiation     
+parabolicTrough
