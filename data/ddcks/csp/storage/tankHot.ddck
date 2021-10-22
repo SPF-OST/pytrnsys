@@ -1,0 +1,87 @@
+******************************************************************************************
+** BEGIN tankHot.ddck
+******************************************************************************************
+ 
+******************************************************************************************
+** Contact person : M. Neugebauer  
+** Creation date  : 22.10.2021 
+** Last changes   : 
+******************************************************************************************
+
+******************************************************************************************
+** Description: 
+** hot salt storage based on type1261 of High Temperature Solar (TESS)
+******************************************************************************************
+
+******************************************************************************************
+** inputs from hydraulic solver
+******************************************************************************************
+EQUATIONS 3
+THotTIn = TPiHotTankIn				! 1: Inlet fluid temperature, deg C
+MfrHotTIn = ABS(MfrPiHotTankIn)		! 2: Inlet mass flow rate, kg/h
+MfrHotTOut = ABS(MfrPiHotTankOut)	! 4: Outlet mass flow rate, kg/h
+
+******************************************************************************************
+** outputs to hydraulic solver
+******************************************************************************************
+EQUATIONS 1
+THotTOut = [2,1]					! 1: Outlet fluid temperature, deg C
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 1
+qSysOut_QLossHotT = [2,3]/3600				! 3: Tank thermal losses, kW
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+EQUATIONS 1
+tAmbHotT = tAmbDry					! in 3: Ambient temperature, deg C, from weather_base_csp.ddck
+
+*************************************************************************************************
+** outputs to other ddck
+*************************************************************************************************
+
+
+*************************************************************************************************
+** type1261
+*************************************************************************************************
+UNIT 2 TYPE 1261	 
+PARAMETERS 14
+hotTVol				! 1: Expansion tank volume, m^3
+hotTSurfA			! 2: Tank surface area, m^2
+hotTInitT			! 3: Initial temperature, deg C
+hotTInitVol			! 4: Initial fluid volume, m^3
+nrHotTRKSteps		! 5: Number of Runge Kutta steps
+hotTDens_r0			! 6: Fluid density coefficient r0 (kg/m3)
+hotTDens_r1			! 7: Fluid density coefficient r1 (kg/m3.K)
+hotTDens_r2			! 8: Fluid density coefficient r2 (kg/m3.K^2)
+hotTFluidEnt_h0		! 9: Fluid enthalpy coefficient h0 (kJ/kg)
+hotTFluidEnt_h1		! 10: Fluid enthalpy coefficient h1 (kJ/kg.K)
+hotTFluidEnt_h2		! 11: Fluid enthalpy coefficient h2 (kJ/kg.K^2)
+hotTFluidIntE_u0	! 12: Fluid internal energy coefficient u0 (kJ/kg)
+hotTFluidIntE_u1	! 13: Fluid internal energy coefficient u1 (kJ/kg.K)
+hotTFluidIntE_u2	! 14: Fluid internal energy coefficient u2 (kJ/kg.K^2)
+INPUTS 5
+THotTIn				! 1: Inlet fluid temperature, deg C
+MfrHotTIn			! 2: Inlet mass flow rate, kg/h
+tAmbHotT			! 3: Ambient temperature, deg C
+MfrHotTOut			! 4: Outlet mass flow rate, kg/h
+hotTQLossCoeff		! 5: Tank heat loss coefficient
+*** INITIAL INPUT VALUES
+293.0 0. 10.0 0. 5.
+
+*************************************************************************************************
+** remaining outputs
+*************************************************************************************************
+EQUATIONS 6
+MfrHotTOutOut = [2,2]	! 2: Output outlet mass flow rate, kg/h
+QHotTIn = [2,4] 		! 4: Inlet energy rate, kJ/h
+QHotTOut = [2,5]		! 5: Outlet energy rate, kJ/h
+QHotTStore = [2,6] 		! 6: Energy storage rate, kJ/h
+QHotTBal = [2,7]		! 7: Energy balance, %
+VolRatioHotT = [2,8] 	! 8: Volumetric ratio
