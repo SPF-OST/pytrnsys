@@ -85,3 +85,31 @@ QHotTOut = [2,5]		! 5: Outlet energy rate, kJ/h
 QHotTStore = [2,6] 		! 6: Energy storage rate, kJ/h
 QHotTBal = [2,7]		! 7: Energy balance, %
 VolRatioHotT = [2,8] 	! 8: Volumetric ratio
+
+*************************************************************************************************
+** online plotter tankHot.ddck
+*************************************************************************************************
+UNIT 89 TYPE 65     
+PARAMETERS 12     
+10    			! 1: Nb. of left-axis variables
+10    			! 2: Nb. of right-axis variables
+0   			! 3: Left axis minimum
+1    			! 4: Left axis maximum
+0     			! 5: Right axis minimum
+1000   			! 6: Right axis maximum
+nPlotsPerSim 	! 7: Number of plots per simulation
+12    			! 8: X-axis gridpoints
+1     			! 9: Shut off Online w/o removing
+-1    			! 10: Logical unit for output file
+0     			! 11: Output file units
+0     			! 12: Output file delimiter
+INPUTS 20     
+VolRatioHotT Nix Nix Nix Nix Nix Nix Nix Nix Nix
+THotTOut THotTIn Nix Nix Nix Nix Nix Nix Nix Nix
+**
+VolRatioHotT Nix Nix Nix Nix Nix Nix Nix Nix Nix
+THotTOut THotTIn Nix Nix Nix Nix Nix Nix Nix Nix
+LABELS  3     
+volRatio     
+temperatures     
+hotTank

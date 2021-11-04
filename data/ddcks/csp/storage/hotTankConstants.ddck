@@ -15,8 +15,8 @@
 CONSTANTS 14 
 hotTVol = 287.				! 1: Expansion tank volume, m^3
 hotTSurfA = 300.			! 2: Tank surface area, m^2
-hotTInitT = 293.			! 3: Initial temperature, deg C
-hotTInitVol = 200.			! 4: Initial fluid volume, m^3
+hotTInitT = 385.			! 3: Initial temperature, deg C
+hotTInitVol = 15.			! 4: Initial fluid volume, m^3
 nrHotTRKSteps = 1000		! 5: Number of Runge Kutta steps
 hotTDens_r0 = 1074.			! 6: Fluid density coefficient r0 (kg/m3)
 hotTDens_r1 = -0.6367		! 7: Fluid density coefficient r1 (kg/m3.K)

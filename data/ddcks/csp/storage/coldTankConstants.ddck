@@ -15,8 +15,8 @@
 CONSTANTS 14 
 coldTVol = 287.					! 1: Expansion tank volume, m^3
 coldTSurfA = 300.				! 2: Tank surface area, m^2
-coldTInitT = 300.				! 3: Initial temperature, deg C
-coldTInitVol = 200.				! 4: Initial fluid volume, m^3
+coldTInitT = 294.				! 3: Initial temperature, deg C
+coldTInitVol = 272.				! 4: Initial fluid volume, m^3
 nrcoldTRKSteps = 1000			! 5: Number of Runge Kutta steps
 coldTDens_r0 = 1074.			! 6: Fluid density coefficient r0 (kg/m3)
 coldTDens_r1 = -0.6367			! 7: Fluid density coefficient r1 (kg/m3.K)
