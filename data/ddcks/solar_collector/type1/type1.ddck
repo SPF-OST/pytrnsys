@@ -34,7 +34,8 @@ TCollOut = [28,1]
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value
-** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+** Following this naming standard : 
+** qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
 
 EQUATIONS 1

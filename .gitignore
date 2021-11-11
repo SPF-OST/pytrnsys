@@ -22,3 +22,5 @@ venv
 /dist/
 /pytrnsys.egg-info/
 
+
+pytrnsys_p39/
