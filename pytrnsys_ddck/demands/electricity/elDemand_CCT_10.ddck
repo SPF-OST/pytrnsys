@@ -1,0 +1,113 @@
+*******************************
+**BEGIN elDemand.ddck 
+*******************************
+
+*****************************************
+** Contact person : Rober Haberl   
+** Creation date  : 11.09.2018
+** Last changes   : 15.04.20, Dani Carbonell 
+**					06.08.20, JS: change profile to mfh30
+*****************************************
+
+***************************************************************************
+** Description: 
+** Household electricity demand data section. 
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+EQUATIONS 1
+elSysOut_HHDemand = PelHH_kW
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+** Re-assing here the variables necessary from other types
+** variableInternal = variableExternal
+** Exception: those from general variables
+
+***********************************
+** outputs to other ddck
+***********************************
+
+** Add here the outputs of the TYPE or TYPES that will be used in other types
+** Exception: those for printers and so on don't need to be here.
+
+EQUATIONS 1
+PelHH_kW = frPelHH*PelHhDr_kW    !kW, um Faktor fr korrigierter HH-Strom
+
+*********************************
+** DATA READER
+*********************************
+
+** UNIT 75 TYPE 9    !, Data Reader Household Electricity
+** PARAMETERS 10
+** 6    !-, 1, Mode
+** 0    !-, 2, Header Lines to Skip
+** 1    !-, 3, No. of values to read
+** dtSim    !h, 4, Time interval of data
+** -1  30  0  0    !----, 5-8, Interpolate (+) or not (-)? 6: Multiplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+** unitReadEl_1    !-, 9, Logical unit for input file
+** -1    !-, 10, Free format mode
+
+*********************************
+** DATA READER
+*********************************
+
+** CONSTANTS 2
+** unitReadEl_1=18
+** unitReadEl_2=19
+
+
+** ASSIGN  PATH$\demands\electricity\profiles\Familie-2Kinder-1Arbeiter-1Zuhause\Haushaltsstrom_4Pers_Normal.txt unitReadEl_1
+** ASSIGN  PATH$\demands\electricity\profiles\House430HT06withCHR53\H430.txt unitReadEl_2
+
+** UNIT 76 TYPE 9    !, Data Reader Household Electricity
+** PARAMETERS 10
+** 6    !-, 1, Mode
+** 0    !-, 2, Header Lines to Skip
+** 1    !-, 3, No. of values to read
+** dtSim    !h, 4, Time interval of data
+** -1  30  0  0    !----, 5-8, Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+** unitReadEl_2    !-, 9, Logical unit for input file
+** -1    !-, 10, Free format mode
+
+*********************************
+** DATA READER
+*********************************
+
+CONSTANTS 1
+unitReadEl_3=20
+
+
+ASSIGN  C:\Daten\OngoingProject\TRI-HP\Simulations\DataHHCCT_10Days.txt unitReadEl_3
+
+UNIT 77 TYPE 9    !, Data Reader Household Electricity
+PARAMETERS 10
+6    !-, 1, Mode
+0    !-, 2, Header Lines to Skip
+1    !-, 3, No. of values to read
+dtSim    !h, 4, Time interval of data
+-1  30  0  0    !----, 5-8, Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+unitReadEl_3    !-, 9, Logical unit for input file
+-1    !-, 10, Free format mode
+
+EQUATIONS 2    !, Output of PVT HH el. Data reader
+PelHhDr_kW = [77,1] ![75,1]+[76,1]    !kW,  Totaler el. Konsum des Haushaltes gemäss Data Reader [kW]
+frPelHH = 1.0    !-, Korrekturfaktor für HH-Strom
+
+
+
+

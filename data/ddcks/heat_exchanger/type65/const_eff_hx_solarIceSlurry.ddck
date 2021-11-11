@@ -1,0 +1,68 @@
+*******************************
+**BEGIN Const_eff_HX.ddck
+*******************************
+    
+*****************************************
+** Contact person : Mattia Battaglia
+** Creation date  : 12.19   
+** Last changes   : 04.2020 MB
+*****************************************
+
+***********************************
+** HX with constant efficiency used for cooling loop
+** source corresponds to building, load to Ice Storage loop.
+***********************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS 4
+TSourceIn_ColIce = TPiSolarToHxIce
+MfrSourceIn_ColIce = ABS(MfrPiSolarToHxIce)
+TLoadIn_ColIce = TPiHxSolarIceOut
+MfrLoadIn_ColIce = ABS(MfrPiHxSolarIceOut)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+EQUATIONS 2
+TsourceOut_ColIce = [500,1] 	!Source-side outlet temperature	C
+TLoadOut_ColIce = [500,3] 		!Load side outlet temperature	C
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+
+CONSTANTS 1
+HX_eff_solarIce = 0.95
+
+UNIT 500 TYPE 91 		! Heat Exchanger with Constant Effectiveness
+PARAMETERS 3
+HX_eff_solarIce			!1: HX Efficiency [-]
+CPBRI					!2: Specific heat of source side fluid [kJ/kgK]
+CPWAT     				 !3: Specific heat of load side fluid [kJ/kgK]
+INPUTS 4
+TSourceIn_ColIce				!Source side inlet temperature	C
+MfrSourceIn_ColIce				!Source side flow rate	kg/hr
+TLoadIn_ColIce					!Load side inlet temperature	C
+MfrLoadIn_ColIce				!Load side flow rate	kg/hr
+TSourceIn_ColIce MfrSourceIn_ColIce TLoadIn_ColIce MfrLoadIn_ColIce
+
+EQUATIONS 4
+MfrSource_ColIce = [500,2]		!Source side flow rate	kg/hr
+MrfLoad_ColIce = [500,4]		!Load side flow rate	kg/hr
+HTR_HX_ColIce = [500,5]		!Heat transfer rate	kJ/hr
+OHTC_HX_ColIce = [500,6]		!Overall heat transfer coefficient	kJ/hr.K
+
+
+
+*******************************
+**END Const_eff_HX.ddck
+*******************************

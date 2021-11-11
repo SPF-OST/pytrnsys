@@ -56,7 +56,7 @@ directory is called `foo` then `pytrnsys` will be installed to `foo\pytrnsys`.
          
 1. Install `pytrnsys` and its requirements:
     ```commandline
-    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys/master/requirements/releases/v0.5a4/requirements.txt
+    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys/master/requirements/releases/v0.5.1/requirements.txt
     ```
 You can now close the command prompt opened in the first step.
 
@@ -107,12 +107,15 @@ first need to active the environment (step 2. above).
 This code was not initially developed with the intention to be shared with others outside our institute SPF,
 but after realizing that it could help the community to have a better workflow with TRNSYS, we decided to share it.
 
-#### Developers: 
-- Daniel Carbonell : Institut für Solartechnik SPF, Rapperswil, Switzerland.
-- Jeremias Schmidli : Institut für Solartechnik SPF, Rapperswil, Switzerland.
-- Maike Schubert: Institut für Solartechnik SPF, Rapperswil, Switzerland.
-- Martin Neugebauer: Institut für Solartechnik SPF, Rapperswil, Switzerland.
-- Mattia Battaglia : Institut für Solartechnik SPF, Rapperswil, Switzerland.
+#### Current developers: 
+- Daniel Carbonell
+- Martin Neugebauer
+- Damian Birchler
+- Jeremias Schmidli
+- Maike Schubert
+
+All current developers are based at the Institute for Solar Technology (SPF) at the Eastern Switzerland University of 
+Applied Sciences (OST) in Rapperswil.
 
 ## Acknowledgements
  
