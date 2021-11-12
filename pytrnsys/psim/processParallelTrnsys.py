@@ -168,6 +168,7 @@ class ProcessParallelTrnsys:
         self.inputs["hourlyBalance"] = False
         # self.inputs['daysSelected'] = "2019,2,30" "2019,4,30" "2019,8,30"
 
+        # self.inputs["automaticTrnsysProcess"] = True maybe add this to set to false automatically the ones below
         self.inputs["calculateHeatDemand"] = True
         self.inputs["calculateSPF"] = True
         self.inputs["addWeightedSPF"] = False
@@ -242,6 +243,8 @@ class ProcessParallelTrnsys:
         fileName = []
         classList = []
 
+        self.filesReturn=None
+
         if os.path.exists(os.path.join(self.inputs["pathBase"], "Summary.dat")):
             os.remove(os.path.join(self.inputs["pathBase"], "Summary.dat"))
 
@@ -253,6 +256,8 @@ class ProcessParallelTrnsys:
                 files = glob.glob(os.path.join(pathFolder, "**/*.lst"), recursive=True)
                 fileName = [_pl.Path(name).parts[-2] for name in files]
                 relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
+
+                self.filesReturn = files
 
             elif self.inputs["typeOfProcess"] == "json":
                 files = glob.glob(os.path.join(pathFolder, "**/*.json"), recursive=True)
@@ -311,6 +316,9 @@ class ProcessParallelTrnsys:
             pathFolder = self.inputs["pathBase"]
             baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)  # DC This was missing
             casesInputs.append((baseClass, pathFolder, name, self.inputs))  # DC This was missing
+
+            self.filesReturn=[]
+            self.filesReturn.append(os.path.join(pathFolder, name, name)+".dck")
 
         elif self.inputs["typeOfProcess"] == "citiesFolder":
 
@@ -514,6 +522,8 @@ class ProcessParallelTrnsys:
 
         if "printBoxPlotGLEData" in self.inputs.keys():
             self.printBoxPlotGLEData()
+
+        return self.filesReturn #Dc maybe not the best way
 
     def calculationsAcrossSets(self):
         pathFolder = self.inputs["pathBase"]
