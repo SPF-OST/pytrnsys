@@ -217,7 +217,7 @@ UNIT 82 TYPE 993      ! Input value recall (element RcA) DC CHANGED
 PARAMETERS 1     
 4   ! 1: number of variables to be remembered
 INPUTS 4    
-HpIsBlock THpCondOut myHpIsOn MfrHpPDRc  !ImbHpOnErr_kWh EImbPPiShHot_kWh ImbHpDhwOnErr_kWh     
+HpIsBlock THpCondOut myHpIsOn MfrHpPDRc   
 0 0  0  0  !0 0 0  
      
 EQUATIONS 6   
