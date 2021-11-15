@@ -166,7 +166,10 @@ class RunParallelTrnsys:
             tests.append(exeTrnsys.ExecuteTrnsys(path, fileNames[i]))
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
             # tests[i].setAddBuildingData(self.inputs["copyBuildingData"]) I comment it until we use again a case where we need this functionality. I guess we dont need this anymore.
-            tests[i].loadDeck()
+            tests[i].loadDeck(check=self.inputs["checkDeck"])
+
+
+
             tests[i].changeParameter(self.parameters)
             if self.inputs["ignoreOnlinePlotter"] == True:
                 tests[i].ignoreOnlinePlotter()
