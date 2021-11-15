@@ -71,7 +71,7 @@ class ResultsWriter:
         results = json.loads(serializedResults)
 
         costsDict = self._createCostsDict(output)
-        resultsWithCosts = {**results, **costsDict}
+        resultsWithCosts = results | costsDict
 
         serializedResultsWithCosts = json.dumps(
             resultsWithCosts, indent=2, sort_keys=True
