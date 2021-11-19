@@ -10,6 +10,7 @@ import os
 from datetime import datetime, timedelta
 import numpy as num
 import pytrnsys.utils.utilsSpf as utils
+import logging
 
 
 class SimulationLoader:
@@ -66,6 +67,8 @@ class SimulationLoader:
         footerPresent=True,
         individualFiles=False,
     ):
+
+        self.logger = logging.getLogger("root")
 
         self._path = path
         self._mode = mode
@@ -144,7 +147,11 @@ class SimulationLoader:
                     columns=lambda x: x.strip()
                 )
             file = file[file.columns[:-1]]
-            file["Number"] = file.index + pd.to_datetime(file["Month"][0].strip(), format="%B").month
+            try:
+                file["Number"] = file.index + pd.to_datetime(file["Month"][0].strip(), format="%B").month
+            except:
+                self.logger.warning(f"Could not load incomplete or broken file: {pathFile}")
+                return
             file.set_index("Number", inplace=True)
             if self._fullYear:
                 if self._year == -1:
