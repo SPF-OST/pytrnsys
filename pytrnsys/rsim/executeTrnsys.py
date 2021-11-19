@@ -134,7 +134,7 @@ class ExecuteTrnsys:
         )
 
         if check == True:
-            deckUtils.checkEquationsAndConstants(lines)
+            deckUtils.checkEquationsAndConstants(lines,nameDck)
 
     def changeParameter(self, _parameters):
 

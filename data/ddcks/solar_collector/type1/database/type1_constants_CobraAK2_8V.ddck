@@ -27,6 +27,4 @@ GroundReflectance = 0.2
 
 FirstOrderIAM = 0.108
 SecondOrderIAM = 0
-*******************************
-**END Type1_Constants_Test.ddck
-*******************************
+

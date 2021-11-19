@@ -1,0 +1,31 @@
+******************************
+**BEGIN ghx_2x2_5m.ddck
+*******************************
+
+*****************************************
+** 2x2 ground heat exchanger G-Function loading ddck
+** Version : v1.0
+** Last Changes: Jeremias Schmidli
+** Date: 26.05.2020
+******************************************
+
+CONSTANTS 3
+dghxProbes = 0.032  ! 10: inner diameter of the pipes, m
+nGhxProbes = 4
+calcRand = 2 ! 1: old Randaussen approach of EWS. If nBorehole>1 the MfrGHX/Nbore, 2: Lamarche-g-Functions, 3: read-in g-function
+
+
+***********************************
+** g-function loading
+***********************************
+
+CONSTANTS 1
+unitGhxGfunc = 85
+
+ASSIGN PATH$\ground_heat_exchanger\type951\database\g_functions\2x2_5m.txt unitGhxGfunc
+
+
+
+*******************************
+**END ghx_2x2_5m.ddck
+*******************************

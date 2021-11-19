@@ -9,6 +9,8 @@
 ** History: 
 **** DC adapted to TriHp
 **** DC first version in ddck format 25.02.2019
+**NOTES this file needs quite some work. 
+** PelHeatSys_kW should be calculated externally by some means of automatization
 ******************************************
 
 ***********************************
@@ -37,8 +39,9 @@ elSysOut_InvLoss = PelLossesDCAC
 ** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
 *************************************************************************************************
 **PelPVAC_kW,FCellToBat_kW,PelFuelCellToBui_kW
-EQUATIONS 1
-myPelSystem_kW = (PelAuxTot_kW+PelContr_kW+PelPuSH_kW+PelPuDHW_kW+qAuxStoreDHW_KW+qAuxStoreSH_KW)
+EQUATIONS 2
+PelHeatSys_kW = elSysIn_Q_Hp+elSysOut_PuTot+PelContr_kW+qAuxStoreDHW_KW+qAuxStoreSH_KW
+PelUsedTotal_kW = PelHeatSys_kW + PelHH_kW + PelBatStandby_kW    !kW, Total konsumierter Strom des Gebäudes [kW]
 
 **********************************************
 ** Dependencies with overall variables 
@@ -47,10 +50,6 @@ myPelSystem_kW = (PelAuxTot_kW+PelContr_kW+PelPuSH_kW+PelPuDHW_kW+qAuxStoreDHW_K
 **********************************************
 **None
 
-
-EQUATIONS 2    ! Stromverbrauch und Stromnetzbilanz THIS WILL BE ELIMINATED           ! System electricity consumption [kW]
-PelHeatSys_kW = myPelSystem_kW
-PelUsedTotal_kW = PelHeatSys_kW + PelHH_kW + PelBatStandby_kW    !kW, Total konsumierter Strom des Gebäudes [kW]
 
 **********************************
 ** Generic constants
@@ -165,12 +164,12 @@ unitPrinterBat  !, 1, Logical unit number, -
 -1   !, 4, Printing & integrating interval, h. -1 for monthly integration
 1    !, 5, Number of inputs to avoid integration, -
 1    !, 6, Output number to avoid integration
-INPUTS 19
+INPUTS 20
 Time  PelHH_kW PelPVDC_kW  PelPVRoof_kW PvToBat_kW  PvToHeatSys_kW PvToHH_kW PelFromBat_kW   PelBatWRLoss_kW  PelFromGrid_kW PelBatLoss_kW
-PelBatTimeLoss_kW  PelBatStandby_kW PelFromBatToHH_kW PelBatToHeatSys_kW  PelFuelCellToBat_kW PvToGrid_kW PvInverterLoss_kW PelHeatSys_kW     
+PelBatTimeLoss_kW  PelBatStandby_kW PelFromBatToHH_kW PelBatToHeatSys_kW  PelFuelCellToBat_kW PvToGrid_kW PvInverterLoss_kW PelHeatSys_kW  PelUsedTotal_kW   
 *******
 Time  PelHH_kW PelPVDC_kW  PelPVRoof_kW PvToBat_kW  PvToHeatSys_kW PvToHH_kW PelFromBat_kW   PelBatWRLoss_kW  PelFromGrid_kW PelBatLoss_kW
-PelBatTimeLoss_kW  PelBatStandby_kW PelFromBatToHH_kW PelBatToHeatSys_kW PelFuelCellToBat_kW PvToGrid_kW PvInverterLoss_kW PelHeatSys_kW
+PelBatTimeLoss_kW  PelBatStandby_kW PelFromBatToHH_kW PelBatToHeatSys_kW PelFuelCellToBat_kW PvToGrid_kW PvInverterLoss_kW PelHeatSys_kW PelUsedTotal_kW
 
 
 *******************************

@@ -397,6 +397,11 @@ class ProcessTrnsysDf:
         self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
         self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
 
+        self.yearlyMin = {value + "_Min": round(self.steDataDf[value].min(),2) for value in self.steDataDf.columns}
+        self.yearlyMax = {value + "_Max": round(self.steDataDf[value].max(),2) for value in self.steDataDf.columns}
+        self.yearlyAvg = {value + "_Avg": round(self.steDataDf[value].mean(),2) for value in self.steDataDf.columns}
+        self.yearlyEnd = {value + "_End": round(self.steDataDf[value][-1],2) for value in self.steDataDf.columns}
+
         for column in self.monDataDf.columns:
             self.monDataDf["Cum_" + column] = self.monDataDf[column].cumsum()
         self.calcConfigEquations()
@@ -408,6 +413,11 @@ class ProcessTrnsysDf:
         self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
         self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
         self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
+
+        self.yearlyMin = {value + "_Min": round(self.steDataDf[value].min(), 2) for value in self.steDataDf.columns}
+        self.yearlyMax = {value + "_Max": round(self.steDataDf[value].max(), 2) for value in self.steDataDf.columns}
+        self.yearlyAvg = {value + "_Avg": round(self.steDataDf[value].mean(), 2) for value in self.steDataDf.columns}
+        self.yearlyEnd = {value + "_End": round(self.steDataDf[value][-1], 2) for value in self.steDataDf.columns}
 
         try:
             self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
@@ -826,6 +836,7 @@ class ProcessTrnsysDf:
                 **self.yearlyMin,
                 **self.yearlyMax,
                 **self.yearlyAvg,
+                **self.cumSumEnd,
             }
             expression = equation.replace(" ", "")
             exec(expression, globals(), namespace)
@@ -859,7 +870,7 @@ class ProcessTrnsysDf:
             self.dayDataDf.eval(equation, inplace=True, **kwargs)
             self.yearlyMin = {value + "_Min": self.dayDataDf[value].min() for value in self.dayDataDf.columns}
             self.yearlyMax = {value + "_Max": self.dayDataDf[value].max() for value in self.dayDataDf.columns}
-            self.cumSumEnd = {value + "_End": self.dayDataDf[value][-1] for value in self.dayDataDf.columns}
+            # self.cumSumEnd = {value + "_End": self.dayDataDf[value][-1] for value in self.dayDataDf.columns} #I guess not needed since we dont have cumsumDaily?
             self.yearlyAvg = {value + "_Avg": self.dayDataDf[value].mean() for value in self.houDataDf.columns}
 
         for equation in self.inputs["calcHourly"]:
@@ -876,7 +887,7 @@ class ProcessTrnsysDf:
             self.houDataDf.eval(equation, inplace=True, **kwargs)
             self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
             self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-            self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
+            # self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
             self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
 
         for equation in self.inputs["calcMonthlyFromHourly"]:
@@ -900,7 +911,7 @@ class ProcessTrnsysDf:
             self.monDataDf[calculatedVariableName] = calculatedVariablePerMonth
             self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
             self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-            self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
+            # self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
             self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
 
         for equation in self.inputs["calcCumSumHourly"]:
@@ -910,6 +921,7 @@ class ProcessTrnsysDf:
                         self.houDataDf["cumsum_" + value] = self.houDataDf[value].cumsum()
                         myValue = "cumsum_" + value
                         self.cumSumEnd = {myValue + "_End": self.houDataDf[myValue][-1]}
+
         for equation in self.inputs["calcHourlyTest"]:
             kwargs = {"local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax}}
             scalars = kwargs["local_dict"].keys()
@@ -924,10 +936,10 @@ class ProcessTrnsysDf:
             # self.yearlyMax = {value + '_Ma': self.houDataDf[value].max()}
             self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
             self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-            self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
+            # self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
             self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
 
-        for equation in self.inputs["calcTimeStep"]:
+        for equation in (self.inputs["calcTimeStep"]):
             kwargs = {"local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax}}
             scalars = kwargs["local_dict"].keys()
             splitEquation = equation.split("=")
@@ -941,12 +953,16 @@ class ProcessTrnsysDf:
             )  # by doing so we add also the key into the dictionary steDataDf
             self.yearlyMin = {value + "_Min": self.steDataDf[value].min() for value in self.steDataDf.columns}
             self.yearlyMax = {value + "_Max": self.steDataDf[value].max() for value in self.steDataDf.columns}
+            # self.cumSumEnd = {value + "_End": self.steDataDf[value][-1] for value in self.steDataDf.columns}
 
         for equation in self.inputs["calcCumSumTimeStep"]:
             for value in equation:
                 for key in self.steDataDf.columns:
                     if key == value:
-                        self.steDataDf["cumsum_" + value] = self.steDataDf[value].cumsum()
+                        myValue = "cumsum_" + value
+                        self.steDataDf[myValue] = self.steDataDf[value].cumsum()
+                        # self.cumSumEnd = {myValue + "_End": self.steDataDf[myValue][-1]}
+                        self.cumSumEnd.update({myValue + "_End": round(self.steDataDf[myValue][-1],2)})
 
         for equation in self.inputs[
             "calcTimeStepTest"
@@ -971,6 +987,7 @@ class ProcessTrnsysDf:
                 **self.yearlyMin,
                 **self.yearlyMax,
                 **self.yearlyAvg,
+                **self.cumSumEnd,
             }
             expression = equation.replace(" ", "")
             exec(expression, globals(), namespace)
@@ -2035,6 +2052,7 @@ class ProcessTrnsysDf:
                 **self.yearlyMin,
                 **self.yearlyMax,
                 **self.yearlyAvg,
+                **self.yearlyEnd,
                 **self.cumSumEnd,
             }  # ,**self.maximumMonth,**self.minimumMonth}
             for key in self.inputs["results"][0]:
