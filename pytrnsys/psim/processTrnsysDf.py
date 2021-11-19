@@ -475,35 +475,39 @@ class ProcessTrnsysDf:
             self.pltB.createBokehPlot(self.houDataDf, self.outputPath, self.fileName, self.inputs["plotHourly"][0])
 
     def addQvsTPlot(self):
-        # define QvsTDf here!
-        monthsSplit = []
-        if "plotHourlyQvsT" in self.inputs.keys():
-            InputListQvsT = self.inputs["plotHourlyQvsT"][0]
-            QvsTDf = self.houDataDf
-            logger.debug("hourlyUsed")
-            self.loadQvsTConfig(
-                QvsTDf, InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False
-            )
-        if "plotTimestepQvsT" in self.inputs.keys():
-            InputListQvsT = self.inputs["plotTimestepQvsT"][0]
-            QvsTDf = self.steDataDf
-            if "Time" in QvsTDf:
-                timestep = (QvsTDf[2] - QvsTDf[1]).seconds
-            else:
-                timestep = (QvsTDf.index[2] - QvsTDf.index[1]).seconds
-            factorForHour = timestep / 3600
-            logger.debug("stepDfUsed")
-            self.loadQvsTConfig(
-                QvsTDf,
-                InputListQvsT,
-                "plotQvsTconfigured",
-                monthsSplit=monthsSplit,
-                normalized=True,
-                cut=False,
-                factor=factorForHour,
-            )
+        if (os.getenv("GLE_EXE") == None):
+            logger.warning("No gle environment defined!")
+            logger.warning("QvsTPlot can only be used with existing gle environment.")
+            return
         else:
-            pass
+            monthsSplit = []
+            if "plotHourlyQvsT" in self.inputs.keys():
+                InputListQvsT = self.inputs["plotHourlyQvsT"][0]
+                QvsTDf = self.houDataDf
+                logger.debug("hourlyUsed")
+                self.loadQvsTConfig(
+                    QvsTDf, InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False
+                )
+            if "plotTimestepQvsT" in self.inputs.keys():
+                InputListQvsT = self.inputs["plotTimestepQvsT"][0]
+                QvsTDf = self.steDataDf
+                if "Time" in QvsTDf:
+                    timestep = (QvsTDf[2] - QvsTDf[1]).seconds
+                else:
+                    timestep = (QvsTDf.index[2] - QvsTDf.index[1]).seconds
+                factorForHour = timestep / 3600
+                logger.debug("stepDfUsed")
+                self.loadQvsTConfig(
+                    QvsTDf,
+                    InputListQvsT,
+                    "plotQvsTconfigured",
+                    monthsSplit=monthsSplit,
+                    normalized=True,
+                    cut=False,
+                    factor=factorForHour,
+                )
+            else:
+                pass
 
     def executeLatexFile(self):
 
