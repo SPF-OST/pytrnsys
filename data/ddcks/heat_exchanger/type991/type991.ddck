@@ -21,11 +21,11 @@
 ******************************************************************************************
 EQUATIONS 6
 THxRevLeftTop = TPiHxLeftTop			! 1: Left top side inlet temperature, deg C
-MfrHxRevLDown = MfrPiHxLeftTop			! 2: Left top side flow rate, kg/h
+MfrHxRevLDown = MfrPiHxLeftTop			! 2: Left side downwards flow rate, kg/h
 THxRevRightBot = TPiHxRightBottom 		! 3: Right bottom side inlet temperature, deg C
-MfrHxRevRUp	= MfrPiHxRightBottom		! 4: Right bottom side flow rate, kg/h
-THxRevLeftBot = TPiHxLeftBottom
-THxRevRightTop = TPiHxRightTop
+MfrHxRevRUp	= MfrPiHxRightBottom		! 4: Right side upwards flow rate, kg/h
+THxRevLeftBot = TPiHxLeftBottom			! 5: Left bottom side inlet temperature, deg C
+THxRevRightTop = TPiHxRightTop			! 6: Right top side inlet temperature, deg C
 
 ******************************************************************************************
 ** outputs to hydraulic solver
@@ -65,13 +65,15 @@ PARAMETERS 3
 hxEfficiency		! 1: Heat exchanger efficiency
 hxRevCpLeft			! 2: Specific heat of left side fluid, kJ/kg.K
 hxRevCpRight		! 3: Specific heat of right side fluid, kJ/kg.K
-INPUTS 4
+INPUTS 6
 THxRevLeftTop		! 1: Upper left side inlet temperature, deg C
 MfrHxRevLDown		! 2: Upper left side flow rate, kg/h
 THxRevRightBot		! 3: Lower right side inlet temperature, deg C
 MfrHxRevRUp			! 4: Lower right side flow rate, kg/h
+THxRevLeftBot		! 5: Left bottom side inlet temperature, deg C
+THxRevRightTop      ! 6: Right top side inlet temperature, deg C
 *** INITIAL INPUT VALUES
-THxRevLeftTop MfrHxRevLDown THxRevRightBot MfrHxRevRUp
+THxRevLeftTop MfrHxRevLDown THxRevRightBot MfrHxRevRUp THxRevLeftBot THxRevRightTop
 
 ******************************************************************************************
 ** remaining outputs
