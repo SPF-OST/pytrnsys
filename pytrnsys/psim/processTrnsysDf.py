@@ -474,6 +474,61 @@ class ProcessTrnsysDf:
         if "plotHourly" in self.inputs.keys():
             self.pltB.createBokehPlot(self.houDataDf, self.outputPath, self.fileName, self.inputs["plotHourly"][0])
 
+        if "scatterHourly" in self.inputs.keys():
+            self.scatterHourly()
+
+    def scatterHourly(self):
+        plotVariables = self.inputs["scatterHourly"][0]
+        xVariable = plotVariables[0]
+        yVariable = plotVariables[1]
+
+        try:
+            xDf = self.houDataDf[xVariable]
+        except:
+            logger.warning("%s not found in hourly data.", xVariable)
+            logger.warning("scatterHourly not generated.")
+            return
+        try:
+            yDf = self.houDataDf[yVariable]
+        except:
+            logger.warning("%s not found in hourly data.", yVariable)
+            logger.warning("scatterHourly not generated.")
+            return
+
+        logger.info("Generating scatterHourly...")
+
+        if "latexNames" in self.inputs.keys():
+            if ":" in self.inputs["latexNames"]:
+                latexNameFullPath = self.inputs["latexNames"]
+            else:
+                latexNameFullPath = os.path.join(self.configPath, self.inputs["latexNames"])
+            self.doc.getLatexNamesDict(file=latexNameFullPath)
+        else:
+            self.doc.getLatexNamesDict()
+
+        fig1, ax1 = plt.subplots(constrained_layout=True)
+
+        ax1.plot(xDf, yDf, "o", color='b', markersize=1)
+        ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
+        ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
+
+        fileName = "scatter_" + xVariable + "_" + yVariable
+        fileName = re.sub(r"[^\w\-_\. ]", "", fileName)
+
+        lines = xVariable + "\t" + yVariable + "\n"
+        for i in range(len(xDf)):
+            line = str(xDf.iloc[i]) + "\t" + str(yDf.iloc[i])
+            lines += line + "\n"
+
+        pathFolder = os.path.join(self.executingPath,self.folderName)
+
+        outfile = open(os.path.join(pathFolder, fileName + ".dat"), "w")
+        outfile.writelines(lines)
+        outfile.close()
+
+        fig1.savefig(os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
+        plt.close()
+
     def addQvsTPlot(self):
         if (os.getenv("GLE_EXE") == None):
             logger.warning("No gle environment defined!")
