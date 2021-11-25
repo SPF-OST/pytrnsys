@@ -296,20 +296,6 @@ parameters. The custom defined plots will automatically be added to the result p
         :width: 400
         :alt: SP
 
-``fitHeatingLimit``
-    This function was created to plot and fit heating power values against average daily temperatures. In principle it
-    can plot any daily or hourly data against average daily temperature. The time resolution of the heating power data
-    (or its equivalent) needs to be specified as ``daily`` or ``hourly`` (``heatingDataTimeStep``) when calling the
-    function::
-
-        string fitHeatingLimit "y_variable" "heatingDataTimeStep"
-
-    A linear fit is done for ``daily``, while the data only are shown for ``hourly``.
-
-    .. image:: ./resources/fitHeatingLimit.png
-        :width: 400
-        :alt: SP
-
 .. note::
 
     All variables used in ``comparePlot``, ``comparePlotUncertain``, and ``acrossSetsCalculationsPlot`` need to be
@@ -396,6 +382,27 @@ parameters. The custom defined plots will automatically be added to the result p
     .. image:: ./resources/bokeh_plot.png
         :width: 400
         :alt: SP
+
+``scatterHourly``
+    Hourly printed values can be displayed as a scatter plot::
+
+        stringArray scatterHourly "x_variable" "y_variable"
+
+``comfortHourly``
+    The hourly printed humidity of a room can be plotted against the hourly printed room temperature and be compared to
+    different comfort norms::
+
+        string Array comfortHourly ["norm"] "temperature_variable" "humidity_variable"
+
+    There are two norm boundaries available. The default one (can also be actively called by setting ``norm`` to
+    ``ISO7730``) is ISO 7730:
+
+    .. image:: ./resources/comfort_ISO.png
+        :width: 400
+        :alt: comfort ISO
+
+    The alternative one is according to `this publication <https://www.irbnet.de/daten/rswb/15109001837.pdf>`_ and can
+    be employed by setting ``norm`` to ``Dahlheimer``:
 
 .. _ref-plotHourlyQvsT:
 
