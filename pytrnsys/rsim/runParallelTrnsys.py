@@ -148,8 +148,9 @@ class RunParallelTrnsys:
         file = open(fileToRunWithPath, "r")
         lines = file.readlines()
         cases = []
+
         for line in lines:
-            if line == "\n":  # ignoring blank lines
+            if line == "\n" or line[0]=="#":  # ignoring blank lines and lines starting with #
                 pass
             else:
                 cases.append(line[:-1])  # remove \n
@@ -165,17 +166,20 @@ class RunParallelTrnsys:
             tests.append(exeTrnsys.ExecuteTrnsys(path, fileNames[i]))
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
             # tests[i].setAddBuildingData(self.inputs["copyBuildingData"]) I comment it until we use again a case where we need this functionality. I guess we dont need this anymore.
-            tests[i].loadDeck()
+            tests[i].loadDeck(check=self.inputs["checkDeck"])
+
+
+
             tests[i].changeParameter(self.parameters)
             if self.inputs["ignoreOnlinePlotter"] == True:
                 tests[i].ignoreOnlinePlotter()
 
             tests[i].setRemovePopUpWindow(self.inputs["removePopUpWindow"])
-            tests[i].copyFilesForRunning()
+            # tests[i].copyFilesForRunning()
 
             # tests[i].setTrnsysVersion("TRNSYS17_EXE")
 
-            self.cmds.append(tests[i].getExecuteTrnsys(self.inputs))
+            self.cmds.append(tests[i].getExecuteTrnsys(self.inputs,useDeckName=tests[i].nameDck))
 
         self.runParallel()
 

@@ -1,4 +1,5 @@
-*2 Sonden
-*Abstand 5m
+1x2; borehole field
+5
+2
 0.00,	0.00
 0.00,	5.00

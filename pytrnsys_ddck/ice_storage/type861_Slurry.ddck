@@ -18,17 +18,22 @@
 ** inputs from hydraulic solver
 ***********************************
 
-EQUATIONS 4     ! Collector inlet temperature 
-MfrPCMIceHX = MfrPiIceIn !CHANGED BACK TO NORMAL. WE CAN'T USE ABS HERE !!!!
-TCsHx1i=TPiIceIn     
-TCsHx1iRev=TPiIceOut      
-MfrCsHx1i=MfrPCMIceHX !MfrPcmIceHx     
+EQUATIONS 6     ! Collector inlet temperature 
+**MfrPCMIceHX = MfrPiIceIn 
+TCsHx1i=TPiIceToHpIn     
+TCsHx1iRev=-1000 !TPiIceOutToHp      always positive flow
+MfrCsHx1i=ABS(MfrPiIceToHpIn)
+
+TCsHx2i=TPiHxSolarIceIn
+TCsHx2iRev=-1000 !TPiHxSolarIceOut      always positive flow
+MfrCsHx2i=ABS(MfrPiHxSolarIceIn)
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
-EQUATIONS 1
+EQUATIONS 2
 TCsHx1o = [130,13]     ! Outlet temperature     [�C]
+TCsHx2o = [130,20]     ! Outlet temperature     [�C]
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value
@@ -71,7 +76,8 @@ qSysIn_IceMelt     = qIcePcm-sumQMeltkW     ! kW latent heat for ice formed in H
 ** Generic variables
 ***********************************
 
-CONSTANTS 4
+CONSTANTS 5
+rhoIce=rhoWat     
 QnomHxIce=140/1000    ! Nominal power of hx at icing conditions KW/m2
 TFreeze = 0.0    
 lambdaIce =2.2222     ! [W/m.K]
@@ -152,75 +158,92 @@ verboseLevel     ! 0 : verbose level 0 no messages, 1 only important messages, 3
 VIceS     ! 2Tank Volume                        [m^3]
 Tankheight     ! 3Tank height                        [m]
 Tankwidth     ! 4Tank width                         [m]
-iceStorageGeometry     ! 5Tank geometry 0 box, 1 cylinder
-x1Type861     ! 6: xBetweenPipes in capillary mats, yBetweenHx in Flat plates
-x2Type861     ! 7: yBetweenHx, not used in flat plates 
-LamEff     ! 8 Eff. thermal cond. of tank         [W/m.K]
-RHOWAT     ! 9 Density water                      [kg/m^3]
+iceStorageGeometry     ! 5Tank geometry 0 box, 1 cilinder
+x1Type861     ! xBetweenPipes in capillary mats, yBetweenHx in Flat plates
+x2Type861     ! yBetweenHx, not used in flat plates 
+LamEff     ! 8Eff. thermal cond. of tank         [W/m.K]
+RHOWAT     ! 9Density water                      [kg/m^3]
 CPWAT_SI     ! 10Specific heat water                [J/kg.K]
-notused     ! 11
+rhoIce     ! 11Density ice                        [kg/m^3]
 lambdaIce     ! 12Tank ice thermal conductivity      [[W/m.K]
-hFusion     ! 13 Water<->Ice enthalpy               [J/kg]
-TSubcool     ! 14 supercooling temperature        [C]
-TFreeze     ! 15 tFreezing                                     [C]
-iceBlockIni     ! 16 Initial amount of ice in store [kg]
-notused     ! 17 Film critical melting thickness    [m]
-maxIceFrac     ! 18 The maximum storage ice fraction     
+hFusion     ! 13Water<->Ice enthalpy               [J/kg]
+TSubcool     ! 14Water<->Ice temperature            [C]
+TFreeze     ! 15tFreezing                                     [C]
+iceBlockIni     ! 16Initial amount of ice in store [kg]
+iceThickToDeIce     ! 17Film critical melting thickness    [m]
+maxIceFrac     ! 18The maximum storage ice fraction     
 1     ! 19Parameter Check: 1 Error interrups simulation/ 0 allows 'all' parameters
-notused     ! 20 : 0 in parallel so we need mdot tin for all . 1 in series, so the outlet of the first hx is the inlet of the second
-heightIceHx    !21   
-maxIceFrac     ! 22   
-useTwallOld     !23
-nRealHx   ! 24 not used for flat plates     
-PhysicalPropConst !25    
-useCorrugated !26 only implemented for flat plates      
-*** HEAT EXCHANGER 1   
-hxGeometry    !27 
-NHx1          ! 28
-hxType861par3 !29
-hxType861par4 !30
-hxType861par5  !31  
-hxType861par6  !32
-orderHx1       !33
-lambdaHx       !34
-HxIceIn        !35 
-HxIceOut       !36 
-RHOBRI         !37
-CPBRI_SI       !38
-30             !39
-numberOfCvHx   !40   
-CIceHeat      ! 41: cUserDefined HEATING if we set to 0 Churchill equation is employed
-nIceHeat    ! 42: nUserDefined HEATING if we set to 0 Churchill equation is employed
-CIceCool     ! 43: cUserDefined COOLING if we set to 0 Churchill equation is employed
-nIceCool     ! 44: nUserDefined COOLING if we set to 0 Churchill equation is employed
-nEnhanceNu    !45 
-*** HEAT EXCHANGER 2  46-64  (used as wall HX for loading ice storage, up to bottom)
+seriesMode     ! 84 : 0 in parallel so we need mdot tin for all . 1 in series, so the outlet of the first hx is the inlet of the second
+heightIceHx     
+maxIceFrac       
+useTwallOld     
+nRealHx   ! not used for flat plates     
+PhysicalPropConst     
+useCorrugated !only implemented for flat plates      
+*** HEAT EXCHANGER 1 (icing, from hp)  
+hxGeometry     
+NHx1
+hxType861par3
+hxType861par4
+hxType861par5    
+hxType861par6
+1     
+lambdaHx     
+HxIceIn     
+HxIceOut     
+RHOWAT     
+CPWAT_SI     
+0   
+numberOfCvHx     
+CIceHeat      ! 32: cUserDefined HEATING if we set to 0 Churchill equation is employed
+nIceHeat    ! 33: nUserDefined HEATING if we set to 0 Churchill equation is employed
+CIceCool     ! 32: cUserDefined COOLING if we set to 0 Churchill equation is employed
+nIceCool     ! 33: nUserDefined COOLING if we set to 0 Churchill equation is employed
+nEnhanceNu
+*** HEAT EXCHANGER 2    (melting from solar)
+hxGeometry     
+NHx1
+hxType861par3
+hxType861par4
+hxType861par5    
+hxType861par6
+2     
+lambdaHx     
+HxIceIn     
+HxIceOut     
+RHOWAT    
+CPWAT_SI     
+0    
+numberOfCvHx     
+CIceHeat      ! 32: cUserDefined HEATING if we set to 0 Churchill equation is employed
+nIceHeat    ! 33: nUserDefined HEATING if we set to 0 Churchill equation is employed
+CIceCool     ! 32: cUserDefined COOLING if we set to 0 Churchill equation is employed
+nIceCool     ! 33: nUserDefined COOLING if we set to 0 Churchill equation is employed
+nEnhanceNu    
+*** HEAT EXCHANGER 3     (used as HX for loading the ice storage with waste water)
 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
 RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
-*** HEAT EXCHANGER 3  65-83   (used as HX for loading the ice storage with waste water)
-0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
-RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
-*** HEAT EXCHANGER 4 84-102
+*** HEAT EXCHANGER 4
 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
 RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
 *** U-values 
-UBotCv      ! 103 Additional U-value for node-1      [W/m^2K]
-UTopCv      ! 104 Additional U-value for node-1      [W/m^2K]
-Ubot        ! 105
-UTop        ! 106
-zSensorPcm1 ! 107
-zSensorPcm2 ! 108
-zsensorPcm3 ! 109
-zSensorPcm4 ! 110
-zSensorPcm5 ! 111
+UBotCv     ! 84 Additional U-value for node-1      [W/m^2K]
+UTopCv     ! 84 Additional U-value for node-1      [W/m^2K]
+Ubot     
+UTop     
+zSensorPcm1
+zSensorPcm2
+zsensorPcm3
+zSensorPcm4
+zSensorPcm5
 ****************************************INPUTS ICE STORAGE*****************************************
 INPUTS nInputsType861    
 TCsHx1i              ! Inlet temperature HX-1             [deg. C]
 MfrCsHx1i            ! Inlet flowrate HX-1                [kg/hr]
 TCsHx1iRev           ! reverted (m<0) Inlet temperature HX-1             [deg. C]
-Nix              ! Inlet temperature HX-2             [deg. C]
-Nix            ! Inlet flowrate HX-2                [kg/hr]
-Nix           ! reverted (m<0) Inlet temperature HX-2             [deg. C]
+TCsHx2i              ! Inlet temperature HX-1             [deg. C]
+MfrCsHx2i            ! Inlet flowrate HX-1                [kg/hr]
+TCsHx2iRev           ! reverted (m<0) Inlet temperature HX-1             [deg. C]
 Nix             ! Inlet temperature HX-3             [deg. C]
 Nix            ! Inlet flowrate HX-3                [kg/hr]
 Nix           ! reverted (m<0) Inlet temperature HX-3             [deg. C]
@@ -288,8 +311,8 @@ PHx1o = [130,15]     ! Power Exchange        [W]
 IceThicknessHx1 = [130,16]     ! Ice Thickness on Hx  [m]
 IceMeltHx1 = [130,17]     
 UAPCMHx1 = [130,18]     ! Heat transfer             [W/K]
-VIceRatio = 100.0*MassIce/(VIceS*RHOWAT)     
-VIceRatioFloat = 100*MassIceFloating/(VIceS*RHOWAT)     ! VIceRatioUp = 100*icekg/(VIceSUp*RHOWAT)
+VIceRatio = 100.0*MassIce/(VIceS*RHOICE)     
+VIceRatioFloat = 100*MassIceFloating/(VIceS*RhoIce)     ! VIceRatioUp = 100*icekg/(VIceSUp*RHOWAT)
 cmIceOneSide = 100*IceThicknessHx1/NHx1         
 yRelativeIceDown = heightIceHx/Tankheight     
 VIceRatioMax = maxIceFrac*100       
@@ -327,14 +350,6 @@ UBotOut   = [130,70]
 USideAvOut= [130,71]      
 UTopOut   = [130,72]      
     
-****All these should be out and done by the hydraulic part.  DC
-EQUATIONS 6     ! Electric pump power PCM-Aux loop
-dpPCMAuxNom_bar = 0.4     ! pressure-drop of loop at nominal mass flow, bar
-frMfrEvapIn = MfrEvapIn/MfrHpEvapNom     ! Flow rate fraction of nominal flow rate
-dpPCMAux_bar = (frMfrEvapIn)^2*dpPCMAuxNom_bar     ! pressure drop at actual mass flow rate, bar
-PflowPCMAux_W = ((MfrEvapIn/3600)/RhoBRI)*dpPCMAux_bar*100000     ! required power to drive the flow, W
-etaPuPCMAux = 0.12-0.00*(1-frMfrEvapIn)     ! pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
-PelPuPCMAux_kW = (PflowPCMAux_W/1000)/etaPuPCMAux     ! required pump electric power, kW
      
 	 
 EQUATIONS 9    ! Converted values for outputs
@@ -403,10 +418,10 @@ TIME VIceRatio  TAvgPCM  TCsHx1o  IceThicknessHx1 TsensorPcm1 TsensorPcm2 Tsenso
 
 UNIT 139 TYPE 65     ! Online Plotter Store (element OpS)
 PARAMETERS 12     
-6     ! 1 Nb. of left-axis variables
-6     ! 2 Nb. of right-axis variables
--20     ! 3 Left axis minimum
-100     ! 4 Left axis maximum
+10     ! 1 Nb. of left-axis variables
+10    ! 2 Nb. of right-axis variables
+-10     ! 3 Left axis minimum
+50     ! 4 Left axis maximum
 -15     ! 5 Right axis minimum
 15     ! 6 Right axis maximum
 nPlotsPerSim     ! 7 Number of plots per simulation
@@ -415,12 +430,12 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 -1     ! 10 Logical unit for output file
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
-INPUTS 12 
-TAvgPCM    TCsHx1o  TCsHx1i  TsensorPcm1  TsensorPcm3  TsensorPcm5 
-VIceRatio    MassIce qIcePcm   StoreIsFullOfIce BlockIceStore MfrCsHx1i   
-**     
-TAvgPCM    TCsHx1o  TCsHx1i  TsensorPcm1  TsensorPcm3  TsensorPcm5 
-VIceRatio    MassIce qIcePcm   StoreIsFullOfIce BlockIceStore MfrCsHx1i   
+INPUTS 20
+TAvgPCM    TCsHx1o  TCsHx1i  TCsHx2o  TCsHx2i TsensorPcm1  TsensorPcm3  TsensorPcm5 TPiIceToHp TPiIceToHpIn
+MfrCsHx1i MfrCsHx2i VIceRatio   MassIce qIcePcm   StoreIsFullOfIce BlockIceStore   TPiHxSolarIceIn TPiHxSolarIceOut Nix
+**
+TAvgPCM    TCsHx1o  TCsHx1i  TCsHx2o  TCsHx2i TsensorPcm1  TsensorPcm3  TsensorPcm5 TPiIceToHp TPiIceToHpIn
+MfrCsHx1i MfrCsHx2i VIceRatio   MassIce qIcePcm   StoreIsFullOfIce BlockIceStore   TPiHxSolarIceIn TPiHxSolarIceOut Nix
 LABELS  3     
 Temperatures     
 Heat_transf_rates     

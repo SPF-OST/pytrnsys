@@ -1,0 +1,392 @@
+******************************
+**BEGIN type833.ddck
+*******************************
+    
+
+*****************************************
+** Contact person : Dani Carbonell    
+** Creation date  : 10.01.2010
+** Last changes   : 03.2021 Dani C 
+** version v1 (03.21) without electrical consumption which is moved to hydraulic export
+*****************************************
+
+***************************************************************************
+** Description: 
+** Collector model (MacSheep model) using efficiency curve efficiency
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS 2     
+TCollIn = TPiColIn   !  �C
+MfrColl = ABS(MfrPiColIn) ! MfrColl_B   ! because its the other way around  
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS 1
+TCollOut = [74,1]     ! Temperature of collector loop - collector to pipe
+
+***********************************
+** outputs to other ddck
+***********************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 1
+qSysIn_Collector = PColl_kW  
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+** ColAperArea from specific collector data base  
+** TTesSolar (Temperature sensor used for solar collector control)
+** pumpColOn Control signal for collector pump
+CONSTANTS 1   
+AcollAp = NumberOfColl*ColAperArea  ! Total Collector aperture area [m2]
+
+
+****************************
+**COLLECTOR DATA
+***************************
+CONSTANTS 3
+C_tilt = slopeSurfUser_1  ! Collector tilt angle / slope [�]
+C_azim = aziSurfUser_1    ! Collector azimuth  (0:s, 90:w, 270: e) [�]
+NumberOfColl = 10    ! Number of total collectors
+
+***************************************
+** Weather Data calculation
+***************************************
+
+EQUATIONS 4
+**surface-8
+IT_Coll_kJhm2 = IT_SurfUser_1  ! Incident total radiation on collector plane, kJ/hm2 
+IB_Coll_kJhm2 = IB_SurfUser_1  ! incident beam radiation on collector plane, kJ/hm2
+ID_Coll_kJhm2 = ID_SurfUser_1  ! diffuse and ground reflected irradiance on collector tilt
+AI_Coll = AI_SurfUser_1  ! incident angle on collector plane, �
+
+EQUATIONS 5
+IT_Coll_kW = IT_Coll_kJhm2/3600     ! Incident total radiation on collector plane, kW/m2
+IB_Coll_kW = IB_Coll_kJhm2/3600     ! incident beam radiation on collector plane, kW/m2
+ID_Coll_kW = ID_Coll_kJhm2/3600     ! diffuse and ground reflected irradiance on collector tilt (kW/m2)
+IT_Coll_Wm2 = IT_SurfUser_1/3.6
+IT_Coll_kWm2 = IT_SurfUser_1/3600
+
+***************************************
+** overall constants
+**************************************
+
+CONSTANTS 2
+TskyCalc = (1+COS(C_tilt))*0.5*tSky + (1-COS(C_tilt))*0.5*tAmb     
+vwindCalc = vWind * 0.5     
+
+EQUATIONS 5
+LI_Pyrg = ((tSky+273.15)**4)*5.67*(10**-8)*3.6     ! kJ/(m2h)
+BoCollBelowDp = LT(0.5*(TCollOutRc+TCollInRc),tAmbDewPoint) ! LT(TCollOutUc,TambDewPoint)     ! Boolean: if TCollOut is below dew point we assume condensation
+BoCondWindIrr = LT(IT_Coll_Wm2,300)*LT(vWind,2)     ! condensation is only allowed if irradiation and wind speed are not too high
+parRatio =MAX(MIN((parRatioRc+dtSim/tSelLoss*(BoCollBelowDp*BoCondWindIrr-NOT(BoCondWindIrr)-EQL(MfrColl,0)*NOT(BoCollBelowDp))),1),0)  
+**parRatio =MAX(MIN(NOT(BoCollBelowDp*),1),0)  !BoCondWindIrr falla !!!
+**parRatio =MAX(MIN((parRatioRc+dtSim/tSelLoss*(BoCollBelowDp-EQL(MfrColl,0)*NOT(BoCollBelowDp))),1),0)  
+   
+**parRatio = 1   
+rf = (1+cos(C_tilt))/2 
+CONSTANTS 5     
+MfrCPriSpec = 75 !60     ! Coll. Prim. loop spec. mass flow [kg/hm2]
+dtColOn = 7     ! Upper dead band coll. pump ON
+dtColOff = 3     ! Lower dead band coll. pump OFF
+tMaxCol = 110     ! Upper collector temp. limit for pump running
+LPiCollPri = 15     ! length of collector loop pipe
+! Nominal (= maximum) mass flow rates and minimum mass flow rates
+
+CONSTANTS 2
+MfrColNom = MfrCPriSpec*AcollAp 
+MfrColMin = 0.4*MfrColNom     ! minimum mass flow rate
+
+*********************************** Collector loop control ********************************************************************     
+     
+EQUATIONS 2
+TCstOff = tMaxCol - 15.0     ! Temperature of Collector stagnation OFF
+BoCst = GT(TCollOutRc,tMaxCol)*NOT(BoCstRc) + GT(TCollOutRc,TCstOff)*BoCstRc     ! Boolean for collector stagnation, 1/0    
+     
+UNIT 70 TYPE 2      ! Collector Controller
+PARAMETERS 2     
+5     ! 1 No. of oscillations
+300     ! 2 High limit cut-out
+INPUTS 6     
+TcollOut     ! Upper input temperature Th
+TTesSolar     ! Lower input temperature Tl
+TTesSolar     ! Monitoring temperature Tin
+BoCtc     ! 70,1 Input control function
+dtColOn       ! Upper dead band dT
+dtColOff       ! Lower dead band dT
+*** INITIAL INPUT VALUES     
+0.0 20.0 0.0 0 dtColOn dtColOff      
+     
+EQUATIONS 5   
+BoCtc = [70,1]     ! output of controllers for collector normal operation and collector High Flow
+dMfrColMax = 4*MfrColNom     
+dMfrColMin = -dMfrColMax     
+dTCollDf = 5     ! Delta T Collector when Deicing with collectors is on
+**dTColl = GT(NOT(TimerBlockUnc)*isWinterMonth,0.5)*1+LT(NOT(TimerBlockUnc)*isWinterMonth,0.5)*7     ! Delta T Collector when Collector is running
+**DfColOn =  0 ! (ProDfSc+ProDfUc)   One of the deicing Programms with collectors is running
+**TCollSet = GT(DfColOn,0.51)*(TPiIceIn+dTCollDf)+LT(DfColOn,0.49)*(TPiColIn+dTColl)     ! Set delta T over the collector
+TCollSet = (TCollIn+dTCollDf)     ! Set delta T over the collector
+
+
+! CONTROL OF COLLECTOR MASSFLOW. IT MAY CREATE PROBLEMS WITH TOO LOW ICE STORAGE MASS FLOW IN CAPILLARY MATS !!     
+UNIT 157 TYPE 889     ! Adapted PD-controller
+PARAMETERS 9     
+1     ! 1: mode of timesteps: 1= use previous value, 0 = use current value
+MfrColMin     ! 2: lowest possible output value
+MfrColNom     ! 3: highest possible output value
+-1     ! 4: mode of action: 1 = positive, (increase in manipulated value causes increase in process variable), -1 = negative
+MfrColNom     ! 5: By how much shall the manipulated variable be changed per hour if the process variable is 1 unit off?
+4     ! 6: A high value for D counteracts overshoot / counteracts high rates of increase or decrease in the process variable.
+120     ! 7: maximum rate of setpoint change per hour
+dMfrColMax     ! 8: maximum rate of increase of the manipulated variable (positive value)
+dMfrColMin     ! 9: maximum rate of decrease of the manipulated variable (negative value)
+INPUTS 5     
+TProPID     ! 1: process variable
+TCollSet    ! 2: setpoint
+Nix     ! 3: freeze manipulated variable (1) or let act (0)
+Nix     ! 4: Manual (1) or automatic (0) manipulated variable
+MfrPDNew     ! 5: manual manipulated variable
+*** INITIAL INPUT VALUES     
+0.0   0.0   0.0   0.0    0.0     
+*** OUTUPUTS     
+** 1: manipulated variable, 2: current setpoint, 3: current deviation      
+      
+EQUATIONS 4     ! Collector ON-Signal and mass flow
+MfrCPri = pumpColOn*MfrPDRc       
+MfrPDNew=[157,1]        
+MfrPD=MfrPDRc              
+TProPID= TCollOut ! TpiColOutInUsed   
+   
+     
+UNIT 71 TYPE 993     ! Input value recall (element RcC)
+PARAMETERS 1     
+6     ! 1: number of variables to be remembered
+**     
+INPUTS 6
+TCollOut   BoCst  MfrPDNew   TCollIn    parRatio MfrColl !QImbPri_kW_Int
+20     0.0   1.0     20   0 0
+         
+EQUATIONS 6               ! Recalled values for collector control
+TCollOutRc = [71,1]     ! recalled value of collector outlet temperature, �C
+BoCstRc = [71,2]     ! recalled Boolean for collector stagnation, 1/0
+MfrPDRc = [71,3]     
+TCollInRc = [71,4]     ! recalled value of collector outlet temperature, �C
+**QImbPri_kW_IntRc = [71,5]
+parRatioRc = [71,5]    
+MfrCollRc = [71,6] 
+
+CONSTANTS 3     
+MoFrost = 1     ! 0 = no condensation gains
+**cCondPerers = 0.25
+uCintBertram = 8     
+uConv = 5.8     
+
+    
+**UNIT 129 TYPE 993     ! Input value recall (element RcB)
+**PARAMETERS 1     
+**4     ! 1: number of variables to be remembered
+**INPUTS 4     
+**parRatio TPiColIn TCollOut   pUncSpec     
+**0.0 0 0 0     
+
+        
+UNIT 74 TYPE 833      ! MacSheep Type with optional set for free convection switch
+PARAMETERS 40     
+AcollAp    ! 1 Area - Collector aperture area
+Eta0     ! 2 Eta0 - optical efficiency or effective tau-alpha
+IAMdfu    ! 3 Kdiff - IAM for diffuse radiation
+a1    ! 4 U0 - c1 Linear heat loss coeff
+a2     ! 5 U1 - c2 Quadr. heat loss coeff
+cw_a1     ! 6 Uw - c3 Wind speed dependency of a1
+cIr_1     ! 7 Ur - c4 IR dependency  (inserted here: eta_0 * epsilon/alpha)
+CeffColl     ! 8 Ceff - c5 Effective heat capacity including collector fluid [J/m2K]
+cw_Eta0     ! 9 cw - c6 Wind speed dependency of Eta0
+cpBri     ! 10 Cp - c7 Fluid specific heat
+C_tilt     ! 11 Beta - Collector slope
+1     ! 12 CMode - Collector mode
+1     ! 13 wf - Wind speed factor
+rf     ! 14 rf - Sky radiation factor
+Omode     ! 15 OMode - Optical mode
+0     ! 16 Cfl - For Cmode 2 or 4 only
+0     ! 17 UAbsfl - For Cmode 2 or 4 only
+Par_b0     ! 18 b0 - For Cmode 1-3 only
+Par_b1     ! 19 b1 - For Cmode 1-3 only
+10     ! 20 Nseg - nr of segments
+1     ! 21 MoSeg - Mode for segmented heat loss calculation.
+C_azim     ! 22 Cazi - Collector azimuth; 999 if transversal and longitudinal angles are calculated externally and fed to inputs 9 and 10
+0     ! 23 Logical Unit for input file
+MoCond     ! 24 MoCond - Mode for condensation gain calculation: 0 = no cond. gains, 1 = method of Perers, 2 = method of Bertram
+cCondPerers     ! 25 cCond - additional coefficient for condensation gains - method of Perers, idally = 0.916
+UvalueAbs_Fluid     ! 26 u-value of the absorber or material between fluid and surface of the absorber to ambient boundary for condesation gain calculation according to Bertram
+BoFrostGains     ! 27 MoFrost - mode for calculation of frost gains. 0 = no calculation of condensation or frost gains below Tamb = 0�C, 1 = calculation of frost gains
+NIX     ! 28 frei
+NIX     ! 29 frei
+NIX     ! 30 frei
+eta0Wet     ! 31 Eta0_fc - optical efficiency or effective tau-alpha for free convection collector properties
+a1Wet     ! 32 U0_fc - c1 Linear heat loss coeff for free convection collector properties
+a2Wet     ! 33 U1_fc - c2 Quadr. heat loss coeff for free convection collector properties
+cw_a1     ! 34 Uw_fc - Wind speed dependency of a1_fc
+cw_Eta0     ! 35 cw_fc - Wind speed dependency of the zero heat loss efficiency for free convection collector properties
+MoCond_fc     ! 36 MoCond_fc - Mode for condensation gain calculation for free convection collector properties
+cCondPerers     ! 37 cCond_fc - additional coefficent for condensation gains for free convection collector
+UvalueAbs_Fluid     ! 38 u-value with free convection collector properties instead of Parameter 26
+BoFrostGains     ! 39 MoFrost_fc = mode for calculation of frost gains; 0 = no gains, 1 = calculation of frost gains with free convection collector properties
+cIr_2     ! 40 infrared radiation dependency, cIR, [-inf;inf]
+INPUTS 15     
+TCollIn     !  1  Inlet temp. of fluid to collector..from..PIPE/DUCT " To " [-]  
+MfrColl     !  2  Inlet mass flowrate to collector ..from..PIPE/DUCT " m "   [kg/h]
+Tamb     !  3  Ambient temperature              ..from..DATA READER " Tamb "    [C]
+**IT_Coll     !  4  Global radiation in collector plane..from..RADIATION PROCESSOR " It " [kJ/hm2]
+**ID_Coll     !  5  Incident diffuse radiation..from..L  LBL " IdT " [kJ/hm2]
+**AI_Coll     !  6  Incident angle of beam radiation..from..L  LBL " ai,b " [degrees]
+IT_Coll_kJhm2     !  4  Global radiation in collector plane..from..RADIATION PROCESSOR " It " [kJ/hm2]
+ID_Coll_kJhm2     !  5  Incident diffuse radiation..from..L  LBL " IdT " [kJ/hm2]
+AI_Coll     !  6  Incident angle of beam radiation..from..L  LBL " ai,b " [degrees]
+vwind     !  7  Wind speed                              [m/s]
+LI_Pyrg     !  8  Longwave Radiation downwards from sky   [kJ/hm2]
+AISZ     !  9 if Cazi = 999: ThetaT - Tranversal angle of solar incidence on collector; otherwise: Solar zenith anlge
+AISA     ! 10 if Cazi=999: ThetaL - Longtitudinal angle of solar incidence on collector; otherwise: solar azimuth angle
+RHamb_100     ! 11 relative humidity  of the ambient air [0;100]
+pamb_bar     ! 12 pressure of the ambient air, [bar]
+CoHTransMode     ! 13 convective heat transfer coefficient to absorber (condensation gains of Bertram - model). Set to -1 for internal calculation
+parRatio     ! 14 Parameter ratio; 0 = 100% parameter set 1 (a0_1, a1_1, a2_1, cIR_1), 1 = 100% parameter set 2 (a0_2, a1_2, a2_2, cIR_2); [0-1], not a Boolean value, linear change
+CoHTransMode     ! 15 convective heat transfer coefficient to absorber with free convection
+*** INITIAL INPUT VALUES     
+4 100 15 0 0 0 1 0 0 0     
+100 1 -1 0 -1     
+LABELS 1     
+ASSIGN PATH$\solar_collector\type833\iam_data\IAM_Sample_SPFC910.iam     
+    
+EQUATIONS 12     ! Collector Outputs
+MfrCout = [74,2]     ! Massflow out of collector
+Pcoll = [74,3]     ! kJ/h: Power of collector outlet
+pRadGain = [74,5]     ! Radiative energy gain per m2 [W/m2]
+iamBeamRad = [74,6]     ! No flow absorber temperature, �C
+Tabs = [74,4]     ! Mean absorber temperature, �C
+iaTrans = [74,7]     
+iaLong = [74,8]     
+specHeatGain= [74,9]     ! W/m2
+pCollCondens = [74,10]     ! W/m2
+dTTamb = Tamb-TCollIn     
+pUncSpec = pColl/3.6/ACollAp/(ABS(dTTamb)+0.00001)     ! W/m2/K    
+PelPVT_kW = 0 !electricity from PVT when used
+
+*************************************************************************
+******************ELECTRICITY CONSUMPTION OF PUMPS***********************
+*************************************************************************
+
+
+
+
+  
+EQUATIONS 12   ! Converted values for outputs
+P_IRRAD_kW = IT_Coll_kW*AcollAp              ! solar radiation on total collector field [kW]
+**P_IRRAD_kW = P_IRRAD_COV_KW + P_IRRAD_UNC_KW     
+PColl_kW = (Pcoll)/3600  !kW CHECK THIS !!!!!!!   
+PColl_kWm2 = PColl_kW/(AcollAp+1e-30)   
+PCollCondens_kW = pCollCondens*AcollAp/1000     ! This is a part of PCollHeatGainUc!!
+PCollHeatGain_kW = specHeatGain*AcollAp/1000     ! It's almost the same like PCollUc_kW
+PRad_kW = pRadGain*AcollAp/1000     ! Not the same like P_Irrad_Unc_kW! This is with long wave radiation from the environment
+PGainAmbient_kW= PCollHeatGain_kW - PRad_kW - PCollCondens_kW     ! Gains or losses to the ambinet.
+PCollAmbPos_kW = MAX(PGainAmbient_kW,0.0)
+PCollAmbNeg_kW = -MIN(PGainAmbient_kW,0.0)
+PCollPos_kW = MAX(PColl_kW,0.0)     
+PCollNeg_kW = -MIN(PColl_kW,0.0)     
+PCollOff_kW = GT(MfrCPri,1)*PColl_kW       
+  
+    
+EQUATIONS 2     
+P_Irrad_ON_kW = P_Irrad_kW*GT(MfrCPri,0)     ! Irradiation at times the collector loop is in operation, kW
+P_Irrad_OFF_kW = P_Irrad_kW*NOT(GT(MfrCPri,0))     ! Irradiation at times the collector loop is not in operation, kW
+
+***********************************
+** Monthly printer
+***********************************
+
+CONSTANTS 1
+unitPrintSol=214
+
+ASSIGN    temp\SOLAR_MO.Prt      unitPrintSol     
+    
+UNIT 214 Type 46     ! Printegrator Monthly Values for Solar
+PARAMETERS 6   
+unitPrintSol     ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+INPUTS 17
+Time  Pcoll_kW  BoCst P_IRRAD_kW    PColl_kWm2  PCollOff_kW     PCollCondens_kW IT_Coll_kWm2
+PCollHeatGain_kW  PRad_kW  PGainAmbient_kW  PCollNeg_kW  PCollPos_kW  PCollAmbPos_kW PCollAmbNeg_kW  Pcoll_kW  IT_Coll_kW      
+*******     
+Time  Pcoll_kW  BoCst P_IRRAD_kW    PColl_kWm2 PCollOff_kW     PCollCondens_kW IT_Coll_kWm2
+PCollHeatGain_kW  PRad_kW  PGainAmbient_kW  PCollNeg_kW  PCollPos_kW  PCollAmbPos_kW PCollAmbNeg_kW  Pcoll_kW  IT_Coll_kW  
+
+***********************************
+** Hourly printer
+***********************************
+
+CONSTANTS 1
+unitHourlyCol = 33
+
+ASSIGN    temp\SOLAR_HR.Prt    unitHourlyCol     
+
+UNIT 34 TYPE 46     ! Printegrator Monthly Values for System
+PARAMETERS 7    
+unitHourlyCol ! 1: Logical unit number, -
+-1            ! 2: Logical unit for monthly summaries, -
+1             ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1             ! 4: Printing & integrating interval, h. -1 for monthly integration
+2             ! 5: Number of inputs to avoid integration, -
+4             ! 6: Output number to avoid integration
+5             ! 7: Output number to avoid integration
+INPUTS 6
+Pcoll_kW  PColl_kWm2  IT_Coll_kWm2 TCollOut TCollIn MfrColl
+**  
+Pcoll_kW  PColl_kWm2  IT_Coll_kWm2 TCollOut TCollIn MfrColl
+
+
+UNIT 79 TYPE 65     ! Online Plotter Collector (Element OpC)
+PARAMETERS 12     
+10     ! 1 Nb. of left-axis variables
+10     ! 2 Nb. of right-axis variables
+-1     ! 3 Left axis minimum
+90     ! 4 Left axis maximum
+-50    ! 5 Right axis minimum
+75     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+
+INPUTS 20     
+TCollIn TCollOut NIX NIX  NIX  NIX  MfrColl  PColl_kW NIX NIX
+IT_H_Wm2 IB_Coll_kJhm2 IT_Coll_kW IT_Coll_Wm2 IT_Coll_kJhm2 IT_SurfUser_1 IT_SurfUser_2 MfrColl PColl_kW    Tamb  
+**      
+TCollIn TCollOut NIX NIX  NIX  NIX  MfrColl  PColl_kW NIX NIX
+IT_H_Wm2 IB_Coll_kJhm2 IT_Coll_kW IT_Coll_Wm2 IT_Coll_kJhm2 IT_SurfUser_1 IT_SurfUser_2 MfrColl PColl_kW    Tamb  
+
+
+**     
+LABELS  3     
+Temperatures     
+Heat_transf_rates     
+Collector     
+
+*******************************
+**END SolarCollector.ddck
+*******************************
