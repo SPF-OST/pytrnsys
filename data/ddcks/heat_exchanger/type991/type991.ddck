@@ -31,8 +31,8 @@ THxRevRightTop = TPiHxRightTop			! 6: Right top side inlet temperature, deg C
 ** outputs to hydraulic solver
 ******************************************************************************************
 EQUATIONS 2
-THxOutLeft = [2,1]				! 1: Lower left side outlet temperature, deg C 
-THxOutRight = [2,3]				! 3: Upper right side outlet temperature, deg C
+THxOutLeft = [2,1]				! 1: Left side outlet temperature, deg C 
+THxOutRight = [2,3]				! 3: Right side outlet temperature, deg C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh

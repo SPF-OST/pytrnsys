@@ -396,7 +396,7 @@ parameters. The custom defined plots will automatically be added to the result p
     The hourly printed humidity of a room can be plotted against the hourly printed room temperature and be compared to
     different comfort norms::
 
-        string Array comfortHourly ["norm"] "temperature_variable" "humidity_variable"
+        stringArray comfortHourly ["norm"] "temperature_variable" "humidity_variable"
 
     There are two norm boundaries available. The default one (can also be actively called by setting ``norm`` to
     ``ISO7730``) is ISO 7730:
