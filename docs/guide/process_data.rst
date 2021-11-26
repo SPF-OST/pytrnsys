@@ -388,6 +388,10 @@ parameters. The custom defined plots will automatically be added to the result p
 
         stringArray scatterHourly "x_variable" "y_variable"
 
+    .. image:: ./resources/scatterHourly.png
+        :width: 400
+        :alt: scatterHourly
+
 ``comfortHourly``
     The hourly printed humidity of a room can be plotted against the hourly printed room temperature and be compared to
     different comfort norms::
@@ -403,6 +407,10 @@ parameters. The custom defined plots will automatically be added to the result p
 
     The alternative one is according to `this publication <https://www.irbnet.de/daten/rswb/15109001837.pdf>`_ and can
     be employed by setting ``norm`` to ``Dahlheimer``:
+
+    .. image:: ./resources/comfort_Dahlheimer.png
+        :width: 400
+        :alt: comfort Dahlheimer
 
 .. _ref-plotHourlyQvsT:
 
