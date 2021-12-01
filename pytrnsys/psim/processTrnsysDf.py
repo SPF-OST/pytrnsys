@@ -1810,29 +1810,21 @@ class ProcessTrnsysDf:
                 legend = []
                 inVar = []
                 for variable in self.inputs["monthlyBalance"][i]:
-                    # legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
-                    # inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
-                    # First name is now the name of the plot
-                    # legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables[1:] ]
-                    # inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables[1:]]
                     if ":" in variable:
                         plotStyle = variable.split(":")[-1]
                     elif variable != namePlot:
-                        legend.append(
-                            self.getNiceLatexNames(variable)
-                        )  # if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables[1:] ]
-                        inVar.append(
-                            self.monDataDf[variable].values
-                        )  # if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables[1:]]
-
+                        if variable[0] != "-":
+                            legend.append(self.getNiceLatexNames(variable))
+                            inVar.append(self.monDataDf[variable].values)
+                        else:
+                            legend.append(self.getNiceLatexNames(variable[1:]))
+                            inVar.append(-self.monDataDf[variable[1:]].values)
                 if plotStyle == "relative":
                     nameFile = namePlot + "_relative"
                 else:
                     nameFile = namePlot  #'Balance'+'_'.join(variables)
                 titlePlot = "Balance"
-                titleOfPlot = (
-                    titlePlot  # self.deckData['Simulation_MFH'] + ' (' + self.deckData['Umgebungstemperatur'] + ')'
-                )
+                titleOfPlot = (titlePlot)
                 namePdf = self.plot.plotMonthlyBalanceDf(
                     inVar,
                     [],
@@ -1856,7 +1848,6 @@ class ProcessTrnsysDf:
 
                 self.addPlotToLaTeX = {namePdf: caption}
 
-                # self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def addHeatingLimitFit(self):
         """
