@@ -276,8 +276,9 @@ parameters. The custom defined plots will automatically be added to the result p
 
 ``monthlyBalance``
     Custom monthly balance. The sign of the values can be inverted by adding a - in front of the variable name. If
-    positive and negative values don't add up to zero, the imbalance is shown as black bars. When adding the optional
-    ``style:relative`` the bars will be shown as values relative to the positive sum of the monthly energy values::
+    positive and negative values don't add up to zero, the imbalance is shown as black bars. The name of the pdf to be
+    created needs to specified through ``pdf name``. When adding the optional ``style:relative`` the bars will be shown
+    as values relative to the positive sum of the monthly energy values::
 
         stringArray monthlyBalance "pdf name" ["style:relative"] "variable 1" "variable 2" ...
 
@@ -295,6 +296,17 @@ parameters. The custom defined plots will automatically be added to the result p
     .. image:: ./resources/StackedBar.png
         :width: 400
         :alt: SP
+
+``plotT``
+    This generates one or more frequency analysis plots for hourly variables, i.e., bar plots of bandwidth bins for
+    certain values of the respective variables (originally aimed at temperatures, hence the name). It provides an
+    overview over how often a certain value range of a variable appears::
+
+        stringArray plotT "hourly variable 1" "hourly variable 2" ...
+
+    .. image:: ./resources/plotT.png
+        :width: 400
+        :alt: plotT
 
 .. note::
 
