@@ -499,7 +499,7 @@ class ProcessTrnsysDf:
                 logger.warning("scatterHourly not generated.")
                 continue
 
-            logger.info("Generating scatterHourly...")
+            logger.info("Generating scatterHourly %s %s..." %(xVariable, yVariable))
 
             if "latexNames" in self.inputs.keys():
                 if ":" in self.inputs["latexNames"]:
@@ -575,7 +575,7 @@ class ProcessTrnsysDf:
                 logger.warning("comfortHourly not generated.")
                 continue
 
-            logger.info("Generating comfortHourly...")
+            logger.info("Generating comfortHourly %s %s..." %(xVariable, yVariable))
 
             if "latexNames" in self.inputs.keys():
                 if ":" in self.inputs["latexNames"]:
@@ -588,13 +588,26 @@ class ProcessTrnsysDf:
 
             fig1, ax1 = plt.subplots(constrained_layout=True)
 
-            ax1.plot(xDf, yDf, "o", color='b', markersize=1)
-            ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
-            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
+            ax1.plot(xDf[xDf.index.month == 3], yDf[xDf.index.month == 3], "o", color='lime', markersize=0.25, label = 'Mar-May')
+            ax1.plot(xDf[xDf.index.month == 4], yDf[xDf.index.month == 4], "o", color='lime', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 5], yDf[xDf.index.month == 5], "o", color='lime', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 6], yDf[xDf.index.month == 6], "o", color='r', markersize=0.25, label = 'Jun-Aug')
+            ax1.plot(xDf[xDf.index.month == 7], yDf[xDf.index.month == 7], "o", color='r', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 8], yDf[xDf.index.month == 8], "o", color='r', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 9], yDf[xDf.index.month == 9], "o", color='orange', markersize=0.25, label = 'Sep-Nov')
+            ax1.plot(xDf[xDf.index.month == 10], yDf[xDf.index.month == 10], "o", color='orange', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 11], yDf[xDf.index.month == 11], "o", color='orange', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 12], yDf[xDf.index.month == 12], "o", color='b', markersize=0.25, label = 'Dec-Feb')
+            ax1.plot(xDf[xDf.index.month == 1], yDf[xDf.index.month == 1], "o", color='b', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 2], yDf[xDf.index.month == 2], "o", color='b', markersize=0.25)
 
             self.outlinePlotter(ax1, comfortBoundary)
             if acceptableBoundary:
                 self.outlinePlotter(ax1, acceptableBoundary, color='grey')
+
+            ax1.legend(loc = 'best', markerscale = 10)
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
 
             fileName = "comfort_" + xVariable + "_" + yVariable
             fileName = re.sub(r"[^\w\-_\. ]", "", fileName)
