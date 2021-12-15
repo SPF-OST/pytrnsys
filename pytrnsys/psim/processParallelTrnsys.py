@@ -163,15 +163,11 @@ class ProcessParallelTrnsys:
         self.inputs["costPdf"] = False
         self.inputs["dailyBalance"] = False
         self.inputs["hourlyBalance"] = False
-        # self.inputs['daysSelected'] = "2019,2,30" "2019,4,30" "2019,8,30"
-
-        # self.inputs["automaticTrnsysProcess"] = True maybe add this to set to false automatically the ones below
         self.inputs["calculateHeatDemand"] = True
         self.inputs["calculateSPF"] = True
         self.inputs["addWeightedSPF"] = False
         self.inputs["calculateElectricDemand"] = True
         self.inputs["extensionFig"] = '.png'
-
         self.inputs["comparePlotUserName"] = ""  # don't change this default value
 
         self.individualFile = False
