@@ -62,6 +62,13 @@ You can now close the command prompt opened in the first step.
 
 pytrnsys can now be used from a python editor of your choice within the virtual environment you created.
 
+Several original types are delivered with pytrnsys. For those you'll manually need to copy the dll-files from:
+
+    pytrnsys\pytrnsys_data\ddcks\dlls
+    
+to the respective folder of your TRNSYS installation::
+
+    ...\UserLib\ReleaseDLLs
 
 ### Installation from source / Developer installation
 
@@ -94,6 +101,14 @@ specified are for a Windows environment. They are very similar for Linux.
     pip install wheel
     pip install -r requirements\dev\requirements.txt
     ```
+   
+Several original types are delivered with pytrnsys. For those you'll manually need to copy the dll-files from:
+
+    pytrnsys\data\ddcks\dlls
+    
+to the respective folder of your TRNSYS installation::
+
+    ...\UserLib\ReleaseDLLs
 
 And you're ready to go!
     
