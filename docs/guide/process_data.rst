@@ -257,11 +257,69 @@ By default the processing creates a pdf with the following content:
       :width: 400
       :alt: SPF
 
-Custom plotting and printing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Plotting hourly data
+^^^^^^^^^^^^^^^^^^^^
 
-The user can add additional monthly plots to the processing of a single simulation run by the use of the following
-parameters. The custom defined plots will automatically be added to the result pdf-file:
+.. note::
+
+    If an argument in the code excerpts below is set in square brackets, it is optional.
+
+``plotT``
+    This generates one or more frequency analysis plots for hourly variables, i.e., bar plots of bandwidth bins for
+    certain values of the respective variables (originally aimed at temperatures, hence the name). It provides an
+    overview over how often a certain value range of a variable appears::
+
+        stringArray plotT "hourly variable 1" "hourly variable 2" ...
+
+    .. image:: ./resources/plotT.png
+        :width: 400
+        :alt: plotT
+
+``plotHourly``
+    Hourly printed values can be displayed in a interactable html-plot that is created using the bokeh plotting library.
+
+    .. image:: ./resources/bokeh_plot.png
+        :width: 400
+        :alt: SP
+
+``scatterHourly``
+    Hourly printed values can be displayed as a scatter plot::
+
+        stringArray scatterHourly "x_variable" "y_variable"
+
+    .. image:: ./resources/scatterHourly.png
+        :width: 400
+        :alt: scatterHourly
+
+``comfortHourly``
+    The hourly printed humidity of a room can be plotted against the hourly printed room temperature and be compared to
+    different comfort norms::
+
+        stringArray comfortHourly ["norm"] "temperature_variable" "humidity_variable"
+
+    There are two norm boundaries available. The default one (can also be actively called by setting ``norm`` to
+    ``ISO7730``) is ISO 7730:
+
+    .. image:: ./resources/comfort_ISO.png
+        :width: 400
+        :alt: comfort ISO
+
+    The alternative one is according to `this publication <https://www.irbnet.de/daten/rswb/15109001837.pdf>`_ and can
+    be employed by setting ``norm`` to ``Dahlheimer``:
+
+    .. image:: ./resources/comfort_Dahlheimer.png
+        :width: 400
+        :alt: comfort Dahlheimer
+
+.. _ref-plotHourlyQvsT:
+
+``plotHourlyQvsT``
+    Adds a cumulative plot that contains a line for each heat temperature pair given in the string array.
+    Used to show at what temperature levels the heat is released or consumed in different system components.
+    Uses hourly printer files.
+
+Plotting monthly data
+^^^^^^^^^^^^^^^^^^^^^
 
 .. note::
 
@@ -276,8 +334,9 @@ parameters. The custom defined plots will automatically be added to the result p
 
 ``monthlyBalance``
     Custom monthly balance. The sign of the values can be inverted by adding a - in front of the variable name. If
-    positive and negative values don't add up to zero, the imbalance is shown as black bars. When adding the optional
-    ``style:relative`` the bars will be shown as values relative to the positive sum of the monthly energy values::
+    positive and negative values don't add up to zero, the imbalance is shown as black bars. The name of the pdf to be
+    created needs to specified through ``pdf name``. When adding the optional ``style:relative`` the bars will be shown
+    as values relative to the positive sum of the monthly energy values::
 
         stringArray monthlyBalance "pdf name" ["style:relative"] "variable 1" "variable 2" ...
 
@@ -296,25 +355,26 @@ parameters. The custom defined plots will automatically be added to the result p
         :width: 400
         :alt: SP
 
-``fitHeatingLimit``
-    This function was created to plot and fit heating power values against average daily temperatures. In principle it
-    can plot any daily or hourly data against average daily temperature. The time resolution of the heating power data
-    (or its equivalent) needs to be specified as ``daily`` or ``hourly`` (``heatingDataTimeStep``) when calling the
-    function::
+Plotting time-step data
+^^^^^^^^^^^^^^^^^^^^^^^
 
-        string fitHeatingLimit "y_variable" "heatingDataTimeStep"
+.. _ref-plotTimestepQvsT:
 
-    A linear fit is done for ``daily``, while the data only are shown for ``hourly``.
+``plotTimestepQvsT``
+    Adds a cumulative plot that contains a line for each heat temperature pair given in the string array.
+    Used to show at what temperature levels the heat is released or consumed in different system componenets.
+    Uses timestep printer files.
 
-    .. image:: ./resources/fitHeatingLimit.png
-        :width: 400
-        :alt: SP
+Plotting parametric data
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. note::
 
-    All variables used in ``comparePlot``, ``comparePlotUncertain``, and ``acrossSetsCalculationsPlot`` need to be
-    saved in the ``-results.json`` files.
+    If an argument in the code excerpts below is set in square brackets, it is optional.
 
+.. note::
+
+    All variables used for the parametric plots need to be saved in the ``-results.json`` files.
 
 ``comparePlot``
     When processing parametric runs, scalar results of the simulations can be visualized in comparison plots. The first
@@ -388,28 +448,6 @@ parameters. The custom defined plots will automatically be added to the result p
     .. image:: ./resources/scatter_diff.png
         :width: 400
         :alt: scatter difference
-
-
-``plotHourly``
-    Hourly printed values can be displayed in a interactable html-plot that is created using the bokeh plotting library.
-
-    .. image:: ./resources/bokeh_plot.png
-        :width: 400
-        :alt: SP
-
-.. _ref-plotHourlyQvsT:
-
-``plotHourlyQvsT``
-    Adds a cumulative plot that contains a line for each heat temperature pair given in the string array.
-    Used to show at what temperature levels the heat is released or consumed in different system components.
-    Uses hourly printer files.
-
-.. _ref-plotTimestepQvsT:
-
-``plotTimestepQvsT``
-    Adds a cumulative plot that contains a line for each heat temperature pair given in the string array.
-    Used to show at what temperature levels the heat is released or consumed in different system componenets.
-    Uses timestep printer files.
 
 Example
 -------

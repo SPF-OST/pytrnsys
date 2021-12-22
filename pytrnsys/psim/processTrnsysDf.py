@@ -474,36 +474,192 @@ class ProcessTrnsysDf:
         if "plotHourly" in self.inputs.keys():
             self.pltB.createBokehPlot(self.houDataDf, self.outputPath, self.fileName, self.inputs["plotHourly"][0])
 
-    def addQvsTPlot(self):
-        # define QvsTDf here!
-        monthsSplit = []
-        if "plotHourlyQvsT" in self.inputs.keys():
-            InputListQvsT = self.inputs["plotHourlyQvsT"][0]
-            QvsTDf = self.houDataDf
-            logger.debug("hourlyUsed")
-            self.loadQvsTConfig(
-                QvsTDf, InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False
-            )
-        if "plotTimestepQvsT" in self.inputs.keys():
-            InputListQvsT = self.inputs["plotTimestepQvsT"][0]
-            QvsTDf = self.steDataDf
-            if "Time" in QvsTDf:
-                timestep = (QvsTDf[2] - QvsTDf[1]).seconds
+        if "scatterHourly" in self.inputs.keys():
+            self.scatterHourly()
+
+        if "comfortHourly" in self.inputs.keys():
+            self.comfortHourly()
+
+    def scatterHourly(self):
+        for plotVariables in self.inputs["scatterHourly"]:
+
+            xVariable = plotVariables[0]
+            yVariable = plotVariables[1]
+
+            try:
+                xDf = self.houDataDf[xVariable]
+            except:
+                logger.warning("%s not found in hourly data.", xVariable)
+                logger.warning("scatterHourly not generated.")
+                continue
+            try:
+                yDf = self.houDataDf[yVariable]
+            except:
+                logger.warning("%s not found in hourly data.", yVariable)
+                logger.warning("scatterHourly not generated.")
+                continue
+
+            logger.info("Generating scatterHourly %s %s..." %(xVariable, yVariable))
+
+            if "latexNames" in self.inputs.keys():
+                if ":" in self.inputs["latexNames"]:
+                    latexNameFullPath = self.inputs["latexNames"]
+                else:
+                    latexNameFullPath = os.path.join(self.configPath, self.inputs["latexNames"])
+                self.doc.getLatexNamesDict(file=latexNameFullPath)
             else:
-                timestep = (QvsTDf.index[2] - QvsTDf.index[1]).seconds
-            factorForHour = timestep / 3600
-            logger.debug("stepDfUsed")
-            self.loadQvsTConfig(
-                QvsTDf,
-                InputListQvsT,
-                "plotQvsTconfigured",
-                monthsSplit=monthsSplit,
-                normalized=True,
-                cut=False,
-                factor=factorForHour,
-            )
+                self.doc.getLatexNamesDict()
+
+            fig1, ax1 = plt.subplots(constrained_layout=True)
+
+            ax1.plot(xDf, yDf, "o", color='b', markersize=1)
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
+
+            fileName = "scatter_" + xVariable + "_" + yVariable
+            fileName = re.sub(r"[^\w\-_\. ]", "", fileName)
+
+            lines = xVariable + "\t" + yVariable + "\n"
+            for i in range(len(xDf)):
+                line = str(xDf.iloc[i]) + "\t" + str(yDf.iloc[i])
+                lines += line + "\n"
+
+            pathFolder = os.path.join(self.executingPath,self.folderName)
+
+            outfile = open(os.path.join(pathFolder, fileName + ".dat"), "w")
+            outfile.writelines(lines)
+            outfile.close()
+
+            fig1.savefig(os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
+            plt.close()
+
+    def outlinePlotter(self, axis, outlinePoints, color='k', label = None):
+        if label == None:
+            axis.plot([outlinePoints[-1][0], outlinePoints[0][0]], [outlinePoints[-1][1], outlinePoints[0][1]],
+                      linestyle='-', markersize=0, color=color)
         else:
-            pass
+            axis.plot([outlinePoints[-1][0], outlinePoints[0][0]], [outlinePoints[-1][1], outlinePoints[0][1]],
+                      linestyle='-', markersize=0, color=color, label=label)
+
+        for i in range(0,len(outlinePoints)-1):
+            axis.plot([outlinePoints[i][0], outlinePoints[i+1][0]], [outlinePoints[i][1], outlinePoints[i+1][1]],
+                      linestyle='-', markersize=0, color=color)
+
+    def comfortHourly(self):
+        for plotVariables in self.inputs["comfortHourly"]:
+
+            variableStartIndex = 0
+            comfortBoundary = [(20, 30), (20, 70), (26, 70), (26, 30)]
+            acceptableBoundary = []
+
+            if plotVariables[0] == "ISO7730":
+                variableStartIndex = 1
+            elif plotVariables[0] == "Dahlheimer":
+                variableStartIndex = 1
+                comfortBoundary = [(17,75), (21,65), (22,35), (19,35)]
+                acceptableBoundary = [(16,75), (17,85), (21,80), (25,60), (27,30), (26,20), (20,20), (17,35)]
+
+            xVariable = plotVariables[variableStartIndex]
+            yVariable = plotVariables[variableStartIndex + 1]
+
+            try:
+                xDf = self.houDataDf[xVariable]
+            except:
+                logger.warning("%s not found in hourly data.", xVariable)
+                logger.warning("comfortHourly not generated.")
+                continue
+            try:
+                yDf = self.houDataDf[yVariable]
+            except:
+                logger.warning("%s not found in hourly data.", yVariable)
+                logger.warning("comfortHourly not generated.")
+                continue
+
+            logger.info("Generating comfortHourly %s %s..." %(xVariable, yVariable))
+
+            if "latexNames" in self.inputs.keys():
+                if ":" in self.inputs["latexNames"]:
+                    latexNameFullPath = self.inputs["latexNames"]
+                else:
+                    latexNameFullPath = os.path.join(self.configPath, self.inputs["latexNames"])
+                self.doc.getLatexNamesDict(file=latexNameFullPath)
+            else:
+                self.doc.getLatexNamesDict()
+
+            fig1, ax1 = plt.subplots(constrained_layout=True)
+
+            ax1.plot(xDf[xDf.index.month == 3], yDf[xDf.index.month == 3], "o", color='lime', markersize=0.25, label = 'Mar-May')
+            ax1.plot(xDf[xDf.index.month == 4], yDf[xDf.index.month == 4], "o", color='lime', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 5], yDf[xDf.index.month == 5], "o", color='lime', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 6], yDf[xDf.index.month == 6], "o", color='r', markersize=0.25, label = 'Jun-Aug')
+            ax1.plot(xDf[xDf.index.month == 7], yDf[xDf.index.month == 7], "o", color='r', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 8], yDf[xDf.index.month == 8], "o", color='r', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 9], yDf[xDf.index.month == 9], "o", color='orange', markersize=0.25, label = 'Sep-Nov')
+            ax1.plot(xDf[xDf.index.month == 10], yDf[xDf.index.month == 10], "o", color='orange', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 11], yDf[xDf.index.month == 11], "o", color='orange', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 12], yDf[xDf.index.month == 12], "o", color='b', markersize=0.25, label = 'Dec-Feb')
+            ax1.plot(xDf[xDf.index.month == 1], yDf[xDf.index.month == 1], "o", color='b', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 2], yDf[xDf.index.month == 2], "o", color='b', markersize=0.25)
+
+            self.outlinePlotter(ax1, comfortBoundary)
+            if acceptableBoundary:
+                self.outlinePlotter(ax1, acceptableBoundary, color='grey')
+
+            ax1.legend(loc = 'best', markerscale = 10)
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
+
+            fileName = "comfort_" + xVariable + "_" + yVariable
+            fileName = re.sub(r"[^\w\-_\. ]", "", fileName)
+
+            lines = xVariable + "\t" + yVariable + "\n"
+            for i in range(len(xDf)):
+                line = str(xDf.iloc[i]) + "\t" + str(yDf.iloc[i])
+                lines += line + "\n"
+
+            pathFolder = os.path.join(self.executingPath,self.folderName)
+
+            outfile = open(os.path.join(pathFolder, fileName + ".dat"), "w")
+            outfile.writelines(lines)
+            outfile.close()
+
+            fig1.savefig(os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
+            plt.close()
+
+    def addQvsTPlot(self):
+        if (os.getenv("GLE_EXE") == None):
+            logger.warning("No gle environment defined!")
+            logger.warning("QvsTPlot can only be used with existing gle environment.")
+            return
+        else:
+            monthsSplit = []
+            if "plotHourlyQvsT" in self.inputs.keys():
+                InputListQvsT = self.inputs["plotHourlyQvsT"][0]
+                QvsTDf = self.houDataDf
+                logger.debug("hourlyUsed")
+                self.loadQvsTConfig(
+                    QvsTDf, InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False
+                )
+            if "plotTimestepQvsT" in self.inputs.keys():
+                InputListQvsT = self.inputs["plotTimestepQvsT"][0]
+                QvsTDf = self.steDataDf
+                if "Time" in QvsTDf:
+                    timestep = (QvsTDf[2] - QvsTDf[1]).seconds
+                else:
+                    timestep = (QvsTDf.index[2] - QvsTDf.index[1]).seconds
+                factorForHour = timestep / 3600
+                logger.debug("stepDfUsed")
+                self.loadQvsTConfig(
+                    QvsTDf,
+                    InputListQvsT,
+                    "plotQvsTconfigured",
+                    monthsSplit=monthsSplit,
+                    normalized=True,
+                    cut=False,
+                    factor=factorForHour,
+                )
+            else:
+                pass
 
     def executeLatexFile(self):
 
@@ -1667,29 +1823,21 @@ class ProcessTrnsysDf:
                 legend = []
                 inVar = []
                 for variable in self.inputs["monthlyBalance"][i]:
-                    # legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
-                    # inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
-                    # First name is now the name of the plot
-                    # legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables[1:] ]
-                    # inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables[1:]]
                     if ":" in variable:
                         plotStyle = variable.split(":")[-1]
                     elif variable != namePlot:
-                        legend.append(
-                            self.getNiceLatexNames(variable)
-                        )  # if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables[1:] ]
-                        inVar.append(
-                            self.monDataDf[variable].values
-                        )  # if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables[1:]]
-
+                        if variable[0] != "-":
+                            legend.append(self.getNiceLatexNames(variable))
+                            inVar.append(self.monDataDf[variable].values)
+                        else:
+                            legend.append(self.getNiceLatexNames(variable[1:]))
+                            inVar.append(-self.monDataDf[variable[1:]].values)
                 if plotStyle == "relative":
                     nameFile = namePlot + "_relative"
                 else:
                     nameFile = namePlot  #'Balance'+'_'.join(variables)
                 titlePlot = "Balance"
-                titleOfPlot = (
-                    titlePlot  # self.deckData['Simulation_MFH'] + ' (' + self.deckData['Umgebungstemperatur'] + ')'
-                )
+                titleOfPlot = (titlePlot)
                 namePdf = self.plot.plotMonthlyBalanceDf(
                     inVar,
                     [],
@@ -1713,7 +1861,6 @@ class ProcessTrnsysDf:
 
                 self.addPlotToLaTeX = {namePdf: caption}
 
-                # self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def addHeatingLimitFit(self):
         """
