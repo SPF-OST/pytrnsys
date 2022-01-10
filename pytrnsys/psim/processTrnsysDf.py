@@ -292,7 +292,6 @@ class ProcessTrnsysDf:
         self.monthlyUsed = True
         self.hourlyUsed = True
         self.timeStepUsed = True
-        self.fullYear = False
         self.fileNameListToRead = None
         self.loadMode = "complete"
 
@@ -357,7 +356,6 @@ class ProcessTrnsysDf:
                     hourlyUsed=self.hourlyUsed,
                     timeStepUsed=self.timeStepUsed,
                     firstMonth=self.firstMonth,
-                    fullYear=self.fullYear,
                     year=self.yearReadedInMonthlyFile,
                 )
         self.monDataDf = self.loader.monDataDf
