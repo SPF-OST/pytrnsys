@@ -27,8 +27,6 @@ class SimulationLoader:
         list of file names to include into the loader
     mode : {array,dataframe,complete}, optional, default: complete
         modes for the loader
-    fullYear : bool
-        extract one year accoring to firstMonth and year arguments
     firstMonth : {January, February, March, ... , December}
         start full year with this month
     year : {-1, 0, 1, 2, ...}
@@ -57,7 +55,6 @@ class SimulationLoader:
         path,
         fileNameList=None,
         mode="complete",
-        fullYear=True,
         firstMonth="January",
         year=-1,
         sortMonths=False,
@@ -72,7 +69,6 @@ class SimulationLoader:
 
         self._path = path
         self._mode = mode
-        self._fullYear = fullYear
         self._firstMonth = firstMonth
         self._year = year
         self._sortMonths = sortMonths
@@ -153,23 +149,22 @@ class SimulationLoader:
                 self.logger.warning(f"Could not load incomplete or broken file: {pathFile}")
                 return
             file.set_index("Number", inplace=True)
-            if self._fullYear:
-                if self._year == -1:
-                    file = file[-12:]
+            if self._year == -1:
+                file = file[-12:]
 
-                else:
-                    firstMonthNumber = firstMonthN + self._year * 12
-                    try:
-                        file = file.loc[firstMonthNumber : firstMonthNumber + 11]
+            else:
+                firstMonthNumber = firstMonthN + self._year * 12
+                try:
+                    file = file.loc[firstMonthNumber : firstMonthNumber + 11]
 
-                    except:
-                        raise ValueError(
-                            pathFile
-                            + " is not in the right Format to read Months "
-                            + str(firstMonthNumber)
-                            + " to "
-                            + str(firstMonthNumber + 12)
-                        )
+                except:
+                    raise ValueError(
+                        pathFile
+                        + " is not in the right Format to read Months "
+                        + str(firstMonthNumber)
+                        + " to "
+                        + str(firstMonthNumber + 12)
+                    )
 
                 file["Number"] = pd.to_datetime(file["Month"].str.strip(), format="%B").dt.month
                 file.set_index("Number", inplace=True)
@@ -203,28 +198,27 @@ class SimulationLoader:
 
             file.set_index("Period", inplace=True, drop=False)
 
-            if self._fullYear:
-                if self._year == -1:
-                    try:
-                        file = file[-8760:]
-                    except:
-                        file = file[-8758:]  # this is here because of the trnsys bug in type 99
+            if self._year == -1:
+                try:
+                    file = file[-8760:]
+                except:
+                    file = file[-8758:]  # this is here because of the trnsys bug in type 99
 
-                else:
-                    firstHourNumber = (
-                        datetime(2018, firstMonthN, 1) - datetime(2018, 1, 1)
-                    ).days * 24 + self._year * 8760
-                    try:
-                        file = file.loc[firstHourNumber : firstHourNumber + 8760]
+            else:
+                firstHourNumber = (
+                    datetime(2018, firstMonthN, 1) - datetime(2018, 1, 1)
+                ).days * 24 + self._year * 8760
+                try:
+                    file = file.loc[firstHourNumber : firstHourNumber + 8760]
 
-                    except:
-                        raise ValueError(
-                            pathFile
-                            + " is not in the right Format to read hours "
-                            + str(firstHourNumber)
-                            + " to "
-                            + str(firstHourNumber + 8760)
-                        )
+                except:
+                    raise ValueError(
+                        pathFile
+                        + " is not in the right Format to read hours "
+                        + str(firstHourNumber)
+                        + " to "
+                        + str(firstHourNumber + 8760)
+                    )
 
             period = datetime(2018, 1, 1) + pd.to_timedelta(file["Period"], unit="h")
             file["Period"] = period
