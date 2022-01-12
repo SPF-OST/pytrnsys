@@ -1927,22 +1927,19 @@ class ProcessTrnsysDf:
 
     def addCustomStackedBar(self):
         if "monthlyStackedBar" in self.inputs.keys():
-            if "monthlyStackedBar" in self.inputs.keys():
-                for i in range(len(self.inputs["monthlyStackedBar"])):
-                    nameFile = self.inputs["monthlyStackedBar"][i][0]
+            for i in range(len(self.inputs["monthlyStackedBar"])):
+                nameFile = self.inputs["monthlyStackedBar"][i][0]
 
-                    legend = []
-                    inVar = []
-                    for variable in self.inputs["monthlyStackedBar"][i]:
-                        if ":" in variable:
-                            plotStyle = variable.split(":")[-1]
-                        elif variable != nameFile:
-                            if variable[0] != "-":
-                                legend.append(self.getNiceLatexNames(variable))
-                                inVar.append(self.monDataDf[variable].values)
-                            else:
-                                legend.append(self.getNiceLatexNames(variable[1:]))
-                                inVar.append(-self.monDataDf[variable[1:]].values)
+                legend = []
+                inVar = []
+                for variable in self.inputs["monthlyStackedBar"][i]:
+                    if variable != nameFile:
+                        if variable[0] != "-":
+                            legend.append(self.getNiceLatexNames(variable))
+                            inVar.append(self.monDataDf[variable].values)
+                        else:
+                            legend.append(self.getNiceLatexNames(variable[1:]))
+                            inVar.append(-self.monDataDf[variable[1:]].values)
 
                 titlePlot = "Balance"
                 namePdf = self.plot.plotMonthlyBalanceDf(
@@ -1971,16 +1968,20 @@ class ProcessTrnsysDf:
 
     def addCustomNBar(self):
         if "monthlyBars" in self.inputs.keys():
-            for variables in self.inputs["monthlyBars"]:
-                legend = [
-                    self.getNiceLatexNames(name) if name[0] != "-" else self.getNiceLatexNames(name[1:])
-                    for name in variables
-                ]
-                inVar = [
-                    self.monDataDf[name].values if name[0] != "-" else -self.monDataDf[name[1:]].values
-                    for name in variables
-                ]
-                nameFile = "NBar" + "_".join(variables)
+            for i in range(len(self.inputs["monthlyBars"])):
+                nameFile = self.inputs["monthlyBars"][i][0]
+
+                legend = []
+                inVar = []
+                for variable in self.inputs["monthlyBars"][i]:
+                    if variable != nameFile:
+                        if variable[0] != "-":
+                            legend.append(self.getNiceLatexNames(variable))
+                            inVar.append(self.monDataDf[variable].values)
+                        else:
+                            legend.append(self.getNiceLatexNames(variable[1:]))
+                            inVar.append(-self.monDataDf[variable[1:]].values)
+
                 titlePlot = "Balance"
                 namePdf = self.plot.plotMonthlyNBar(
                     inVar, legend, "", nameFile, 10, self.myShortMonths, plotEmf=self.inputs["plotEmf"]
@@ -1992,8 +1993,6 @@ class ProcessTrnsysDf:
                 self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
 
                 self.addPlotToLaTeX = {namePdf: caption}
-
-                # self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def addCaseDefinition(
         self,
