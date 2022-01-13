@@ -181,6 +181,7 @@ class ProcessTrnsysDf:
         self.addCustomNBar()
         self.addTemperatureFreq()
 
+        self.saveTSToCsv()
         self.saveHourlyToCsv()
         self.addResultsFile()
 
@@ -710,6 +711,7 @@ class ProcessTrnsysDf:
 
         # self.addQvsTPlot()
         self.saveHourlyToCsv()
+        self.saveTSToCsv()
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
 
@@ -2229,6 +2231,22 @@ class ProcessTrnsysDf:
             for stringArray in self.inputs["hourlyToCsv"]:
                 pathFile = os.path.join(self.outputPath, stringArray[0] + ".csv")
                 self.houDataDf[stringArray[1:]].to_csv(pathFile, sep=";")
+
+
+
+
+
+    def saveTSToCsv(self):
+        """
+        Saves timestep printer values to csv files. config file key is stringArray "timestepToCsv" nameOfFile [variables,...]
+        Returns
+        -------
+        """
+        if "timestepToCsv" in self.inputs:
+            for stringArray in self.inputs["timestepToCsv"]:
+                pathFile = os.path.join(self.outputPath, stringArray[0] + ".csv")
+                self.steDataDf[stringArray[1:]].to_csv(pathFile, sep=";")
+
 
     def plot_as_emf(self, figure, **kwargs):
         if "inkscape" in self.inputs:
