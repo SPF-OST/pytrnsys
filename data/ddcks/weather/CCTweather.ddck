@@ -35,9 +35,9 @@
 ***********************************************************
 CONSTANTS 1
 unitReadWeather = 35
- ASSIGN  C:\Daten\OngoingProject\TRI-HP\WP7\SimProp\DataWeatherCCT.csv unitReadWeather   
+ ASSIGN  C:\Daten\OngoingProject\TRI-HP\Simulations\DataWeatherCCT.txt unitReadWeather   
 UNIT 33 TYPE 9      !Changed automatically
-PARAMETERS 228
+PARAMETERS 194
 5     ! 1 Mode
 1     ! 2 Header Lines to Skip
 47     ! 3 No. of values to read
@@ -89,14 +89,8 @@ dtSim     ! 4 Time interval of data
   -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
   -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
-   -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
-  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
- -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
-  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
- -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
-  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
 unitReadWeather     ! 9 Logical unit for input file (vorher 18)
--1     ! 10 Free format mode     
+-1     ! 10 Free format mode      
 EQUATIONS 11
 tAmbDry = [33,47]       !Changed automatically
 relHum  = [33,4]*100	   !Changed automatically
@@ -137,12 +131,12 @@ ID_surfUser_2 = [33,37]  !Changed automatically
 IDS_surfUser_2 = [33,38]  !Changed automatically
 IDG_surfUser_2 = [33,39]  !Changed automatically
 AI_surfUser_2 = [33,40]      !Changed automatically
-IT_surfUser_3 = [33,41]      !Changed automatically
-IB_surfUser_3 = [33,42]      !Changed automatically
-ID_surfUser_3 = [33,43]  !Changed automatically
-IDS_surfUser_3 = [33,44]  !Changed automatically
-IDG_surfUser_3 = [33,45]  !Changed automatically
-AI_surfUser_3 = [33,46]      !Changed automatically
+IT_surfUser_3 = [33,41]       !Changed automatically
+IB_surfUser_3 = [33,42]       !Changed automatically
+ID_surfUser_3 = [33,43]   !Changed automatically
+IDS_surfUser_3 = [33,44]   !Changed automatically
+IDG_surfUser_3 = [33,45]   !Changed automatically
+AI_surfUser_3 = [33,46]       !Changed automatically
 
 EQUATIONS 6
 IT_surfUser_2_Wm2 = IT_surfUser_2/3.6
@@ -178,7 +172,15 @@ slope90 = 90.0
 CONSTANTS 2
 myUnitWeatherData   = unitWeatherData   !from the specific weatherFile
 myFormatWeatherData = formatWeatherData   !formatWeatherData from the specific weatherFile
-
+CONSTANTS 8  ! Values to be filled up by GUI
+slopeSurfUser_1 = 45. ! Slope of surface-5
+aziSurfUser_1 = 0.    ! Azimuth of surface-5
+slopeSurfUser_2 = 10. ! Slope of surface-6
+aziSurfUser_2 = 110.    ! Azimuth of surface-6
+slopeSurfUser_3 = 10. ! Slope of surface-7
+aziSurfUser_3 = 70.    ! Azimuth of surface-7
+slopeSurfUser_4 = 10. ! Slope of surface-8
+aziSurfUser_4 = 70.    ! Azimuth of surface-8
 UNIT 32 TYPE 33      !Changed automatically
 PARAMETERS 3     
 2     ! 1 Psychrometrics mode 2: dry bulb and relative humidity known
