@@ -49,9 +49,21 @@ _st.setup(
     long_description_content_type="text/markdown",
     url="https://pytrnsys.readthedocs.io",
     include_package_data=True,
-    install_requires=["numpy", "scipy", "pandas", "matplotlib", "seaborn", "bokeh", "dataclasses-jsonschema"],
+    install_requires=[
+        "numpy",
+        "scipy",
+        "pandas",
+        "matplotlib",
+        "seaborn",
+        "bokeh",
+        "dataclasses-jsonschema",
+        "lark"],
     package_data={
-        "pytrnsys": ["./plot/stylesheets/*.*", "./report/latex_doc/*.*"],
+        "pytrnsys": [
+            "./plot/stylesheets/*.*",
+            "./report/latex_doc/*.*",
+            "ddck/ddck.lark"
+        ],
     },
     data_files=_getDataFilePairs(),
     classifiers=[

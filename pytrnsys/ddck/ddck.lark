@@ -1,0 +1,118 @@
+?start: ddck
+
+ddck: block+
+
+?block: equations | constants | unit | assign
+
+unit: header parameters inputs [labels]
+
+header: "UNIT"i unit_number "TYPE"i type_number
+
+unit_number: POSITIVE_INT
+
+type_number: POSITIVE_INT
+
+parameters: "PARAMETERS" number_of_parameters parameter+
+
+number_of_parameters: POSITIVE_INT
+
+parameter: variable_name
+    | SIGNED_NUMBER -> literal
+
+inputs: "INPUTS" number_of_inputs input+
+
+number_of_inputs: POSITIVE_INT
+
+input: variable_name
+    | SIGNED_NUMBER -> literal
+
+labels: "LABELS" number_of_labels label+
+
+number_of_labels: POSITIVE_INT
+
+label: NAME
+
+constants: "CONSTANTS" number_of_constants equation+
+
+number_of_constants: POSITIVE_INT
+
+equations: "EQUATIONS" number_of_equations equation+
+
+number_of_equations: POSITIVE_INT
+
+equation: assignment_target "=" sum
+
+assignment_target: explicit_var_name
+
+?sum: product
+    | sum "+" product -> plus
+    | sum "-" product -> minus
+
+?product: atom
+    | product "*" atom -> times
+    | product "/" atom -> divided_by
+
+?atom: NUMBER -> number
+    | "-" atom -> negate
+    | variable_name
+    | output
+    | "(" sum ")"
+    | func_call
+
+func_call: func_name func_args -> func_call
+
+func_args: "(" (sum ("," sum)* )? ")"
+
+func_name: NAME
+
+output: "[" unit_number "," output_number "]"
+
+output_number: INT
+
+?variable_name: explicit_var_name
+    | computer_var
+
+explicit_var_name: SHARED_VAR_NAME -> shared_var
+    | NAME -> private_var
+
+assign: "ASSIGN" file_path logical_unit
+
+file_path: FILE_PATH
+
+logical_unit: INT | NAME
+
+FILE_PATH: /[A-Za-z_\-\\:\.]+/
+
+SHARED_VAR_NAME: "$" NAME
+
+computer_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_PORT_NAME ")"
+
+PORT_NAME: NAME
+
+PORT_PROPERTY: "@" ("temp" | "mfr")
+
+DEFAULT_PORT_NAME: NAME
+
+NAME: LETTER (LETTER|DIGIT|"_")*
+
+POSITIVE_INT: POSITIVE_DIGIT DIGIT*
+
+POSITIVE_DIGIT: "1".."9"
+
+SIGNED_NUMBER: ("+"?|"-") NUMBER
+
+COMMENT: /(\*\*|!)[^\n]*/
+
+%import common.INT
+
+%import common.NUMBER
+
+%import common.LETTER
+
+%import common.DIGIT
+
+%import common.WS
+
+%ignore COMMENT
+
+%ignore WS
