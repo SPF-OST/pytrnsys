@@ -21,10 +21,10 @@
 ***********************************
 
 EQUATIONS 4
-ThpEvapIn = @temp(hpEvapIn, TPiHpEvapIn)   !@connector   
-MfrEvapIn = ABS(@mfr(hpEvapIn, MfrPuHpEvap))     
-THpCondIn = @temp(hpCondIn, TPiHpCondIn)      
-MfrCondIn = ABS(@mfr(hpCondIn, MfrPiHpCondIn))
+ThpEvapIn = TPiHpEvapIn   !@connector   
+MfrEvapIn = ABS(MfrPuHpEvap)     
+THpCondIn = TPiHpCondIn      
+MfrCondIn = ABS(MfrPiHpCondIn)
 
 ***********************************
 ** outputs to hydraulic solver
