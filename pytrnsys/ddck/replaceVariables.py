@@ -17,17 +17,15 @@ def replaceComputedVariablesWithDefaults(
 
     visitor.computed_var(tree)
 
-    inputDdckFile = open(inputDdckFilePath, "rt")
+    with open(inputDdckFilePath, "rt") as inputDdckFile, open(outputDdckFilePath, "wt") as outputDdckFile:
+        for line in inputDdckFile:
+            matching = [defaultPortName for defaultPortName in visitor.variableNames if defaultPortName in line]
+            if len(matching) > 0:
+                replace = _re.sub(r'@.+?[)]', matching[0], line)
+                outputDdckFile.write(replace)
+            else:
+                outputDdckFile.write(line)
 
-    outputDdckFile = open(outputDdckFilePath, "wt")
-
-    for line in inputDdckFile:
-        matching = [defaultPortName for defaultPortName in visitor.variableNames if defaultPortName in line]
-        if len(matching) > 0:
-            replace = _re.sub(r'@.+?[)]', matching[0], line)
-            outputDdckFile.write(replace)
-        else:
-            outputDdckFile.write(line)
 
 class _CollectAllVariableNamesVisitor(_lvis.Visitor_Recursive):
     def __init__(self):
@@ -48,6 +46,6 @@ class _CollectAllVariableNamesVisitor(_lvis.Visitor_Recursive):
         for child in tree.children:
             if tree.data == "computer_var":
                 token = tree.children[-1]
-                self._variableNames.add(token.value)
+                self._variableNames.add(token)
             elif isinstance(child, _lark.Tree):
                 self._addVariableName(child)
