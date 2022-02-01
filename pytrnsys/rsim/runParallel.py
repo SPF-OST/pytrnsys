@@ -45,7 +45,7 @@ def getExclusiveAffinityMask(cpu):
 
 
 def runParallel(
-    cmds, reduceCpu=0, outputFile=False, estimedCPUTime=0.33, delayTime=0.3, trackingFile=None, masterFile=None
+    cmds, reduceCpu=0, outputFile=False, estimedCPUTime=0.33, delayTime=5, trackingFile=None, masterFile=None
 ):
     """Exec commands in parallel in multiple process
     (as much as we have CPU)
