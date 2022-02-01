@@ -1731,14 +1731,21 @@ class ProcessTrnsysDf:
                 climate = os.path.split(self.executingPath)[-1].split('_')[-1]
             else:
                 climate = self.deckData["Umgebungstemperatur"]
-            climateDataPath = (
-                "R:\\Projekte\\BFE_KliKo\\02_AP2_Simulationen\\IDA_ICE_HSLU\\Simulation_MFH_Resultate\\KlimaDaten\\Luzern_"
-                + climate
-                + "_daily.csv"
-            )
-            self.loadClimateDataFile(climateDataPath)
-            averageDailyTemperature = self.climateDf["TAIR_Deg-C"][0:365]
+            # climateDataPath = (
+            #     "R:\\Projekte\\BFE_KliKo\\02_AP2_Simulationen\\IDA_ICE_HSLU\\Simulation_MFH_Resultate\\KlimaDaten\\Luzern_"
+            #     + climate
+            #     + "_daily.csv"
+            # )
+            self.singleYear = False
+            if self.singleYear:
+                climateDataPath = self.inputs["climatePath"][0]
+                self.loadClimateDataFile(climateDataPath)
+                averageDailyTemperature = self.climateDf["TAIR_Deg-C"][0:365]
 
+            else:
+                hourlyT = self.loader.houDataDf['tAmbDry']
+                hourlyT.index = hourlyT.index- pd.Timedelta(hours=1)
+                averageDailyTemperature = hourlyT.resample('1d').mean()
             if timeStep == "daily":
                 yAxisVariable = self.dayDataDf[yAxisVariableName][0:365]
                 fileName = "HeatingLimitFit_daily"
