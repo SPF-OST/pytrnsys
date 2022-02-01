@@ -100,21 +100,21 @@ dTProHpPID= HpIsOn*(THpCondOut-THpCondIn)+NOT(HpIsOn)*5
 
 UNIT 157 TYPE 889     ! Adapted PD-controller
 PARAMETERS 9     
-1     ! 1: mode of timesteps: 1= use previous value, 0 = use current value
-MfrHpCondMin     ! 2: lowest possible output value
-MfrHpCondMax     ! 3: highest possible output value
--1     ! 4: mode of action: 1 = positive, (increase in manipulated value causes increase in process variable), -1 = negative
-MfrHpCondNom     ! 5: By how much shall the manipulated variable be changed per hour if the process variable is 1 unit off?
-4     ! 6: A high value for D counteracts overshoot / counteracts high rates of increase or decrease in the process variable.
-120     ! 7: maximum rate of setpoint change per hour
-dMfrHpCondInc     ! 8: maximum rate of increase of the manipulated variable (positive value)
-dMfrHpCondDec     ! 9: maximum rate of decrease of the manipulated variable (negative value)
+1     			! 1: mode of timesteps: 1= use previous value, 0 = use current value
+MfrHpCondMin    ! 2: lowest possible output value
+MfrHpCondMax    ! 3: highest possible output value
+-1     			! 4: mode of action: 1 = positive, (increase in manipulated value causes increase in process variable), -1 = negative
+MfrHpCondNom    ! 5: By how much shall the manipulated variable be changed per hour if the process variable is 1 unit off?
+4     			! 6: A high value for D counteracts overshoot / counteracts high rates of increase or decrease in the process variable.
+120     		! 7: maximum rate of setpoint change per hour
+dMfrHpCondInc   ! 8: maximum rate of increase of the manipulated variable (positive value)
+dMfrHpCondDec   ! 9: maximum rate of decrease of the manipulated variable (negative value)
 INPUTS 5     
-dTProHpPID     ! 1: process variable
-dtSetHp    ! 2: setpoint
-Nix     ! 3: freeze manipulated variable (1) or let act (0)
-Nix     ! 4: Manual (1) or automatic (0) manipulated variable
-Nix     ! 5: manual manipulated variable
+dTProHpPID     	! 1: process variable
+dtSetHp    		! 2: setpoint
+Nix     		! 3: freeze manipulated variable (1) or let act (0)
+Nix     		! 4: Manual (1) or automatic (0) manipulated variable
+Nix     		! 5: manual manipulated variable
 *** INITIAL INPUT VALUES     
 0.0   0.0   0.0   0.0    0.0     
 *** OUTUPUTS     
@@ -140,44 +140,44 @@ PelHpCtr_kW = 0
 
 UNIT 162 TYPE 977     ! Compression Heat Pump Model v401
 PARAMETERS 28     
-CHPM_c1     ! 1: c1
-CHPM_c2     ! 2: c2
-CHPM_c3     ! 3: c3
-CHPM_c4     ! 4: c4
-CHPM_c5     ! 5: c5
-CHPM_c6     ! 6: c6
-COP_c1     ! 7: cop1
-COP_c2     ! 8: cop2
-COP_c3     ! 9: cop3
-COP_c4     ! 10: cop4
-COP_c5     ! 11: cop5
-COP_c6     ! 12: cop6
-tauWPstart     ! 13: tau_start, s
-tauWPstop     ! 14: tau_stop, s
-TWPEvapIce     ! 14: tevapIce, �C
-EtaDefrost     ! 15: eta_defrost, -
-PelWPVen     ! 16: ventilator electricity consumption, kW
-PelHpCtr_kW     ! 17: controller electricity consumption, kW
-TminEvapTout   ! 18: tevap,min, �C
-TEvapMaxHp     ! 19: tevap,max, �C
-0     ! 20: tcond,min, �C
-tCondMaxHp     ! 21: tcond,max, �C
-CpEvap     ! 22: cp,evap, kJ/kgK
-CpWat     ! 23: cp,cond, kJ/kgK
-timeHpBlock     ! 24: tau_error, hr
-Moloss     !0-3
-Ctherm     !kJ/K
-Ualoss     !W/k
+CHPM_c1     	! 1: c1
+CHPM_c2     	! 2: c2
+CHPM_c3     	! 3: c3
+CHPM_c4     	! 4: c4
+CHPM_c5     	! 5: c5
+CHPM_c6     	! 6: c6
+COP_c1     		! 7: cop1
+COP_c2     		! 8: cop2
+COP_c3     		! 9: cop3
+COP_c4     		! 10: cop4
+COP_c5     		! 11: cop5
+COP_c6     		! 12: cop6
+tauWPstart     	! 13: tau_start, s
+tauWPstop     	! 14: tau_stop, s
+TWPEvapIce     	! 15: tevapIce, deg C
+EtaDefrost     	! 16: eta_defrost, -
+PelWPVen     	! 17: ventilator electricity consumption, kW
+PelHpCtr_kW     ! 18: controller electricity consumption, kW
+TminEvapTout   	! 19: tevap,min, deg C
+TEvapMaxHp     	! 20: tevap,max, deg C
+0     			! 21: tcond,min, deg C
+tCondMaxHp     	! 22: tcond,max, deg C
+CpEvap     		! 23: cp,evap, kJ/kgK
+CpWat     		! 24: cp,cond, kJ/kgK
+timeHpBlock     ! 25: tau_error, hr
+Moloss     		! 26: loss type, 0-3
+Ctherm     		! 27: heat capacity, kJ/K
+Ualoss     		! 28: losses, W/k
 INPUTS 9     
-ThpEvapIn     ! 1: tevap,in, �C
-MfrEvapIn     ! 2: Mfr,evap,in, kg/h
-THpCondIn     ! 3: tcond,in, �C
-MfrCondIn !DC LET IS AS IT WAS BEFORE (CHECK) MfrHpCond !      ! 4: Mfr,cond,in, kg/h
-myHpIsOn     ! 5: gamma_ON, -
-RHamb_1     ! 6: RH_air_in
-tAmbHp     !7
-frCond     !8
-frCOP     !9
+ThpEvapIn     	! 1: tevap,in, deg C
+MfrEvapIn     	! 2: Mfr,evap,in, kg/h
+THpCondIn     	! 3: tcond,in, deg C
+MfrCondIn 		! 4: Mfr,cond,in, kg/h
+myHpIsOn     	! 5: gamma_ON, -
+RHamb_1     	! 6: RH_air_in
+tAmbHp     		! 7
+frCond     		! 8
+frCOP     		! 9
 0  0  0  0  0  0.5 21 1 1     
     
 EQUATIONS 7     ! Heat Pump: Outputs
@@ -239,7 +239,7 @@ HpStartPerH = BoHpStart/dtsim
 **PflowAuxBrine_W = ((MfrAuxEvapOut/3600)/RhoBri)*dpAuxBrine_bar*100000     ! required power to drive the flow, W
 **etaPuAuxBrine = 0.35     ! Assumption
 **PelPuAuxBrine_kW = (PflowAuxBrine_W/1000)/etaPuAuxBrine     ! required pump electric power, kW
-**PelPuAuxBri_kW=GT(MfrEvapIn,0.1)*PelPuAuxBrine_kW     ! GT(MfrcondIn,0.1)*PelPuAuxBrine_kW          ! naming could be better�
+**PelPuAuxBri_kW=GT(MfrEvapIn,0.1)*PelPuAuxBrine_kW     ! GT(MfrcondIn,0.1)*PelPuAuxBrine_kW          ! naming could be betterdeg 
 	 
 EQUATIONS 2
 dtEvap = ThpEvapIn-THpEvapOut

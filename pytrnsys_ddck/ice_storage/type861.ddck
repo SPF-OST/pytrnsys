@@ -1,0 +1,433 @@
+*******************************
+**BEGIN IceStorage-861-Generic.dck
+*******************************
+
+*****************************************
+** Contact person : D. Carbonell   
+** Creation date  : 05.10.2018   
+** Last changes   : 30.04.20, MB 
+*****************************************
+
+***************************************************************************
+** Description: 
+** One generic file for all ice storages. Different files for those things that change Hx , etc..
+** TODO: remove pump consumption calculations
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS 4     ! Collector inlet temperature 
+MfrPCMIceHX = MfrPiIceIn !CHANGED BACK TO NORMAL. WE CAN'T USE ABS HERE !!!!
+TCsHx1i=TPiIceIn     
+TCsHx1iRev=TPiIceOut      
+MfrCsHx1i=MfrPCMIceHX !MfrPcmIceHx     
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS 1
+TCsHx1o = [130,13]     ! Outlet temperature     [�C]
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 3
+qSysIn_WallGains   = -sumQLosskW   ! kW heat lost to the ground  
+qSysOut_IceSenAcum = sumQAcumkW  ! kW sensible heat acumulated 
+qSysIn_IceMelt     = qIcePcm-sumQMeltkW     ! kW latent heat for ice formed in Hx
+
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+
+**from ground (GroundIceCoupled.ddck) or cellar model(CellarIceCoupled.ddck)
+**TG1      ! Temp. of surroundings at node 1 (bottom) [�C]
+**TG2      ! Temp. of surroundings at node 2 [�C]
+**TG3      ! Temp. of surroundings at node 3 [�C]
+**TG4      ! Temp. of surroundings at node 4 [�C]
+**TG5      ! Temp. of surroundings at node 5 [�C]
+**TG6     ! Temp. of surroundings at node 6 [�C]
+**TG7     ! Temp. of surroundings at node 7 [�C]
+**TG8     ! Temp. of surroundings at node 8 [�C]
+**TG9     ! Temp. of surroundings at node 9 [�C]
+**TG10     ! Temp. of surroundings at node 10 [�C]
+**TGBot     
+**TGTop   
+
+*****************************************************************
+** Dependencies with overall variables 
+**
+**Tamb, RHOBRI CPBRI_SI
+**CPWAT (kJ/kgK) from Head.ddck -> changeTo FluidProperties.ddck
+****************************************************************
+
+***********************************
+** Generic variables
+***********************************
+
+CONSTANTS 4
+QnomHxIce=140/1000    ! Nominal power of hx at icing conditions KW/m2
+TFreeze = 0.0    
+lambdaIce =2.2222     ! [W/m.K]
+hFusion =332500.00    ! [J/kg]
+
+***********************************
+** Storage related variables
+***********************************
+CONSTANTS 5
+VIceS = 2     ! Volume filed with water
+iceStorageGeometry = 0 !0  box, 1 cilinder
+Tankheight = 2.5     ! Tank height    [m]
+Tankwidth = (VIceS/Tankheight)^(0.5)     ! Tank width    [m]
+Lstore = ViceS/Tankheight/TankWidth 
+    
+***********************************
+** initial  values ****************
+***********************************
+
+CONSTANTS 5
+TSubcool = -0.5     ! Temperature at which water starts to freeze on the Hx surfaces [�C]
+TiceIni = 30
+TiniPCM=GT(ratioIceBegin,0)*0+NOT(GT(ratioIceBegin,0))*TiceIni !Tground     !TiniPCM=TGround  
+ratioIceBegin= 0 ! 0.5     
+iceBlockIni=ratioIceBegin*VIceS*RHOWAT      !iceBlockIni=0.15*VIceS*rhoIce 
+
+***********************************
+** physical properties ****************
+***********************************
+
+CONSTANTS 11   ! Divider Control
+thickFoam = 0.05     
+lambdaFoam= 0.041        
+UFoam = lambdaFoam/thickFoam          
+Uair    = 20 ! From KiGa validation       ! 5 = W/m2K for 20 cm of air at 10oC with deltaT=5.6 between surfaces U=3.3 woth T=10 and deltaT=16
+UaddTnk = 45 ! From KiGa validation      
+UTankPCM = UFoam ! 1./(1./Uconcrete+1./UaddTnk)   !KiGa     ! Effective Tank U . The cisterne thickess of cement in the ground model is set to 0 DC
+UaddBot  = 2.15     
+UTop =    UFoam ! VALUE FROM NEUBAU !UTankPCM !1./(1/UTankPCM+1./Uair+1./UFoam)     !INPUTS
+UBot =    UFoam ! VALUE FROM NEUBAU, !UTankPCM ! 1./(1./UTankPCM+1/UaddBot)     !INPUTS
+UBotCv =  UFoam ! VALUE FROM NEUBAU !UTankPCM     !INPUTS
+UTopCv =  UFoam ! VALUE FROM NEUBAU, !UTankPCM ! 1./(1./UTankPCM+1./UFoam)     !INPUTS
+**UTop =    0.68 ! W/m2K factor 3.6 smaller than in TES -> makes no sense, better insulated than DHW-Storage??
+**UBot =    1.52 ! W/m2K factor 3.6 smaller than in TES -> makes no sense, better insulated than DHW-Storage??
+**UBotCv =  0.69 ! W/m2K factor 3.6 smaller than in TES -> makes no sense, better insulated than DHW-Storage??
+**UTopCv =  0.69 ! W/m2K factor 3.6 smaller than in TES -> makes no sense, better insulated than DHW-Storage??
+
+
+CONSTANTS 5
+zSensorPcm1 = 0.014     
+zSensorPcm2 = 0.252     
+zSensorPcm3 = 0.475     
+zSensorPcm4 = 0.705     
+zSensorPcm5 = 0.957     
+     
+CONSTANTS 8
+nCv=10
+nInputsType861 = 13 + nCv + 2     
+nParType861    = 26 + 4*19+4+5     
+useTwallOld = 1     
+seriesMode = 0     
+LamEff = 1.0     
+PhysicalPropConst = 0     
+maxIceFrac=0.6  !0.8    
+   
+  
+CONSTANTS 6
+CIceHeat=0.55 ! value changed from original by executeTrnsys.py
+nIceHeat=0.25 ! value changed from original by executeTrnsys.py
+CIceCool=0.55 ! value changed from original by executeTrnsys.py
+nIceCool=0.25 ! value changed from original by executeTrnsys.py
+nEnhanceNu=1.0 ! value changed from original by executeTrnsys.py
+verboseLevel = 1
+
+UNIT 130 TYPE 861     ! PCM TES
+PARAMETERS nParType861     
+verboseLevel     ! 0 : verbose level 0 no messages, 1 only important messages, 3 all messages, 4 debug mode ((print where is in the code to check if it hangs out) 
+VIceS     ! 2Tank Volume                        [m^3]
+Tankheight     ! 3Tank height                        [m]
+Tankwidth     ! 4Tank width                         [m]
+iceStorageGeometry     ! 5Tank geometry 0 box, 1 cylinder
+x1Type861     ! xBetweenPipes in capillary mats, yBetweenHx in Flat plates
+x2Type861     ! yBetweenHx, not used in flat plates 
+LamEff     ! 8Eff. thermal cond. of tank         [W/m.K]
+RHOWAT     ! 9Density water                      [kg/m^3]
+CPWAT_SI     ! 10Specific heat water                [J/kg.K]
+notused     ! 
+lambdaIce     ! 12Tank ice thermal conductivity      [[W/m.K]
+hFusion     ! 13Water<->Ice enthalpy               [J/kg]
+TSubcool     ! 14Water<->Ice temperature            [C]
+TFreeze     ! 15tFreezing                                     [C]
+iceBlockIni     ! 16Initial amount of ice in store [kg]
+iceThickToDeIce     ! 17Film critical melting thickness    [m]
+maxIceFrac     ! 18The maximum storage ice fraction     
+1     ! 19Parameter Check: 1 Error interrups simulation/ 0 allows 'all' parameters
+seriesMode     ! 84 : 0 in parallel so we need mdot tin for all . 1 in series, so the outlet of the first hx is the inlet of the second
+heightIceHx     
+maxIceFrac       
+useTwallOld     
+nRealHx   ! not used for flat plates     
+PhysicalPropConst     
+useCorrugated !only implemented for flat plates      
+*** HEAT EXCHANGER 1   
+hxGeometry     
+NHx1
+hxType861par3
+hxType861par4
+hxType861par5    
+hxType861par6
+orderHx1     
+lambdaHx     
+HxIceIn     
+HxIceOut     
+RHOBRI     
+CPBRI_SI     
+30    
+numberOfCvHx     
+CIceHeat      ! 32: cUserDefined HEATING if we set to 0 Churchill equation is employed
+nIceHeat    ! 33: nUserDefined HEATING if we set to 0 Churchill equation is employed
+CIceCool     ! 32: cUserDefined COOLING if we set to 0 Churchill equation is employed
+nIceCool     ! 33: nUserDefined COOLING if we set to 0 Churchill equation is employed
+nEnhanceNu
+*** HEAT EXCHANGER 2    (used as wall HX for loading ice storage, up to bottom)
+0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
+RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
+*** HEAT EXCHANGER 3     (used as HX for loading the ice storage with waste water)
+0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
+RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
+*** HEAT EXCHANGER 4
+0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
+RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
+*** U-values 
+UBotCv     ! 84 Additional U-value for node-1      [W/m^2K]
+UTopCv     ! 84 Additional U-value for node-1      [W/m^2K]
+Ubot     
+UTop     
+zSensorPcm1
+zSensorPcm2
+zsensorPcm3
+zSensorPcm4
+zSensorPcm5
+****************************************INPUTS ICE STORAGE*****************************************
+INPUTS nInputsType861    
+TCsHx1i              ! Inlet temperature HX-1             [deg. C]
+MfrCsHx1i            ! Inlet flowrate HX-1                [kg/hr]
+TCsHx1iRev           ! reverted (m<0) Inlet temperature HX-1             [deg. C]
+Nix              ! Inlet temperature HX-2             [deg. C]
+Nix            ! Inlet flowrate HX-2                [kg/hr]
+Nix           ! reverted (m<0) Inlet temperature HX-2             [deg. C]
+Nix             ! Inlet temperature HX-3             [deg. C]
+Nix            ! Inlet flowrate HX-3                [kg/hr]
+Nix           ! reverted (m<0) Inlet temperature HX-3             [deg. C]
+Nix              ! Inlet temperature HX-4             [deg. C]
+Nix            ! 11 Inlet flowrate HX-4                [kg/hr]
+Nix           ! 12 Reverted (m<0) Inlet temperature HX-4             [deg. C]
+Nix      ! 13 mechanical DeICe
+TG1      ! Temp. of surroundings at node 1 (bottom) [�C]
+TG2      ! Temp. of surroundings at node 2 [�C]
+TG3      ! Temp. of surroundings at node 3 [�C]
+TG4      ! Temp. of surroundings at node 4 [�C]
+TG5      ! Temp. of surroundings at node 5 [�C]
+TG6     ! Temp. of surroundings at node 6 [�C]
+TG7     ! Temp. of surroundings at node 7 [�C]
+TG8     ! Temp. of surroundings at node 8 [�C]
+TG9     ! Temp. of surroundings at node 9 [�C]
+TG10     ! Temp. of surroundings at node 10 [�C]
+TGBot     
+TGTop   
+**********
+Nix Nix Nix Nix Nix Nix Nix Nix Nix Nix
+Nix Nix Nix Nix Nix Nix Nix Nix Nix Nix
+Nix Nix Nix Nix Nix 
+**
+DERIVATIVES nCv ! Number of Derivatives determines the number of Nodes in the storage (for each node the initial temp. has to be specified)
+TiniPCM     ! Initial temperature of node-1      [C]
+TiniPCM     ! Initial temperature of node-3      [C]
+TiniPCM     ! Initial temperature of node-5      [C]
+TiniPCM     ! Initial temperature of node-7      [C]
+TiniPCM     ! Initial temperature of node-9      [C]
+TiniPCM     ! Initial temperature of node-11     [C]
+TiniPCM     ! Initial temperature of node-13     [C]
+TiniPCM     ! Initial temperature of node-15     [C]
+TiniPCM     ! Initial temperature of node-17     [C]
+TiniPCM     ! Initial temperature of node-19     [C]
+     
+EQUATIONS 6     
+TsensorPcm1 = [130,41]     
+TsensorPcm2 = [130,42]     
+TsensorPcm3 = [130,43]     
+TsensorPcm4 = [130,44]     
+TsensorPcm5 = [130,45]     
+TsensorPcmControl = MAX(TsensorPcm1,TsensorPcm5) ! used to decide if solar heat can be used for regeneration. Depending on direction of flow (up-down) should be changed
+  
+EQUATIONS 1     
+TPCM2 = [130,47]     ! Node Temperature
+
+     
+EQUATIONS 23    ! Outputs PCM
+TAvgPCM = [130,1]     ! Average storage temperature [�C]
+sumQHxkW  = [130,2]/1000.     ! Power exchanged through all HXs  [W]
+sumQAcumkW = [130,3]/1000.     ! [W]
+sumQLosskW = [130,4]/1000.     ! Loss  Power [W]
+sumQMeltkW = [130,5]/1000.     
+sumQIcekW = [130,6]/1000.     
+ImbalancekW = [130,7]/1000.  !imbalance = sumQHx - qAcumStore - sumQLoss  - qFused + sumQIce   
+MassIceFloating = [130,8]     ! Mass Ice floating [kg]
+iceThick = [130,9]     ! Ice Thickness Sum  [m]
+MassIce = [130,10]     ! Mass Ice [kg]
+storeIsFullOfIce = [130,11]     
+storeIsCollapsed = [130,40]     ! IceStorage is totally full of Ice
+t1i = [130,12]     ! Inlet temperature        [�C]
+t1Surf = [130,14]     ! Surface temperature  [�C]
+PHx1o = [130,15]     ! Power Exchange        [W]
+IceThicknessHx1 = [130,16]     ! Ice Thickness on Hx  [m]
+IceMeltHx1 = [130,17]     
+UAPCMHx1 = [130,18]     ! Heat transfer             [W/K]
+VIceRatio = 100.0*MassIce/(VIceS*RHOWAT)     
+VIceRatioFloat = 100*MassIceFloating/(VIceS*RHOWAT)     ! VIceRatioUp = 100*icekg/(VIceSUp*RHOWAT)
+cmIceOneSide = 100*IceThicknessHx1/NHx1         
+yRelativeIceDown = heightIceHx/Tankheight     
+VIceRatioMax = maxIceFrac*100       
+
+UNIT 126 TYPE 993     ! Input value recall (element RcB)
+PARAMETERS 1     
+1    ! 1: number of variables to be remembered     
+INPUTS 1
+BlockIceStore
+0.0 
+     
+EQUATIONS 1    ! outputs of Input Value Recall
+BlockIceStoreRc = [126,1] 
+     
+EQUATIONS 20     ! 
+VIce    = MassIce/RhoWat     ! Volume of liquide water that is freezed [m3  -  H2O(l)]      = Mass Ice [kg] / Rho [kg/m3]
+VIceMax = VIceS*maxIceFrac  
+BlockIceStore = NOT(BlockIceStoreRc)*GT(VIceRatioRc,VIceRatioMax*0.99)+BlockIceStoreRc*GT(VIceRatioRc,VIceRatioMax*0.95)   
+   
+QLossPCMBot= [130,56]     
+QLossPCM1  = [130,57]      
+QLossPCM2  = [130,58]      
+QLossPCM3  = [130,59]      
+QLossPCM4  = [130,60]      
+QLossPCM5  = [130,61]      
+QLossPCM6  = [130,62]      
+QLossPCM7  = [130,63]      
+QLossPCM8  = [130,64]      
+QLossPCM9  = [130,65]      
+QLossPCM10 = [130,66]      
+QLossPCMTop= [130,67]      
+TGBotSideAv= [130,68]      
+TGTopSideAv= [130,69]      
+UBotOut   = [130,70]      
+USideAvOut= [130,71]      
+UTopOut   = [130,72]      
+    
+****All these should be out and done by the hydraulic part.  DC
+EQUATIONS 6     ! Electric pump power PCM-Aux loop
+dpPCMAuxNom_bar = 0.4     ! pressure-drop of loop at nominal mass flow, bar
+frMfrEvapIn = MfrEvapIn/MfrHpEvapNom     ! Flow rate fraction of nominal flow rate
+dpPCMAux_bar = (frMfrEvapIn)^2*dpPCMAuxNom_bar     ! pressure drop at actual mass flow rate, bar
+PflowPCMAux_W = ((MfrEvapIn/3600)/RhoBRI)*dpPCMAux_bar*100000     ! required power to drive the flow, W
+etaPuPCMAux = 0.12-0.00*(1-frMfrEvapIn)     ! pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+PelPuPCMAux_kW = (PflowPCMAux_W/1000)/etaPuPCMAux     ! required pump electric power, kW
+     
+	 
+EQUATIONS 9    ! Converted values for outputs
+qIcePcm = sumQIcekW     ! KW
+qMeltedHxPcm       = -MIN(qIcePcm,0.0)     ! KW Q for ice melted in Hx
+qIceFormationPcm   = MAX(qIcePcm,0.0)     ! KW Q for ice formed in Hx
+qLossPcm    = MAX(sumQLosskW,0.0)     ! KW heat lost to the ground
+qGainPcm    = -MIN(sumQLosskW,0.0)     ! kW heat gain from the ground
+qHeatPcm    = MAX(sumQHxkW,0.0)     ! KW heating Q from heat exchanger
+qCoolPcm    = -MIN(sumQhxkW,0.0)     ! kW cooling Q from heat exchanger
+qReleasePcm = -MIN(sumQAcumkW,0.0)     ! kW released heat in water liquid (Sensible storage)
+qAcumPcm    = MAX(sumQAcumkW,0.0)     ! kW acumulated heat in water liquid (Sensible storage)
+
+  
+ 
+
+*******************************
+** Monthly printers
+*******************************
+CONSTANTS 1
+unitPrintPcm=229
+
+ASSIGN    temp\PCM_MO.Prt      unitPrintPcm     
+    
+UNIT 229 Type 46     ! Printegrator Monthly Values for Heat Pump
+PARAMETERS 6     
+unitPrintPcm     ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+INPUTS 11
+Time qHeatPcm qIceFormationPcm qGainPcm QReleasePcm 	
+qCoolPcm qMeltedHxPcm sumQMeltkW qLossPcm qAcumPcm
+qIcePcm sumQhxkW
+***
+Time qHeatPcm qIceFormationPcm qGainPcm QReleasePcm 	
+qCoolPcm qMeltedHxPcm sumQMeltkW qLossPcm qAcumPcm
+qIcePcm sumQhxkW
+
+*******************************
+** hourly printers
+*******************************
+CONSTANTS 1
+unitPrintPcmHour=219
+
+ASSIGN temp\PCMOut.hr   unitPrintPcmHour     
+
+UNIT 219 Type 46      !Changed automatically
+PARAMETERS 6    
+unitPrintPcmHour   ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+INPUTS 10
+TIME VIceRatio  TAvgPCM  TCsHx1o  IceThicknessHx1 TsensorPcm1 TsensorPcm2 TsensorPcm3 TsensorPcm4 TsensorPcm5
+*****     
+TIME VIceRatio  TAvgPCM  TCsHx1o  IceThicknessHx1 TsensorPcm1 TsensorPcm2 TsensorPcm3 TsensorPcm4 TsensorPcm5
+
+*******************************
+** Online plotters
+*******************************
+
+UNIT 139 TYPE 65     ! Online Plotter Store (element OpS)
+PARAMETERS 12     
+6     ! 1 Nb. of left-axis variables
+6     ! 2 Nb. of right-axis variables
+-20     ! 3 Left axis minimum
+100     ! 4 Left axis maximum
+-15     ! 5 Right axis minimum
+15     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+0     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 12 
+TAvgPCM    TCsHx1o  TCsHx1i  TsensorPcm1  TsensorPcm3  TsensorPcm5 
+VIceRatio    MassIce qIcePcm   StoreIsFullOfIce BlockIceStore MfrCsHx1i   
+**     
+TAvgPCM    TCsHx1o  TCsHx1i  TsensorPcm1  TsensorPcm3  TsensorPcm5 
+VIceRatio    MassIce qIcePcm   StoreIsFullOfIce BlockIceStore MfrCsHx1i   
+LABELS  3     
+Temperatures     
+Heat_transf_rates     
+PCM     
+**      
+
+
+*******************************
+**END IceStorage-861-Generic.ddck
+*******************************

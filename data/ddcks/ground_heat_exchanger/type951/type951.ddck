@@ -44,10 +44,12 @@ qSysIn_Ghx = Qghx_kW
 ** Dependencies with other ddck
 ***********************************
 
-CONSTANTS 3
+CONSTANTS 5
 MfrGhxNom = MfrHpEvapNom
-lBorePerkW = 15
-lGhxProbes = lBorePerkW*sizeHpUsed
+GhxExtrationPower = 40 ! W/m
+qExtractHp = sizeHpUsed-sizeHpUsed/4 !we assume a COP of 4 qEvap = Qcond  - Wcp = Qcond  - Qcond /COP
+lBoreholeTotal = 1000*qExtractHp/GhxExtrationPower
+lGhxProbes = lBoreholeTotal/nGhxProbes !input to the model
 
 ** Re-assing here the variables necessary from other types
 ** variableInternal = variableExternal
@@ -141,7 +143,7 @@ rhoFill      !16
 lambdaFill   !17
 CpBRI     ! 18: specific heat of the brine, kJ/kgK
 RhoBRI     ! 19: density of the brine, kg/m3
-lambdaBrine     ! 20: lambda of the brine, kJ/hmK
+lambdaBrine     ! 20: lambda of the brine, W/mK (?)
 muBrine       !21 
 Wprecond     ! 22: Number of weeks of ground preconditionning
 Pprecond     ! 23: Extraction power during preconditionning

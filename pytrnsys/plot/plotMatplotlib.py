@@ -2217,8 +2217,7 @@ class PlotMatplotlib:
 
         ax.set_title(name)
         ax.hist(temperature, bins=100)
-        # plt.xlabel('Temperature [deg C]')
-        plt.ylabel("Frequency [-]")
+        plt.ylabel("Time [h]")
 
         namePdf = "%s.%s" % (nameFile, extension)
         nameWithPath = os.path.join(path, namePdf)

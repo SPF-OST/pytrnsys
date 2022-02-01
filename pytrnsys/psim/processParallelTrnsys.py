@@ -127,10 +127,7 @@ class ProcessParallelTrnsys:
         self.defaultInputs()
         self.filteredfolder = [".gle"]
 
-        try:
-            self.logger = logging.getself.logger("root")
-        except:
-            self.logger = log.setup_custom_logger("root", self.inputs["outputLevel"])
+        self.logger = log.setup_custom_logger("root", self.inputs["outputLevel"])
 
     def defaultInputs(self):
 
@@ -166,14 +163,11 @@ class ProcessParallelTrnsys:
         self.inputs["costPdf"] = False
         self.inputs["dailyBalance"] = False
         self.inputs["hourlyBalance"] = False
-        # self.inputs['daysSelected'] = "2019,2,30" "2019,4,30" "2019,8,30"
-
         self.inputs["calculateHeatDemand"] = True
         self.inputs["calculateSPF"] = True
         self.inputs["addWeightedSPF"] = False
         self.inputs["calculateElectricDemand"] = True
         self.inputs["extensionFig"] = '.png'
-
         self.inputs["comparePlotUserName"] = ""  # don't change this default value
 
         self.individualFile = False
@@ -185,6 +179,7 @@ class ProcessParallelTrnsys:
         self.configPath = path
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated)
+        self.logger.setLevel(self.inputs["outputLevel"])
         if "latexNames" in self.inputs.keys():
             if ":" not in self.inputs["latexNames"]:
                 self.inputs["latexNames"] = os.path.join(self.configPath, self.inputs["latexNames"])
@@ -242,6 +237,8 @@ class ProcessParallelTrnsys:
         fileName = []
         classList = []
 
+        self.filesReturn=None
+
         if os.path.exists(os.path.join(self.inputs["pathBase"], "Summary.dat")):
             os.remove(os.path.join(self.inputs["pathBase"], "Summary.dat"))
 
@@ -251,8 +248,12 @@ class ProcessParallelTrnsys:
 
             if self.inputs["typeOfProcess"] == "completeFolder":
                 files = glob.glob(os.path.join(pathFolder, "**/*.lst"), recursive=True)
+                if not files:
+                    self.logger.warning("No lst files in %s", pathFolder)
                 fileName = [_pl.Path(name).parts[-2] for name in files]
                 relPaths = [os.path.relpath(os.path.dirname(file), pathFolder) for file in files]
+
+                self.filesReturn = files
 
             elif self.inputs["typeOfProcess"] == "json":
                 files = glob.glob(os.path.join(pathFolder, "**/*.json"), recursive=True)
@@ -311,6 +312,9 @@ class ProcessParallelTrnsys:
             pathFolder = self.inputs["pathBase"]
             baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)  # DC This was missing
             casesInputs.append((baseClass, pathFolder, name, self.inputs))  # DC This was missing
+
+            self.filesReturn=[]
+            self.filesReturn.append(os.path.join(pathFolder, name, name)+".dck")
 
         elif self.inputs["typeOfProcess"] == "citiesFolder":
 
@@ -514,6 +518,8 @@ class ProcessParallelTrnsys:
 
         if "printBoxPlotGLEData" in self.inputs.keys():
             self.printBoxPlotGLEData()
+
+        return self.filesReturn #Dc maybe not the best way
 
     def calculationsAcrossSets(self):
         pathFolder = self.inputs["pathBase"]

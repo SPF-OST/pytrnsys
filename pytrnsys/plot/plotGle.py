@@ -507,7 +507,7 @@ class PlotGle:
 
     def executeGLE(self, fileName,fileExtension="pdf"):
 
-
+   
         gleExe = os.getenv("GLE_EXE")
         if not os.path.exists(gleExe):
             gleExe = "gle.exe"

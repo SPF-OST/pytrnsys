@@ -153,66 +153,66 @@ VIceS     ! 2Tank Volume                        [m^3]
 Tankheight     ! 3Tank height                        [m]
 Tankwidth     ! 4Tank width                         [m]
 iceStorageGeometry     ! 5Tank geometry 0 box, 1 cylinder
-x1Type861     ! xBetweenPipes in capillary mats, yBetweenHx in Flat plates
-x2Type861     ! yBetweenHx, not used in flat plates 
-LamEff     ! 8Eff. thermal cond. of tank         [W/m.K]
-RHOWAT     ! 9Density water                      [kg/m^3]
+x1Type861     ! 6: xBetweenPipes in capillary mats, yBetweenHx in Flat plates
+x2Type861     ! 7: yBetweenHx, not used in flat plates 
+LamEff     ! 8 Eff. thermal cond. of tank         [W/m.K]
+RHOWAT     ! 9 Density water                      [kg/m^3]
 CPWAT_SI     ! 10Specific heat water                [J/kg.K]
-notused     ! 
+notused     ! 11
 lambdaIce     ! 12Tank ice thermal conductivity      [[W/m.K]
-hFusion     ! 13Water<->Ice enthalpy               [J/kg]
-TSubcool     ! 14Water<->Ice temperature            [C]
-TFreeze     ! 15tFreezing                                     [C]
-iceBlockIni     ! 16Initial amount of ice in store [kg]
-iceThickToDeIce     ! 17Film critical melting thickness    [m]
-maxIceFrac     ! 18The maximum storage ice fraction     
+hFusion     ! 13 Water<->Ice enthalpy               [J/kg]
+TSubcool     ! 14 supercooling temperature        [C]
+TFreeze     ! 15 tFreezing                                     [C]
+iceBlockIni     ! 16 Initial amount of ice in store [kg]
+notused     ! 17 Film critical melting thickness    [m]
+maxIceFrac     ! 18 The maximum storage ice fraction     
 1     ! 19Parameter Check: 1 Error interrups simulation/ 0 allows 'all' parameters
-seriesMode     ! 84 : 0 in parallel so we need mdot tin for all . 1 in series, so the outlet of the first hx is the inlet of the second
-heightIceHx     
-maxIceFrac       
-useTwallOld     
-nRealHx   ! not used for flat plates     
-PhysicalPropConst     
-useCorrugated !only implemented for flat plates      
+notused     ! 20 : 0 in parallel so we need mdot tin for all . 1 in series, so the outlet of the first hx is the inlet of the second
+heightIceHx    !21   
+maxIceFrac     ! 22   
+useTwallOld     !23
+nRealHx   ! 24 not used for flat plates     
+PhysicalPropConst !25    
+useCorrugated !26 only implemented for flat plates      
 *** HEAT EXCHANGER 1   
-hxGeometry     
-NHx1
-hxType861par3
-hxType861par4
-hxType861par5    
-hxType861par6
-orderHx1     
-lambdaHx     
-HxIceIn     
-HxIceOut     
-RHOBRI     
-CPBRI_SI     
-30    
-numberOfCvHx     
-CIceHeat      ! 32: cUserDefined HEATING if we set to 0 Churchill equation is employed
-nIceHeat    ! 33: nUserDefined HEATING if we set to 0 Churchill equation is employed
-CIceCool     ! 32: cUserDefined COOLING if we set to 0 Churchill equation is employed
-nIceCool     ! 33: nUserDefined COOLING if we set to 0 Churchill equation is employed
-nEnhanceNu
-*** HEAT EXCHANGER 2    (used as wall HX for loading ice storage, up to bottom)
+hxGeometry    !27 
+NHx1          ! 28
+hxType861par3 !29
+hxType861par4 !30
+hxType861par5  !31  
+hxType861par6  !32
+orderHx1       !33
+lambdaHx       !34
+HxIceIn        !35 
+HxIceOut       !36 
+RHOBRI         !37
+CPBRI_SI       !38
+30             !39
+numberOfCvHx   !40   
+CIceHeat      ! 41: cUserDefined HEATING if we set to 0 Churchill equation is employed
+nIceHeat    ! 42: nUserDefined HEATING if we set to 0 Churchill equation is employed
+CIceCool     ! 43: cUserDefined COOLING if we set to 0 Churchill equation is employed
+nIceCool     ! 44: nUserDefined COOLING if we set to 0 Churchill equation is employed
+nEnhanceNu    !45 
+*** HEAT EXCHANGER 2  46-64  (used as wall HX for loading ice storage, up to bottom)
 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
 RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
-*** HEAT EXCHANGER 3     (used as HX for loading the ice storage with waste water)
+*** HEAT EXCHANGER 3  65-83   (used as HX for loading the ice storage with waste water)
 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
 RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
-*** HEAT EXCHANGER 4
+*** HEAT EXCHANGER 4 84-102
 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000  0.0000 0.0000 0.0000     
 RHOBRI CPBRI_SI 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 1.0000     
 *** U-values 
-UBotCv     ! 84 Additional U-value for node-1      [W/m^2K]
-UTopCv     ! 84 Additional U-value for node-1      [W/m^2K]
-Ubot     
-UTop     
-zSensorPcm1
-zSensorPcm2
-zsensorPcm3
-zSensorPcm4
-zSensorPcm5
+UBotCv      ! 103 Additional U-value for node-1      [W/m^2K]
+UTopCv      ! 104 Additional U-value for node-1      [W/m^2K]
+Ubot        ! 105
+UTop        ! 106
+zSensorPcm1 ! 107
+zSensorPcm2 ! 108
+zsensorPcm3 ! 109
+zSensorPcm4 ! 110
+zSensorPcm5 ! 111
 ****************************************INPUTS ICE STORAGE*****************************************
 INPUTS nInputsType861    
 TCsHx1i              ! Inlet temperature HX-1             [deg. C]

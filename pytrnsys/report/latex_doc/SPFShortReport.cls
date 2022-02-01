@@ -114,7 +114,7 @@
 \includegraphics[width=5.0cm]{SPFlogo.jpg}
 }
 \rhead{
-\includegraphics[width=5.0cm]{HSRlogo.jpg}
+\includegraphics[width=5.0cm]{OST_logo.jpg}
 }
 }
 
@@ -123,7 +123,7 @@
 \includegraphics[width=5.0cm]{SPFlogo.jpg}
 }
 \rhead{
-\includegraphics[width=5.0cm]{HSRlogo.jpg}
+\includegraphics[width=5.0cm]{OST_logo.jpg}
 }
 }
 
