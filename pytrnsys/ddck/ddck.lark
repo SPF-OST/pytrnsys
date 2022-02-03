@@ -70,7 +70,7 @@ output: "[" unit_number "," output_number "]"
 output_number: INT
 
 ?variable_name: explicit_var_name
-    | computer_var
+    | computed_var
 
 explicit_var_name: SHARED_VAR_NAME -> shared_var
     | NAME -> private_var
@@ -85,7 +85,7 @@ FILE_PATH: /[A-Za-z_\-\\:\.]+/
 
 SHARED_VAR_NAME: "$" NAME
 
-computer_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_PORT_NAME ")"
+computed_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_PORT_NAME ")"
 
 PORT_NAME: NAME
 

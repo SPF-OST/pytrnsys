@@ -17,14 +17,21 @@ def replaceComputedVariablesWithDefaults(
 
     visitor.computed_var(tree)
 
-    with open(inputDdckFilePath, "rt") as inputDdckFile, open(outputDdckFilePath, "wt") as outputDdckFile:
-        for line in inputDdckFile:
-            matching = [defaultPortName for defaultPortName in visitor.variableNames if defaultPortName in line]
-            if len(matching) > 0:
-                replace = _re.sub(r'@.+?[)]', matching[0], line)
-                outputDdckFile.write(replace)
-            else:
-                outputDdckFile.write(line)
+    inputContent = inputDdckFilePath.read_text()
+
+    copyContent = inputContent
+
+    with open(outputDdckFilePath, "wt") as outputDdckFile:
+        for i in range(len(visitor.variableNames)):
+            search = _re.search(r'[^!](@.+?[)])', copyContent, flags=_re.DOTALL)
+            
+            filteredSearch = _re.search(r'(@.+?[)])', search.group(0), flags=_re.DOTALL)
+
+            matching = [defaultPortName for defaultPortName in visitor.variableNames if defaultPortName in filteredSearch.group(0)]
+
+            copyContent = copyContent.replace(filteredSearch.group(0), matching[0])
+
+        outputDdckFile.write(copyContent)
 
 
 class _CollectAllVariableNamesVisitor(_lvis.Visitor_Recursive):
@@ -41,10 +48,8 @@ class _CollectAllVariableNamesVisitor(_lvis.Visitor_Recursive):
         self._addVariableName(tree)
 
     def _addVariableName(self, tree: _lark.Tree) -> None:
-
-        "Visits the tree, starting with the leaves and finally the root (bottom-up)"
         for child in tree.children:
-            if tree.data == "computer_var":
+            if tree.data == "computed_var":
                 token = tree.children[-1]
                 self._variableNames.add(token)
             elif isinstance(child, _lark.Tree):
