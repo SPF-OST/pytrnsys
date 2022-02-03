@@ -22,15 +22,14 @@ def replaceComputedVariablesWithDefaults(
     copyContent = inputContent
 
     with open(outputDdckFilePath, "wt") as outputDdckFile:
-        for i in range(len(visitor.variableNames)):
-            search = _re.search(r'[^!](@.+?[)])', copyContent, flags=_re.DOTALL)
-            
-            filteredSearch = _re.search(r'(@.+?[)])', search.group(0), flags=_re.DOTALL)
-
-            matching = [defaultPortName for defaultPortName in visitor.variableNames if defaultPortName in filteredSearch.group(0)]
-
-            copyContent = copyContent.replace(filteredSearch.group(0), matching[0])
-
+        for _unused in range(len(visitor.variableNames)):
+            search = _re.search(r'[^!*](@.+?[)])', copyContent, flags=_re.DOTALL)
+            if search is not None:
+                filteredSearch = _re.search(r'(@.+?[)])', search.group(0), flags=_re.DOTALL)
+                if filteredSearch is not None:
+                    matching = [defaultPortName for defaultPortName in visitor.variableNames if
+                                defaultPortName in filteredSearch.group(0)]
+                    copyContent = copyContent.replace(filteredSearch.group(0), matching[0])
         outputDdckFile.write(copyContent)
 
 
