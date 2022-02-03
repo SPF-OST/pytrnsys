@@ -9,7 +9,7 @@ import pytrnsys.ddck.parse as _parse
 
 
 @_dc.dataclass
-class _ComputedVariable:
+class _ComputedVariable:  # pylint: disable=too-few-public-methods
     startIndex: int
     endIndex: int
     defaultVariableName: str
