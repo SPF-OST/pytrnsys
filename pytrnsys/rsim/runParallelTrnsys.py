@@ -27,6 +27,7 @@ from copy import deepcopy
 import sys
 import pkg_resources
 import pytrnsys.utils.log as log
+import random
 
 try:
     import pytrnsys_examples
@@ -126,6 +127,7 @@ class RunParallelTrnsys:
         self.overwriteForcedByUser = False
 
         self.variablesOutput = []
+        self.randVariablesOutput = []
 
     def readFromFolder(self, pathRun):
 
@@ -236,10 +238,128 @@ class RunParallelTrnsys:
 
                         if self.foldersForDDckVariationUsed == True:
                             self.path = originalPath  # recall the original path, otherwise the next folder will be cerated inside the first
+            elif self.changeRandomDDckFilesUsed == True:
+                # choosing randomly nrandvar ddcks specified in randvarddck, to each of which then random parameters are assigned.
+                # currently only one ddck can be randomly varied, also scaling is not yet implemented for the random variations
+                nameBase = self.nameBase
+
+                self.sinkRandDdck = random.choices(self.randSinkFilesToChange[0],k=int(self.nrandvar))
+
+                originalSourceFile = self.randSourceFilesToChange[0]
+                sourceFile = self.randSourceFilesToChange[0]
+                for i in range(int(self.nrandvar)):
+                    sinkFile = self.sinkRandDdck[i]
+                    self.changeDDckFile(sourceFile, sinkFile)
+
+                    sourceFile = sinkFile  # for each case the listddck will be changed to the new one, so we need to compare with the updated string
+
+                    self.nameBase = nameBase + "-" + os.path.split(sinkFile)[-1]
+
+                    self.buildTrnsysDeck()
+                    self.createDecksFromRandomVariant()
+
 
             else:
                 self.buildTrnsysDeck()
                 self.createDecksFromVariant()
+
+    def createDecksFromRandomVariant(self):
+
+        parameters = self.parameters
+
+        randomVariation = []
+
+        for variation in self.randVariablesOutput:
+            randomVariation.append(variation[0:2] + [random.choice(variation[2:-1])])
+
+        myDeckGenerator = createDeck.CreateTrnsysDeck(self.path, self.nameBase, randomVariation)
+
+        successfulCases = []
+
+        if "masterFile" in self.inputs:
+            if os.path.isfile(self.inputs["masterFile"]):
+                try:
+                    masterDf = pd.read_csv(self.inputs["masterFile"], sep=";", index_col=0)
+                except:
+                    self.logger.error("Unable to read " + self.inputs["masterFile"])
+                    self.logger.error("Variation dck files of %s won't be created" % self.nameBase)
+                    return
+
+                self.logger.info("Checking for successful runs in " + self.inputs["masterFile"])
+                for index, row in masterDf.iterrows():
+                    if row["outcome"] == "success":
+                        successfulCases.append(index)
+            else:
+                self.logger.info("Master file does not exist, no runs will be excluded")
+
+        # creates a list of decks with the appripiate name but nothing changed inside!!
+        if self.randvarUsed or self.changeRandomDDckFilesUsed == True:
+            if successfulCases:
+                fileName = myDeckGenerator.generateDecks(successfulCases=successfulCases)
+            else:
+                fileName = myDeckGenerator.generateDecks()
+        else:
+            fileName = []
+            fileName.append(self.nameBase)
+
+        if myDeckGenerator.noVariationCreated and self.variation:
+            self.logger.warning("No variation dck files created from " + self.nameBase)
+            return
+
+        tests = []
+        cmds = []
+
+        variablePath = self.path
+
+        for i in range(len(fileName)):
+
+            self.logger.debug("name to run :%s" % fileName[i])
+
+            #        if useLocationStructure:
+            #            variablePath = os.path.join(path,location) #assign subfolder for path
+
+            #           # Parameters changed by variation
+            localCopyPar = dict.copy(parameters)  #
+
+            if self.variationsUsed:
+                myParameters = myDeckGenerator.getParameters(i)
+                localCopyPar.update(myParameters)
+
+            #           # We add to the global parameters that also need to be modified
+            #  If we assign like localCopyPar = parameters, then the parameters will change with localCopyPar !!
+            # Otherwise we change the global parameter and some values of last variation will remain.
+            #            newPath = path + fileName[i]
+            #            newFileDck = newPath+"\\"+fileName[i]+".dck"
+            #            print "path:%s fileName:%s newPath:%s newFileDeck:%s"%(path,fileName[i],newPath,newFileDck)
+
+            tests.append(exeTrnsys.ExecuteTrnsys(variablePath, fileName[i]))
+
+            tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
+
+            tests[i].setRemovePopUpWindow(self.inputs["removePopUpWindow"])
+
+            # tests[i].setTrnsysVersion("TRNSYS17_EXE")
+
+            tests[i].moveFileFromSource()
+
+            tests[i].loadDeck(useDeckOutputPath=True)
+
+            tests[i].changeParameter(localCopyPar)
+
+            if self.inputs["ignoreOnlinePlotter"] == True:
+                tests[i].ignoreOnlinePlotter()
+
+            # ==============================================================================
+            #             RESIZE PARAMETERS PIPE DIAMETER
+            # ==============================================================================
+            #            tests[i].resizeParameters()
+            tests[i].cleanAndCreateResultsTempFolder()
+            tests[i].moveFileFromSource()
+
+            if self.inputs["runCases"] == True:
+                test = os.path.split(tests[i].nameDck)[-1]
+                self.cmds.append(tests[i].getExecuteTrnsys(self.inputs))
+
 
     def createDecksFromVariant(self, fitParameters={}):
 
@@ -440,6 +560,28 @@ class RunParallelTrnsys:
 
             self.variablesOutput = variations
 
+    def addRandomParametricVariations(self, variations):
+        """
+        it fills a variableOutput with a list of all variations to choose from
+
+        Parameters
+        ----------
+        variations : list of list
+            list object containing the variations to be used.
+
+        Returns
+        -------
+
+        """
+
+        # self.randVariablesOutput=[]
+        for n in range(len(variations)):
+            variation_range = num.arange(variations[n][2],variations[n][3]+variations[n][4],variations[n][4])
+            variation_base = [variations[n][0],variations[n][1]]
+            variation = variation_base + list(variation_range)
+
+            self.randVariablesOutput.append(variation)
+
     def runParallel(self, writeLogFile=True):
         if writeLogFile:
             self.writeRunLogFile()
@@ -577,6 +719,8 @@ class RunParallelTrnsys:
         # The vector self.inputs used in python has been filled. Now other variables for Trnsys will be filled
 
         self.variation = []  # parametric studies
+        self.randvar = []  # random variations of parameters
+        self.nrandvar = 0 # number of random variations to be executed
         self.parDeck = []  # fixed values changed in all simulations
         self.listDdck = []
         self.parameters = {}  # deck parameters fixed for all simulations
@@ -587,6 +731,8 @@ class RunParallelTrnsys:
         self.caseDict = {}
         self.sourceFilesToChange = []
         self.sinkFilesToChange = []
+        self.randSourceFilesToChange = []
+        self.randSinkFilesToChange = []
         self.foldersForDDckVariation = []
         self.replaceLines = []
 
@@ -608,6 +754,25 @@ class RunParallelTrnsys:
                             variation.append(splitLine[i])
 
                 self.variation.append(variation)
+
+            elif splitLine[0] == "randvar":
+                randvar = []
+                for i in range(len(splitLine)):
+                    if i == 0:
+                        pass
+                    elif i <= 2:
+                        randvar.append(splitLine[i])
+                    else:
+                        try:
+                            randvar.append(float(splitLine[i]))
+                        except:
+                            randvar.append(splitLine[i])
+
+                self.randvar.append(randvar)
+
+            elif splitLine[0] == "nrandvar":
+                nrandvar = splitLine[1]
+                self.nrandvar = nrandvar
 
             elif splitLine[0] == "deck":
 
@@ -637,6 +802,16 @@ class RunParallelTrnsys:
                     else:
                         sinkFilesToChange.append(splitLine[i])
                 self.sinkFilesToChange.append(sinkFilesToChange)
+
+            elif splitLine[0] == "randvarddck":
+                self.randSourceFilesToChange.append(splitLine[1])
+                sinkFilesToChange = []
+                for i in range(len(splitLine)):
+                    if i < 2:
+                        pass
+                    else:
+                        sinkFilesToChange.append(splitLine[i])
+                self.randSinkFilesToChange.append(sinkFilesToChange)
 
             elif splitLine[0] == "addDDckFolder":
                 for i in range(len(splitLine)):
@@ -674,10 +849,21 @@ class RunParallelTrnsys:
         else:
             self.variationsUsed = False
 
+        if len(self.randvar) > 0:
+            self.addRandomParametricVariations(self.randvar)
+            self.randvarUsed = True
+        else:
+            self.randvarUsed = False
+
         if len(self.sourceFilesToChange) > 0:
             self.changeDDckFilesUsed = True
         else:
             self.changeDDckFilesUsed = False
+
+        if len(self.randSourceFilesToChange) > 0:
+            self.changeRandomDDckFilesUsed = True
+        else:
+            self.changeRandomDDckFilesUsed = False
 
         if len(self.foldersForDDckVariation) > 0:
             self.foldersForDDckVariationUsed = True
