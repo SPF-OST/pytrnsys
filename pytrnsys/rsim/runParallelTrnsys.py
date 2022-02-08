@@ -270,7 +270,7 @@ class RunParallelTrnsys:
         randomVariation = []
 
         for variation in self.randVariablesOutput:
-            randomVariation.append(variation[0:2] + [random.choice(variation[2:-1])])
+            randomVariation.append(variation[0:2] + [random.choice(variation[2:])])
 
         myDeckGenerator = createDeck.CreateTrnsysDeck(self.path, self.nameBase, randomVariation)
 
@@ -583,6 +583,8 @@ class RunParallelTrnsys:
             self.randVariablesOutput.append(variation)
 
     def runParallel(self, writeLogFile=True):
+
+        self.cmds = list(dict.fromkeys(self.cmds)) # convert to dictionary and back in order to delete any duplicates
         if writeLogFile:
             self.writeRunLogFile()
 
