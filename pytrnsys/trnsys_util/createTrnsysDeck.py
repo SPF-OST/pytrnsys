@@ -216,7 +216,7 @@ class CreateTrnsysDeck:
                             if valuesOfVariationInFile - int(valuesOfVariationInFile) == 0:
                                 variationsLine = variationsLine + "-%i" % int(valuesOfVariationInFile)
                             else:
-                                variationsLine = variationsLine + "-%.4f" % float(valuesOfVariationInFile)
+                                variationsLine = variationsLine + "-%.2f" % float(valuesOfVariationInFile)
 
                         # If I write variation = ["","useCovered",0,1] then no value is printed
                         elif len(self.variations[nvar][0]) > 0:
@@ -227,7 +227,7 @@ class CreateTrnsysDeck:
                                         int(valuesOfVariationInFile),
                                     )
                                 else:
-                                    variationsLine = variationsLine + "-%s%.4f" % (
+                                    variationsLine = variationsLine + "-%s%.2f" % (
                                         self.variations[nvar][0],
                                         float(valuesOfVariationInFile),
                                     )
