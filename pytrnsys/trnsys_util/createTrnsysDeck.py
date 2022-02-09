@@ -284,7 +284,8 @@ class CreateTrnsysDeck:
                 self.noVariationCreated = False
                 logger.info("Parametric variation generated with the following values" + str(parameterDict))
         if not self.deckOutputs:
-            self.deckOutputs.append(self.case)
+            # self.deckOutputs.append(self.case) # This line is commented, because it is unclear why it is here...
+            pass
 
         return self.deckOutputs
 
