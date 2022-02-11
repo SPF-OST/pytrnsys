@@ -18,9 +18,10 @@ VERSION 18
 ***Simulation time              ******
 **************************************
 
-CONSTANTS 3
-START = 0     
-STOP = 8760     
+CONSTANTS 4
+year = 1 ! select year to be run of weather files that contain data for more than one year
+START = 8760*(year-1)    
+STOP = 8760*year    
 dtSim = 1/30.  ! time step in hours
 
 ************************************** 
