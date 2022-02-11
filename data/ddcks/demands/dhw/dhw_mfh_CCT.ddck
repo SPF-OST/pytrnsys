@@ -43,7 +43,7 @@ qSysOut_DhwDemand = Pdhw_kW
 ***********************************
 
 CONSTANTS 1
-TcwStd = TcwAvg   ! Standard cold water temperature (�C)   TcwAvg  from weatherData
+TcwStd = 9 ! MS: fix cold water Temperature for CCT runs!   ! Standard cold water temperature (�C)   TcwAvg  from weatherData
 
 ***********************************
 ** outputs to other ddck
