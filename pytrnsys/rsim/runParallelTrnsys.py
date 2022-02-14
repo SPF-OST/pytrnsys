@@ -270,7 +270,7 @@ class RunParallelTrnsys:
         randomVariation = []
 
         for variation in self.randVariablesOutput:
-            randomVariation.append(variation[0:2] + [random.choice(variation[2:])])
+            randomVariation.append(variation[0:2] + [round(random.choice(variation[2:]),5)])
 
         myDeckGenerator = createDeck.CreateTrnsysDeck(self.path, self.nameBase, randomVariation)
 
