@@ -325,6 +325,10 @@ class RunParallelTrnsys:
                 myParameters = myDeckGenerator.getParameters(i)
                 localCopyPar.update(myParameters)
 
+            if self.randvarUsed:
+                myParameters = myDeckGenerator.getParameters(i)
+                localCopyPar.update(myParameters)
+
             #           # We add to the global parameters that also need to be modified
             #  If we assign like localCopyPar = parameters, then the parameters will change with localCopyPar !!
             # Otherwise we change the global parameter and some values of last variation will remain.
