@@ -243,7 +243,9 @@ class RunParallelTrnsys:
                 # currently only one ddck can be randomly varied, also scaling is not yet implemented for the random variations
                 nameBase = self.nameBase
 
+                random.seed(a=self.randseed)
                 self.sinkRandDdck = random.choices(self.randSinkFilesToChange[0],k=int(self.nrandvar))
+                self.randseed+=1
 
                 originalSourceFile = self.randSourceFilesToChange[0]
                 sourceFile = self.randSourceFilesToChange[0]
@@ -270,7 +272,9 @@ class RunParallelTrnsys:
         randomVariation = []
 
         for variation in self.randVariablesOutput:
+            random.seed(a=self.randseed)
             randomVariation.append(variation[0:2] + [round(random.choice(variation[2:]),5)])
+            self.randseed+=1
 
         myDeckGenerator = createDeck.CreateTrnsysDeck(self.path, self.nameBase, randomVariation)
 
@@ -779,6 +783,13 @@ class RunParallelTrnsys:
             elif splitLine[0] == "nrandvar":
                 nrandvar = splitLine[1]
                 self.nrandvar = nrandvar
+
+            elif splitLine[0] == "randseed":
+                if splitLine[1] == 'None':
+                    self.randseed = random.randrange(sys.maxsize)
+                else:
+                    randseed = int(splitLine[1])
+                    self.randseed = randseed
 
             elif splitLine[0] == "deck":
 
