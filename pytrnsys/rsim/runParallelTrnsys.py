@@ -730,7 +730,7 @@ class RunParallelTrnsys:
 
         self.variation = []  # parametric studies
         self.randvar = []  # random variations of parameters
-        self.nrandvar = 0 # number of random variations to be executed
+        self.nrandvar = 100 # number of random variations to be executed
         self.parDeck = []  # fixed values changed in all simulations
         self.listDdck = []
         self.parameters = {}  # deck parameters fixed for all simulations
@@ -743,6 +743,7 @@ class RunParallelTrnsys:
         self.sinkFilesToChange = []
         self.randSourceFilesToChange = []
         self.randSinkFilesToChange = []
+        self.randseed = random.randrange(sys.maxsize)  # default random value
         self.foldersForDDckVariation = []
         self.replaceLines = []
 
