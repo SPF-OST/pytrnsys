@@ -212,19 +212,19 @@ class BuildTrnsysDeck:
 
         ok = True
 
-        if self.dckAlreadyExists and self.overwriteForcedByUser == False:
-
-            window = tk.Tk()
-            window.geometry("2x2+" + str(window.winfo_screenwidth()) + "+" + str(window.winfo_screenheight()))
-            ok = tkMessageBox.askokcancel(
-                title="Processing Trnsys",
-                message="Do you want override %s ?\n If parallel simulations most likely accepting this will ovrewrite all the rest too. Think of it twice !! "
-                % tempName,
-            )
-            window.destroy()
-
-            if ok:
-                self.overwriteForcedByUser = True
+        # if self.dckAlreadyExists and self.overwriteForcedByUser == False:
+        #
+        #     window = tk.Tk()
+        #     window.geometry("2x2+" + str(window.winfo_screenwidth()) + "+" + str(window.winfo_screenheight()))
+        #     ok = tkMessageBox.askokcancel(
+        #         title="Processing Trnsys",
+        #         message="Do you want override %s ?\n If parallel simulations most likely accepting this will ovrewrite all the rest too. Think of it twice !! "
+        #         % tempName,
+        #     )
+        #     window.destroy()
+        #
+        #     if ok:
+        #         self.overwriteForcedByUser = True
 
         if ok:
             tempFile = open(tempName, "w")
