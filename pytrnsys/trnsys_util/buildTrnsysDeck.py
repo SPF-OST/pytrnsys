@@ -8,21 +8,20 @@ Date   : 30.09.2016
 ToDo :
 """
 
-import pytrnsys.pdata.processFiles as spfUtils
-import pytrnsys.trnsys_util.deckTrnsys as deck
-import os
-import pytrnsys.trnsys_util.deckUtils as deckUtils
-import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
-import numpy as num
-
-# import Tkinter as tk
-import tkinter as tk
-
-# import Tkinter.messagebox as tkMessageBox
-from tkinter import messagebox as tkMessageBox
-
 # from graphviz import Graph
 import logging
+import os
+# import Tkinter as tk
+import tkinter as tk
+# import Tkinter.messagebox as tkMessageBox
+from tkinter import messagebox as tkMessageBox
+import json as _json
+
+import pytrnsys.pdata.processFiles as spfUtils
+import pytrnsys.trnsys_util.deckTrnsys as deck
+import pytrnsys.trnsys_util.deckUtils as deckUtils
+import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
+import pytrnsys.ddck.replaceVariables as _replace
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -73,9 +72,26 @@ class BuildTrnsysDeck:
 
         nameOneDck = _path + "\%s.%s" % (_name, self.extOneSheetDeck)
 
+        split = _path.split("\\")
+        folderPath = ""
+        for i in range(len(split) - 2):
+            folderPath = folderPath + split[i] + "\\"
+        ddckFolderPath = split[-2] + "\\" + split[-1] + "\\" + _name + ".ddck"
+
         infile = open(nameOneDck, "r")
         lines = infile.readlines()
 
+        jsonFile = open(folderPath + "connection.json")
+        jsonData = _json.load(jsonFile)
+
+        if ddckFolderPath in jsonData:
+            replacedLines = _replace.replaceComputedVariablesWithName(nameOneDck, jsonData[ddckFolderPath])
+            lastLine = replacedLines[-1]
+            if lastLine == "":
+                lines = replacedLines[:-1]
+            else:
+                lines = replacedLines
+        
         replaceChar = None
 
         self.linesChanged = spfUtils.purgueLines(lines, self.skypChar, replaceChar, removeBlankLines=True)

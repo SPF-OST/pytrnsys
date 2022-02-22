@@ -10,7 +10,7 @@ def _createParser() -> _lark.Lark:
     data = _pu.get_data(_ddck.__name__, "ddck.lark")
     assert data, "Could not find ddck Lark grammar file."
     grammar = data.decode()
-    parser = _lark.Lark(grammar, parser="lalr", propagate_positions=True)
+    parser = _lark.Lark(grammar, parser="earley", propagate_positions=True)
     return parser
 
 

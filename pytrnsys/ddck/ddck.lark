@@ -4,7 +4,7 @@ ddck: block+
 
 ?block: equations | constants | unit | assign
 
-unit: header parameters inputs [labels]
+unit: header parameters [inputs [labels]]
 
 header: "UNIT"i unit_number "TYPE"i type_number
 
@@ -14,7 +14,7 @@ type_number: POSITIVE_INT
 
 parameters: "PARAMETERS" number_of_parameters parameter+
 
-number_of_parameters: POSITIVE_INT
+number_of_parameters: POSITIVE_INT | NAME | ZERO
 
 parameter: variable_name
     | SIGNED_NUMBER -> literal
@@ -30,7 +30,7 @@ labels: "LABELS" number_of_labels label+
 
 number_of_labels: POSITIVE_INT
 
-label: NAME
+label: LABEL
 
 constants: "CONSTANTS" number_of_constants equation+
 
@@ -47,10 +47,13 @@ assignment_target: explicit_var_name
 ?sum: product
     | sum "+" product -> plus
     | sum "-" product -> minus
-
-?product: atom
-    | product "*" atom -> times
-    | product "/" atom -> divided_by
+    
+?product: power
+    | product "*" power -> times
+    | product "/" power -> divided_by
+    
+?power: atom
+    | power "^" atom -> to_power_of
 
 ?atom: NUMBER -> number
     | "-" atom -> negate
@@ -74,6 +77,7 @@ output_number: INT
 
 explicit_var_name: SHARED_VAR_NAME -> shared_var
     | NAME -> private_var
+    | MODULATION -> modulation_control
 
 assign: "ASSIGN" file_path logical_unit
 
@@ -81,11 +85,15 @@ file_path: FILE_PATH
 
 logical_unit: INT | NAME
 
-FILE_PATH: /[A-Za-z_\-\\:\.]+/
+computed_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
+
+MODULATION: ZERO "," ZERO
+
+ZERO: "0" NUMBER*
+
+FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
 
 SHARED_VAR_NAME: "$" NAME
-
-computed_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
 
 PORT_NAME: NAME
 
@@ -93,7 +101,9 @@ PORT_PROPERTY: "@" ("temp" | "mfr")
 
 DEFAULT_VARIABLE_NAME: NAME
 
-NAME: LETTER (LETTER|DIGIT|"_")*
+NAME: LETTER (LETTER|DIGIT|"_"|"-")*
+
+LABEL: LETTER (LETTER|DIGIT|"_"|"%"|"-")*
 
 POSITIVE_INT: POSITIVE_DIGIT DIGIT*
 
@@ -101,7 +111,7 @@ POSITIVE_DIGIT: "1".."9"
 
 SIGNED_NUMBER: ("+"?|"-") NUMBER
 
-COMMENT: /(\*\*|!)[^\n]*/
+COMMENT: /^\*[^\n]*/m | /\![^\n]*/
 
 %import common.INT
 
