@@ -5,7 +5,6 @@ import typing as _tp
 import lark as _lark
 import lark.visitors as _lvis
 
-
 from . import _parse
 
 
@@ -62,9 +61,7 @@ class _CollectComputedVariables(_lvis.Visitor_Recursive):
 
 # def replaceComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path, outputDdckFilePath: _pl.Path) -> None:
 #     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
-# 
 #     inputDdckContent = inputDdckFilePath.read_text()
-# 
 #     outputDdckContent = inputDdckContent
 #     offset = 0
 #     for computedVariable in computedVariables:
@@ -75,10 +72,9 @@ class _CollectComputedVariables(_lvis.Visitor_Recursive):
 #             computedVariable.defaultVariableName,
 #         )
 #         offset += computedVariable.lengthChange
-# 
 #     outputDdckFilePath.write_text(outputDdckContent)
-
-def replaceComputedVariablesWithNameUsingPath(inputDdckFilePath: _pl.Path, outputDdckFilePath: _pl.Path, jsonData: dict) -> None:
+def replaceComputedVariablesWithNameUsingPath(inputDdckFilePath: _pl.Path, outputDdckFilePath: _pl.Path,
+                                              jsonData: dict) -> None:
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
 
     inputDdckContent = inputDdckFilePath.read_text()
@@ -100,18 +96,18 @@ def replaceComputedVariablesWithNameUsingPath(inputDdckFilePath: _pl.Path, outpu
 
     outputDdckFilePath.write_text(outputDdckContent)
 
+
 def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict) -> list:
-    
     inputDdckFilePath = _pl.Path(inputFilePathInStr)
-    
+
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
 
-    inputDdckContent = inputDdckFilePath.read_text()
+    inputDdckContent = inputDdckFilePath.read_text(encoding="utf8")
 
     outputDdckContent = inputDdckContent
     offset = 0
     for computedVariable in computedVariables:
-        namesForPort = namesByPort.get(computedVariable.portName)          
+        # namesForPort = namesByPort.get(computedVariable.portName)
         if computedVariable.portName in namesByPort and computedVariable.portProperty in namesByPort[
             computedVariable.portName]:
             replamentString = namesByPort[computedVariable.portName][computedVariable.portProperty]
@@ -125,6 +121,7 @@ def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict)
             offset += computedVariable.lengthChange(replamentString)
 
     return outputDdckContent.split("\n")
+
 
 def _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath: _pl.Path) -> _tp.Sequence["_ComputedVariable"]:
     tree = _parse.parseDdck(inputDdckFilePath)
