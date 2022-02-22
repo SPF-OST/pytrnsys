@@ -1430,7 +1430,7 @@ class PlotMatplotlib:
                 for day in dailyTemperature.index.dayofyear:
                     dayFilterMask.append(day in fitHeatingPower.index.dayofyear)
 
-                fitDailyTemperature = dailyTemperature[dayFilterMask]
+                fitDailyTemperature = dailyTemperature[dayFilterMask].values
 
                 fitParametersStartValues = [-1000.0, 15.0]
                 fittedParameters, covarianceParameters = curve_fit(
