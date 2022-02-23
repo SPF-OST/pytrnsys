@@ -101,7 +101,7 @@ def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict)
     inputDdckFilePath = _pl.Path(inputFilePathInStr)
 
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
-    inputDdckContent = inputDdckFilePath.read_text() # pylint: disable=unspecified-encoding
+    inputDdckContent = inputDdckFilePath.read_text() # pylint: disable=bad-option-value,unspecified-encoding
 
     outputDdckContent = inputDdckContent
     offset = 0
