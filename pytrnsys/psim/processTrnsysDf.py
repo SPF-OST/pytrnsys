@@ -224,7 +224,7 @@ class ProcessTrnsysDf:
 
         self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Time"].values)
 
-    def loadClimateDataFile(self, filePath=""):
+    def loadClimateDataFile(self, filePath="", delimiter=';'):
         """
         Load Climate Data File (csv)
 
@@ -241,12 +241,29 @@ class ProcessTrnsysDf:
             filePathFull = self.inputs["loadClimateData"]
         else:
             filePathFull = filePath
-        file = pd.read_csv(filePathFull, header=0, delimiter=";")
+        file = pd.read_csv(filePathFull, header=0, delimiter=delimiter)
 
-        file.set_index("Time", inplace=True, drop=False)
-        period = pd.to_datetime(file["Time"], format="%d.%m.%Y %H:%M")
-        file["Time"] = period
-        file.set_index("Time", inplace=True)
+        if 'Time' in file.columns:
+            file.set_index("Time", inplace=True, drop=False)
+            period = pd.to_datetime(file["Time"], format="%d.%m.%Y %H:%M")
+            file["Time"] = period
+            file.set_index("Time", inplace=True)
+            file['temperature'] = file['TAIR_Deg-C']
+
+        elif 'date' in file.columns:
+            file.set_index("date", inplace=True, drop=False)
+            period = pd.to_datetime(file["date"], format="%Y-%m-%d")
+            file["date"] = period
+            file.set_index("date", inplace=True)
+            file['TAIR_Deg-C'] = file['tre200h0']
+
+        elif 'time' in file.columns:
+            file.set_index("time", inplace=True, drop=False)
+            period = pd.to_datetime(file["time"], format="%Y-%m-%d")
+            file["time"] = period
+            file.set_index("time", inplace=True)
+            file['TAIR_Deg-C'] = file['tre200h0']
+
 
         self.climateDf = file
 
@@ -1866,7 +1883,8 @@ class ProcessTrnsysDf:
                 doPLot = False
 
             if self.inputs["isTrnsys"]:
-                climate = os.path.split(self.executingPath)[-1].split('_')[-1]
+                # climate = os.path.split(self.executingPath)[-1].split('_')[-1]
+                climate = self.folderName[0]
             else:
                 climate = self.deckData["Umgebungstemperatur"]
             # climateDataPath = (
@@ -1874,10 +1892,18 @@ class ProcessTrnsysDf:
             #     + climate
             #     + "_daily.csv"
             # )
-            self.singleYear = False
+            self.singleYear = True
             if self.singleYear:
-                climateDataPath = self.inputs["climatePath"][0]
-                self.loadClimateDataFile(climateDataPath)
+
+                climateDataPath = self.inputs["climatePath"]
+
+                climateFileDict = {}
+
+                for i, file in enumerate(self.inputs['climateFiles'][0]):
+                    if i%2 == 0:
+                        climateFileDict[self.inputs['climateFiles'][0][i]]=self.inputs['climateFiles'][0][i+1]
+                climateFile = os.path.join(climateDataPath,climateFileDict[climate])
+                self.loadClimateDataFile(climateFile,climateFileDict['delimiter'])
                 averageDailyTemperature = self.climateDf["TAIR_Deg-C"][0:365]
 
             else:
