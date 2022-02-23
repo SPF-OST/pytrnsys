@@ -1,7 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/python
+# !/usr/bin/python
 """
 Author : Dani Carbonell
 Date   : 30.09.2016
@@ -32,7 +32,6 @@ This class uses a list of ddck files to built a complete TRNSYS deck file
 
 
 class BuildTrnsysDeck:
-
     """
     Class used to built a deck file out of a list of ddck files
     Parameters
@@ -51,6 +50,9 @@ class BuildTrnsysDeck:
 
         self.pathDeck = _pathDeck
         self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
+
+        self.connectionJson = _pathDeck + "\\connection.json"
+        self.connectionJsonData = _json.load(open(self.connectionJson))
 
         self.oneSheetList = []
         self.nameList = _nameList
@@ -73,25 +75,21 @@ class BuildTrnsysDeck:
         nameOneDck = _path + "\%s.%s" % (_name, self.extOneSheetDeck)
 
         split = _path.split("\\")
-        folderPath = ""
-        for i in range(len(split) - 2):
-            folderPath = folderPath + split[i] + "\\"
         ddckFolderPath = split[-2] + "\\" + split[-1] + "\\" + _name + ".ddck"
 
         infile = open(nameOneDck, "r")
         lines = infile.readlines()
 
-        jsonFile = open(folderPath + "connection.json")
-        jsonData = _json.load(jsonFile)
-
-        if ddckFolderPath in jsonData:
-            replacedLines = _replace.replaceComputedVariablesWithName(nameOneDck, jsonData[ddckFolderPath])
+        if ddckFolderPath in self.connectionJsonData:
+            replacedLines = _replace.replaceComputedVariablesWithName(nameOneDck,
+                                                                      self.connectionJsonData[ddckFolderPath]).split(
+                "\n")
             lastLine = replacedLines[-1]
             if lastLine == "":
                 lines = replacedLines[:-1]
             else:
                 lines = replacedLines
-        
+
         replaceChar = None
 
         self.linesChanged = spfUtils.purgueLines(lines, self.skypChar, replaceChar, removeBlankLines=True)
@@ -151,11 +149,11 @@ class BuildTrnsysDeck:
             ddck = trnsysComponent.TrnsysComponent(pathList, nameList)
             definedVariables, requiredVariables = ddck.getVariables()
             if (
-                "printer" not in nameList
-                and "Printer" not in nameList
-                and "Control" not in nameList
-                and "control" not in nameList
-                and "BigIceCoolingTwoStorages" not in nameList
+                    "printer" not in nameList
+                    and "Printer" not in nameList
+                    and "Control" not in nameList
+                    and "control" not in nameList
+                    and "BigIceCoolingTwoStorages" not in nameList
             ):
                 self.dependencies[nameList] = requiredVariables - definedVariables
                 self.definitions[nameList] = definedVariables
@@ -167,8 +165,8 @@ class BuildTrnsysDeck:
             addedLines = firstThreeLines + self.linesChanged
 
             caption = (
-                " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
-                % (nameList, pathList)
+                    " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
+                    % (nameList, pathList)
             )
 
             if doAutoUnitNumbering:
@@ -235,7 +233,7 @@ class BuildTrnsysDeck:
             ok = tkMessageBox.askokcancel(
                 title="Processing Trnsys",
                 message="Do you want override %s ?\n If parallel simulations most likely accepting this will ovrewrite all the rest too. Think of it twice !! "
-                % tempName,
+                        % tempName,
             )
             window.destroy()
 
@@ -294,7 +292,6 @@ class BuildTrnsysDeck:
         lines = "UNIT\tTYPE\tName\n"
 
         for i in range(len(self.TrnsysTypes)):
-
             line = "%4d\t%4d\t%s\n" % (
                 self.TrnsysUnits[i],
                 self.TrnsysTypes[i],

@@ -97,30 +97,39 @@ def replaceComputedVariablesWithNameUsingPath(inputDdckFilePath: _pl.Path, outpu
     outputDdckFilePath.write_text(outputDdckContent)
 
 
-def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict) -> list:
+def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict) -> str:
     inputDdckFilePath = _pl.Path(inputFilePathInStr)
 
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
-
-    inputDdckContent = inputDdckFilePath.read_text(encoding="utf8")
+    inputDdckContent = inputDdckFilePath.read_text() # pylint: disable=unspecified-encoding
 
     outputDdckContent = inputDdckContent
     offset = 0
     for computedVariable in computedVariables:
-        # namesForPort = namesByPort.get(computedVariable.portName)
-        if computedVariable.portName in namesByPort and computedVariable.portProperty in namesByPort[
-            computedVariable.portName]:
-            replamentString = namesByPort[computedVariable.portName][computedVariable.portProperty]
+        namesForPort = namesByPort.get(computedVariable.portName, {})
+        if _isEmpty(namesForPort):
+            raise Exception(
+                f"There is no connection name in json file for {computedVariable.portName} for {inputFilePathInStr}")
 
-            outputDdckContent = _replace(
-                outputDdckContent,
-                offset + computedVariable.startIndex,
-                offset + computedVariable.endIndex,
-                replamentString,
-            )
-            offset += computedVariable.lengthChange(replamentString)
+        replamentString = namesForPort.get(computedVariable.portProperty, {})
+        if _isEmpty(replamentString):
+            raise Exception(
+                f"There is no {computedVariable.portProperty} in json file for {computedVariable.portName} for "
+                f"{inputFilePathInStr}")
 
-    return outputDdckContent.split("\n")
+        outputDdckContent = _replace(
+            outputDdckContent,
+            offset + computedVariable.startIndex,
+            offset + computedVariable.endIndex,
+            replamentString,
+        )
+        offset += computedVariable.lengthChange(replamentString)
+
+    return outputDdckContent
+
+
+def _isEmpty(dictionary) -> bool:
+    return not bool(dictionary)
 
 
 def _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath: _pl.Path) -> _tp.Sequence["_ComputedVariable"]:
