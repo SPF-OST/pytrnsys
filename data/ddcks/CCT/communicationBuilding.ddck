@@ -1,0 +1,185 @@
+*******************************
+**BEGIN communicationBuilding.ddck
+*******************************
+
+*****************************************
+** Contact person : Maike Schubert (MS)
+** Creation date  : 23.02.2022
+** Last changes   : 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Communication part between labview and trnsys
+** for building/radiation system simulation
+** 
+***************************************************************************
+
+***********************************
+** inputs from building/radiation distribution
+***********************************
+
+EQUATIONS 2
+Tdhw = TPiDHWDemand ![22,1]     ! Warm water supply temperature from WW heat exchanger or mixing valve [�C]
+MfrDhw = ABS(MfrPiDHWDemand) ! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
+
+***********************************
+** outputs to building/ratiation distribution
+***********************************
+
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 1
+qSysOut_DhwDemand = Pdhw_kW
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+CONSTANTS 1
+TcwStd = 9 ! MS: fix cold water Temperature for CCT runs!   ! Standard cold water temperature (�C)   TcwAvg  from weatherData
+
+***********************************
+** outputs to other ddck
+***********************************
+EQUATIONS 1
+
+MfrDHWset = dtDhwCorrect*MfrDHWreal
+
+***********************************
+** main part - reading writing communication file
+***********************************
+EQUATIONS 1
+Qdot_sh = BoSkipNot*cp_water*(Tbbi-TBout)*MfrB    ! kJ/h
+
+    
+EQUATIONS 6     ! Attribution of Shared Memory inputs
+OPMode = 5     ! Operation-Mode 5 is Valve open, Pump of manufacturer on, Operation-Mode 6 is Valve closed, conditioning
+PowMode = 0     !  PowMode 1 is Power-controlled Temperature (TCout is overridden)
+tCCT = max(0,time-72)     
+PBforecast_kW = Qdot_sh/3600
+TBout = [224,1]
+PBcorr_kW = 0	! Nur ein Type 56 Gebäude simuliert, korrektur mit gemitteltedn Daten des letzten Zeitschrittes feht noch
+
+
+
+EQUATIONS 12     ! Attribution of Shared Memory inputs
+OPMode = 5     ! Operation-Mode 5 is Valve open, Pump of manufacturer on, Operation-Mode 6 is Valve closed, conditioning
+PowMode = 0     !  PowMode 1 is Power-controlled Temperature (TCout is overridden)
+tCCT = time
+PBcorr_kW = 0
+!TBuiAir_C = Troom
+PBforecast_kW = 0   ! Power forecast for the building loop in the next simulation timestep (kW)
+TBout=20.3     ! Outlet temperature forecast for the building loop in next simulation timestep (°C)
+!Tamb =23.3    ! Outside ambient air temperature (°C)
+!Rhamb_100 =8.6    ! relative outdoor humidity [%, 0-100]
+!! clarify following section with Robert: !!!
+Pbset_kW  =5.9   ! Power setpoint according to the load file ??? what is this?
+EBdaily_kWh   =8.6  ! Tagesendwert ???
+EBdailyMax_kWh  =6.6   ! Daily energy (laufend incl. Differenz) ???
+**BoSkip = 1 
+     
+     
+     
+     
+UNIT 19 TYPE 278      ! ExchangeData with Shared Memory
+PARAMETERS 5     
+6     ! PAR1: Number of Values to be read from textfile (= number of outputs), seperated by tabs  (maximum 50)
+0     ! PAR2: number of milliseconds to wait before checking if new timestep is due
+102     ! Logical Unit for SharedMem File to be read by this type: Caution! Do not use this logical unit for ASSIGN statements or Parameter 4 or 5!
+103     ! Logical Unit for SharedMem File to be written by this type:  *  Caution! Do not use this logical unit for ASSIGN statements or Paramter 3 or 5!
+104     ! Logical Unit for SharedMem-Log File:   Caution! Do not use this logical unit for ASSIGN statements or Paramter 3 or 4!
+     
+INPUTS 13     
+BoSkip     ! Boolean to indicate skipping time (0/1)
+tCCT     ! CCT-time that corresponds to emulation in testbench, h
+OPMode     ! Operation mode of the next timestep: 5 is valve open, 6 is valve closed
+PowMode     ! Power mode for the next timestep: 1 is power controlled, 0 is temperature controlled
+PBforecast_kW     ! Power forecast for the building loop in the next simulation timestep (kW)
+TBout     ! Outlet temperature forecast for the building loop in next simulation timestep (°C)
+PBcorr_kW     ! Power correction term for next simulation timestep (kW)
+Troom     ! temperature of air in EG corrected simulation (°C)
+Tamb     ! Outside ambient air temperature (°C)
+Rhamb_100     ! relative outdoor humidity [%, 0-100]
+*  Initial values     
+0   0    04      0     2       20     0       20    15
+LABELS 3     
+C:\Daten\CCTspecific\bLVtoTRNSYS.txt    
+C:\Daten\CCTspecific\bTRNSYStoLV.txt   
+C:\Daten\CCTspecific\bTRNSYStoLV.log     
+     
+EQUATIONS 8
+tLVsim = [19,1]     !  time of lab view simulation
+Tbbi = [19,2]*BoSkipNot+TRdFl*BoSkip     ! Instant measured building Inlet temparture (°C)
+MfrB = [19,3]     ! Instant Measured building Mass flow (kg/h]
+TbbiMean = [19,5]     !  Mean measured building values of previous timestep: Tin (°C), Tout (°C) cap.flow-rate (kJ/hrK)
+MfrBMean = [19,6]     ! Mean measured building inlet temperature of previous timestep (°C)
+mb = MfrB
+#* mb = MfrB*BoStp1Not     ! mass flow of building loop (kg/h)
+mbMean = MfrBMean
+mfl_flo = MfrBuiRd    
+
+   
+
+
+***********************************
+** Hourly printer
+***********************************
+
+CONSTANTS 1
+unitHourlyDHW = 218
+
+ASSIGN    temp\DHW_HR.Prt  unitHourlyDHW     
+
+
+UNIT 218 TYPE 46     ! Printegrator Monthly Values for System
+PARAMETERS 6   
+unitHourlyDHW    ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1		! 6: Output number to avoid integration
+INPUTS 4
+nix nix nix nix          
+**  
+nix nix nix nix          
+
+***********************************
+** Online plotter
+***********************************
+
+
+UNIT 20 TYPE 65     ! Online Plotter DHW (Element OpDHW)
+PARAMETERS 12     
+1     ! 1 Nb. of left-axis variables
+1     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+300     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+60     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 2    
+MfrDhw  
+Tdhw 
+**     
+MfrDhw  
+Tdhw 
+**     
+LABELS  3     
+massFlow
+Temperatures     
+DHW-Hyd
+
+*******************************
+**END communicationBuilding.ddck
+*******************************
