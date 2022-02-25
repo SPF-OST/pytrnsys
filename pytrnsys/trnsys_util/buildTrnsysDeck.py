@@ -8,6 +8,7 @@ Date   : 30.09.2016
 ToDo :
 """
 
+import json as _json
 # from graphviz import Graph
 import logging
 import os
@@ -15,13 +16,12 @@ import os
 import tkinter as tk
 # import Tkinter.messagebox as tkMessageBox
 from tkinter import messagebox as tkMessageBox
-import json as _json
 
+import pytrnsys.ddck.replaceVariables as _replace
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deck
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
-import pytrnsys.ddck.replaceVariables as _replace
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -46,13 +46,14 @@ class BuildTrnsysDeck:
         the Base path of the ddck files
     """
 
-    def __init__(self, _pathDeck, _nameDeck, _nameList):
+    def __init__(self, _pathDeck, _nameDeck, _nameList, _connectionInfo):
 
         self.pathDeck = _pathDeck
         self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
 
-        self.connectionJson = _pathDeck + "\\connection.json"
-        self.connectionJsonData = _json.load(open(self.connectionJson))
+        self.connectionInfo = _connectionInfo
+        if self.connectionInfo != "default":
+            self.connectionJsonData = _json.load(open(self.connectionInfo))
 
         self.oneSheetList = []
         self.nameList = _nameList
@@ -75,15 +76,23 @@ class BuildTrnsysDeck:
         nameOneDck = _path + "\%s.%s" % (_name, self.extOneSheetDeck)
 
         split = _path.split("\\")
-        ddckFolderPath = split[-2] + "\\" + split[-1] + "\\" + _name + ".ddck"
+        ddckFolderPath = split[-2] + "\\" + split[-1]
 
         infile = open(nameOneDck, "r")
         lines = infile.readlines()
 
-        if ddckFolderPath in self.connectionJsonData:
-            replacedLines = _replace.replaceComputedVariablesWithName(nameOneDck,
-                                                                      self.connectionJsonData[ddckFolderPath]).split(
-                "\n")
+        if self.connectionInfo != "default":
+            if ddckFolderPath in self.connectionJsonData:
+                replacedLines = _replace.replaceComputedVariablesWithName(nameOneDck,
+                                                                          self.connectionJsonData[ddckFolderPath]).split(
+                    "\n")
+                lastLine = replacedLines[-1]
+                if lastLine == "":
+                    lines = replacedLines[:-1]
+                else:
+                    lines = replacedLines
+        elif ddckFolderPath != "ddck\\generic":
+            replacedLines = _replace.replaceComputedVariablesWithDefaults(nameOneDck).split("\n")
             lastLine = replacedLines[-1]
             if lastLine == "":
                 lines = replacedLines[:-1]

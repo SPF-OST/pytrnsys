@@ -12,16 +12,9 @@ from . import _parse
 class _ComputedVariable:  # pylint: disable=too-few-public-methods
     startIndex: int
     endIndex: int
-    # defaultVariableName: str
     portProperty: str
     portName: str
-
-    # @property
-    # def lengthChange(self) -> int:
-    #     lengthBeforeReplacing = self.endIndex - self.startIndex
-    #     lengthAfterReplacing = len(self.defaultVariableName)
-    #     lengthChange = lengthAfterReplacing - lengthBeforeReplacing
-    #     return lengthChange
+    defaultVariableName: str
 
     def lengthChange(self, replacementString) -> int:
         lengthBeforeReplacing = self.endIndex - self.startIndex
@@ -36,15 +29,12 @@ class _CollectComputedVariables(_lvis.Visitor_Recursive):
 
         self.computedVariables = []
 
-    # def computed_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
-    #     defaultVariableName = self._getChildToken("DEFAULT_VARIABLE_NAME", tree)
-    #     computedVariable = _ComputedVariable(tree.meta.start_pos, tree.meta.end_pos, defaultVariableName)
-    #     self.computedVariables.append(computedVariable)
-
     def computed_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         portProperty = self._getChildToken("PORT_PROPERTY", tree)
         portName = self._getChildToken("PORT_NAME", tree)
-        computedVariable = _ComputedVariable(tree.meta.start_pos, tree.meta.end_pos, portProperty, portName)
+        defaultVariableName = self._getChildToken("DEFAULT_VARIABLE_NAME", tree)
+        computedVariable = _ComputedVariable(tree.meta.start_pos, tree.meta.end_pos, portProperty, portName,
+                                             defaultVariableName)
         self.computedVariables.append(computedVariable)
 
     @staticmethod
@@ -59,49 +49,29 @@ class _CollectComputedVariables(_lvis.Visitor_Recursive):
         return matchingChildToken.value
 
 
-# def replaceComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path, outputDdckFilePath: _pl.Path) -> None:
-#     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
-#     inputDdckContent = inputDdckFilePath.read_text()
-#     outputDdckContent = inputDdckContent
-#     offset = 0
-#     for computedVariable in computedVariables:
-#         outputDdckContent = _replace(
-#             outputDdckContent,
-#             offset + computedVariable.startIndex,
-#             offset + computedVariable.endIndex,
-#             computedVariable.defaultVariableName,
-#         )
-#         offset += computedVariable.lengthChange
-#     outputDdckFilePath.write_text(outputDdckContent)
-def replaceComputedVariablesWithNameUsingPath(inputDdckFilePath: _pl.Path, outputDdckFilePath: _pl.Path,
-                                              jsonData: dict) -> None:
+def replaceComputedVariablesWithDefaults(inputFilePathInStr: str) -> str:
+    inputDdckFilePath = _pl.Path(inputFilePathInStr)
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
-
     inputDdckContent = inputDdckFilePath.read_text()
-
     outputDdckContent = inputDdckContent
     offset = 0
     for computedVariable in computedVariables:
-        if computedVariable.portName in jsonData and computedVariable.portProperty in jsonData[
-            computedVariable.portName]:
-            replamentString = jsonData[computedVariable.portName][computedVariable.portProperty]
-
-            outputDdckContent = _replace(
-                outputDdckContent,
-                offset + computedVariable.startIndex,
-                offset + computedVariable.endIndex,
-                replamentString,
-            )
-            offset += computedVariable.lengthChange(replamentString)
-
-    outputDdckFilePath.write_text(outputDdckContent)
+        replacementString = computedVariable.defaultVariableName
+        outputDdckContent = _replace(
+            outputDdckContent,
+            offset + computedVariable.startIndex,
+            offset + computedVariable.endIndex,
+            replacementString,
+        )
+        offset += computedVariable.lengthChange(replacementString)
+    return outputDdckContent
 
 
 def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict) -> str:
     inputDdckFilePath = _pl.Path(inputFilePathInStr)
 
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
-    inputDdckContent = inputDdckFilePath.read_text() # pylint: disable=bad-option-value,unspecified-encoding
+    inputDdckContent = inputDdckFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
 
     outputDdckContent = inputDdckContent
     offset = 0

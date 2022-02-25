@@ -38,17 +38,14 @@ TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects(_DATA_DIR_1)]
 
 
 class TestDdckGeneration:
-    def testReplaceComputedVariablesWithDefaults(self):
-        pass
-        # inputDdckFilePath = _DATA_DIR / "type977_v1_input.ddck"
-        # actualDdckFilePath = _DATA_DIR / "type977_v1_actual.ddck"
-        # expectedDdckFilePath = _DATA_DIR / "type977_v1_expected.ddck"
-        # _replace.replaceComputedVariablesWithDefaults(inputDdckFilePath, actualDdckFilePath)
-        # assert actualDdckFilePath.read_text() == expectedDdckFilePath.read_text()
+    def testReplaceComputedVariablesWithDefaults(self):  # pylint: disable=no-self-use
+        inputDdckFilePath = _DATA_DIR / "type977_v1_input.ddck"
+        expectedDdckFilePath = _DATA_DIR / "type977_v1_expected.ddck"
+        actualDdckContent = _replace.replaceComputedVariablesWithDefaults(inputDdckFilePath)
+        assert actualDdckContent == expectedDdckFilePath.read_text()
 
     @_pt.mark.parametrize("project", TEST_CASES)
-    @classmethod
-    def testReplaceComputedVariablesWithName(cls, project: _Project):
+    def testReplaceComputedVariablesWithName(self, project: _Project):  # pylint: disable=no-self-use
 
         helper = Helper(_DATA_DIR_1, project.projectName)
 
@@ -56,7 +53,6 @@ class TestDdckGeneration:
 
         with open(helper.jsonFilePath, "r", encoding="utf8") as jsonFile:
             jsonData = _json.load(jsonFile)
-
         helper.assertFileStructureEqual(helper.actualDdckDirPath, helper.expectedDdckDirPath)
 
         for actualDdckFilesPath, baseDdckFilesPath, expectedDdckFilesPath in zip(
@@ -66,21 +62,21 @@ class TestDdckGeneration:
 
             helper.assertFileStructureEqual(baseDdckFilesPath, expectedDdckFilesPath)
 
-            for baseDdckFilePath, expectedDdckFilePath in zip(baseDdckFilesPath.iterdir(),
-                                                              expectedDdckFilesPath.iterdir()):
+            for baseDdckFile, expectedDdckFile in zip(baseDdckFilesPath.iterdir(),
+                                                      expectedDdckFilesPath.iterdir()):
 
-                fileName = baseDdckFilePath.parts[-1]
-                folderName = baseDdckFilePath.parts[-2]
-                folderPath = baseDdckFilePath.parts[-3] + "\\" + folderName + "\\" + fileName
+                fileName = baseDdckFile.parts[-1]
+                folderName = baseDdckFile.parts[-2]
+                folderPath = baseDdckFile.parts[-3] + "\\" + folderName
                 actualDdckFilePath = actualDdckFilesPath / fileName
 
-                baseExtension = baseDdckFilePath.suffix
-                if folderPath not in jsonData or baseExtension != ".ddck" or folderName == "generic":
-                    _sh.copy(baseDdckFilePath, actualDdckFilesPath)
+                if folderPath not in jsonData or baseDdckFile.suffix != ".ddck" or folderName == "generic":
+                    _sh.copy(baseDdckFile, actualDdckFilesPath)
                 else:
-                    _replace.replaceComputedVariablesWithNameUsingPath(baseDdckFilePath, actualDdckFilePath,
-                                                                       jsonData[folderPath])
-                    assert actualDdckFilePath.read_text() == expectedDdckFilePath.read_text()
+                    actualDdckContent = _replace.replaceComputedVariablesWithName(str(baseDdckFile),
+                                                                                  jsonData[folderPath])
+                    actualDdckFilePath.write_text(actualDdckContent)
+                    assert actualDdckContent == expectedDdckFile.read_text()
 
         helper.assertContentEqual(helper.actualDdckDirPath, helper.expectedDdckDirPath)
 

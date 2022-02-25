@@ -1,5 +1,5 @@
 {
-	"ddck\\Ghx\\type951.ddck":
+	"ddck\\Ghx":
 	{
 		"input":
 		{
@@ -7,7 +7,7 @@
 			"@mfr": "MfrPiHxCoolBriOut"
 		}
 	},
-	"ddck\\HP\\type982.ddck":
+	"ddck\\HP":
 	{
 		"evaporatorInput":
 		{
@@ -25,7 +25,7 @@
 			"@mfr": "MfrPiHpDesIn"
 		}
 	},
-	"ddck\\HxCool\\const_eff_hx.ddck":
+	"ddck\\HxCool":
 	{
 		"side1Input":
 		{
@@ -38,7 +38,7 @@
 			"@mfr": "MfrPiHxCoolWatIn"
 		}
 	},
-	"ddck\\HxDHW\\const_eff_hx_dhw_contr.ddck":
+	"ddck\\HxDHW":
 	{
 		"side1Input":
 		{
@@ -51,7 +51,7 @@
 			"@mfr": "MfrPiSupplyToHxDhw"
 		}
 	},
-	"ddck\\RadiatorSH\\type1792.ddck":
+	"ddck\\RadiatorSH":
 	{
 		"input":
 		{
@@ -59,7 +59,7 @@
 			"@mfr": "MfrPiRadIn"
 		}
 	},
-	"ddck\\tapWater\\dhw_mfh_ES.ddck":
+	"ddck\\tapWater":
 	{
 		"input":
 		{
