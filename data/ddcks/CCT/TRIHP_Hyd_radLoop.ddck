@@ -1,5 +1,5 @@
 *******************************
-**BEGIN HydIceSlurry_propane.ddck
+**BEGIN TRIHP_Hyd_radLoop.ddck
 *******************************
 
 
@@ -7,8 +7,8 @@
 ** Whole system hydraulic section.
 ** MFH with a combi-store and circulation losses loop and cooling
 ** Version : v1
-** Last Changes: dcarbonell
-** Date: 29.01.2021
+** Last Changes: mschubert
+** Date: 24.02.2022
 ******************************************
 
 ******************************************************************************************
@@ -34,6 +34,10 @@ TRadiatorSH=TRdRt
 EQUATIONS 1
 *** Pump outlet temperatures
 TPuSH = TPiSHOutMix
+
+
+CONSTANTS 1
+PPiCircLoss_kW = 0.377    ! constant value in kW for circ losses calculated from annual losses
 
 *****************************************************
 ****** ELECTRICIY CONSUMPTION OF PUMPS
@@ -76,7 +80,7 @@ xFracDivSH_heat =  (1.-[441,5] )
 MfrEmulator = xFracDivSH_heat
 
 
-EQUATIONS 228	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+EQUATIONS 7! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MfrRadiatorSH_A=[450,1]
 MfrRadiatorSH_B=[450,2]
 MfrPuSH_A=[450,4]
@@ -103,6 +107,28 @@ EQUATIONS 1
 TDivSH= [451,1]
 
 
+
+UNIT 482 TYPE 931
+!PiDivSHCool
+PARAMETERS 6
+diPiDivSHCool
+LPiDivSHCool
+UPiDivSHCool
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivSH
+MfrPiDivSHCool_A
+TRoomStore
+TDivSHCool
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDivSHCool= [482,1]
+PPiDivSHCool_kW= [482,3]/3600 !kW
+MfrPiDivSHCool= MfrPiDivSHCool_A
 
 UNIT 471 TYPE 929
 !TeeMixSH
@@ -135,11 +161,27 @@ TRoomStore
 TTeeMixSH
 ***Initial values
 20 0.0 20 20
-
 EQUATIONS 3
 TPiTeeMixSHIn= [472,1]
 PPiTeeMixSHIn_kW= [472,3]/3600 !kW
 MfrPiTeeMixSHIn= MfrPiTeeMixSHIn_A
+
+
+UNIT 455 TYPE 929
+!DivSHCool
+PARAMETERS 0
+INPUTS 6
+MfrDivSHCool_A
+MfrDivSHCool_B
+MfrDivSHCool_C
+TPiDivSHCool
+TPiShToTeeShHp
+TPiHxCoolWatIn
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivSHCool= [455,1]
+
 
 UNIT 473 TYPE 931
 !PiSHInMix
@@ -233,7 +275,7 @@ MfrPiRadOut= MfrPiRadOut_A
 
 
 
-CONSTANTS 22
+CONSTANTS 3
 
 ** Fluid Loop : ShLoop
 di_loop_1=0.05
@@ -242,7 +284,7 @@ U_loop_1=5*scalePipes
 
 
 
-EQUATIONS 171
+EQUATIONS 18
 
 ******SHLoop****Fluid:Water*******
 
@@ -258,7 +300,6 @@ UPiRadIn=U_loop_1
 diPiRadOut=di_loop_1
 LPiRadOut=L_loop_1
 UPiRadOut=U_loop_1
-
 *** PiTeeMixSHIn
 diPiTeeMixSHIn=di_loop_1
 LPiTeeMixSHIn=L_loop_1
@@ -267,14 +308,17 @@ UPiTeeMixSHIn=U_loop_1
 diPiSHInMix=di_loop_1
 LPiSHInMix=L_loop_1
 UPiSHInMix=U_loop_1
+*** PiDivSHCool
+diPiDivSHCool=di_loop_1
+LPiDivSHCool=L_loop_1
+UPiDivSHCool=U_loop_1
 
 
 
 
-
-EQUATIONS 8
+EQUATIONS 2
 **PipeLoss0=PPiHpToTesDhwIn_kW+PPiHpCondOut_kW+PPiOutHxTesSh_kW+PPiHxDhwSecIn_kW+PPiHpToSh_kW+PPiShToTeeShHp_kW+PPiHpToSHDiffTop_kW+PPiTeeMixSHIn_kW+PPiSHInMix_kW+PPiTesDhwIn_kW+PPiCircIn_kW+PPiTesDhwOut_kW+PPiCircOut_kW+PPiHxDhwIn_kW+PPiDhwSecOut_kW+PPiDhwDemand_kW+PPiDhwMains_kW+PPiSHOutMix_kW+PPiRadIn_kW+PPiRadOut_kW+PPiDivSHCool_kW+PPiHpToSHDiffBot_kW+PPiHxCoolWatOut_kW+PPiOutHxTes_kW+PPiInHxTesSh_kW+PPiHpToTesDHWOut_kW+PPiSHToHP_kW+PPiHPToTeeHpToSh_kW+PPiHpInPu_kW+PPiHpCondIn_kW+PPiDivDhwShCol_kW+PPiColOut_kW+PPiColDivDhwSh_kW+PPiHxCoolBriOut_kW+PPiHxCoolBriIn_kW+PPiSolarToHxIce_kW+PPiHxIceToPuIce_kW+PPiHxSolarIceIn_kW+PPiHxSolarIceOut_kW+PPiIceToHp_kW+PPiIceToHxCool_kW+PPiIceToHpIn_kW+PPiHpToIce2_kW+PPiHpEvapOut_kW+PPiHpOutPu_kW+PPiColPuIn_kW+PPiColIn_kW+PPiPuDhwOut_kW+PPiHxDhwOut_kW+PPiPuCircIn_kW+PPiPuCircOut_kW+PConn1139_kW+PPiHpEvapMix_kW+PPiHpEvapIn_kW+PPiInHxTes_kW+PPiHxIceToSolar_kW
-PipeLoss1=PPiSHOutMix_kW+PPiRadIn_kW+PPiRadOut_kW+PPiTeeMixSHIn_kW+PPiSHInMix_kW
+PipeLoss1=PPiSHOutMix_kW+PPiRadIn_kW+PPiRadOut_kW+PPiTeeMixSHIn_kW+PPiSHInMix_kW+PPiDivSHCool_kW
 PipeLossTotal=PipeLoss1
 **by now this is manually created
 

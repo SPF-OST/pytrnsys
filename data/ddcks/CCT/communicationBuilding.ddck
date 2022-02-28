@@ -67,7 +67,7 @@ PBcorr_kW = 0	! Nur ein Type 56 Gebäude simuliert, korrektur mit gemitteltedn D
 
 
 
-EQUATIONS 12     ! Attribution of Shared Memory inputs
+EQUATIONS 9     ! Attribution of Shared Memory inputs
 OPMode = 5     ! Operation-Mode 5 is Valve open, Pump of manufacturer on, Operation-Mode 6 is Valve closed, conditioning
 PowMode = 0     !  PowMode 1 is Power-controlled Temperature (TCout is overridden)
 tCCT = time
@@ -112,7 +112,7 @@ C:\Daten\CCTspecific\bLVtoTRNSYS.txt
 C:\Daten\CCTspecific\bTRNSYStoLV.txt   
 C:\Daten\CCTspecific\bTRNSYStoLV.log     
      
-EQUATIONS 8
+EQUATIONS 9
 tLVsim = [19,1]     !  time of lab view simulation
 Tbbi = [19,2]*BoSkipNot+TRdFl*BoSkip     ! Instant measured building Inlet temparture (°C)
 MfrB = [19,3]     ! Instant Measured building Mass flow (kg/h]
