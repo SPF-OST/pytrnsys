@@ -1423,7 +1423,8 @@ class PlotMatplotlib:
 
             elif timeStep == "daily":
 
-                plot.plot(dailyTemperature, heatingPower, "bo", Markersize=3)
+                # plot.plot(dailyTemperature, heatingPower, "bo", Markersize=3)
+                plot.plot(dailyTemperature, heatingPower, "bo")
                 timeStepTitle = "Tageswerte"
 
                 dayFilterMask = []
