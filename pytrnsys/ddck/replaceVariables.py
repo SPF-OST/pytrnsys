@@ -52,7 +52,7 @@ class _CollectComputedVariables(_lvis.Visitor_Recursive):
 def replaceComputedVariablesWithDefaults(inputFilePathInStr: str) -> str:
     inputDdckFilePath = _pl.Path(inputFilePathInStr)
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
-    inputDdckContent = inputDdckFilePath.read_text()
+    inputDdckContent = inputDdckFilePath.read_text() # pylint: disable=bad-option-value,unspecified-encoding
     outputDdckContent = inputDdckContent
     offset = 0
     for computedVariable in computedVariables:

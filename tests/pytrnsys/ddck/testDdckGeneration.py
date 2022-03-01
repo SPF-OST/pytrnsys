@@ -79,7 +79,7 @@ class TestDdckGeneration:
                     assert actualDdckContent == expectedDdckFile.read_text()
 
         helper.assertContentEqual(helper.actualDdckDirPath, helper.expectedDdckDirPath)
-     
+
 
 class Helper:
     def __init__(self, dataDir: _pl.Path, projectName: str):
