@@ -1,0 +1,60 @@
+{
+    "ddck\\FCU": {
+        "input": {
+            "@mfr": "MfrPiFCUIn",
+            "@temp": "TPiFCUIn"
+        }
+    },
+    "ddck\\Ghx": {
+        "input": {
+            "@mfr": "MfrPiHxCoolBriOut",
+            "@temp": "TPiHxCoolBriOut"
+        }
+    },
+    "ddck\\HP": {
+        "condenser1Input": {
+            "@mfr": "MfrPiHpCondIn",
+            "@temp": "TPiHpCondIn"
+        },
+        "condenser2Input": {
+            "@mfr": "MfrPiHpDesIn",
+            "@temp": "TPiHpDesIn"
+        },
+        "evaporatorInput": {
+            "@mfr": "MfrPiGhxToHP",
+            "@temp": "TPiGhxToHP"
+        }
+    },
+    "ddck\\HxCool": {
+        "side1Input": {
+            "@mfr": "MfrPiHpToHxCool",
+            "@temp": "TPiHpToHxCool"
+        },
+        "side2Input": {
+            "@mfr": "MfrPiHxCoolWatIn",
+            "@temp": "TPiHxCoolWatIn"
+        }
+    },
+    "ddck\\HxDHW": {
+        "side1Input": {
+            "@mfr": "MfrPiDhwToHxDhw",
+            "@temp": "TPiDhwToHxDhw"
+        },
+        "side2Input": {
+            "@mfr": "MfrPiSupplyToHxDhw",
+            "@temp": "TPiSupplyToHxDhw"
+        }
+    },
+    "ddck\\RadiatorSH": {
+        "input": {
+            "@mfr": "MfrPiRadIn",
+            "@temp": "TPiRadIn"
+        }
+    },
+    "ddck\\tapWater": {
+        "input": {
+            "@mfr": "MfrPiToDhwDem",
+            "@temp": "TPiToDhwDem"
+        }
+    }
+}
