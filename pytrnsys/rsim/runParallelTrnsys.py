@@ -504,6 +504,8 @@ class RunParallelTrnsys:
             self.logger = log.setup_custom_logger("root", self.inputs["outputLevel"])
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
+        if "pathToConnectionInfo" in self.inputs:
+            self.connectionInfo = self.inputs["pathToConnectionInfo"]
         if self.inputs["addResultsFolder"] == False:
             pass
         else:
