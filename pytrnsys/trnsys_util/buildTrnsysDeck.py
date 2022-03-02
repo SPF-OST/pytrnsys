@@ -76,7 +76,7 @@ class BuildTrnsysDeck:
         nameOneDck = _path + "\%s.%s" % (_name, self.extOneSheetDeck)
 
         split = _path.split("\\")
-        ddckFolderPath = split[-2] + "\\" + split[-1]
+        ddckFolderPath = split[-1]
 
         infile = open(nameOneDck, "r")
         lines = infile.readlines()
@@ -91,7 +91,7 @@ class BuildTrnsysDeck:
                     lines = replacedLines[:-1]
                 else:
                     lines = replacedLines
-        elif ddckFolderPath != "ddck\\generic":
+        elif ddckFolderPath != "generic":
             replacedLines = _replace.replaceComputedVariablesWithDefaults(nameOneDck).split("\n")
             lastLine = replacedLines[-1]
             if lastLine == "":

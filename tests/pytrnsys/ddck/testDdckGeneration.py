@@ -67,14 +67,13 @@ class TestDdckGeneration:
 
                 fileName = baseDdckFile.parts[-1]
                 folderName = baseDdckFile.parts[-2]
-                folderPath = baseDdckFile.parts[-3] + "\\" + folderName
                 actualDdckFilePath = actualDdckFilesPath / fileName
 
-                if folderPath not in jsonData or baseDdckFile.suffix != ".ddck" or folderName == "generic":
+                if folderName not in jsonData or baseDdckFile.suffix != ".ddck":
                     _sh.copy(baseDdckFile, actualDdckFilesPath)
                 else:
                     actualDdckContent = _replace.replaceComputedVariablesWithName(str(baseDdckFile),
-                                                                                  jsonData[folderPath])
+                                                                                  jsonData[folderName])
                     actualDdckFilePath.write_text(actualDdckContent)
                     assert actualDdckContent == expectedDdckFile.read_text()
 

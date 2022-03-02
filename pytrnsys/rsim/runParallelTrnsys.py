@@ -62,6 +62,8 @@ class RunParallelTrnsys:
 
         self.pathConfig = pathConfig
 
+        self.connectionInfo = "default"
+
         self.defaultInputs()
         self.cmds = []
         if runPath == None:
@@ -373,7 +375,7 @@ class RunParallelTrnsys:
 
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck)
+        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self.connectionInfo)
         deck.readDeckList(
             self.pathConfig,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
