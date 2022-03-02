@@ -9,12 +9,13 @@ ToDo :
 """
 
 import json as _json
-# from graphviz import Graph
+import typing as _tp
+
 import logging
 import os
-# import Tkinter as tk
+
 import tkinter as tk
-# import Tkinter.messagebox as tkMessageBox
+
 from tkinter import messagebox as tkMessageBox
 
 import pytrnsys.ddck.replaceVariables as _replace
@@ -22,6 +23,7 @@ import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deck
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
+import pytrnsys.utils.result as _res
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -71,7 +73,7 @@ class BuildTrnsysDeck:
         self.existingDckUnchecked = True
         self.dckAlreadyExists = True
 
-    def loadDeck(self, _path, _name):
+    def loadDeck(self, _path, _name) -> _res.Result[_tp.Tuple[str, str, str]]:
 
         nameOneDck = _path + "\%s.%s" % (_name, self.extOneSheetDeck)
 
@@ -83,9 +85,15 @@ class BuildTrnsysDeck:
 
         if self.connectionInfo != "default":
             if ddckFolderPath in self.connectionJsonData:
-                replacedLines = _replace.replaceComputedVariablesWithName(nameOneDck,
-                                                                          self.connectionJsonData[ddckFolderPath]).split(
-                    "\n")
+                result = _replace.replaceComputedVariablesWithName(nameOneDck, self.connectionJsonData[ddckFolderPath])
+
+                if _res.isError(result):
+                    return _res.error(result)
+
+                replacedContent = _res.value(result)
+
+                replacedLines = replacedContent.split("\n")
+
                 lastLine = replacedLines[-1]
                 if lastLine == "":
                     lines = replacedLines[:-1]
@@ -158,11 +166,11 @@ class BuildTrnsysDeck:
             ddck = trnsysComponent.TrnsysComponent(pathList, nameList)
             definedVariables, requiredVariables = ddck.getVariables()
             if (
-                    "printer" not in nameList
-                    and "Printer" not in nameList
-                    and "Control" not in nameList
-                    and "control" not in nameList
-                    and "BigIceCoolingTwoStorages" not in nameList
+                "printer" not in nameList
+                and "Printer" not in nameList
+                and "Control" not in nameList
+                and "control" not in nameList
+                and "BigIceCoolingTwoStorages" not in nameList
             ):
                 self.dependencies[nameList] = requiredVariables - definedVariables
                 self.definitions[nameList] = definedVariables
@@ -174,8 +182,8 @@ class BuildTrnsysDeck:
             addedLines = firstThreeLines + self.linesChanged
 
             caption = (
-                    " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
-                    % (nameList, pathList)
+                " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
+                % (nameList, pathList)
             )
 
             if doAutoUnitNumbering:
@@ -242,7 +250,7 @@ class BuildTrnsysDeck:
             ok = tkMessageBox.askokcancel(
                 title="Processing Trnsys",
                 message="Do you want override %s ?\n If parallel simulations most likely accepting this will ovrewrite all the rest too. Think of it twice !! "
-                        % tempName,
+                % tempName,
             )
             window.destroy()
 
