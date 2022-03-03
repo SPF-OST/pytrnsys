@@ -49,47 +49,47 @@ class TestDdckGeneration:
 
         helper = Helper(_DATA_DIR_1, project.projectName)
 
-        helper.copyFolderAndFiles(helper.baseDirPath, helper.actualDirPath)
+        helper.copyFolderAndFiles(helper.actualDirPath, helper.generatedDirPath)
 
-        with open(helper.jsonFilePath, "r", encoding="utf8") as jsonFile:
-            jsonData = _json.load(jsonFile)
-        helper.assertFileStructureEqual(helper.actualDdckDirPath, helper.expectedDdckDirPath)
+        with open(helper.DdckPlaceHolderValueJsonPath, "r", encoding="utf8") as DdckPlaceHolderValueJson:
+            DdckPlaceHolderValue = _json.load(DdckPlaceHolderValueJson)
+        helper.assertFileStructureEqual(helper.generatedDdckDirPath, helper.expectedDdckDirPath)
 
-        for actualDdckFilesPath, baseDdckFilesPath, expectedDdckFilesPath in zip(
-                list(helper.actualDdckDirPath.iterdir()),
-                list(helper.baseDdckDirPath.iterdir()),
+        for generatedDdckFilesPath, actualDdckFilesPath, expectedDdckFilesPath in zip(
+                list(helper.generatedDdckDirPath.iterdir()),
+                list(helper.actulDdckDirPath.iterdir()),
                 list(helper.expectedDdckDirPath.iterdir())):
 
-            helper.assertFileStructureEqual(baseDdckFilesPath, expectedDdckFilesPath)
+            helper.assertFileStructureEqual(actualDdckFilesPath, expectedDdckFilesPath)
 
-            for baseDdckFile, expectedDdckFile in zip(baseDdckFilesPath.iterdir(),
+            for actualDdckFile, expectedDdckFile in zip(actualDdckFilesPath.iterdir(),
                                                       expectedDdckFilesPath.iterdir()):
 
-                fileName = baseDdckFile.parts[-1]
-                folderName = baseDdckFile.parts[-2]
-                actualDdckFilePath = actualDdckFilesPath / fileName
+                fileName = actualDdckFile.parts[-1]
+                folderName = actualDdckFile.parts[-2]
+                generatedDdckFilePath = generatedDdckFilesPath / fileName
 
-                if folderName not in jsonData or baseDdckFile.suffix != ".ddck":
-                    _sh.copy(baseDdckFile, actualDdckFilesPath)
+                if folderName not in DdckPlaceHolderValue or actualDdckFile.suffix != ".ddck":
+                    _sh.copy(actualDdckFile, generatedDdckFilesPath)
                 else:
-                    actualDdckContent = _replace.replaceComputedVariablesWithName(str(baseDdckFile),
-                                                                                  jsonData[folderName])
-                    actualDdckFilePath.write_text(actualDdckContent)
-                    assert actualDdckContent == expectedDdckFile.read_text()
+                    replacedDdckContent = _replace.replaceComputedVariablesWithName(str(actualDdckFile),
+                                                                                  DdckPlaceHolderValue[folderName])
+                    generatedDdckFilePath.write_text(replacedDdckContent)
+                    assert replacedDdckContent == expectedDdckFile.read_text()
 
-        helper.assertContentEqual(helper.actualDdckDirPath, helper.expectedDdckDirPath)
+        helper.assertContentEqual(helper.generatedDdckDirPath, helper.expectedDdckDirPath)
 
 
 class Helper:
     def __init__(self, dataDir: _pl.Path, projectName: str):
-        self.actualDirPath = dataDir / projectName / "actual"
-        self.baseDirPath = dataDir / projectName / "base"
+        self.generatedDirPath = dataDir / projectName / "Generated_TRIHP_dualSource"
+        self.actualDirPath = dataDir / projectName / "TRIHP_dualSource"
         self.expectedDirPath = dataDir / projectName / "expected"
 
-        self.jsonFilePath = self.actualDirPath / "connection.json"
+        self.DdckPlaceHolderValueJsonPath = self.generatedDirPath / "DdckPlaceHolderValue.json"
 
-        self.actualDdckDirPath = self.actualDirPath / "ddck"
-        self.baseDdckDirPath = self.baseDirPath / "ddck"
+        self.generatedDdckDirPath = self.generatedDirPath / "ddck"
+        self.actulDdckDirPath = self.actualDirPath / "ddck"
         self.expectedDdckDirPath = self.expectedDirPath / "ddck"
 
     def copyFolderAndFiles(self, inputPath: _pl.Path, outputPath: _pl.Path) -> None:
