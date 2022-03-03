@@ -51,8 +51,8 @@ class TestDdckGeneration:
 
         helper.copyFolderAndFiles(helper.actualDirPath, helper.generatedDirPath)
 
-        with open(helper.DdckPlaceHolderValueJsonPath, "r", encoding="utf8") as DdckPlaceHolderValueJson:
-            DdckPlaceHolderValue = _json.load(DdckPlaceHolderValueJson)
+        with open(helper.ddckPlaceHolderValueJsonPath, "r", encoding="utf8") as ddckPlaceHolderValueJson:
+            ddckPlaceHolderValue = _json.load(ddckPlaceHolderValueJson)
         helper.assertFileStructureEqual(helper.generatedDdckDirPath, helper.expectedDdckDirPath)
 
         for generatedDdckFilesPath, actualDdckFilesPath, expectedDdckFilesPath in zip(
@@ -69,11 +69,11 @@ class TestDdckGeneration:
                 folderName = actualDdckFile.parts[-2]
                 generatedDdckFilePath = generatedDdckFilesPath / fileName
 
-                if folderName not in DdckPlaceHolderValue or actualDdckFile.suffix != ".ddck":
+                if folderName not in ddckPlaceHolderValue or actualDdckFile.suffix != ".ddck":
                     _sh.copy(actualDdckFile, generatedDdckFilesPath)
                 else:
                     replacedDdckContent = _replace.replaceComputedVariablesWithName(str(actualDdckFile),
-                                                                                  DdckPlaceHolderValue[folderName])
+                                                                                  ddckPlaceHolderValue[folderName])
                     generatedDdckFilePath.write_text(replacedDdckContent)
                     assert replacedDdckContent == expectedDdckFile.read_text()
 
@@ -86,7 +86,7 @@ class Helper:
         self.actualDirPath = dataDir / projectName / "TRIHP_dualSource"
         self.expectedDirPath = dataDir / projectName / "expected"
 
-        self.DdckPlaceHolderValueJsonPath = self.generatedDirPath / "DdckPlaceHolderValue.json"
+        self.ddckPlaceHolderValueJsonPath = self.generatedDirPath / "DdckPlaceHolderValue.json"
 
         self.generatedDdckDirPath = self.generatedDirPath / "ddck"
         self.actulDdckDirPath = self.actualDirPath / "ddck"
