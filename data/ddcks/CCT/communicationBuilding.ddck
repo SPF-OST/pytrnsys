@@ -19,9 +19,9 @@
 ** inputs from building/radiation distribution
 ***********************************
 
-EQUATIONS 2
-Tdhw = TPiDHWDemand ![22,1]     ! Warm water supply temperature from WW heat exchanger or mixing valve [�C]
-MfrDhw = ABS(MfrPiDHWDemand) ! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
+!EQUATIONS 2
+!Tdhw = TPiDHWDemand ![22,1]     ! Warm water supply temperature from WW heat exchanger or mixing valve [�C]
+!MfrDhw = ABS(MfrPiDHWDemand) ! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
 
 ***********************************
 ** outputs to building/ratiation distribution
@@ -33,12 +33,34 @@ MfrDhw = ABS(MfrPiDHWDemand) ! Mass flow on consumption side mixed down, kg/h = 
 ** outputs to energy balance in kWh
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
-EQUATIONS 1
-qSysOut_DhwDemand = Pdhw_kW
+
+
+************************************************
+CONSTANTS 4
+ tSimStrt = 0
+ tSimEnd = 504.0000000
+ tSkip = 0
+ tCond = 0.0000000
+ !dtSim = 0.0166660
+******* this part will be changed by labview!
+************************************************
+
+!CONSTANTS 2
+!FrInte_Tol = 0.001
+!FrConv_Tol = 0.001
+     
+
+CONSTANTS 3
+dtHour = 1/int(1/dtSim+0.5)
+tSkipA = tSkip          ! Zur Konditionierung läuft die Simulation erst für drei Tage mit nominaler Heizleistung
+tSimEndA = tSimEnd
+
 
 ***********************************
 ** Dependencies with other ddck
 ***********************************
+
+
 
 CONSTANTS 1
 TcwStd = 9 ! MS: fix cold water Temperature for CCT runs!   ! Standard cold water temperature (�C)   TcwAvg  from weatherData
@@ -46,44 +68,28 @@ TcwStd = 9 ! MS: fix cold water Temperature for CCT runs!   ! Standard cold wate
 ***********************************
 ** outputs to other ddck
 ***********************************
-EQUATIONS 1
+!EQUATIONS 1
 
-MfrDHWset = dtDhwCorrect*MfrDHWreal
+!MfrDHWset = dtDhwCorrect*MfrDHWreal
 
 ***********************************
 ** main part - reading writing communication file
 ***********************************
 EQUATIONS 1
-Qdot_sh = BoSkipNot*cp_water*(Tbbi-TBout)*MfrB    ! kJ/h
+Qdot_sh = MfrB !BoSkipNot*cp_water*(Tbbi-TBout)*MfrB    ! kJ/h
 
     
-EQUATIONS 6     ! Attribution of Shared Memory inputs
-OPMode = 5     ! Operation-Mode 5 is Valve open, Pump of manufacturer on, Operation-Mode 6 is Valve closed, conditioning
+EQUATIONS 7     ! Attribution of Shared Memory inputs
 PowMode = 0     !  PowMode 1 is Power-controlled Temperature (TCout is overridden)
 tCCT = max(0,time-72)     
-PBforecast_kW = Qdot_sh/3600
-TBout = [224,1]
+PBforecast_kW = PheatBui_kW
 PBcorr_kW = 0	! Nur ein Type 56 Gebäude simuliert, korrektur mit gemitteltedn Daten des letzten Zeitschrittes feht noch
+BoSkip = LT(time,tskip+dthour) 		
+OPMode = 5*BoHS+6*NOT(BoHS)
+TBout = TRdRt ! -> correct? TBout is the return temperature of the radiaton?
 
 
 
-EQUATIONS 9     ! Attribution of Shared Memory inputs
-OPMode = 5     ! Operation-Mode 5 is Valve open, Pump of manufacturer on, Operation-Mode 6 is Valve closed, conditioning
-PowMode = 0     !  PowMode 1 is Power-controlled Temperature (TCout is overridden)
-tCCT = time
-PBcorr_kW = 0
-!TBuiAir_C = Troom
-PBforecast_kW = 0   ! Power forecast for the building loop in the next simulation timestep (kW)
-TBout=20.3     ! Outlet temperature forecast for the building loop in next simulation timestep (°C)
-!Tamb =23.3    ! Outside ambient air temperature (°C)
-!Rhamb_100 =8.6    ! relative outdoor humidity [%, 0-100]
-!! clarify following section with Robert: !!!
-Pbset_kW  =5.9   ! Power setpoint according to the load file ??? what is this?
-EBdaily_kWh   =8.6  ! Tagesendwert ???
-EBdailyMax_kWh  =6.6   ! Daily energy (laufend incl. Differenz) ???
-**BoSkip = 1 
-     
-     
      
      
 UNIT 19 TYPE 278      ! ExchangeData with Shared Memory
@@ -94,60 +100,70 @@ PARAMETERS 5
 103     ! Logical Unit for SharedMem File to be written by this type:  *  Caution! Do not use this logical unit for ASSIGN statements or Paramter 3 or 5!
 104     ! Logical Unit for SharedMem-Log File:   Caution! Do not use this logical unit for ASSIGN statements or Paramter 3 or 4!
      
-INPUTS 13     
-BoSkip     ! Boolean to indicate skipping time (0/1)
+INPUTS 14    
+BoSkip     ! Boolean to indicate skipping time (0/1) -> skippen nicht nötig! BoSkip = 0 -> block am Anfang definierten
 tCCT     ! CCT-time that corresponds to emulation in testbench, h
-OPMode     ! Operation mode of the next timestep: 5 is valve open, 6 is valve closed
-PowMode     ! Power mode for the next timestep: 1 is power controlled, 0 is temperature controlled
-PBforecast_kW     ! Power forecast for the building loop in the next simulation timestep (kW)
+OPMode     ! Operation mode of the next timestep: 5 is valve open, 6 is valve closed !!MS: 5 wenn Massenstrom > 0 (Heizperiode) 6 wenn MFREmulator 0
+PowMode     ! Power mode for the next timestep: 1 is power controlled, 0 is temperature controlled  !MS immer 0
+PBforecast_kW     ! Power forecast for the building loop in the next simulation timestep (kW)		! MS berechnete Heizkreisleistung in kW
 TBout     ! Outlet temperature forecast for the building loop in next simulation timestep (°C)
-PBcorr_kW     ! Power correction term for next simulation timestep (kW)
+PBcorr_kW     ! Power correction term for next simulation timestep (kW)			MS immer 0
 Troom     ! temperature of air in EG corrected simulation (°C)
 Tamb     ! Outside ambient air temperature (°C)
 Rhamb_100     ! relative outdoor humidity [%, 0-100]
-*  Initial values     
-0   0    04      0     2       20     0       20    15
+nix
+nix
+nix
+MfrEmulator ! Soll Massenstrom für Labview! 
+
+**  Initial values     
+0   0    04      0     2       20     0       20    15 0 0 0 0 0
 LABELS 3     
-C:\Daten\CCTspecific\bLVtoTRNSYS.txt    
-C:\Daten\CCTspecific\bTRNSYStoLV.txt   
-C:\Daten\CCTspecific\bTRNSYStoLV.log     
+C:\SharedMem\bLVtoTRNSYS.txt    ! change path for final version!
+C:\SharedMem\bTRNSYStoLV.txt   
+C:\SharedMem\bTRNSYStoLV.log     
      
-EQUATIONS 9
+EQUATIONS 8
 tLVsim = [19,1]     !  time of lab view simulation
-Tbbi = [19,2]*BoSkipNot+TRdFl*BoSkip     ! Instant measured building Inlet temparture (°C)
+Tbbi = [19,2]*NOT(BoSkip)+TRdFl*BoSkip     ! Instant measured building Inlet temparture (°C) Testsstand Temperatur für Radiator
 MfrB = [19,3]     ! Instant Measured building Mass flow (kg/h]
 TbbiMean = [19,5]     !  Mean measured building values of previous timestep: Tin (°C), Tout (°C) cap.flow-rate (kJ/hrK)
 MfrBMean = [19,6]     ! Mean measured building inlet temperature of previous timestep (°C)
+ ! [19,13] M
 mb = MfrB
-#* mb = MfrB*BoStp1Not     ! mass flow of building loop (kg/h)
+** mb = MfrB*BoStp1Not     ! mass flow of building loop (kg/h)
 mbMean = MfrBMean
 mfl_flo = MfrBuiRd    
 
    
 
 
+
+
 ***********************************
-** Hourly printer
+** Timestep printer
 ***********************************
 
 CONSTANTS 1
-unitHourlyDHW = 218
-
-ASSIGN    temp\DHW_HR.Prt  unitHourlyDHW     
+unitTimestepEmulator = 218
 
 
-UNIT 218 TYPE 46     ! Printegrator Monthly Values for System
-PARAMETERS 6   
-unitHourlyDHW    ! 1: Logical unit number, -
--1     ! 2: Logical unit for monthly summaries, -
-1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
-1     ! 5: Number of inputs to avoid integration, -
-1		! 6: Output number to avoid integration
-INPUTS 4
-nix nix nix nix          
-**  
-nix nix nix nix          
+ASSIGN temp\CheckEmulationSim.Plt unitTimestepEmulator
+UNIT 91 TYPE 25        !Changed automatically
+PARAMETERS 10     
+dtSim                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitTimestepEmulator     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 16
+Time BoSkip TCCT OPMode PowMode PBforecast_kW TBout PBcorr_kW Troom Tamb Rhamb_100 MfrEmulator tLVsim Tbbi MfrB TbbiMean MfrBMean
+Time BoSkip TCCT OPMode PowMode PBforecast_kW TBout PBcorr_kW Troom Tamb Rhamb_100 MfrEmulator tLVsim Tbbi MfrB TbbiMean MfrBMean
 
 ***********************************
 ** Online plotter
@@ -179,6 +195,7 @@ LABELS  3
 massFlow
 Temperatures     
 DHW-Hyd
+
 
 *******************************
 **END communicationBuilding.ddck

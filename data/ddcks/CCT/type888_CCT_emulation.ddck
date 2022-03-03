@@ -111,6 +111,14 @@ MoScTrh = 1 ! Mode of temperature setpoint for room heating:
 *********************************************************************
 ******** Controller Heating System and Heat Pump
 *********************************************************************
+CONSTANTS 7
+TMax = 90.0
+TMin = 0.0
+Tupper = 65
+TcondIn=20
+TrhStUp = 25
+Tuppersh = 65
+CoolingOn = 0
 
 UNIT 2 TYPE 888  ! version v0 
 PARAMETERS 16     
@@ -124,20 +132,20 @@ m_Rd     ! 12 mrad: radiator exponent
 TambD     ! 14 TambHCref: reference (design) ambient temperature. At TambD, e.g -10 the flowT is at TBuiFlNom 35
 TBuiFlNom     ! 15 TflowRef: reference (design) flow temperature
 TBuiRtNom     ! 16 TretRef: reference (design) return temperature
-0     ! 21 TScMin: minimum setpoint temperature for heat source
-90     ! 22 TScMaxWW: maximum setpoint temperature for heat source in WW mode
-90     ! 23 TScMaxRH: maximum setpoint for heat source temperature in space heating mode
+TMin     ! 21 TScMin: minimum setpoint temperature for heat source
+TMax     ! 22 TScMaxWW: maximum setpoint temperature for heat source in WW mode
+TMax     ! 23 TScMaxRH: maximum setpoint for heat source temperature in space heating mode
 MoScOn     ! 24 MoScOn:  1 = heat at least to minimum setpoint whenever heat-season is on or WW-Mode is on; 2 = heat at least to minimum setpoint only when RH-Mode is on or WW-Mode is on; 3 = always heat to minimum setpoint at least
 MoScTww     ! 25 MoScTww: 
 MoScTrh     ! 26 MoScTrh: 
 INPUTS 14     
 Tamb24      ! 1: Tamb ->TambHS is used for determination of heating season
-65.0    ! 2: TwwStUp: upper Store temperature measurement for Warm water MS: high enough for not blocking radiatior pump
-60.0    ! 3: TwwStLo: lower store temperature measurement for Warm water MS: high enough for not blocking radiatior pump
+Tupper    ! 2: TwwStUp: upper Store temperature measurement for Warm water MS: high enough for not blocking radiatior pump
+Tuppersh    ! 3: TwwStLo: lower store temperature measurement for Warm water MS: high enough for not blocking radiatior pump
 TwwStAuxON  ! 4: TwwON: temperature of store (upper) below which auxiliary is on for WW-Mode
 TwwStauxOff ! 5: TwwOFF: temperature of store (lower) above which auxiliary is off for WW-Mode
-25.0    ! 6: TrhStUp:upper temperature measured for room heating (on)
-20.0    ! 7 : THpsCondIn    11: TrhStLo: lower temperature measured for room heating (off)
+TrhStUp    ! 6: TrhStUp:upper temperature measured for room heating (on)
+TcondIn    ! 7 : THpsCondIn    11: TrhStLo: lower temperature measured for room heating (off)
 dt_rh_on    ! 8: TrhON: temperature (difference) for room heating on
 dt_rh_off   ! 9: TrhOFF: temperature (difference) for room heating off
 tRoomSet    ! 10: TroomSet: room set-point for heating curve calculation
@@ -149,7 +157,7 @@ TScSetRH     ! 14: TScSetRH:Set-point temperature for the heat source in room he
 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
 			
-UNIT 4 Type 816     ! Transient Value Averaging for ambient temperature (heating system control)
+UNIT 4 TYPE 816     ! Transient Value Averaging for ambient temperature (heating system control)
 PARAMETERS 2     
 1     !  1: number of values for input
 tavgTamb     !  2: time of averaging (dt in hours)
