@@ -14,6 +14,7 @@ import logging
 import os
 # import Tkinter as tk
 import tkinter as tk
+import typing as _tp
 # import Tkinter.messagebox as tkMessageBox
 from tkinter import messagebox as tkMessageBox
 
@@ -22,6 +23,7 @@ import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deck
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
+import pytrnsys.utils.result as _res
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -71,7 +73,7 @@ class BuildTrnsysDeck:
         self.existingDckUnchecked = True
         self.dckAlreadyExists = True
 
-    def loadDeck(self, _path, _name):
+    def loadDeck(self, _path, _name) -> _res.Result[_tp.Tuple[str, str, str]]:
 
         nameOneDck = _path + "\%s.%s" % (_name, self.extOneSheetDeck)
 
@@ -83,9 +85,16 @@ class BuildTrnsysDeck:
 
         if self.DdckPlaceHolderValueJsonPath is not None:
             if ddckFolderPath in self.DdckPlaceHolderValue:
-                replacedLines = _replace.replaceComputedVariablesWithName(nameOneDck,
-                                                                          self.DdckPlaceHolderValue[ddckFolderPath]).split(
-                    "\n")
+                result = _replace.replaceComputedVariablesWithName(nameOneDck,
+                                                                   self.DdckPlaceHolderValue[ddckFolderPath])
+
+                if _res.isError(result):
+                    return _res.error(result)
+
+                replacedContent = _res.value(result)
+
+                replacedLines = replacedContent.split("\n")
+
                 lastLine = replacedLines[-1]
                 if lastLine == "":
                     lines = replacedLines[:-1]
@@ -110,7 +119,8 @@ class BuildTrnsysDeck:
 
         return lines[0:3]  # only returns the caption with the info of the file
 
-    def readDeckList(self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]):
+    def readDeckList(self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]) -> _res.Result[
+        None]:
         """
 
         Parameters
@@ -153,7 +163,12 @@ class BuildTrnsysDeck:
                     pathList = pathList + "\\" + pathVec[j]
                 dictPaths[self.nameList[i]] = os.path.join(pathConfig, dictPaths[self.nameList[i]])
 
-            firstThreeLines = self.loadDeck(pathList, nameList)
+            result = self.loadDeck(pathList, nameList)
+
+            if _res.isError(result):
+                return _res.error(result)
+
+            firstThreeLines = _res.value(result)
 
             ddck = trnsysComponent.TrnsysComponent(pathList, nameList)
             definedVariables, requiredVariables = ddck.getVariables()

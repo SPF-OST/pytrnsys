@@ -1,37 +1,38 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/python
+# !/usr/bin/python
 """
 Author : Dani Carbonell
 Date   : 30.09.2016
 ToDo
 """
 
-import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
-import pytrnsys.rsim.executeTrnsys as exeTrnsys
-import pytrnsys.trnsys_util.buildTrnsysDeck as build
-import numpy as num
-import pandas as pd
-import os
-import pytrnsys.pdata.processFiles
-import string
-import pytrnsys.rsim.runParallel as runPar
-import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
-import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
-import shutil
-import sys
 import imp
 import json
+import os
+import shutil
+import typing as _tp
 from copy import deepcopy
-import sys
+
+import numpy as num
+import pandas as pd
 import pkg_resources
+import sys
+
+import pytrnsys.rsim.executeTrnsys as exeTrnsys
+import pytrnsys.rsim.runParallel as runPar
+import pytrnsys.trnsys_util.buildTrnsysDeck as build
+import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
+import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.utils.log as log
+import pytrnsys.utils.result as _res
 
 try:
     import pytrnsys_examples
 except ImportError:
     pass
+
 
 # from sets import Set
 
@@ -152,7 +153,7 @@ class RunParallelTrnsys:
         cases = []
 
         for line in lines:
-            if line == "\n" or line[0]=="#":  # ignoring blank lines and lines starting with #
+            if line == "\n" or line[0] == "#":  # ignoring blank lines and lines starting with #
                 pass
             else:
                 cases.append(line[:-1])  # remove \n
@@ -170,8 +171,6 @@ class RunParallelTrnsys:
             # tests[i].setAddBuildingData(self.inputs["copyBuildingData"]) I comment it until we use again a case where we need this functionality. I guess we dont need this anymore.
             tests[i].loadDeck(check=self.inputs["checkDeck"])
 
-
-
             tests[i].changeParameter(self.parameters)
             if self.inputs["ignoreOnlinePlotter"] == True:
                 tests[i].ignoreOnlinePlotter()
@@ -181,11 +180,11 @@ class RunParallelTrnsys:
 
             # tests[i].setTrnsysVersion("TRNSYS17_EXE")
 
-            self.cmds.append(tests[i].getExecuteTrnsys(self.inputs,useDeckName=tests[i].nameDck))
+            self.cmds.append(tests[i].getExecuteTrnsys(self.inputs, useDeckName=tests[i].nameDck))
 
         self.runParallel()
 
-    def runConfig(self):
+    def runConfig(self) -> _res.Result[None]:
         """
         Runs the cases defined in the config file
 
@@ -233,14 +232,19 @@ class RunParallelTrnsys:
                         else:
                             self.nameBase = nameBase + "-" + os.path.split(sinkFile)[-1]
 
-                        self.buildTrnsysDeck()
+                        result = self.buildTrnsysDeck()
+
+                        if _res.isError(result):
+                            return _res.error(result)
+
                         self.createDecksFromVariant()
 
                         if self.foldersForDDckVariationUsed == True:
                             self.path = originalPath  # recall the original path, otherwise the next folder will be cerated inside the first
-
             else:
-                self.buildTrnsysDeck()
+                result = self.buildTrnsysDeck()
+                if _res.isError(result):
+                    return _res.error(result)
                 self.createDecksFromVariant()
 
     def createDecksFromVariant(self, fitParameters={}):
@@ -364,7 +368,7 @@ class RunParallelTrnsys:
 
         shutil.move(root_src_dir, root_target_dir)
 
-    def buildTrnsysDeck(self):
+    def buildTrnsysDeck(self) -> _res.Result[_tp.Optional[str]]:
         """
         It builds a TRNSYS Deck from a listDdck with pathDdck using the BuildingTrnsysDeck Class.
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
@@ -376,13 +380,15 @@ class RunParallelTrnsys:
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
         deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self.DdckPlaceHolderValueJsonPath)
-        deck.readDeckList(
+        result = deck.readDeckList(
             self.pathConfig,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
             dictPaths=self.dictDdckPaths,
             replaceLineList=self.replaceLines,
         )
-        # deck.createDependencyGraph()
+
+        if _res.isError(result):
+            return _res.error(result)
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
         deck.writeDeck(addedLines=deckExplanation)
@@ -391,7 +397,6 @@ class RunParallelTrnsys:
         deck.checkTrnsysDeck(deck.nameDeck, check=self.inputs["checkDeck"])
 
         if self.inputs["generateUnitTypesUsed"] == True:
-
             deck.saveUnitTypeFile()
 
         if self.inputs["addAutomaticEnergyBalance"] == True:
@@ -554,8 +559,8 @@ class RunParallelTrnsys:
         for i in range(len(self.listDdck)):
             # self.lines[i].replace(source,end)
             mySource = self.listDdck[i][
-                -nCharacters:
-            ]  # I read only the last characters with the same size as the end file
+                       -nCharacters:
+                       ]  # I read only the last characters with the same size as the end file
             if mySource == source:
                 newDDck = self.listDdck[i][0:-nCharacters] + end
                 self.dictDdckPaths[newDDck] = self.dictDdckPaths[self.listDdck[i]]
@@ -726,11 +731,11 @@ class RunParallelTrnsys:
             for i in range(2, len(self.variablesOutput[j]), 1):
                 if self.variablesOutput[j][1] == "sizeHpUsed":
                     self.variablesOutput[j][i] = (
-                        str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadHPsize, 3))
+                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadHPsize, 3))
                     )
                 else:
                     self.variablesOutput[j][i] = (
-                        str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadDemand, 3))
+                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadDemand, 3))
                     )
 
 

@@ -5,6 +5,7 @@ import typing as _tp
 import lark as _lark
 import lark.visitors as _lvis
 
+import pytrnsys.utils.result as _res
 from . import _parse
 
 
@@ -52,7 +53,7 @@ class _CollectComputedVariables(_lvis.Visitor_Recursive):
 def replaceComputedVariablesWithDefaults(inputFilePathInStr: str) -> str:
     inputDdckFilePath = _pl.Path(inputFilePathInStr)
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
-    inputDdckContent = inputDdckFilePath.read_text() # pylint: disable=bad-option-value,unspecified-encoding
+    inputDdckContent = inputDdckFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
     outputDdckContent = inputDdckContent
     offset = 0
     for computedVariable in computedVariables:
@@ -67,7 +68,7 @@ def replaceComputedVariablesWithDefaults(inputFilePathInStr: str) -> str:
     return outputDdckContent
 
 
-def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict) -> str:
+def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict) -> _res.Result[str]:
     inputDdckFilePath = _pl.Path(inputFilePathInStr)
 
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
@@ -78,12 +79,12 @@ def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict)
     for computedVariable in computedVariables:
         namesForPort = namesByPort.get(computedVariable.portName, {})
         if _isEmpty(namesForPort):
-            raise Exception(
+            return _res.Error(
                 f"There is no connection name in json file for {computedVariable.portName} for {inputFilePathInStr}")
 
         replamentString = namesForPort.get(computedVariable.portProperty, {})
         if _isEmpty(replamentString):
-            raise Exception(
+            return _res.Error(
                 f"There is no {computedVariable.portProperty} in json file for {computedVariable.portName} for "
                 f"{inputFilePathInStr}")
 
