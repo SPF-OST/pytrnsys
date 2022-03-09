@@ -9,6 +9,7 @@ import typing as _tp
 import pytest as _pt
 
 import pytrnsys.ddck.replaceVariables as _replace
+import pytrnsys.utils.result as _res
 
 _DATA_DIR = _pl.Path(__file__).parent / "data"
 _DATA_DIR_1 = _pl.Path(__file__).parent / "data1"
@@ -63,7 +64,7 @@ class TestDdckGeneration:
             helper.assertFileStructureEqual(actualDdckFilesPath, expectedDdckFilesPath)
 
             for actualDdckFile, expectedDdckFile in zip(actualDdckFilesPath.iterdir(),
-                                                      expectedDdckFilesPath.iterdir()):
+                                                        expectedDdckFilesPath.iterdir()):
 
                 fileName = actualDdckFile.parts[-1]
                 folderName = actualDdckFile.parts[-2]
@@ -72,8 +73,14 @@ class TestDdckGeneration:
                 if folderName not in ddckPlaceHolderValue or actualDdckFile.suffix != ".ddck":
                     _sh.copy(actualDdckFile, generatedDdckFilesPath)
                 else:
-                    replacedDdckContent = _replace.replaceComputedVariablesWithName(str(actualDdckFile),
-                                                                                  ddckPlaceHolderValue[folderName])
+                    result = _replace.replaceComputedVariablesWithName(str(actualDdckFile),
+                                                                       ddckPlaceHolderValue[folderName])
+
+                    if _res.isError(result):
+                        return _res.error(result)
+
+                    replacedDdckContent = _res.value(result)
+
                     generatedDdckFilePath.write_text(replacedDdckContent)
                     assert replacedDdckContent == expectedDdckFile.read_text()
 
