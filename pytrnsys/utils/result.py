@@ -3,8 +3,6 @@ __all__ = ["Error", "Result", "isError", "value"]
 import dataclasses as _dc
 import typing as _tp
 
-import PyQt5.QtWidgets as _qtw
-
 _T = _tp.TypeVar("_T")
 
 
@@ -36,9 +34,3 @@ def error(result: Result[_T]) -> Error:
         raise ValueError("Result is not an error.")
 
     return _tp.cast(Error, result)
-
-
-def showErrorMessageBox(_error: Error) -> None:
-    messageBox = _qtw.QMessageBox()
-    messageBox.setText(_error.message)
-    messageBox.exec()
