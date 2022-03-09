@@ -53,7 +53,7 @@ assignment_target: explicit_var_name
     | product "/" power -> divided_by
     
 ?power: atom
-    | power "^" atom -> to_power_of
+    | power ("^" | "**") atom -> to_power_of
 
 ?atom: NUMBER -> number
     | "-" atom -> negate
@@ -79,7 +79,7 @@ explicit_var_name: SHARED_VAR_NAME -> shared_var
     | NAME -> private_var
     | MODULATION -> modulation_control
 
-assign: "ASSIGN" file_path logical_unit
+assign: "ASSIGN" file_path [logical_unit]
 
 file_path: FILE_PATH
 
