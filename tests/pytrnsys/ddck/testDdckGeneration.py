@@ -76,8 +76,7 @@ class TestDdckGeneration:
                     result = _replace.replaceComputedVariablesWithName(str(actualDdckFile),
                                                                        ddckPlaceHolderValue[folderName])
 
-                    if _res.isError(result):
-                        return _res.error(result)
+                    assert not _res.isError(result)
 
                     replacedDdckContent = _res.value(result)
 

@@ -7,7 +7,7 @@ _T = _tp.TypeVar("_T")
 
 
 @_dc.dataclass
-class Error:
+class Error:  # pylint: disable= too-few-public-methods
     message: str
 
 
