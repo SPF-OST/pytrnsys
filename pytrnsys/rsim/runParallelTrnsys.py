@@ -63,7 +63,7 @@ class RunParallelTrnsys:
 
         self.pathConfig = pathConfig
 
-        self.DdckPlaceHolderValueJsonPath = None
+        self.ddckPlaceHolderValueJsonPath = None
 
         self.defaultInputs()
         self.cmds = []
@@ -379,7 +379,7 @@ class RunParallelTrnsys:
 
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self.DdckPlaceHolderValueJsonPath)
+        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self.ddckPlaceHolderValueJsonPath)
         result = deck.readDeckList(
             self.pathConfig,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
@@ -512,7 +512,7 @@ class RunParallelTrnsys:
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
         if "pathToConnectionInfo" in self.inputs:
-            self.DdckPlaceHolderValueJsonPath = self.inputs["pathToConnectionInfo"]
+            self.ddckPlaceHolderValueJsonPath = self.inputs["pathToConnectionInfo"]
         if self.inputs["addResultsFolder"] == False:
             pass
         else:

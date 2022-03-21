@@ -48,14 +48,14 @@ class BuildTrnsysDeck:
         the Base path of the ddck files
     """
 
-    def __init__(self, _pathDeck, _nameDeck, _nameList, _DdckPlaceHolderValueJsonPath):
+    def __init__(self, _pathDeck, _nameDeck, _nameList, _ddckPlaceHolderValueJsonPath):
 
         self.pathDeck = _pathDeck
         self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
 
-        self.DdckPlaceHolderValueJsonPath = _DdckPlaceHolderValueJsonPath
-        if self.DdckPlaceHolderValueJsonPath is not None:
-            self.DdckPlaceHolderValue = _json.load(open(self.DdckPlaceHolderValueJsonPath))
+        self.ddckPlaceHolderValueJsonPath = _ddckPlaceHolderValueJsonPath
+        if self.ddckPlaceHolderValueJsonPath is not None:
+            self.ddckPlaceHolderValue = _json.load(open(self.ddckPlaceHolderValueJsonPath))
 
         self.oneSheetList = []
         self.nameList = _nameList
@@ -83,10 +83,10 @@ class BuildTrnsysDeck:
         infile = open(nameOneDck, "r")
         lines = infile.readlines()
 
-        if self.DdckPlaceHolderValueJsonPath is not None:
-            if ddckFolderPath in self.DdckPlaceHolderValue:
+        if self.ddckPlaceHolderValueJsonPath is not None:
+            if ddckFolderPath in self.ddckPlaceHolderValue:
                 result = _replace.replaceComputedVariablesWithName(nameOneDck,
-                                                                   self.DdckPlaceHolderValue[ddckFolderPath])
+                                                                   self.ddckPlaceHolderValue[ddckFolderPath])
 
                 if _res.isError(result):
                     return _res.error(result)
