@@ -41,7 +41,7 @@ def getNumberOfCPU():
 
 
 def getExclusiveAffinityMask(cpu):
-    return 2**(cpu-1)
+    return 2 ** (cpu - 1)
 
 
 def runParallel(

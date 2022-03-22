@@ -11,8 +11,8 @@ import pytest as _pt
 import pytrnsys.ddck.replaceVariables as _replace
 import pytrnsys.utils.result as _res
 
-_DATA_DIR = _pl.Path(__file__).parent / "data"
-_DATA_DIR_1 = _pl.Path(__file__).parent / "data1"
+_REPLACE_WITH_DEFAULTS_DATA_DIR = _pl.Path(__file__).parent / "defaults"
+_REPLACE_WITH_NAMES_DATA_DIR = _pl.Path(__file__).parent / "names"
 
 
 @_dc.dataclass
@@ -35,20 +35,20 @@ def getProjects(path: _pl.Path) -> _tp.Iterable[_Project]:
         yield _Project.createForProject(projectName)
 
 
-TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects(_DATA_DIR_1)]
+TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects(_REPLACE_WITH_NAMES_DATA_DIR)]
 
 
 class TestDdckGeneration:
     def testReplaceComputedVariablesWithDefaults(self):  # pylint: disable=no-self-use
-        inputDdckFilePath = _DATA_DIR / "type977_v1_input.ddck"
-        expectedDdckFilePath = _DATA_DIR / "type977_v1_expected.ddck"
+        inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input.ddck"
+        expectedDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_expected.ddck"
         actualDdckContent = _replace.replaceComputedVariablesWithDefaults(inputDdckFilePath)
         assert actualDdckContent == expectedDdckFilePath.read_text()
 
     @_pt.mark.parametrize("project", TEST_CASES)
     def testReplaceComputedVariablesWithName(self, project: _Project):  # pylint: disable=no-self-use
 
-        helper = Helper(_DATA_DIR_1, project.projectName)
+        helper = Helper(_REPLACE_WITH_NAMES_DATA_DIR, project.projectName)
 
         helper.copyFolderAndFiles(helper.actualDirPath, helper.generatedDirPath)
 
@@ -57,14 +57,14 @@ class TestDdckGeneration:
         helper.assertFileStructureEqual(helper.generatedDdckDirPath, helper.expectedDdckDirPath)
 
         for generatedDdckFilesPath, actualDdckFilesPath, expectedDdckFilesPath in zip(
-                list(helper.generatedDdckDirPath.iterdir()),
-                list(helper.actulDdckDirPath.iterdir()),
-                list(helper.expectedDdckDirPath.iterdir())):
+            list(helper.generatedDdckDirPath.iterdir()),
+            list(helper.actulDdckDirPath.iterdir()),
+            list(helper.expectedDdckDirPath.iterdir()),
+        ):
 
             helper.assertFileStructureEqual(actualDdckFilesPath, expectedDdckFilesPath)
 
-            for actualDdckFile, expectedDdckFile in zip(actualDdckFilesPath.iterdir(),
-                                                        expectedDdckFilesPath.iterdir()):
+            for actualDdckFile, expectedDdckFile in zip(actualDdckFilesPath.iterdir(), expectedDdckFilesPath.iterdir()):
 
                 fileName = actualDdckFile.parts[-1]
                 folderName = actualDdckFile.parts[-2]
@@ -73,8 +73,9 @@ class TestDdckGeneration:
                 if folderName not in ddckPlaceHolderValue or actualDdckFile.suffix != ".ddck":
                     _sh.copy(actualDdckFile, generatedDdckFilesPath)
                 else:
-                    result = _replace.replaceComputedVariablesWithName(str(actualDdckFile),
-                                                                       ddckPlaceHolderValue[folderName])
+                    result = _replace.replaceComputedVariablesWithName(
+                        str(actualDdckFile), ddckPlaceHolderValue[folderName]
+                    )
 
                     assert not _res.isError(result)
 

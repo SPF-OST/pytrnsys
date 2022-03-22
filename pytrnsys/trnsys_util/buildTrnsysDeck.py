@@ -1,7 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
-# !/usr/bin/python
+#!/usr/bin/python
 """
 Author : Dani Carbonell
 Date   : 30.09.2016
@@ -9,13 +9,10 @@ ToDo :
 """
 
 import json as _json
-# from graphviz import Graph
 import logging
 import os
-# import Tkinter as tk
 import tkinter as tk
 import typing as _tp
-# import Tkinter.messagebox as tkMessageBox
 from tkinter import messagebox as tkMessageBox
 
 import pytrnsys.ddck.replaceVariables as _replace
@@ -48,14 +45,12 @@ class BuildTrnsysDeck:
         the Base path of the ddck files
     """
 
-    def __init__(self, _pathDeck, _nameDeck, _nameList, _ddckPlaceHolderValueJsonPath):
+    def __init__(self, _pathDeck, _nameDeck, _nameList, ddckPlaceHolderValuesJsonPath):
 
         self.pathDeck = _pathDeck
         self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
 
-        self.ddckPlaceHolderValueJsonPath = _ddckPlaceHolderValueJsonPath
-        if self.ddckPlaceHolderValueJsonPath is not None:
-            self.ddckPlaceHolderValue = _json.load(open(self.ddckPlaceHolderValueJsonPath))
+        self._ddckPlaceHolderValuesJsonPath = ddckPlaceHolderValuesJsonPath
 
         self.oneSheetList = []
         self.nameList = _nameList
@@ -83,10 +78,12 @@ class BuildTrnsysDeck:
         infile = open(nameOneDck, "r")
         lines = infile.readlines()
 
-        if self.ddckPlaceHolderValueJsonPath is not None:
-            if ddckFolderPath in self.ddckPlaceHolderValue:
-                result = _replace.replaceComputedVariablesWithName(nameOneDck,
-                                                                   self.ddckPlaceHolderValue[ddckFolderPath])
+        if self._ddckPlaceHolderValuesJsonPath is not None:
+            placeholderValues = _json.load(open(self._ddckPlaceHolderValuesJsonPath))
+
+            if ddckFolderPath in placeholderValues:
+                name = placeholderValues[ddckFolderPath]
+                result = _replace.replaceComputedVariablesWithName(nameOneDck, name)
 
                 if _res.isError(result):
                     return _res.error(result)
@@ -119,8 +116,9 @@ class BuildTrnsysDeck:
 
         return lines[0:3]  # only returns the caption with the info of the file
 
-    def readDeckList(self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]) -> _res.Result[
-        None]:
+    def readDeckList(
+        self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
+    ) -> _res.Result[None]:
         """
 
         Parameters
@@ -173,11 +171,11 @@ class BuildTrnsysDeck:
             ddck = trnsysComponent.TrnsysComponent(pathList, nameList)
             definedVariables, requiredVariables = ddck.getVariables()
             if (
-                    "printer" not in nameList
-                    and "Printer" not in nameList
-                    and "Control" not in nameList
-                    and "control" not in nameList
-                    and "BigIceCoolingTwoStorages" not in nameList
+                "printer" not in nameList
+                and "Printer" not in nameList
+                and "Control" not in nameList
+                and "control" not in nameList
+                and "BigIceCoolingTwoStorages" not in nameList
             ):
                 self.dependencies[nameList] = requiredVariables - definedVariables
                 self.definitions[nameList] = definedVariables
@@ -189,8 +187,8 @@ class BuildTrnsysDeck:
             addedLines = firstThreeLines + self.linesChanged
 
             caption = (
-                    " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
-                    % (nameList, pathList)
+                " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
+                % (nameList, pathList)
             )
 
             if doAutoUnitNumbering:
@@ -257,7 +255,7 @@ class BuildTrnsysDeck:
             ok = tkMessageBox.askokcancel(
                 title="Processing Trnsys",
                 message="Do you want override %s ?\n If parallel simulations most likely accepting this will ovrewrite all the rest too. Think of it twice !! "
-                        % tempName,
+                % tempName,
             )
             window.destroy()
 

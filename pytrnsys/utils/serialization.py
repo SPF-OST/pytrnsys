@@ -40,9 +40,7 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
             expectedVersion = str(cls.getVersion())
 
             if actualVersion != expectedVersion:
-                raise SerializationError(
-                    f"Version mismatch: expected {expectedVersion}, got {actualVersion}."
-                )
+                raise SerializationError(f"Version mismatch: expected {expectedVersion}, got {actualVersion}.")
 
         try:
             deserializedObject = super().from_dict(data, validate, validate_enums)
@@ -134,15 +132,11 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
                 raise SerializationError from error
 
         try:
-            return super().from_dict(
-                data, validate=False, validate_enums=validate_enums
-            )
+            return super().from_dict(data, validate=False, validate_enums=validate_enums)
         except SerializationError:
             supersededClass = cls.getSupersededClass()
 
-            supersededInstance = supersededClass.from_dict(
-                data, validate=False, validate_enums=validate_enums
-            )
+            supersededInstance = supersededClass.from_dict(data, validate=False, validate_enums=validate_enums)
 
             return cls.upgrade(supersededInstance)
 
@@ -182,9 +176,7 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
         return combinedFullSchema
 
     @classmethod
-    def _addSupersededSchemaToEmbeddable(
-        cls, fullSchema, fullSupersededSchema, schemaType, supersededClass
-    ):
+    def _addSupersededSchemaToEmbeddable(cls, fullSchema, fullSupersededSchema, schemaType, supersededClass):
         schema = fullSchema[cls.__name__]
         schemaReference = _dcj.schema_reference(schemaType, supersededClass.__name__)
         combinedSchema = {"anyOf": [schema, schemaReference]}
@@ -218,9 +210,7 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
         return combinedFullSchema
 
     @classmethod
-    def _addSupersededSchemaToTopLevel(
-        cls, fullSupersededSchema, fullSchema, supersededClass, schemaType
-    ):
+    def _addSupersededSchemaToTopLevel(cls, fullSupersededSchema, fullSchema, supersededClass, schemaType):
         definitions = fullSchema.get("definitions", {})
 
         cls._assertNoCollidingDefinitions(definitions, fullSupersededSchema)
@@ -240,9 +230,7 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
     @classmethod
     def _assertNoCollidingDefinitions(cls, definitions, fullSupersededSchema):
         collidingDefinitions = [
-            (k, v)
-            for k, v in fullSupersededSchema.items()
-            if k in definitions and definitions[k] != v
+            (k, v) for k, v in fullSupersededSchema.items() if k in definitions and definitions[k] != v
         ]
         if collidingDefinitions:
             key, newDefinition = collidingDefinitions[0]
@@ -263,9 +251,7 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
 
             return cls.upgrade(partiallyUpgradedInstance)
 
-        raise ValueError(
-            "`instance' isn't an instance of current or any previous version."
-        )
+        raise ValueError("`instance' isn't an instance of current or any previous version.")
 
     @classmethod
     def _doesRequireVersion(cls) -> bool:

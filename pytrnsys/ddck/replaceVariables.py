@@ -34,8 +34,9 @@ class _CollectComputedVariables(_lvis.Visitor_Recursive):
         portProperty = self._getChildToken("PORT_PROPERTY", tree)
         portName = self._getChildToken("PORT_NAME", tree)
         defaultVariableName = self._getChildToken("DEFAULT_VARIABLE_NAME", tree)
-        computedVariable = _ComputedVariable(tree.meta.start_pos, tree.meta.end_pos, portProperty, portName,
-                                             defaultVariableName)
+        computedVariable = _ComputedVariable(
+            tree.meta.start_pos, tree.meta.end_pos, portProperty, portName, defaultVariableName
+        )
         self.computedVariables.append(computedVariable)
 
     @staticmethod
@@ -50,8 +51,7 @@ class _CollectComputedVariables(_lvis.Visitor_Recursive):
         return matchingChildToken.value
 
 
-def replaceComputedVariablesWithDefaults(inputFilePathInStr: str) -> str:
-    inputDdckFilePath = _pl.Path(inputFilePathInStr)
+def replaceComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path) -> str:
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
     inputDdckContent = inputDdckFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
     outputDdckContent = inputDdckContent
@@ -80,13 +80,15 @@ def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict)
         namesForPort = namesByPort.get(computedVariable.portName, {})
         if _isEmpty(namesForPort):
             return _res.Error(
-                f"There is no connection name in json file for {computedVariable.portName} for {inputFilePathInStr}")
+                f"There is no connection name in json file for {computedVariable.portName} for {inputFilePathInStr}"
+            )
 
         replamentString = namesForPort.get(computedVariable.portProperty, {})
         if _isEmpty(replamentString):
             return _res.Error(
                 f"There is no {computedVariable.portProperty} in json file for {computedVariable.portName} for "
-                f"{inputFilePathInStr}")
+                f"{inputFilePathInStr}"
+            )
 
         outputDdckContent = _replace(
             outputDdckContent,

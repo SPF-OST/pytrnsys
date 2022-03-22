@@ -1,7 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
-# !/usr/bin/python
+#!/usr/bin/python
 """
 Author : Dani Carbonell
 Date   : 30.09.2016
@@ -368,7 +368,7 @@ class RunParallelTrnsys:
 
         shutil.move(root_src_dir, root_target_dir)
 
-    def buildTrnsysDeck(self) -> _res.Result[_tp.Optional[str]]:
+    def buildTrnsysDeck(self) -> _res.Result[str]:
         """
         It builds a TRNSYS Deck from a listDdck with pathDdck using the BuildingTrnsysDeck Class.
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
@@ -559,8 +559,8 @@ class RunParallelTrnsys:
         for i in range(len(self.listDdck)):
             # self.lines[i].replace(source,end)
             mySource = self.listDdck[i][
-                       -nCharacters:
-                       ]  # I read only the last characters with the same size as the end file
+                -nCharacters:
+            ]  # I read only the last characters with the same size as the end file
             if mySource == source:
                 newDDck = self.listDdck[i][0:-nCharacters] + end
                 self.dictDdckPaths[newDDck] = self.dictDdckPaths[self.listDdck[i]]
@@ -731,11 +731,11 @@ class RunParallelTrnsys:
             for i in range(2, len(self.variablesOutput[j]), 1):
                 if self.variablesOutput[j][1] == "sizeHpUsed":
                     self.variablesOutput[j][i] = (
-                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadHPsize, 3))
+                        str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadHPsize, 3))
                     )
                 else:
                     self.variablesOutput[j][i] = (
-                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadDemand, 3))
+                        str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadDemand, 3))
                     )
 
 
