@@ -139,10 +139,11 @@ vWind	    	! Wind speed
 
 
 
-EQUATIONS 11   !, Output of PV collector
+EQUATIONS 12   !, Output of PV collector
 ** PelOperating_kW = [154,3]/1000  	! We assume an mpp tracker, so this output is not used	- this corresponds to power at operating point, only meaningful if op is defined (Load Voltage, Input 3)
 PelMaxPower1_kW = [154,4]*NInverters/1000   	! this corresponds to power at mpp after inverter (AC)
 PelArrayMPP1_kW = [154,16]*NInverters/1000  	! this corresponds to power at mpp before inverter (DC)
+TArray1 = [154,11]    !PV module temperature
 ** PelArray_kW = [154,20]/1000	    ! We assume an mpp tracker, so this output is not used	- this corresponds to power at operating point, only meaningful if op is defined (Load Voltage, Input 3)
 ** VelOp = [154,1] 					! We assume an mpp tracker, so this output is not used
 VelMp1 = [154,6]  					! Voltage at MPP (including inverter effects)

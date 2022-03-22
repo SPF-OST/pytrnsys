@@ -153,6 +153,35 @@ inverterEffDCAC = MAX(inverterEffDCAC_mp,0.887) !MAX(inverterEffDCAC_mp,0.000000
 ** inverterEffDCAC_op = [154,17]	! We assume an mpp tracker, so this output is not used
 PvInverterLoss_kW = PelPVDC_kW-PelPVAC_kW
 
+
+
+
+
+*******************************
+***** timestamp printer
+*******************************
+CONSTANTS 1
+unitTimestep1PV = 218
+
+
+ASSIGN temp\check1Pv.Plt unitTimestep1Pv
+UNIT 91 TYPE 25        !Changed automatically
+PARAMETERS 10     
+dtSim                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitTimestep1PV     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 6
+Time IT_PV_kW IT_H_kW PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
+*******
+Time IT_PV_kW IT_H_kW PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
+
 *******************************
 **Monthly printer
 *******************************

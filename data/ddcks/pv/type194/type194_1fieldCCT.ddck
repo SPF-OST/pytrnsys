@@ -1,20 +1,17 @@
 *******************************
-**BEGIN pv_field2.dck
+**BEGIN pv.dck
 *******************************
 
 
 *****************************************
-** Contact person : Maike Schubert
-** Creation date  : 22.12.2021
-** Last changes   : 
+** Contact person : Dani Carbonell    
+** Creation date  : 01.08.19
+** Last changes   : 02.03.20 Jeremias Schmidli
 *****************************************
 
 ***************************************************************************
 ** Description: 
-** PV ddck for 2nd (of 2) PV field 
-** define azimuth and slope as: aziSurfUser_3 and slopeSurfUser_3 in the config file!
-** define areaPV2 in the config file
-** use type194_join.ddck for joining the el. outputs of both PV fields for consideration in other types
+** PV ddck
 ***************************************************************************
 
 ***********************************
@@ -30,10 +27,8 @@
 ** outputs to energy balance in kWh
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
-
-** MS: moved the following equation to the type194_join.ddck!
-**EQUATIONS 1
-**elSysIn_PV       = PelArrayMPP_kW !DC Power provided by PV field
+EQUATIONS 1
+elSysIn_PV       = PelArrayMPP_kW !DC Power provided by PV field
 ** elSysOut_InvLoss = PvInverterLoss_kW  !JS: Only correct if there is no battery, otherwise the inverter losses have to be accounted for in the battery ddck.
 
 *************************************************************************************************
@@ -50,24 +45,25 @@
 **tSky, tAmb, vWind, tAmbDewPoint
 ** weatherDataFormat, unitWeatherData   from weatherDataFile
 
-!EQUATIONS 1
-!ASolarZenith = AISZ !
+EQUATIONS 1
+ASolarZenith = AISZ !
 
 ****************************
 **COLLECTOR DATA
 ***************************
 
-CONSTANTS 6
-slopePv2 = slopeSurfUser_3   		!define in config file correctly!
-Pv2_azim = aziSurfUser_3			!define in config file correctly!
-
-AreaPv2 = 30
-numModPv2 = AreaPv2 / areaOneModuleRoof
-!NPanelPara = 2
-!NPanelSeries = 15
-!NPanelsPerInverter = NPanelPara*NPanelSeries
-NInverters2 = numModPv2/NPanelsPerInverter
-PowerPeakPV2_kWp = numModPv2*PvURefMpp*PvIRefMpp/1000
+CONSTANTS 11
+slopePvRoof = slopeSurfUser_2
+PvRoof_azim = aziSurfUser_2
+AreaPV1 = 27.3
+AreaPV2 = 19.4
+AreaPvRoof = AreaPV1 + AreaPV2   !m2
+numModPvRoof = AreaPvRoof / areaOneModuleRoof
+NPanelPara = 2
+NPanelSeries = 15
+NPanelsPerInverter = NPanelPara*NPanelSeries
+NInverters = numModPvRoof/NPanelsPerInverter
+PowerPeakPV_kWp = numModPvRoof*PvURefMpp*PvIRefMpp/1000
 
 ***************************************
 ** Weather Data calculation
@@ -76,22 +72,23 @@ PowerPeakPV2_kWp = numModPv2*PvURefMpp*PvIRefMpp/1000
 
 EQUATIONS 6
 **surface-8
-IT_Pv2 = IT_surfUser_3  ! Incident total radiation on collector plane, kJ/hm2 
-IB_Pv2 = IB_surfUser_3  ! incident beam radiation on collector plane, kJ/hm2
-ID_Pv2 = ID_surfUser_3  ! diffuse and ground reflected irradiance on collector tilt
-IDS_Pv2 = IDS_surfUser_3
-IDG_Pv2 = IDG_surfUser_3
-AI_Pv2 = AI_surfUser_3  ! incident angle on collector plane, �
+IT_PvRoof = (IT_surfUser_2*AreaPv1 + IT_surfUser_3*AreaPv2)/(AreaPV1+AreaPV2)  ! Incident total radiation on collector plane, kJ/hm2 
+IB_PvRoof = (IB_surfUser_2*AreaPv1 + IB_surfUser_3*AreaPv2)/(AreaPV1+AreaPV2)  ! incident beam radiation on collector plane, kJ/hm2
+ID_PvRoof = (ID_surfUser_2*AreaPv1 + ID_surfUser_3*AreaPv2)/(AreaPV1+AreaPV2)  ! diffuse and ground reflected irradiance on collector tilt
+IDS_PvRoof = (IDS_surfUser_2*AreaPv1 + IDS_surfUser_3*AreaPv2)/(AreaPV1+AreaPV2)
+IDG_PvRoof = (IDG_surfUser_2*AreaPv1 + IDG_surfUser_3*AreaPv2)/(AreaPV1+AreaPV2)
+AI_PvRoof = (AI_surfUser_2*AreaPv1 + AI_surfUser_3*AreaPv2)/(AreaPV1+AreaPV2)  ! incident angle on collector plane, �
 
 EQUATIONS 4
-IT_PV2_kW = IT_Pv2/3600     ! Incident total radiation on collector plane, kW/m2
-IB_PV2_kW = IB_Pv2/3600     ! incident beam radiation on collector plane, kW/m2
-ID_PV2_kW = ID_Pv2/3600     ! diffuse and ground reflected irradiance on collector tilt (kW/m2)
-IT_PV2_Wm2 = IT_surfUser_3/3.6
+IT_PV_kW = IT_PvRoof/3600     ! Incident total radiation on collector plane, kW/m2
+IB_PV_kW = IB_PvRoof/3600     ! incident beam radiation on collector plane, kW/m2
+ID_PV_kW = ID_PvRoof/3600     ! diffuse and ground reflected irradiance on collector tilt (kW/m2)
+IT_PV_Wm2 = IT_surfUser_2/3.6
 
 
 
-UNIT 164 TYPE 194	! PV + Inverter E	 SUNSKIN ROOF-MODUL ETERNIT
+
+UNIT 154 TYPE 194	! PV + Inverter E	 SUNSKIN ROOF-MODUL ETERNIT
 PARAMETERS 29
 2		! 1 Mode
 PvIsc		! 2 Module short-circuit current at reference conditions
@@ -123,66 +120,95 @@ PvMinVInv		! 27 Minimum inverter voltage
 1		! 28 Night tare
 unitReadInvPv		! 29 Logical unit number for inverter data
 INPUTS 10
-IT_Pv2		! kJ/(hm2), Total incident radiation on tilted surface
+IT_PvRoof		! kJ/(hm2), Total incident radiation on tilted surface
 Tamb		!  Ambient temperature
 0,0		! [unconnected] Load voltage
 0,0		! [unconnected] Array slope
-IB_Pv2		! kJ/(hm2), Beam radiation on tilted surface
-IDS_Pv2	! kJ/(hm2), Sky diffuse radiation on tilted surface
-IDG_Pv2		! Ground diffuse radiation on tilted surface
-AI_Pv2		! Incidence angle on tilted surface
+IB_PvRoof		! kJ/(hm2), Beam radiation on tilted surface
+IDS_PvRoof	! kJ/(hm2), Sky diffuse radiation on tilted surface
+IDG_PvRoof		! Ground diffuse radiation on tilted surface
+AI_PvRoof		! Incidence angle on tilted surface
 ASolarZenith    		! Solar zenith angle
 vWind	    	! Wind speed
 *** INITIAL INPUT VALUES
-0 Tamb 0 slopePv2 0 0 0 0 0 0  
+0 Tamb 0 slopePvRoof 0 0 0 0 0 0  
 *** External files
 
 
 
-EQUATIONS 12   !, Output of PV collector
+EQUATIONS 13   !, Output of PV collector
 ** PelOperating_kW = [154,3]/1000  	! We assume an mpp tracker, so this output is not used	- this corresponds to power at operating point, only meaningful if op is defined (Load Voltage, Input 3)
-PelMaxPower2_kW = [164,4]*NInverters2/1000   	! this corresponds to power at mpp after inverter (AC)
-PelArrayMPP2_kW = [164,16]*NInverters2/1000  	! this corresponds to power at mpp before inverter (DC)
-TArray2 = [164,11]    !PV module temperature
+PelMaxPower_kW = [154,4]*NInverters/1000   	! this corresponds to power at mpp after inverter (AC)
+PelArrayMPP_kW = [154,16]*NInverters/1000  	! this corresponds to power at mpp before inverter (DC)
+TPV = [154,11]    !PV module temperature
 ** PelArray_kW = [154,20]/1000	    ! We assume an mpp tracker, so this output is not used	- this corresponds to power at operating point, only meaningful if op is defined (Load Voltage, Input 3)
 ** VelOp = [154,1] 					! We assume an mpp tracker, so this output is not used
-VelMp2 = [164,6]  					! Voltage at MPP (including inverter effects)
+VelMp = [154,6]  					! Voltage at MPP (including inverter effects)
 ** VelArrayOp = [154,18]			! We assume an mpp tracker, so this output is not used
-VelArrayMp2 = [164,14]				! Voltage at MPP (NOT including inverter effects)
-PelPv2DC = PelArrayMPP2_kW*3600 	! Power DC in kJ/h
-!PelPV2DC = PelPV2DC				! Power DC in kJ/h
-PelPV2_kW = PelMaxPower2_kW   	! Power AC in kW
-PelPV2DC_kW = PelArrayMPP2_kW  		! Power DC in kW
-PelPV2AC_kW = PelPV2_kW
-inverterEff2DCAC_mp = [164,13]		! Inverter efficiency at mpp
-inverterEff2DCAC = MAX(inverterEff2DCAC_mp,0.887) !MAX(inverterEffDCAC_mp,0.000000001) ! Prevent division by 0  JS: Set minimum to 0.887 because this efficiency is used by battery basic_battery.ddck
+VelArrayMp = [154,14]				! Voltage at MPP (NOT including inverter effects)
+PelPvRoofDC = PelArrayMPP_kW*3600 	! Power DC in kJ/h
+PelPVDC = PelPVRoofDC				! Power DC in kJ/h
+PelPVRoof_kW = PelMaxPower_kW   	! Power AC in kW
+PelPVDC_kW = PelArrayMPP_kW  		! Power DC in kW
+PelPVAC_kW = PelPVRoof_kW
+inverterEffDCAC_mp = [154,13]		! Inverter efficiency at mpp
+inverterEffDCAC = MAX(inverterEffDCAC_mp,0.887) !MAX(inverterEffDCAC_mp,0.000000001) ! Prevent division by 0  JS: Set minimum to 0.887 because this efficiency is used by battery basic_battery.ddck
 ** inverterEffDCAC_op = [154,17]	! We assume an mpp tracker, so this output is not used
-PvInverterLoss2_kW = PelPV2DC_kW-PelPV2AC_kW
+PvInverterLoss_kW = PelPVDC_kW-PelPVAC_kW
+
+
+
+
+
+*******************************
+***** timestamp printer
+*******************************
+CONSTANTS 1
+unitTimestep1PV = 218
+
+
+ASSIGN temp\check1Pv.Plt unitTimestep1Pv
+UNIT 91 TYPE 25        !Changed automatically
+PARAMETERS 10     
+dtSim                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitTimestep1PV     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 6
+Time IT_PV_kW IT_H_kW PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
+*******
+Time IT_PV_kW IT_H_kW PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
 
 *******************************
 **Monthly printer
 *******************************
 
 CONSTANTS 1
-unitPrinterPV2=309
+unitPrinterPV=308
 
-ASSIGN    temp\PV2_MO.Prt      unitPrinterPV2
+ASSIGN    temp\PV_MO.Prt      unitPrinterPV
 
-UNIT 309 Type 46    !, Printegrator Monthly Values for Electricity
+UNIT 308 Type 46    !, Printegrator Monthly Values for Electricity
 PARAMETERS 6
-unitPrinterPV2  !, 1, Logical unit number, -
+unitPrinterPV  !, 1, Logical unit number, -
 -1   !, 2, Logical unit for monthly summaries, -
 1    !, 3, Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
 -1   !, 4, Printing & integrating interval, h. -1 for monthly integration
 1    !, 5, Number of inputs to avoid integration, -
 1    !, 6, Output number to avoid integration
 INPUTS 6
-Time IT_PV2_kW IT_H_kW PelPV2DC_kW  PelPV2_kW PvInverterLoss2_kW 
+Time IT_PV_kW IT_H_kW PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
 *******
-Time IT_PV2_kW IT_H_kW PelPV2DC_kW  PelPV2_kW PvInverterLoss2_kW 
+Time IT_PV_kW IT_H_kW PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
 
 
-UNIT 159 TYPE 65     ! Online Plotter Collector (Element OpC)
+UNIT 155 TYPE 65     ! Online Plotter Collector (Element OpC)
 PARAMETERS 12     
 5     ! 1 Nb. of left-axis variables
 3     ! 2 Nb. of right-axis variables
@@ -192,14 +218,14 @@ PARAMETERS 12
 1000     ! 6 Right axis maximum
 nPlotsPerSim     ! 7 Number of plots per simulation
 12     ! 8 X-axis gridpoints
--1     ! 9 Shut off Online w/o removing
+1     ! 9 Shut off Online w/o removing
 -1     ! 10 Logical unit for output file
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 8
-Tamb  PelMaxPower2_kW  PelArrayMPP2_kW  IT_H_KW  IB_H_kW  VelMp2  VelArrayMp2  inverterEff2DCAC_mp  
+Tamb  PelMaxPower_kW  PelArrayMPP_kW  IT_H_KW  IB_H_kW  VelMp  VelArrayMp  inverterEffDCAC_mp  
 **     
-Tamb  PelMaxPower2_kW  PelArrayMPP2_kW  IT_H_KW  IB_H_kW  VelMp2  VelArrayMp2  inverterEff2DCAC_mp  
+Tamb  PelMaxPower_kW  PelArrayMPP_kW  IT_H_KW  IB_H_kW  VelMp  VelArrayMp  inverterEffDCAC_mp  
 LABELS  3    
 Pel
 Vel
