@@ -1,0 +1,11 @@
+*************************************
+**BEGIN Dhw.ddcx
+*************************************
+** This file is used to store the black box component outputs of Dhw
+
+TDhwPortLeft95=Tdp1In_Tes1
+TDhwPortRight5=Tdp2In_Tes1
+TDhwPortRight70=Tdp3In_Tes1
+TDhwPortLeft35=Tdp1Out_Tes1
+TDhwPortRight95=Tdp2Out_Tes1
+TDhwPortRight90=Tdp3Out_Tes1
