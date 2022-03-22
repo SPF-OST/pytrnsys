@@ -1,0 +1,128 @@
+?start: ddck
+
+ddck: block+
+
+?block: equations | constants | unit | assign
+
+unit: header parameters [inputs [labels]]
+
+header: "UNIT"i unit_number "TYPE"i type_number
+
+unit_number: POSITIVE_INT
+
+type_number: POSITIVE_INT
+
+parameters: "PARAMETERS" number_of_parameters parameter+
+
+number_of_parameters: POSITIVE_INT | NAME | ZERO
+
+parameter: variable_name
+    | SIGNED_NUMBER -> literal
+
+inputs: "INPUTS" number_of_inputs input+
+
+number_of_inputs: POSITIVE_INT
+
+input: variable_name
+    | SIGNED_NUMBER -> literal
+
+labels: "LABELS" number_of_labels label+
+
+number_of_labels: POSITIVE_INT
+
+label: LABEL
+
+constants: "CONSTANTS" number_of_constants equation+
+
+number_of_constants: POSITIVE_INT
+
+equations: "EQUATIONS" number_of_equations equation+
+
+number_of_equations: POSITIVE_INT
+
+equation: assignment_target "=" sum
+
+assignment_target: explicit_var_name
+
+?sum: product
+    | sum "+" product -> plus
+    | sum "-" product -> minus
+    
+?product: power
+    | product "*" power -> times
+    | product "/" power -> divided_by
+    
+?power: atom
+    | power ("^" | "**") atom -> to_power_of
+
+?atom: NUMBER -> number
+    | "-" atom -> negate
+    | variable_name
+    | output
+    | "(" sum ")"
+    | func_call
+
+func_call: func_name func_args -> func_call
+
+func_args: "(" (sum ("," sum)* )? ")"
+
+func_name: NAME
+
+output: "[" unit_number "," output_number "]"
+
+output_number: INT
+
+?variable_name: explicit_var_name
+    | computed_var
+
+explicit_var_name: SHARED_VAR_NAME -> shared_var
+    | NAME -> private_var
+    | MODULATION -> modulation_control
+
+assign: "ASSIGN" file_path [logical_unit]
+
+file_path: FILE_PATH
+
+logical_unit: INT | NAME
+
+computed_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
+
+MODULATION: ZERO "," ZERO
+
+ZERO: "0" NUMBER*
+
+FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
+
+SHARED_VAR_NAME: "$" NAME
+
+PORT_NAME: NAME
+
+PORT_PROPERTY: "@" ("temp" | "mfr")
+
+DEFAULT_VARIABLE_NAME: NAME
+
+NAME: LETTER (LETTER|DIGIT|"_"|"-")*
+
+LABEL: LETTER (LETTER|DIGIT|"_"|"%"|"-")*
+
+POSITIVE_INT: POSITIVE_DIGIT DIGIT*
+
+POSITIVE_DIGIT: "1".."9"
+
+SIGNED_NUMBER: ("+"?|"-") NUMBER
+
+COMMENT: /^\*[^\n]*/m | /\![^\n]*/
+
+%import common.INT
+
+%import common.NUMBER
+
+%import common.LETTER
+
+%import common.DIGIT
+
+%import common.WS
+
+%ignore COMMENT
+
+%ignore WS

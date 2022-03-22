@@ -8,21 +8,19 @@ Date   : 30.09.2016
 ToDo :
 """
 
-import pytrnsys.pdata.processFiles as spfUtils
-import pytrnsys.trnsys_util.deckTrnsys as deck
+import json as _json
+import logging
 import os
-import pytrnsys.trnsys_util.deckUtils as deckUtils
-import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
-import numpy as num
-
-# import Tkinter as tk
 import tkinter as tk
-
-# import Tkinter.messagebox as tkMessageBox
+import typing as _tp
 from tkinter import messagebox as tkMessageBox
 
-# from graphviz import Graph
-import logging
+import pytrnsys.ddck.replaceVariables as _replace
+import pytrnsys.pdata.processFiles as spfUtils
+import pytrnsys.trnsys_util.deckTrnsys as deck
+import pytrnsys.trnsys_util.deckUtils as deckUtils
+import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
+import pytrnsys.utils.result as _res
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -33,7 +31,6 @@ This class uses a list of ddck files to built a complete TRNSYS deck file
 
 
 class BuildTrnsysDeck:
-
     """
     Class used to built a deck file out of a list of ddck files
     Parameters
@@ -48,10 +45,12 @@ class BuildTrnsysDeck:
         the Base path of the ddck files
     """
 
-    def __init__(self, _pathDeck, _nameDeck, _nameList):
+    def __init__(self, _pathDeck, _nameDeck, _nameList, ddckPlaceHolderValuesJsonPath):
 
         self.pathDeck = _pathDeck
         self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
+
+        self._ddckPlaceHolderValuesJsonPath = ddckPlaceHolderValuesJsonPath
 
         self.oneSheetList = []
         self.nameList = _nameList
@@ -69,12 +68,42 @@ class BuildTrnsysDeck:
         self.existingDckUnchecked = True
         self.dckAlreadyExists = True
 
-    def loadDeck(self, _path, _name):
+    def loadDeck(self, _path, _name) -> _res.Result[_tp.Tuple[str, str, str]]:
 
         nameOneDck = _path + "\%s.%s" % (_name, self.extOneSheetDeck)
 
+        split = _path.split("\\")
+        ddckFolderPath = split[-1]
+
         infile = open(nameOneDck, "r")
         lines = infile.readlines()
+
+        if self._ddckPlaceHolderValuesJsonPath is not None:
+            placeholderValues = _json.load(open(self._ddckPlaceHolderValuesJsonPath))
+
+            if ddckFolderPath in placeholderValues:
+                name = placeholderValues[ddckFolderPath]
+                result = _replace.replaceComputedVariablesWithName(nameOneDck, name)
+
+                if _res.isError(result):
+                    return _res.error(result)
+
+                replacedContent = _res.value(result)
+
+                replacedLines = replacedContent.split("\n")
+
+                lastLine = replacedLines[-1]
+                if lastLine == "":
+                    lines = replacedLines[:-1]
+                else:
+                    lines = replacedLines
+        elif ddckFolderPath != "generic":
+            replacedLines = _replace.replaceComputedVariablesWithDefaults(nameOneDck).split("\n")
+            lastLine = replacedLines[-1]
+            if lastLine == "":
+                lines = replacedLines[:-1]
+            else:
+                lines = replacedLines
 
         replaceChar = None
 
@@ -87,7 +116,9 @@ class BuildTrnsysDeck:
 
         return lines[0:3]  # only returns the caption with the info of the file
 
-    def readDeckList(self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]):
+    def readDeckList(
+        self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
+    ) -> _res.Result[None]:
         """
 
         Parameters
@@ -130,7 +161,12 @@ class BuildTrnsysDeck:
                     pathList = pathList + "\\" + pathVec[j]
                 dictPaths[self.nameList[i]] = os.path.join(pathConfig, dictPaths[self.nameList[i]])
 
-            firstThreeLines = self.loadDeck(pathList, nameList)
+            result = self.loadDeck(pathList, nameList)
+
+            if _res.isError(result):
+                return _res.error(result)
+
+            firstThreeLines = _res.value(result)
 
             ddck = trnsysComponent.TrnsysComponent(pathList, nameList)
             definedVariables, requiredVariables = ddck.getVariables()
@@ -278,7 +314,6 @@ class BuildTrnsysDeck:
         lines = "UNIT\tTYPE\tName\n"
 
         for i in range(len(self.TrnsysTypes)):
-
             line = "%4d\t%4d\t%s\n" % (
                 self.TrnsysUnits[i],
                 self.TrnsysTypes[i],
