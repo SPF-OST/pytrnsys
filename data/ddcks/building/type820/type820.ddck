@@ -1,0 +1,41 @@
+*******************************
+**BEGIN type820.ddck
+*******************************
+
+*****************************************
+** Contact person : M. Neugebauer  
+** Creation date  : 23.03.2022  
+** Last changes   : --.--.---- 
+*****************************************
+
+***************************************************************************
+** Description: 
+** 
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************		
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+UNIT 130 TYPE 820    
+PARAMETERS 3
+VRoom					! 1: room volume, m3
+outConcCO2  			! 2: outside CO2 concentration, ppm
+iniConcCO2  			! 3: initial CO2 concentration in room, ppm
+INPUTS 3 
+metSum					! 1: sum of met values
+infRate					! 2: infiltration rate, m3/h
+ventRate				! 3: ventilation rate, m3/h
+0 0 0
+
+EQUATIONS 2
+co2Conc = [130,1]		! 1: CO2 concentration in room, ppm
+co2GenRate = [130,2]    ! 2: CO2 generation rate in room, kg/h
+
+*******************************
+**END type820.ddck
+*******************************
