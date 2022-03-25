@@ -11,6 +11,7 @@ ToDo :
 import json as _json
 import logging
 import os
+import pathlib as _pl
 import tkinter as tk
 import typing as _tp
 from tkinter import messagebox as tkMessageBox
@@ -70,7 +71,7 @@ class BuildTrnsysDeck:
 
     def loadDeck(self, _path, _name) -> _res.Result[_tp.Tuple[str, str, str]]:
 
-        nameOneDck = _path + "\%s.%s" % (_name, self.extOneSheetDeck)
+        nameOneDck = _pl.Path(_path) / f"{_name}.{self.extOneSheetDeck}"
 
         split = _path.split("\\")
         ddckFolderPath = split[-1]

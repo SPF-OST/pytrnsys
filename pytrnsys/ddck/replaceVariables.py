@@ -68,9 +68,7 @@ def replaceComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path) -> str:
     return outputDdckContent
 
 
-def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict) -> _res.Result[str]:
-    inputDdckFilePath = _pl.Path(inputFilePathInStr)
-
+def replaceComputedVariablesWithName(inputDdckFilePath: _pl.Path, namesByPort: dict) -> _res.Result[str]:
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
     inputDdckContent = inputDdckFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
 

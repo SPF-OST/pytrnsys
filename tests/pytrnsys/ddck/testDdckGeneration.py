@@ -73,9 +73,7 @@ class TestDdckGeneration:
                 if folderName not in ddckPlaceHolderValue or actualDdckFile.suffix != ".ddck":
                     _sh.copy(actualDdckFile, generatedDdckFilesPath)
                 else:
-                    result = _replace.replaceComputedVariablesWithName(
-                        str(actualDdckFile), ddckPlaceHolderValue[folderName]
-                    )
+                    result = _replace.replaceComputedVariablesWithName(actualDdckFile, ddckPlaceHolderValue[folderName])
 
                     assert not _res.isError(result)
 
