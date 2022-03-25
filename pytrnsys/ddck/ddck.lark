@@ -2,7 +2,11 @@
 
 ddck: block+
 
-?block: equations | constants | unit | assign
+?block: version | equations | constants | unit | assign
+
+version: "VERSION" version_number
+
+version_number: POSITIVE_INT
 
 unit: header parameters [inputs [labels]]
 
