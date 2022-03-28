@@ -37,4 +37,3 @@ def error(result: Result[_T]) -> Error:
         raise ValueError("Result is not an error.")
 
     return _tp.cast(Error, result)
-
