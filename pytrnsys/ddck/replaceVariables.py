@@ -78,23 +78,23 @@ def replaceComputedVariablesWithName(inputDdckFilePath: _pl.Path, namesByPort: d
         namesForPort = namesByPort.get(computedVariable.portName, {})
         if _isEmpty(namesForPort):
             return _res.Error(
-                f"There is no connection name in json file for {computedVariable.portName} for {inputFilePathInStr}"
+                f"There is no connection name in json file for {computedVariable.portName} for {inputDdckFilePath}"
             )
 
-        replamentString = namesForPort.get(computedVariable.portProperty, {})
-        if _isEmpty(replamentString):
+        replacementString = namesForPort.get(computedVariable.portProperty, {})
+        if _isEmpty(replacementString):
             return _res.Error(
                 f"There is no {computedVariable.portProperty} in json file for {computedVariable.portName} for "
-                f"{inputFilePathInStr}"
+                f"{inputDdckFilePath}"
             )
 
         outputDdckContent = _replace(
             outputDdckContent,
             offset + computedVariable.startIndex,
             offset + computedVariable.endIndex,
-            replamentString,
+            replacementString,
         )
-        offset += computedVariable.lengthChange(replamentString)
+        offset += computedVariable.lengthChange(replacementString)
 
     return outputDdckContent
 
