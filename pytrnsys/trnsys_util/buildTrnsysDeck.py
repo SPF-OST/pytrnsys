@@ -1,7 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/python
+# !/usr/bin/python
 """
 Author : Dani Carbonell
 Date   : 30.09.2016
@@ -118,7 +118,7 @@ class BuildTrnsysDeck:
         return lines[0:3]  # only returns the caption with the info of the file
 
     def readDeckList(
-        self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
+            self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
     ) -> _res.Result[None]:
         """
 
@@ -172,11 +172,11 @@ class BuildTrnsysDeck:
             ddck = trnsysComponent.TrnsysComponent(pathList, nameList)
             definedVariables, requiredVariables = ddck.getVariables()
             if (
-                "printer" not in nameList
-                and "Printer" not in nameList
-                and "Control" not in nameList
-                and "control" not in nameList
-                and "BigIceCoolingTwoStorages" not in nameList
+                    "printer" not in nameList
+                    and "Printer" not in nameList
+                    and "Control" not in nameList
+                    and "control" not in nameList
+                    and "BigIceCoolingTwoStorages" not in nameList
             ):
                 self.dependencies[nameList] = requiredVariables - definedVariables
                 self.definitions[nameList] = definedVariables
@@ -188,8 +188,8 @@ class BuildTrnsysDeck:
             addedLines = firstThreeLines + self.linesChanged
 
             caption = (
-                " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
-                % (nameList, pathList)
+                    " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
+                    % (nameList, pathList)
             )
 
             if doAutoUnitNumbering:
@@ -256,7 +256,7 @@ class BuildTrnsysDeck:
             ok = tkMessageBox.askokcancel(
                 title="Processing Trnsys",
                 message="Do you want override %s ?\n If parallel simulations most likely accepting this will ovrewrite all the rest too. Think of it twice !! "
-                % tempName,
+                        % tempName,
             )
             window.destroy()
 

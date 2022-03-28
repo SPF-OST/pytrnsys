@@ -57,9 +57,9 @@ class TestDdckGeneration:
         helper.assertFileStructureEqual(helper.generatedDdckDirPath, helper.expectedDdckDirPath)
 
         for generatedDdckFilesPath, actualDdckFilesPath, expectedDdckFilesPath in zip(
-            list(helper.generatedDdckDirPath.iterdir()),
-            list(helper.actulDdckDirPath.iterdir()),
-            list(helper.expectedDdckDirPath.iterdir()),
+                list(helper.generatedDdckDirPath.iterdir()),
+                list(helper.actulDdckDirPath.iterdir()),
+                list(helper.expectedDdckDirPath.iterdir()),
         ):
 
             helper.assertFileStructureEqual(actualDdckFilesPath, expectedDdckFilesPath)
