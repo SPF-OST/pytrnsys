@@ -4,7 +4,6 @@
 
 import argparse as ap
 import pathlib as pl
-import shlex as sl
 import shutil as sh
 import subprocess as sp
 import sys
@@ -49,7 +48,7 @@ def main():
         default=None,
         const="",
         nargs="?",
-        dest="pytestArguments",
+        dest="pytestMarkersExpression",
     )
     parser.add_argument(
         "-d",
@@ -92,7 +91,7 @@ def main():
 
     if (
         arguments.shallRunAll
-        or arguments.pytestArguments is not None
+        or arguments.pytestMarkersExpression is not None
         or not (
             arguments.shallPerformStaticChecks
             or arguments.mypyArguments is not None
@@ -100,16 +99,20 @@ def main():
             or arguments.diagramsFormat
         )
     ):
-        additionalArgs = arguments.pytestArguments or "-m 'not ci' -m 'not linux'"
+        markersExpression = arguments.pytestMarkersExpression or "not ci and not linux"
+        additionalArgs = ["-m", markersExpression]
+
         cmd = [
             "pytest",
             "--cov=pytrnsys",
             f"--cov-report=html:{testResultsDirPath / 'coverage'}",
             "--cov-report=term",
             f"--html={testResultsDirPath / 'report' / 'report.html'}",
-            "tests",
         ]
-        sp.run([*cmd, *sl.split(additionalArgs)], check=True)
+
+        args = [*cmd, *additionalArgs, "tests"]
+
+        sp.run(args, check=True)
 
 
 def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: bool) -> None:
