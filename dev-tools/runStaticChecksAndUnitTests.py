@@ -2,12 +2,13 @@
 
 # Run from top-level directory
 
+import argparse as ap
 import pathlib as pl
+import shlex as sl
 import shutil as sh
 import subprocess as sp
-import argparse as ap
-import time
 import sys
+import time
 
 
 def main():
@@ -20,37 +21,45 @@ def main():
         action="store_true",
         dest="shallKeepResults",
     )
-
     parser.add_argument(
         "-s",
         "--static-checks",
-        help="Perform type checking and linting",
+        help="Perform linting and type checking",
         action="store_true",
         dest="shallPerformStaticChecks",
     )
     parser.add_argument(
-        "-l", "--lint", help="Perform linting", action="store_true", dest="shallLint"
+        "-l", "--lint", help="Perform linting", type=str, default=None, const="", nargs="?", dest="lintArguments"
     )
     parser.add_argument(
         "-t",
         "--type",
         help="Perform type checking",
-        action="store_true",
-        dest="shallTypeCheck",
+        type=str,
+        default=None,
+        const="",
+        nargs="?",
+        dest="mypyArguments",
     )
     parser.add_argument(
         "-u",
         "--unit",
         help="Perform unit tests",
-        action="store_true",
-        dest="shallRunTests",
+        type=str,
+        default=None,
+        const="",
+        nargs="?",
+        dest="pytestArguments",
     )
     parser.add_argument(
         "-d",
         "--diagram",
         help="Create package and class diagrams",
-        action="store_true",
-        dest="shallCreateDiagrams",
+        nargs="?",
+        default=None,
+        const="pdf",
+        choices=["pdf", "dot"],
+        dest="diagramsFormat",
     )
     parser.add_argument(
         "-a",
@@ -65,47 +74,42 @@ def main():
 
     _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
 
-    if (
-        arguments.shallRunAll
-        or arguments.shallPerformStaticChecks
-        or arguments.shallTypeCheck
-    ):
-        cmd = "mypy pytrnsys tests dev-tools"
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
+        cmd = "mypy --show-error-codes trnsysGUI tests dev-tools"
+        additionalArgs = arguments.mypyArguments or ""
+        sp.run([*cmd.split(), *additionalArgs.split()], check=True)
+
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
+        cmd = "pylint trnsysGUI tests dev-tools"
+        additionalArgs = arguments.lintArguments or ""
+
+        sp.run([*cmd.split(), *additionalArgs.split()], check=True)
+
+    if arguments.shallRunAll or arguments.diagramsFormat:
+        diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
+        cmd = f"pyreverse -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
         sp.run(cmd.split(), check=True)
 
     if (
         arguments.shallRunAll
-        or arguments.shallPerformStaticChecks
-        or arguments.shallLint
-    ):
-        cmd = "pylint pytrnsys tests dev-tools"
-        sp.run(cmd.split(), check=True)
-
-    if arguments.shallRunAll or arguments.shallCreateDiagrams:
-        cmd = "pyreverse -k -o pdf -p pytrnsys -d test-results pytrnsys"
-        sp.run(cmd.split(), check=True)
-
-    if (
-        arguments.shallRunAll
-        or arguments.shallRunTests
+        or arguments.pytestArguments
         or not (
             arguments.shallPerformStaticChecks
-            or arguments.shallTypeCheck
-            or arguments.shallLint
-            or arguments.shallCreateDiagrams
+            or arguments.mypyArguments is not None
+            or arguments.lintArguments is not None
+            or arguments.diagramsFormat
         )
     ):
-        args = [
+        additionalArgs = arguments.pytestArguments or "-m 'not ci' -m 'not linux'"
+        cmd = [
             "pytest",
-            "--cov=pytrnsys",
+            "--cov=trnsysGUI",
             f"--cov-report=html:{testResultsDirPath / 'coverage'}",
             "--cov-report=term",
             f"--html={testResultsDirPath / 'report' / 'report.html'}",
-            "-m",
-            "not manual",
             "tests",
         ]
-        sp.run(args, check=True)
+        sp.run([*cmd, *sl.split(additionalArgs)], check=True)
 
 
 def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: bool) -> None:

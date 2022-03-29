@@ -2,12 +2,14 @@ import inspect as _is
 import pathlib as _pl
 
 import jinja2 as _ja
+import pytest as _pytest
 
 import pytrnsys as _pt
 import pytrnsys.rsim.runParallelTrnsys as _rpt
 
 
 class TestRunParallelTrnsys:  # pylint: disable=too-few-public-methods
+    @_pytest.mark.windows
     def testRunConfig(self):
         testDirPath = _pl.Path(__file__).parent
 
