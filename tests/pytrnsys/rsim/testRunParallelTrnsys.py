@@ -7,7 +7,7 @@ import pytrnsys as _pt
 import pytrnsys.rsim.runParallelTrnsys as _rpt
 
 
-class TestRunParallelTrnsys:
+class TestRunParallelTrnsys:  # pylint: disable=too-few-public-methods
     def testRunConfig(self):
         testDirPath = _pl.Path(__file__).parent
 
@@ -29,13 +29,18 @@ class TestRunParallelTrnsys:
         expectedDckFilePath = expectedDckFilePath / "pytrnsysRun.dck"
         actualDckFilePath = inputDirPath / "Building_4Study" / "pytrnsysRun" / "pytrnsysRun.dck"
 
-        assert actualDckFilePath.read_text(encoding="windows-1252") == expectedDckFilePath.read_text(encoding="windows-1252")
+        assert actualDckFilePath.read_text(encoding="windows-1252") == expectedDckFilePath.read_text(
+            encoding="windows-1252"
+        )
 
     @staticmethod
     def _createConfigFile(inputDirPath: _pl.Path) -> None:
         configFileTemplatePath = inputDirPath / "Building_4Study.config.jinja"
 
-        pytrnsysModuleDirPath = _pl.Path(_is.getsourcefile(_pt)).parent
+        pytrnsysModuleSourceFilePathAsString = _is.getsourcefile(_pt)
+        assert pytrnsysModuleSourceFilePathAsString
+
+        pytrnsysModuleDirPath = _pl.Path(pytrnsysModuleSourceFilePathAsString).parent
         pytrnsysDdcksPath = pytrnsysModuleDirPath.parent / "data" / "ddcks"
 
         templateContent = configFileTemplatePath.read_text()
