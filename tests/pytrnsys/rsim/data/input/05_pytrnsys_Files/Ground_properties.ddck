@@ -1,0 +1,46 @@
+*******************************
+**BEGIN Ground_properties.ddck
+*******************************
+    
+*****************************************
+** Contact person : Toni Calabrese   
+** Creation date  : 22.09.2021 
+** Last changes   : 22.09.2021 
+*****************************************
+
+***************************************************************************
+** Description: 
+** DDCK of ground properties where all the properties of the ground are defined (e.g. inputs for Type 985 for the calculation of the undisturbed ground temperature)
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+
+*************************************************************************************************
+
+***********************************
+** outputs to other ddck
+***********************************
+
+CONSTANTS 4
+lamGrd = 2		        ! 4 conductivity of the ground [W/mK]
+RhoGrd = 2500		    ! 5 density of the ground [kg/m3]
+CpGrd = 0.8		        ! 6 heat capacity of the ground [kJ/kgK]
+Gt = 0.025		        ! 7 geothermal gradient [K/m]
+
+
