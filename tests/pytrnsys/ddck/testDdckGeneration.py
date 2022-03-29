@@ -52,8 +52,8 @@ class TestDdckGeneration:
 
         helper.copyFolderAndFiles(helper.actualDirPath, helper.generatedDirPath)
 
-        with open(helper.ddckPlaceHolderValueJsonPath, "r", encoding="utf8") as ddckPlaceHolderValueJson:
-            ddckPlaceHolderValue = _json.load(ddckPlaceHolderValueJson)
+        with open(helper.ddckPlaceHolderValuesJsonPath, "r", encoding="utf8") as ddckPlaceHolderValuesJson:
+            ddckPlaceHolderValues = _json.load(ddckPlaceHolderValuesJson)
         helper.assertFileStructureEqual(helper.generatedDdckDirPath, helper.expectedDdckDirPath)
 
         for generatedDdckFilesPath, actualDdckFilesPath, expectedDdckFilesPath in zip(
@@ -70,10 +70,10 @@ class TestDdckGeneration:
                 folderName = actualDdckFile.parts[-2]
                 generatedDdckFilePath = generatedDdckFilesPath / fileName
 
-                if folderName not in ddckPlaceHolderValue or actualDdckFile.suffix != ".ddck":
+                if folderName not in ddckPlaceHolderValues or actualDdckFile.suffix != ".ddck":
                     _sh.copy(actualDdckFile, generatedDdckFilesPath)
                 else:
-                    result = _replace.replaceComputedVariablesWithName(actualDdckFile, ddckPlaceHolderValue[folderName])
+                    result = _replace.replaceComputedVariablesWithName(actualDdckFile, ddckPlaceHolderValues[folderName])
 
                     assert not _res.isError(result)
 
@@ -91,7 +91,7 @@ class Helper:
         self.actualDirPath = dataDir / projectName / "TRIHP_dualSource"
         self.expectedDirPath = dataDir / projectName / "expected"
 
-        self.ddckPlaceHolderValueJsonPath = self.generatedDirPath / "DdckPlaceHolderValue.json"
+        self.ddckPlaceHolderValuesJsonPath = self.generatedDirPath / "DdckPlaceHolderValues.json"
 
         self.generatedDdckDirPath = self.generatedDirPath / "ddck"
         self.actulDdckDirPath = self.actualDirPath / "ddck"
