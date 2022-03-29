@@ -295,7 +295,7 @@ Shd_1fBedE_NE
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 CONSTANTS 1
 unitBuilding = 83
- ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\02_Model\Building_4Study.b18" unitBuilding
+ ASSIGN 02_Model\Building_4Study.b18 unitBuilding
 EQUATIONS 212                                        ! Outputs Type 56
 TcStair = [18,1]                                      !Changed automatically
 TcCel = [18,2] !Changed automatically
@@ -2106,9 +2106,9 @@ formatWeatherData = 1        ! 1 = user format, 2 = Standard weather file in the
 unitWeatherData = 92
  unitWeatherData2 = 93
  unitWeatherData3 = 94
- ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99" unitWeatherData
-ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99" unitWeatherData2
-ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99" unitWeatherData3
+ ASSIGN 05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99 unitWeatherData
+ASSIGN 05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99 unitWeatherData2
+ASSIGN 05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99 unitWeatherData3
  **********************************************************************
  ** end.ddck from C:\Users\damian.birchler\src\pytrnsys\pytrnsys\data\ddcks\generic 
  **********************************************************************

@@ -300,7 +300,7 @@ Shd_1fBedE_NE
 *** External files
 CONSTANTS 1
 unitBuilding = 31
-ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\02_Model\Building_4Study.b18" unitBuilding
+ASSIGN 02_Model\Building_4Study.b18 unitBuilding
 *|? Building description file (*.b18, *.b17, *.bui) |1000
 *------------------------------------------------------------------------------
 EQUATIONS 212                                        ! Outputs Type 56

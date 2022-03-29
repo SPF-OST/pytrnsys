@@ -19,8 +19,8 @@ bool combineAllCases True
 
 string trnsysExePath "C:\TRNSYS18\Exe\TrnEXE.exe"
 string addResultsFolder "Building_4Study"
-string HOME$ .
-string PYTRNSYS$ "{{pytrnsys_ddck_folder}}"
+string HOME$ "$INPUT_FOLDER"
+string PYTRNSYS$ "$PYTRNSYS_FOLDER\data\ddcks"
 string runType "runFromConfig"
 
 
@@ -29,9 +29,9 @@ deck START 0
 deck STOP 8760
 
 PYTRNSYS$ generic\head
-HOME$ Building_4Study
-HOME$ weather_data_base_2
-HOME$ Type_985
-HOME$ Ground_properties
-HOME$ 01_Weather_Data\Kasava_hour
+HOME$ 05_pytrnsys_Files\Building_4Study
+HOME$ 05_pytrnsys_Files\weather_data_base_2
+HOME$ 05_pytrnsys_Files\Type_985
+HOME$ 05_pytrnsys_Files\Ground_properties
+HOME$ 05_pytrnsys_Files\01_Weather_Data\Kasava_hour
 PYTRNSYS$ generic\end

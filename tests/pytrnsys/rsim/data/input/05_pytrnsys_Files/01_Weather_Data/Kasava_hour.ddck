@@ -26,9 +26,9 @@ unitWeatherData = 38
 unitWeatherData2 = 39
 unitWeatherData3 = 40
 
-ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99" unitWeatherData
-ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99" unitWeatherData2
-ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99" unitWeatherData3
+ASSIGN 05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99 unitWeatherData
+ASSIGN 05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99 unitWeatherData2
+ASSIGN 05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99 unitWeatherData3
 
 
 *******************************
