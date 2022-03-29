@@ -1,0 +1,36 @@
+*******************************
+**BEGIN Kasava_hour.ddck
+*******************************
+
+*****************************************
+** Weather data section. V1.2
+** Last Changes: Jeremias Schmidli
+** Ddck Generated: 2021-11-01
+******************************************
+
+** Normal Building Simulation     
+** City Name = Kasava 
+
+CONSTANTS 7     
+Lat = 49.300                 ! Latitude, °
+TambD = -10.44               ! ambient design temperature of heating system - equal to minimum 4-day moving average value, °C
+TambAvg = 9.4                ! average outdoor temperature, °C
+dTambAmpl = 10.77            ! amplitude of outside temperature, K
+tTambShift = 387             ! Offset of outside air temperature minimum, h
+altid = 342                  ! elevation, meters above sealevel
+ddTcwOffset = 40             ! time shift of minimum cold water temperature, d
+
+CONSTANTS 4
+formatWeatherData = 1        ! 1 = user format, 2 = Standard weather file in the TMY2 format
+unitWeatherData = 38
+unitWeatherData2 = 39
+unitWeatherData3 = 40
+
+ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99" unitWeatherData
+ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99" unitWeatherData2
+ASSIGN "R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99" unitWeatherData3
+
+
+*******************************
+**END Kasava_hour.ddck
+*******************************
