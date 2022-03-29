@@ -1,5 +1,5 @@
  **********************************************************************
- ** head.ddck from C:\Users\damian.birchler\src\pytrnsys\pytrnsys\data\ddcks\generic 
+ ** head.ddck from $PYTRNSYS_FOLDER\data\ddcks\generic 
  **********************************************************************
 *******************************
 **BEGIN Head.ddck
@@ -55,7 +55,7 @@ LAMWAT = 0.58    ! heat conductivity W/(mK)
 CPWAT_SI = CPWAT*1000 ! J/(kgK)    
 CPBRI_SI = CPBRI*1000 ! J/(kgK)    
  **********************************************************************
- ** Building_4Study.ddck from C:\Users\damian.birchler\src\pytrnsys\pytrnsys\tests\pytrnsys\rsim\data\input\05_pytrnsys_Files 
+ ** Building_4Study.ddck from $PYTRNSYS_FOLDER\tests\pytrnsys\rsim\data\input\05_pytrnsys_Files 
  **********************************************************************
 *******************************
 **BEGIN Building_4Study.ddck
@@ -1761,7 +1761,7 @@ Temperatures
 Nix     
 Nix
  **********************************************************************
- ** weather_data_base_2.ddck from C:\Users\damian.birchler\src\pytrnsys\pytrnsys\tests\pytrnsys\rsim\data\input\05_pytrnsys_Files 
+ ** weather_data_base_2.ddck from $PYTRNSYS_FOLDER\tests\pytrnsys\rsim\data\input\05_pytrnsys_Files 
  **********************************************************************
 *******************************
 **BEGIN WeatherData.dck
@@ -2044,7 +2044,7 @@ INPUTS 6
 Time Tamb one IT_H_KW IB_H_kW IT_surfUser_1_Wm2
 Time Tamb hoursInMonth IT_H_KW IB_H_kW IT_surfUser_1_Wm2
  **********************************************************************
- ** Type_985.ddck from C:\Users\damian.birchler\src\pytrnsys\pytrnsys\tests\pytrnsys\rsim\data\input\05_pytrnsys_Files 
+ ** Type_985.ddck from $PYTRNSYS_FOLDER\tests\pytrnsys\rsim\data\input\05_pytrnsys_Files 
  **********************************************************************
 *******************************
 **BEGIN Type_985.ddck
@@ -2077,7 +2077,7 @@ w		        ! 15 thickness of the walls around the floor in contact with the grou
 RGrTot		    ! 16 total thermal resistance of floor
 Psi		        ! 17 Linear thermal transmittance
  **********************************************************************
- ** Ground_properties.ddck from C:\Users\damian.birchler\src\pytrnsys\pytrnsys\tests\pytrnsys\rsim\data\input\05_pytrnsys_Files 
+ ** Ground_properties.ddck from $PYTRNSYS_FOLDER\tests\pytrnsys\rsim\data\input\05_pytrnsys_Files 
  **********************************************************************
 *******************************
 **BEGIN Ground_properties.ddck
@@ -2088,7 +2088,7 @@ RhoGrd = 2500		    ! 5 density of the ground [kg/m3]
 CpGrd = 0.8		        ! 6 heat capacity of the ground [kJ/kgK]
 Gt = 0.025		        ! 7 geothermal gradient [K/m]
  **********************************************************************
- ** Kasava_hour.ddck from C:\Users\damian.birchler\src\pytrnsys\pytrnsys\tests\pytrnsys\rsim\data\input\05_pytrnsys_Files\01_Weather_Data 
+ ** Kasava_hour.ddck from $PYTRNSYS_FOLDER\tests\pytrnsys\rsim\data\input\05_pytrnsys_Files\01_Weather_Data 
  **********************************************************************
 *******************************
 **BEGIN Kasava_hour.ddck
@@ -2110,7 +2110,7 @@ unitWeatherData = 92
 ASSIGN 05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99 unitWeatherData2
 ASSIGN 05_pytrnsys_Files\01_Weather_Data\Kasava_hour.99 unitWeatherData3
  **********************************************************************
- ** end.ddck from C:\Users\damian.birchler\src\pytrnsys\pytrnsys\data\ddcks\generic 
+ ** end.ddck from $PYTRNSYS_FOLDER\data\ddcks\generic 
  **********************************************************************
 ***************************************************************
 **BEGIN Monthly Energy Balance printer automatically generated from DDck files
