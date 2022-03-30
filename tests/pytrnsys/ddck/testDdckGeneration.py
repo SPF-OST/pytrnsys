@@ -86,9 +86,9 @@ class TestDdckGeneration:
 
         result = _replace.replaceComputedVariablesWithNames(ddckFile.input, names)
         assert not _res.isError(result)
-        replacedDdckContent = _res.value(result)
+        actualDdckContent = _res.value(result)
 
         ddckFile.actual.parent.mkdir(parents=True, exist_ok=True)
-        ddckFile.actual.write_text(replacedDdckContent)
+        ddckFile.actual.write_text(actualDdckContent)
 
-        assert replacedDdckContent == ddckFile.expected.read_text()
+        assert ddckFile.actual.read_text() == ddckFile.expected.read_text()
