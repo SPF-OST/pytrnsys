@@ -1,9 +1,6 @@
 import dataclasses as _dc
-import filecmp as _fc
 import json as _json
-import os as _os
 import pathlib as _pl
-import shutil as _sh
 import typing as _tp
 
 import pytest as _pt
@@ -15,27 +12,62 @@ _REPLACE_WITH_DEFAULTS_DATA_DIR = _pl.Path(__file__).parent / "defaults"
 _REPLACE_WITH_NAMES_DATA_DIR = _pl.Path(__file__).parent / "names"
 
 
-@_dc.dataclass
-class _Project:
-    projectName: str
-    shallCopyFolderFromExamples: bool
+class _Paths:  # pylint: disable=too-few-public-methods
+    def __init__(self, projectDirPath: _pl.Path) -> None:
+        self.actualDdckDirPath = projectDirPath / "actual"
+        self.inputDirPath = projectDirPath / projectDirPath.name
+        self.inputDdckDirPath = self.inputDirPath / "ddck"
+        self.expectedDdckDirPath = projectDirPath / "expected"
 
-    @staticmethod
-    def createForProject(projectName: str) -> "_Project":
-        return _Project(projectName, False)
+        self.ddckPlaceHolderValuesFilePath = self.inputDirPath / "DdckPlaceHolderValues.json"
+
+
+@_dc.dataclass
+class _DdckFile:  # pylint: disable=too-few-public-methods
+    projectDirPath: _pl.Path
+    ddckPlaceHoldervaluesFilePath: _pl.Path
+    componentName: str
+
+    input: _pl.Path
+    actual: _pl.Path
+    expected: _pl.Path
 
     @property
     def testId(self) -> str:
-        return f"{self.projectName}"
+        relativeInputPath = self.input.relative_to(self.projectDirPath)
+        return relativeInputPath.as_posix()
 
 
-def getProjects(path: _pl.Path) -> _tp.Iterable[_Project]:
-    for projectDirPath in path.iterdir():
-        projectName = projectDirPath.name
-        yield _Project.createForProject(projectName)
+def getDdckFiles() -> _tp.Iterable[_DdckFile]:
+    for projectDirPath in _REPLACE_WITH_NAMES_DATA_DIR.iterdir():
+        assert projectDirPath.is_dir()
+
+        paths = _Paths(projectDirPath)
+
+        inputDdckFilesPaths = paths.inputDdckDirPath.rglob("*.ddck")
+
+        for inputDdckFilePath in inputDdckFilesPaths:
+            relativeDdckFilePath = inputDdckFilePath.relative_to(paths.inputDdckDirPath)
+
+            actualDdckFilePath = paths.actualDdckDirPath / relativeDdckFilePath
+            expectedDdckFilePath = paths.expectedDdckDirPath / relativeDdckFilePath
+
+            componentName = inputDdckFilePath.parent.name
+            # Skip `head.ddck` and `end.ddck` as we currently are unable to parse it.
+            if componentName == "generic":
+                continue
+
+            yield _DdckFile(
+                projectDirPath,
+                paths.ddckPlaceHolderValuesFilePath,
+                componentName,
+                inputDdckFilePath,
+                actualDdckFilePath,
+                expectedDdckFilePath,
+            )
 
 
-TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects(_REPLACE_WITH_NAMES_DATA_DIR)]
+_REPLACE_WITH_NAME_TEST_CASES = [_pt.param(p, id=p.testId) for p in getDdckFiles()]
 
 
 class TestDdckGeneration:
@@ -45,82 +77,18 @@ class TestDdckGeneration:
         actualDdckContent = _replace.replaceComputedVariablesWithDefaults(inputDdckFilePath)
         assert actualDdckContent == expectedDdckFilePath.read_text()
 
-    @_pt.mark.parametrize("project", TEST_CASES)
-    def testReplaceComputedVariablesWithName(self, project: _Project):  # pylint: disable=no-self-use
+    @_pt.mark.parametrize("ddckFile", _REPLACE_WITH_NAME_TEST_CASES)
+    def testReplaceComputedVariablesWithName(self, ddckFile: _DdckFile):  # pylint: disable=no-self-use
+        serializedDdckPlaceHolderValues = ddckFile.ddckPlaceHoldervaluesFilePath.read_text(encoding="utf8")
+        ddckPlaceHolderValues = _json.loads(serializedDdckPlaceHolderValues)
 
-        helper = Helper(_REPLACE_WITH_NAMES_DATA_DIR, project.projectName)
+        names = ddckPlaceHolderValues.get(ddckFile.componentName) or {}
 
-        helper.copyFolderAndFiles(helper.actualDirPath, helper.generatedDirPath)
+        result = _replace.replaceComputedVariablesWithNames(ddckFile.input, names)
+        assert not _res.isError(result)
+        replacedDdckContent = _res.value(result)
 
-        with open(helper.ddckPlaceHolderValuesJsonPath, "r", encoding="utf8") as ddckPlaceHolderValuesJson:
-            ddckPlaceHolderValues = _json.load(ddckPlaceHolderValuesJson)
-        helper.assertFileStructureEqual(helper.generatedDdckDirPath, helper.expectedDdckDirPath)
+        ddckFile.actual.parent.mkdir(parents=True, exist_ok=True)
+        ddckFile.actual.write_text(replacedDdckContent)
 
-        for generatedDdckFilesPath, actualDdckFilesPath, expectedDdckFilesPath in zip(
-                list(helper.generatedDdckDirPath.iterdir()),
-                list(helper.actulDdckDirPath.iterdir()),
-                list(helper.expectedDdckDirPath.iterdir()),
-        ):
-
-            helper.assertFileStructureEqual(actualDdckFilesPath, expectedDdckFilesPath)
-
-            for actualDdckFile, expectedDdckFile in zip(actualDdckFilesPath.iterdir(), expectedDdckFilesPath.iterdir()):
-
-                fileName = actualDdckFile.parts[-1]
-                folderName = actualDdckFile.parts[-2]
-                generatedDdckFilePath = generatedDdckFilesPath / fileName
-
-                if folderName not in ddckPlaceHolderValues or actualDdckFile.suffix != ".ddck":
-                    _sh.copy(actualDdckFile, generatedDdckFilesPath)
-                else:
-                    result = _replace.replaceComputedVariablesWithName(actualDdckFile, ddckPlaceHolderValues[folderName])
-
-                    assert not _res.isError(result)
-
-                    replacedDdckContent = _res.value(result)
-
-                    generatedDdckFilePath.write_text(replacedDdckContent)
-                    assert replacedDdckContent == expectedDdckFile.read_text()
-
-        helper.assertContentEqual(helper.generatedDdckDirPath, helper.expectedDdckDirPath)
-
-
-class Helper:
-    def __init__(self, dataDir: _pl.Path, projectName: str):
-        self.generatedDirPath = dataDir / projectName / "Generated_TRIHP_dualSource"
-        self.actualDirPath = dataDir / projectName / "TRIHP_dualSource"
-        self.expectedDirPath = dataDir / projectName / "expected"
-
-        self.ddckPlaceHolderValuesJsonPath = self.generatedDirPath / "DdckPlaceHolderValues.json"
-
-        self.generatedDdckDirPath = self.generatedDirPath / "ddck"
-        self.actulDdckDirPath = self.actualDirPath / "ddck"
-        self.expectedDdckDirPath = self.expectedDirPath / "ddck"
-
-    def copyFolderAndFiles(self, inputPath: _pl.Path, outputPath: _pl.Path) -> None:
-        if outputPath.exists():
-            _sh.rmtree(outputPath)
-
-        _sh.copytree(inputPath, outputPath, ignore=self._ignoreFiles)
-
-        for path in inputPath.iterdir():
-            if path.is_file():
-                _sh.copy(path, outputPath)
-
-    @classmethod
-    def _ignoreFiles(cls, path, files):
-        return [f for f in files if _os.path.isfile(_os.path.join(path, f))]
-
-    @classmethod
-    def assertFileStructureEqual(cls, actualPath, expectedPath):
-        dircmp = _fc.dircmp(actualPath, expectedPath)
-
-        assert not dircmp.left_only
-        assert not dircmp.right_only
-
-    @classmethod
-    def assertContentEqual(cls, actualPath, expectedPath):
-        dircmp = _fc.dircmp(actualPath, expectedPath)
-
-        for subDirectory in dircmp.subdirs.values():
-            assert not subDirectory.diff_files
+        assert replacedDdckContent == ddckFile.expected.read_text()

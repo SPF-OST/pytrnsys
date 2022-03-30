@@ -82,7 +82,7 @@ class BuildTrnsysDeck:
 
             if componentName in placeholderValues:
                 namesByPort = placeholderValues[componentName]
-                result = _replace.replaceComputedVariablesWithName(ddckFilePath, namesByPort)
+                result = _replace.replaceComputedVariablesWithNames(ddckFilePath, namesByPort)
 
                 if _res.isError(result):
                     return _res.error(result)

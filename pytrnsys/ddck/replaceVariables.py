@@ -68,7 +68,7 @@ def replaceComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path) -> str:
     return outputDdckContent
 
 
-def replaceComputedVariablesWithName(inputDdckFilePath: _pl.Path, namesByPort: dict) -> _res.Result[str]:
+def replaceComputedVariablesWithNames(inputDdckFilePath: _pl.Path, namesByPort: dict) -> _res.Result[str]:
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
     inputDdckContent = inputDdckFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
 
@@ -78,23 +78,23 @@ def replaceComputedVariablesWithName(inputDdckFilePath: _pl.Path, namesByPort: d
         namesForPort = namesByPort.get(computedVariable.portName, {})
         if _isEmpty(namesForPort):
             return _res.Error(
-                f"There is no connection name in json file for {computedVariable.portName} for {inputDdckFilePath}"
+                f"Unknown port `{computedVariable.portName}` in {inputDdckFilePath.name}"
             )
 
-        replacementString = namesForPort.get(computedVariable.portProperty, {})
-        if _isEmpty(replacementString):
+        valuesByProperty = namesForPort.get(computedVariable.portProperty, {})
+        if _isEmpty(valuesByProperty):
             return _res.Error(
-                f"There is no {computedVariable.portProperty} in json file for {computedVariable.portName} for "
-                f"{inputDdckFilePath}"
+                f"Unknown property `{computedVariable.portProperty}` in for port `{computedVariable.portName}` in "
+                f"{inputDdckFilePath.name}"
             )
 
         outputDdckContent = _replace(
             outputDdckContent,
             offset + computedVariable.startIndex,
             offset + computedVariable.endIndex,
-            replacementString,
+            valuesByProperty,
         )
-        offset += computedVariable.lengthChange(replacementString)
+        offset += computedVariable.lengthChange(valuesByProperty)
 
     return outputDdckContent
 
