@@ -1,0 +1,2250 @@
+*******************************
+**BEGIN Building_4Study.ddck
+*******************************
+    
+*****************************************
+** Contact person : Toni Calabrese   
+** Creation date  : 07.01.2022 
+** Last changes   : 16.03.2022 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Building model created for the simulation of the real demo building of KASAVA (after renovation) within the EU project PLURAL (Update based on new floor plans of 30.11.2021)
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS 46
+MfrStair1 = CtrlHeatStair1*0            ! MfrConnStair1In            ! Mass flow rate active layer of the wall [kg/h]
+MfrStair2 = CtrlHeatStair2*0            ! MfrConnStair2In
+MfrGfStor1 = CtrlHeatGfStor1*0          ! MfrConnGfStor1In
+MfrGfStor2 = CtrlHeatGfStor2*0          ! MfrConnGfStor2In
+MfrGfWC = BoHS*CtrlHeatGfWC*80          ! MfrConnGfWCIn
+MfrGfHall1 = BoHS*CtrlHeatGfHall1*20    ! MfrConnGfHall1In
+MfrGfHall2 = BoHS*CtrlHeatGfHall2*60    ! MfrConnGfHall2In
+MfrGfBath = BoHS*CtrlHeatGfBath*55      ! MfrConnGfBathIn
+MfrGfBedN1 = BoHS*CtrlHeatGfBedN1*85    ! MfrConnGfBedN1In
+MfrGfBedN2 = BoHS*CtrlHeatGfBedN2*100   ! MfrConnGfBedN2In
+MfrGfLiv1 = BoHS*CtrlHeatGfLiv1*110     ! MfrConnGfLiv1In
+MfrGfLiv2 = BoHS*CtrlHeatGfLiv2*180     ! MfrConnGfLiv2In
+MfrGfBedS = BoHS*CtrlHeatGfBedS*50      ! MfrConnGfBedSIn
+MfrGfBedE1 = BoHS*CtrlHeatGfBedE1*200   ! MfrConnGfBedE1In
+MfrGfBedE2 = BoHS*CtrlHeatGfBedE2*200   ! MfrConnGfBedE2In
+Mfr1fStor = CtrlHeat1fStor*0            ! MfrConn1fStorIn
+Mfr1fWC = BoHS*CtrlHeat1fWC*20          ! MfrConn1fWCIn
+Mfr1fHall = BoHS*CtrlHeat1fHall*30      ! MfrConn1fHallIn
+Mfr1fBath = BoHS*CtrlHeat1fBath*65      ! MfrConn1fBathIn
+Mfr1fLiv1 = BoHS*CtrlHeat1fLiv1*100      ! MfrConn1fLiv1In
+Mfr1fLiv2 = BoHS*CtrlHeat1fLiv2*200      ! MfrConn1fLiv2In
+Mfr1fBedS = BoHS*CtrlHeat1fBedS*90      ! MfrConn1fBedSIn
+Mfr1fBedE = BoHS*CtrlHeat1fBedE*100      ! MfrConn1fBedEIn
+TinStair1 = Tv     ! TConnStair1InRc
+TinStair2 = Tv     ! TConnStair2InRc
+TinGfStor1 = Tv    ! TConnGfStor1InRc
+TinGfStor2 = Tv    ! TConnGfStor2InRc
+TinGfWC = Tv       ! TConnGfWCInRc
+TinGfHall1 = Tv    ! TConnGfHall1InRc
+TinGfHall2 = Tv    ! TConnGfHall2InRc
+TinGfBath = Tv     ! TConnGfBathInRc
+TinGfBedN1 = Tv    ! TConnGfBedN1InRc
+TinGfBedN2 = Tv    ! TConnGfBedN2InRc
+TinGfLiv1 = Tv     ! TConnGfLiv1InRc
+TinGfLiv2 = Tv     ! TConnGfLiv2InRc
+TinGfBedS = Tv     ! TConnGfBedSInRc
+TinGfBedE1 = Tv    ! TConnGfBedE1InRc
+TinGfBedE2 = Tv    ! TConnGfBedE2InRc
+Tin1fStor = Tv     ! TConn1fStorInRc
+Tin1fWC = Tv       ! TConn1fWCInRc
+Tin1fHall = Tv     ! TConn1fHallInRc
+Tin1fBath = Tv     ! TConn1fBathInRc
+Tin1fLiv1 = Tv     ! TConn1fLiv1InRc
+Tin1fLiv2 = Tv     ! TConn1fLiv2InRc
+Tin1fBedS = Tv     ! TConn1fBedSInRc
+Tin1fBedE = Tv     ! TConn1fBedEInRc
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS 23
+TStair1 = [56,171]                                     ! Tout active layer [°C]
+TStair2 = [56,172]
+TGfStor1 = [56,173]
+TGfStor2 = [56,174]
+TGfWC = [56,175]
+TGfHall1 = [56,176]
+TGfHall2 = [56,177]
+TGfBath = [56,178]
+TGfBedN1 = [56,179]
+TGfBedN2 = [56,180]
+TGfLiv1 = [56,181]
+TGfLiv2 = [56,182]
+TGfBedS = [56,183]
+TGfBedE1 = [56,184]
+TGfBedE2 = [56,185]
+T1fStor = [56,186]
+T1fWC = [56,187]
+T1fHall = [56,188]
+T1fBath = [56,189]
+T1fLiv1 = [56,190]
+T1fLiv2 = [56,191]
+T1fBedS = [56,192]
+T1fBedE = [56,193]
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 5
+elSysOut_Rad = ElRad                           ! Electricity consumption electric radiators of bathrooms
+elSysOut_VentBui = ElventBui                   ! Electricity consumption ventilation system
+elSysOut_Light = ElIGMiscBui                   ! Electricity consumption light
+elSysOut_Equip = ElIGEquipBui                  ! Electricity consumption equipment
+qSysOut_HeatBui = -QdotBui                     ! Heating demand building (only through wall heating systems)                       
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+
+*************************************************************************************************
+EQUATIONS 1
+TGroundBui = T_zGrd2                           ! undisturbed soil temperature [°C] coming from Type 985 (choose the correct output of Type 985 depending on the case)
+
+***********************************
+** outputs to other ddck
+***********************************
+EQUATIONS 1
+Troom = (TcGfWC + TcGfHall + TcGfBath + TcGfBedN + TcGfLiv + TcGfBedS + TcGfBedE + Tc1fWC + Tc1fHall + Tc1fBath + Tc1fLiv + Tc1fBedS + Tc1fBedE)/13 
+
+CONSTANTS 7
+TiAvg = 15		        ! Tcellar average over the year [°C]                                               -> Parameter 11 of Type 985
+dTi = 0		            ! amplitude of sine-curve Tcellar [K]                                              -> Parameter 12 of Type 985
+lFl = 14.3		        ! length of the floor in contact with the ground [m]                               -> Parameter 13 of Type 985
+bFl = 9.6	            ! width of the floor in contact with the ground [m]                                -> Parameter 14 of Type 985
+w = 0.52		        ! thickness of the walls around the floor in contact with the ground [m]           -> Parameter 15 of Type 985
+RGrTot = 0.29		    ! total thermal resistance of floor [K/m2W]                                        -> Parameter 16 of Type 985
+Psi = 0		            ! Linear thermal transmittance [W/mK]                                              -> Parameter 17 of Type 985
+
+
+CONSTANTS 3
+AirDens = 1.204                                 ! density of air [kg/m3]
+g_multipl_factor = 0.20                         ! g multiplication factor shading                          -> change this parameter to modify the g multiplication factor of shading
+EltoIGFactor = 0.7                              ! From electr. consumption to internal gains factor    
+
+VERSION 18
+*******************************************************************************
+*** If you have problems, questions or suggestions please contact your local 
+*** TRNSYS distributor or mailto:software@cstb.fr 
+*** 
+*******************************************************************************
+
+
+*******************************************************************************
+*** Units 
+*******************************************************************************
+
+*******************************************************************************
+*** Control cards
+*******************************************************************************
+
+* Model "Building" (Type 56)
+* 
+
+UNIT 56 TYPE 56	 Building
+*$UNIT_NAME Building
+*$MODEL .\Loads and Structures\Multi-Zone Building\Type56.tmf
+*$POSITION 606 261
+*$LAYER Main # # 
+*$#   
+PARAMETERS 3
+unitBuilding		       ! 1 Logical unit for building description file (*.b18, *.b17, *.bui)
+0		                   ! 2 Star network calculation switch
+0.50		               ! 3 Weighting factor for operative temperature
+INPUTS 132
+tAmbDry		               ! 1- TAMB
+relHum		               ! 2- RELHUMAMB
+Tsky		               ! 3- TSKY
+tAmbDry		               ! 4- TSGRD
+AISZ		               ! 5- AZEN
+AISA		               ! 6- AAZM
+IT_surfUser_5
+IT_surfUser_6
+IT_surfUser_7
+IT_surfUser_8
+IT_surfUser_9
+IT_surfUser_10
+IT_surfUser_11
+IT_surfUser_12
+IB_surfUser_5
+IB_surfUser_6
+IB_surfUser_7
+IB_surfUser_8
+IB_surfUser_9
+IB_surfUser_10
+IB_surfUser_11
+IB_surfUser_12
+AI_surfUser_5
+AI_surfUser_6
+AI_surfUser_7
+AI_surfUser_8
+AI_surfUser_9
+AI_surfUser_10
+AI_surfUser_11
+AI_surfUser_12
+groundRef	               ! 7- GRDREF
+TGroundBui	               ! 8- TGROUND
+MventGfWC      
+MventGfHall
+MventGfBath
+MventGfBedN
+MventGfLiv
+MventGfBedS
+MventGfBedE
+Mvent1fWC
+Mvent1fHall
+Mvent1fBath
+Mvent1fLiv
+Mvent1fBedS
+Mvent1fBedE
+TSupAirGfWC      
+TSupAirGfHall
+TSupAirGfBath
+TSupAirGfBedN
+TSupAirGfLiv
+TSupAirGfBedS
+TSupAirGfBedE
+TSupAir1fWC
+TSupAir1fHall
+TSupAir1fBath
+TSupAir1fLiv
+TSupAir1fBedS
+TSupAir1fBedE
+RHSupAirGfWC      
+RHSupAirGfHall
+RHSupAirGfBath
+RHSupAirGfBedN
+RHSupAirGfLiv
+RHSupAirGfBedS
+RHSupAirGfBedE
+RHSupAir1fWC
+RHSupAir1fHall
+RHSupAir1fBath
+RHSupAir1fLiv
+RHSupAir1fBedS
+RHSupAir1fBedE
+MfrStair1
+MfrStair2
+MfrGfStor1
+MfrGfStor2
+MfrGfWC
+MfrGfHall1
+MfrGfHall2
+MfrGfBath
+MfrGfBedN1
+MfrGfBedN2
+MfrGfLiv1
+MfrGfLiv2
+MfrGfBedS
+MfrGfBedE1
+MfrGfBedE2
+Mfr1fStor
+Mfr1fWC
+Mfr1fHall
+Mfr1fBath
+Mfr1fLiv1
+Mfr1fLiv2
+Mfr1fBedS
+Mfr1fBedE
+TinStair1
+TinStair2
+TinGfStor1
+TinGfStor2
+TinGfWC
+TinGfHall1
+TinGfHall2
+TinGfBath
+TinGfBedN1
+TinGfBedN2
+TinGfLiv1
+TinGfLiv2
+TinGfBedS
+TinGfBedE1
+TinGfBedE2
+Tin1fStor
+Tin1fWC
+Tin1fHall
+Tin1fBath
+Tin1fLiv1
+Tin1fLiv2
+Tin1fBedS
+Tin1fBedE
+Shd_GfHall_NW 
+Shd_GfHall_NE 
+Shd_GfBath_NW 
+Shd_GfBedN_NE
+Shd_GfLiv_SW 
+Shd_GfLiv_SE 
+Shd_GfBedS_SE 
+Shd_GfBedE_SE 
+Shd_GfBedE_NE 
+Shd_1fHall_NW 
+Shd_1fBath_NW 
+Shd_1fLiv_SW 
+Shd_1fLiv_SE 
+Shd_1fBedS_SE
+Shd_1fBedE_NE
+*** INITIAL INPUT VALUES
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+*** External files
+CONSTANTS 1
+unitBuilding = 31
+ASSIGN 02_Model\Building_4Study.b18 unitBuilding
+*|? Building description file (*.b18, *.b17, *.bui) |1000
+*------------------------------------------------------------------------------
+EQUATIONS 212                                        ! Outputs Type 56
+TcStair = [56,1]                                     ! Convective temperature [°C] 
+TcCel = [56,2]
+TcGfStor = [56,3]
+TcGfWC = [56,4]
+TcGfHall = [56,5]
+TcGfBath = [56,6]
+TcGfBedN = [56,7]
+TcGfLiv = [56,8]
+TcGfBedS = [56,9]
+TcGfBedE = [56,10]
+Tc1fStor = [56,11]
+Tc1fWC = [56,12]
+Tc1fHall = [56,13]
+Tc1fBath = [56,14]
+Tc1fLiv = [56,15]
+Tc1fBedS = [56,16]
+Tc1fBedE = [56,17]
+TopStair = [56,18]                                     ! Operative temperature [°C] 
+TopCel = [56,19]
+TopGfStor = [56,20]
+TopGfWC = [56,21]
+TopGfHall = [56,22]
+TopGfBath = [56,23]
+TopGfBedN = [56,24]
+TopGfLiv = [56,25]
+TopGfBedS = [56,26]
+TopGfBedE = [56,27]
+Top1fStor = [56,28]
+Top1fWC = [56,29]
+Top1fHall = [56,30]
+Top1fBath = [56,31]
+Top1fLiv = [56,32]
+Top1fBedS = [56,33]
+Top1fBedE = [56,34]
+RHStair = [56,35]                                      ! Relative humidity [%]
+RHCel = [56,36]
+RHGfStor = [56,37]
+RHGfWC = [56,38]
+RHGfHall = [56,39]
+RHGfBath = [56,40]
+RHGfBedN = [56,41]
+RHGfLiv = [56,42]
+RHGfBedS = [56,43]
+RHGfBedE = [56,44]
+RH1fStor = [56,45]
+RH1fWC = [56,46]
+RH1fHall = [56,47]
+RH1fBath = [56,48]
+RH1fLiv = [56,49]
+RH1fBedS = [56,50]
+RH1fBedE = [56,51]
+IdHeatStair = [56,52]/3600                             ! Ideal heating power [kW]
+IdHeatCel = [56,53]/3600
+IdHeatGfStor = [56,54]/3600
+IdHeatGfWC = [56,55]/3600
+IdHeatGfHall = [56,56]/3600
+IdHeatGfBath = [56,57]/3600
+IdHeatGfBedN = [56,58]/3600
+IdHeatGfLiv = [56,59]/3600
+IdHeatGfBedS = [56,60]/3600
+IdHeatGfBedE = [56,61]/3600
+IdHeat1fStor = [56,62]/3600
+IdHeat1fWC = [56,63]/3600
+IdHeat1fHall = [56,64]/3600
+IdHeat1fBath = [56,65]/3600
+IdHeat1fLiv = [56,66]/3600
+IdHeat1fBedS = [56,67]/3600
+IdHeat1fBedE = [56,68]/3600
+InfStair = [56,69]/3600                                ! Infiltration losses [kW]
+InfCel = [56,70]/3600
+InfGfStor = [56,71]/3600
+InfGfWC = [56,72]/3600
+InfGfHall = [56,73]/3600
+InfGfBath = [56,74]/3600
+InfGfBedN = [56,75]/3600
+InfGfLiv = [56,76]/3600
+InfGfBedS = [56,77]/3600
+InfGfBedE = [56,78]/3600
+Inf1fStor = [56,79]/3600
+Inf1fWC = [56,80]/3600
+Inf1fHall = [56,81]/3600
+Inf1fBath = [56,82]/3600
+Inf1fLiv = [56,83]/3600
+Inf1fBedS = [56,84]/3600
+Inf1fBedE = [56,85]/3600
+VStair = [56,86]/3600                                  ! Ventilation losses [kW]
+VCel = [56,87]/3600
+VGfStor = [56,88]/3600
+VGfWC = [56,89]/3600
+VGfHall = [56,90]/3600
+VGfBath = [56,91]/3600
+VGfBedN = [56,92]/3600
+VGfLiv = [56,93]/3600
+VGfBedS = [56,94]/3600
+VGfBedE = [56,95]/3600
+V1fStor = [56,96]/3600
+V1fWC = [56,97]/3600
+V1fHall = [56,98]/3600
+V1fBath = [56,99]/3600
+V1fLiv = [56,100]/3600
+V1fBedS = [56,101]/3600
+V1fBedE = [56,102]/3600
+TrStair = [56,103]/3600                                ! Transmission losses [kW]
+TrCel = [56,104]/3600
+TrGfStor = [56,105]/3600
+TrGfWC = [56,106]/3600
+TrGfHall = [56,107]/3600
+TrGfBath = [56,108]/3600
+TrGfBedN = [56,109]/3600
+TrGfLiv = [56,110]/3600
+TrGfBedS = [56,111]/3600
+TrGfBedE = [56,112]/3600
+Tr1fStor = [56,113]/3600
+Tr1fWC = [56,114]/3600
+Tr1fHall = [56,115]/3600
+Tr1fBath = [56,116]/3600
+Tr1fLiv = [56,117]/3600
+Tr1fBedS = [56,118]/3600
+Tr1fBedE = [56,119]/3600
+IGStair = [56,120]/3600                                ! Internal gains (total) [kW]
+IGCel = [56,121]/3600
+IGGfStor = [56,122]/3600
+IGGfWC = [56,123]/3600
+IGGfHall = [56,124]/3600
+IGGfBath = [56,125]/3600
+IGGfBedN = [56,126]/3600
+IGGfLiv = [56,127]/3600
+IGGfBedS = [56,128]/3600
+IGGfBedE = [56,129]/3600
+IG1fStor = [56,130]/3600
+IG1fWC = [56,131]/3600
+IG1fHall = [56,132]/3600
+IG1fBath = [56,133]/3600
+IG1fLiv = [56,134]/3600
+IG1fBedS = [56,135]/3600
+IG1fBedE = [56,136]/3600
+SGStair = [56,137]/3600                                ! Solar gains [kW]
+SGCel = [56,138]/3600
+SGGfStor = [56,139]/3600
+SGGfWC = [56,140]/3600
+SGGfHall = [56,141]/3600
+SGGfBath = [56,142]/3600
+SGGfBedN = [56,143]/3600
+SGGfLiv = [56,144]/3600
+SGGfBedS = [56,145]/3600
+SGGfBedE = [56,146]/3600
+SG1fStor = [56,147]/3600
+SG1fWC = [56,148]/3600
+SG1fHall = [56,149]/3600
+SG1fBath = [56,150]/3600
+SG1fLiv = [56,151]/3600
+SG1fBedS = [56,152]/3600
+SG1fBedE = [56,153]/3600
+IGMiscStair = [56,154]/3600                            ! Internal gains (Light) [kW]
+IGMiscCel = [56,155]/3600
+IGMiscGfStor = [56,156]/3600
+IGMiscGfWC = [56,157]/3600
+IGMiscGfHall = [56,158]/3600
+IGMiscGfBath = [56,159]/3600
+IGMiscGfBedN = [56,160]/3600
+IGMiscGfLiv = [56,161]/3600
+IGMiscGfBedS = [56,162]/3600
+IGMiscGfBedE = [56,163]/3600
+IGMisc1fStor = [56,164]/3600
+IGMisc1fWC = [56,165]/3600
+IGMisc1fHall = [56,166]/3600
+IGMisc1fBath = [56,167]/3600
+IGMisc1fLiv = [56,168]/3600
+IGMisc1fBedS = [56,169]/3600
+IGMisc1fBedE = [56,170]/3600
+QdotStair1 = [56,194]/3600                             ! Heating power active layer [kW]
+QdotStair2 = [56,195]/3600
+QdotGfStor1 = [56,196]/3600
+QdotGfStor2 = [56,197]/3600
+QdotGfWC = [56,198]/3600
+QdotGfHall1 = [56,199]/3600
+QdotGfHall2 = [56,200]/3600
+QdotGfBath = [56,201]/3600
+QdotGfBedN1 = [56,202]/3600
+QdotGfBedN2 = [56,203]/3600
+QdotGfLiv1 = [56,204]/3600
+QdotGfLiv2 = [56,205]/3600
+QdotGfBedS = [56,206]/3600
+QdotGfBedE1 = [56,207]/3600
+QdotGfBedE2 = [56,208]/3600
+Qdot1fStor = [56,209]/3600
+Qdot1fWC = [56,210]/3600
+Qdot1fHall = [56,211]/3600
+Qdot1fBath = [56,212]/3600
+Qdot1fLiv1 = [56,213]/3600
+Qdot1fLiv2 = [56,214]/3600
+Qdot1fBedS = [56,215]/3600
+Qdot1fBedE = [56,216]/3600
+IGEquipStair = [56,217]/3600                           ! Internal gains (Equipment) [kW]
+IGEquipCel = [56,218]/3600
+IGEquipGfStor = [56,219]/3600
+IGEquipGfWC = [56,220]/3600
+IGEquipGfHall = [56,221]/3600
+IGEquipGfBath = [56,222]/3600
+IGEquipGfBedN = [56,223]/3600
+IGEquipGfLiv = [56,224]/3600
+IGEquipGfBedS = [56,225]/3600
+IGEquipGfBedE = [56,226]/3600
+IGEquip1fStor = [56,227]/3600
+IGEquip1fWC = [56,228]/3600
+IGEquip1fHall = [56,229]/3600
+IGEquip1fBath = [56,230]/3600
+IGEquip1fLiv = [56,231]/3600
+IGEquip1fBedS = [56,232]/3600
+IGEquip1fBedE = [56,233]/3600
+QComI1fBedS = [56, 234]/3600                             ! Output for study of active layer (to the zone and to outside)                           
+QAbsI1fBedS = [56, 235]/3600                             ! Output for study of active layer (to the zone and to outside)                           
+*------------------------------------------------------------------------------
+EQUATIONS 6
+ElRad = IdHeatGfBath + IdHeat1fBath        ! Electricity consumption radiators installed in the bathrooms  
+QdotBui =  QdotStair1 + QdotStair2 + QdotGfStor1 + QdotGfStor2 + QdotGfWC + QdotGfHall1 + QdotGfHall2 + QdotGfBath + QdotGfBedN1 + QdotGfBedN2 + QdotGfLiv1 + QdotGfLiv2 + QdotGfBedS + QdotGfBedE1 + QdotGfBedE2 + Qdot1fStor + Qdot1fWC + Qdot1fHall + Qdot1fBath + Qdot1fLiv1 + Qdot1fLiv2 + Qdot1fBedS + Qdot1fBedE 
+IGMiscBui = IGMiscStair + IGMiscCel + IGMiscGfStor + IGMiscGfWC + IGMiscGfHall + IGMiscGfBath + IGMiscGfBedN + IGMiscGfLiv + IGMiscGfBedS + IGMiscGfBedE + IGMisc1fStor + IGMisc1fWC + IGMisc1fHall + IGMisc1fBath + IGMisc1fLiv + IGMisc1fBedS + IGMisc1fBedE 
+ElIGMiscBui = IGMiscBui/EltoIGFactor       ! Electricity consumption light [kW] 
+IGEquipBui = IGEquipStair + IGEquipCel + IGEquipGfStor + IGEquipGfWC + IGEquipGfHall + IGEquipGfBath + IGEquipGfBedN + IGEquipGfLiv + IGEquipGfBedS + IGEquipGfBedE + IGEquip1fStor + IGEquip1fWC + IGEquip1fHall + IGEquip1fBath + IGEquip1fLiv + IGEquip1fBedS + IGEquip1fBedE 
+ElIGEquipBui = IGEquipBui/EltoIGFactor       ! Electricity consumption equipment [kW] 
+
+*** SHADING CONTROL
+
+*** Shading control -> Global radiation on surface (IT > 200 W/m2 (-50 W/m2))
+
+UNIT 32 TYPE 2	                     ! Building Shading Controller: Radiation North-West Side
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+IT_surfUser_11	                     ! Radiation -> Upper input value
+0,0       	                         ! Lower input value
+0,0       	                         ! Monitoring value
+Shd_IrrCtrl_NW     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 720.0 540.0	
+**        200 W/m² a. 150 W/m² 	
+
+EQUATIONS 1
+Shd_IrrCtrl_NW = [32,1]
+
+UNIT 33 TYPE 2	                     ! Building Shading Controller: Radiation South-East Side
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+IT_surfUser_7	                     ! Radiation -> Upper input value
+0,0       	                         ! Lower input value
+0,0       	                         ! Monitoring value
+Shd_IrrCtrl_SE     	                 ! Output control function -> Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 720.0 540.0	
+
+EQUATIONS 1
+Shd_IrrCtrl_SE = [33,1]
+
+	
+UNIT 34 TYPE 2	                     ! Building Shading Controller: Radiation North-East Side
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+IT_surfUser_12	                     ! Radiation -> Upper input value
+0,0       	                         ! Lower input value
+0,0       	                         ! Monitoring value
+Shd_IrrCtrl_NE     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 720.0 540.0	
+
+EQUATIONS 1
+Shd_IrrCtrl_NE = [34,1]
+	
+	
+UNIT 35 TYPE 2	                     ! Building Shading Controller: Radiation South-West Side
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+IT_surfUser_8	                     ! Radiation: -> Upper input value
+0,0       	                         ! Lower input value
+0,0       	                         ! Monitoring value
+Shd_IrrCtrl_SW     	                 ! Output control function -> Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 720.0 540.0	
+
+EQUATIONS 1	
+Shd_IrrCtrl_SW = [35,1]
+
+
+*** Shading control -> Operative temperature room (Top > 23 °C (+-1°C))
+
+UNIT 110 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+TopGfHall	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_GfHall    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_GfHall = [110,1]
+
+UNIT 111 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+TopGfBath	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_GfBath    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_GfBath = [111,1]
+
+
+UNIT 112 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+TopGfBedN	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_GfBedN    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_GfBedN = [112,1]
+
+UNIT 113 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+TopGfLiv	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_GfLiv    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_GfLiv = [113,1]
+
+UNIT 114 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+TopGfBedS	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_GfBedS    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_GfBedS = [114,1]
+
+UNIT 115 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+TopGfBedE	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_GfBedE    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_GfBedE = [115,1]
+
+UNIT 116 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+Top1fHall	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_1fHall    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_1fHall = [116,1]
+
+UNIT 117 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+Top1fBath	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_1fBath    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_1fBath = [117,1]
+
+UNIT 118 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+Top1fLiv	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_1fLiv    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_1fLiv = [118,1]
+
+UNIT 119 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+Top1fBedS	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_1fBedS    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_1fBedS = [119,1]
+
+UNIT 120 TYPE 2	                     ! Building Shading Controller: Temperature
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+95	                                 ! 2 High limit cut-out
+INPUTS 6	
+Top1fBedE	                         ! Temp. oper -> Upper input value
+0,0      	                         ! Lower input value
+0,0      	                         ! Monitoring value
+Shd_TCtrl_1fBedE    	             ! Output control function ->Input control function 49,1
+0,0      	                         ! Upper dead band
+0,0      	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+21 0 0 0 24 23 	
+
+EQUATIONS 1	
+Shd_TCtrl_1fBedE = [120,1]
+
+
+EQUATIONS 15                                                                                                        ! Shading factors for TrnBuild
+Shd_GfHall_NW =  Shd_TCtrl_GfHall * Shd_IrrCtrl_NW * (1- g_multipl_factor)
+Shd_GfHall_NE =  Shd_TCtrl_GfHall * Shd_IrrCtrl_NE * (1- g_multipl_factor)
+Shd_GfBath_NW =  Shd_TCtrl_GfBath * Shd_IrrCtrl_NW * (1- g_multipl_factor)
+Shd_GfBedN_NE =  Shd_TCtrl_GfBedN * Shd_IrrCtrl_NE * (1- g_multipl_factor)
+Shd_GfLiv_SW =   Shd_TCtrl_GfLiv * Shd_IrrCtrl_SW * (1- g_multipl_factor)
+Shd_GfLiv_SE =   Shd_TCtrl_GfLiv * Shd_IrrCtrl_SE * (1- g_multipl_factor)
+Shd_GfBedS_SE =  Shd_TCtrl_GfBedS * Shd_IrrCtrl_SE * (1- g_multipl_factor)
+Shd_GfBedE_SE =  Shd_TCtrl_GfBedE * Shd_IrrCtrl_SE * (1- g_multipl_factor)
+Shd_GfBedE_NE =  Shd_TCtrl_GfBedE * Shd_IrrCtrl_NE * (1- g_multipl_factor)
+Shd_1fHall_NW =  Shd_TCtrl_1fHall * Shd_IrrCtrl_NW * (1- g_multipl_factor)
+Shd_1fBath_NW =  Shd_TCtrl_1fBath * Shd_IrrCtrl_NW * (1- g_multipl_factor)
+Shd_1fLiv_SW =   Shd_TCtrl_1fLiv * Shd_IrrCtrl_SW * (1- g_multipl_factor)
+Shd_1fLiv_SE =   Shd_TCtrl_1fLiv * Shd_IrrCtrl_SE * (1- g_multipl_factor)
+Shd_1fBedS_SE =  Shd_TCtrl_1fBedS * Shd_IrrCtrl_SE * (1- g_multipl_factor)
+Shd_1fBedE_NE =  Shd_TCtrl_1fBedE * Shd_IrrCtrl_NE * (1- g_multipl_factor)
+
+*** END SHADING CONTROL ***
+
+*------------------------------------------------------------------------------
+
+*******************************************
+*** VENTILATION ***
+*******************************************
+
+** The virtual demo building of KASAVA is renovated with a decentralised ventilation system with energy recovery (heat + humidity) integrated in the wall.
+** For each room a single unit (Flow 40 by BGTec) will be installed (Vmax = 42 m3/h)
+** Heat exchanger by-pass control is implemented
+** Control of the airflow rate depending on the RH of the room is implemented (four different airflow rate stages plus hyperventilation)
+
+CONSTANTS 17
+DeltaVdotmin = 10           ! [m3/h] Flow rate ventilator coming from Data Sheet
+DeltaVdotStage1 = 7         ! [m3/h]
+DeltaVdotStage2 = 9         ! [m3/h]
+DeltaVdotStage3 = 11        ! [m3/h]
+DeltaVdotmax = 5            ! [m3/h]
+DeltaVElmin = 3.6           ! [W] Electric consumption ventilator coming from Data sheet
+DeltaVElStage1 = 1.9        ! [W]
+DeltaVElStage2 = 3.5        ! [W]
+DeltaVElStage3 = 8.5        ! [W]
+DeltaVElmax = 2.5           ! [W]
+RHmin = 35                  ! [%]
+RHStage1 = 45               ! [%]
+RHStage2 = 55               ! [%]
+RHStage3 = 65               ! [%]
+RHmax = 70                  ! [%]
+Etath = 0.70		        ! [-] Sensible effectiveness. Value comes from datasheet of "Flow40" by BGTec
+Etahum = 0.56		        ! [-] Latent effectiveness (assumed)
+
+
+
+** HEAT RECOVERY BY-PASS CONTROL ** 
+
+UNIT 31 TYPE 939	 
+PARAMETERS 3
+1		                ! 1 Number of Inputs to Watch
+48		                ! 2 Time Period [h]
+0		                ! 3 Average Value for Input
+INPUTS 1
+tAmbDry 	            ! T_ambient
+*** INITIAL INPUT VALUES
+0
+EQUATIONS 1     
+Tamb48 = [31,2]                        ! 48h average of Tamb, �C
+
+
+UNIT 100 TYPE 939	 
+PARAMETERS 3
+1		                ! 1 Number of Inputs to Watch
+24		                ! 2 Time Period [h]
+0		                ! 3 Average Value for Input
+INPUTS 1
+relHum  	            ! T_ambient
+*** INITIAL INPUT VALUES
+0
+EQUATIONS 1     
+relHum24 = [100,2]       ! 48h average of Tamb, �C
+
+
+*** Control of average ambient temperature (Tamb,ave > 18 °C (+/-0.5K))
+
+UNIT 37 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+Tamb48	                             ! Tamb,ave -> Upper input value
+0,0       	                         ! Lower input value
+0,0       	                         ! Monitoring value
+CtrlHRTamb     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 18.5 17.5 	
+
+EQUATIONS 1
+CtrlHRTamb = [37,1]
+
+
+*** Control of room temperature (Troom > Tamb (+/-2.0 K))
+
+UNIT 68 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TcGfWC	                             ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTcGfWC     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTcGfWC = [68,1]
+
+
+UNIT 69 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TcGfHall	                         ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTcGfHall     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTcGfHall = [69,1]
+
+
+UNIT 70 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TcGfBath	                         ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTcGfBath     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTcGfBath = [70,1]
+
+
+UNIT 71 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TcGfBedN	                         ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTcGfBedN     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTcGfBedN = [71,1]
+
+
+UNIT 72 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TcGfLiv	                             ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTcGfLiv     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTcGfLiv = [72,1]
+
+
+UNIT 73 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TcGfBedS	                         ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTcGfBedS     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTcGfBedS = [73,1]
+
+
+UNIT 74 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TcGfBedE	                         ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTcGfBedE     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTcGfBedE = [74,1]
+
+
+UNIT 75 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+Tc1fWC	                             ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTc1fWC     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTc1fWC = [75,1]
+
+
+UNIT 76 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+Tc1fHall	                         ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTc1fHall     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTc1fHall = [76,1]
+
+
+UNIT 77 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+Tc1fBath	                         ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTc1fBath     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTc1fBath = [77,1]
+
+
+UNIT 78 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+Tc1fLiv	                             ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTc1fLiv     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTc1fLiv = [78,1]
+
+
+UNIT 79 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+Tc1fBedS	                         ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTc1fBedS     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTc1fBedS = [79,1]
+
+UNIT 80 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+Tc1fBedE	                         ! Troom -> Upper input value
+tAmbDry       	                     ! Tamb
+0,0       	                         ! Monitoring value
+CtrlHRTc1fBedE     	                 ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 2.0 -2.0 	
+
+EQUATIONS 1
+CtrlHRTc1fBedE = [80,1]
+
+
+EQUATIONS 13
+CtrlHRGfWC = 1 - (CtrlHRTamb*CtrlHRTcGfWC)
+CtrlHRGfHall = 1 - (CtrlHRTamb*CtrlHRTcGfHall)
+CtrlHRGfBath = 1 - (CtrlHRTamb*CtrlHRTcGfBath)
+CtrlHRGfBedN = 1 - (CtrlHRTamb*CtrlHRTcGfBedN)
+CtrlHRGfLiv = 1 - (CtrlHRTamb*CtrlHRTcGfLiv)
+CtrlHRGfBedS = 1 - (CtrlHRTamb*CtrlHRTcGfBedS)
+CtrlHRGfBedE = 1 - (CtrlHRTamb*CtrlHRTcGfBedE)
+CtrlHR1fWC = 1 - (CtrlHRTamb*CtrlHRTc1fWC)
+CtrlHR1fHall = 1 - (CtrlHRTamb*CtrlHRTc1fHall)
+CtrlHR1fBath = 1 - (CtrlHRTamb*CtrlHRTc1fBath)
+CtrlHR1fLiv = 1 - (CtrlHRTamb*CtrlHRTc1fLiv)
+CtrlHR1fBedS = 1 - (CtrlHRTamb*CtrlHRTc1fBedS)
+CtrlHR1fBedE = 1 - (CtrlHRTamb*CtrlHRTc1fBedE)
+
+** END HEAT RECOVERY BY-PASS CONTROL **
+
+
+** VENTILATION FLOWRATE CONTROL **
+
+UNIT 703 TYPE 993       !Changed automatically
+PARAMETERS 1     
+13   ! 1: number of variables to be remembered
+INPUTS 13    
+RHGfWC
+RHGfHall
+RHGfBath
+RHGfBedN
+RHGfLiv
+RHGfBedS
+RHGfBedE
+RH1fWC
+RH1fHall
+RH1fBath
+RH1fLiv
+RH1fBedS
+RH1fBedE 
+0 0 0 0 0 0 0 0 0 0 0 0 0  
+EQUATIONS 13         
+RHGfWCRc = [703,1]
+RHGfHallRc = [703,2]
+RHGfBathRc = [703,3]
+RHGfBedNRc = [703,4]
+RHGfLivRc = [703,5]
+RHGfBedSRc = [703,6]
+RHGfBedERc = [703,7]
+RH1fWCRc = [703,8]
+RH1fHallRc = [703,9]
+RH1fBathRc = [703,10]
+RH1fLivRc = [703,11]
+RH1fBedSRc = [703,12]
+RH1fBedERc = [703,13]
+
+EQUATIONS 13    ! Mass flow rates ventilation systems [kg/h]
+MventGfWC = 0! ((1 - LT(RHGfWCRc,RHmin)) + GT(RHGfWCRc,RHmin)*DeltaVdotmin + GT(RHGfWCRc,RHStage1)*DeltaVdotStage1 + GT(RHGfWCRc,RHStage2)*DeltaVdotStage2 + GT(RHGfWCRc,RHStage3)*DeltaVdotStage3 + GT(RHGfWCRc,RHmax)*DeltaVdotmax)*Airdens     
+MventGfHall = 0! ((1 - LT(RHGfHallRc,RHmin)) + GT(RHGfHallRc,RHmin)*DeltaVdotmin + GT(RHGfHallRc,RHStage1)*DeltaVdotStage1 + GT(RHGfHallRc,RHStage2)*DeltaVdotStage2 + GT(RHGfHallRc,RHStage3)*DeltaVdotStage3 + GT(RHGfHallRc,RHmax)*DeltaVdotmax)*Airdens     
+MventGfBath = (GT(RHGfBathRc,RHmin)*DeltaVdotmin + GT(RHGfBathRc,RHStage1)*DeltaVdotStage1 + GT(RHGfBathRc,RHStage2)*DeltaVdotStage2 + GT(RHGfBathRc,RHStage3)*DeltaVdotStage3 + GT(RHGfBathRc,RHmax)*DeltaVdotmax)*Airdens     
+MventGfBedN = (GT(RHGfBedNRc,RHmin)*DeltaVdotmin + GT(RHGfBedNRc,RHStage1)*DeltaVdotStage1 + GT(RHGfBedNRc,RHStage2)*DeltaVdotStage2 + GT(RHGfBedNRc,RHStage3)*DeltaVdotStage3 + GT(RHGfBedNRc,RHmax)*DeltaVdotmax)*Airdens     
+MventGfLiv = (GT(RHGfLivRc,RHmin)*DeltaVdotmin + GT(RHGfLivRc,RHStage1)*DeltaVdotStage1 + GT(RHGfLivRc,RHStage2)*DeltaVdotStage2 + GT(RHGfLivRc,RHStage3)*DeltaVdotStage3 + GT(RHGfLivRc,RHmax)*DeltaVdotmax)*Airdens     
+MventGfBedS = (GT(RHGfBedSRc,RHmin)*DeltaVdotmin + GT(RHGfBedSRc,RHStage1)*DeltaVdotStage1 + GT(RHGfBedSRc,RHStage2)*DeltaVdotStage2 + GT(RHGfBedSRc,RHStage3)*DeltaVdotStage3 + GT(RHGfBedSRc,RHmax)*DeltaVdotmax)*Airdens     
+MventGfBedE = (GT(RHGfBedERc,RHmin)*DeltaVdotmin + GT(RHGfBedERc,RHStage1)*DeltaVdotStage1 + GT(RHGfBedERc,RHStage2)*DeltaVdotStage2 + GT(RHGfBedERc,RHStage3)*DeltaVdotStage3 + GT(RHGfBedERc,RHmax)*DeltaVdotmax)*Airdens     
+Mvent1fWC = 0! ((1 - LT(RH1fWCRc,RHmin)) + GT(RH1fWCRc,RHmin)*DeltaVdotmin + GT(RH1fWCRc,RHStage1)*DeltaVdotStage1 + GT(RH1fWCRc,RHStage2)*DeltaVdotStage2 + GT(RH1fWCRc,RHStage3)*DeltaVdotStage3 + GT(RH1fWCRc,RHmax)*DeltaVdotmax)*Airdens     
+Mvent1fHall = 0! ((1 - LT(RH1fHallRc,RHmin)) + GT(RH1fHallRc,RHmin)*DeltaVdotmin + GT(RH1fHallRc,RHStage1)*DeltaVdotStage1 + GT(RH1fHallRc,RHStage2)*DeltaVdotStage2 + GT(RH1fHallRc,RHStage3)*DeltaVdotStage3 + GT(RH1fHallRc,RHmax)*DeltaVdotmax)*Airdens     
+Mvent1fBath = (GT(RH1fBathRc,RHmin)*DeltaVdotmin + GT(RH1fBathRc,RHStage1)*DeltaVdotStage1 + GT(RH1fBathRc,RHStage2)*DeltaVdotStage2 + GT(RH1fBathRc,RHStage3)*DeltaVdotStage3 + GT(RH1fBathRc,RHmax)*DeltaVdotmax)*Airdens     
+Mvent1fLiv = (GT(RH1fLivRc,RHmin)*DeltaVdotmin + GT(RH1fLivRc,RHStage1)*DeltaVdotStage1 + GT(RH1fLivRc,RHStage2)*DeltaVdotStage2 + GT(RH1fLivRc,RHStage3)*DeltaVdotStage3 + GT(RH1fLivRc,RHmax)*DeltaVdotmax)*Airdens     
+Mvent1fBedS = (GT(RH1fBedSRc,RHmin)*DeltaVdotmin + GT(RH1fBedSRc,RHStage1)*DeltaVdotStage1 + GT(RH1fBedSRc,RHStage2)*DeltaVdotStage2 + GT(RH1fBedSRc,RHStage3)*DeltaVdotStage3 + GT(RH1fBedSRc,RHmax)*DeltaVdotmax)*Airdens     
+Mvent1fBedE = (GT(RH1fBedERc,RHmin)*DeltaVdotmin + GT(RH1fBedERc,RHStage1)*DeltaVdotStage1 + GT(RH1fBedERc,RHStage2)*DeltaVdotStage2 + GT(RH1fBedERc,RHStage3)*DeltaVdotStage3 + GT(RH1fBedERc,RHmax)*DeltaVdotmax)*Airdens     
+
+EQUATIONS 14    ! Power consumption ventilation systems [kW]
+
+ElventGfWC = 0!((1 - LT(RHGfWCRc,RHmin)) + GT(RHGfWCRc,RHmin)*DeltaVElmin + GT(RHGfWCRc,RHStage1)*DeltaVElStage1 + GT(RHGfWCRc,RHStage2)*DeltaVElStage2 + GT(RHGfWCRc,RHStage3)*DeltaVElStage3 + GT(RHGfWCRc,RHmax)*DeltaVElmax)/1000     
+ElventGfHall = 0!((1 - LT(RHGfHallRc,RHmin)) + GT(RHGfHallRc,RHmin)*DeltaVElmin + GT(RHGfHallRc,RHStage1)*DeltaVElStage1 + GT(RHGfHallRc,RHStage2)*DeltaVElStage2 + GT(RHGfHallRc,RHStage3)*DeltaVElStage3 + GT(RHGfHallRc,RHmax)*DeltaVElmax)/1000     
+ElventGfBath =(GT(RHGfBathRc,RHmin)*DeltaVElmin + GT(RHGfBathRc,RHStage1)*DeltaVElStage1 + GT(RHGfBathRc,RHStage2)*DeltaVElStage2 + GT(RHGfBathRc,RHStage3)*DeltaVElStage3 + GT(RHGfBathRc,RHmax)*DeltaVElmax)/1000     
+ElventGfBedN =(GT(RHGfBedNRc,RHmin)*DeltaVElmin + GT(RHGfBedNRc,RHStage1)*DeltaVElStage1 + GT(RHGfBedNRc,RHStage2)*DeltaVElStage2 + GT(RHGfBedNRc,RHStage3)*DeltaVElStage3 + GT(RHGfBedNRc,RHmax)*DeltaVElmax)/1000     
+ElventGfLiv =(GT(RHGfLivRc,RHmin)*DeltaVElmin + GT(RHGfLivRc,RHStage1)*DeltaVElStage1 + GT(RHGfLivRc,RHStage2)*DeltaVElStage2 + GT(RHGfLivRc,RHStage3)*DeltaVElStage3 + GT(RHGfLivRc,RHmax)*DeltaVElmax)/1000     
+ElventGfBedS =(GT(RHGfBedSRc,RHmin)*DeltaVElmin + GT(RHGfBedSRc,RHStage1)*DeltaVElStage1 + GT(RHGfBedSRc,RHStage2)*DeltaVElStage2 + GT(RHGfBedSRc,RHStage3)*DeltaVElStage3 + GT(RHGfBedSRc,RHmax)*DeltaVElmax)/1000     
+ElventGfBedE =(GT(RHGfBedERc,RHmin)*DeltaVElmin + GT(RHGfBedERc,RHStage1)*DeltaVElStage1 + GT(RHGfBedERc,RHStage2)*DeltaVElStage2 + GT(RHGfBedERc,RHStage3)*DeltaVElStage3 + GT(RHGfBedERc,RHmax)*DeltaVElmax)/1000     
+Elvent1fWC = 0!((1 - LT(RH1fWCRc,RHmin)) + GT(RH1fWCRc,RHmin)*DeltaVElmin + GT(RH1fWCRc,RHStage1)*DeltaVElStage1 + GT(RH1fWCRc,RHStage2)*DeltaVElStage2 + GT(RH1fWCRc,RHStage3)*DeltaVElStage3 + GT(RH1fWCRc,RHmax)*DeltaVElmax)/1000     
+Elvent1fHall = 0!((1 - LT(RH1fHallRc,RHmin)) + GT(RH1fHallRc,RHmin)*DeltaVElmin + GT(RH1fHallRc,RHStage1)*DeltaVElStage1 + GT(RH1fHallRc,RHStage2)*DeltaVElStage2 + GT(RH1fHallRc,RHStage3)*DeltaVElStage3 + GT(RH1fHallRc,RHmax)*DeltaVElmax)/1000     
+Elvent1fBath =(GT(RH1fBathRc,RHmin)*DeltaVElmin + GT(RH1fBathRc,RHStage1)*DeltaVElStage1 + GT(RH1fBathRc,RHStage2)*DeltaVElStage2 + GT(RH1fBathRc,RHStage3)*DeltaVElStage3 + GT(RH1fBathRc,RHmax)*DeltaVElmax)/1000     
+Elvent1fLiv =(GT(RH1fLivRc,RHmin)*DeltaVElmin + GT(RH1fLivRc,RHStage1)*DeltaVElStage1 + GT(RH1fLivRc,RHStage2)*DeltaVElStage2 + GT(RH1fLivRc,RHStage3)*DeltaVElStage3 + GT(RH1fLivRc,RHmax)*DeltaVElmax)/1000     
+Elvent1fBedS =(GT(RH1fBedSRc,RHmin)*DeltaVElmin + GT(RH1fBedSRc,RHStage1)*DeltaVElStage1 + GT(RH1fBedSRc,RHStage2)*DeltaVElStage2 + GT(RH1fBedSRc,RHStage3)*DeltaVElStage3 + GT(RH1fBedSRc,RHmax)*DeltaVElmax)/1000     
+Elvent1fBedE =(GT(RH1fBedERc,RHmin)*DeltaVElmin + GT(RH1fBedERc,RHStage1)*DeltaVElStage1 + GT(RH1fBedERc,RHStage2)*DeltaVElStage2 + GT(RH1fBedERc,RHStage3)*DeltaVElStage3 + GT(RH1fBedERc,RHmax)*DeltaVElmax)/1000     
+ElventBui = ElventGfWC + ElventGfHall + ElventGfBath + ElventGfBedN + ElventGfLiv + ElventGfBedS + ElventGfBedE + Elvent1fWC + Elvent1fHall + Elvent1fBath + Elvent1fLiv + Elvent1fBedS + Elvent1fBedE
+
+** HEAT RECOVERY EXCHANGER **
+
+* Model "Type667b" (Type 667)
+* 
+
+UNIT 82 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+TcGfWC		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RHGfWC		! [unconnected] Exhaust air %RH
+MventGfWC		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+MventGfWC		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHRGfWC	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHRGfWC 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAirGfWC  = [82,6]
+RHSupAirGfWC = [82,8]
+
+
+UNIT 83 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+TcGfHall		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RHGfHall		! [unconnected] Exhaust air %RH
+MventGfHall		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+MventGfHall		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHRGfHall	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHRGfHall 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAirGfHall  = [83,6]
+RHSupAirGfHall = [83,8]
+
+
+UNIT 84 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+TcGfBath		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RHGfBath		! [unconnected] Exhaust air %RH
+MventGfBath		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+MventGfBath		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHRGfBath	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHRGfBath 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAirGfBath  = [84,6]
+RHSupAirGfBath = [84,8]
+
+
+UNIT 85 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+TcGfBedN		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RHGfBedN		! [unconnected] Exhaust air %RH
+MventGfBedN		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+MventGfBedN		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHRGfBedN	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHRGfBedN 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAirGfBedN  = [85,6]
+RHSupAirGfBedN = [85,8]
+
+
+UNIT 86 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+TcGfLiv		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RHGfLiv		! [unconnected] Exhaust air %RH
+MventGfLiv		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+MventGfLiv		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHRGfLiv	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHRGfLiv 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAirGfLiv  = [86,6]
+RHSupAirGfLiv = [86,8]
+
+
+UNIT 87 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+TcGfBedS		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RHGfBedS		! [unconnected] Exhaust air %RH
+MventGfBedS		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+MventGfBedS		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHRGfBedS	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHRGfBedS 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAirGfBedS  = [87,6]
+RHSupAirGfBedS = [87,8]
+
+
+UNIT 88 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+TcGfBedE		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RHGfBedE		! [unconnected] Exhaust air %RH
+MventGfBedE		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+MventGfBedE		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHRGfBedE	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHRGfBedE 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAirGfBedE  = [88,6]
+RHSupAirGfBedE = [88,8]
+
+
+UNIT 89 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+Tc1fWC		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RH1fWC		! [unconnected] Exhaust air %RH
+Mvent1fWC		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+Mvent1fWC		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHR1fWC	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHR1fWC 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAir1fWC  = [89,6]
+RHSupAir1fWC = [89,8]
+
+
+UNIT 90 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+Tc1fHall		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RH1fHall		! [unconnected] Exhaust air %RH
+Mvent1fHall		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+Mvent1fHall		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHR1fHall	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHR1fHall 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAir1fHall  = [90,6]
+RHSupAir1fHall = [90,8]
+
+
+UNIT 91 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+Tc1fBath		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RH1fBath		! [unconnected] Exhaust air %RH
+Mvent1fBath		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+Mvent1fBath		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHR1fBath	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHR1fBath 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAir1fBath  = [91,6]
+RHSupAir1fBath = [91,8]
+
+
+UNIT 92 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+Tc1fLiv		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RH1fLiv		! [unconnected] Exhaust air %RH
+Mvent1fLiv		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+Mvent1fLiv		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHR1fLiv	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHR1fLiv 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAir1fLiv  = [92,6]
+RHSupAir1fLiv = [92,8]
+
+
+UNIT 93 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+Tc1fBedS		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RH1fBedS		! [unconnected] Exhaust air %RH
+Mvent1fBedS		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+Mvent1fBedS		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHR1fBedS	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHR1fBedS 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAir1fBedS  = [93,6]
+RHSupAir1fBedS = [93,8]
+
+
+UNIT 94 TYPE 667	 Type667b
+*$UNIT_NAME Type667b
+*$MODEL .\HVAC Library (TESS)\Heat Exchangers\Air-to-Air Heat Exchanger\Sensible and Latent Transfer\Air-Air Heat Recovery\Type667b.tmf
+*$POSITION 593 364
+*$LAYER Main # 
+*$# AIR-TO-AIR HEAT RECOVERY
+PARAMETERS 2
+2		            ! 1 Humidity mode
+671.1		        ! 2 Rated power
+INPUTS 15
+Tc1fBedE		! [unconnected] Exhaust air temperature
+0,0		            ! [unconnected] Not used
+RH1fBedE		! [unconnected] Exhaust air %RH
+Mvent1fBedE		! [unconnected] Exhaust air flow rate
+0,0		            ! [unconnected] Exhaust air pressure
+0,0		            ! [unconnected] Exhaust air pressure drop
+tAmbDry		        ! [unconnected] Fresh air temperature
+0,0		            ! [unconnected] Not used
+relHum		        ! [unconnected] Fresh air %RH
+Mvent1fBedE		! [unconnected] Fresh air flow rate
+0,0		            ! [unconnected] Fresh air pressure
+0,0	 	            ! [unconnected] Fresh air pressure drop
+Etath		        ! [unconnected] Sensible effectiveness
+Etahum		        ! [unconnected] Latent effectiveness
+CtrlHR1fBedE	    ! [unconnected] On/Off Control Signal
+*** INITIAL INPUT VALUES
+20.0 0.005 60.0 0.0 1.0 0 20.0 0.005 50.0 0.0 1.0 0.0 Etath Etahum CtrlHR1fBedE 
+*------------------------------------------------------------------------------
+EQUATIONS 2
+TSupAir1fBedE  = [94,6]
+RHSupAir1fBedE = [94,8]
+
+***************************************
+*** END VENTILATION ***
+***************************************
+
+
+***************************************
+*** HEATING ***
+***************************************
+*** Definition of heating season ***
+CONSTANTS 2
+TambHS = 15                          ! Tamb below which heating season starts
+BoHS = LT (Tamb48, TambHS) 
+
+*** Definition of heating curve according to equation of Type 888 ***
+
+CONSTANTS 5
+TBuiFlNom = 38.0                                   ! reference (design) flow temperature          --> Parameter 9 of Type 888
+TBuiRtNom = 35.0                                   ! reference (design) return temperature        --> Parameter 10 of Type 888
+tRoomSet = 23.0                                    ! room set-point for heating curve calculation --> Input 10 of Type 888
+TambN = -10.4
+m = 1.0
+
+UNIT 101 TYPE 939	 
+PARAMETERS 3
+1		                                 ! 1 Number of Inputs to Watch
+24		                                 ! 2 Time Period [h]
+0		                                 ! 3 Average Value for Input
+INPUTS 1
+tAmbDry 	                             ! T_ambient
+*** INITIAL INPUT VALUES
+0
+EQUATIONS 1     
+Tamb24 = [101,2]                        ! 24h average of Tamb, �C
+
+EQUATIONS 1
+Tv = tRoomSet + ((TBuiFlNom-TBuiRtNom)/2)*((tRoomSet-Tamb24)/(tRoomSet-TambN))+((TBuiFlNom+TBuiRtNom)/2 - tRoomSet)*((tRoomSet-Tamb24)/(tRoomSet-TambN))^(1/m) 
+
+*** Control of heating loops ***
+CONSTANTS 4
+TspRoom = 21.0      ! standard set point temperature [°C] for the rooms
+TspGfBedN = 20.0    ! set point temperature [°C] for the room GfBedN
+Tsp1fLiv = 22.0     ! set point temperature [°C] for the room 1fLiv
+Tsp1fBedE = 24.0    ! set point temperature [°C] for the room 1fBedE
+
+
+
+UNIT 300 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcStair       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatStair1     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatStair1 = [300,1]
+UNIT 301 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcStair       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatStair2     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatStair2 = [301,1]
+UNIT 302 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfStor       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfStor1     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfStor1 = [302,1]
+UNIT 303 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfStor       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfStor2     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfStor2 = [303,1]
+UNIT 304 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfWC       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfWC     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfWC = [304,1]
+UNIT 305 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfHall       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfHall1     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfHall1 = [305,1]
+UNIT 306 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfHall       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfHall2     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfHall2 = [306,1]
+UNIT 307 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfBath       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfBath     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfBath = [307,1]
+UNIT 308 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspGfBedN	                         
+TcGfBedN       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfBedN1     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfBedN1 = [308,1]
+UNIT 309 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspGfBedN	                         
+TcGfBedN       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfBedN2     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfBedN2 = [309,1]
+UNIT 310 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfLiv       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfLiv1     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfLiv1 = [310,1]
+UNIT 311 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfLiv       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfLiv2     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfLiv2 = [311,1]
+UNIT 312 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfBedS       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfBedS     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfBedS = [312,1]
+UNIT 313 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfBedE       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfBedE1     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfBedE1 = [313,1]
+UNIT 314 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+TcGfBedE       	                 
+0,0       	                         ! Monitoring value
+CtrlHeatGfBedE2     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeatGfBedE2 = [314,1]
+UNIT 315 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+Tc1fStor       	                 
+0,0       	                         ! Monitoring value
+CtrlHeat1fStor     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeat1fStor = [315,1]
+UNIT 316 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+Tc1fWC       	                 
+0,0       	                         ! Monitoring value
+CtrlHeat1fWC     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeat1fWC = [316,1]
+UNIT 317 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+Tc1fHall       	                 
+0,0       	                         ! Monitoring value
+CtrlHeat1fHall     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeat1fHall = [317,1]
+UNIT 318 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+Tc1fBath       	                 
+0,0       	                         ! Monitoring value
+CtrlHeat1fBath     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeat1fBath = [318,1]
+UNIT 319 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+Tsp1fLiv	                         
+Tc1fLiv       	                 
+0,0       	                         ! Monitoring value
+CtrlHeat1fLiv1     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeat1fLiv1 = [319,1]
+UNIT 320 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+Tsp1fLiv	                         
+Tc1fLiv       	                 
+0,0       	                         ! Monitoring value
+CtrlHeat1fLiv2     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeat1fLiv2 = [320,1]
+UNIT 321 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+TspRoom	                         
+Tc1fBedS       	                 
+0,0       	                         ! Monitoring value
+CtrlHeat1fBedS     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeat1fBedS = [321,1]
+UNIT 322 TYPE 2	                     
+PARAMETERS 2	
+5	                                 ! 1 No. of oscillations
+5000	                             ! 2 High limit cut-out
+INPUTS 6	
+Tsp1fBedE	                         
+Tc1fBedE       	                 
+0,0       	                         ! Monitoring value
+CtrlHeat1fBedE     	                     ! Output control function ->Input control function
+0,0       	                         ! Upper dead band
+0,0       	                         ! Lower dead band
+*** INITIAL INPUT VALUES	
+15 0 0 0 0.0 -0.0 	
+
+EQUATIONS 1
+CtrlHeat1fBedE = [322,1]
+
+*** End control of heating loops
+
+*** END HEATING ***
+
+
+**************************************
+** MONTHLY PRINTER
+**************************************
+
+CONSTANTS 1
+unitPrinterEnergy=45
+
+ASSIGN    temp\Energy_MO.Prt     unitPrinterEnergy
+	
+UNIT 45 Type 46      ! Printegrator Monthly Values for Weather data
+PARAMETERS 6   
+unitPrinterEnergy    ! 1: Logical unit number, -
+-1                   ! 2: Logical unit for monthly summaries, -
+1                    ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1                   ! 4: Printing & integrating interval, h. -1 for monthly integration
+1                    ! 5: Number of inputs to avoid integration, -
+1                    ! 6: Output number to avoid integration
+INPUTS 126  
+Time InfStair InfCel InfGfStor InfGfWC InfGfHall InfGfBath InfGfBedN InfGfLiv InfGfBedS InfGfBedE Inf1fStor Inf1fWC Inf1fHall Inf1fBath Inf1fLiv Inf1fBedS Inf1fBedE TrStair TrCel TrGfStor TrGfWC TrGfHall TrGfBath TrGfBedN TrGfLiv TrGfBedS TrGfBedE Tr1fStor Tr1fWC Tr1fHall Tr1fBath Tr1fLiv Tr1fBedS Tr1fBedE VStair VCel VGfStor VGfWC VGfHall VGfBath VGfBedN VGfLiv VGfBedS VGfBedE V1fStor V1fWC V1fHall V1fBath V1fLiv V1fBedS V1fBedE IGStair IGCel IGGfStor IGGfWC IGGfHall IGGfBath IGGfBedN IGGfLiv IGGfBedS IGGfBedE IG1fStor IG1fWC IG1fHall IG1fBath IG1fLiv IG1fBedS IG1fBedE SGStair SGCel SGGfStor SGGfWC SGGfHall SGGfBath SGGfBedN SGGfLiv SGGfBedS SGGfBedE SG1fStor SG1fWC SG1fHall SG1fBath SG1fLiv SG1fBedS SG1fBedE IdHeatStair IdHeatCel IdHeatGfStor IdHeatGfWC IdHeatGfHall IdHeatGfBath IdHeatGfBedN IdHeatGfLiv IdHeatGfBedS IdHeatGfBedE IdHeat1fStor IdHeat1fWC IdHeat1fHall IdHeat1fBath IdHeat1fLiv IdHeat1fBedS IdHeat1fBedE QdotStair1 QdotStair2 QdotGfStor1 QdotGfStor2 QdotGfWC QdotGfHall1 QdotGfHall2 QdotGfBath QdotGfBedN1 QdotGfBedN2 QdotGfLiv1 QdotGfLiv2 QdotGfBedS QdotGfBedE1 QdotGfBedE2 Qdot1fStor Qdot1fWC Qdot1fHall Qdot1fBath Qdot1fLiv1 Qdot1fLiv2 Qdot1fBedS Qdot1fBedE 
+Time InfStair InfCel InfGfStor InfGfWC InfGfHall InfGfBath InfGfBedN InfGfLiv InfGfBedS InfGfBedE Inf1fStor Inf1fWC Inf1fHall Inf1fBath Inf1fLiv Inf1fBedS Inf1fBedE TrStair TrCel TrGfStor TrGfWC TrGfHall TrGfBath TrGfBedN TrGfLiv TrGfBedS TrGfBedE Tr1fStor Tr1fWC Tr1fHall Tr1fBath Tr1fLiv Tr1fBedS Tr1fBedE VStair VCel VGfStor VGfWC VGfHall VGfBath VGfBedN VGfLiv VGfBedS VGfBedE V1fStor V1fWC V1fHall V1fBath V1fLiv V1fBedS V1fBedE IGStair IGCel IGGfStor IGGfWC IGGfHall IGGfBath IGGfBedN IGGfLiv IGGfBedS IGGfBedE IG1fStor IG1fWC IG1fHall IG1fBath IG1fLiv IG1fBedS IG1fBedE SGStair SGCel SGGfStor SGGfWC SGGfHall SGGfBath SGGfBedN SGGfLiv SGGfBedS SGGfBedE SG1fStor SG1fWC SG1fHall SG1fBath SG1fLiv SG1fBedS SG1fBedE IdHeatStair IdHeatCel IdHeatGfStor IdHeatGfWC IdHeatGfHall IdHeatGfBath IdHeatGfBedN IdHeatGfLiv IdHeatGfBedS IdHeatGfBedE IdHeat1fStor IdHeat1fWC IdHeat1fHall IdHeat1fBath IdHeat1fLiv IdHeat1fBedS IdHeat1fBedE QdotStair1 QdotStair2 QdotGfStor1 QdotGfStor2 QdotGfWC QdotGfHall1 QdotGfHall2 QdotGfBath QdotGfBedN1 QdotGfBedN2 QdotGfLiv1 QdotGfLiv2 QdotGfBedS QdotGfBedE1 QdotGfBedE2 Qdot1fStor Qdot1fWC Qdot1fHall Qdot1fBath Qdot1fLiv1 Qdot1fLiv2 Qdot1fBedS Qdot1fBedE 
+
+
+CONSTANTS 1
+unitPrinterTemper=45
+
+ASSIGN    temp\Temp_and_RH_h.Prt     unitPrinterTemper
+	
+UNIT 45 Type 46     ! Printegrator Monthly Values for Weather data
+PARAMETERS 6   
+unitPrinterTemper    ! 1: Logical unit number, -
+-1                   ! 2: Logical unit for monthly summaries, -
+1                    ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1                    ! 4: Printing & integrating interval, h. -1 for monthly integration
+1                    ! 5: Number of inputs to avoid integration, -
+1                    ! 6: Output number to avoid integration
+INPUTS 55  
+tAmbDry TGroundBui TcStair TcCel TcGfStor TcGfWC TcGfHall TcGfBath TcGfBedN TcGfLiv TcGfBedS TcGfBedE Tc1fStor Tc1fWC Tc1fHall Tc1fBath Tc1fLiv Tc1fBedS Tc1fBedE TopStair TopCel TopGfStor TopGfWC TopGfHall TopGfBath TopGfBedN TopGfLiv TopGfBedS TopGfBedE Top1fStor Top1fWC Top1fHall Top1fBath Top1fLiv Top1fBedS Top1fBedE relHum RHStair RHCel RHGfStor RHGfWC RHGfHall RHGfBath RHGfBedN RHGfLiv RHGfBedS RHGfBedE RH1fStor RH1fWC RH1fHall RH1fBath RH1fLiv RH1fBedS RH1fBedE BoHS
+tAmbDry TGroundBui TcStair TcCel TcGfStor TcGfWC TcGfHall TcGfBath TcGfBedN TcGfLiv TcGfBedS TcGfBedE Tc1fStor Tc1fWC Tc1fHall Tc1fBath Tc1fLiv Tc1fBedS Tc1fBedE TopStair TopCel TopGfStor TopGfWC TopGfHall TopGfBath TopGfBedN TopGfLiv TopGfBedS TopGfBedE Top1fStor Top1fWC Top1fHall Top1fBath Top1fLiv Top1fBedS Top1fBedE relHum RHStair RHCel RHGfStor RHGfWC RHGfHall RHGfBath RHGfBedN RHGfLiv RHGfBedS RHGfBedE RH1fStor RH1fWC RH1fHall RH1fBath RH1fLiv RH1fBedS RH1fBedE BoHS
+
+
+** CONSTANTS 1
+** unitPrinterTimeStep=45
+
+** ASSIGN    temp\Outputs_TimeStep.Prt     unitPrinterTimeStep
+
+** UNIT 2 TYPE 25 
+** PARAMETERS 10
+** dtSim	! 1 Printing interval
+** START	! 2 Start time
+** STOP	! 3 Stop time
+** unitPrinterTimeStep		! 4 Logical unit
+** 0		! 5 Units printing mode
+** 0		! 6 Relative or absolute start time
+** 1		! 7 Overwrite or Append
+** -1		! 8 Print header
+** 0		! 9 Delimiter
+** 1		! 10 Print labels
+** INPUTS 134
+** Time  IdHeatGfBath IdHeat1fBath QdotStair1 QdotStair2 QdotGfStor1 QdotGfStor2 QdotGfWC QdotGfHall1 QdotGfHall2 QdotGfBath QdotGfBedN1 QdotGfBedN2 QdotGfLiv1 QdotGfLiv2 QdotGfBedS QdotGfBedE1 QdotGfBedE2 Qdot1fStor Qdot1fWC Qdot1fHall Qdot1fBath Qdot1fLiv1 Qdot1fLiv2 Qdot1fBedS Qdot1fBedE MfrStair1 MfrStair2 MfrGfStor1 MfrGfStor2 MfrGfWC MfrGfHall1 MfrGfHall2 MfrGfBath MfrGfBedN1 MfrGfBedN2 MfrGfLiv1 MfrGfLiv2 MfrGfBedS MfrGfBedE1 MfrGfBedE2 Mfr1fStor Mfr1fWC Mfr1fHall Mfr1fBath Mfr1fLiv1 Mfr1fLiv2 Mfr1fBedS Mfr1fBedE TinStair1 TinStair2 TinGfStor1 TinGfStor2 TinGfWC TinGfHall1 TinGfHall2 TinGfBath TinGfBedN1 TinGfBedN2 TinGfLiv1 TinGfLiv2 TinGfBedS TinGfBedE1 TinGfBedE2 Tin1fStor Tin1fWC Tin1fHall Tin1fBath Tin1fLiv1 Tin1fLiv2 Tin1fBedS Tin1fBedE TStair1 TStair2 TGfStor1 TGfStor2 TGfWC TGfHall1 TGfHall2 TGfBath TGfBedN1 TGfBedN2 TGfLiv1 TGfLiv2 TGfBedS TGfBedE1 TGfBedE2 T1fStor T1fWC T1fHall T1fBath T1fLiv1 T1fLiv2 T1fBedS T1fBedE HpForDHWIsNeeded HpForSHIsNeeded hpIsOn ElRad ElventBui ElIGMiscBui ElIGEquipBui PelAuxComp_kW ElPuTot PelContr_kW PelPVAC_kW Tsen1_Tes1 Tsen2_Tes1 Tsen3_Tes1 Tsen4_Tes1 Tsen5_Tes1 Tsen6_Tes1 Tsen7_Tes1 Tsen8_Tes1 Tsen9_Tes1 Tsen10_Tes1 TopStair TopCel TopGfStor TopGfWC TopGfHall TopGfBath TopGfBedN TopGfLiv TopGfBedS TopGfBedE Top1fStor Top1fWC Top1fHall Top1fBath Top1fLiv Top1fBedS Top1fBedE tAmbDry
+** Time  IdHeatGfBath IdHeat1fBath QdotStair1 QdotStair2 QdotGfStor1 QdotGfStor2 QdotGfWC QdotGfHall1 QdotGfHall2 QdotGfBath QdotGfBedN1 QdotGfBedN2 QdotGfLiv1 QdotGfLiv2 QdotGfBedS QdotGfBedE1 QdotGfBedE2 Qdot1fStor Qdot1fWC Qdot1fHall Qdot1fBath Qdot1fLiv1 Qdot1fLiv2 Qdot1fBedS Qdot1fBedE MfrStair1 MfrStair2 MfrGfStor1 MfrGfStor2 MfrGfWC MfrGfHall1 MfrGfHall2 MfrGfBath MfrGfBedN1 MfrGfBedN2 MfrGfLiv1 MfrGfLiv2 MfrGfBedS MfrGfBedE1 MfrGfBedE2 Mfr1fStor Mfr1fWC Mfr1fHall Mfr1fBath Mfr1fLiv1 Mfr1fLiv2 Mfr1fBedS Mfr1fBedE TinStair1 TinStair2 TinGfStor1 TinGfStor2 TinGfWC TinGfHall1 TinGfHall2 TinGfBath TinGfBedN1 TinGfBedN2 TinGfLiv1 TinGfLiv2 TinGfBedS TinGfBedE1 TinGfBedE2 Tin1fStor Tin1fWC Tin1fHall Tin1fBath Tin1fLiv1 Tin1fLiv2 Tin1fBedS Tin1fBedE TStair1 TStair2 TGfStor1 TGfStor2 TGfWC TGfHall1 TGfHall2 TGfBath TGfBedN1 TGfBedN2 TGfLiv1 TGfLiv2 TGfBedS TGfBedE1 TGfBedE2 T1fStor T1fWC T1fHall T1fBath T1fLiv1 T1fLiv2 T1fBedS T1fBedE HpForDHWIsNeeded HpForSHIsNeeded hpIsOn ElRad ElventBui ElIGMiscBui ElIGEquipBui PelAuxComp_kW ElPuTot PelContr_kW PelPVAC_kW Tsen1_Tes1 Tsen2_Tes1 Tsen3_Tes1 Tsen4_Tes1 Tsen5_Tes1 Tsen6_Tes1 Tsen7_Tes1 Tsen8_Tes1 Tsen9_Tes1 Tsen10_Tes1 TopStair TopCel TopGfStor TopGfWC TopGfHall TopGfBath TopGfBedN TopGfLiv TopGfBedS TopGfBedE Top1fStor Top1fWC Top1fHall Top1fBath Top1fLiv Top1fBedS Top1fBedE tAmbDry
+
+
+UNIT 59 TYPE 65     ! Onlint Plotter Building
+PARAMETERS 12     
+10       ! 1 Nb. of left-axis variables
+9        ! 2 Nb. of right-axis variables
+18      ! 3 Left axis minimum
+30       ! 4 Left axis maximum
+18      ! 5 Right axis minimum
+30       ! 6 Right axis maximum
+1        ! nPlotsPerSim     ! 7 Number of plots per simulation
+12       ! 8 X-axis gridpoints
+0        ! 9 Shut off Online w/o removing
+-1       ! 10 Logical unit for output file
+0        ! 11 Output file units
+0        ! 12 Output file delimiter
+INPUTS 19     
+tAmbDry TGroundBui TcStair TcCel TcGfStor TcGfWC TcGfHall TcGfBath TcGfBedN TcGfLiv TcGfBedS TcGfBedE Tc1fStor Tc1fWC Tc1fHall Tc1fBath Tc1fLiv Tc1fBedS Tc1fBedE  
+*******
+tAmbDry TGroundBui TcStair TcCel TcGfStor TcGfWC TcGfHall TcGfBath TcGfBedN TcGfLiv TcGfBedS TcGfBedE Tc1fStor Tc1fWC Tc1fHall Tc1fBath Tc1fLiv Tc1fBedS Tc1fBedE  
+****
+LABELS  3     
+Temperatures     
+Nix     
+Nix
+ 
+** UNIT 59 TYPE 65     ! Onlint Plotter Building
+** PARAMETERS 12     
+** 5         ! 1 Nb. of left-axis variables
+** 1         ! 2 Nb. of right-axis variables
+** -20       ! 3 Left axis minimum
+** 30        ! 4 Left axis maximum
+** 0         ! 5 Right axis minimum
+** 2         ! 6 Right axis maximum
+** 1         ! nPlotsPerSim     ! 7 Number of plots per simulation
+** 12        ! 8 X-axis gridpoints
+** 0         ! 9 Shut off Online w/o removing
+** -1        ! 10 Logical unit for output file
+** 0         !11 Output file units
+** 0         ! 12 Output file delimiter
+** INPUTS 6     
+** tAmbDry Tv Tamb48 Tamb24 TambHS BoHS  
+** *******
+** tAmbDry Tv Tamb48 Tamb24 TambHS BoHS 
+** ****
+** LABELS  3     
+** Temp     
+** Ctrl     
+** Nix
+
+
+** UNIT 59 TYPE 65     ! Onlint Plotter Building
+** PARAMETERS 12     
+** 10        ! 1 Nb. of left-axis variables
+** 1        ! 2 Nb. of right-axis variables
+** 0      ! 3 Left axis minimum
+** 100       ! 4 Left axis maximum
+** 0        ! 5 Right axis minimum
+** 100      ! 6 Right axis maximum
+** 1        ! nPlotsPerSim     ! 7 Number of plots per simulation
+** 12       ! 8 X-axis gridpoints
+** 0        ! 9 Shut off Online w/o removing
+** -1       ! 10 Logical unit for output file
+** 0        ! 11 Output file units
+** 0        ! 12 Output file delimiter
+** INPUTS 11     
+** RHGfBedSW RHGfKit RHGfLiv RHGfBath RHGfBedSE RH1fBedSW RH1fKit RH1fLiv RH1fBath RH1fBedNE RH1fBedSE  
+** *******
+** RHGfBedSW RHGfKit RHGfLiv RHGfBath RHGfBedSE RH1fBedSW RH1fKit RH1fLiv RH1fBath RH1fBedNE RH1fBedSE 
+** ****
+** LABELS  3     
+** RH%     
+** Nix     
+** Nix
+** UNIT 59 TYPE 65     ! Onlint Plotter Building
+** PARAMETERS 12     
+** 2       ! 1 Nb. of left-axis variables
+** 1       ! 2 Nb. of right-axis variables
+** 0       ! 3 Left axis minimum
+** 100     ! 4 Left axis maximum
+** 0       ! 5 Right axis minimum
+** 60      ! 6 Right axis maximum
+** 1       ! nPlotsPerSim     ! 7 Number of plots per simulation
+** 12      ! 8 X-axis gridpoints
+** 0       ! 9 Shut off Online w/o removing
+** -1      ! 10 Logical unit for output file
+** 0       ! 11 Output file units
+** 0       ! 12 Output file delimiter
+** INPUTS 3     
+** RHGfBedSW relHum MventGfBedSW  
+** *******
+** RHGfBedSW relHum MventGfBedSW  
+** ****
+** LABELS  3     
+** Rel.Hum     
+** Kg/h     
+** Nix
+
+** UNIT 59 TYPE 65     ! Onlint Plotter Building
+** PARAMETERS 12     
+** 6       ! 1 Nb. of left-axis variables
+** 3       ! 2 Nb. of right-axis variables
+** -20     ! 3 Left axis minimum
+** 40      ! 4 Left axis maximum
+** 0       ! 5 Right axis minimum
+** 2      ! 6 Right axis maximum
+** 1       ! nPlotsPerSim     ! 7 Number of plots per simulation
+** 12      ! 8 X-axis gridpoints
+** 0       ! 9 Shut off Online w/o removing
+** -1      ! 10 Logical unit for output file
+** 0       ! 11 Output file units
+** 0       ! 12 Output file delimiter
+** INPUTS 9     
+** tAmbDry Tamb48 TcGfBedSW TSupAirGfBedSW RHGfBedSW MventGfBedSW CtrlHRGfBedSW CtrlHRTamb CtrlHRTcGfBedSW 
+** *******
+** tAmbDry Tamb48 TcGfBedSW TSupAirGfBedSW RHGfBedSW MventGfBedSW CtrlHRGfBedSW CtrlHRTamb CtrlHRTcGfBedSW  
+** ****
+** LABELS  3     
+** Temp/RH%/Kg/h     
+** Control     
+** Nix
+*******************************
+*!LINK_STYLE
+*!LINK_STYLE_END

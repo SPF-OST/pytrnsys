@@ -87,7 +87,11 @@ class RunParallelTrnsys:
 
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
             self.getConfig()
-            self.runConfig()
+
+            result = self.runConfig()
+            if _res.isError(result):
+                _res.error(result).throw()
+
             self.runParallel()
         else:
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
@@ -243,8 +247,10 @@ class RunParallelTrnsys:
                             self.path = originalPath  # recall the original path, otherwise the next folder will be cerated inside the first
             else:
                 result = self.buildTrnsysDeck()
+
                 if _res.isError(result):
                     return _res.error(result)
+
                 self.createDecksFromVariant()
 
     def createDecksFromVariant(self, fitParameters={}):

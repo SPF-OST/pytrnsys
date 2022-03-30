@@ -10,6 +10,9 @@ _T = _tp.TypeVar("_T")
 class Error:  # pylint: disable= too-few-public-methods
     message: str
 
+    def throw(self):
+        raise RuntimeError(f"En error has occurred: {self.message}")
+
 
 Result = _tp.Union[_T, Error]
 

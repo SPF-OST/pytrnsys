@@ -1,0 +1,37 @@
+############# GENERIC##############################
+
+bool ignoreOnlinePlotter False
+int reduceCpu  2
+bool parseFileCreated True
+bool runCases True
+bool checkDeck True
+bool runParallel False
+
+############# AUTOMATIC WORK BOOL##############################
+
+bool doAutoUnitNumbering True
+bool generateUnitTypesUsed True
+bool addAutomaticEnergyBalance True
+bool combineAllCases True
+
+#############PATHS################################
+
+
+string trnsysExePath "C:\TRNSYS18\Exe\TrnEXE.exe"
+string addResultsFolder "Building_4Study"
+string HOME$ "$INPUT_FOLDER"
+string PYTRNSYS$ "$PYTRNSYS_FOLDER\data\ddcks"
+string runType "runFromConfig"
+
+
+deck dtSim 1
+deck START 0
+deck STOP 8760
+
+PYTRNSYS$ generic\head
+HOME$ 05_pytrnsys_Files\Building_4Study
+HOME$ 05_pytrnsys_Files\weather_data_base_2
+HOME$ 05_pytrnsys_Files\Type_985
+HOME$ 05_pytrnsys_Files\Ground_properties
+HOME$ 05_pytrnsys_Files\01_Weather_Data\Kasava_hour
+PYTRNSYS$ generic\end
