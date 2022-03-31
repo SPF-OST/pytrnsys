@@ -1,0 +1,1952 @@
+*********************************************************************************
+*  TRNBuild   3.0.298
+*********************************************************************************
+*   BUILDING DESCRIPTIONS FILE TRNSYS
+*   FOR BUILDING:   R:\Projekte\EU_PLURAL\SystemSimulationsAndTools\Demo_KASAVA\01_Simulations\02_Building_after_renovation\02_Model\Building_4Study.b18
+*   GET BY WORKING WITH TRNBuild 1.0 for Windows
+*********************************************************************************
+*
+*--------------------------------------------------------------------------------
+*  C o m m e n t s
+*--------------------------------------------------------------------------------
+*#C Originally created by TRNSIDF Version 1.81
+*--------------------------------------------------------------------------------
+*  P r o j e c t
+*--------------------------------------------------------------------------------
+*+++ PROJECT
+*+++ TITLE=UNDEFINED
+*+++ DESCRIPTION=UNDEFINED
+*+++ CREATED=UNDEFINED
+*+++ ADDRESS=UNDEFINED
+*+++ CITY=UNDEFINED
+*+++ SWITCH=UNDEFINED
+*--------------------------------------------------------------------------------
+*  P r o p e r t i e s
+*--------------------------------------------------------------------------------
+PROPERTIES
+ DENSITY=1.204 : CAPACITY=1.012 : PRESSURE=101325.000 : HVAPOR=2454.0 : SIGMA=2.041e-007 : RTEMP=293.15
+*--- convective heat transfer coefficient calculation ---------------------
+ KFLOORUP=7.2 : EFLOORUP=0.31 : KFLOORDOWN=3.888 : EFLOORDOWN=0.31
+ KCEILUP=7.2 : ECEILUP=0.31 : KCEILDOWN=3.888 : ECEILDOWN=0.31
+ KVERTICAL=5.76 : EVERTICAL=0.3
+*--- radiance parameters -------------------
+ SCENE_ROTATION_ANGLE=0 : GROUND_IDS= : GROUND_REFLECTANCE=0.2 : SHADER_REFLECTANCE=0
+ CALC_MODE=RAD : LATITUDE=48 : LONGITUDE=-9.2 : TIME_ZONE=-15 : SITE_ELEVATION=200
+ AB=5 : AD=1000 : AS=20 : AR=300 : AA=0.1
+ LR=6 : ST=0.15 : SJ=1 : LW=0.004 : DJ=0 : DS=0.2 : DR=2 : DP=512
+*--- comfort parameters -------------------
+ DIAM-SENSOR=0.07 : EPS-SENSOR=0.82 : REFL-SENSOR=0.47 : ELV_AIRSPEED1=0.3 : ELV_AIRSPEED2=0.7 : ELV_AIRSPEED3=1.2
+*--- other -------------------
+ FSCAL_TREGENZA=MEDIUM : SHM_MODE=0 : SURFGRID=0.2
+*--- daylight  -------------------
+ UDIMIN=100 : UDIMAX=2000 : DAMIN=300
+*
+*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+TYPES
+*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*
+*--------------------------------------------------------------------------------
+*  L a y e r s
+*--------------------------------------------------------------------------------
+LAYER PUTZ
+ CONDUCTIVITY=   2.52 : CAPACITY=      1 : DENSITY=   1400 : PERT=      0 : PENRT=      0
+LAYER KST
+ CONDUCTIVITY=  3.564 : CAPACITY=      1 : DENSITY=   1600 : PERT=      0 : PENRT=      0
+LAYER DAEMA
+ CONDUCTIVITY=  0.173 : CAPACITY=      1 : DENSITY=     60 : PERT=      0 : PENRT=      0
+LAYER GIPS
+ CONDUCTIVITY=  0.756 : CAPACITY=      1 : DENSITY=    900 : PERT=      0 : PENRT=      0
+LAYER HOLZ
+ CONDUCTIVITY=  0.468 : CAPACITY=    2.1 : DENSITY=    600 : PERT=      0 : PENRT=      0
+LAYER BET
+ CONDUCTIVITY=   7.56 : CAPACITY=      1 : DENSITY=   2200 : PERT=      0 : PENRT=      0
+LAYER TEPP
+ CONDUCTIVITY=  0.288 : CAPACITY=    1.3 : DENSITY=    700 : PERT=      0 : PENRT=      0
+LAYER ESTR
+ CONDUCTIVITY=   5.04 : CAPACITY=      1 : DENSITY=   2000 : PERT=      0 : PENRT=      0
+LAYER MIWO
+ CONDUCTIVITY=  0.144 : CAPACITY=      1 : DENSITY=     60 : PERT=      0 : PENRT=      0
+LAYER DAEMM
+ CONDUCTIVITY=  0.144 : CAPACITY=      1 : DENSITY=     60 : PERT=      0 : PENRT=      0
+LAYER Gipsboard
+ CONDUCTIVITY=  0.756 : CAPACITY=      1 : DENSITY=    900 : PERT=      0 : PENRT=      0
+LAYER Lime_plaster
+ CONDUCTIVITY=   3.13 : CAPACITY=   0.84 : DENSITY=   1600 : PERT=      0 : PENRT=      0
+LAYER Bricks
+ CONDUCTIVITY=   2.88 : CAPACITY=    0.9 : DENSITY=   1700 : PERT=      0 : PENRT=      0
+LAYER Lime-cement_plaster
+ CONDUCTIVITY=   3.56 : CAPACITY=   0.79 : DENSITY=   2000 : PERT=      0 : PENRT=      0
+LAYER Polystyrene_EPS
+ CONDUCTIVITY=   0.14 : CAPACITY=   1.27 : DENSITY=     15 : PERT=      0 : PENRT=      0
+LAYER Wood
+ CONDUCTIVITY=    0.5 : CAPACITY=   2.51 : DENSITY=    400 : PERT=      0 : PENRT=      0
+LAYER Concrete
+ CONDUCTIVITY=   4.43 : CAPACITY=   1.02 : DENSITY=   2100 : PERT=      0 : PENRT=      0
+LAYER Slag
+ CONDUCTIVITY=   0.97 : CAPACITY=   0.75 : DENSITY=    750 : PERT=      0 : PENRT=      0
+LAYER Cement_screed
+ CONDUCTIVITY=   4.18 : CAPACITY=   0.84 : DENSITY=   2000 : PERT=      0 : PENRT=      0
+LAYER Ceramic_block
+ CONDUCTIVITY=   2.16 : CAPACITY=   0.96 : DENSITY=    710 : PERT=      0 : PENRT=      0
+LAYER Mineral_wool
+ CONDUCTIVITY=   0.14 : CAPACITY=   0.88 : DENSITY=     50 : PERT=      0 : PENRT=      0
+LAYER Fiberboard
+ CONDUCTIVITY=   0.62 : CAPACITY=   1.74 : DENSITY=    922 : PERT=      0 : PENRT=      0
+LAYER Sheet_metal
+ CONDUCTIVITY=  208.8 : CAPACITY=   0.88 : DENSITY=   8000 : PERT=      0 : PENRT=      0
+LAYER Stone_cladding
+ CONDUCTIVITY=    108 : CAPACITY=      1 : DENSITY=   2500 : PERT=      0 : PENRT=      0
+LAYER PUR_Plate_022
+ CONDUCTIVITY= 0.0792 : CAPACITY=    1.4 : DENSITY=     30 : PERT=      0 : PENRT=      0
+LAYER Wood_fiber_plate
+ CONDUCTIVITY=   0.13 : CAPACITY=    2.1 : DENSITY=    110 : PERT=      0 : PENRT=      0
+LAYER Ventil_gap
+ CONDUCTIVITY=  0.093 : CAPACITY=      1 : DENSITY=    1.2 : PERT=      0 : PENRT=      0
+LAYER Gipsfiber_plate
+ CONDUCTIVITY=   1.15 : CAPACITY=    1.1 : DENSITY=   1150 : PERT=      0 : PENRT=      0
+LAYER Timber10%_Min_wool90%
+ CONDUCTIVITY=   0.17 : CAPACITY=   1.04 : DENSITY=     85 : PERT=      0 : PENRT=      0
+LAYER ETICS_plaster
+ CONDUCTIVITY=   2.88 : CAPACITY=   0.79 : DENSITY=   2000 : PERT=      0 : PENRT=      0
+LAYER Act_Layer
+ PSPACING=   0.13 : PDIAMETER=  0.014 : PWALLTHICKNESS=  0.002 : PCONDUCTIVITY=   1.44 : CPFLUID= 4.18 : PERT=      0 : PENRT=      0
+LAYER Act_Layer_Fict
+ PSPACING=   0.13 : PDIAMETER=  0.014 : PWALLTHICKNESS=  0.002 : PCONDUCTIVITY=   1.44 : CPFLUID= 4.18 : PERT=      0 : PENRT=      0
+*--------------------------------------------------------------------------------
+*  I n p u t s
+*--------------------------------------------------------------------------------
+INPUTS TGROUND MfrGfWC MfrGfHall MfrGfBath MfrGfBedN MfrGfLiv MfrGfBedS MfrGfBedE Mfr1fWC Mfr1fHall Mfr1fBath Mfr1fLiv Mfr1fBedS Mfr1fBedE TSupGfWC TSupGfHall TSupGfBath TSupGfBedN TSupGfLiv TSupGfBedS TSupGfBedE TSup1fWC TSup1fHall TSup1fBath TSup1fLiv TSup1fBedS TSup1fBedE RHSupGfWC RHSupGfHall RHSupGfBath RHSupGfBedN RHSupGfLiv RHSupGfBedS RHSupGfBedE RHSup1fWC RHSup1fHall RHSup1fBath ;
+ RHSup1fLiv RHSup1fBedS RHSup1fBedE MfrActStair1 MfrActStair2 MfrActGfStor1 MfrActGfStor2 MfrActGfWC MfrActGfHall1 MfrActGfHall2 MfrActGfBath MfrActGfBedN1 MfrActGfBedN2 MfrActGfLiv1 MfrActGfLiv2 MfrActGfBedS MfrActGfBedE1 MfrActGfBedE2 MfrAct1fStor MfrAct1fWC MfrAct1fHall MfrAct1fBath MfrAct1fLiv1 MfrAct1fLiv2 MfrAct1fBedS MfrAct1fBedE TInActStair1 TInActStair2 TInActGfStor1 TInActGfStor2 ;
+ TInActGfWC TInActGfHall1 TInActGfHall2 TInActGfBath TInActGfBedN1 TInActGfBedN2 TInActGfLiv1 TInActGfLiv2 TInActGfBedS TInActGfBedE1 TInActGfBedE2 TInAct1fStor TInAct1fWC TInAct1fHall TInAct1fBath TInAct1fLiv1 TInAct1fLiv2 TInAct1fBedS TInAct1fBedE Shd_GfHall_NW Shd_GfHall_NE Shd_GfBath Shd_GfBedN Shd_GfLiv_SW Shd_GfLiv_SE Shd_GfBedS Shd_GfBedE_SE Shd_GfBedE_NE Shd_1fHall Shd_1fBath Shd_1fLiv_SW ;
+ Shd_1fLiv_SE Shd_1fBedS Shd_1fBedE
+INPUTS_DESCRIPTION
+ TGROUND : °C : Ground Temperature (boundary temperature used for floors adjacent to the ground)
+ MfrGfWC : any : Input
+ MfrGfHall : any : Input
+ MfrGfBath : any : Input
+ MfrGfBedN : any : Input
+ MfrGfLiv : any : Input
+ MfrGfBedS : any : Input
+ MfrGfBedE : any : Input
+ Mfr1fWC : any : Input
+ Mfr1fHall : any : Input
+ Mfr1fBath : any : Input
+ Mfr1fLiv : any : Input
+ Mfr1fBedS : any : Input
+ Mfr1fBedE : any : Input
+ TSupGfWC : any : Input
+ TSupGfHall : any : Input
+ TSupGfBath : any : Input
+ TSupGfBedN : any : Input
+ TSupGfLiv : any : Input
+ TSupGfBedS : any : Input
+ TSupGfBedE : any : Input
+ TSup1fWC : any : Input
+ TSup1fHall : any : Input
+ TSup1fBath : any : Input
+ TSup1fLiv : any : Input
+ TSup1fBedS : any : Input
+ TSup1fBedE : any : Input
+ RHSupGfWC : any : Input
+ RHSupGfHall : any : Input
+ RHSupGfBath : any : Input
+ RHSupGfBedN : any : Input
+ RHSupGfLiv : any : Input
+ RHSupGfBedS : any : Input
+ RHSupGfBedE : any : Input
+ RHSup1fWC : any : Input
+ RHSup1fHall : any : Input
+ RHSup1fBath : any : Input
+ RHSup1fLiv : any : Input
+ RHSup1fBedS : any : Input
+ RHSup1fBedE : any : Input
+ MfrActStair1 : any : Input
+ MfrActStair2 : any : Input
+ MfrActGfStor1 : any : Input
+ MfrActGfStor2 : any : Input
+ MfrActGfWC : any : Input
+ MfrActGfHall1 : any : Input
+ MfrActGfHall2 : any : Input
+ MfrActGfBath : any : Input
+ MfrActGfBedN1 : any : Input
+ MfrActGfBedN2 : any : Input
+ MfrActGfLiv1 : any : Input
+ MfrActGfLiv2 : any : Input
+ MfrActGfBedS : any : Input
+ MfrActGfBedE1 : any : Input
+ MfrActGfBedE2 : any : Input
+ MfrAct1fStor : any : Input
+ MfrAct1fWC : any : Input
+ MfrAct1fHall : any : Input
+ MfrAct1fBath : any : Input
+ MfrAct1fLiv1 : any : Input
+ MfrAct1fLiv2 : any : Input
+ MfrAct1fBedS : any : Input
+ MfrAct1fBedE : any : Input
+ TInActStair1 : any : Input
+ TInActStair2 : any : Input
+ TInActGfStor1 : any : Input
+ TInActGfStor2 : any : Input
+ TInActGfWC : any : Input
+ TInActGfHall1 : any : Input
+ TInActGfHall2 : any : Input
+ TInActGfBath : any : Input
+ TInActGfBedN1 : any : Input
+ TInActGfBedN2 : any : Input
+ TInActGfLiv1 : any : Input
+ TInActGfLiv2 : any : Input
+ TInActGfBedS : any : Input
+ TInActGfBedE1 : any : Input
+ TInActGfBedE2 : any : Input
+ TInAct1fStor : any : Input
+ TInAct1fWC : any : Input
+ TInAct1fHall : any : Input
+ TInAct1fBath : any : Input
+ TInAct1fLiv1 : any : Input
+ TInAct1fLiv2 : any : Input
+ TInAct1fBedS : any : Input
+ TInAct1fBedE : any : Input
+ Shd_GfHall_NW : any : Input
+ Shd_GfHall_NE : any : Input
+ Shd_GfBath : any : Input
+ Shd_GfBedN : any : Input
+ Shd_GfLiv_SW : any : Input
+ Shd_GfLiv_SE : any : Input
+ Shd_GfBedS : any : Input
+ Shd_GfBedE_SE : any : Input
+ Shd_GfBedE_NE : any : Input
+ Shd_1fHall : any : Input
+ Shd_1fBath : any : Input
+ Shd_1fLiv_SW : any : Input
+ Shd_1fLiv_SE : any : Input
+ Shd_1fBedS : any : Input
+ Shd_1fBedE : any : Input
+*--------------------------------------------------------------------------------
+*  S c h e d u l e s
+*--------------------------------------------------------------------------------
+SCHEDULE WORKDAY
+ HOURS =0.000 8.000 18.000 24.0
+ VALUES=0 1. 0 0 
+SCHEDULE WEEKEND
+ HOURS =0.000 1.000 24.0
+ VALUES=0 0 0 
+SCHEDULE WORKLIGHT
+ HOURS =0.000 8.000 18.000 24.0
+ VALUES=0 1. 0 0 
+SCHEDULE DAYNIGHT
+ HOURS =0.000 6.000 18.000 24.0
+ VALUES=0 1. 0 0 
+SCHEDULE People_SIA2024
+ HOURS =0.000 6.000 7.000 8.000 12.000 13.000 14.000 17.000 18.000 21.000 24.0
+ VALUES=1. 0.6 0.4 0 0.8 0.4 0 0.4 0.8 1. 1. 
+SCHEDULE Equipment_SIA2024
+ HOURS =0.000 5.000 6.000 7.000 8.000 12.000 13.000 14.000 17.000 18.000 19.000 20.000 23.000 24.0
+ VALUES=0.1 0.2 0.8 0.2 0.1 0.8 0.2 0.1 0.2 0.8 1. 0.2 0.1 0.1 
+SCHEDULE Light_SIA2024
+ HOURS =0.000 6.000 8.000 12.000 14.000 18.000 21.000 24.0
+ VALUES=0 1. 0 1. 0 1. 0 0 
+SCHEDULE Radiator
+ HOURS =0.000 6.000 8.000 18.000 22.000 24.0
+ VALUES=0 1. 0 1. 0 0 
+SCHEDULE USE
+ DAYS=1 2 3 4 5 6 7
+ HOURLY=WORKDAY WORKDAY WORKDAY WORKDAY WORKDAY WEEKEND WEEKEND
+SCHEDULE LIGHT
+ DAYS=1 2 3 4 5 6 7
+ HOURLY=WORKLIGHT WORKLIGHT WORKLIGHT WORKLIGHT WORKLIGHT WEEKEND WEEKEND
+SCHEDULE SETOFF
+ DAYS=1 2 3 4 5 6 7
+ HOURLY=DAYNIGHT DAYNIGHT DAYNIGHT DAYNIGHT DAYNIGHT WEEKEND WEEKEND
+*--------------------------------------------------------------------------------
+*  C O N S T R U C T I O N (Wall, Floor, Ceiling,..)
+*--------------------------------------------------------------------------------
+CONSTRUCTION Int_ceiling
+ LAYERS   = Wood  Concrete Slag  Cement_screed Ceramic_block Lime-cement_plaster 
+ THICKNESS= 0.02  0.08     0.18  0.02          0.08          0.02                
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 11
+CONSTRUCTION Basement_floor
+ LAYERS   = Concrete 
+ THICKNESS= 0.15     
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 0.0001
+CONSTRUCTION Int_wall
+ LAYERS   = Lime_plaster Bricks Lime_plaster 
+ THICKNESS= 0.025        0.12   0.025        
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 11
+CONSTRUCTION Basement_wall_to_GRD
+ LAYERS   = Lime_plaster Bricks Stone_cladding 
+ THICKNESS= 0.025        0.45   0.05           
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 0.0001
+CONSTRUCTION Ext_door
+ LAYERS   = Wood  
+ THICKNESS= 0.08  
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 64
+CONSTRUCTION Basement_ceiling
+ LAYERS   = Concrete Slag  Cement_screed Ceramic_block Lime-cement_plaster PUR_Plate_022 Gipsboard 
+ THICKNESS= 0.08     0.17  0.02          0.08          0.02                0.05          0.012     
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 11
+CONSTRUCTION Roof
+ LAYERS   = Gipsfiber_plate Timber10%_Min_wool90% Wood_fiber_plate 
+ THICKNESS= 0.015           0.3                   0.1              
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 64
+CONSTRUCTION Ext_wall_new
+ LAYERS   = Gipsfiber_plate Mineral_wool Gipsfiber_plate Timber10%_Min_wool90% Wood_fiber_plate ETICS_plaster 
+ THICKNESS= 0.015           0.06         0.015           0.18                  0.05             0.003         
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 64
+CONSTRUCTION Ext_wall
+ LAYERS   = Lime_plaster Bricks Act_Layer_Fict Bricks Lime_plaster Mineral_wool Gipsfiber_plate Timber10%_Min_wool90% Gipsfiber_plate Wood_fiber_plate 
+ THICKNESS= 0.025        0.4    0              0.05   0.025        0.06         0.015           0.18                  0.015           0.05             
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 64
+CONSTRUCTION Ext_wall_dormer_side
+ LAYERS   = Lime_plaster Bricks Act_Layer_Fict Bricks Lime_plaster Mineral_wool Gipsfiber_plate Timber10%_Min_wool90% Wood_fiber_plate Sheet_metal 
+ THICKNESS= 0.02         0.25   0              0.04   0.03         0.06         0.01            0.18                  0.05             0.006       
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 11
+CONSTRUCTION Basement_wall_to_EXT
+ LAYERS   = Lime_plaster Bricks Stone_cladding 
+ THICKNESS= 0.025        0.45   0.05           
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 64
+CONSTRUCTION Ext_wall_new_ACT
+ LAYERS   = Gipsfiber_plate Act_Layer Gipsfiber_plate Mineral_wool Gipsfiber_plate Timber10%_Min_wool90% Wood_fiber_plate ETICS_plaster 
+ THICKNESS= 0.039           0         0.007           0.06         0.015           0.18                  0.05             0.003         
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 64
+CONSTRUCTION Ext_wall_ACT
+ LAYERS   = Lime_plaster Bricks Ventil_gap Lime_plaster Act_Layer Lime_plaster Mineral_wool Gipsfiber_plate Timber10%_Min_wool90% Gipsfiber_plate Wood_fiber_plate 
+ THICKNESS= 0.025        0.45   0.002      0.039        0         0.007        0.06         0.015           0.18                  0.015           0.05             
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 64
+CONSTRUCTION Int_wall_Stair
+ LAYERS   = Lime_plaster Polystyrene_EPS Bricks Lime_plaster 
+ THICKNESS= 0.025        0.1             0.12   0.025        
+ ABS-FRONT= 0.6   : ABS-BACK= 0.6  
+ EPS-FRONT= 0.9   : EPS-BACK= 0.9  
+ HFRONT   = 11 : HBACK= 11
+*--------------------------------------------------------------------------------
+*  W i n d o w s
+*--------------------------------------------------------------------------------
+WINDOW Ext_window
+ WINID=14301 : HINSIDE=11 : HOUTSIDE=64 : SLOPE=-999 : SPACID=5 : WWID=0 : WHEIG=0 : FFRAME=0.2 : UFRAME=3.24 : ABSFRAME=0.6 : RISHADE=0 : RESHADE=0 : REFLISHADE=0.5 : REFLOSHADE=0.5 : CCISHADE=0.5 : EPSFRAME=0.9 : EPSISHADE=0.9 : ITSHADECLOSE=1 : ITSHADEOPEN=1 : FLOWTOAIRNODE=1 : PERT=0 : PENRT=0 : RADMATERIAL=undefined : RADMATERIAL_SHD1=undefined
+*--------------------------------------------------------------------------------
+*  G a i n s / L o s s e s
+*--------------------------------------------------------------------------------
+GAIN People
+ CONVECTIVE=SCHEDULE 7.2*People_SIA2024 : RADIATIVE=0 : HUMIDITY=SCHEDULE 0.0023*People_SIA2024 : ELPOWERFRAC=0 :  AREA_RELATED : CATEGORY=PEOPLE
+GAIN Equipment
+ CONVECTIVE=SCHEDULE 10.8*Equipment_SIA2024 : RADIATIVE=0 : HUMIDITY=0 : ELPOWERFRAC=0 :  AREA_RELATED : CATEGORY=EQUIPMENT
+GAIN Light
+ CONVECTIVE=SCHEDULE 6.12*Light_SIA2024 : RADIATIVE=0 : HUMIDITY=0 : ELPOWERFRAC=0 :  AREA_RELATED : CATEGORY=MISCELLANEOUS
+*--------------------------------------------------------------------------------
+*  C o m f o r t
+*--------------------------------------------------------------------------------
+*--------------------------------------------------------------------------------
+*  I n f i l t r a t i o n
+*--------------------------------------------------------------------------------
+INFILTRATION Infiltr_0_02
+ AIRCHANGE=0.02
+INFILTRATION Infiltr_0_04
+ AIRCHANGE=0.04
+INFILTRATION Infiltr_0_05
+ AIRCHANGE=0.05
+INFILTRATION Infiltr_0_06
+ AIRCHANGE=0.06
+INFILTRATION Infiltr_0_11
+ AIRCHANGE=0.11
+*--------------------------------------------------------------------------------
+*  V e n t i l a t i o n
+*--------------------------------------------------------------------------------
+VENTILATION GfWC
+ TEMPERATURE=INPUT 1*TSupGfWC
+ AIRFLOW=INPUT 1*MfrGfWC
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSupGfWC
+ RELMAXHUM=INPUT 1*RHSupGfWC
+ CALCQAHU=0
+VENTILATION GfHall
+ TEMPERATURE=INPUT 1*TSupGfHall
+ AIRFLOW=INPUT 1*MfrGfHall
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSupGfHall
+ RELMAXHUM=INPUT 1*RHSupGfHall
+ CALCQAHU=0
+VENTILATION GfBath
+ TEMPERATURE=INPUT 1*TSupGfBath
+ AIRFLOW=INPUT 1*MfrGfBath
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSupGfBath
+ RELMAXHUM=INPUT 1*RHSupGfBath
+ CALCQAHU=0
+VENTILATION GfBedN
+ TEMPERATURE=INPUT 1*TSupGfBedN
+ AIRFLOW=INPUT 1*MfrGfBedN
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSupGfBedN
+ RELMAXHUM=INPUT 1*RHSupGfBedN
+ CALCQAHU=0
+VENTILATION GfLiv
+ TEMPERATURE=INPUT 1*TSupGfLiv
+ AIRFLOW=INPUT 1*MfrGfLiv
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSupGfLiv
+ RELMAXHUM=INPUT 1*RHSupGfLiv
+ CALCQAHU=0
+VENTILATION GfBedS
+ TEMPERATURE=INPUT 1*TSupGfBedS
+ AIRFLOW=INPUT 1*MfrGfBedS
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSupGfBedS
+ RELMAXHUM=INPUT 1*RHSupGfBedS
+ CALCQAHU=0
+VENTILATION GfBedE
+ TEMPERATURE=INPUT 1*TSupGfBedE
+ AIRFLOW=INPUT 1*MfrGfBedE
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSupGfBedE
+ RELMAXHUM=INPUT 1*RHSupGfBedE
+ CALCQAHU=0
+VENTILATION 1fWC
+ TEMPERATURE=INPUT 1*TSup1fWC
+ AIRFLOW=INPUT 1*Mfr1fWC
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSup1fWC
+ RELMAXHUM=INPUT 1*RHSup1fWC
+ CALCQAHU=0
+VENTILATION 1fHall
+ TEMPERATURE=INPUT 1*TSup1fHall
+ AIRFLOW=INPUT 1*Mfr1fHall
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSup1fHall
+ RELMAXHUM=INPUT 1*RHSup1fHall
+ CALCQAHU=0
+VENTILATION 1fBath
+ TEMPERATURE=INPUT 1*TSup1fBath
+ AIRFLOW=INPUT 1*Mfr1fBath
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSup1fBath
+ RELMAXHUM=INPUT 1*RHSup1fBath
+ CALCQAHU=0
+VENTILATION 1fLiv
+ TEMPERATURE=INPUT 1*TSup1fLiv
+ AIRFLOW=INPUT 1*Mfr1fLiv
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSup1fLiv
+ RELMAXHUM=INPUT 1*RHSup1fLiv
+ CALCQAHU=0
+VENTILATION 1fBedS
+ TEMPERATURE=INPUT 1*TSup1fBedS
+ AIRFLOW=INPUT 1*Mfr1fBedS
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSup1fBedS
+ RELMAXHUM=INPUT 1*RHSup1fBedS
+ CALCQAHU=0
+VENTILATION 1fBedE
+ TEMPERATURE=INPUT 1*TSup1fBedE
+ AIRFLOW=INPUT 1*Mfr1fBedE
+ SPECFANPOWER=0
+ SENSHR=0
+ RELMINHUM=INPUT 1*RHSup1fBedE
+ RELMAXHUM=INPUT 1*RHSup1fBedE
+ CALCQAHU=0
+*--------------------------------------------------------------------------------
+*  C o o l i n g
+*--------------------------------------------------------------------------------
+*--------------------------------------------------------------------------------
+*  H e a t i n g
+*--------------------------------------------------------------------------------
+HEATING Radiator
+ ON=SCHEDULE 23*Radiator
+ POWER=1800
+ HUMIDITY=0
+ RRAD=0
+ ELPOWERFRAC=0
+ AREA_RELATED_POWER=0
+*--------------------------------------------------------------------------------
+*  D a y l i g h t   C o n t r o l 
+*--------------------------------------------------------------------------------
+*
+*--------------------------------------------------------------------------------
+*  Z o n e s
+*--------------------------------------------------------------------------------
+ZONES Stair Cel GfStor GfWC GfHall GfBath GfBedN GfLiv GfBedS GfBedE 1fStor 1fWC 1fHall 1fBath 1fLiv 1fBedS 1fBedE
+*--------------------------------------------------------------------------------
+*  O r i e n t a t i o n s
+*--------------------------------------------------------------------------------
+HEMISPHERE NORTHERN
+ORIENTATIONS S_345_20 S_345_40 S_345_90 W_75_90 N_165_20 N_165_40 N_165_90 E_255_90
+*
+*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+BUILDING
+*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*
+*--------------------------------------------------------------------------------
+*  Z o n e  Stair  /  A i r n o d e  Stair
+*--------------------------------------------------------------------------------
+ZONE Stair
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=MANUAL : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE Stair
+WALL         =Int_wall_Stair : SURF=  1 : AREA=     18.25 : ADJACENT=1fLiv : ADJ_SURF=157 : FRONT : GEOSURF=0.029059
+WALL         =Int_wall   : SURF=  2 : AREA=     9.754 : ADJACENT=Cel : ADJ_SURF=18 : FRONT : GEOSURF=0.01553
+WALL         =Int_wall_Stair : SURF=  3 : AREA=     9.604 : ADJACENT=GfHall : ADJ_SURF=68 : FRONT : GEOSURF=0.015291
+ROOF         =Roof       : SURF=  4 : AREA=    15.356 : EXTERNAL : ORI=N_165_40 : FSKY=0.87
+WALL         =Int_wall_Stair : SURF=  5 : AREA=     8.081 : ADJACENT=1fStor : ADJ_SURF=125 : FRONT : GEOSURF=0.012866
+WALL         =Int_wall_Stair : SURF=  6 : AREA=     6.074 : ADJACENT=GfWC : ADJ_SURF=62 : FRONT : GEOSURF=0.009671
+WALL         =Ext_wall_dormer_side : SURF=  7 : AREA=    10.435 : ADJACENT=1fHall : ADJ_SURF=145 : FRONT : GEOSURF=0.016616 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+WALL         =Basement_wall_to_GRD : SURF=  8 : AREA=     5.617 : BOUNDARY=INPUT 1*TGROUND : GEOSURF=0.008944
+FLOOR        =Basement_floor : SURF=  9 : AREA=    11.506 : BOUNDARY=INPUT 1*TGROUND : GEOSURF=0.8
+WALL         =Ext_wall_new_ACT : SURF= 10 : AREA=      8.41 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.013391 : INTEMP = INPUT 1*TInActStair2 : MFLOW = INPUT 1*MfrActStair2 : NLOOP = 1 : MFLOWMIN = 4
+WINDOW=Ext_window : SURF= 16 : AREA=     2.025 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.003224
+WALL         =Ext_wall_ACT : SURF= 11 : AREA=    11.718 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.015059 : INTEMP = INPUT 1*TInActStair1 : MFLOW = INPUT 1*MfrActStair1 : NLOOP = 1 : MFLOWMIN = 7
+WALL         =Int_wall_Stair : SURF= 12 : AREA=    12.116 : ADJACENT=GfLiv : ADJ_SURF=99 : FRONT : GEOSURF=0.019291
+WALL         =Int_wall   : SURF= 13 : AREA=     7.731 : ADJACENT=Cel : ADJ_SURF=35 : FRONT : GEOSURF=0.01231
+WALL         =Int_wall   : SURF= 14 : AREA=     9.754 : ADJACENT=Cel : ADJ_SURF=39 : FRONT : GEOSURF=0.01553
+WALL         =Int_wall_Stair : SURF= 15 : AREA=     6.042 : ADJACENT=GfStor : ADJ_SURF=52 : FRONT : GEOSURF=0.00962
+ REGIME
+ INFILTRATION= Infiltr_0_02
+ CAPACITANCE = 126.965 : VOLUME= 105.805 : REFAREA= 11.506  : TINITIAL= 15      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  Cel  /  A i r n o d e  Cel
+*--------------------------------------------------------------------------------
+ZONE Cel
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=3D_DATA : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE Cel
+WALL         =Int_wall   : SURF= 18 : AREA=     9.754 : ADJACENT=Stair : ADJ_SURF=2 : BACK : GEOSURF=0.01373
+WALL         =Ext_door   : SURF= 19 : AREA=     7.706 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.010847
+WALL         =Basement_wall_to_EXT : SURF= 20 : AREA=    13.299 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.018721
+WINDOW=Ext_window : SURF= 42 : AREA=     0.291 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.00041
+WINDOW=Ext_window : SURF= 43 : AREA=     0.291 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.00041
+WALL         =Basement_wall_to_GRD : SURF= 21 : AREA=     3.348 : BOUNDARY=INPUT 1*TGROUND : GEOSURF=0.004713
+WALL         =Basement_wall_to_GRD : SURF= 22 : AREA=    11.639 : BOUNDARY=INPUT 1*TGROUND : GEOSURF=0.016384
+WALL         =Basement_wall_to_EXT : SURF= 23 : AREA=       0.7 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.000985
+WALL         =Basement_wall_to_GRD : SURF= 24 : AREA=    20.163 : BOUNDARY=INPUT 1*TGROUND : GEOSURF=0.028382
+WALL         =Basement_wall_to_GRD : SURF= 25 : AREA=    14.453 : BOUNDARY=INPUT 1*TGROUND : GEOSURF=0.020344
+WALL         =Basement_wall_to_EXT : SURF= 26 : AREA=    15.044 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.021177
+WINDOW=Ext_window : SURF= 44 : AREA=      0.56 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.000788
+WINDOW=Ext_window : SURF= 45 : AREA=     0.281 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.000395
+WINDOW=Ext_window : SURF= 46 : AREA=      0.56 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.000788
+WALL         =Basement_wall_to_GRD : SURF= 27 : AREA=    10.797 : BOUNDARY=INPUT 1*TGROUND : GEOSURF=0.015198
+WALL         =Basement_wall_to_EXT : SURF= 28 : AREA=     2.662 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.003748
+CEILING      =Basement_ceiling : SURF= 29 : AREA=    20.967 : ADJACENT=GfBedE : ADJ_SURF=114 : FRONT
+CEILING      =Basement_ceiling : SURF= 30 : AREA=    11.122 : ADJACENT=GfBath : ADJ_SURF=79 : FRONT
+CEILING      =Basement_ceiling : SURF= 31 : AREA=    11.713 : ADJACENT=GfBedS : ADJ_SURF=105 : FRONT
+FLOOR        =Basement_floor : SURF= 32 : AREA=   126.346 : BOUNDARY=INPUT 1*TGROUND : GEOSURF=0.8
+CEILING      =Basement_ceiling : SURF= 33 : AREA=    23.041 : ADJACENT=GfHall : ADJ_SURF=66 : BACK
+WALL         =Basement_wall_to_EXT : SURF= 34 : AREA=      1.26 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.001774
+WALL         =Int_wall   : SURF= 35 : AREA=     7.731 : ADJACENT=Stair : ADJ_SURF=13 : BACK : GEOSURF=0.010883
+CEILING      =Basement_ceiling : SURF= 36 : AREA=     3.438 : ADJACENT=GfWC : ADJ_SURF=61 : FRONT
+CEILING      =Basement_ceiling : SURF= 37 : AREA=    16.399 : ADJACENT=GfBedN : ADJ_SURF=92 : FRONT
+CEILING      =Basement_ceiling : SURF= 38 : AREA=    36.246 : ADJACENT=GfLiv : ADJ_SURF=98 : FRONT
+WALL         =Int_wall   : SURF= 39 : AREA=     9.754 : ADJACENT=Stair : ADJ_SURF=14 : BACK : GEOSURF=0.01373
+CEILING      =Basement_ceiling : SURF= 40 : AREA=      3.42 : ADJACENT=GfStor : ADJ_SURF=53 : FRONT
+WALL         =Basement_wall_to_EXT : SURF= 41 : AREA=    10.138 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.014271
+WINDOW=Ext_window : SURF= 47 : AREA=      0.55 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.000774
+WINDOW=Ext_window : SURF= 48 : AREA=      0.55 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.000774
+WINDOW=Ext_window : SURF= 49 : AREA=      0.55 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.000774
+ REGIME
+ INFILTRATION= Infiltr_0_06
+ CAPACITANCE = 388.134 : VOLUME= 323.445 : REFAREA= 126.346 : TINITIAL= 15      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  GfStor  /  A i r n o d e  GfStor
+*--------------------------------------------------------------------------------
+ZONE GfStor
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=3D_DATA : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE GfStor
+CEILING      =Int_ceiling : SURF= 50 : AREA=      3.42 : ADJACENT=1fStor : ADJ_SURF=121 : FRONT
+WALL         =Int_wall_Stair : SURF= 51 : AREA=     5.724 : ADJACENT=GfWC : ADJ_SURF=57 : FRONT : GEOSURF=0.048649
+WALL         =Int_wall_Stair : SURF= 52 : AREA=     6.042 : ADJACENT=Stair : ADJ_SURF=15 : BACK : GEOSURF=0.05135
+FLOOR        =Basement_ceiling : SURF= 53 : AREA=      3.42 : ADJACENT=Cel : ADJ_SURF=40 : BACK : GEOSURF=0.8
+WALL         =Ext_wall_ACT : SURF= 54 : AREA=     5.438 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.046214 : INTEMP = INPUT 1*TInActGfStor1 : MFLOW = INPUT 1*MfrActGfStor1 : NLOOP = 1 : MFLOWMIN = 6
+WINDOW=Ext_window : SURF= 56 : AREA=     0.605 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.005138
+WALL         =Ext_wall_ACT : SURF= 55 : AREA=     5.724 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.048649 : INTEMP = INPUT 1*TInActGfStor2 : MFLOW = INPUT 1*MfrActGfStor2 : NLOOP = 1 : MFLOWMIN = 6
+ REGIME
+ INFILTRATION= Infiltr_0_05
+ CAPACITANCE = 13.051  : VOLUME= 10.876  : REFAREA= 3.42    : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  GfWC  /  A i r n o d e  GfWC
+*--------------------------------------------------------------------------------
+ZONE GfWC
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=3D_DATA : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE GfWC
+WALL         =Int_wall_Stair : SURF= 57 : AREA=     5.724 : ADJACENT=GfStor : ADJ_SURF=51 : BACK : GEOSURF=0.048518
+WALL         =Ext_wall_ACT : SURF= 58 : AREA=     6.074 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.051482 : INTEMP = INPUT 1*TInActGfWC : MFLOW = INPUT 1*MfrActGfWC : NLOOP = 1 : MFLOWMIN = 6
+WALL         =Int_wall   : SURF= 59 : AREA=     5.724 : ADJACENT=GfHall : ADJ_SURF=74 : FRONT : GEOSURF=0.048518
+CEILING      =Int_ceiling : SURF= 60 : AREA=     3.438 : ADJACENT=1fStor : ADJ_SURF=122 : FRONT
+FLOOR        =Basement_ceiling : SURF= 61 : AREA=     3.438 : ADJACENT=Cel : ADJ_SURF=36 : BACK : GEOSURF=0.8
+WALL         =Int_wall_Stair : SURF= 62 : AREA=     6.074 : ADJACENT=Stair : ADJ_SURF=6 : BACK : GEOSURF=0.051482
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_05
+ VENTILATION = GfWC
+ CAPACITANCE = 13.119  : VOLUME= 10.933  : REFAREA= 3.438   : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  GfHall  /  A i r n o d e  GfHall
+*--------------------------------------------------------------------------------
+ZONE GfHall
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=MANUAL : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE GfHall
+WALL         =Int_wall   : SURF= 63 : AREA=    13.833 : ADJACENT=GfBedE : ADJ_SURF=111 : FRONT : GEOSURF=0.828413
+CEILING      =Int_ceiling : SURF= 64 : AREA=       1.8 : ADJACENT=1fWC : ADJ_SURF=130 : FRONT
+WALL         =Ext_wall_ACT : SURF= 65 : AREA=     1.959 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.003038 : INTEMP = INPUT 1*TInActGfHall1 : MFLOW = INPUT 1*MfrActGfHall1 : NLOOP = 1 : MFLOWMIN = 6
+WINDOW=Ext_window : SURF= 77 : AREA=      1.38 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.00382 : ESHADE=INPUT 1*Shd_GfHall_NE
+CEILING      =Basement_ceiling : SURF= 66 : AREA=    23.041 : ADJACENT=Cel : ADJ_SURF=33 : FRONT
+WALL         =Int_wall   : SURF= 67 : AREA=    11.798 : ADJACENT=GfLiv : ADJ_SURF=97 : FRONT : GEOSURF=0.024233
+WALL         =Int_wall_Stair : SURF= 68 : AREA=     9.604 : ADJACENT=Stair : ADJ_SURF=3 : BACK : GEOSURF=0.019726
+CEILING      =Int_ceiling : SURF= 69 : AREA=     4.001 : ADJACENT=1fBedE : ADJ_SURF=188 : BACK
+WALL         =Int_wall   : SURF= 70 : AREA=    13.833 : ADJACENT=GfBedN : ADJ_SURF=91 : FRONT : GEOSURF=0.028413
+WALL         =Int_wall   : SURF= 71 : AREA=    11.989 : ADJACENT=GfBath : ADJ_SURF=81 : FRONT : GEOSURF=0.024624
+CEILING      =Int_ceiling : SURF= 72 : AREA=     17.24 : ADJACENT=1fHall : ADJ_SURF=136 : BACK
+WALL         =Ext_wall_ACT : SURF= 73 : AREA=     8.703 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.017875 : INTEMP = INPUT 1*TInActGfHall2 : MFLOW = INPUT 1*MfrActGfHall2 : NLOOP = 1 : MFLOWMIN = 7
+WINDOW=Ext_window : SURF= 78 : AREA=     1.442 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.002961 : ESHADE=INPUT 1*Shd_GfHall_NW
+WALL         =Int_wall   : SURF= 74 : AREA=     5.724 : ADJACENT=GfWC : ADJ_SURF=59 : BACK : GEOSURF=0.011757
+WALL         =Int_wall   : SURF= 75 : AREA=     9.381 : ADJACENT=GfBath : ADJ_SURF=83 : FRONT : GEOSURF=0.019268
+WALL         =Int_wall   : SURF= 76 : AREA=     7.727 : ADJACENT=GfBedS : ADJ_SURF=106 : FRONT : GEOSURF=0.015872
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_05
+ VENTILATION = GfHall
+ CAPACITANCE = 87.924  : VOLUME= 73.27   : REFAREA= 23.04   : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  GfBath  /  A i r n o d e  GfBath
+*--------------------------------------------------------------------------------
+ZONE GfBath
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=3D_DATA : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE GfBath
+FLOOR        =Basement_ceiling : SURF= 79 : AREA=    11.122 : ADJACENT=Cel : ADJ_SURF=30 : BACK : GEOSURF=0.8
+WALL         =Ext_wall_ACT : SURF= 80 : AREA=      7.94 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.037153 : INTEMP = INPUT 1*TInActGfBath : MFLOW = INPUT 1*MfrActGfBath : NLOOP = 1 : MFLOWMIN = 7
+WINDOW=Ext_window : SURF= 85 : AREA=     1.441 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.006746 : ESHADE=INPUT 1*Shd_GfBath
+WALL         =Int_wall   : SURF= 81 : AREA=    11.989 : ADJACENT=GfHall : ADJ_SURF=71 : BACK : GEOSURF=0.056101
+CEILING      =Int_ceiling : SURF= 82 : AREA=    11.122 : ADJACENT=1fBath : ADJ_SURF=154 : FRONT
+WALL         =Int_wall   : SURF= 83 : AREA=     9.381 : ADJACENT=GfHall : ADJ_SURF=75 : BACK : GEOSURF=0.043899
+WALL         =Int_wall   : SURF= 84 : AREA=    11.989 : ADJACENT=GfBedN : ADJ_SURF=90 : FRONT : GEOSURF=0.056101
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_05
+ VENTILATION = GfBath
+ CAPACITANCE = 42.44   : VOLUME= 35.366  : REFAREA= 11.122  : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  GfBedN  /  A i r n o d e  GfBedN
+*--------------------------------------------------------------------------------
+ZONE GfBedN
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=MANUAL : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE GfBedN
+WALL         =Ext_wall_ACT : SURF= 86 : AREA=    10.609 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.039225 : INTEMP = INPUT 1*TInActGfBedN1 : MFLOW = INPUT 1*MfrActGfBedN1 : NLOOP = 1 : MFLOWMIN = 7
+WINDOW=Ext_window : SURF= 93 : AREA=      1.38 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.007203 : ESHADE=INPUT 1*Shd_GfBedN
+CEILING      =Int_ceiling : SURF= 87 : AREA=     2.036 : ADJACENT=1fBath : ADJ_SURF=149 : FRONT
+WALL         =Ext_wall_ACT : SURF= 88 : AREA=    13.833 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.053572 : INTEMP = INPUT 1*TInActGfBedN2 : MFLOW = INPUT 1*MfrActGfBedN2 : NLOOP = 1 : MFLOWMIN = 7.5
+CEILING      =Int_ceiling : SURF= 89 : AREA=    14.364 : ADJACENT=1fBedE : ADJ_SURF=181 : BACK
+WALL         =Int_wall   : SURF= 90 : AREA=    11.989 : ADJACENT=GfBath : ADJ_SURF=84 : BACK : GEOSURF=0.046429
+WALL         =Int_wall   : SURF= 91 : AREA=    13.833 : ADJACENT=GfHall : ADJ_SURF=70 : BACK : GEOSURF=0.053571
+FLOOR        =Basement_ceiling : SURF= 92 : AREA=      16.4 : ADJACENT=Cel : ADJ_SURF=37 : BACK : GEOSURF=0.8
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_05
+ VENTILATION = GfBedN
+ CAPACITANCE = 62.58   : VOLUME= 52.15   : REFAREA= 16.4    : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  GfLiv  /  A i r n o d e  GfLiv
+*--------------------------------------------------------------------------------
+ZONE GfLiv
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=MANUAL : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE GfLiv
+CEILING      =Int_ceiling : SURF= 94 : AREA=    36.246 : ADJACENT=1fLiv : ADJ_SURF=166 : FRONT
+WALL         =Int_wall   : SURF= 95 : AREA=    15.328 : ADJACENT=GfBedS : ADJ_SURF=108 : FRONT : GEOSURF=0.03906
+WALL         =Ext_wall_ACT : SURF= 96 : AREA=    12.438 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.032817 : INTEMP = INPUT 1*TInActGfLiv1 : MFLOW = INPUT 1*MfrActGfLiv1 : NLOOP = 1 : MFLOWMIN = 7.5
+WINDOW=Ext_window : SURF=103 : AREA=      2.89 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.006243 : ESHADE=INPUT 1*Shd_GfLiv_SW
+WALL         =Int_wall   : SURF= 97 : AREA=    11.798 : ADJACENT=GfHall : ADJ_SURF=67 : BACK : GEOSURF=0.030065
+FLOOR        =Basement_ceiling : SURF= 98 : AREA=    36.246 : ADJACENT=Cel : ADJ_SURF=38 : BACK : GEOSURF=0.8
+WALL         =Int_wall_Stair : SURF= 99 : AREA=    12.116 : ADJACENT=Stair : ADJ_SURF=12 : BACK : GEOSURF=0.030875
+WALL         =Ext_wall_ACT : SURF=100 : AREA=    17.654 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.040095 : INTEMP = INPUT 1*TInActGfLiv2 : MFLOW = INPUT 1*MfrActGfLiv2 : NLOOP = 1 : MFLOWMIN = 7.5
+WINDOW=Ext_window : SURF=101 : AREA=      3.13 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.010652 : ESHADE=INPUT 1*Shd_GfLiv_SE
+WINDOW=Ext_window : SURF=102 : AREA=      3.13 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.010193 : ESHADE=INPUT 1*Shd_GfLiv_SE
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_05
+ VENTILATION = GfLiv
+ CAPACITANCE = 138.316 : VOLUME= 115.264 : REFAREA= 36.246  : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  GfBedS  /  A i r n o d e  GfBedS
+*--------------------------------------------------------------------------------
+ZONE GfBedS
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=MANUAL : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE GfBedS
+WALL         =Ext_wall_ACT : SURF=104 : AREA=     4.597 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.016167 : INTEMP = INPUT 1*TInActGfBedS : MFLOW = INPUT 1*MfrActGfBedS : NLOOP = 1 : MFLOWMIN = 6
+WINDOW=Ext_window : SURF=110 : AREA=      3.13 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.01735 : ESHADE=INPUT 1*Shd_GfBedS
+FLOOR        =Basement_ceiling : SURF=105 : AREA=    11.713 : ADJACENT=Cel : ADJ_SURF=31 : BACK : GEOSURF=0.8
+WALL         =Int_wall   : SURF=106 : AREA=     7.727 : ADJACENT=GfHall : ADJ_SURF=76 : BACK : GEOSURF=0.033517
+WALL         =Int_wall   : SURF=107 : AREA=    15.328 : ADJACENT=GfBedE : ADJ_SURF=116 : FRONT : GEOSURF=0.066483
+WALL         =Int_wall   : SURF=108 : AREA=    15.328 : ADJACENT=GfLiv : ADJ_SURF=95 : BACK : GEOSURF=0.066483
+CEILING      =Int_ceiling : SURF=109 : AREA=    11.713 : ADJACENT=1fBedS : ADJ_SURF=170 : FRONT
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_05
+ VENTILATION = GfBedS
+ CAPACITANCE = 44.695  : VOLUME= 37.246  : REFAREA= 11.713  : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  GfBedE  /  A i r n o d e  GfBedE
+*--------------------------------------------------------------------------------
+ZONE GfBedE
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=MANUAL : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE GfBedE
+WALL         =Int_wall   : SURF=111 : AREA=    13.833 : ADJACENT=GfHall : ADJ_SURF=63 : BACK : GEOSURF=0.047437
+CEILING      =Int_ceiling : SURF=112 : AREA=    18.364 : ADJACENT=1fBedE : ADJ_SURF=185 : BACK
+WALL         =Ext_wall_ACT : SURF=113 : AREA=    13.558 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.046184 : INTEMP = INPUT 1*TInActGfBedE1 : MFLOW = INPUT 1*MfrActGfBedE1 : NLOOP = 1 : MFLOWMIN = 7.5
+WINDOW=Ext_window : SURF=118 : AREA=      1.77 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.006378 : ESHADE=INPUT 1*Shd_GfBedE_NE
+FLOOR        =Basement_ceiling : SURF=114 : AREA=    20.967 : ADJACENT=Cel : ADJ_SURF=29 : BACK : GEOSURF=0.8
+WALL         =Ext_wall_ACT : SURF=115 : AREA=    10.703 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.033103 : INTEMP = INPUT 1*TInActGfBedE2 : MFLOW = INPUT 1*MfrActGfBedE2 : NLOOP = 1 : MFLOWMIN = 7.5
+WINDOW=Ext_window : SURF=119 : AREA=      3.13 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.014334 : ESHADE=INPUT 1*Shd_GfBedE_SE
+WALL         =Int_wall   : SURF=116 : AREA=    15.328 : ADJACENT=GfBedS : ADJ_SURF=107 : BACK : GEOSURF=0.052564
+CEILING      =Int_ceiling : SURF=117 : AREA=     2.603 : ADJACENT=1fBedS : ADJ_SURF=171 : FRONT
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_05
+ VENTILATION = GfBedE
+ CAPACITANCE = 80.01   : VOLUME= 66.675  : REFAREA= 20.967  : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  1fStor  /  A i r n o d e  1fStor
+*--------------------------------------------------------------------------------
+ZONE 1fStor
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=3D_DATA : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE 1fStor
+WALL         =Ext_wall_dormer_side : SURF=120 : AREA=     2.386 : ADJACENT=1fWC : ADJ_SURF=133 : FRONT : GEOSURF=0.032086 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+FLOOR        =Int_ceiling : SURF=121 : AREA=      3.42 : ADJACENT=GfStor : ADJ_SURF=50 : BACK : GEOSURF=0.39895
+FLOOR        =Int_ceiling : SURF=122 : AREA=     3.438 : ADJACENT=GfWC : ADJ_SURF=60 : BACK : GEOSURF=0.40105
+ROOF         =Roof       : SURF=123 : AREA=     9.153 : EXTERNAL : ORI=N_165_40 : FSKY=0.87
+WALL         =Ext_wall_new_ACT : SURF=124 : AREA=     2.386 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.032086 : INTEMP = INPUT 1*TInAct1fStor : MFLOW = INPUT 1*MfrAct1fStor : NLOOP = 1 : MFLOWMIN = 3
+WALL         =Int_wall_Stair : SURF=125 : AREA=     8.081 : ADJACENT=Stair : ADJ_SURF=5 : BACK : GEOSURF=0.108671
+WALL         =Ext_wall_new : SURF=126 : AREA=     2.019 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.027157
+ REGIME
+ INFILTRATION= Infiltr_0_11
+ CAPACITANCE = 10.908  : VOLUME= 9.09    : REFAREA= 6.858   : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  1fWC  /  A i r n o d e  1fWC
+*--------------------------------------------------------------------------------
+ZONE 1fWC
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=3D_DATA : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE 1fWC
+WALL         =Ext_wall_ACT : SURF=127 : AREA=      3.04 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.032248 : INTEMP = INPUT 1*TInAct1fWC : MFLOW = INPUT 1*MfrAct1fWC : NLOOP = 1 : MFLOWMIN = 6
+ROOF         =Roof       : SURF=128 : AREA=     1.915 : EXTERNAL : ORI=N_165_20 : FSKY=0.97
+WALL         =Int_wall   : SURF=129 : AREA=     3.694 : ADJACENT=1fHall : ADJ_SURF=137 : FRONT : GEOSURF=0.039181
+FLOOR        =Int_ceiling : SURF=130 : AREA=       1.8 : ADJACENT=GfHall : ADJ_SURF=64 : BACK : GEOSURF=0.8
+WALL         =Ext_wall_dormer_side : SURF=131 : AREA=     3.674 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.038978 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+WALL         =Int_wall   : SURF=132 : AREA=      6.06 : ADJACENT=1fHall : ADJ_SURF=143 : FRONT : GEOSURF=0.064285
+WALL         =Ext_wall_dormer_side : SURF=133 : AREA=     2.386 : ADJACENT=1fStor : ADJ_SURF=120 : BACK : GEOSURF=0.025308 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_04
+ VENTILATION = 1fWC
+ CAPACITANCE = 7.272   : VOLUME= 6.06    : REFAREA= 1.8     : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  1fHall  /  A i r n o d e  1fHall
+*--------------------------------------------------------------------------------
+ZONE 1fHall
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=3D_DATA : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE 1fHall
+ROOF         =Roof       : SURF=134 : AREA=    18.341 : EXTERNAL : ORI=N_165_20 : FSKY=0.97
+WALL         =Ext_wall_dormer_side : SURF=135 : AREA=     0.287 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.000601 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+CEILING      =Int_ceiling : SURF=136 : AREA=     17.24 : ADJACENT=GfHall : ADJ_SURF=72 : FRONT
+WALL         =Int_wall   : SURF=137 : AREA=     3.694 : ADJACENT=1fWC : ADJ_SURF=129 : BACK : GEOSURF=0.007737
+WALL         =Ext_wall_dormer_side : SURF=138 : AREA=     2.375 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.004974 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+WALL         =Int_wall   : SURF=139 : AREA=    17.771 : ADJACENT=1fLiv : ADJ_SURF=163 : FRONT : GEOSURF=0.837226
+WALL         =Int_wall   : SURF=140 : AREA=    14.041 : ADJACENT=1fBath : ADJ_SURF=153 : FRONT : GEOSURF=0.029413
+WALL         =Int_wall   : SURF=141 : AREA=    15.387 : ADJACENT=1fBath : ADJ_SURF=155 : FRONT : GEOSURF=0.032232
+WALL         =Ext_wall_ACT : SURF=142 : AREA=     5.402 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.011316 : INTEMP = INPUT 1*TInAct1fHall : MFLOW = INPUT 1*MfrAct1fHall : NLOOP = 1 : MFLOWMIN = 6
+WINDOW=Ext_window : SURF=147 : AREA=     1.255 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.00263 : ESHADE=INPUT 1*Shd_1fHall
+WALL         =Int_wall   : SURF=143 : AREA=      6.06 : ADJACENT=1fWC : ADJ_SURF=132 : BACK : GEOSURF=0.012695
+WALL         =Int_wall   : SURF=144 : AREA=    14.226 : ADJACENT=1fBedS : ADJ_SURF=174 : FRONT : GEOSURF=0.029801
+WALL         =Ext_wall_dormer_side : SURF=145 : AREA=    10.435 : ADJACENT=Stair : ADJ_SURF=7 : BACK : GEOSURF=0.02186 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+WALL         =Ext_wall_dormer_side : SURF=146 : AREA=     4.542 : ADJACENT=1fBedE : ADJ_SURF=180 : FRONT : GEOSURF=0.009515 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_04
+ VENTILATION = 1fHall
+ CAPACITANCE = 85.189  : VOLUME= 70.991  : REFAREA= 17.24   : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  1fBath  /  A i r n o d e  1fBath
+*--------------------------------------------------------------------------------
+ZONE 1fBath
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=3D_DATA : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE 1fBath
+WALL         =Ext_wall_dormer_side : SURF=148 : AREA=     5.762 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.02131 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+FLOOR        =Int_ceiling : SURF=149 : AREA=     2.036 : ADJACENT=GfBedN : ADJ_SURF=87 : BACK : GEOSURF=0.123782
+ROOF         =Roof       : SURF=150 : AREA=    13.998 : EXTERNAL : ORI=N_165_20 : FSKY=0.97
+WALL         =Ext_wall_ACT : SURF=151 : AREA=     9.354 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.034595 : INTEMP = INPUT 1*TInAct1fBath : MFLOW = INPUT 1*MfrAct1fBath : NLOOP = 1 : MFLOWMIN = 6
+WINDOW=Ext_window : SURF=156 : AREA=     1.255 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.004643 : ESHADE=INPUT 1*Shd_1fBath
+WALL         =Ext_wall_dormer_side : SURF=152 : AREA=     8.279 : ADJACENT=1fBedE : ADJ_SURF=179 : FRONT : GEOSURF=0.030618 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+WALL         =Int_wall   : SURF=153 : AREA=    14.041 : ADJACENT=1fHall : ADJ_SURF=140 : BACK : GEOSURF=0.051928
+FLOOR        =Int_ceiling : SURF=154 : AREA=    11.122 : ADJACENT=GfBath : ADJ_SURF=82 : BACK : GEOSURF=0.676218
+WALL         =Int_wall   : SURF=155 : AREA=    15.387 : ADJACENT=1fHall : ADJ_SURF=141 : BACK : GEOSURF=0.056906
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_04
+ VENTILATION = 1fBath
+ CAPACITANCE = 58.803  : VOLUME= 49.003  : REFAREA= 13.157  : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  1fLiv  /  A i r n o d e  1fLiv
+*--------------------------------------------------------------------------------
+ZONE 1fLiv
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=MANUAL : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE 1fLiv
+WALL         =Int_wall_Stair : SURF=157 : AREA=     18.25 : ADJACENT=Stair : ADJ_SURF=1 : BACK : GEOSURF=0.041925
+WALL         =Ext_wall_new_ACT : SURF=158 : AREA=     8.321 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.019116 : INTEMP = INPUT 1*TInAct1fLiv1 : MFLOW = INPUT 1*MfrAct1fLiv1 : NLOOP = 1 : MFLOWMIN = 4
+WINDOW=Ext_window : SURF=167 : AREA=       4.5 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.010338 : ESHADE=INPUT 1*Shd_1fLiv_SW
+WALL         =Ext_wall_new : SURF=159 : AREA=     2.019 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.004639
+WALL         =Int_wall   : SURF=160 : AREA=     18.87 : ADJACENT=1fBedS : ADJ_SURF=176 : FRONT : GEOSURF=0.043351
+WALL         =Ext_wall_ACT : SURF=161 : AREA=     8.338 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.017777 : INTEMP = INPUT 1*TInAct1fLiv2 : MFLOW = INPUT 1*MfrAct1fLiv2 : NLOOP = 1 : MFLOWMIN = 7
+WINDOW=Ext_window : SURF=168 : AREA=      2.94 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.008132 : ESHADE=INPUT 1*Shd_1fLiv_SE
+ROOF         =Roof       : SURF=162 : AREA=    24.509 : EXTERNAL : ORI=S_345_40 : FSKY=0.87
+WALL         =Int_wall   : SURF=163 : AREA=    17.771 : ADJACENT=1fHall : ADJ_SURF=139 : BACK : GEOSURF=0.040825
+ROOF         =Roof       : SURF=164 : AREA=    19.024 : EXTERNAL : ORI=S_345_20 : FSKY=0.97
+WALL         =Ext_wall_dormer_side : SURF=165 : AREA=     6.049 : EXTERNAL : ORI=W_75_90 : FSKY=0.5 : GEOSURF=0.013897 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+FLOOR        =Int_ceiling : SURF=166 : AREA=    36.246 : ADJACENT=GfLiv : ADJ_SURF=94 : BACK : GEOSURF=0.8
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_05
+ VENTILATION = 1fLiv
+ CAPACITANCE = 142.629 : VOLUME= 118.858 : REFAREA= 36.246  : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  1fBedS  /  A i r n o d e  1fBedS
+*--------------------------------------------------------------------------------
+ZONE 1fBedS
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=MANUAL : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE 1fBedS
+WALL         =Ext_wall_ACT : SURF=169 : AREA=     6.089 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.017997 : INTEMP = INPUT 1*TInAct1fBedS : MFLOW = INPUT 1*MfrAct1fBedS : NLOOP = 1 : MFLOWMIN = 7
+WINDOW=Ext_window : SURF=177 : AREA=      2.94 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.011607 : ESHADE=INPUT 1*Shd_1fBedS
+FLOOR        =Int_ceiling : SURF=170 : AREA=    11.713 : ADJACENT=GfBedS : ADJ_SURF=109 : BACK : GEOSURF=0.654545
+FLOOR        =Int_ceiling : SURF=171 : AREA=     2.603 : ADJACENT=GfBedE : ADJ_SURF=117 : BACK : GEOSURF=0.145455
+WALL         =Ext_wall_dormer_side : SURF=172 : AREA=     6.049 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.019835 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+ROOF         =Roof       : SURF=173 : AREA=     15.23 : EXTERNAL : ORI=S_345_20 : FSKY=0.97
+WALL         =Int_wall   : SURF=174 : AREA=    14.226 : ADJACENT=1fHall : ADJ_SURF=144 : BACK : GEOSURF=0.046647
+WALL         =Ext_wall_dormer_side : SURF=175 : AREA=    12.821 : ADJACENT=1fBedE : ADJ_SURF=187 : FRONT : GEOSURF=0.04204 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+WALL         =Int_wall   : SURF=176 : AREA=     18.87 : ADJACENT=1fLiv : ADJ_SURF=160 : BACK : GEOSURF=0.061874
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_04
+ VENTILATION = 1fBedS
+ CAPACITANCE = 67.254  : VOLUME= 56.045  : REFAREA= 14.315  : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  Z o n e  1fBedE  /  A i r n o d e  1fBedE
+*--------------------------------------------------------------------------------
+ZONE 1fBedE
+RADIATIONMODE
+ BEAM=STANDARD : DIFFUSE=STANDARD : LONGWAVE=STANDARD : GEOMODE=MANUAL : FSOLAIR=0
+DAYLIGHTMODE
+ DLSHADE =-1
+AIRNODE 1fBedE
+WALL         =Ext_wall_new_ACT : SURF=178 : AREA=    19.762 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.873178 : INTEMP = INPUT 1*TInAct1fBedE : MFLOW = INPUT 1*MfrAct1fBedE : NLOOP = 1 : MFLOWMIN = 4
+WINDOW=Ext_window : SURF=189 : AREA=      2.94 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.009761 : ESHADE=INPUT 1*Shd_1fBedE
+WINDOW=Ext_window : SURF=190 : AREA=      2.94 : EXTERNAL : ORI=E_255_90 : FSKY=0.5 : GEOSURF=0.009761 : ESHADE=INPUT 1*Shd_1fBedE
+WALL         =Ext_wall_dormer_side : SURF=179 : AREA=     8.279 : ADJACENT=1fBath : ADJ_SURF=152 : BACK : GEOSURF=0.029929 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+WALL         =Ext_wall_dormer_side : SURF=180 : AREA=     4.542 : ADJACENT=1fHall : ADJ_SURF=146 : BACK : GEOSURF=0.016421 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+CEILING      =Int_ceiling : SURF=181 : AREA=    14.364 : ADJACENT=GfBedN : ADJ_SURF=89 : FRONT
+WALL         =Ext_wall_new : SURF=182 : AREA=     2.019 : EXTERNAL : ORI=S_345_90 : FSKY=0.5 : GEOSURF=0.0073
+ROOF         =Roof       : SURF=183 : AREA=    24.509 : EXTERNAL : ORI=N_165_40 : FSKY=0.87
+ROOF         =Roof       : SURF=184 : AREA=    24.509 : EXTERNAL : ORI=S_345_40 : FSKY=0.87
+CEILING      =Int_ceiling : SURF=185 : AREA=    18.364 : ADJACENT=GfBedE : ADJ_SURF=112 : FRONT
+WALL         =Ext_wall_new : SURF=186 : AREA=     2.019 : EXTERNAL : ORI=N_165_90 : FSKY=0.5 : GEOSURF=0.0073
+WALL         =Ext_wall_dormer_side : SURF=187 : AREA=    12.821 : ADJACENT=1fBedS : ADJ_SURF=175 : BACK : GEOSURF=0.04635 : INTEMP = 0 : NLOOP = 1 : MFLOWMIN = 10
+CEILING      =Int_ceiling : SURF=188 : AREA=     4.001 : ADJACENT=GfHall : ADJ_SURF=69 : FRONT
+ REGIME
+ GAIN        = People     : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Equipment  : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ GAIN        = Light      : SCALE= 1 : GEOPOS= 0 : SCALE2= 1 : FRAC_REFAREA= 1
+ INFILTRATION= Infiltr_0_06
+ VENTILATION = 1fBedE
+ CAPACITANCE = 117.237 : VOLUME= 97.698  : REFAREA= 36.72   : TINITIAL= 22      : PHINITIAL= 50      : WCAPR= 1
+*--------------------------------------------------------------------------------
+*  O u t p u t s
+*--------------------------------------------------------------------------------
+OUTPUTS
+ TRANSFER : TIMEBASE=1.000
+ AIRNODES = Stair Cel GfStor GfWC GfHall GfBath GfBedN GfLiv GfBedS GfBedE 1fStor 1fWC 1fHall 1fBath 1fLiv 1fBedS 1fBedE 
+ NTYPES =   1 : TAIR - air temperature of airnode
+        =  25 : TOP - obsolete use new comfort outputs (Version 16: Operative temperature)
+        =   9 : RELHUM - relativ humidity of airnode air
+ AIRNODES = Stair Cel GfStor GfWC GfHall GfBath GfBedN GfLiv GfBedS GfBedE 1fStor 1fWC 1fHall 1fBath 1fLiv 1fBedS 1fBedE 
+ NTYPES = 952 : B4_QHEAT - BAL 4: power of ideal heating (convective+radiative)
+        = 954 : B4_QINF - BAL 4: infiltration gains
+        = 955 : B4_QVENT - BAL 4: ventilation gains
+        = 957 : B4_QTRANS - BAL 4: transmission into the wall from inner surface node
+        = 958 : B4_QGINT - BAL 4: internal gains (convective+radiative)
+        = 960 : B4_QSOL - BAL 4: absorbed solar gains on all inside surfaces of zone
+ AIRNODES = Stair Cel GfStor GfWC GfHall GfBath GfBedN GfLiv GfBedS GfBedE 1fStor 1fWC 1fHall 1fBath 1fLiv 1fBedS 1fBedE 
+ NTYPES = 153 : QGMISC - Sensible energy gains from  "miscellaneous" gains of airnode [kJ/hr]
+ AIRNODES = Stair 
+ NTYPES =  58 : SURF = 11, 10,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = GfStor 
+ NTYPES =  58 : SURF = 54, 55,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = GfWC 
+ NTYPES =  58 : SURF = 58,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = GfHall 
+ NTYPES =  58 : SURF = 65, 73,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = GfBath 
+ NTYPES =  58 : SURF = 80,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = GfBedN 
+ NTYPES =  58 : SURF = 86, 88,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = GfLiv 
+ NTYPES =  58 : SURF = 96, 100,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = GfBedS 
+ NTYPES =  58 : SURF = 104,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = GfBedE 
+ NTYPES =  58 : SURF = 113, 115,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = 1fStor 
+ NTYPES =  58 : SURF = 124,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = 1fWC 
+ NTYPES =  58 : SURF = 127,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = 1fHall 
+ NTYPES =  58 : SURF = 142,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = 1fBath 
+ NTYPES =  58 : SURF = 151,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = 1fLiv 
+ NTYPES =  58 : SURF = 158, 161,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = 1fBedS 
+ NTYPES =  58 : SURF = 169,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = 1fBedE 
+ NTYPES =  58 : SURF = 178,  : TOFL - fluid outlet temperature of active layer
+ AIRNODES = Stair 
+ NTYPES =  59 : SURF = 11, 10,  : QALFL - energy input by fluid of active layer
+ AIRNODES = GfStor 
+ NTYPES =  59 : SURF = 54, 55,  : QALFL - energy input by fluid of active layer
+ AIRNODES = GfWC 
+ NTYPES =  59 : SURF = 58,  : QALFL - energy input by fluid of active layer
+ AIRNODES = GfHall 
+ NTYPES =  59 : SURF = 65, 73,  : QALFL - energy input by fluid of active layer
+ AIRNODES = GfBath 
+ NTYPES =  59 : SURF = 80,  : QALFL - energy input by fluid of active layer
+ AIRNODES = GfBedN 
+ NTYPES =  59 : SURF = 86, 88,  : QALFL - energy input by fluid of active layer
+ AIRNODES = GfLiv 
+ NTYPES =  59 : SURF = 96, 100,  : QALFL - energy input by fluid of active layer
+ AIRNODES = GfBedS 
+ NTYPES =  59 : SURF = 104,  : QALFL - energy input by fluid of active layer
+ AIRNODES = GfBedE 
+ NTYPES =  59 : SURF = 113, 115,  : QALFL - energy input by fluid of active layer
+ AIRNODES = 1fStor 
+ NTYPES =  59 : SURF = 124,  : QALFL - energy input by fluid of active layer
+ AIRNODES = 1fWC 
+ NTYPES =  59 : SURF = 127,  : QALFL - energy input by fluid of active layer
+ AIRNODES = 1fHall 
+ NTYPES =  59 : SURF = 142,  : QALFL - energy input by fluid of active layer
+ AIRNODES = 1fBath 
+ NTYPES =  59 : SURF = 151,  : QALFL - energy input by fluid of active layer
+ AIRNODES = 1fLiv 
+ NTYPES =  59 : SURF = 158, 161,  : QALFL - energy input by fluid of active layer
+ AIRNODES = 1fBedS 
+ NTYPES =  59 : SURF = 169,  : QALFL - energy input by fluid of active layer
+ AIRNODES = 1fBedE 
+ NTYPES =  59 : SURF = 178,  : QALFL - energy input by fluid of active layer
+ AIRNODES = Stair Cel GfStor GfWC GfHall GfBath GfBedN GfLiv GfBedS GfBedE 1fStor 1fWC 1fHall 1fBath 1fLiv 1fBedS 1fBedE 
+ NTYPES = 152 : QGEQUIP - Sensible energy gains from  "equipment" gains of airnode [kJ/hr]
+ AIRNODES = 1fBedS 
+ NTYPES =  19 : SURF = 169,  : QCOMI - energy from  inside surface incl. conv. to the air and l-wave radiation to other surfaces
+        =  21 : SURF = 169,  : QABSI - total radiation absorbed (and transmitted) at all inside surf. of airnode (inc. solar gains, radiative heat and int. rad. gains, but not l-wave radiation from other walls
+*--------------------------------------------------------------------------------
+*  E n d
+*--------------------------------------------------------------------------------
+END
+
+_EXTENSION_WINPOOL_START_
+BERKELEY LAB WINDOW v7.4.6.0  DOE-2 Data File : Multi Band Calculation : generated with Trnsys18.std
+Unit System : SI
+Name        : DOE-2 WINDOW LIB
+Desc        : 2-WSV_#3_Ar90
+Window ID   : 201
+Tilt        : 90.0
+Glazings    : 2
+Frame       :  3 Wood                  2.270
+Spacer      :  2 Class2                0.068   1.550  -0.143
+Total Height: 1500.0 mm
+Total Width : 1200.0 mm
+Glass Height: 1360.3 mm
+Glass Width : 1060.3 mm
+Mullion     : None
+Gap        Thick    Cond  dCond    Vis   dVis   Dens   dDens     Pr     dPr
+1 Ar90/Air1 16.0 0.01712  5.410  2.062  6.300  1.711 -0.0060  0.687 -0.0001
+2              0       0      0      0      0      0       0      0       0
+3              0       0      0      0      0      0       0      0       0
+4              0       0      0      0      0      0       0      0       0
+5              0       0      0      0      0      0       0      0       0
+Angle     0    10    20    30    40    50    60    70    80    90 Hemis
+Tsol  0.504 0.507 0.499 0.489 0.475 0.449 0.392 0.284 0.130 0.000 0.418
+Abs1  0.171 0.172 0.174 0.178 0.184 0.191 0.197 0.199 0.184 0.000 0.185
+Abs2  0.094 0.095 0.103 0.108 0.109 0.112 0.121 0.125 0.086 0.000 0.109
+Abs3      0     0     0     0     0     0     0     0     0     0     0
+Abs4      0     0     0     0     0     0     0     0     0     0     0
+Abs5      0     0     0     0     0     0     0     0     0     0     0
+Abs6      0     0     0     0     0     0     0     0     0     0     0
+Rfsol 0.230 0.226 0.224 0.225 0.231 0.248 0.290 0.391 0.600 1.000 0.279
+Rbsol 0.232 0.226 0.224 0.226 0.237 0.256 0.294 0.382 0.582 0.999 0.280
+Tvis  0.717 0.721 0.711 0.697 0.678 0.641 0.559 0.405 0.186 0.000 0.596
+Rfvis 0.133 0.127 0.126 0.130 0.142 0.169 0.229 0.365 0.620 1.000 0.207
+Rbvis 0.131 0.124 0.121 0.124 0.136 0.160 0.208 0.313 0.540 0.999 0.189
+SHGC  0.620   N/A   N/A   N/A   N/A   N/A   N/A   N/A   N/A   N/A   N/A
+Tvis_daylight:  0.780
+Layer ID#         7199    37003        0        0        0        0
+Tir              0.000    0.000        0        0        0        0
+Emis F           0.837    0.037        0        0        0        0
+Emis B           0.837    0.837        0        0        0        0
+Thickness(mm)      6.0      6.0        0        0        0        0
+Cond(W/m2-K     ) 166.7    166.7        0        0        0        0
+Spectral File  ip_fl_6.ipe 37003_IP_ipl         None         None         None         None
+Overall and Center of Glass Ig U-values (W/m2-K)
+Outdoor Temperature                 -17.8 C      15.6 C      26.7 C      37.8 C
+Solar      WdSpd  hcout hrout  hin
+(W/m2)     (m/s)     (W/m2-K)
+0        0.00   0.00  0.00  0.00  1.35 1.35  1.08 1.08  1.10 1.10  1.12 1.12
+0        6.71   0.00  0.00  0.00  1.35 1.35  1.08 1.08  1.10 1.10  1.12 1.12
+783        0.00   0.00  0.00  0.00  1.35 1.35  1.08 1.08  1.10 1.10  1.12 1.12
+783        6.71   0.00  0.00  0.00  1.35 1.35  1.08 1.08  1.10 1.10  1.12 1.12
+WINDOW 4.1  DOE-2 Data File : Multi Band Calculation
+Unit System : SI
+Name        : TRNSYS15 WINDOW LIB
+Desc        : Pilkington OPTITHERM S Besch.#2#5 4/16/4/16/4
+Window ID   : 12008
+Tilt        : 90.0
+Glazings    : 3
+Frame       : 11 TRNSYS WIN - 1        2.270
+Spacer      :  1 Class1                2.330  -0.010   0.138
+Total Height: 1600.0 mm
+Total Width : 1250.0 mm
+Glass Height: 1460.3 mm
+Glass Width : 1110.3 mm
+Mullion     : None
+Gap        Thick   Cond  dCond    Vis   dVis   Dens   dDens     Pr     dPr
+1 Argon     16.0 0.01620  5.000  2.110  6.300  1.780 -0.0060  0.680 0.00066
+2 Argon     16.0 0.01620  5.000  2.110  6.300  1.780 -0.0060  0.680 0.00066
+3              0       0      0      0      0      0       0      0       0
+4              0       0      0      0      0      0       0      0       0
+5              0       0      0      0      0      0       0      0       0
+Angle     0    10    20    30    40    50    60    70    80    90 Hemis
+Tsol  0.358 0.358 0.354 0.350 0.344 0.330 0.296 0.221 0.095 0.000 0.305
+Abs1  0.146 0.146 0.147 0.148 0.150 0.153 0.158 0.164 0.162 0.000 0.152
+Abs2  0.078 0.079 0.080 0.083 0.086 0.091 0.097 0.103 0.093 0.000 0.088
+Abs3  0.056 0.057 0.058 0.058 0.058 0.056 0.055 0.049 0.026 0.000 0.054
+Abs4      0     0     0     0     0     0     0     0     0     0     0
+Abs5      0     0     0     0     0     0     0     0     0     0     0
+Abs6      0     0     0     0     0     0     0     0     0     0     0
+Rfsol 0.361 0.361 0.361 0.361 0.362 0.369 0.393 0.463 0.624 1.000 0.391
+Rbsol 0.429 0.428 0.427 0.427 0.430 0.442 0.475 0.559 0.726 1.000 0.466
+Tvis  0.658 0.660 0.654 0.646 0.632 0.596 0.512 0.355 0.149 0.000 0.547
+Rfvis 0.174 0.173 0.174 0.178 0.190 0.221 0.299 0.453 0.678 1.000 0.264
+Rbvis 0.174 0.185 0.185 0.189 0.201 0.232 0.307 0.455 0.684 1.000 0.273
+SHGC  0.451 0.451 0.450 0.447 0.441 0.429 0.398 0.320 0.169 0.000 0.401
+Tvis_daylight: 0.658
+Layer ID#         4061F    4046     4061        0        0        0
+Tir              0.000    0.000    0.000        0        0        0
+Emis F           0.840    0.840    0.040        0        0        0
+Emis B           0.040    0.840    0.840        0        0        0
+Thickness(mm)      4.0      4.0      4.0        0        0        0
+Cond(W/m2-C     ) 225.0    225.0    225.0        0        0        0
+Spectral File     None     None     None     None     None     None
+Overall and Center of Glass Ig U-values (W/m2-C)
+Outdoor Temperature                 -17.8 C      15.6 C      26.7 C      37.8 C
+Solar      WdSpd  hcout hrout  hin
+(W/m2)     (m/s)     (W/m2-C)
+0        0.00  12.25  3.20  7.19  0.66 0.66  0.56 0.56  0.58 0.58  0.60 0.60
+0        6.71  25.47  3.19  7.20  0.67 0.67  0.57 0.57  0.59 0.59  0.61 0.61
+783        0.00  12.25  3.39  7.71  0.68 0.68  0.79 0.79  0.82 0.82  0.76 0.76
+783        6.71  25.47  3.29  7.64  0.70 0.70  0.75 0.75  0.78 0.78  0.77 0.77
+BERKELEY LAB WINDOW v7.4.6.0  DOE-2 Data File : Multi Band Calculation : generated with Trnsys18.std
+Unit System : SI
+Name        : DOE-2 WINDOW LIB
+Desc        : SG_UltraN_ST167_#3_Ar90
+Window ID   : 11415
+Tilt        : 90.0
+Glazings    : 2
+Frame       :  3 Wood                  2.270
+Spacer      :  2 Class2                0.068   1.550  -0.143
+Total Height: 1500.0 mm
+Total Width : 1200.0 mm
+Glass Height: 1360.3 mm
+Glass Width : 1060.3 mm
+Mullion     : None
+Gap        Thick    Cond  dCond    Vis   dVis   Dens   dDens     Pr     dPr
+1 Ar90/Air1 16.0 0.01712  5.410  2.062  6.300  1.711 -0.0060  0.687 -0.0001
+2              0       0      0      0      0      0       0      0       0
+3              0       0      0      0      0      0       0      0       0
+4              0       0      0      0      0      0       0      0       0
+5              0       0      0      0      0      0       0      0       0
+Angle     0    10    20    30    40    50    60    70    80    90 Hemis
+Tsol  0.396 0.400 0.390 0.378 0.365 0.342 0.291 0.202 0.090 0.000 0.318
+Abs1  0.269 0.272 0.282 0.289 0.292 0.298 0.317 0.337 0.286 0.001 0.296
+Abs2  0.073 0.075 0.080 0.083 0.084 0.085 0.091 0.090 0.061 0.000 0.082
+Abs3      0     0     0     0     0     0     0     0     0     0     0
+Abs4      0     0     0     0     0     0     0     0     0     0     0
+Abs5      0     0     0     0     0     0     0     0     0     0     0
+Abs6      0     0     0     0     0     0     0     0     0     0     0
+Rfsol 0.262 0.253 0.249 0.250 0.259 0.275 0.300 0.370 0.562 0.999 0.293
+Rbsol 0.290 0.281 0.277 0.279 0.289 0.306 0.334 0.406 0.591 0.999 0.324
+Tvis  0.541 0.547 0.533 0.517 0.499 0.467 0.397 0.274 0.121 0.000 0.435
+Rfvis 0.213 0.204 0.201 0.204 0.217 0.237 0.272 0.358 0.565 0.999 0.258
+Rbvis 0.201 0.190 0.184 0.186 0.198 0.217 0.248 0.329 0.539 0.999 0.238
+SHGC  0.470   N/A   N/A   N/A   N/A   N/A   N/A   N/A   N/A   N/A   N/A
+Tvis_daylight:  0.590
+Layer ID#        11249    11333        0        0        0        0
+Tir              0.000    0.000        0        0        0        0
+Emis F           0.821    0.037        0        0        0        0
+Emis B           0.837    0.837        0        0        0        0
+Thickness(mm)      6.0      4.0        0        0        0        0
+Cond(W/m2-K     ) 166.7    250.0        0        0        0        0
+Spectral File COOL-LITE ST PLT ULTRA N          None         None         None         None
+Overall and Center of Glass Ig U-values (W/m2-K)
+Outdoor Temperature                 -17.8 C      15.6 C      26.7 C      37.8 C
+Solar      WdSpd  hcout hrout  hin
+(W/m2)     (m/s)     (W/m2-K)
+0        0.00   0.00  0.00  0.00  1.36 1.36  1.08 1.08  1.10 1.10  1.13 1.13
+0        6.71   0.00  0.00  0.00  1.36 1.36  1.08 1.08  1.10 1.10  1.13 1.13
+783        0.00   0.00  0.00  0.00  1.36 1.36  1.08 1.08  1.10 1.10  1.13 1.13
+783        6.71   0.00  0.00  0.00  1.36 1.36  1.08 1.08  1.10 1.10  1.13 1.13
+BERKELEY LAB WINDOW v7.4.6.0  DOE-2 Data File : Multi Band Calculation : generated with Trnsys18.std
+Unit System : SI
+Name        : DOE-2 WINDOW LIB
+Desc        : GT_SANCO_PLUS_ENplus_#2#5_KR90
+Window ID   : 14301
+Tilt        : 90.0
+Glazings    : 3
+Frame       :  3 Wood                  2.270
+Spacer      :  2 Class2                0.068   1.550  -0.143
+Total Height: 1500.0 mm
+Total Width : 1200.0 mm
+Glass Height: 1360.3 mm
+Glass Width : 1060.3 mm
+Mullion     : None
+Gap        Thick    Cond  dCond    Vis   dVis   Dens   dDens     Pr     dPr
+1 Kr90/Air1 12.0 0.01020  3.319  2.283  7.493  3.448 -0.0122  0.725 0.00002
+2 Kr90/Air1 12.0 0.01020  3.319  2.283  7.493  3.448 -0.0122  0.725 0.00002
+3              0       0      0      0      0      0       0      0       0
+4              0       0      0      0      0      0       0      0       0
+5              0       0      0      0      0      0       0      0       0
+Angle     0    10    20    30    40    50    60    70    80    90 Hemis
+Tsol  0.418 0.422 0.410 0.397 0.380 0.349 0.285 0.180 0.066 0.000 0.324
+Abs1  0.161 0.163 0.173 0.181 0.185 0.193 0.218 0.254 0.234 0.001 0.197
+Abs2  0.045 0.045 0.045 0.046 0.047 0.048 0.047 0.043 0.033 0.000 0.045
+Abs3  0.054 0.056 0.061 0.065 0.065 0.067 0.071 0.068 0.039 0.000 0.063
+Abs4      0     0     0     0     0     0     0     0     0     0     0
+Abs5      0     0     0     0     0     0     0     0     0     0     0
+Abs6      0     0     0     0     0     0     0     0     0     0     0
+Rfsol 0.323 0.314 0.310 0.312 0.323 0.343 0.378 0.456 0.629 0.999 0.361
+Rbsol 0.323 0.314 0.310 0.312 0.323 0.343 0.378 0.456 0.629 0.999 0.361
+Tvis  0.625 0.632 0.615 0.595 0.570 0.524 0.427 0.268 0.098 0.000 0.485
+Rfvis 0.202 0.191 0.186 0.189 0.205 0.232 0.280 0.380 0.582 0.999 0.256
+Rbvis 0.202 0.191 0.186 0.189 0.205 0.232 0.280 0.380 0.582 0.999 0.256
+SHGC  0.490   N/A   N/A   N/A   N/A   N/A   N/A   N/A   N/A   N/A   N/A
+Tvis_daylight:  0.700
+Layer ID#        44066    44007    44066        0        0        0
+Tir              0.000    0.000    0.000        0        0        0
+Emis F           0.837    0.837    0.037        0        0        0
+Emis B           0.037    0.837    0.837        0        0        0
+Thickness(mm)      4.0      4.0      4.0        0        0        0
+Cond(W/m2-K     ) 250.0    250.0    250.0        0        0        0
+Spectral File 44066_GT_ENp 44007_GT_EUR 44066_GT_ENp         None         None         None
+Overall and Center of Glass Ig U-values (W/m2-K)
+Outdoor Temperature                 -17.8 C      15.6 C      26.7 C      37.8 C
+Solar      WdSpd  hcout hrout  hin
+(W/m2)     (m/s)     (W/m2-K)
+0        0.00   0.00  0.00  0.00  0.62 0.62  0.50 0.50  0.52 0.52  0.53 0.53
+0        6.71   0.00  0.00  0.00  0.62 0.62  0.50 0.50  0.52 0.52  0.53 0.53
+783        0.00   0.00  0.00  0.00  0.62 0.62  0.50 0.50  0.52 0.52  0.53 0.53
+783        6.71   0.00  0.00  0.00  0.62 0.62  0.50 0.50  0.52 0.52  0.53 0.53
+*** END OF LIBRARY ***
+************************************************************************************************************
+*WinID   Description                              Design         U-Value g-value T-sol Rf-sol T-vis-daylight
+************************************************************************************************************
+   201   2-WSV_#3_Ar90                            6/16/6           1.1  0.62  0.504  0.23  0.78
+ 12008   Pilkington OPTITHERM S Besch.#2#5 4/16/4/16/4  4/16/4/16/4      0.59  0.451  0.358  0.361  0.658
+ 11415   SG_UltraN_ST167_#3_Ar90                  6/16/4           1.1  0.47  0.396  0.262  0.59
+ 14301   GT_SANCO_PLUS_ENplus_#2#5_KR90           4/12/4/12/4      0.52  0.49  0.418  0.323  0.7
+_EXTENSION_WINPOOL_END_
+
+_EXTENSION_BuildingGeometry_START_
+vertex 1 18.952419031000 -5.728708586131 10.530000000000
+vertex 2 18.952419039552 -5.728708565384 5.740000000000
+vertex 3 22.614826095172 -4.678530241415 5.740000000000
+vertex 4 22.614826092525 -4.678530260469 10.530000000000
+vertex 5 18.119994281947 -2.825698270469 7.860871284287
+vertex 6 18.119994230663 -2.825698229877 5.740000000000
+vertex 7 18.459026888603 -4.008050901712 8.040000002618
+vertex 8 18.459026887495 -4.008050902030 5.790000002618
+vertex 9 18.707100507730 -4.873186428374 5.790000002618
+vertex 10 18.707100508838 -4.873186428057 8.040000002618
+vertex 11 18.119994230663 -2.825698229877 1.860000000000
+vertex 12 18.952419045230 -5.728708551611 1.860000000000
+vertex 13 18.662999821622 -4.719383770876 4.170000000000
+vertex 14 18.662999821622 -4.719383770876 1.910000000000
+vertex 15 18.938637177439 -5.680645466814 1.910000000000
+vertex 16 18.938637177439 -5.680645466814 4.170000000000
+vertex 17 18.952419045230 -5.728708551611 2.560000000000
+vertex 18 22.614826106755 -4.678530225948 2.560000000000
+vertex 19 22.614826106755 -4.678530225948 0.000000000000
+vertex 20 21.782401292188 -1.775519904214 0.000000000000
+vertex 21 21.782401292188 -1.775519904214 2.560000000000
+vertex 22 18.119994230663 -2.825698229877 0.000000000000
+vertex 23 18.119994230663 -2.825698229877 2.560000000000
+vertex 24 19.946391454987 -2.301987260943 5.740000000000
+vertex 25 19.946391452946 -2.301987253825 2.560000000000
+vertex 26 18.952419045230 -5.728708551611 0.000000000000
+vertex 27 21.782401279667 -1.775519938700 5.740000000000
+vertex 28 21.782401197083 -1.775520236608 7.860871100076
+vertex 29 21.280703264044 -10.075327075984 2.560000000000
+vertex 30 21.280703264044 -10.075327075984 0.000000000000
+vertex 31 24.174100968818 -9.245658634975 0.000000000000
+vertex 32 24.174100968818 -9.245658634975 2.560000000000
+vertex 33 34.027033352186 -6.420375737850 2.560000000000
+vertex 34 34.027033352186 -6.420375737850 1.120000000000
+vertex 35 31.369889242110 2.846187010995 1.120000000000
+vertex 36 31.369889242110 2.846187010995 2.560000000000
+vertex 37 31.783345275835 1.404294467088 1.580000000000
+vertex 38 31.783345275835 1.404294467088 1.170000000000
+vertex 39 31.587642753206 2.086790271204 1.170000000000
+vertex 40 31.587642753206 2.086790271204 1.580000000000
+vertex 41 32.524809762983 -1.181499494987 1.580000000000
+vertex 42 32.524809762983 -1.181499494987 1.170000000000
+vertex 43 32.329107240353 -0.499003690870 1.170000000000
+vertex 44 32.329107240353 -0.499003690870 1.580000000000
+vertex 45 17.623846990192 -1.095427177188 1.860000000000
+vertex 46 17.623846990192 -1.095427177188 0.000000000000
+vertex 47 20.280991100268 -10.361989926034 0.000000000000
+vertex 48 20.280991100268 -10.361989926034 2.560000000000
+vertex 49 19.228056401047 -6.689970247549 2.560000000000
+vertex 50 19.228056401047 -6.689970247549 1.860000000000
+vertex 51 31.369889242110 2.846187010995 1.410000000000
+vertex 52 31.369889242110 2.846187010995 0.000000000000
+vertex 53 17.623846990192 -1.095427177188 1.410000000000
+vertex 54 24.174100968818 -9.245658634975 1.410000000000
+vertex 55 34.027033352186 -6.420375737850 0.000000000000
+vertex 56 34.027033352186 -6.420375737850 1.410000000000
+vertex 57 17.623846990192 -1.095427177188 2.560000000000
+vertex 58 26.361715806272 1.410116387188 2.020000000000
+vertex 59 26.361715806272 1.410116387188 1.620000000000
+vertex 60 25.015949431958 1.024224089045 1.620000000000
+vertex 61 25.015949431958 1.024224089045 2.020000000000
+vertex 62 19.507919914231 -0.555177959787 2.010000000000
+vertex 63 19.507919914231 -0.555177959787 1.620000000000
+vertex 64 18.815811493156 -0.753636855975 1.620000000000
+vertex 65 18.815811493156 -0.753636855975 2.010000000000
+vertex 66 23.997012034263 0.732048491879 2.020000000000
+vertex 67 23.997012034263 0.732048491879 1.620000000000
+vertex 68 22.651245659950 0.346156193735 1.620000000000
+vertex 69 22.651245659950 0.346156193735 2.020000000000
+vertex 70 28.516972919816 -2.986116861232 2.560000000000
+vertex 71 29.845544974854 -7.619398235654 2.560000000000
+vertex 72 32.698461297148 -1.787094363428 2.560000000000
+vertex 73 24.352678861760 0.834034313531 2.560000000000
+vertex 74 25.391831693191 -2.789922280157 2.560000000000
+vertex 75 28.227553696209 -1.976792080496 2.560000000000
+vertex 76 27.188400864778 1.647164513191 2.560000000000
+vertex 77 26.181106998686 -3.655915635867 2.560000000000
+vertex 78 27.509679053724 -8.289197010290 2.560000000000
+vertex 79 21.286254051717 -0.045248851525 2.560000000000
+vertex 80 32.409042073540 -0.777769582693 2.560000000000
+vertex 81 19.450244212475 -0.571716201136 2.560000000000
+vertex 82 27.625030457237 -8.256120527592 2.010000000000
+vertex 83 27.625030457237 -8.256120527592 1.620000000000
+vertex 84 28.980409448510 -7.867471855890 1.620000000000
+vertex 85 28.980409448510 -7.867471855890 2.010000000000
+vertex 86 25.279551919147 -8.928675675785 2.010000000000
+vertex 87 25.279551919147 -8.928675675785 1.620000000000
+vertex 88 26.634930910420 -8.540027004083 1.620000000000
+vertex 89 26.634930910420 -8.540027004083 2.010000000000
+vertex 90 31.479689857950 -7.150814730765 2.010000000000
+vertex 91 31.479689857950 -7.150814730765 1.620000000000
+vertex 92 32.835068849223 -6.762166059064 1.620000000000
+vertex 93 32.835068849223 -6.762166059064 2.010000000000
+vertex 94 17.623846990192 -1.095427177188 5.740000000000
+vertex 95 18.119994340889 -2.825698614280 5.740000000000
+vertex 96 19.946391785793 -2.301987574392 5.740000000000
+vertex 97 19.450244212475 -0.571716201136 5.740000000000
+vertex 98 19.946391785793 -2.301987574392 2.560000000000
+vertex 99 18.119994340889 -2.825698614280 2.560000000000
+vertex 100 19.286829724166 -0.618574551625 4.110000000000
+vertex 101 19.286829724166 -0.618574551625 3.460000000000
+vertex 102 18.392856346943 -0.874917292535 3.460000000000
+vertex 103 18.392856346943 -0.874917292535 4.110000000000
+vertex 104 21.286254051717 -0.045248851525 5.740000000000
+vertex 105 21.782401292188 -1.775519904214 5.740000000000
+vertex 106 28.516972919816 -2.986116861232 5.740000000000
+vertex 107 32.698461297148 -1.787094363428 5.740000000000
+vertex 108 22.743662975605 -1.499882582883 5.740000000000
+vertex 109 22.247515747656 0.230388504292 5.740000000000
+vertex 110 32.409042073540 -0.777769582693 5.740000000000
+vertex 111 32.681923055799 -1.729418661671 5.010000000000
+vertex 112 32.681923055799 -1.729418661671 3.010000000000
+vertex 113 32.425580314889 -0.835445284449 3.010000000000
+vertex 114 32.425580314889 -0.835445284449 5.010000000000
+vertex 115 22.614826106755 -4.678530225948 5.740000000000
+vertex 116 26.181106998686 -3.655915635867 5.740000000000
+vertex 117 28.746635012015 -1.827947908355 5.740000000000
+vertex 118 29.036054235623 -2.837272689091 5.740000000000
+vertex 119 28.227553696209 -1.976792080496 5.740000000000
+vertex 120 25.391831693191 -2.789922280157 5.740000000000
+vertex 121 24.352678861760 0.834034313531 5.740000000000
+vertex 122 23.477930718457 0.583204319737 5.010000000000
+vertex 123 23.477930718457 0.583204319737 3.460000000000
+vertex 124 22.583957341234 0.326861578828 3.460000000000
+vertex 125 22.583957341234 0.326861578828 5.010000000000
+vertex 126 27.188400864778 1.647164513191 5.740000000000
+vertex 127 26.082949914449 1.330181554001 5.010000000000
+vertex 128 26.082949914449 1.330181554001 3.460000000000
+vertex 129 25.188976537227 1.073838813092 3.460000000000
+vertex 130 25.188976537227 1.073838813092 5.010000000000
+vertex 131 31.369889242110 2.846187010995 5.740000000000
+vertex 132 31.890843844604 1.029402405672 5.010000000000
+vertex 133 31.890843844604 1.029402405672 3.010000000000
+vertex 134 31.634501103694 1.923375782894 3.010000000000
+vertex 135 31.634501103694 1.923375782894 5.010000000000
+vertex 136 28.227554029056 -1.976792401064 5.740000000000
+vertex 137 27.707482180585 1.796008685332 5.740000000000
+vertex 138 28.227554029056 -1.976792401064 2.560000000000
+vertex 139 20.280991100268 -10.361989926034 5.740000000000
+vertex 140 27.509679053724 -8.289197010290 5.740000000000
+vertex 141 21.001937372222 -10.155261909172 5.010000000000
+vertex 142 21.001937372222 -10.155261909172 3.010000000000
+vertex 143 23.010974316733 -9.579179835514 3.010000000000
+vertex 144 23.010974316733 -9.579179835514 5.010000000000
+vertex 145 24.895047240772 -9.038930618113 5.010000000000
+vertex 146 24.895047240772 -9.038930618113 3.010000000000
+vertex 147 26.817570632649 -8.487655906479 3.010000000000
+vertex 148 26.817570632649 -8.487655906479 5.010000000000
+vertex 149 18.952419045230 -5.728708551611 5.740000000000
+vertex 150 26.181107331534 -3.655915956434 5.740000000000
+vertex 151 26.181107331534 -3.655915956434 2.560000000000
+vertex 152 19.754523750658 -8.525980086791 5.060000000000
+vertex 153 19.754523750658 -8.525980086791 2.610000000000
+vertex 154 20.030161106475 -9.487241782730 2.610000000000
+vertex 155 20.030161106475 -9.487241782730 5.060000000000
+vertex 156 29.845544974854 -7.619398235654 5.740000000000
+vertex 157 27.538516904602 -8.280927889615 5.010000000000
+vertex 158 27.538516904602 -8.280927889615 3.010000000000
+vertex 159 29.461040296479 -7.729653177981 3.010000000000
+vertex 160 29.461040296479 -7.729653177981 5.010000000000
+vertex 161 30.364626290661 -7.470554063513 5.740000000000
+vertex 162 34.027033352186 -6.420375737850 5.740000000000
+vertex 163 33.756908743485 -5.478339275831 5.010000000000
+vertex 164 33.756908743485 -5.478339275831 3.010000000000
+vertex 165 33.500566002576 -4.584365898608 3.010000000000
+vertex 166 33.500566002576 -4.584365898608 5.010000000000
+vertex 167 31.297050135721 -7.203185828371 5.010000000000
+vertex 168 31.297050135721 -7.203185828371 3.010000000000
+vertex 169 33.306087080232 -6.627103754713 3.010000000000
+vertex 170 33.306087080232 -6.627103754713 5.010000000000
+vertex 171 21.782401065616 -1.775519743349 7.860871197648
+vertex 172 21.286253773861 -0.045248650067 6.269999913361
+vertex 173 19.946391683753 -2.301987218537 5.740000000000
+vertex 174 18.119994563510 -2.825698550444 5.740000000000
+vertex 175 17.623846990192 -1.095427177188 6.270000000000
+vertex 176 22.247515368786 0.230388753609 8.779999863505
+vertex 177 21.286253712391 -0.045248605499 8.780000000000
+vertex 178 22.743662867849 -1.499882693600 9.433526899061
+vertex 179 21.782401211454 -1.775520052708 9.433527035556
+vertex 180 29.036054235623 -2.837272689091 10.530000000000
+vertex 181 28.746635012015 -1.827947908355 10.148775933610
+vertex 182 25.391831693191 -2.789922280157 10.148775933610
+vertex 183 24.352678474796 0.834034582486 8.779999531239
+vertex 184 22.743662886685 -1.499882702829 9.433526927448
+vertex 185 22.614826095172 -4.678530241415 10.530000000000
+vertex 186 28.746635012015 -1.827947908355 9.601991701245
+vertex 187 26.181106999402 -3.655915638362 10.530000000000
+vertex 188 23.477930594941 0.583204535359 7.990000000000
+vertex 189 23.477930638351 0.583204383970 6.640000000000
+vertex 190 22.583957261129 0.326861643060 6.640000000000
+vertex 191 22.583957217719 0.326861794449 7.990000000000
+vertex 192 27.707482180585 1.796008685332 6.270000000000
+vertex 193 27.707482180585 1.796008685332 8.780000000000
+vertex 194 24.352678861760 0.834034313531 8.780000000000
+vertex 195 26.082949909584 1.330181570968 7.990000000000
+vertex 196 26.082949909584 1.330181570968 6.640000000000
+vertex 197 25.188976532362 1.073838830058 6.640000000000
+vertex 198 25.188976532362 1.073838830058 7.990000000000
+vertex 199 22.614826216981 -4.678530610351 10.530000000000
+vertex 200 22.614826216981 -4.678530610351 5.740000000000
+vertex 201 18.952419378077 -5.728708872178 5.740000000000
+vertex 202 18.952419378077 -5.728708872178 10.530000000000
+vertex 203 20.280991100268 -10.361989926034 6.270000000000
+vertex 204 18.971713665920 -5.795996868668 8.040000000000
+vertex 205 18.971713665920 -5.795996868668 5.790000000000
+vertex 206 19.522988377554 -7.718520260545 5.790000000000
+vertex 207 19.522988377554 -7.718520260545 8.040000000000
+vertex 208 23.943398187023 -9.311811688358 5.740000000000
+vertex 209 23.943398212253 -9.311811776344 6.270000000000
+vertex 210 27.509679053724 -8.289197010290 8.780000000000
+vertex 211 26.181107108912 -3.655916020270 5.740000000000
+vertex 212 26.181107108912 -3.655916020270 10.530000000000
+vertex 213 23.943398161793 -9.311811600371 8.780000000000
+vertex 214 24.895047265504 -9.038930704363 7.960000000000
+vertex 215 24.895047262369 -9.038930693431 6.190000000000
+vertex 216 26.817570654246 -8.487655981797 6.190000000000
+vertex 217 26.817570657381 -8.487655992729 7.960000000000
+vertex 218 30.364626290661 -7.470554063513 8.780000000000
+vertex 219 27.538516917906 -8.280927936012 7.960000000000
+vertex 220 27.538516917906 -8.280927936012 6.190000000000
+vertex 221 29.461040309783 -7.729653224378 6.190000000000
+vertex 222 29.461040309783 -7.729653224378 7.960000000000
+vertex 223 30.364626290661 -7.470554063513 6.270000000000
+vertex 224 26.181106998686 -3.655915635867 10.530000000000
+vertex 225 34.027033352186 -6.420375737850 6.270000000000
+vertex 226 31.369889242110 2.846187010995 6.270000000000
+vertex 227 32.698461297148 -1.787094363428 10.530000000000
+vertex 228 32.668141188008 -1.681355576875 7.990000000000
+vertex 229 32.668141188008 -1.681355576875 6.190000000000
+vertex 230 32.254685154283 -0.239463032967 6.190000000000
+vertex 231 32.254685154283 -0.239463032967 7.990000000000
+vertex 232 33.136724692897 -3.315500459970 7.990000000000
+vertex 233 33.136724692897 -3.315500459970 6.190000000000
+vertex 234 32.723268659172 -1.873607916062 6.190000000000
+vertex 235 32.723268659172 -1.873607916062 7.990000000000
+
+
+zone Cel
+wall 18 18 19 26 17
+wall 19 29 30 31 32
+wall 20 33 34 35 36
+window 42 37 38 39 40
+window 43 41 42 43 44
+wall 21 45 46 22 11
+wall 22 12 26 47 48 49 50
+wall 23 17 12 50 49
+wall 24 51 52 46 53
+wall 25 54 31 55 56
+wall 26 36 51 53 57
+window 44 58 59 60 61
+window 45 62 63 64 65
+window 46 66 67 68 69
+wall 27 34 55 52 35
+wall 28 48 47 30 29
+ceiling 29 70 71 33 72
+ceiling 30 73 74 75 76
+ceiling 31 77 78 71 70
+floor 32 52 55 47 26 19 20 22 46
+ceiling 33 79 18 72 80 74 73
+wall 34 57 45 11 23
+wall 35 21 20 19 18
+ceiling 36 81 25 21 79
+ceiling 37 76 75 80 36
+ceiling 38 17 48 78 77
+wall 39 23 22 20 21
+ceiling 40 57 23 25 81
+wall 41 32 54 56 33
+window 47 82 83 84 85
+window 48 86 87 88 89
+window 49 90 91 92 93
+
+zone GfStor
+ceiling 50 94 95 96 97
+wall 51 96 98 81 97
+wall 52 95 99 98 96
+floor 53 81 98 99 57
+wall 54 97 81 57 94
+window 56 100 101 102 103
+wall 55 94 57 99 95
+
+zone GfWC
+wall 57 97 81 98 96
+wall 58 104 79 81 97
+wall 59 105 21 79 104
+ceiling 60 97 96 105 104
+floor 61 79 21 98 81
+wall 62 96 98 21 105
+
+zone GfBath
+floor 79 76 75 74 73
+wall 80 126 76 73 121
+window 85 127 128 129 130
+wall 81 121 73 74 120
+ceiling 82 121 120 119 126
+wall 83 120 74 75 119
+wall 84 119 75 76 126
+
+zone 1fStor
+wall 120 171 27 104 172
+floor 121 97 173 174 94
+floor 122 104 27 173 97
+roof 123 171 172 175 5
+wall 124 175 94 174 5
+wall 125 5 174 27 171
+wall 126 172 104 94 175
+
+zone 1fWC
+wall 127 176 109 104 177
+roof 128 178 176 177 179
+wall 129 179 105 108 178
+floor 130 109 108 105 104
+wall 131 177 172 171 179
+wall 132 178 108 109 176
+wall 133 172 104 105 171
+
+zone 1fHall
+roof 134 180 181 182 183 176 184 179 185
+wall 135 180 186 181
+ceiling 136 117 118 3 105 108 109 121 120
+wall 137 184 108 105 179
+wall 138 179 28 185
+wall 139 185 3 116 187
+wall 140 182 120 121 183
+wall 141 181 117 120 182
+wall 142 183 121 109 176
+window 147 188 189 190 191
+wall 143 176 109 108 184
+wall 144 187 116 118 180
+wall 145 28 105 3 185
+wall 146 180 118 117 186
+
+zone 1fBath
+wall 148 181 186 192 193
+floor 149 137 117 136 126
+roof 150 181 193 194 182
+wall 151 193 137 121 194
+window 156 195 196 197 198
+wall 152 186 117 137 192
+wall 153 194 121 120 182
+floor 154 126 136 120 121
+wall 155 182 120 117 181
+_EXTENSION_BuildingGeometry_END_
+
+
+_EXTENSION_VirtualSurfaceGeometry_START_
+_EXTENSION_VirtualSurfaceGeometry_END_
+
+
+_EXTENSION_ExternalShadingGeometry_START_
+vertex 236 19.073699481789 -6.151663697824 2.560000000000
+vertex 237 20.280991100268 -10.361989926034 2.560000000000
+vertex 238 18.185440603122 -10.962879361715 2.560000000000
+vertex 239 16.978148984644 -6.752553133505 2.560000000000
+vertex 240 16.978148984644 -6.752553133505 3.680000000000
+vertex 241 18.185440603122 -10.962879361715 3.680000000000
+vertex 242 20.280991100268 -10.361989926034 3.680000000000
+vertex 243 26.062437473583 -23.268378957536 19.860000000000
+vertex 244 30.971180022320 -22.317460143856 -1.140000000000
+vertex 245 30.557802776686 -21.079385857580 -1.140000000000
+vertex 246 31.050034575339 -23.620337975817 -1.140000000000
+vertex 247 30.788992628267 -24.899230382321 -1.140000000000
+vertex 248 27.013356287264 -28.177121506274 -1.140000000000
+vertex 249 28.251430573540 -27.763744260639 -1.140000000000
+vertex 250 29.340328597535 -27.044015298540 -1.140000000000
+vertex 251 25.710478455302 -28.255976059293 -1.140000000000
+vertex 252 30.205843758405 -26.066982959336 -1.140000000000
+vertex 253 22.286801132578 -26.546270081488 -1.140000000000
+vertex 254 23.263833471782 -27.411785242359 -1.140000000000
+vertex 255 24.431586048797 -27.994934112221 -1.140000000000
+vertex 256 21.153694924846 -24.219297771216 -1.140000000000
+vertex 257 21.567072170479 -25.457372057492 -1.140000000000
+vertex 258 21.074840371826 -22.916419939255 -1.140000000000
+vertex 259 21.335882318898 -21.637527532751 -1.140000000000
+vertex 260 21.919031188760 -20.469774955736 -1.140000000000
+vertex 261 22.784546349630 -19.492742616531 -1.140000000000
+vertex 262 23.873444373626 -18.773013654433 -1.140000000000
+vertex 263 25.111518659902 -18.359636408798 -1.140000000000
+vertex 264 27.693288898368 -18.541823802851 -1.140000000000
+vertex 265 26.414396491863 -18.280781855779 -1.140000000000
+vertex 266 29.838073814587 -19.990487833584 -1.140000000000
+vertex 267 28.861041475384 -19.124972672713 -1.140000000000
+vertex 268 14.269510163708 -15.518742484512 17.000000000000
+vertex 269 13.664705424709 -17.944481800202 0.000000000000
+vertex 270 14.313141179801 -18.018361722403 0.000000000000
+vertex 271 12.532864237561 -17.317091985359 0.000000000000
+vertex 272 13.057486113092 -17.705291752361 0.000000000000
+vertex 273 11.769890925817 -15.562373500606 0.000000000000
+vertex 274 11.866355923862 -16.207835874055 0.000000000000
+vertex 275 12.471160662861 -13.782096558365 0.000000000000
+vertex 276 12.082960895860 -14.306718433897 0.000000000000
+vertex 277 12.126591911953 -16.806337671788 0.000000000000
+vertex 278 11.843770848018 -14.913937745513 0.000000000000
+vertex 279 16.006156089856 -13.720392983666 0.000000000000
+vertex 280 15.481534214324 -13.332193216664 0.000000000000
+vertex 281 14.874314902707 -13.093003168822 0.000000000000
+vertex 282 16.672664403554 -14.829649094970 0.000000000000
+vertex 283 16.412428415463 -14.231147297237 0.000000000000
+vertex 284 13.580416774166 -13.115588244668 0.000000000000
+vertex 285 12.981914976433 -13.375824232757 0.000000000000
+vertex 286 14.225879147615 -13.019123246621 0.000000000000
+vertex 287 16.067859664555 -17.255388410660 0.000000000000
+vertex 288 16.456059431557 -16.730766535128 0.000000000000
+vertex 289 16.695249479398 -16.123547223512 0.000000000000
+vertex 290 15.557105350983 -17.661660736268 0.000000000000
+vertex 291 16.769129401599 -15.475111468419 0.000000000000
+vertex 292 14.958603553251 -17.921896724358 0.000000000000
+vertex 293 12.780968939366 -10.636364170995 21.400000000000
+vertex 294 12.780968939366 -10.636364170995 0.000000000000
+vertex 295 12.788980926061 -10.657108580348 0.000000000000
+vertex 296 12.788980926061 -10.657108580348 21.400000000000
+vertex 297 12.791035805783 -10.571947934023 21.400000000000
+vertex 298 12.804994997922 -10.554637145335 21.400000000000
+vertex 299 11.139149930893 -8.806412445966 0.000000000000
+vertex 300 10.729479185629 -9.314444976283 0.000000000000
+vertex 301 12.782032623381 -10.592281776671 21.400000000000
+vertex 302 10.465256126881 -9.911197309008 0.000000000000
+vertex 303 12.791035805783 -10.571947934023 0.000000000000
+vertex 304 12.782032623381 -10.592281776671 0.000000000000
+vertex 305 12.778599002717 -10.614252955504 0.000000000000
+vertex 306 12.778599002717 -10.614252955504 21.400000000000
+vertex 307 12.822958903921 -10.541529112246 21.400000000000
+vertex 308 12.822958903921 -10.541529112246 0.000000000000
+vertex 309 12.804994997922 -10.554637145335 0.000000000000
+vertex 310 11.666349978397 -8.421721295432 0.000000000000
+vertex 311 12.883815984809 -10.699098544903 21.400000000000
+vertex 312 12.883815984809 -10.699098544903 0.000000000000
+vertex 313 12.904560394162 -10.691086558208 0.000000000000
+vertex 314 12.904560394162 -10.691086558208 21.400000000000
+vertex 315 12.922524300161 -10.677978525119 0.000000000000
+vertex 316 12.922524300161 -10.677978525119 21.400000000000
+vertex 317 13.452367781940 -13.046028079594 0.000000000000
+vertex 318 14.061169319685 -12.810894375022 0.000000000000
+vertex 319 12.861704769320 -10.701468481551 21.400000000000
+vertex 320 12.803453572659 -13.115580364815 0.000000000000
+vertex 321 12.861704769320 -10.701468481551 0.000000000000
+vertex 322 12.865814528764 -10.531147188903 21.400000000000
+vertex 323 12.865814528764 -10.531147188903 0.000000000000
+vertex 324 12.843703313273 -10.533517125551 0.000000000000
+vertex 325 12.843703313273 -10.533517125551 21.400000000000
+vertex 326 12.887785707598 -10.534580809567 21.400000000000
+vertex 327 13.568870175260 -8.217804313067 0.000000000000
+vertex 328 12.924065725425 -8.117035305639 0.000000000000
+vertex 329 12.887785707598 -10.534580809567 0.000000000000
+vertex 330 12.908119550245 -10.543583991969 21.400000000000
+vertex 331 14.165622507985 -8.482027371815 0.000000000000
+vertex 332 12.908119550245 -10.543583991969 0.000000000000
+vertex 333 12.925430338934 -10.557543184107 21.400000000000
+vertex 334 14.673655038303 -8.891698117079 0.000000000000
+vertex 335 12.938538372022 -10.575507090106 21.400000000000
+vertex 336 12.946550358717 -10.596251499459 21.400000000000
+vertex 337 15.293479893408 -10.027699702328 0.000000000000
+vertex 338 15.058346188836 -9.418898164583 0.000000000000
+vertex 339 12.925430338934 -10.557543184107 0.000000000000
+vertex 340 12.948920295366 -10.618362714949 21.400000000000
+vertex 341 12.945486674702 -10.640333893783 21.400000000000
+vertex 342 15.262263171202 -11.321418361446 0.000000000000
+vertex 343 15.363032178629 -10.676613911609 0.000000000000
+vertex 344 12.946550358717 -10.596251499459 0.000000000000
+vertex 345 12.938538372022 -10.575507090106 0.000000000000
+vertex 346 12.948920295366 -10.618362714949 0.000000000000
+vertex 347 12.936483492300 -10.660667736430 21.400000000000
+vertex 348 14.588369367189 -12.426203224488 0.000000000000
+vertex 349 14.998040112455 -11.918170694170 0.000000000000
+vertex 350 12.945486674702 -10.640333893783 0.000000000000
+vertex 351 12.936483492300 -10.660667736430 0.000000000000
+vertex 352 12.275151516142 -8.186587590860 0.000000000000
+vertex 353 12.839733590487 -10.698034860887 21.400000000000
+vertex 354 12.158649122823 -13.014811357387 0.000000000000
+vertex 355 12.839733590487 -10.698034860887 0.000000000000
+vertex 356 12.819399747838 -10.689031678485 21.400000000000
+vertex 357 12.819399747838 -10.689031678485 0.000000000000
+vertex 358 11.561896790098 -12.750588298639 0.000000000000
+vertex 359 12.802088959149 -10.675072486347 21.400000000000
+vertex 360 10.669173109247 -11.813717505871 0.000000000000
+vertex 361 11.053864259780 -12.340917553375 0.000000000000
+vertex 362 12.802088959149 -10.675072486347 0.000000000000
+vertex 363 10.364487119454 -10.556001758845 0.000000000000
+vertex 364 10.434039404675 -11.204915968126 0.000000000000
+vertex 365 13.204124618528 -4.547390988907 21.400000000000
+vertex 366 12.738197800186 -1.078542159692 0.000000000000
+vertex 367 11.856269729947 -1.317331051487 0.000000000000
+vertex 368 14.535044572146 -1.310316371747 0.000000000000
+vertex 369 13.651878013113 -1.076149583064 0.000000000000
+vertex 370 15.327511135790 -1.765084446070 0.000000000000
+vertex 371 16.441199235689 -5.878310942525 0.000000000000
+vertex 372 16.675366024371 -4.995144383491 0.000000000000
+vertex 373 16.672973447744 -4.081464170563 0.000000000000
+vertex 374 15.975272417345 -2.409462113309 0.000000000000
+vertex 375 16.434184555949 -3.199536100326 0.000000000000
+vertex 376 15.986431161366 -6.670777506169 0.000000000000
+vertex 377 15.342053494126 -7.318538787723 0.000000000000
+vertex 378 14.551979507110 -7.777450926327 0.000000000000
+vertex 379 13.670051436872 -8.016239818122 0.000000000000
+vertex 380 12.756371223945 -8.018632394750 0.000000000000
+vertex 381 11.873204664911 -7.784465606067 0.000000000000
+vertex 382 11.080738101267 -7.329697531744 0.000000000000
+vertex 383 9.735275789313 -5.013317807251 0.000000000000
+vertex 384 9.974064681108 -5.895245877488 0.000000000000
+vertex 385 10.432976819712 -6.685319864505 0.000000000000
+vertex 386 10.421818075692 -2.424004471645 0.000000000000
+vertex 387 9.967050001369 -3.216471035289 0.000000000000
+vertex 388 9.732883212685 -4.099637594323 0.000000000000
+vertex 389 11.066195742932 -1.776243190090 0.000000000000
+vertex 390 31.369889242110 2.846187010995 6.270000000000
+vertex 391 31.206728009615 3.415197849873 5.746831692999
+vertex 392 27.544320948090 2.365019524210 5.746831692999
+vertex 393 27.707482180585 1.796008685332 6.270000000000
+vertex 394 21.286253848349 -0.045248909840 6.270000000000
+vertex 395 21.123092513834 0.523762190565 5.746831616856
+vertex 396 17.460685680652 -0.526416069621 5.746831616856
+vertex 397 17.623846990192 -1.095427177188 6.270000000000
+vertex 398 20.280991100268 -10.361989926034 6.270000000000
+vertex 399 20.444152293550 -10.931000731345 5.746831644261
+vertex 400 24.106559382415 -9.880822397843 5.746831644261
+vertex 401 23.943398212253 -9.311811776344 6.270000000000
+vertex 402 30.364626290661 -7.470554063513 6.270000000000
+vertex 403 30.527787517219 -8.039564881688 5.746831668630
+vertex 404 34.190194578744 -6.989386556025 5.746831668630
+vertex 405 34.027033352186 -6.420375737850 6.270000000000
+vertex 406 23.943398161793 -9.311811600371 8.780000000000
+vertex 407 23.995216006750 -9.492521901321 8.711745343935
+vertex 408 30.416444135618 -7.651264364463 8.711745343935
+vertex 409 30.364626290661 -7.470554063513 8.780000000000
+vertex 410 27.707482180585 1.796008685332 8.780000000000
+vertex 411 27.655664243747 1.976719306712 8.711745353067
+vertex 412 21.234435856834 0.135461695861 8.711745353067
+vertex 413 21.286253803359 -0.045248922741 8.780000000000
+vertex 414 18.119994946677 -2.825698440573 5.740000000000
+vertex 415 19.536770420528 -7.766581691761 5.740000000000
+vertex 416 17.710373198245 -8.290292667813 5.740000000000
+vertex 417 16.293597724394 -3.349409416625 5.740000000000
+vertex 418 16.293597724394 -3.349409416625 6.840000000000
+vertex 419 17.710373198245 -8.290292667813 6.840000000000
+vertex 420 18.119994177480 -2.825698474052 6.840000000000
+vertex 421 19.536770420528 -7.766581691761 6.840000000000
+
+shader 10001 236 237 238 239
+shader 10002 240 239 238 241
+shader 10003 241 238 237 242
+shader 10004 243 244 245
+shader 10005 243 246 244
+shader 10006 243 247 246
+shader 10007 243 248 249
+shader 10008 243 249 250
+shader 10009 243 251 248
+shader 10010 243 250 252
+shader 10011 243 252 247
+shader 10012 243 253 254
+shader 10013 243 255 251
+shader 10014 243 254 255
+shader 10015 243 256 257
+shader 10016 243 257 253
+shader 10017 243 258 256
+shader 10018 243 259 258
+shader 10019 243 260 259
+shader 10020 243 261 260
+shader 10021 243 262 261
+shader 10022 243 263 262
+shader 10023 243 264 265
+shader 10024 243 265 263
+shader 10025 243 245 266
+shader 10026 243 266 267
+shader 10027 243 267 264
+shader 10028 268 269 270
+shader 10029 268 271 272
+shader 10030 268 273 274
+shader 10031 268 275 276
+shader 10032 268 272 269
+shader 10033 268 277 271
+shader 10034 268 274 277
+shader 10035 268 278 273
+shader 10036 268 276 278
+shader 10037 268 279 280
+shader 10038 268 280 281
+shader 10039 268 282 283
+shader 10040 268 284 285
+shader 10041 268 286 284
+shader 10042 268 283 279
+shader 10043 268 285 275
+shader 10044 268 281 286
+shader 10045 268 287 288
+shader 10046 268 288 289
+shader 10047 268 290 287
+shader 10048 268 291 282
+shader 10049 268 289 291
+shader 10050 268 270 292
+shader 10051 268 292 290
+shader 10052 293 294 295 296
+shader 10053 297 298 299 300
+shader 10054 301 297 300 302
+shader 10055 297 303 304 301
+shader 10056 301 304 305 306
+shader 10057 307 308 309 298
+shader 10058 298 309 303 297
+shader 10059 298 307 310 299
+shader 10060 311 312 313 314
+shader 10061 314 313 315 316
+shader 10062 314 311 317 318
+shader 10063 311 319 320 317
+shader 10064 319 321 312 311
+shader 10065 322 323 324 325
+shader 10066 322 326 327 328
+shader 10067 326 329 323 322
+shader 10068 326 330 331 327
+shader 10069 330 332 329 326
+shader 10070 330 333 334 331
+shader 10071 335 336 337 338
+shader 10072 333 339 332 330
+shader 10073 333 335 338 334
+shader 10074 340 341 342 343
+shader 10075 336 344 345 335
+shader 10076 340 346 344 336
+shader 10077 335 345 339 333
+shader 10078 336 340 343 337
+shader 10079 347 316 348 349
+shader 10080 341 350 346 340
+shader 10081 341 347 349 342
+shader 10082 347 351 350 341
+shader 10083 316 315 351 347
+shader 10084 316 314 318 348
+shader 10085 325 322 328 352
+shader 10086 325 324 308 307
+shader 10087 307 325 352 310
+shader 10088 319 353 354 320
+shader 10089 353 355 321 319
+shader 10090 356 357 355 353
+shader 10091 353 356 358 354
+shader 10092 359 296 360 361
+shader 10093 356 359 361 358
+shader 10094 359 362 357 356
+shader 10095 296 295 362 359
+shader 10096 306 301 302 363
+shader 10097 306 305 294 293
+shader 10098 296 293 364 360
+shader 10099 293 306 363 364
+shader 10100 365 366 367
+shader 10101 365 368 369
+shader 10102 365 370 368
+shader 10103 365 371 372
+shader 10104 365 372 373
+shader 10105 365 374 370
+shader 10106 365 375 374
+shader 10107 365 373 375
+shader 10108 365 376 371
+shader 10109 365 377 376
+shader 10110 365 378 377
+shader 10111 365 379 378
+shader 10112 365 380 379
+shader 10113 365 381 380
+shader 10114 365 382 381
+shader 10115 365 383 384
+shader 10116 365 384 385
+shader 10117 365 386 387
+shader 10118 365 385 382
+shader 10119 365 387 388
+shader 10120 365 388 383
+shader 10121 365 389 386
+shader 10122 365 367 389
+shader 10123 365 369 366
+shader 10124 390 391 392 393
+shader 10125 394 395 396 397
+shader 10126 398 399 400 401
+shader 10127 402 403 404 405
+shader 10128 406 407 408 409
+shader 10129 410 411 412 413
+shader 10130 414 415 416 417
+shader 10131 418 417 416 419
+shader 10132 420 414 417 418
+shader 10133 419 416 415 421
+_EXTENSION_ExternalShadingGeometry_END_
+
+
+_EXTENSION_GeoPositionGeometry_START_
+_EXTENSION_GeoPositionGeometry_END_
+
+
+_EXTENSION_DaylightSensorPoints_START_
+_EXTENSION_DaylightSensorPoints_END_
+
+
+_EXTENSION_AdditionalDaylightGeometry_START_
+_EXTENSION_AdditionalDaylightGeometry_END_
+
+
+_EXTENSION_VAMPARAMS_START_
+_EXTENSION_VAMPARAMS_END_
+
+
+

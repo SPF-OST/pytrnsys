@@ -1,16 +1,11 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/python
-"""
-Author : Dani Carbonell
-Date   : 30.09.2016
-ToDo :
-"""
-
+import io as _io
 import json as _json
 import logging
 import os
+import pathlib as _pl
 import tkinter as tk
 import typing as _tp
 from tkinter import messagebox as tkMessageBox
@@ -31,26 +26,12 @@ This class uses a list of ddck files to built a complete TRNSYS deck file
 
 
 class BuildTrnsysDeck:
-    """
-    Class used to built a deck file out of a list of ddck files
-    Parameters
-    ----------
-    _pathDeck : str
-        outlet path where we want to built the dck file
-    _nameDeck : str
-        the base name of the deck. This could be modified by the results of each simulation if variants are used in the cofing file
-    _nameList : str
-        the list of ddck files needed to built a deck
-    _pathList : str
-        the Base path of the ddck files
-    """
-
     def __init__(self, _pathDeck, _nameDeck, _nameList, ddckPlaceHolderValuesJsonPath):
 
         self.pathDeck = _pathDeck
         self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
 
-        self._ddckPlaceHolderValuesJsonPath = ddckPlaceHolderValuesJsonPath
+        self._ddckPlaceHolderValuesJsonPath = _pl.Path(ddckPlaceHolderValuesJsonPath) if ddckPlaceHolderValuesJsonPath else None
 
         self.oneSheetList = []
         self.nameList = _nameList
@@ -69,55 +50,49 @@ class BuildTrnsysDeck:
         self.dckAlreadyExists = True
 
     def loadDeck(self, _path, _name) -> _res.Result[_tp.Tuple[str, str, str]]:
+        ddckFilePath = _pl.Path(_path) / f"{_name}.{self.extOneSheetDeck}"
 
-        nameOneDck = _path + "\%s.%s" % (_name, self.extOneSheetDeck)
+        result = self._replacePlaceholdersAndGetContent(ddckFilePath)
+        if _res.isError(result):
+            return _res.error(result)
+        ddckContent = _res.value(result)
 
-        split = _path.split("\\")
-        ddckFolderPath = split[-1]
-
-        infile = open(nameOneDck, "r")
-        lines = infile.readlines()
-
-        if self._ddckPlaceHolderValuesJsonPath is not None:
-            placeholderValues = _json.load(open(self._ddckPlaceHolderValuesJsonPath))
-
-            if ddckFolderPath in placeholderValues:
-                name = placeholderValues[ddckFolderPath]
-                result = _replace.replaceComputedVariablesWithName(nameOneDck, name)
-
-                if _res.isError(result):
-                    return _res.error(result)
-
-                replacedContent = _res.value(result)
-
-                replacedLines = replacedContent.split("\n")
-
-                lastLine = replacedLines[-1]
-                if lastLine == "":
-                    lines = replacedLines[:-1]
-                else:
-                    lines = replacedLines
-        elif ddckFolderPath != "generic":
-            replacedLines = _replace.replaceComputedVariablesWithDefaults(nameOneDck).split("\n")
-            lastLine = replacedLines[-1]
-            if lastLine == "":
-                lines = replacedLines[:-1]
-            else:
-                lines = replacedLines
+        # Historically, the lines we're read in from a file directly using `readlines`. To reproduce the same behaviour
+        # regarding new line characters, we use `StringIO.readlines` here.
+        stream = _io.StringIO(ddckContent)
+        lines = stream.readlines()
 
         replaceChar = None
 
         self.linesChanged = spfUtils.purgueLines(lines, self.skypChar, replaceChar, removeBlankLines=True)
 
-        if self.eliminateComments == True:
+        if self.eliminateComments:
             self.linesChanged = spfUtils.purgueComments(self.linesChanged, ["!"])
-
-        infile.close()
 
         return lines[0:3]  # only returns the caption with the info of the file
 
+    def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path) -> _res.Result[str]:
+        componentName = ddckFilePath.parent.name
+
+        if componentName == "generic":
+            return ddckFilePath.read_text()
+
+        if self._ddckPlaceHolderValuesJsonPath:
+            placeholderValues = _json.loads(self._ddckPlaceHolderValuesJsonPath.read_text())
+
+            if componentName in placeholderValues:
+                namesByPort = placeholderValues[componentName]
+                result = _replace.replaceComputedVariablesWithNames(ddckFilePath, namesByPort)
+
+                if _res.isError(result):
+                    return _res.error(result)
+
+                return _res.value(result)
+
+        return _replace.replaceComputedVariablesWithDefaults(ddckFilePath)
+
     def readDeckList(
-        self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
+            self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
     ) -> _res.Result[None]:
         """
 
@@ -171,11 +146,11 @@ class BuildTrnsysDeck:
             ddck = trnsysComponent.TrnsysComponent(pathList, nameList)
             definedVariables, requiredVariables = ddck.getVariables()
             if (
-                "printer" not in nameList
-                and "Printer" not in nameList
-                and "Control" not in nameList
-                and "control" not in nameList
-                and "BigIceCoolingTwoStorages" not in nameList
+                    "printer" not in nameList
+                    and "Printer" not in nameList
+                    and "Control" not in nameList
+                    and "control" not in nameList
+                    and "BigIceCoolingTwoStorages" not in nameList
             ):
                 self.dependencies[nameList] = requiredVariables - definedVariables
                 self.definitions[nameList] = definedVariables
@@ -187,8 +162,8 @@ class BuildTrnsysDeck:
             addedLines = firstThreeLines + self.linesChanged
 
             caption = (
-                " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
-                % (nameList, pathList)
+                    " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
+                    % (nameList, pathList)
             )
 
             if doAutoUnitNumbering:
@@ -255,7 +230,7 @@ class BuildTrnsysDeck:
             ok = tkMessageBox.askokcancel(
                 title="Processing Trnsys",
                 message="Do you want override %s ?\n If parallel simulations most likely accepting this will ovrewrite all the rest too. Think of it twice !! "
-                % tempName,
+                        % tempName,
             )
             window.destroy()
 

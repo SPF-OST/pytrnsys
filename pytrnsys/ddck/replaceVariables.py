@@ -68,9 +68,7 @@ def replaceComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path) -> str:
     return outputDdckContent
 
 
-def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict) -> _res.Result[str]:
-    inputDdckFilePath = _pl.Path(inputFilePathInStr)
-
+def replaceComputedVariablesWithNames(inputDdckFilePath: _pl.Path, namesByPort: dict) -> _res.Result[str]:
     computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
     inputDdckContent = inputDdckFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
 
@@ -80,23 +78,23 @@ def replaceComputedVariablesWithName(inputFilePathInStr: str, namesByPort: dict)
         namesForPort = namesByPort.get(computedVariable.portName, {})
         if _isEmpty(namesForPort):
             return _res.Error(
-                f"There is no connection name in json file for {computedVariable.portName} for {inputFilePathInStr}"
+                f"Unknown port `{computedVariable.portName}` in {inputDdckFilePath.name}"
             )
 
-        replamentString = namesForPort.get(computedVariable.portProperty, {})
-        if _isEmpty(replamentString):
+        valuesByProperty = namesForPort.get(computedVariable.portProperty, {})
+        if _isEmpty(valuesByProperty):
             return _res.Error(
-                f"There is no {computedVariable.portProperty} in json file for {computedVariable.portName} for "
-                f"{inputFilePathInStr}"
+                f"Unknown property `{computedVariable.portProperty}` in for port `{computedVariable.portName}` in "
+                f"{inputDdckFilePath.name}"
             )
 
         outputDdckContent = _replace(
             outputDdckContent,
             offset + computedVariable.startIndex,
             offset + computedVariable.endIndex,
-            replamentString,
+            valuesByProperty,
         )
-        offset += computedVariable.lengthChange(replamentString)
+        offset += computedVariable.lengthChange(valuesByProperty)
 
     return outputDdckContent
 

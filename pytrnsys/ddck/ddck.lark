@@ -2,11 +2,17 @@
 
 ddck: block+
 
-?block: equations | constants | unit | assign
+?block: version | equations | constants | unit | assign
+
+version: "VERSION" version_number
+
+version_number: POSITIVE_INT
 
 unit: header parameters [inputs [labels]]
 
-header: "UNIT"i unit_number "TYPE"i type_number
+header: "UNIT"i unit_number "TYPE"i type_number [header_comment]
+
+header_comment: (LETTER | DIGIT)+
 
 unit_number: POSITIVE_INT
 
@@ -79,7 +85,7 @@ explicit_var_name: SHARED_VAR_NAME -> shared_var
     | NAME -> private_var
     | MODULATION -> modulation_control
 
-assign: "ASSIGN" file_path [logical_unit]
+assign: "ASSIGN" (file_path | "\"" file_path "\"") [logical_unit]
 
 file_path: FILE_PATH
 

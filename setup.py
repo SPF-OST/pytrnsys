@@ -48,7 +48,7 @@ _st.setup(
     include_package_data=True,
     install_requires=["numpy", "scipy", "pandas", "matplotlib", "seaborn", "bokeh", "dataclasses-jsonschema", "lark"],
     package_data={
-        "pytrnsys": ["./plot/stylesheets/*.*", "./report/latex_doc/*.*", "ddck/ddck.lark"],
+        "pytrnsys": ["py.typed", "./plot/stylesheets/*.*", "./report/latex_doc/*.*", "ddck/ddck.lark"],
     },
     data_files=_getDataFilePairs(),
     classifiers=[
