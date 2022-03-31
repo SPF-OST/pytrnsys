@@ -78,11 +78,9 @@ input: variable_name
     | SIGNED_NUMBER -> literal
     | ("0" "," "0" | "CONST") -> const
 
-labels: "LABELS" number_of_labels label+
+labels: "LABELS" number_of_labels (LABEL [","])* LABEL
 
 number_of_labels: POSITIVE_INT
-
-label: LABEL
 
 constants: "CONSTANTS" number_of_constants equation+
 
@@ -161,7 +159,7 @@ DEFAULT_VARIABLE_NAME: NAME
 
 NAME: LETTER (LETTER|DIGIT|"_"|"-")*
 
-LABEL: LETTER (LETTER|DIGIT|"_"|"%"|"-")*
+LABEL: /[^,\s]+/
 
 POSITIVE_INT: POSITIVE_DIGIT DIGIT*
 
@@ -171,7 +169,7 @@ BOOL: "0" | "1"
 
 SIGNED_NUMBER: ("+"?|"-") NUMBER
 
-COMMENT: /^\*[^\n]*/m | /\![^\n]*/
+COMMENT: /^\s*\*[^\n]*\n?/m | /\![^\n]*/
 
 %import common.INT
 

@@ -17,9 +17,16 @@ def _createParser() -> _lark.Lark:
 _PARSER = _createParser()
 
 
+class ParsingException(Exception):
+    pass
+
+
 def parseDdck(ddckFilePath: _pl.Path) -> _lark.Tree:
     ddckText = ddckFilePath.read_text()
 
-    tree = _PARSER.parse(ddckText)
+    try:
+        tree = _PARSER.parse(ddckText)
+    except _lark.UnexpectedInput as larkException:
+        raise ParsingException(f"Error parsing file {ddckFilePath}") from larkException
 
     return tree
