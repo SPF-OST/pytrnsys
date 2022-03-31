@@ -148,8 +148,8 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 10    
-CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM,TmaxIceTes BlockSeries 
-CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM,TmaxIceTes BlockSeries 
+CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM TmaxIceTes BlockSeries 
+CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM TmaxIceTes BlockSeries 
 LABELS  3     
 Temperatures  
 MassFlows   
