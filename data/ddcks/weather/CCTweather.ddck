@@ -35,7 +35,7 @@
 ***********************************************************
 CONSTANTS 1
 unitReadWeather = 35
- ASSIGN  C:\Daten\OngoingProject\TRI-HP\WP7\SimProp\DataWeatherCCT_Prop.txt unitReadWeather   
+ ASSIGN  O:\Kombiteststand\TRNSYS\TRIHP\simdata\DataWeatherCCT_Prop.txt unitReadWeather   
 UNIT 33 TYPE 9      !Changed automatically
 PARAMETERS 194
 5     ! 1 Mode
