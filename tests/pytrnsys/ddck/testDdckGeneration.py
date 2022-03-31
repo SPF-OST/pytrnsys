@@ -53,9 +53,6 @@ def getDdckFiles() -> _tp.Iterable[_DdckFile]:
             expectedDdckFilePath = paths.expectedDdckDirPath / relativeDdckFilePath
 
             componentName = inputDdckFilePath.parent.name
-            # Skip `head.ddck` and `end.ddck` as we currently are unable to parse it.
-            if componentName == "generic":
-                continue
 
             yield _DdckFile(
                 projectDirPath,

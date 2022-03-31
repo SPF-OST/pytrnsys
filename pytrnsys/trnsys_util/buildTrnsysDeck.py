@@ -74,9 +74,6 @@ class BuildTrnsysDeck:
     def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path) -> _res.Result[str]:
         componentName = ddckFilePath.parent.name
 
-        if componentName == "generic":
-            return ddckFilePath.read_text()
-
         if self._ddckPlaceHolderValuesJsonPath:
             placeholderValues = _json.loads(self._ddckPlaceHolderValuesJsonPath.read_text())
 

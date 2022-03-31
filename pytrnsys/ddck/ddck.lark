@@ -2,7 +2,52 @@
 
 ddck: block+
 
-?block: version | equations | constants | unit | assign
+?block: simulation_control | component_control | listing_control
+
+?simulation_control: version | simulation | tolerances | limits
+    | nan_check | overwrite_check | time_report | dfq | eqsolver | solver |
+    | assign | end | equations | constants
+
+simulation: "SIMULATION" tstart tend delta_t
+
+tstart: number_or_private_var
+tend: number_or_private_var
+delta_t: number_or_private_var
+
+tolerances: "TOLERANCES" "-" integration_tol "-" convergance_tol | integration_tol convergance_tol
+
+integration_tol: number_or_private_var
+convergance_tol: number_or_private_var
+
+limits: "LIMITS" max_iterations_per_time_step max_warnings [trace_component_after_iterations]
+
+max_iterations_per_time_step: positive_int_or_private_var
+max_warnings: positive_int_or_private_var
+trace_component_after_iterations: positive_int_or_private_var
+
+nan_check: "NAN_CHECK" bool_or_private_var
+
+nan_check_value: BOOL -> value | private_var
+
+overwrite_check: "OVERWRITE_CHECK" bool_or_private_var
+
+time_report: "OVERWRITE_CHECK" bool_or_private_var
+
+dfq: "DFQ" POSITIVE_INT -> method
+
+eqsolver: "EQSOLVER" POSITIVE_INT -> solve_order
+
+solver: "SOLVER" POSITIVE_INT -> method
+
+end: "END"
+
+?listing_control: width | list
+
+width: "WIDTH" POSITIVE_INT -> width
+
+list: "LIST"
+
+?component_control: unit
 
 version: "VERSION" version_number
 
@@ -20,7 +65,7 @@ type_number: POSITIVE_INT
 
 parameters: "PARAMETERS" number_of_parameters parameter+
 
-number_of_parameters: POSITIVE_INT | NAME | ZERO
+number_of_parameters: POSITIVE_INT | NAME
 
 parameter: variable_name
     | SIGNED_NUMBER -> literal
@@ -31,6 +76,7 @@ number_of_inputs: POSITIVE_INT
 
 input: variable_name
     | SIGNED_NUMBER -> literal
+    | ("0" "," "0" | "CONST") -> const
 
 labels: "LABELS" number_of_labels label+
 
@@ -68,6 +114,15 @@ assignment_target: explicit_var_name
     | "(" sum ")"
     | func_call
 
+?number_or_private_var: NUMBER -> value
+    | private_var
+
+?positive_int_or_private_var: POSITIVE_INT -> value
+    | private_var
+
+?bool_or_private_var: BOOL -> value
+    | private_var
+
 func_call: func_name func_args -> func_call
 
 func_args: "(" (sum ("," sum)* )? ")"
@@ -82,8 +137,9 @@ output_number: INT
     | computed_var
 
 explicit_var_name: SHARED_VAR_NAME -> shared_var
-    | NAME -> private_var
-    | MODULATION -> modulation_control
+    | private_var
+
+private_var: NAME
 
 assign: "ASSIGN" (file_path | "\"" file_path "\"") [logical_unit]
 
@@ -92,10 +148,6 @@ file_path: FILE_PATH
 logical_unit: INT | NAME
 
 computed_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
-
-MODULATION: ZERO "," ZERO
-
-ZERO: "0" NUMBER*
 
 FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
 
@@ -114,6 +166,8 @@ LABEL: LETTER (LETTER|DIGIT|"_"|"%"|"-")*
 POSITIVE_INT: POSITIVE_DIGIT DIGIT*
 
 POSITIVE_DIGIT: "1".."9"
+
+BOOL: "0" | "1"
 
 SIGNED_NUMBER: ("+"?|"-") NUMBER
 
