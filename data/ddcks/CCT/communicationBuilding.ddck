@@ -151,7 +151,7 @@ unitTimestepEmulator = 218
 ASSIGN temp\CheckEmulationSim.Plt unitTimestepEmulator
 UNIT 91 TYPE 25        !Changed automatically
 PARAMETERS 10     
-dtSim                  ! 1 Printing interval
+dtHour                  ! 1 Printing interval
 tStrtUser            ! 2 Start time
 tEndUser                ! 3 Stop time
 unitTimestepEmulator     ! 4 Logical unit

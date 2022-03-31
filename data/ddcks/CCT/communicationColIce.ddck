@@ -88,8 +88,8 @@ PEcorr_kW = 0	! Nur ein Type 56 Gebäude simuliert, korrektur mit gemitteltedn D
 PAcorr_kW = 0
 BoSkip = LT(time,tskip+dthour) 		
 OPMode = 0
-TAout = TPiColDivDhwSh
-TEout = TPiIceToHp
+TAout = TPiColOut
+TEout = TPiPuEvapIn
 PuAOn = SaAOn
 TEmBox = TColl
 AlFlowSet = MfrPuCol
@@ -143,10 +143,6 @@ MfrE = [19,9]           ! Instant Measured evaporator Mass flow (kg/h]
  ! [19,13] M
 
 
-   
-
-
-
 
 ***********************************
 ** Timestep printer
@@ -159,7 +155,7 @@ unitTimestepEmA = 218
 ASSIGN temp\CheckEmulationSimA.Plt unitTimestepEmA
 UNIT 91 TYPE 25        !Changed automatically
 PARAMETERS 10     
-dtSim                  ! 1 Printing interval
+dtHour                  ! 1 Printing interval
 tStrtUser            ! 2 Start time
 tEndUser                ! 3 Stop time
 unitTimestepEmA     ! 4 Logical unit
@@ -179,7 +175,7 @@ unitTimestepEmE = 256
 ASSIGN temp\CheckEmulationSimE.Plt unitTimestepEmE
 UNIT 111 TYPE 25        !Changed automatically
 PARAMETERS 10     
-dtSim                  ! 1 Printing interval
+dtHour                  ! 1 Printing interval
 tStrtUser            ! 2 Start time
 tEndUser                ! 3 Stop time
 unitTimestepEmE     ! 4 Logical unit
