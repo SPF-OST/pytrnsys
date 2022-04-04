@@ -37,10 +37,10 @@ CONSTANTS 1
 unitReadWeather = 35
  ASSIGN  O:\Kombiteststand\TRNSYS\TRIHP\simdata\DataWeatherCCT_Prop.txt unitReadWeather   
 UNIT 33 TYPE 9      !Changed automatically
-PARAMETERS 194
+PARAMETERS 198
 5     ! 1 Mode
 1     ! 2 Header Lines to Skip
-47     ! 3 No. of values to read
+48     ! 3 No. of values to read
 dtSim     ! 4 Time interval of data
  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
@@ -88,6 +88,7 @@ dtSim     ! 4 Time interval of data
  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
   -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
   -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
 unitReadWeather     ! 9 Logical unit for input file (vorher 18)
 -1     ! 10 Free format mode      
@@ -137,6 +138,8 @@ ID_surfUser_3 = [33,43]   !Changed automatically
 IDS_surfUser_3 = [33,44]   !Changed automatically
 IDG_surfUser_3 = [33,45]   !Changed automatically
 AI_surfUser_3 = [33,46]       !Changed automatically
+EQUATIONS 1
+PrioCol = [33,48]
 
 EQUATIONS 6
 IT_surfUser_2_Wm2 = IT_surfUser_2/3.6
