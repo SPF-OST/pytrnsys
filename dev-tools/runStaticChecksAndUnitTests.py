@@ -86,7 +86,7 @@ def main():
 
     if arguments.shallRunAll or arguments.diagramsFormat:
         diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
-        cmd = f"pyreverse -k -o {diagramsFormat} -p pytrnsys_gui -d test-results pytrnsys"
+        cmd = f"pyreverse -k -o {diagramsFormat} -p pytrnsys -d test-results pytrnsys"
         sp.run(cmd.split(), check=True)
 
     if (
