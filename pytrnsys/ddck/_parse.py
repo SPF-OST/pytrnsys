@@ -22,7 +22,7 @@ class ParsingException(Exception):
 
 
 def parseDdck(ddckFilePath: _pl.Path) -> _lark.Tree:
-    ddckText = ddckFilePath.read_text()
+    ddckText = ddckFilePath.read_text(encoding="windows-1252")
 
     try:
         tree = _PARSER.parse(ddckText)

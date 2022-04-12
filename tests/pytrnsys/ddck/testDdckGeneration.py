@@ -88,4 +88,4 @@ class TestDdckGeneration:
         ddckFile.actual.parent.mkdir(parents=True, exist_ok=True)
         ddckFile.actual.write_text(actualDdckContent)
 
-        assert ddckFile.actual.read_text() == ddckFile.expected.read_text()
+        assert ddckFile.actual.read_text() == ddckFile.expected.read_text(encoding="windows-1252")
