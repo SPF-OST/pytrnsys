@@ -92,7 +92,7 @@ number_of_equations: POSITIVE_INT
 
 equation: assignment_target "=" sum
 
-assignment_target: explicit_var_name
+assignment_target: explicit_var_name | unreferencable_variable_name
 
 ?sum: product
     | sum "+" product -> plus
@@ -136,6 +136,8 @@ output_number: INT
 
 explicit_var_name: SHARED_VAR_NAME -> shared_var
     | private_var
+
+unreferencable_variable_name: LETTER (LETTER|DIGIT|"_"|"-")*
 
 private_var: NAME
 
