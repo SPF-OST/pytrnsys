@@ -157,7 +157,7 @@ PORT_PROPERTY: "@" ("temp" | "mfr")
 
 DEFAULT_VARIABLE_NAME: NAME
 
-NAME: LETTER (LETTER|DIGIT|"_"|"-")*
+NAME: LETTER (LETTER|DIGIT|"_")*
 
 LABEL: /[^,\s]+/
 
