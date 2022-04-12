@@ -79,37 +79,39 @@ TcwStd = 9 ! MS: fix cold water Temperature for CCT runs!   ! Standard cold wate
 !Qdot_sh = MfrB !BoSkipNot*cp_water*(Tbbi-TBout)*MfrB    ! kJ/h
 
     
-EQUATIONS 13     ! Attribution of Shared Memory inputs
+EQUATIONS 14     ! Attribution of Shared Memory inputs
 PowMode = 0     !  PowMode 1 is Power-controlled Temperature (TCout is overridden)
-tCCT = max(0,time-72)     
+tCCT = time  
 PEforecast_kW = QPcmToHp_kW			!MS: extraction power from ice storage!
 PAforecast_kW = Pcoll_kW			!MS: thermal collector power
 PEcorr_kW = 0	! Nur ein Type 56 Gebäude simuliert, korrektur mit gemitteltedn Daten des letzten Zeitschrittes feht noch
 PAcorr_kW = 0
 BoSkip = LT(time,tskip+dthour) 		
-OPMode = 0
+OPMode = 5*NOT(SaV) + 6*SaV  !E-Loop nur off / normal operation und A-Loop conditioning mode and normal operation 
+OPModeE = 5  	!MS 5 wenn in Betrieb sonst Standby -> 4 (off) 
 TAout = TPiColOut
 TEout = TPiPuEvapIn
+ 
 PuAOn = SaAOn
 TEmBox = TColl
-AlFlowSet = MfrPuCol
+AlFlowSet = MfrPuCol * NOT(SaV) + 0* SaV
 
      
      
 UNIT 19 TYPE 278      ! ExchangeData with Shared Memory
 PARAMETERS 5     
 6     ! PAR1: Number of Values to be read from textfile (= number of outputs), seperated by tabs  (maximum 50)
-0     ! PAR2: number of milliseconds to wait before checking if new timestep is due
+100     ! PAR2: number of milliseconds to wait before checking if new timestep is due
 102     ! Logical Unit for SharedMem File to be read by this type: Caution! Do not use this logical unit for ASSIGN statements or Parameter 4 or 5!
 103     ! Logical Unit for SharedMem File to be written by this type:  *  Caution! Do not use this logical unit for ASSIGN statements or Paramter 3 or 5!
 104     ! Logical Unit for SharedMem-Log File:   Caution! Do not use this logical unit for ASSIGN statements or Paramter 3 or 4!
      
-INPUTS 14    
+INPUTS 14   
 BoSkip     ! Boolean to indicate skipping time (0/1) -> skippen nicht nötig! BoSkip = 0 -> block am Anfang definierten
 tCCT     ! CCT-time that corresponds to emulation in testbench, h
-OPMode     ! unused! Operation mode of the next timestep: 5 is valve open, 6 is valve closed !!MS: 5 wenn Massenstrom > 0 (Heizperiode) 6 wenn MFREmulator 0
+OPMode     ! unused! Operation mode of the next timestep: 5 ion, 6 standby !!MS: 5 wenn Massenstrom > 0 (Heizperiode) 6 wenn MFREmulator 0
 PowMode     ! Power mode for the next timestep: 1 is power controlled, 0 is temperature controlled  !MS immer 0
-PAforecast_kW     ! Power forecast for the building loop in the next simulation timestep (kW)		! MS berechnete Heizkreisleistung in kW
+PAforecast_kW     ! MS Kollektorleistung! 
 TAout     ! Outlet temperature forecast for the solar loop in next simulation timestep (°C)
 PAcorr_kW     ! Power correction term for next simulation timestep (kW)			MS immer 0
 AlFlowSet  !MS Sollmassenstrom für A-Loop Emulator Pumpe PA2
@@ -118,9 +120,9 @@ VIceRatio !MS: massIce/(ViceS*rhoIce)*100 (%)
 TEmBox
 TEout     ! Outlet temperature forecast for the HP loop in next simulation timestep (°C)
 PrioCol     !MS Priority for collector heat: 1: Col to PCM priority 0: col to warm storages priority
-nix     ! relative outdoor humidity [%, 0-100]
+HorizontalIrradiation   ! MS horizontal irradiation -> find threashold!! 
 **  Initial values     
-0   0    04      0     2       20     0       20    15 0 0 0 0 0
+0   0    04      0     2       20     0       20    15 0 0 0 0 0 
 LABELS 3     
 C:\SharedMem\aLVtoTRNSYS.txt    ! change path for final version!
 C:\SharedMem\aTRNSYStoLV.txt   

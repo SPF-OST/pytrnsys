@@ -81,11 +81,11 @@ Qdot_sh = MfrB !BoSkipNot*cp_water*(Tbbi-TBout)*MfrB    ! kJ/h
     
 EQUATIONS 7     ! Attribution of Shared Memory inputs
 PowMode = 0     !  PowMode 1 is Power-controlled Temperature (TCout is overridden)
-tCCT = max(0,time-72)     
+tCCT = time  
 PBforecast_kW = PheatBui_kW
 PBcorr_kW = 0	! Nur ein Type 56 Gebäude simuliert, korrektur mit gemitteltedn Daten des letzten Zeitschrittes feht noch
 BoSkip = LT(time,tskip+dthour) 		
-OPMode = 5*BoHS+6*NOT(BoHS)
+OPMode = 5*BoHS + 6*NOT(BoHS)
 TBout = TRdRt ! -> correct? TBout is the return temperature of the radiaton?
 
 
