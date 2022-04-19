@@ -57,7 +57,7 @@ unit: header parameters [inputs [labels]]
 
 header: "UNIT"i unit_number "TYPE"i type_number [header_comment]
 
-header_comment: (LETTER | DIGIT)+
+header_comment: HEADER_COMMENT
 
 unit_number: POSITIVE_INT
 
@@ -137,7 +137,7 @@ output_number: INT
 explicit_var_name: SHARED_VAR_NAME -> shared_var
     | private_var
 
-unreferencable_variable_name: LETTER (LETTER|DIGIT|"_"|"-")*
+unreferencable_variable_name: UNREFERENCABLE_NAME
 
 private_var: NAME
 
@@ -163,6 +163,8 @@ NAME: LETTER (LETTER|DIGIT|"_")*
 
 LABEL: /[^,\s]+/
 
+UNREFERENCABLE_NAME: LETTER (LETTER|DIGIT|"_"|"-")*
+
 POSITIVE_INT: POSITIVE_DIGIT DIGIT*
 
 POSITIVE_DIGIT: "1".."9"
@@ -172,6 +174,8 @@ BOOL: "0" | "1"
 SIGNED_NUMBER: ("+"?|"-") NUMBER
 
 COMMENT: /^\s*\*[^\n]*\n?/m | /\![^\n]*/
+
+HEADER_COMMENT: (LETTER | DIGIT)+
 
 %import common.INT
 
