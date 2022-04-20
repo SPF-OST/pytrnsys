@@ -358,6 +358,10 @@ class BuildTrnsysDeck:
                 if match:
                     if constant == "UNIT":
                         numOfTrnsysConstants[constant] = numOfTrnsysConstants.get(constant, 0) + 1
+                    elif constant == "CONSTANTS":
+                        split = match.group().split()
+                        numOfTrnsysConstants["EQUATIONS"] = numOfTrnsysConstants.get("EQUATIONS", 0) + int(split[1])
+                        maxNumberOfConstantsInABlock = max(maxNumberOfConstantsInABlock, int(split[1]))
                     else:
                         split = match.group().split()
                         numOfTrnsysConstants[constant] = numOfTrnsysConstants.get(constant, 0) + int(split[1])
