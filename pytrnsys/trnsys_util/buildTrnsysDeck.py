@@ -6,6 +6,7 @@ import json as _json
 import logging
 import os
 import pathlib as _pl
+import re as _re
 import tkinter as tk
 import typing as _tp
 from tkinter import messagebox as tkMessageBox
@@ -31,7 +32,8 @@ class BuildTrnsysDeck:
         self.pathDeck = _pathDeck
         self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
 
-        self._ddckPlaceHolderValuesJsonPath = _pl.Path(ddckPlaceHolderValuesJsonPath) if ddckPlaceHolderValuesJsonPath else None
+        self._ddckPlaceHolderValuesJsonPath = _pl.Path(
+            ddckPlaceHolderValuesJsonPath) if ddckPlaceHolderValuesJsonPath else None
 
         self.oneSheetList = []
         self.nameList = _nameList
@@ -159,7 +161,7 @@ class BuildTrnsysDeck:
             addedLines = firstThreeLines + self.linesChanged
 
             caption = (
-                    " **********************************************************************\n ** %s.ddck from %s \n **********************************************************************\n"
+                    "**********************************************************************\n** %s.ddck from %s \n**********************************************************************\n"
                     % (nameList, pathList)
             )
 
@@ -171,8 +173,11 @@ class BuildTrnsysDeck:
                 unitModifiedLines = [line.replace("£", "") for line in addedLines]
                 addedLines = unitModifiedLines
 
-            self.deckText.append(caption)
+            stream = _io.StringIO(caption)
+            lines = stream.readlines()
+            self.deckText.extend(lines)
             self.deckText = self.deckText + addedLines
+
         self.logger = logging.getLogger("root")
         # stop propagting to root logger
         self.logger.propagate = False
@@ -235,7 +240,7 @@ class BuildTrnsysDeck:
                 self.overwriteForcedByUser = True
 
         if ok:
-            tempFile = open(tempName, "w")
+            tempFile = open(tempName, "w", encoding='windows-1252')
             if addedLines != None:
                 text = addedLines + self.deckText
             else:
@@ -258,20 +263,12 @@ class BuildTrnsysDeck:
             useDeckName=useDeckName, eraseBeginComment=False, eliminateComments=False
         )
 
-        # self.myDeck.loadDeckWithoutComments()
-        # self.linesDeckReaded = self.myDeck.linesReadedNoComments
-
     def checkTrnsysDeck(self, nameDck, check=True):
-
-        # self.readTrnsyDeck()
-        # deckUtils.checkEquationsAndConstants(self.linesDeckReaded)
-
         lines = deckUtils.loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True)
         if check:
             deckUtils.checkEquationsAndConstants(lines, self.nameDeck)
 
         self.linesDeckReaded = lines
-        # self.myDeck.checkEquationsAndConstants(self.deckText) #This does not need to read
 
     def saveUnitTypeFile(self):
 
@@ -300,7 +297,6 @@ class BuildTrnsysDeck:
                 line = "%s\tNone\t%s\n" % (self.filesUnitUsedInDdck[i], self.filesUsedInDdck[i])
             else:
                 line = "%s\t%s\t%s\n" % (self.filesUnitUsedInDdck[i], nameUnitFile, self.filesUsedInDdck[i])
-                # line = "%s\t%s\t%s\n" % (self.filesUnitUsedInDdck[i],nameUnitFile[:-1],self.filesUsedInDdck[i])
 
             lines = lines + line
 
@@ -325,8 +321,6 @@ class BuildTrnsysDeck:
         lines = deckUtils.addEnergyBalanceHourlyPrinter(unitId, eBalance)
         self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
 
-        self.writeDeck()  # Deck rewritten with added printer
-
     def replaceLines(self, replaceList):
         """
         Replaces a deck lines with different lines
@@ -344,4 +338,34 @@ class BuildTrnsysDeck:
             for index, line in enumerate(self.linesChanged):
                 if oldLine in line:
                     self.linesChanged[index] = newLine + "\n"
-                    changedLine = oldLine
+
+    def analyseDck(self) -> _res.Result[None]:
+        maxLineWidth = 0
+
+        constantsToCheck = ["UNIT", "EQUATIONS", "CONSTANTS", "PARAMETERS", "INPUTS"]
+        numOfTrnsysConstants = {}
+
+        for index, line in enumerate(self.deckText):
+            maxLineWidth = max(maxLineWidth, len(line))
+            if maxLineWidth > 1000:
+                return _res.Error(
+                    f"Line {index + 1} has {maxLineWidth} characters and exceeded the limit."
+                )
+
+            for constant in constantsToCheck:
+                match = _re.search(fr"^\b{constant}\s*\d+\b", line, _re.MULTILINE)
+                if match:
+                    if constant == "UNIT":
+                        numOfTrnsysConstants[constant] = numOfTrnsysConstants.get(constant, 0) + 1
+                    else:
+                        split = match.group().split()
+                        numOfTrnsysConstants[constant] = numOfTrnsysConstants.get(constant, 0) + int(split[1])
+                    break
+                else:
+                    continue
+
+        for constant, number in numOfTrnsysConstants.items():
+            if number > 1000:
+                return _res.Error(
+                    f"There are {number} of {constant} which exceeds the limit"
+                )
