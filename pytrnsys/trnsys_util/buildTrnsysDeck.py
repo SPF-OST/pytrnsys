@@ -339,8 +339,9 @@ class BuildTrnsysDeck:
                 if oldLine in line:
                     self.linesChanged[index] = newLine + "\n"
 
-    def analyseDck(self) -> _res.Result[None]:
+    def analyseDck(self):
         maxLineWidth = 0
+        maxNumberOfConstantsInABlock = 0
 
         constantsToCheck = ["UNIT", "EQUATIONS", "CONSTANTS", "PARAMETERS", "INPUTS"]
         numOfTrnsysConstants = {}
@@ -348,9 +349,9 @@ class BuildTrnsysDeck:
         for index, line in enumerate(self.deckText):
             maxLineWidth = max(maxLineWidth, len(line))
             if maxLineWidth > 1000:
-                return _res.Error(
-                    f"Line {index + 1} has {maxLineWidth} characters and exceeded the limit."
-                )
+                self.createWarningMessageBox("Default Limits Exceeded",
+                                             f"Line {index + 1} has {maxLineWidth} characters which exceeds the limit.")
+                maxLineWidth = 0
 
             for constant in constantsToCheck:
                 match = _re.search(fr"^\b{constant}\s*\d+\b", line, _re.MULTILINE)
@@ -360,12 +361,24 @@ class BuildTrnsysDeck:
                     else:
                         split = match.group().split()
                         numOfTrnsysConstants[constant] = numOfTrnsysConstants.get(constant, 0) + int(split[1])
+                        maxNumberOfConstantsInABlock = max(maxNumberOfConstantsInABlock, int(split[1]))
                     break
                 else:
                     continue
 
         for constant, number in numOfTrnsysConstants.items():
-            if number > 1000:
-                return _res.Error(
-                    f"There are {number} of {constant} which exceeds the limit"
-                )
+            if (constant == "UNIT" and number > 1000) or (constant == "EQUATIONS" and number > 500) or (
+                    constant == "PARAMETERS" and number > 2000) or (constant == "INPUTS" and number > 750):
+                self.createWarningMessageBox("Default Limits Exceeded",
+                                             f"There are {number} of {constant} which exceeds the limit")
+
+        if maxNumberOfConstantsInABlock > 250:
+            self.createWarningMessageBox("Default Limits Exceeded",
+                                         f"There are {maxNumberOfConstantsInABlock} of components in one block which "
+                                         f"exceeds the limit")
+
+    def createWarningMessageBox(self, title, message):
+        window = tk.Tk()
+        window.geometry("2x2+" + str(window.winfo_screenwidth()) + "+" + str(window.winfo_screenheight()))
+        tkMessageBox.showwarning(title=title, message=message)
+        window.destroy()
