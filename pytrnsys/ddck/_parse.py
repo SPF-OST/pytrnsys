@@ -3,6 +3,7 @@ import pkgutil as _pu
 
 import lark as _lark
 
+import pytrnsys.utils.result as _res
 import pytrnsys.ddck as _ddck
 
 
@@ -21,12 +22,12 @@ class ParsingException(Exception):
     pass
 
 
-def parseDdck(ddckFilePath: _pl.Path) -> _lark.Tree:
+def parseDdck(ddckFilePath: _pl.Path) -> _res.Result[_lark.Tree]:
     ddckText = ddckFilePath.read_text(encoding="windows-1252")
 
     try:
         tree = _PARSER.parse(ddckText)
     except _lark.UnexpectedInput as larkException:
-        raise ParsingException(f"Error parsing file {ddckFilePath}") from larkException
+        return _res.Error(f"Error parsing file {ddckFilePath}: {larkException}")
 
     return tree
