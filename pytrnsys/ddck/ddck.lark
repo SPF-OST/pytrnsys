@@ -8,48 +8,48 @@ ddck: block+
     | nan_check | overwrite_check | time_report | dfq | eqsolver | solver |
     | assign | end | equations | constants
 
-simulation: "SIMULATION" tstart tend delta_t
+simulation: "SIMULATION"i tstart tend delta_t
 
 tstart: number_or_private_var
 tend: number_or_private_var
 delta_t: number_or_private_var
 
-tolerances: "TOLERANCES" "-" integration_tol "-" convergance_tol | integration_tol convergance_tol
+tolerances: "TOLERANCES"i ("-" integration_tol "-" convergance_tol | integration_tol convergance_tol)
 
 integration_tol: number_or_private_var
 convergance_tol: number_or_private_var
 
-limits: "LIMITS" max_iterations_per_time_step max_warnings [trace_component_after_iterations]
+limits: "LIMITS"i max_iterations_per_time_step max_warnings [trace_component_after_iterations]
 
 max_iterations_per_time_step: positive_int_or_private_var
 max_warnings: positive_int_or_private_var
 trace_component_after_iterations: positive_int_or_private_var
 
-nan_check: "NAN_CHECK" bool_or_private_var
+nan_check: "NAN_CHECK"i bool_or_private_var
 
 nan_check_value: BOOL -> value | private_var
 
-overwrite_check: "OVERWRITE_CHECK" bool_or_private_var
+overwrite_check: "OVERWRITE_CHECK"i bool_or_private_var
 
-time_report: "OVERWRITE_CHECK" bool_or_private_var
+time_report: "OVERWRITE_CHECK"i bool_or_private_var
 
 dfq: "DFQ" POSITIVE_INT -> method
 
-eqsolver: "EQSOLVER" POSITIVE_INT -> solve_order
+eqsolver: "EQSOLVER"i POSITIVE_INT -> solve_order
 
-solver: "SOLVER" POSITIVE_INT -> method
+solver: "SOLVER"i POSITIVE_INT -> method
 
-end: "END"
+end: "END"i
 
 ?listing_control: width | list
 
-width: "WIDTH" POSITIVE_INT -> width
+width: "WIDTH"i POSITIVE_INT -> width
 
-list: "LIST"
+list: "LIST"i
 
 ?component_control: unit
 
-version: "VERSION" version_number
+version: "VERSION"i version_number
 
 version_number: POSITIVE_INT
 
@@ -63,14 +63,14 @@ unit_number: POSITIVE_INT
 
 type_number: POSITIVE_INT
 
-parameters: "PARAMETERS" number_of_parameters parameter+
+parameters: "PARAMETERS"i number_of_parameters parameter+
 
 number_of_parameters: POSITIVE_INT | NAME
 
 parameter: variable_name
     | SIGNED_NUMBER -> literal
 
-inputs: "INPUTS" number_of_inputs input+
+inputs: "INPUTS"i number_of_inputs input+
 
 number_of_inputs: POSITIVE_INT
 
@@ -78,15 +78,15 @@ input: variable_name
     | SIGNED_NUMBER -> literal
     | ("0" "," "0" | "CONST") -> const
 
-labels: "LABELS" number_of_labels (LABEL [","])* LABEL
+labels: "LABELS"i number_of_labels (LABEL [","])* LABEL
 
 number_of_labels: POSITIVE_INT
 
-constants: "CONSTANTS" number_of_constants equation+
+constants: "CONSTANTS"i number_of_constants equation+
 
 number_of_constants: POSITIVE_INT
 
-equations: "EQUATIONS" number_of_equations equation+
+equations: "EQUATIONS"i number_of_equations equation+
 
 number_of_equations: POSITIVE_INT
 
@@ -97,11 +97,11 @@ assignment_target: explicit_var_name | unreferencable_variable_name
 ?sum: product
     | sum "+" product -> plus
     | sum "-" product -> minus
-    
+
 ?product: power
     | product "*" power -> times
     | product "/" power -> divided_by
-    
+
 ?power: atom
     | power ("^" | "**") atom -> to_power_of
 
@@ -175,7 +175,7 @@ SIGNED_NUMBER: ("+"?|"-") NUMBER
 
 COMMENT: /^\s*\*[^\n]*\n?/m | /\![^\n]*/
 
-HEADER_COMMENT: (LETTER | DIGIT)+
+HEADER_COMMENT: /[^!\n]+/
 
 %import common.INT
 
