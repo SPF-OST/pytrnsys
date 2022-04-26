@@ -57,8 +57,8 @@ def replaceComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Re
         return _res.error(result)
     computedVariables = _res.value(result)
 
-    computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
     inputDdckContent = inputDdckFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
+
     outputDdckContent = inputDdckContent
     offset = 0
     for computedVariable in computedVariables:
@@ -86,9 +86,7 @@ def replaceComputedVariablesWithNames(inputDdckFilePath: _pl.Path, namesByPort: 
     for computedVariable in computedVariables:
         namesForPort = namesByPort.get(computedVariable.portName, {})
         if _isEmpty(namesForPort):
-            return _res.Error(
-                f"Unknown port `{computedVariable.portName}` in {inputDdckFilePath.name}"
-            )
+            return _res.Error(f"Unknown port `{computedVariable.portName}` in {inputDdckFilePath.name}")
 
         valuesByProperty = namesForPort.get(computedVariable.portProperty, {})
         if _isEmpty(valuesByProperty):
@@ -112,7 +110,9 @@ def _isEmpty(dictionary) -> bool:
     return not bool(dictionary)
 
 
-def _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath: _pl.Path) -> _res.Result[_tp.Sequence["_ComputedVariable"]]:
+def _getComputedVariablesSortedByStartIndexAscending(
+    inputDdckFilePath: _pl.Path,
+) -> _res.Result[_tp.Sequence["_ComputedVariable"]]:
     result = _parse.parseDdck(inputDdckFilePath)
     if _res.isError(result):
         return _res.error(result)

@@ -82,7 +82,7 @@ class TestDdckGeneration:
         names = ddckPlaceHolderValues.get(ddckFile.componentName) or {}
 
         result = _replace.replaceComputedVariablesWithNames(ddckFile.input, names)
-        assert not _res.isError(result)
+        _res.throwIfError(result)
         actualDdckContent = _res.value(result)
 
         ddckFile.actual.parent.mkdir(parents=True, exist_ok=True)

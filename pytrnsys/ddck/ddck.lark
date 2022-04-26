@@ -31,13 +31,16 @@ nan_check_value: bool_or_private_var
 
 overwrite_check: "OVERWRITE_CHECK"i bool_or_private_var
 
-time_report: "OVERWRITE_CHECK"i bool_or_private_var
+time_report: "TIME_REPORT"i bool_or_private_var
 
 dfq: "DFQ"i positive_int_or_private_var
 
 eqsolver: "EQSOLVER"i positive_int_or_private_var
 
-solver: "SOLVER"i positive_int_or_private_var
+solver: "SOLVER"i positive_int_or_private_var [relax_factor_min relax_factor_max]
+
+relax_factor_min: number_or_private_var
+relax_factor_max: number_or_private_var
 
 end: "END"i
 
@@ -63,7 +66,7 @@ unit_number: POSITIVE_INT
 
 type_number: POSITIVE_INT
 
-parameters: "PARAMETERS"i number_of_parameters parameter+
+parameters: "PARAMETERS"i ("0" | number_of_parameters parameter+)
 
 number_of_parameters: POSITIVE_INT | NAME
 
