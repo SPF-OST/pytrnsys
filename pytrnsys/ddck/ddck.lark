@@ -27,23 +27,23 @@ trace_component_after_iterations: positive_int_or_private_var
 
 nan_check: "NAN_CHECK"i bool_or_private_var
 
-nan_check_value: BOOL -> value | private_var
+nan_check_value: bool_or_private_var
 
 overwrite_check: "OVERWRITE_CHECK"i bool_or_private_var
 
 time_report: "OVERWRITE_CHECK"i bool_or_private_var
 
-dfq: "DFQ" POSITIVE_INT -> method
+dfq: "DFQ"i positive_int_or_private_var
 
-eqsolver: "EQSOLVER"i POSITIVE_INT -> solve_order
+eqsolver: "EQSOLVER"i positive_int_or_private_var
 
-solver: "SOLVER"i POSITIVE_INT -> method
+solver: "SOLVER"i positive_int_or_private_var
 
 end: "END"i
 
 ?listing_control: width | list
 
-width: "WIDTH"i POSITIVE_INT -> width
+width: "WIDTH"i positive_int_or_private_var -> width
 
 list: "LIST"i
 
@@ -51,7 +51,7 @@ list: "LIST"i
 
 version: "VERSION"i version_number
 
-version_number: POSITIVE_INT
+version_number: positive_int_or_private_var
 
 unit: header parameters [inputs [labels]]
 
