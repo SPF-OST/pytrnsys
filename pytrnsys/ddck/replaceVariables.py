@@ -51,8 +51,12 @@ class _CollectComputedVariables(_lvis.Visitor_Recursive):
         return matchingChildToken.value
 
 
-def replaceComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path) -> str:
-    computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
+def replaceComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
+    result = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
+    if _res.isError(result):
+        return _res.error(result)
+    computedVariables = _res.value(result)
+
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
     outputDdckContent = inputDdckContent
     offset = 0
@@ -69,7 +73,11 @@ def replaceComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path) -> str:
 
 
 def replaceComputedVariablesWithNames(inputDdckFilePath: _pl.Path, namesByPort: dict) -> _res.Result[str]:
-    computedVariables = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
+    result = _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath)
+    if _res.isError(result):
+        return _res.error(result)
+    computedVariables = _res.value(result)
+
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
     outputDdckContent = inputDdckContent
@@ -77,9 +85,7 @@ def replaceComputedVariablesWithNames(inputDdckFilePath: _pl.Path, namesByPort: 
     for computedVariable in computedVariables:
         namesForPort = namesByPort.get(computedVariable.portName, {})
         if _isEmpty(namesForPort):
-            return _res.Error(
-                f"Unknown port `{computedVariable.portName}` in {inputDdckFilePath.name}"
-            )
+            return _res.Error(f"Unknown port `{computedVariable.portName}` in {inputDdckFilePath.name}")
 
         valuesByProperty = namesForPort.get(computedVariable.portProperty, {})
         if _isEmpty(valuesByProperty):
@@ -103,8 +109,14 @@ def _isEmpty(dictionary) -> bool:
     return not bool(dictionary)
 
 
-def _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath: _pl.Path) -> _tp.Sequence["_ComputedVariable"]:
-    tree = _parse.parseDdck(inputDdckFilePath)
+def _getComputedVariablesSortedByStartIndexAscending(
+    inputDdckFilePath: _pl.Path,
+) -> _res.Result[_tp.Sequence["_ComputedVariable"]]:
+    result = _parse.parseDdck(inputDdckFilePath)
+    if _res.isError(result):
+        return _res.error(result)
+    tree = _res.value(result)
+
     visitor = _CollectComputedVariables()
     visitor.visit(tree)
 

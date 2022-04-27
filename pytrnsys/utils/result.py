@@ -17,6 +17,11 @@ class Error:  # pylint: disable= too-few-public-methods
 Result = _tp.Union[_T, Error]
 
 
+@_dc.dataclass
+class ErrorException(Exception):
+    message: str
+
+
 def isError(result: Result[_T]) -> bool:
     if isinstance(result, Error):
         return True
@@ -37,3 +42,9 @@ def error(result: Result[_T]) -> Error:
         raise ValueError("Result is not an error.")
 
     return _tp.cast(Error, result)
+
+
+def throwIfError(result: Result[_T]) -> None:
+    if isError(result):
+        message = error(result).message
+        raise ErrorException(message)

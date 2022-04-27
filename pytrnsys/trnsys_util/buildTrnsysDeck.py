@@ -77,6 +77,10 @@ class BuildTrnsysDeck:
         componentName = ddckFilePath.parent.name
 
         if self._ddckPlaceHolderValuesJsonPath:
+
+            if not self._ddckPlaceHolderValuesJsonPath.is_file():
+                return _res.Error(f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} does not exist.")
+
             placeholderValues = _json.loads(self._ddckPlaceHolderValuesJsonPath.read_text())
 
             if componentName in placeholderValues:
