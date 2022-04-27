@@ -5,7 +5,7 @@
 ******************************************************************************************
 ** Contact person : M. Neugebauer  
 ** Creation date  : 04.11.2021 
-** Last changes   : 
+** Last changes   : 07.03.2022
 ******************************************************************************************
 
 ******************************************************************************************
@@ -20,19 +20,19 @@
 ** inputs from hydraulic solver
 ******************************************************************************************
 EQUATIONS 6
-THxRevLeftTop = TPiHxLeftTop			! 1: Left top side inlet temperature, deg C
-MfrHxRevLDown = MfrPiHxLeftTop			! 2: Left side downwards flow rate, kg/h
-THxRevRightBot = TPiHxRightBottom 		! 3: Right bottom side inlet temperature, deg C
-MfrHxRevRUp	= MfrPiHxRightBottom		! 4: Right side upwards flow rate, kg/h
-THxRevLeftBot = TPiHxLeftBottom			! 5: Left bottom side inlet temperature, deg C
-THxRevRightTop = TPiHxRightTop			! 6: Right top side inlet temperature, deg C
+THxRevLeftTop = @temp(side1Input, TPiHxLeftTop)				! 1: Left top side inlet temperature, deg C
+MfrHxRevLDown = @mfr(side1Input, MfrPiHxLeftTop)			! 2: Left side downwards flow rate, kg/h
+THxRevRightBot = @temp(side2Input, TPiHxRightBottom)		! 3: Right bottom side inlet temperature, deg C
+MfrHxRevRUp	= @mfr(side2Input, MfrPiHxRightBottom)			! 4: Right side upwards flow rate, kg/h
+THxRevLeftBot = TPiHxLeftBottom								! 5: Left bottom side inlet temperature, deg C
+THxRevRightTop = TPiHxRightTop								! 6: Right top side inlet temperature, deg C
 
 ******************************************************************************************
 ** outputs to hydraulic solver
 ******************************************************************************************
 EQUATIONS 2
-THxOutLeft = [2,1]				! 1: Left side outlet temperature, deg C 
-THxOutRight = [2,3]				! 3: Right side outlet temperature, deg C
+THxOutLeft = [2,1]		! 1: Left side outlet temperature, deg C 
+THxOutRight = [2,3]		! 3: Right side outlet temperature, deg C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh
@@ -48,8 +48,6 @@ THxOutRight = [2,3]				! 3: Right side outlet temperature, deg C
 ******************************************************************************************
 ** outputs to other ddck
 ******************************************************************************************
-
-
 CONSTANTS 1
 hxEfficiency = 0.95
 

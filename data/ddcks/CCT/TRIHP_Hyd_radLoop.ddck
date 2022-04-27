@@ -1,0 +1,319 @@
+*******************************
+**BEGIN TRIHP_Hyd_radLoop.ddck
+*******************************
+
+
+*****************************************
+** Whole system hydraulic section.
+** MFH with a combi-store and circulation losses loop and cooling
+** Version : v1
+** Last Changes: mschubert
+** Date: 24.02.2022
+******************************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+
+
+
+EQUATIONS 2
+qSysOut_PipeLoss = PipeLossTotal
+elSysOut_PuTot = PelPuSH_kW
+*******************************************************************
+******* BEGIN: Connexions with types
+*******************************************************************
+
+EQUATIONS 5
+TRadiatorSH = TRdRt 
+T_set_DivSH = T_set_d				!MS connection with radiator-type
+TRoomStore = 15						!changable by config file 
+TPiTeeMixSHIn = Tbbi*NOT(BoSkip)+BoSkip TRdSet 	! Temperature from Emulator! TRdSet is the set value from the heating curve
+! -> if skipping time is on -> then use just the tempearture directly from the heating code 
+scalePipes = 1						!changable by config file 
+
+EQUATIONS 1
+*** Pump outlet temperatures
+TPuSH = TPiSHOutMix
+
+*****************************************************
+****** Connection for mass flow rate -> no mass flow solver! 
+*****************************************************
+
+EQUATIONS 16! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MfrRadiatorSH_A = MfrPuSH
+MfrRadiatorSH_B = MfrPuSH
+MfrPuSH_A = MfrPuSH
+MfrPuSH_B = MfrPuSH
+MfrDivSH_A  = MfrPuSH
+MfrDivSH_B = MfrEmulator
+MfrDivSH_C = MfrPuSh - MfrEmulator
+MfrPiDivSHCool_A = mfrEmulator !MS determined mass flow from 3-way valve mixing down to correct SH in temp
+MfrTeeMixSH_A = MfrPuSH
+MfrTeeMixSH_B = MfrPuSh - MfrEmulator
+MfrTeeMixSH_C = MfrEmulator
+MfrPiSHInMix_A = MfrPuSh - MfrEmulator
+MfrPiSHOutMix_A = MfrPuSh
+MFRPIRADIN_A = MfrPuSh
+MFRPIRADOUT_A = MfrPuSh
+TDivSHCool = TPiRadOut
+
+
+CONSTANTS 1
+PPiCircLoss_kW = 0.377    ! constant value in kW for circ losses calculated from annual losses
+
+*****************************************************
+****** ELECTRICIY CONSUMPTION OF PUMPS
+*****************************************************
+
+EQUATIONS 1 !to be defined by user and exported by GUI
+MfrPuShNom     = MfrBuiRdNom     
+
+** Attention! No mass flow dependency of the efficiency here due to thermostatic valves!     
+EQUATIONS 6     ! Electric pump power for space heat distribution
+dpPuShNom_bar = 0.25     ! pressure-drop of loop at nominal mass flow, bar     
+frMfrPuSh= MfrPuSh/MfrPuShNom     ! Flow rate fraction of nominal flow rate    
+dpPuSh_bar = (frMfrPuSh)^2*dpPuShNom_bar     ! pressure drop at actual mass flow rate, bar
+PflowPuSh_W = ((MfrPuShNom/3600)/RhoWat)*dpPuShNom_bar*100000     ! required power to drive the flow, W
+etaPuSh = 0.3-0.00*(1-frMfrPuSh)     ! pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+PelPuSh_kW = GT(MfrPuSh,1)*0.015     ! required pump electric power, kW
+
+
+EQUATIONS 2
+PelPuDis_kW        = PelPuSH_kW
+
+*****************************************************
+*** temperating valve for SH ************************
+*****************************************************
+
+MfrPuSH = MfrBuiRd ! = MfrPiRadOut !! (check!)
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4
+TPiTeeMixSHIn 	!Thot
+TPiRadOut		!Tcold
+MfrPiRadOut
+T_set_DivSH
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivSH
+EQUATIONS 2
+xFracDivSH_heat =  (1.-[441,5] )   !-> 1-output -> 
+MfrEmulator = [441,3]  !mfr hot
+
+
+
+
+
+
+UNIT 451 TYPE 929
+!DivSH
+PARAMETERS 0
+INPUTS 6
+MfrDivSH_A
+MfrDivSH_B
+MfrDivSH_C
+TPiRadOut
+TPiDivSHCool
+TPiSHInMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivSH= [451,1]
+
+
+
+UNIT 482 TYPE 931
+!PiDivSHCool
+PARAMETERS 6
+diPiDivSHCool
+LPiDivSHCool
+UPiDivSHCool
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivSH
+MfrPiDivSHCool_A
+TRoomStore
+TDivSHCool
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDivSHCool= [482,1]
+PPiDivSHCool_kW= [482,3]/3600 !kW
+MfrPiDivSHCool= MfrPiDivSHCool_A
+
+UNIT 471 TYPE 929
+!TeeMixSH
+PARAMETERS 0
+INPUTS 6
+MfrTeeMixSH_A
+MfrTeeMixSH_B
+MfrTeeMixSH_C
+TPiSHOutMix
+TPiTeeMixSHIn
+TPiSHInMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeMixSH= [471,1]
+
+
+
+
+UNIT 473 TYPE 931
+!PiSHInMix
+PARAMETERS 6
+diPiSHInMix
+LPiSHInMix
+UPiSHInMix
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeMixSH
+MfrPiSHInMix_A
+TRoomStore
+TDivSH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiSHInMix= [473,1]
+PPiSHInMix_kW= [473,3]/3600 !kW
+MfrPiSHInMix= MfrPiSHInMix_A
+
+
+
+UNIT 479 TYPE 931
+!PiSHOutMix
+PARAMETERS 6
+diPiSHOutMix
+LPiSHOutMix
+UPiSHOutMix
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeMixSH
+MfrPiSHOutMix_A
+TRoomStore
+TPuSH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiSHOutMix= [479,1]
+PPiSHOutMix_kW= [479,3]/3600 !kW
+MfrPiSHOutMix= MfrPiSHOutMix_A
+
+UNIT 480 TYPE 931
+!PiRadIn
+PARAMETERS 6
+diPiRadIn
+LPiRadIn
+UPiRadIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuSH
+MfrPiRadIn_A
+TRoomStore
+TRadiatorSH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiRadIn= [480,1]
+PPiRadIn_kW= [480,3]/3600 !kW
+MfrPiRadIn= MfrPiRadIn_A
+
+UNIT 481 TYPE 931
+!PiRadOut
+PARAMETERS 6
+diPiRadOut
+LPiRadOut
+UPiRadOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TRadiatorSH
+MfrPiRadOut_A
+TRoomStore
+TDivSH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiRadOut= [481,1]
+PPiRadOut_kW= [481,3]/3600 !kW
+MfrPiRadOut= MfrPiRadOut_A
+
+
+
+CONSTANTS 3
+
+** Fluid Loop : ShLoop
+di_loop_1=0.05
+L_loop_1=4*scalePipes
+U_loop_1=5*scalePipes
+
+
+
+EQUATIONS 18
+
+******SHLoop****Fluid:Water*******
+
+*** PiSHOutMix
+diPiSHOutMix=di_loop_1
+LPiSHOutMix=L_loop_1
+UPiSHOutMix=U_loop_1
+*** PiRadIn
+diPiRadIn=di_loop_1
+LPiRadIn=L_loop_1
+UPiRadIn=U_loop_1
+*** PiRadOut
+diPiRadOut=di_loop_1
+LPiRadOut=L_loop_1
+UPiRadOut=U_loop_1
+*** PiTeeMixSHIn
+diPiTeeMixSHIn=di_loop_1
+LPiTeeMixSHIn=L_loop_1
+UPiTeeMixSHIn=U_loop_1
+*** PiSHInMix
+diPiSHInMix=di_loop_1
+LPiSHInMix=L_loop_1
+UPiSHInMix=U_loop_1
+*** PiDivSHCool
+diPiDivSHCool=di_loop_1
+LPiDivSHCool=L_loop_1
+UPiDivSHCool=U_loop_1
+
+
+
+
+EQUATIONS 2
+**PipeLoss0=PPiHpToTesDhwIn_kW+PPiHpCondOut_kW+PPiOutHxTesSh_kW+PPiHxDhwSecIn_kW+PPiHpToSh_kW+PPiShToTeeShHp_kW+PPiHpToSHDiffTop_kW+PPiTeeMixSHIn_kW+PPiSHInMix_kW+PPiTesDhwIn_kW+PPiCircIn_kW+PPiTesDhwOut_kW+PPiCircOut_kW+PPiHxDhwIn_kW+PPiDhwSecOut_kW+PPiDhwDemand_kW+PPiDhwMains_kW+PPiSHOutMix_kW+PPiRadIn_kW+PPiRadOut_kW+PPiDivSHCool_kW+PPiHpToSHDiffBot_kW+PPiHxCoolWatOut_kW+PPiOutHxTes_kW+PPiInHxTesSh_kW+PPiHpToTesDHWOut_kW+PPiSHToHP_kW+PPiHPToTeeHpToSh_kW+PPiHpInPu_kW+PPiHpCondIn_kW+PPiDivDhwShCol_kW+PPiColOut_kW+PPiColDivDhwSh_kW+PPiHxCoolBriOut_kW+PPiHxCoolBriIn_kW+PPiSolarToHxIce_kW+PPiHxIceToPuIce_kW+PPiHxSolarIceIn_kW+PPiHxSolarIceOut_kW+PPiIceToHp_kW+PPiIceToHxCool_kW+PPiIceToHpIn_kW+PPiHpToIce2_kW+PPiHpEvapOut_kW+PPiHpOutPu_kW+PPiColPuIn_kW+PPiColIn_kW+PPiPuDhwOut_kW+PPiHxDhwOut_kW+PPiPuCircIn_kW+PPiPuCircOut_kW+PConn1139_kW+PPiHpEvapMix_kW+PPiHpEvapIn_kW+PPiInHxTes_kW+PPiHxIceToSolar_kW
+PipeLoss1=PPiSHOutMix_kW+PPiRadIn_kW+PPiRadOut_kW+PPiSHInMix_kW+PPiDivSHCool_kW
+PipeLossTotal=PipeLoss1
+**by now this is manually created
+
+
+
+***********************************
+** Monthly printer
+***********************************
+
+
+
+
+
+
+

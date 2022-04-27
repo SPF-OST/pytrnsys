@@ -1,0 +1,227 @@
+*******************************
+**BEGIN communicationBuilding.ddck
+*******************************
+
+*****************************************
+** Contact person : Maike Schubert (MS)
+** Creation date  : 23.02.2022
+** Last changes   : 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Communication part between labview and trnsys
+** for building/radiation system simulation
+** 
+***************************************************************************
+
+***********************************
+** inputs from building/radiation distribution
+***********************************
+
+!EQUATIONS 2
+!Tdhw = TPiDHWDemand ![22,1]     ! Warm water supply temperature from WW heat exchanger or mixing valve [�C]
+!MfrDhw = ABS(MfrPiDHWDemand) ! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
+
+***********************************
+** outputs to building/ratiation distribution
+***********************************
+
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+
+************************************************
+CONSTANTS 4
+ tSimStrt = 0
+ tSimEnd = 504.0000000
+ tSkip = 0
+ tCond = 0.0000000
+ !dtSim = 0.0166660
+******* this part will be changed by labview!
+************************************************
+
+!CONSTANTS 2
+!FrInte_Tol = 0.001
+!FrConv_Tol = 0.001
+     
+
+CONSTANTS 3
+dtHour = 1/int(1/dtSim+0.5)
+tSkipA = tSkip          ! Zur Konditionierung läuft die Simulation erst für drei Tage mit nominaler Heizleistung
+tSimEndA = tSimEnd
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+
+
+CONSTANTS 1
+TcwStd = 9 ! MS: fix cold water Temperature for CCT runs!   ! Standard cold water temperature (�C)   TcwAvg  from weatherData
+
+***********************************
+** outputs to other ddck
+***********************************
+!EQUATIONS 1
+
+!MfrDHWset = dtDhwCorrect*MfrDHWreal
+
+***********************************
+** main part - reading writing communication file
+***********************************
+!EQUATIONS 1
+!Qdot_sh = MfrB !BoSkipNot*cp_water*(Tbbi-TBout)*MfrB    ! kJ/h
+
+    
+EQUATIONS 13     ! Attribution of Shared Memory inputs
+PowMode = 0     !  PowMode 1 is Power-controlled Temperature (TCout is overridden)
+tCCT = max(0,time-72)     
+PEforecast_kW = QPcmToHp_kW			!MS: extraction power from ice storage!
+PAforecast_kW = Pcoll_kW			!MS: thermal collector power
+PEcorr_kW = 0	! Nur ein Type 56 Gebäude simuliert, korrektur mit gemitteltedn Daten des letzten Zeitschrittes feht noch
+PAcorr_kW = 0
+BoSkip = LT(time,tskip+dthour) 		
+OPMode = 0
+TAout = TPiColOut
+TEout = TPiPuEvapIn
+PuAOn = SaAOn
+TEmBox = TColl
+AlFlowSet = MfrPuCol
+
+     
+     
+UNIT 19 TYPE 278      ! ExchangeData with Shared Memory
+PARAMETERS 5     
+6     ! PAR1: Number of Values to be read from textfile (= number of outputs), seperated by tabs  (maximum 50)
+0     ! PAR2: number of milliseconds to wait before checking if new timestep is due
+102     ! Logical Unit for SharedMem File to be read by this type: Caution! Do not use this logical unit for ASSIGN statements or Parameter 4 or 5!
+103     ! Logical Unit for SharedMem File to be written by this type:  *  Caution! Do not use this logical unit for ASSIGN statements or Paramter 3 or 5!
+104     ! Logical Unit for SharedMem-Log File:   Caution! Do not use this logical unit for ASSIGN statements or Paramter 3 or 4!
+     
+INPUTS 14    
+BoSkip     ! Boolean to indicate skipping time (0/1) -> skippen nicht nötig! BoSkip = 0 -> block am Anfang definierten
+tCCT     ! CCT-time that corresponds to emulation in testbench, h
+OPMode     ! unused! Operation mode of the next timestep: 5 is valve open, 6 is valve closed !!MS: 5 wenn Massenstrom > 0 (Heizperiode) 6 wenn MFREmulator 0
+PowMode     ! Power mode for the next timestep: 1 is power controlled, 0 is temperature controlled  !MS immer 0
+PAforecast_kW     ! Power forecast for the building loop in the next simulation timestep (kW)		! MS berechnete Heizkreisleistung in kW
+TAout     ! Outlet temperature forecast for the solar loop in next simulation timestep (°C)
+PAcorr_kW     ! Power correction term for next simulation timestep (kW)			MS immer 0
+AlFlowSet  !MS Sollmassenstrom für A-Loop Emulator Pumpe PA2
+TAvgPCM    !MS: averaged PCM temperature
+VIceRatio !MS: massIce/(ViceS*rhoIce)*100 (%)
+TEmBox
+TEout     ! Outlet temperature forecast for the HP loop in next simulation timestep (°C)
+PrioCol     !MS Priority for collector heat: 1: Col to PCM priority 0: col to warm storages priority
+nix     ! relative outdoor humidity [%, 0-100]
+**  Initial values     
+0   0    04      0     2       20     0       20    15 0 0 0 0 0
+LABELS 3     
+C:\SharedMem\aLVtoTRNSYS.txt    ! change path for final version!
+C:\SharedMem\aTRNSYStoLV.txt   
+C:\SharedMem\aTRNSYStoLV.log     
+     
+EQUATIONS 9
+tLVsim = [19,1]     !  time of lab view simulation
+***** block for A-Loop *****
+Taai = [19,2]*NOT(BoSkip)+25*BoSkip     ! Instant measured A-Loop Inlet temparture (°C) Testsstand Temperatur für Radiator
+MfrA = [19,3]
+SaAOn = [19,4]     !MS assumption Valve_W_Vell = 100 if ProWS and 0 if ProCS
+TaaiMean = [19,5]     !  Mean measured A-Loop values of previous timestep: Tin (°C), Tout (°C) cap.flow-rate (kJ/hrK)
+MfrAMean = [19,6] 
+SaV = [19,7]
+***** block for E-Loop *****
+Teei = [19,8]*NOT(BoSkip)+3*BoSkip
+MfrE = [19,9]           ! Instant Measured evaporator Mass flow (kg/h]
+!MfrEMean = [19,10]     ! Mean measured building inlet temperature of previous timestep (°C)
+!TeeiMean = [19,11]
+ ! [19,13] M
+
+
+
+***********************************
+** Timestep printer
+***********************************
+
+CONSTANTS 1
+unitTimestepEmA = 218
+
+
+ASSIGN temp\CheckEmulationSimA.Plt unitTimestepEmA
+UNIT 91 TYPE 25        !Changed automatically
+PARAMETERS 10     
+dtHour                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitTimestepEmA     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 14
+Time BoSkip TCCT OPMode PowMode PAforecast_kW TAout PAcorr_kW Tamb MfrA tLVsim Taai AlFlowSet TaaiMean MfrAMean
+Time BoSkip TCCT OPMode PowMode PAforecast_kW TAout PAcorr_kW Tamb MfrA tLVsim Taai AlFlowSet TaaiMean MfrAMean
+
+CONSTANTS 1
+unitTimestepEmE = 256
+
+ASSIGN temp\CheckEmulationSimE.Plt unitTimestepEmE
+UNIT 111 TYPE 25        !Changed automatically
+PARAMETERS 10     
+dtHour                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitTimestepEmE     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 12
+Time BoSkip TCCT OPMode PowMode PEforecast_kW TEout PEcorr_kW Tamb MfrE tLVsim Teei MfrE 
+Time BoSkip TCCT OPMode PowMode PEforecast_kW TEout PEcorr_kW Tamb MfrE tLVsim Taai MfrE 
+
+
+***********************************
+** Online plotter
+***********************************
+
+
+UNIT 20 TYPE 65     ! Online Plotter DHW (Element OpDHW)
+PARAMETERS 12     
+1     ! 1 Nb. of left-axis variables
+1     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+300     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+60     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 2    
+MfrDhw  
+Tdhw 
+**     
+MfrDhw  
+Tdhw 
+**     
+LABELS  3     
+massFlow
+Temperatures     
+DHW-Hyd
+
+
+*******************************
+**END communicationBuilding.ddck
+*******************************

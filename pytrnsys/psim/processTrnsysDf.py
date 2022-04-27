@@ -181,6 +181,7 @@ class ProcessTrnsysDf:
         self.addCustomNBar()
         self.addTemperatureFreq()
 
+        self.saveTSToCsv()
         self.saveHourlyToCsv()
         self.addResultsFile()
 
@@ -292,7 +293,6 @@ class ProcessTrnsysDf:
         self.monthlyUsed = True
         self.hourlyUsed = True
         self.timeStepUsed = True
-        self.fullYear = False
         self.fileNameListToRead = None
         self.loadMode = "complete"
 
@@ -357,7 +357,6 @@ class ProcessTrnsysDf:
                     hourlyUsed=self.hourlyUsed,
                     timeStepUsed=self.timeStepUsed,
                     firstMonth=self.firstMonth,
-                    fullYear=self.fullYear,
                     year=self.yearReadedInMonthlyFile,
                 )
         self.monDataDf = self.loader.monDataDf
@@ -481,56 +480,57 @@ class ProcessTrnsysDf:
             self.comfortHourly()
 
     def scatterHourly(self):
-        plotVariables = self.inputs["scatterHourly"][0]
-        xVariable = plotVariables[0]
-        yVariable = plotVariables[1]
+        for plotVariables in self.inputs["scatterHourly"]:
 
-        try:
-            xDf = self.houDataDf[xVariable]
-        except:
-            logger.warning("%s not found in hourly data.", xVariable)
-            logger.warning("scatterHourly not generated.")
-            return
-        try:
-            yDf = self.houDataDf[yVariable]
-        except:
-            logger.warning("%s not found in hourly data.", yVariable)
-            logger.warning("scatterHourly not generated.")
-            return
+            xVariable = plotVariables[0]
+            yVariable = plotVariables[1]
 
-        logger.info("Generating scatterHourly...")
+            try:
+                xDf = self.houDataDf[xVariable]
+            except:
+                logger.warning("%s not found in hourly data.", xVariable)
+                logger.warning("scatterHourly not generated.")
+                continue
+            try:
+                yDf = self.houDataDf[yVariable]
+            except:
+                logger.warning("%s not found in hourly data.", yVariable)
+                logger.warning("scatterHourly not generated.")
+                continue
 
-        if "latexNames" in self.inputs.keys():
-            if ":" in self.inputs["latexNames"]:
-                latexNameFullPath = self.inputs["latexNames"]
+            logger.info("Generating scatterHourly %s %s..." %(xVariable, yVariable))
+
+            if "latexNames" in self.inputs.keys():
+                if ":" in self.inputs["latexNames"]:
+                    latexNameFullPath = self.inputs["latexNames"]
+                else:
+                    latexNameFullPath = os.path.join(self.configPath, self.inputs["latexNames"])
+                self.doc.getLatexNamesDict(file=latexNameFullPath)
             else:
-                latexNameFullPath = os.path.join(self.configPath, self.inputs["latexNames"])
-            self.doc.getLatexNamesDict(file=latexNameFullPath)
-        else:
-            self.doc.getLatexNamesDict()
+                self.doc.getLatexNamesDict()
 
-        fig1, ax1 = plt.subplots(constrained_layout=True)
+            fig1, ax1 = plt.subplots(constrained_layout=True)
 
-        ax1.plot(xDf, yDf, "o", color='b', markersize=1)
-        ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
-        ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
+            ax1.plot(xDf, yDf, "o", color='b', markersize=1)
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
 
-        fileName = "scatter_" + xVariable + "_" + yVariable
-        fileName = re.sub(r"[^\w\-_\. ]", "", fileName)
+            fileName = "scatter_" + xVariable + "_" + yVariable
+            fileName = re.sub(r"[^\w\-_\. ]", "", fileName)
 
-        lines = xVariable + "\t" + yVariable + "\n"
-        for i in range(len(xDf)):
-            line = str(xDf.iloc[i]) + "\t" + str(yDf.iloc[i])
-            lines += line + "\n"
+            lines = xVariable + "\t" + yVariable + "\n"
+            for i in range(len(xDf)):
+                line = str(xDf.iloc[i]) + "\t" + str(yDf.iloc[i])
+                lines += line + "\n"
 
-        pathFolder = os.path.join(self.executingPath,self.folderName)
+            pathFolder = os.path.join(self.executingPath,self.folderName)
 
-        outfile = open(os.path.join(pathFolder, fileName + ".dat"), "w")
-        outfile.writelines(lines)
-        outfile.close()
+            outfile = open(os.path.join(pathFolder, fileName + ".dat"), "w")
+            outfile.writelines(lines)
+            outfile.close()
 
-        fig1.savefig(os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
-        plt.close()
+            fig1.savefig(os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
+            plt.close()
 
     def outlinePlotter(self, axis, outlinePoints, color='k', label = None):
         if label == None:
@@ -545,72 +545,85 @@ class ProcessTrnsysDf:
                       linestyle='-', markersize=0, color=color)
 
     def comfortHourly(self):
-        plotVariables = self.inputs["comfortHourly"][0]
+        for plotVariables in self.inputs["comfortHourly"]:
 
-        variableStartIndex = 0
-        comfortBoundary = [(20, 30), (20, 70), (26, 70), (26, 30)]
-        acceptableBoundary = []
+            variableStartIndex = 0
+            comfortBoundary = [(20, 30), (20, 70), (26, 70), (26, 30)]
+            acceptableBoundary = []
 
-        if plotVariables[0] == "ISO7730":
-            variableStartIndex = 1
-        elif plotVariables[0] == "Dahlheimer":
-            variableStartIndex = 1
-            comfortBoundary = [(17,75), (21,65), (22,35), (19,35)]
-            acceptableBoundary = [(16,75), (17,85), (21,80), (25,60), (27,30), (26,20), (20,20), (17,35)]
+            if plotVariables[0] == "ISO7730":
+                variableStartIndex = 1
+            elif plotVariables[0] == "Dahlheimer":
+                variableStartIndex = 1
+                comfortBoundary = [(17,75), (21,65), (22,35), (19,35)]
+                acceptableBoundary = [(16,75), (17,85), (21,80), (25,60), (27,30), (26,20), (20,20), (17,35)]
 
-        xVariable = plotVariables[variableStartIndex]
-        yVariable = plotVariables[variableStartIndex + 1]
+            xVariable = plotVariables[variableStartIndex]
+            yVariable = plotVariables[variableStartIndex + 1]
 
-        try:
-            xDf = self.houDataDf[xVariable]
-        except:
-            logger.warning("%s not found in hourly data.", xVariable)
-            logger.warning("comfortHourly not generated.")
-            return
-        try:
-            yDf = self.houDataDf[yVariable]
-        except:
-            logger.warning("%s not found in hourly data.", yVariable)
-            logger.warning("comfortHourly not generated.")
-            return
+            try:
+                xDf = self.houDataDf[xVariable]
+            except:
+                logger.warning("%s not found in hourly data.", xVariable)
+                logger.warning("comfortHourly not generated.")
+                continue
+            try:
+                yDf = self.houDataDf[yVariable]
+            except:
+                logger.warning("%s not found in hourly data.", yVariable)
+                logger.warning("comfortHourly not generated.")
+                continue
 
-        logger.info("Generating comfortHourly...")
+            logger.info("Generating comfortHourly %s %s..." %(xVariable, yVariable))
 
-        if "latexNames" in self.inputs.keys():
-            if ":" in self.inputs["latexNames"]:
-                latexNameFullPath = self.inputs["latexNames"]
+            if "latexNames" in self.inputs.keys():
+                if ":" in self.inputs["latexNames"]:
+                    latexNameFullPath = self.inputs["latexNames"]
+                else:
+                    latexNameFullPath = os.path.join(self.configPath, self.inputs["latexNames"])
+                self.doc.getLatexNamesDict(file=latexNameFullPath)
             else:
-                latexNameFullPath = os.path.join(self.configPath, self.inputs["latexNames"])
-            self.doc.getLatexNamesDict(file=latexNameFullPath)
-        else:
-            self.doc.getLatexNamesDict()
+                self.doc.getLatexNamesDict()
 
-        fig1, ax1 = plt.subplots(constrained_layout=True)
+            fig1, ax1 = plt.subplots(constrained_layout=True)
 
-        ax1.plot(xDf, yDf, "o", color='b', markersize=1)
-        ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
-        ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
+            ax1.plot(xDf[xDf.index.month == 3], yDf[xDf.index.month == 3], "o", color='lime', markersize=0.25, label = 'Mar-May')
+            ax1.plot(xDf[xDf.index.month == 4], yDf[xDf.index.month == 4], "o", color='lime', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 5], yDf[xDf.index.month == 5], "o", color='lime', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 6], yDf[xDf.index.month == 6], "o", color='r', markersize=0.25, label = 'Jun-Aug')
+            ax1.plot(xDf[xDf.index.month == 7], yDf[xDf.index.month == 7], "o", color='r', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 8], yDf[xDf.index.month == 8], "o", color='r', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 9], yDf[xDf.index.month == 9], "o", color='orange', markersize=0.25, label = 'Sep-Nov')
+            ax1.plot(xDf[xDf.index.month == 10], yDf[xDf.index.month == 10], "o", color='orange', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 11], yDf[xDf.index.month == 11], "o", color='orange', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 12], yDf[xDf.index.month == 12], "o", color='b', markersize=0.25, label = 'Dec-Feb')
+            ax1.plot(xDf[xDf.index.month == 1], yDf[xDf.index.month == 1], "o", color='b', markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 2], yDf[xDf.index.month == 2], "o", color='b', markersize=0.25)
 
-        self.outlinePlotter(ax1, comfortBoundary)
-        if acceptableBoundary:
-            self.outlinePlotter(ax1, acceptableBoundary, color='grey')
+            self.outlinePlotter(ax1, comfortBoundary)
+            if acceptableBoundary:
+                self.outlinePlotter(ax1, acceptableBoundary, color='grey')
 
-        fileName = "comfort_" + xVariable + "_" + yVariable
-        fileName = re.sub(r"[^\w\-_\. ]", "", fileName)
+            ax1.legend(loc = 'best', markerscale = 10)
+            ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
+            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
 
-        lines = xVariable + "\t" + yVariable + "\n"
-        for i in range(len(xDf)):
-            line = str(xDf.iloc[i]) + "\t" + str(yDf.iloc[i])
-            lines += line + "\n"
+            fileName = "comfort_" + xVariable + "_" + yVariable
+            fileName = re.sub(r"[^\w\-_\. ]", "", fileName)
 
-        pathFolder = os.path.join(self.executingPath,self.folderName)
+            lines = xVariable + "\t" + yVariable + "\n"
+            for i in range(len(xDf)):
+                line = str(xDf.iloc[i]) + "\t" + str(yDf.iloc[i])
+                lines += line + "\n"
 
-        outfile = open(os.path.join(pathFolder, fileName + ".dat"), "w")
-        outfile.writelines(lines)
-        outfile.close()
+            pathFolder = os.path.join(self.executingPath,self.folderName)
 
-        fig1.savefig(os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
-        plt.close()
+            outfile = open(os.path.join(pathFolder, fileName + ".dat"), "w")
+            outfile.writelines(lines)
+            outfile.close()
+
+            fig1.savefig(os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
+            plt.close()
 
     def addQvsTPlot(self):
         if (os.getenv("GLE_EXE") == None):
@@ -698,6 +711,7 @@ class ProcessTrnsysDf:
 
         # self.addQvsTPlot()
         self.saveHourlyToCsv()
+        self.saveTSToCsv()
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
 
@@ -1776,69 +1790,35 @@ class ProcessTrnsysDf:
             self.doc.addTableMonthlyDf(var, names, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
-    def addCustomMonthlyBars(self):
-        if "monthlyBar" in self.inputs.keys():
-            for name in self.inputs["monthlyBar"]:
-                values = self.monDataDf[name].values
-                averageValue = values.mean()
-
-                namePdf = self.plot.plotMonthlyDf(
-                    values,
-                    name,
-                    name,
-                    averageValue,
-                    self.myShortMonths,
-                    useYearlyFactorAsValue=True,
-                    myTitle=None,
-                    printData=self.printDataForGle,
-                    plotEmf=self.inputs["plotEmf"],
-                )
-
-                caption = name
-                self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
-
-                nameFile = name
-                legend = ["Month", name]
-
     def addCustomBalance(self):
         if "monthlyBalance" in self.inputs.keys():
             for i in range(len(self.inputs["monthlyBalance"])):
-                namePlot = self.inputs["monthlyBalance"][i][0]
+                nameFile = self.inputs["monthlyBalance"][i][0]
                 plotStyle = ""
 
                 legend = []
                 inVar = []
                 for variable in self.inputs["monthlyBalance"][i]:
-                    # legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables ]
-                    # inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables]
-                    # First name is now the name of the plot
-                    # legend = [self.getNiceLatexNames(name) if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables[1:] ]
-                    # inVar = [self.monDataDf[name].values if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables[1:]]
                     if ":" in variable:
                         plotStyle = variable.split(":")[-1]
-                    elif variable != namePlot:
-                        legend.append(
-                            self.getNiceLatexNames(variable)
-                        )  # if name[0]!='-' else self.getNiceLatexNames(name[1:]) for name in variables[1:] ]
-                        inVar.append(
-                            self.monDataDf[variable].values
-                        )  # if name[0]!='-' else -self.monDataDf[name[1:]].values for name in variables[1:]]
-
+                    elif variable != nameFile:
+                        if variable[0] != "-":
+                            legend.append(self.getNiceLatexNames(variable))
+                            inVar.append(self.monDataDf[variable].values)
+                        else:
+                            legend.append(self.getNiceLatexNames(variable[1:]))
+                            inVar.append(-self.monDataDf[variable[1:]].values)
                 if plotStyle == "relative":
-                    nameFile = namePlot + "_relative"
-                else:
-                    nameFile = namePlot  #'Balance'+'_'.join(variables)
+                    nameFile = nameFile + "_relative"
                 titlePlot = "Balance"
-                titleOfPlot = (
-                    titlePlot  # self.deckData['Simulation_MFH'] + ' (' + self.deckData['Umgebungstemperatur'] + ')'
-                )
+                titleOfPlot = (titlePlot)
                 namePdf = self.plot.plotMonthlyBalanceDf(
                     inVar,
                     [],
                     legend,
                     "Energy",
                     nameFile,
-                    "MWh",
+                    "kWh",
                     self.myShortMonths,
                     yearlyFactor=10,
                     useYear=False,
@@ -1851,11 +1831,10 @@ class ProcessTrnsysDf:
                 tableNames = ["Month"] + legend + ["Total"]
                 var = inVar
                 var.append(sum(inVar))
-                self.doc.addTableMonthlyDf(var, tableNames, "MWh", caption, nameFile, self.myShortMonths, sizeBox=15)
+                self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
 
                 self.addPlotToLaTeX = {namePdf: caption}
 
-                # self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def addHeatingLimitFit(self):
         """
@@ -1950,16 +1929,20 @@ class ProcessTrnsysDf:
 
     def addCustomStackedBar(self):
         if "monthlyStackedBar" in self.inputs.keys():
-            for variables in self.inputs["monthlyStackedBar"]:
-                legend = [
-                    self.getNiceLatexNames(name) if name[0] != "-" else self.getNiceLatexNames(name[1:])
-                    for name in variables
-                ]
-                inVar = [
-                    self.monDataDf[name].values if name[0] != "-" else -self.monDataDf[name[1:]].values
-                    for name in variables
-                ]
-                nameFile = "StackedBar" + "_".join(variables)
+            for i in range(len(self.inputs["monthlyStackedBar"])):
+                nameFile = self.inputs["monthlyStackedBar"][i][0]
+
+                legend = []
+                inVar = []
+                for variable in self.inputs["monthlyStackedBar"][i]:
+                    if variable != nameFile:
+                        if variable[0] != "-":
+                            legend.append(self.getNiceLatexNames(variable))
+                            inVar.append(self.monDataDf[variable].values)
+                        else:
+                            legend.append(self.getNiceLatexNames(variable[1:]))
+                            inVar.append(-self.monDataDf[variable[1:]].values)
+
                 titlePlot = "Balance"
                 namePdf = self.plot.plotMonthlyBalanceDf(
                     inVar,
@@ -1967,7 +1950,7 @@ class ProcessTrnsysDf:
                     legend,
                     "Energy",
                     nameFile,
-                    "MWh",
+                    "kWh",
                     self.myShortMonths,
                     yearlyFactor=10,
                     useYear=False,
@@ -1987,16 +1970,20 @@ class ProcessTrnsysDf:
 
     def addCustomNBar(self):
         if "monthlyBars" in self.inputs.keys():
-            for variables in self.inputs["monthlyBars"]:
-                legend = [
-                    self.getNiceLatexNames(name) if name[0] != "-" else self.getNiceLatexNames(name[1:])
-                    for name in variables
-                ]
-                inVar = [
-                    self.monDataDf[name].values if name[0] != "-" else -self.monDataDf[name[1:]].values
-                    for name in variables
-                ]
-                nameFile = "NBar" + "_".join(variables)
+            for i in range(len(self.inputs["monthlyBars"])):
+                nameFile = self.inputs["monthlyBars"][i][0]
+
+                legend = []
+                inVar = []
+                for variable in self.inputs["monthlyBars"][i]:
+                    if variable != nameFile:
+                        if variable[0] != "-":
+                            legend.append(self.getNiceLatexNames(variable))
+                            inVar.append(self.monDataDf[variable].values)
+                        else:
+                            legend.append(self.getNiceLatexNames(variable[1:]))
+                            inVar.append(-self.monDataDf[variable[1:]].values)
+
                 titlePlot = "Balance"
                 namePdf = self.plot.plotMonthlyNBar(
                     inVar, legend, "", nameFile, 10, self.myShortMonths, plotEmf=self.inputs["plotEmf"]
@@ -2008,8 +1995,6 @@ class ProcessTrnsysDf:
                 self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
 
                 self.addPlotToLaTeX = {namePdf: caption}
-
-                # self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def addCaseDefinition(
         self,
@@ -2246,6 +2231,22 @@ class ProcessTrnsysDf:
             for stringArray in self.inputs["hourlyToCsv"]:
                 pathFile = os.path.join(self.outputPath, stringArray[0] + ".csv")
                 self.houDataDf[stringArray[1:]].to_csv(pathFile, sep=";")
+
+
+
+
+
+    def saveTSToCsv(self):
+        """
+        Saves timestep printer values to csv files. config file key is stringArray "timestepToCsv" nameOfFile [variables,...]
+        Returns
+        -------
+        """
+        if "timestepToCsv" in self.inputs:
+            for stringArray in self.inputs["timestepToCsv"]:
+                pathFile = os.path.join(self.outputPath, stringArray[0] + ".csv")
+                self.steDataDf[stringArray[1:]].to_csv(pathFile, sep=";")
+
 
     def plot_as_emf(self, figure, **kwargs):
         if "inkscape" in self.inputs:

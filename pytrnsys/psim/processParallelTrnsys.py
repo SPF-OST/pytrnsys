@@ -163,15 +163,11 @@ class ProcessParallelTrnsys:
         self.inputs["costPdf"] = False
         self.inputs["dailyBalance"] = False
         self.inputs["hourlyBalance"] = False
-        # self.inputs['daysSelected'] = "2019,2,30" "2019,4,30" "2019,8,30"
-
-        # self.inputs["automaticTrnsysProcess"] = True maybe add this to set to false automatically the ones below
         self.inputs["calculateHeatDemand"] = True
         self.inputs["calculateSPF"] = True
         self.inputs["addWeightedSPF"] = False
         self.inputs["calculateElectricDemand"] = True
-        self.inputs["extensionFig"] = '.png'
-
+        self.inputs["extensionFig"] = ".png"
         self.inputs["comparePlotUserName"] = ""  # don't change this default value
 
         self.individualFile = False
@@ -241,7 +237,7 @@ class ProcessParallelTrnsys:
         fileName = []
         classList = []
 
-        self.filesReturn=None
+        self.filesReturn = None
 
         if os.path.exists(os.path.join(self.inputs["pathBase"], "Summary.dat")):
             os.remove(os.path.join(self.inputs["pathBase"], "Summary.dat"))
@@ -317,8 +313,8 @@ class ProcessParallelTrnsys:
             baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)  # DC This was missing
             casesInputs.append((baseClass, pathFolder, name, self.inputs))  # DC This was missing
 
-            self.filesReturn=[]
-            self.filesReturn.append(os.path.join(pathFolder, name, name)+".dck")
+            self.filesReturn = []
+            self.filesReturn.append(os.path.join(pathFolder, name, name) + ".dck")
 
         elif self.inputs["typeOfProcess"] == "citiesFolder":
 
@@ -452,7 +448,7 @@ class ProcessParallelTrnsys:
             # maximum number of processes at once:
             maxNumberOfCPU = min(run.getNumberOfCPU() - self.inputs["reduceCpu"], len(fileName))
 
-            pool = mp.Pool(processes=maxNumberOfCPU)
+            pool = mp.Pool(processes=1)
 
             results = pool.map(processDataGeneral, casesInputs)
 
@@ -523,7 +519,7 @@ class ProcessParallelTrnsys:
         if "printBoxPlotGLEData" in self.inputs.keys():
             self.printBoxPlotGLEData()
 
-        return self.filesReturn #Dc maybe not the best way
+        return self.filesReturn  # Dc maybe not the best way
 
     def calculationsAcrossSets(self):
         pathFolder = self.inputs["pathBase"]
@@ -1016,7 +1012,7 @@ class ProcessParallelTrnsys:
     def _plotBoxOrViolin(self, plotVariables, shallPlotViolin):
         pathFolder = self.inputs["pathBase"]
         extensionFig = self.inputs["extensionFig"]
-        
+
         if len(plotVariables) == 0:
             raise ValueError("You must specify a variable name for the values for the box plot.")
 

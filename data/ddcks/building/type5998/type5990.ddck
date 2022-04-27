@@ -1,0 +1,388 @@
+**************************************
+**BEGIN type5998.ddck 
+**************************************
+    
+*****************************************
+** Contact person : Maike Schubert
+** Creation date  : 12.01.2022
+
+*****************************************
+
+***************************************************************************
+** Description: 
+** Building demands for CCT test cycles using the ISO model from the standard model.
+** Parameters were fitted to fit the IDA-ICE results
+** Special: additional variable TmassUpdate updates the Tmass of the building 
+** for re-initialzation in short simulations
+** TODO: 
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+***********************************
+** Dependencies with other ddck
+***********************************
+EQUATIONS 2
+myPheatBui = PheatBui
+myPBuiIntGain = PBuiIntGain !from internal gains calculation 
+EQUATIONS 1
+TroomRc = [49,1] !Changed automatically
+CONSTANTS 3
+TroomSet   = 23*realUserBehaviour + 21*NOT(realUserBehaviour)     ! Setpoint for Room temperature, Â°C
+TroomSetCool   = 24.00     ! Setpoint for Room temperature for cooling, Â°C
+dTCool = 1
+EQUATIONS 1
+CoolingNeeded = OR(AND(GE(TroomRc,TroomSetCool-dTCool),CoolingNeededRc),GE(TroomRc,TroomSetCool))*GT(Tamb24,17) !Deadband
+CONSTANTS 1
+unitReadBui = 53
+ ASSIGN  C:\Daten\OngoingProject\TRI-HP\WP7\SimProp\TUpdateBui_cool.txt unitReadBui
+UNIT 47 TYPE 9      !Changed automatically
+PARAMETERS 14
+5    !-, 1, Mode
+0    !-, 2, Header Lines to Skip
+2    !-, 3, No. of values to read
+24    !h, 4, Time interval of data
+-1  1  0  0    !----, 5-8, Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0
+unitReadBui    !-, 9, Logical unit for input file
+-1    !-, 10, Free format mode
+EQUATIONS 2    !, Output of PVT HH el. Data reader
+TroomUpdate = [47,1]   !Changed automatically
+TmassUpdate = [47,2]  !Changed automatically
+CONSTANTS 1
+UpdateBui = GE(MOD(time,24),0)*LT(MOD(time,24),1.1)!  MS check if this works! 
+EQUATIONS 3 !DC added for CCT
+forceTempCapacity = 1*UpdateBui
+TBuildingMassIni = TmassUpdate !This is the output that corresponds to the initialization
+TairIni = TroomUpdate         !This is the output that corresponds to the initialization
+CONSTANTS 6
+realUserBehaviour=1.0 ! value changed from original by executeTrnsys.py
+useAHU=1.0 ! value changed from original by executeTrnsys.py
+VentilationMode=1 !1 Weber, 2 Hall Radiatiors, 3 Hall floor
+upperShadeT = 21*realUserBehaviour + 24*NOT(realUserBehaviour)
+lowerShadeT = 20*realUserBehaviour + 22*NOT(realUserBehaviour)
+ShadeTinit = (upperShadeT+lowerShadeT)/2
+UNIT 38 TYPE 2	 !Changed automatically
+PARAMETERS 2	
+5	! 1 No. of oscillations
+5000	! 2 High limit cut-out
+INPUTS 6	
+IT_N	! Radiation:IT_H ->Upper input value
+0,0       	! Lower input value
+0,0       	! Monitoring value
+shadingControlN     	! Output control function ->Input control function
+0,0       	! Upper dead band
+0,0       	! Lower dead band
+15 0 0 0 720.0 540.0	
+EQUATIONS 1
+shadingControlN=[38,1] !Changed automatically
+UNIT 41 TYPE 2	 !Changed automatically
+PARAMETERS 2	
+5	! 1 No. of oscillations
+5000	! 2 High limit cut-out
+INPUTS 6	
+IT_S	! Radiation:IT_H ->Upper input value
+0,0       	! Lower input value
+0,0       	! Monitoring value
+shadingControlS     	! Output control function ->Input control function
+0,0       	! Upper dead band
+0,0       	! Lower dead band
+15 0 0 0 720.0 540.0	
+EQUATIONS 1
+shadingControlS=[41,1] !Changed automatically
+UNIT 39 TYPE 2	 !Changed automatically
+PARAMETERS 2	
+5	! 1 No. of oscillations
+5000	! 2 High limit cut-out
+INPUTS 6	
+IT_E	! Radiation:IT_H ->Upper input value
+0,0       	! Lower input value
+0,0       	! Monitoring value
+shadingControlE     	! Output control function ->Input control function
+0,0       	! Upper dead band
+0,0       	! Lower dead band
+15 0 0 0 720.0 540.0	
+EQUATIONS 1
+shadingControlE=[39,1] !Changed automatically
+UNIT 40 TYPE 2	 !Changed automatically
+PARAMETERS 2	
+5	! 1 No. of oscillations
+5000	! 2 High limit cut-out
+INPUTS 6	
+IT_W	! Radiation:IT_H ->Upper input value
+0,0       	! Lower input value
+0,0       	! Monitoring value
+shadingControlW     	! Output control function ->Input control function
+0,0       	! Upper dead band
+0,0       	! Lower dead band
+15 0 0 0 720.0 540.0	
+EQUATIONS 1	
+shadingControlW=[40,1] !Changed automatically
+UNIT 42 TYPE 2	 !Changed automatically
+PARAMETERS 2	
+5	! 1 No. of oscillations
+95	! 2 High limit cut-out
+INPUTS 6	
+Troom	! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
+0,0      	! Lower input value
+0,0      	! Monitoring value
+shadingConTemp    	! Output control function ->Input control function 49,1
+0,0      	! Upper dead band
+0,0      	! Lower dead band
+ShadeTinit 0 0 0 upperShadeT lowerShadeT 	
+EQUATIONS 1	
+shadingConTemp=[42,1] !Changed automatically
+UNIT 46 TYPE 2	 !Changed automatically
+PARAMETERS 2	
+5	! 1 No. of oscillations
+95	! 2 High limit cut-out
+INPUTS 6	
+vWind	! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
+0,0      	! Lower input value
+0,0      	! Monitoring value
+vWindAbove10    	! Output control function ->Input control function 49,1
+0,0      	! Upper dead band
+0,0      	! Lower dead band
+10 0 0 0 11 9 	
+EQUATIONS 1	
+vWindAbove10=[42,1] !Changed automatically
+EQUATIONS 4	! Variable Shading
+Fsh_N = shd_fix_N * (AND(shadingConTemp,shadingControlN)*win_g_shd+NOT(AND(shadingConTemp,shadingControlN))*win_g)
+Fsh_S = shd_fix_S * (AND(shadingConTemp,shadingControlS)*win_g_shd+NOT(AND(shadingConTemp,shadingControlS))*win_g)	! Wird Fenster g-Value im Model berÃ¼cksichtigt??? Entsprechend dann XX ausfÃ¼llen bei ideal sind die HÃ¤lfte der Fenster geschlossen
+Fsh_E = shd_fix_E * (AND(shadingConTemp,shadingControlE)*win_g_shd+NOT(AND(shadingConTemp,shadingControlE))*win_g)
+Fsh_W = shd_fix_W * (AND(shadingConTemp,shadingControlW)*win_g_shd+NOT(AND(shadingConTemp,shadingControlW))*win_g)
+CONSTANTS 13
+g_earth = 9.81
+s_Hall= 0.1 ! distance of window from wall to frame when tilted [m] (Hall: 0.1 m)
+y_Hall=0.01 !distance between the blind frame and sash [m] (0.01 m) [Hall]
+d_Hall=0.05 !frame size of window [m] (0.05 m)
+m_Hall=0.6 !air flow exponent [-] (0.6)
+C_dWeber = 0.0147*alphaWindow-0.0928*heightWindow*widthWindow^(-1)+0.4116
+C_dHallF = 0.93*s_Hall^(0.2)
+C_dHallR = 0.532*s_Hall^(0.07)
+C_k = 2.6*(10)^(-7)*alphaWindow^3-1.19*(10)^(-4)*alphaWindow^2+1.86*(10)^(-2)*alphaWindow
+h_Hall=heightWindow*(1+d_Hall/s_Hall)^(-1)
+Z_Hall=((widthWindow-s_Hall)/heightWindow)^(0.5)
+x_Hall=heightWindow-h_Hall
+Aeff_Hall=s_Hall*Z_Hall*(h_Hall-heightWindow*(1-Z_Hall))+2*x_Hall*y_Hall
+UNIT 43 TYPE 2	 !Changed automatically
+PARAMETERS 2	
+5	! 1 No. of oscillations
+95	! 2 High limit cut-out
+INPUTS 6	
+Tamb24	! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
+0,0      	! Lower input value
+0,0      	! Monitoring value
+Tamb24above18    	! Output control function ->Input control function 49,1
+0,0      	! Upper dead band
+0,0      	! Lower dead band
+18 0 0 0 18.5 17.5 	
+EQUATIONS 1	
+Tamb24above18=[43,1] !Changed automatically
+UNIT 44 TYPE 2	 !Changed automatically
+PARAMETERS 2	
+5	! 1 No. of oscillations
+95	! 2 High limit cut-out
+INPUTS 6	
+Troom	! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
+0,0      	! Lower input value
+0,0      	! Monitoring value
+TroomAbove24    	! Output control function ->Input control function 49,1
+0,0      	! Upper dead band
+0,0      	! Lower dead band
+24 0 0 0 25 23 	
+EQUATIONS 1	
+TroomAbove24=[44,1] !Changed automatically
+EQUATIONS 1
+dTroomAmb = Troom-Tamb ! difference from indoor to outdoor temperature
+UNIT 45 TYPE 2	 !Changed automatically
+PARAMETERS 2	
+5	! 1 No. of oscillations
+95	! 2 High limit cut-out
+INPUTS 6	
+dTroomAmb	! Building:    1- (air temperature of zone)  TAIR   1 ->Upper input value
+0,0      	! Lower input value
+0,0      	! Monitoring value
+dTroomAmbAbove2    	! Output control function ->Input control function 49,1
+0,0      	! Upper dead band
+0,0      	! Lower dead band
+2 0 0 0 3 1 	
+EQUATIONS 1	
+dTroomAmbAbove2=[45,1] !Changed automatically
+EQUATIONS 13
+f_win_ideal = 0 !ideal user behaviour -> no window opening
+f_win_withAHU = (-8E-07*Tamb24^4+ 9E-6*Tamb24^3+0.0007*Tamb24^2+0.0078*Tamb24+0.0551)*1
+f_win_withoutAHU = (-9E-07*Tamb24^4+ 6E-6*Tamb24^3+0.0008*Tamb24^2+0.0103*Tamb24+0.0713)*1
+f_win_summer = 1
+summerVentOn = OR(GT(MOD(time,24),21),LT(MOD(time,24),8))*Tamb24above18*TroomAbove24*dTroomAmbAbove2
+f_win = (f_win_ideal*NOT(realUserBehaviour) + (useAHU*f_win_withAHU + NOT(useAHU)*f_win_withoutAHU)*realUserBehaviour)*NOT(summerVentOn) + summerVentOn*f_win_summer
+VfrWindowWeber = numberWindows*f_win*C_dWeber*C_k*widthWindow/3*(ABS(Troom-Tamb)/((Troom+Tamb)/2+273)*g_earth*heightWindow^3)^(0.5)	! Infiltration due window opening [m3/s] (Readout Textfile!) SCJ: what is scaleVfrWindow?
+VfrWindowHallFloor = numberWindows*f_win*C_dHallF*Aeff_Hall*(2*g_earth*heightWindow*Z_Hall*ABS(Troom-Tamb)/(Troom+273))^(m_Hall)	! Infiltration due window opening [m3/s] (Readout Textfile!) SCJ: what is scaleVfrWindow?
+VfrWindowHallRad = numberWindows*f_win*C_dHallR*Aeff_Hall*(2*g_earth*heightWindow*Z_Hall*ABS(Troom-Tamb)/((Troom+Tamb)/2+273))^(m_Hall)	! Infiltration due window opening [m3/s] (Readout Textfile!) SCJ: what is scaleVfrWindow?
+VfrWindow = LT(VentilationMode,2)*VfrWindowWeber+LT(VentilationMode,3)*GT(VentilationMode,1)*VfrWindowHallFloor+GT(VentilationMode,2)*VfrWindowHallRad
+etaHeatRec = 0.8*NOT(summerVentOn)	! Heatrecovery efficiency of the ventilation system
+VfrInf=realUserBehaviour*(useAHU*VfrInfRealAHU+NOT(useAHU)*VfrInfRealnoAHU)+NOT(realUserBehaviour)*(useAHU*VfrInfIdealAHU+NOT(useAHU)*VfrInfIdealnoAHU)
+VfrAirExTot = VfrInf + VfrVent*useAHU + VfrWindow	! Air exchange of the building [m3/s]
+EQUATIONS 3	! Ventilation and Infiltration
+TairSup = NOT(useAHU)*Tamb+useAHU*((Tamb+(Troom-Tamb)*etaHeatRec)*VfrVent+Tamb*(VfrInf+VfrWindow))/VfrAirExTot	! Temperature of the air coming into the building (infiltration and ventilation)
+Ua_vent = CPAIR * 1000 * (VfrAirExTot) *RHOAIR	! Thermal transmission coefficient due ventilation and infiltration [W/K]
+HveISO = Ua_vent*scaleBuilding ! ventilation heat loss coefficient 300 ; m3/day *day/s * kg/m3 * J/kg K = W/K
+CONSTANTS 1
+UaBui = Htr_op
+CONSTANTS 14
+rhoAir = 1.002 ! kg/m3
+cpAir = 1.2041 ! kJ/kgK
+freeMode  = 1 ! 
+powerMode = 0 !
+heatEmmitter = 0
+his = 3.45	   ! Heat transfer coefficient between the air node Tair and the star node W/m2K
+hms = 9.1      ! Heat transfer coefficient between the mass-related node Tm and the star node W/m2K
+xat = 5.4      ! Ratio between the internal surfaces area and the floor area
+Nsurf = 4
+Cair = volBui*rhoAir*cpAir*1000 !3128 !J/K
+Tinitial = 21
+Tint_Hset = 21
+Tint_Cset = 26
+EpsilonWindow = 0.9
+EQUATIONS 5
+PGainISO = myPbuiIntGain   ! Internal Gains [kJ/h] 
+PlossInfr_N = 0!.67*10^-8*((TroomRc+273.15)^4-(Tamb+273.15)^4)*AsolN
+PlossInfr_S = 0!5.67*10^-8*((TroomRc+273.15)^4-(Tamb+273.15)^4)*AsolS
+PlossInfr_W = 0!5.67*10^-8*((TroomRc+273.15)^4-(Tamb+273.15)^4)*AsolW
+PlossInfr_E = 0!5.67*10^-8*((TroomRc+273.15)^4-(Tamb+273.15)^4)*AsolE
+UNIT 48 TYPE 5900	  !Changed automatically
+PARAMETERS 13
+Cm		! 1 J/K, thermal capacitance of zone (voir ISO 13790-2008 : 12.3)
+Am		! 2 m2, surface of the effective thermal mass  (voir ISO 13790-2008 : 12.2.2)
+AreaBui	! 3 m2, surface of the heated floor area (voir ISO 13790-2008 : 6.4)
+UaWin	! 4 W/K, window heat transfer coefficient (voir ISO 13790-2008 : ANNEXE A)
+his		! 5 W/m2K, Heat transfer coefficient between the inner air and the star-node / wall surface (3.45 W/mÂ².K according to the standard)
+hms		! 6 W/m2K, heat transfer coefficient between the thermal capacity and the inner surface / star-node (9.1 W/mÂ².K according to the standard)
+xat		! 7 ratio between the surface of the inner walls and the heated floor (4.5 according to the standard)
+Nsurf		! 8 Nsurf
+heatEmmitter		! 9 Heat emitter type
+freeMode		! 10 "True" : Calculation of the building temperatures given Phc_nd as an input [Temperatures in outputs 1 to 4 correspond then to this kind of model)
+powerMode		! 11 "AC"   : "True" = Calculation of the required power for heating or cooling the building according to set point temp. Tint_Hset and Tint_Cset (PAR(14) and PAR(15)) [Temperatures in outputs 1 to 4 correspond to this kind of model only if "Free" mode PAR(10) is <False>]
+Cair		! 12 C_air
+Tinitial
+INPUTS 26
+Tamb		! EQU_Weather:Tamb ->Text
+TairSup		! EQU_Weather:Tamb ->Tsup
+myPheatBui		! kJ/h, heating power from heating system
+PGainISO		! kJ/h, internal heat gains (voir ISO 13790-2008 : 10.2)
+HveISO		! W/K, ventilation heat loss coefficient (voir ISO 13790-2008 : ANNEXE A)
+Htr_op		! [unconnected] W/K, overall heat transfer coefficient of outside walls and roof (voir ISO 13790-2008 : ANNEXE 
+0,0      !not used
+IT_N		! kJ/hm2, total solar irradiation on surface 
+Fsh_N		! non-shading factor for surface 1
+AsolN		! m2, effective reception area of surface 1 (voir ISO 13790-2008 : 11.3.3 et 11.3.4)
+PlossInfr_N	! kJ/h, long wave losses of surface 1  (voir ISO 13790-2008 : 11.3.5 et 11.4.6)
+IT_S		! EQ_Radiation:IT_S_ISO ->Isol-2
+Fsh_S		! [equation] Fsh_ob-2
+AsolS		! [unconnected] Asol-2
+PlossInfr_S		! [unconnected] Ploss_GLO-2
+IT_E		! EQ_Radiation:IT_E_ISO ->Isol-3
+Fsh_E		! [equation] Fsh_ob-3
+AsolE		! [unconnected] Asol-3
+PlossInfr_E		! [unconnected] Ploss_GLO-3
+IT_W		! EQ_Radiation:IT_W_ISO ->Isol-4
+Fsh_W		! [equation] Fsh_ob-4
+AsolW		! [unconnected] Asol-4
+PlossInfr_W		! [unconnected] Ploss_GLO-4
+forceTempCapacity
+TBuildingMassIni
+TairIni
+10 10 0 0 1 67.55 0 0 Fsh_N 1.43 20 0 Fsh_S 5.71 80 0 Fsh_E 1.9 27 0 Fsh_W 1.9 27 
+0 10 10
+EQUATIONS 11
+Troom = [48,1] !Changed automatically
+TMass = [48,2] !Changed automatically
+PBuiUAstatic_kW = [48,11]/3600 !Changed automatically
+PbuiVent_kW = [48,12]/3600 !Changed automatically
+PAcumBui_kW = [48,13]/3600 !Changed automatically
+PBuiSol_kW = [48,5]/3600 !Changed automatically
+PBuiGains_kW = ([48,6]+[48,7]+[48,8]-[48,5]+[48,9])/3600 !Changed automatically
+TroomStar = [48,3] !Changed automatically
+TroomOp = [48,4] !Changed automatically
+PBuiIntGain_kW = myPBuiIntGain/3600
+PBuiGrd_kW  = 0
+UNIT 49 TYPE 993  !Changed automatically
+PARAMETERS 1     
+3     ! 1: number of variables to be remembered
+INPUTS 3    
+Troom TRoomStar CoolingNeeded
+20 20 0
+EQUATIONS 2    ! outputs of Input Value Recall   
+TRoomStarRc = [49,2]      !Changed automatically
+CoolingNeededRc = [49,3] !Changed automatically
+EQUATIONS 7     ! penalty calculation for space haeting / cooling according to Task 26 and Task 32
+X = 2     ! exponent for penalty calculation
+NightPen = GT(MOD(time,24),23)+LT(MOD(time,24),6)        
+DayPen = Not(NightPen)       
+dTsh = MAX(0,19.5-Troom)*DayPen+MAX(0,19.5-Troom)*NightPen      ! delta-T for room heating not met JS: Change night penalty to 19.5 because we don't heat less during night
+PpenSH_kW = UaBui*(dTsh+(dTsh+1)^X-1)/1000.0     ! penalty function for room-temperature below 19.5Â°C [kW]
+dTsc = MAX(0,(Troom-TroomSetCool))     ! delta-T for room cooling not met
+PpenSC_kW = UaBui*(dTsc+(dTsc+1)^X-1)/1000.0     ! penalty function for room-temperatures above limits of DIN 1946-2 [kW]
+CONSTANTS 1 !The ISO model does not provide these ones
+PbuiInf_kW = 0
+UNIT 50 TYPE 65      !Changed automatically
+PARAMETERS 12     
+8     ! 1 Nb. of left-axis variables
+3     ! 2 Nb. of right-axis variables
+-5     ! 3 Left axis minimum
+60     ! 4 Left axis maximum
+-10     ! 5 Right axis minimum
+50     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+0     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 11     
+Tamb Tamb24 myTroomRc vWind  Troom Tmass TroomUpdate TmassUpdate
+BoHS forceTempCapacity UpdateBui
+Tamb Tamb24 myTroomRc vWind  Troom Tmass TroomUpdate TmassUpdate
+BoHS forceTempCapacity UpdateBui
+LABELS  3     
+Temperatures     
+Control     
+Building
+CONSTANTS 1
+unitPrinterBui = 54
+ASSIGN temp\BUILDING_MO.Prt unitPrinterBui 
+UNIT 51 Type 46  !Changed automatically
+PARAMETERS 6    
+unitPrinterBui ! 1: Logical unit number, -
+-1             ! 2: Logical unit for monthly summaries, -
+1              ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1             ! 4: Printing & integrating interval, h. -1 for monthly integration
+1              ! 5: Number of inputs to avoid integration, -
+1              ! 6: Output number to avoid integration
+INPUTS 8
+Time  PBuiSol_kW PBuiGains_KW PpenSH_kW  
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PAcumBui_kW dTsc
+Time  PBuiSol_kW PBuiGains_KW PpenSH_kW 
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PAcumBui_kW dTsc
+CONSTANTS 1
+unitPrintHouVar = 55
+ASSIGN temp\Building_HR.hr unitPrintHouVar 
+UNIT 52 Type 46      !Changed automatically
+PARAMETERS 6    
+unitPrintHouVar   ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1 ! 6: Output number to avoid integration
+INPUTS 13
+Time Tamb Tamb24  Troom TroomUpdate TmassUpdate PBuiSol_kW PBuiGains_KW PpenSH_kW  
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PAcumBui_kW
+Time Tamb Tamb24  Troom TroomUpdate TmassUpdate PBuiSol_kW PBuiGains_KW PpenSH_kW  
+PBuiUAstatic_kW PbuiInf_kW PbuiVent_kW PAcumBui_kW
+	
+*******************************
+**END Building.dck
+*******************************

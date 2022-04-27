@@ -1,0 +1,516 @@
+*******************************
+**BEGIN TRIHP_Hyd_IceColLoop.ddck
+*******************************
+
+
+*****************************************
+** Whole system hydraulic section.
+** MFH with a combi-store and circulation losses loop and cooling
+** Version : v1
+** Last Changes: mschubert
+** Date: 24.02.2022
+******************************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+
+
+
+EQUATIONS 2
+qSysOut_PipeLoss = PipeLossTot
+elSysOut_PuTot = PelPuDis_kW
+*******************************************************************
+******* BEGIN: Connexions with types
+*******************************************************************
+
+EQUATIONS 5
+TPiPuEvapOut = Teei
+TPlaceholder = Taai
+!TTeeSolarDhwSh = TPiColDivDhwSh
+!TTeeColToHp = TPiIceToHp
+TRoomStore = 15						!changable by config file 
+TColl=TCollOut
+TPuEvaporator = Teei  !MS temperature coming from test rig! (HP evaporator out ) 
+
+
+EQUATIONS 6
+*** Pump outlet temperatures
+TPuCol = TPiColPuIn
+TPuHxIce = TPiHxIceToPuIce
+TIceSlurryX1=TCsHx2o !solar loop
+TIceSlurryX2=TCsHx1o ! heat pump loop 
+THxColIceX1=TLoadOut_ColIce
+THxColIceX2=TsourceOut_ColIce !collector
+
+*****************************************************
+****** ELECTRICIY CONSUMPTION OF PUMPS
+*****************************************************
+
+EQUATIONS 2 !to be defined by user and exported by GUI
+MfrPuHxIceNom  = MfrHpEvapNom  
+MfrPuColNom    = MfrCPriSpec*AcollAp              ! nominal mass flow rate, kg/h
+
+EQUATIONS 6     ! Electric pump power PuCol
+dpPuColNom_bar = 0.4                             ! Pressure-drop of loop at nominal mass flow, bar
+frMfrPuCol = MfrPuCol/MfrPuColNom            ! Flow rate fraction of nominal flow rate
+dpPuCol_bar = (frMfrPuCol)^2*dpPuColNom_bar  ! Pressure drop at actual mass flow rate, bar
+PflowPuCol_W = ((MfrPuCol/3600)/RhoBri)*dpPuCol_bar*100000  ! Required power to drive the flow, W
+etaPuCol = 0.12-0.00*(1-frMfrPuCol)           ! Pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+PelPuCol_kW = (PflowPuCol_W/1000)/etaPuCol  ! Required pump electric power, kW
+
+EQUATIONS 6     ! Electric pump power PuHxIce
+dpPuHxIceNom_bar = 0.2                             ! Pressure-drop of loop at nominal mass flow, bar
+frMfrPuHxIce = MfrPuHxIce/MfrPuHxIceNom            ! Flow rate fraction of nominal flow rate
+dpPuHxIce_bar = (frMfrPuHxIce)^2*dpPuHxIceNom_bar  ! Pressure drop at actual mass flow rate, bar
+PflowPuHxIce_W = ((MfrPuHxIce/3600)/RhoWat)*dpPuHxIce_bar*100000  ! Required power to drive the flow, W
+etaPuHxIce = 0.12-0.00*(1-frMfrPuHxIce)           ! Pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+PelPuHxIce_kW = (PflowPuHxIce_W/1000)/etaPuHxIce  ! Required pump electric power, kW
+
+
+EQUATIONS 1
+PelPuDis_kW        = PelPuCol_kW + PelPuHxIce_kW
+
+*****************************************************************
+****** Mass Flow Solver and Hydraulic with adaption to CCT ******
+*****************************************************************
+
+
+UNIT 450 TYPE 935
+PARAMETERS 85
+21
+16 21 10 3     !1 : MixHxTes
+4 21 9 2       !2 : TeeDivTes
+17 4 0 0       !3 : Coll
+3 2 0 0        !4 : PiColOut
+13 14 0 0      !5 : IceSlurryleftSide
+19 20 0 0      !6 : IceSlurryrightSide
+12 14 0 0      !7 : HxColIceSide1
+9 10 0 0       !8 : HxColIceSide2
+8 2 0 0        !9 : PiSolarToHxIce
+1 8 0 0        !10 : PiHxIceToSolar
+12 13 0 1      !11 : PuHxIce
+7 11 0 0       !12 : PiHxIceToPuIce
+11 5 0 0       !13 : PiHxSolarIceIn
+5 7 0 0        !14 : PiHxSolarIceOut
+16 17 0 1      !15 : PuCol
+1 15 0 0       !16 : PiColPuIn
+15 3 0 0       !17 : PiColIn
+19 20 0 1      !18 : PuEvaporator
+6 18 0 0       !19 : PiPuEvapIn
+18 6 0 0       !20 : PiPuEvapOut
+2 1 0 0        !21 : Placeholder
+INPUTS 21! for Type 935
+xFracMixHxTes 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+MfrPuHxIce 0,0 0,0 0,0 MfrPuCol 0,0 0,0 MfrPuEvaporator 0,0 0,0 
+0,0 
+*** Initial Inputs
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 
+
+EQUATIONS 44	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MfrMixHxTes_A=[450,1]
+MfrMixHxTes_B=[450,2]
+MfrMixHxTes_C=[450,3]
+MfrTeeDivTes_A=[450,4]
+MfrTeeDivTes_B=[450,5]
+MfrTeeDivTes_C=[450,6]
+MfrColl_A=[450,7]
+MfrColl_B=[450,8]
+MfrPiColOut_A=[450,10]
+MfrPiColOut_B=[450,11]
+MfrIceSlurryleft_A=[450,13]
+MfrIceSlurryleft_B=[450,14]
+MfrIceSlurryright_A=[450,16]
+MfrIceSlurryright_B=[450,17]
+MfrHxColIceSide1_A=[450,19]
+MfrHxColIceSide1_B=[450,20]
+MfrHxColIceSide2_A=[450,22]
+MfrHxColIceSide2_B=[450,23]
+MfrPiSolarToHxIce_A=[450,25]
+MfrPiSolarToHxIce_B=[450,26]
+MfrPiHxIceToSolar_A=[450,28]
+MfrPiHxIceToSolar_B=[450,29]
+MfrPuHxIce_A=[450,31]
+MfrPuHxIce_B=[450,32]
+MfrPiHxIceToPuIce_A=[450,34]
+MfrPiHxIceToPuIce_B=[450,35]
+MfrPiHxSolarIceIn_A=[450,37]
+MfrPiHxSolarIceIn_B=[450,38]
+MfrPiHxSolarIceOut_A=[450,40]
+MfrPiHxSolarIceOut_B=[450,41]
+MfrPuCol_A=[450,43]
+MfrPuCol_B=[450,44]
+MfrPiColPuIn_A=[450,46]
+MfrPiColPuIn_B=[450,47]
+MfrPiColIn_A=[450,49]
+MfrPiColIn_B=[450,50]
+MfrPuEvaporator_A=[450,52]
+MfrPuEvaporator_B=[450,53]
+MfrPiPuEvapIn_A=[450,55]
+MfrPiPuEvapIn_B=[450,56]
+MfrPiPuEvapOut_A=[450,58]
+MfrPiPuEvapOut_B=[450,59]
+MfrPlaceholder_A=[450,61]
+MfrPlaceholder_B=[450,62]
+
+
+** Fluids:
+EQUATIONS 4
+** brine
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+** water
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+
+** Hydraulic loops
+EQUATIONS 18
+** loop4
+loop4NPipes = 6
+loop4Len = 5*scalePipes
+loop4Dia = 0.1 ! [m]
+loop4UVal = 5*scalePipes ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop4Rho = FwaterRho
+Lloop4Cp = FwaterCp
+
+** loop6
+loop6NPipes = 3
+loop6Len = 2*scalePipes
+loop6Dia = 0.05 ! [m]
+loop6UVal = 5*scalePipes ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop6Rho = FwaterRho
+Lloop6Cp = FwaterCp
+
+** loop1
+loop1NPipes = 2
+loop1Len = 2*scalePipes
+loop1Dia = 0.05 ! [m]
+loop1UVal = 5*scalePipes ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho = FwaterRho
+Lloop1Cp = FwaterCp
+
+
+UNIT 451 TYPE 929
+!MixHxTes
+PARAMETERS 0
+INPUTS 6
+MfrMixHxTes_A
+MfrMixHxTes_B
+MfrMixHxTes_C
+TPiColPuIn
+TPlaceholder
+TPiHxIceToSolar
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixHxTes= [451,1]
+
+UNIT 452 TYPE 929
+!TeeDivTes
+PARAMETERS 0
+INPUTS 6
+MfrTeeDivTes_A
+MfrTeeDivTes_B
+MfrTeeDivTes_C
+TPiColOut
+TPlaceholder
+TPiSolarToHxIce
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeDivTes= [452,1]
+
+UNIT 453 TYPE 931
+!PiColOut
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
+Lloop4Rho
+Lloop4Cp
+20
+INPUTS 4
+TColl
+MfrPiColOut_A
+TRoomStore
+TTeeDivTes
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColOut= [453,1]
+PPiColOut_kW= [453,3]/3600 !kW
+MfrPiColOut= MfrPiColOut_A
+
+UNIT 454 TYPE 931
+!PiSolarToHxIce
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
+Lloop4Rho
+Lloop4Cp
+20
+INPUTS 4
+THxColIceX2
+MfrPiSolarToHxIce_A
+TRoomStore
+TTeeDivTes
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiSolarToHxIce= [454,1]
+PPiSolarToHxIce_kW= [454,3]/3600 !kW
+MfrPiSolarToHxIce= MfrPiSolarToHxIce_A
+
+UNIT 455 TYPE 931
+!PiHxIceToSolar
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
+Lloop4Rho
+Lloop4Cp
+20
+INPUTS 4
+TMixHxTes
+MfrPiHxIceToSolar_A
+TRoomStore
+THxColIceX2
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxIceToSolar= [455,1]
+PPiHxIceToSolar_kW= [455,3]/3600 !kW
+MfrPiHxIceToSolar= MfrPiHxIceToSolar_A
+
+UNIT 456 TYPE 931
+!PiHxIceToPuIce
+PARAMETERS 6
+loop6Dia ! diameter [m]
+loop6Len ! length [m]
+loop6UVal ! U-value [kJ/(h*m^2*K)]
+Lloop6Rho
+Lloop6Cp
+20
+INPUTS 4
+THxColIceX1
+MfrPiHxIceToPuIce_A
+TRoomStore
+TPuHxIce
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxIceToPuIce= [456,1]
+PPiHxIceToPuIce_kW= [456,3]/3600 !kW
+MfrPiHxIceToPuIce= MfrPiHxIceToPuIce_A
+
+UNIT 457 TYPE 931
+!PiHxSolarIceIn
+PARAMETERS 6
+loop6Dia ! diameter [m]
+loop6Len ! length [m]
+loop6UVal ! U-value [kJ/(h*m^2*K)]
+Lloop6Rho
+Lloop6Cp
+20
+INPUTS 4
+TPuHxIce
+MfrPiHxSolarIceIn_A
+TRoomStore
+TIceSlurryX1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxSolarIceIn= [457,1]
+PPiHxSolarIceIn_kW= [457,3]/3600 !kW
+MfrPiHxSolarIceIn= MfrPiHxSolarIceIn_A
+
+UNIT 458 TYPE 931
+!PiHxSolarIceOut
+PARAMETERS 6
+loop6Dia ! diameter [m]
+loop6Len ! length [m]
+loop6UVal ! U-value [kJ/(h*m^2*K)]
+Lloop6Rho
+Lloop6Cp
+20
+INPUTS 4
+TIceSlurryX1
+MfrPiHxSolarIceOut_A
+TRoomStore
+THxColIceX1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxSolarIceOut= [458,1]
+PPiHxSolarIceOut_kW= [458,3]/3600 !kW
+MfrPiHxSolarIceOut= MfrPiHxSolarIceOut_A
+
+UNIT 459 TYPE 931
+!PiColPuIn
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
+Lloop4Rho
+Lloop4Cp
+20
+INPUTS 4
+TMixHxTes
+MfrPiColPuIn_A
+TRoomStore
+TPuCol
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColPuIn= [459,1]
+PPiColPuIn_kW= [459,3]/3600 !kW
+MfrPiColPuIn= MfrPiColPuIn_A
+
+UNIT 460 TYPE 931
+!PiColIn
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
+Lloop4Rho
+Lloop4Cp
+20
+INPUTS 4
+TPuCol
+MfrPiColIn_A
+TRoomStore
+TColl
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColIn= [460,1]
+PPiColIn_kW= [460,3]/3600 !kW
+MfrPiColIn= MfrPiColIn_A
+
+UNIT 461 TYPE 931
+!PiPuEvapIn
+PARAMETERS 6
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TIceSlurryX2
+MfrPiPuEvapIn_A
+TRoomStore
+TPuEvaporator
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPuEvapIn= [461,1]
+PPiPuEvapIn_kW= [461,3]/3600 !kW
+MfrPiPuEvapIn= MfrPiPuEvapIn_A
+
+UNIT 462 TYPE 931
+!PiPuEvapOut
+PARAMETERS 6
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TPuEvaporator
+MfrPiPuEvapOut_A
+TRoomStore
+TIceSlurryX2
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 2
+!TPiPuEvapOut= [46,1]   !MS: this is connected to the test rig such has to be disonnected here... 
+PPiPuEvapOut_kW= [462,3]/3600 !kW
+MfrPiPuEvapOut= MfrPiPuEvapOut_A
+
+UNIT 463 TYPE 931
+!Placeholder
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
+Lloop4Rho
+Lloop4Cp
+20
+INPUTS 4
+TTeeDivTes
+MfrPlaceholder_A
+TRoomStore
+TMixHxTes
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 2
+!TPlaceholder= [463,1]   !MS: this is connected to the test rig such has to be disonnected here... 
+PPlaceholder_kW= [463,3]/3600 !kW
+MfrPlaceholder= MfrPlaceholder_A
+
+*** Pipe losses
+EQUATIONS 1
+PipeLossTot=PPiColOut_kW+PPiSolarToHxIce_kW+PPiHxIceToSolar_kW+PPiHxIceToPuIce_kW+PPiHxSolarIceIn_kW+PPiHxSolarIceOut_kW+PPiColPuIn_kW+PPiColIn_kW+PPiPuEvapIn_kW+PPiPuEvapOut_kW+PPlaceholder_kW
+
+ASSIGN CCT_ColIce_Mfr.prt 464
+
+UNIT 464 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+tSimStrt! 2 tSimStrt time
+tSimEnd! 3 tSimEnd time
+464! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute tSimStrt time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 12
+xFracMixHxTes MfrPiColOut MfrPiSolarToHxIce MfrPiHxIceToSolar MfrPiHxIceToPuIce MfrPiHxSolarIceIn MfrPiHxSolarIceOut 
+MfrPiColPuIn MfrPiColIn MfrPiPuEvapIn MfrPiPuEvapOut MfrPlaceholder 
+***
+xFracMixHxTes MfrPiColOut MfrPiSolarToHxIce MfrPiHxIceToSolar MfrPiHxIceToPuIce MfrPiHxSolarIceIn MfrPiHxSolarIceOut 
+MfrPiColPuIn MfrPiColIn MfrPiPuEvapIn MfrPiPuEvapOut MfrPlaceholder 
+
+ASSIGN CCT_ColIce_T.prt 465
+
+UNIT 465 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+tSimStrt! 2 tSimStrt time
+tSimEnd! 3 tSimEnd time
+465! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute tSimStrt time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 11
+TPiColOut TPiSolarToHxIce TPiHxIceToSolar TPiHxIceToPuIce TPiHxSolarIceIn TPiHxSolarIceOut TPiColPuIn 
+TPiColIn TPiPuEvapIn TPiPuEvapOut TPlaceholder 
+***
+TPiColOut TPiSolarToHxIce TPiHxIceToSolar TPiHxIceToPuIce TPiHxSolarIceIn TPiHxSolarIceOut TPiColPuIn 
+TPiColIn TPiPuEvapIn TPiPuEvapOut TPlaceholder 
+

@@ -1,0 +1,254 @@
+*******************************
+**BEGIN CCTweatherData.dck
+*******************************
+    
+*****************************************
+** Contact person : Maike Schubert
+** Last changes   : 01.2022
+*****************************************
+
+****************************************************
+** Description: 
+** Weather data and calculation on inclined surfaces for CCT test (extracted from annual simulation)
+****************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+***********************************
+** outputs to other ddck
+** DEFINITION of OVERALL VARIABLES
+** This variables will be used in all decks. Keep this nomenclature in Ddck
+** To clean what is strictly necessary DC
+*****************************************************************************
+
+ **********************************************************************
+ ** CCTweather.ddck from C:\Daten\spfPackages\GIT\PyTrnsys\pytrnsys_ddck\weather 
+ **********************************************************************
+***********************************************************
+********** weather data ddck for CCT-Simulations **********
+***********************************************************
+CONSTANTS 1
+unitReadWeather = 35
+ ASSIGN  C:\Daten\OngoingProject\TRI-HP\WP7\SimProp\DataWeatherCCT_cool.txt unitReadWeather   
+UNIT 33 TYPE 9      !Changed automatically
+PARAMETERS 202
+5     ! 1 Mode
+1     ! 2 Header Lines to Skip
+49     ! 3 No. of values to read
+dtSim     ! 4 Time interval of data
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1) 
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+ -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+  -1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+unitReadWeather     ! 9 Logical unit for input file (vorher 18)
+-1     ! 10 Free format mode      
+EQUATIONS 11
+tAmbDry = [33,47]       !Changed automatically
+relHum  = [33,4]*100	   !Changed automatically
+vWind   = [33,5]       !Changed automatically
+dirWind = [33,6]       !Changed automatically
+pAmb_Pa = [33,7]       !Changed automatically
+AISZ = [33,8]         !Changed automatically
+AISA = [33,9]         !Changed automatically
+IT_H = [33,10]*3.6  !Changed automatically
+IB_H = [33,11]  !Changed automatically
+ID_H = [33,12]         !Changed automatically
+AI_H = [33,13]         !Changed automatically
+EQUATIONS 35
+IT_N = [33,14]      !Changed automatically
+AI_N = [33,15]      !Changed automatically
+IB_N = [33,16]   !Changed automatically
+IT_S = [33,17]      !Changed automatically
+IB_S = [33,18]      !Changed automatically
+ID_S = [33,19]   !Changed automatically
+AI_S = [33,20]      !Changed automatically
+IT_E = [33,21]     !Changed automatically
+IB_E = [33,22]      !Changed automatically
+ID_E = [33,23] !Changed automatically
+AI_E = [33,24]     !Changed automatically
+IT_W = [33,25]     !Changed automatically
+IB_W = [33,26]      !Changed automatically
+ID_W = [33,27] !Changed automatically
+AI_W = [33,28]      !Changed automatically
+IT_surfUser_1 = [33,29]     !Changed automatically
+IB_surfUser_1 = [33,30]      !Changed automatically
+ID_surfUser_1 = [33,31]  !Changed automatically
+IDS_surfUser_1 = [33,32]  !Changed automatically
+IDG_surfUser_1 = [33,33]  !Changed automatically
+AI_surfUser_1 = [33,34]      !Changed automatically
+IT_surfUser_2 = [33,35]      !Changed automatically
+IB_surfUser_2 = [33,36]      !Changed automatically
+ID_surfUser_2 = [33,37]  !Changed automatically
+IDS_surfUser_2 = [33,38]  !Changed automatically
+IDG_surfUser_2 = [33,39]  !Changed automatically
+AI_surfUser_2 = [33,40]      !Changed automatically
+IT_surfUser_3 = [33,41]       !Changed automatically
+IB_surfUser_3 = [33,42]       !Changed automatically
+ID_surfUser_3 = [33,43]   !Changed automatically
+IDS_surfUser_3 = [33,44]   !Changed automatically
+IDG_surfUser_3 = [33,45]   !Changed automatically
+AI_surfUser_3 = [33,46]       !Changed automatically
+stopMeltingRead = [33,48]   !Changed automatically
+summerMonthsRead = [33,49]       !Changed automatically
+EQUATIONS 6
+IT_surfUser_2_Wm2 = IT_surfUser_2/3.6
+IT_surfUser_1_Wm2 = IT_surfUser_1/3.6
+IT_S_Wm2 =IT_S/3.6
+IT_N_Wm2 =IT_N/3.6
+IT_W_Wm2 =IT_W/3.6
+IT_E_Wm2 =IT_E/3.6
+EQUATIONS 4
+IT_H_kW = IT_H/3600  
+IB_H_kW = IB_H/3600  
+IT_S_kW = IT_S/3600     ! Irradiation on south plane in kW/m2
+IB_S_kW = IB_S/3600     ! Direct Irradiation on south plane in kW/m3
+EQUATIONS 2
+IT_H_Wm2 = IT_H_kW*100  
+IB_H_Wm2 = IB_H_KW*100  
+EQUATIONS 3    ! pressure conversions
+pamb_kPa = pamb_Pa/1000     ! ambient pressure [kPa]
+pamb_atm = pamb_kPa/101.325     ! Ambient pressure [atm]
+pamb_bar = pamb_kPa/100     ! Ambient pressure [bar]
+EQUATIONS 2     
+Tsky = [31,1]      !Changed automatically
+dTsky = Tsky-Tamb     ! delta-T from sky to ambient (K)
+CONSTANTS 8    ! Turn the North,South,East and West orientations with "TURN"
+TcwAvg = TambAvg     
+TURN = 0.0     
+AA_N = 180.0 + TURN     
+AA_S = TURN     
+AA_E = 270.0      
+AA_W = 90.0 + TURN     
+groundRef = 0.2
+slope90 = 90.0
+
+EQUATIONS 2
+stopMelting = GE(stopMeltingRead,0.5)
+summerMonths = GE(summerMonthsRead,0.5)
+
+CONSTANTS 2
+myUnitWeatherData   = unitWeatherData   !from the specific weatherFile
+myFormatWeatherData = formatWeatherData   !formatWeatherData from the specific weatherFile
+CONSTANTS 8  ! Values to be filled up by GUI
+slopeSurfUser_1 = 45. ! Slope of surface-5
+aziSurfUser_1 = 0.    ! Azimuth of surface-5
+slopeSurfUser_2 = 10. ! Slope of surface-6
+aziSurfUser_2 = 110.    ! Azimuth of surface-6
+slopeSurfUser_3 = 10. ! Slope of surface-7
+aziSurfUser_3 = 70.    ! Azimuth of surface-7
+slopeSurfUser_4 = 10. ! Slope of surface-8
+aziSurfUser_4 = 70.    ! Azimuth of surface-8
+UNIT 32 TYPE 33      !Changed automatically
+PARAMETERS 3     
+2     ! 1 Psychrometrics mode 2: dry bulb and relative humidity known
+1     ! 2 Wet bulb mode 1: calculate wet bulb temperature; 0: do not calculate wet bulb temperature
+1     ! 3 Error mode 1: only one warning will be printed for the whole simulation; 2: all warnings will be printed
+INPUTS 3     
+tAmbDry ! Ambient dry bulb temperature [Â°C]
+relHum  ! Relative humidity [0..100]
+pamb_atm     ! Ambient pressure [atm]
+20 50 1      
+EQUATIONS 6    
+tAmb_Met = [32,7]       !Changed automatically
+tAmbDewPoint = [32,8]      !Changed automatically
+RHamb_100 = [32,6]       !Changed automatically
+tAmb = Tamb_Met     ! Psychrometrics:Dry bulb temperature
+RHamb_1 = RHamb_100/100     
+Tcw = MAX(TcwAvg,0.1)     !  Temperature shift cold water, K . We avoid below 0 Â°C
+UNIT 31 TYPE 69      !Changed automatically
+PARAMETERS 2     
+0     ! 1 mode for cloudiness factor
+altid     ! 2 height over sea level
+INPUTS 4     
+tamb_Met        ! Psychrometrics:Dry bulb temperature ->Ambient temperature
+tambDewPoint        ! Psychrometrics:Dew point temperature. ->Dew point temperature at ambient conditions
+IB_H       ! Weather data:beam radiation on horizontal ->Beam radiation on the horizontal
+ID_H      ! Weather data:sky diffuse radiation on horizontal ->Diffuse radiation on the horizontal
+0 20 0 0     
+CONSTANTS 7    
+Lat = 46.93     ! Latitude, Â°
+TambD = -10     ! ambient design temperature of heating system, Â°C
+TambAvg = 9.32    ! average outdoor temperature, Â°C
+dTambAmpl = 9.3     ! amplitude of outside temperature, K
+tTambShift = 488     ! Offset of outside air temperature minimum , h
+ddTcwOffset = 40     ! time shift of minimum cold water temperature, d
+altid = 565  
+CONSTANTS 4
+formatWeatherData = 1! 1 = user format, 2 = Standard weather file in the TMY2 format
+unitWeatherData=38
+unitWeatherData2=39
+unitWeatherData3=40
+UNIT 34 TYPE 65      !Changed automatically
+PARAMETERS 12     
+3     ! 1 Nb. of left-axis variables
+1     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+100     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+60     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 4    
+tAmbDry tAmb relHum 
+pAmb_Pa
+tAmbDry tAmb relHum 
+pAmb_Pa
+LABELS  3     
+Temperatures  
+MassFlows   
+weatherData

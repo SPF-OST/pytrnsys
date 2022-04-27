@@ -1,0 +1,236 @@
+*******************************
+**BEGIN Control-Cooling-888.ddck 
+**
+**Control BigIce
+*******************************
+    
+*****************************************
+** Author: Dani Carbonell        
+** Date:  23.04.2018    
+******************************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+********************************
+************ HYDRAULIC EXPORT
+********************************
+
+
+EQUATIONS 15
+*** Massflowrates
+**MfrSeries = 0 !does not exist 
+MfrPuSH = MfrBuiRd
+MfrsupplyWater = MfrDHWset
+MfrCW= MfrDHWset
+xFracDivHp = NOT(BoAuxWWonRc)
+MfrPuCool = 0!MfrPiHxCoolWatIn 
+xFracDivSHCool = CoolingOnRc
+xFracMixHxTes = AND(NOT(OR(ProWs,ProPar)),NOT(blockCol)) 
+**MfrPuCol = pumpColOn*(ProWs*MfrCPri+MfrCPriNom*(ProCs+ProDoubleHpCs)) !+ProSeries*MfrSeries)
+MfrPuCol = pumpColOn*MfrCPri*(ProWs+ProCs+ProPar+ProDoubleHpCs) !+ProSeries*MfrSeries)
+
+MfrPuDHW = MfrSrcDHWHXUsed!NOT(GT(MfrDHWset,0))*150+GT(MfrDHWset,0)*MfrDHWset
+MfrPuCirc = NOT(GT(MfrDHWset,0))*150
+MfrPuHpEvap = MfrHpEvapUsed*hpIsOn
+MfrPuHpCond = MfrHpCondNom*hpIsOn
+*** here allow loading of SH-storage, too! Load Tes_SH xFracDivSolarDhwSh = 1! ???
+xFracDivSolarDhwSh = GT(TTesDhwBotRc,TTesShBotRc)*BoHS !AND(AND(GT(TTesDhwBotRc+UdbProWs,TCollExpectedRc),LT(TTesShBotRc, TCollExpectedRc)),BoHS) !AND(AND(GT(T1_Tes1,TCollExpected),LT(TsensorTesSh, TCollExpected)),BoHS)
+xFracDivDhw = NOT(GT(MfrDHWset,0))
+xFracDivDhwOut = NOT(GT(MfrDHWset,0))
+
+EQUATIONS 12
+TTesDhwAuxOff = T8_Tes1
+TTesDhwAuxOn  = T9_Tes1
+TTesDhwBot = T2_Tes1
+TTesShBot = T2_Tes2
+TCollectorOn = MIN(T3_Tes1+UdbProWs,T3_Tes2+UdbProWs)
+TProAuxDhwTes = T9_Tes1
+TesOverheat = GT(T10_Tes1,Tmax_Tes1)*NOT(TesOverheatRc) + GT(T10_Tes1Rc,Tmax_Tes1-5)*TesOverheatRc
+TProWs     = MIN(TTesDhwBotRc,TTesShBotRc)*BoHS + TTesDhwBotRc*NOT(BoHS) !	MIN(TTesDhwAuxOn,TsensorTesSh)*BoHS + TTesDhwAuxOn*NOT(BoHS)  	! 4 Used for ProWs 
+TTesSolar = TProWs
+TsensorTesSh = T7_Tes2
+TPROAUXShTes = T9_Tes2
+TdhwSet = TdhwSetProfile
+
+EQUATIONS 1
+MfrPuHxIce = MfrPuCol*(ProCs+ProDoubleHpCs)
+
+
+
+
+********************************
+************ TEMPERAING VALVES
+********************************
+
+CONSTANTS 3
+T_set_DivSH=T_set_d
+T_set_MixCirc=TdhwSet
+T_set_DivHpEvap=25
+
+EQUATIONS 1
+T_set_cool = MIN(Tamb-5,TRdRt)
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4
+TPiTeeMixSHIn 
+TPiRadOut
+MfrPiRadOut
+T_set_DivSH
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivSH
+EQUATIONS 1
+xFracDivSH_heat =  (1-CoolingOnRC)*(1.-[441,5] )
+
+**UNIT 441 TYPE 811 ! Passive Divider for heating 
+**PARAMETERS 1
+**5 !Nb.of iterations before fixing the value 
+**INPUTS 4 
+**TPiDivSHCool
+**TPiSHInMix
+**MfrPiRadOut
+**T_set_DivSH
+***** INITIAL INPUT VALUES
+**35.0 21.0 800.0 T_set_DivSH
+**EQUATIONS 1
+**xFracDivSH =  1.-[441,5] 
+
+
+
+UNIT 24 TYPE 811    ! Passive Divider for cooling
+PARAMETERS 1!2
+!4     ! 1 Tempering valve mode
+5     ! 2 Nb. of iterations before fixing the value
+INPUTS 4
+TPiRadOut   ! Heat source temperature, °C
+TPiTeeMixSHIn  ! Inlet temperature, °C
+MfrPuSH      ! Inlet flow rate, kg/h
+T_set_cool     ! Set point temperature, °C
+*** INITIAL INPUT VALUES
+15.0 21.0 800.0 17.0
+EQUATIONS 2
+** xFracDivSH_cool = CoolingOn*(1.-[24,5]) !Different convention in TRNSYS
+xFracDivSH_cool = CoolingOnRC*([24,5]) 
+xFracDivSH = xFracDivSH_heat + xFracDivSH_cool 
+
+UNIT 443 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiIceToHp
+TPiHpEvapMix
+MfrPiHpEvapIn
+T_set_DivHpEvap
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivHpEvap
+EQUATIONS 1
+xFracDivHpEvap =  0 ! 1.-[443,5]
+
+***************************************************
+******** Cooling Section***************************
+***************************************************
+
+CONSTANTS 2
+TPCMCoolStop = 24 ! Stop cooling if TAvgPCM is above this temperature
+dTCoolPCM = 1
+
+EQUATIONS 1
+CoolingOn = 0! OR(AND(AND(CoolingNeeded,LE(TAvgPCM,TPCMCoolStop+dTCoolPCM)),CoolingOnRc),AND(CoolingNeeded,LE(TAvgPCM,TPCMCoolStop))) !Deadband
+
+
+EQUATIONS 4
+BoAuxWWon = HpForDHWIsNeeded*NOT(HpIsBlock) ! JS: Do not block HP during summer (we need it for cooling)
+BoAuxSHon = HpForSHIsNeeded*NOT(BoAuxWWon)*NOT(HpIsBLock) !DC CHANGED TO AVOID RUNNING THE LOOP WITHOUT POWER     ! Auxiliary heater space heating mode, 0/1
+HpIsOn = OR(BoAuxWWonRc,BoAuxSHonRc)*NOT(BlockIceStoreRc)     ! Auxiliary heater on for DHW or SH, 0/1
+**HpIsOn = OR(BoAuxWWon,BoAuxSHon)*NOT(BlockIceStoreRc)     ! Auxiliary heater on for DHW or SH, 0/1
+
+pumpColOn = GT(ProCs+ProSeries+ProWs+ProPar+ProDfCol+ProDfWs+ProDoubleHpCs,0.5)*NOT(blockCol)!GT([100,9],0.5)   
+
+*******************************************
+****** BLOCK PROGRAMS  ********************
+*******************************************
+
+EQUATIONS 12
+LowRad_Ambient = LT(Tamb+4,TCollInRc)*LT(IT_Coll_Wm2,1.)
+BlockHp       = BlockIceStore              ! p 1  / ProHp  Heat pump is running, lower Hx in Pcm, ice is formed on HX
+BlockSeries   = 1 ! ColTooColdTimer*LowRad_Ambient 
+**BlockWs       = LT(TAvgPCM,1)*NOT(stopMelting) !LT(AcollAp,21)*(EQL(actualMonth,11)+EQL(actualMonth,12)+EQL(actualMonth,1)+EQL(actualMonth,2))               ! p 3  / ProWs  col. charging tes   if T(1) is hot enough for upper part in tes T(4)
+BlockWs       = (BlockWsRc*LT(TAvgPCMRc,1.2)+ NOT(BlockWsRc)*LT(TAvgPCMRc,1))*NOT(stopMelting) !DC-CONTROL otherwise it shifts continously at TPCM=1
+TPcmTooHigh   = TPcmTooHighRc*LT(TAvgPCMRc,TmaxIceTes+1) + NOT(TPcmTooHighRc)*GT(TAvgPCMRc,TmaxIceTes)
+BlockCs       = OR(OR(OR(PriorWs,stopMelting),CoolingOn),TPcmTooHigh) !DC-CONTROL use boolean TPcmTooHigh with deadbands 
+**BlockCs       = OR(OR(PriorWs,stopMelting),CoolingOn) ! OR(PriorWs,GT(TAvgPCM,TmaxIceTes))         ! p 4  / ProCs  col. charging pcmtes if T(1) is hot enough for upper part in pcm T(6)  
+BlockPar      = BlockIceStore   ! p 5  / Parallel mode : solar to Tes and heat pump with Pcm at same   
+BlockDfCol    = 0
+BlockDfWs     = 0
+BlockCol      = BoCst ! AND(OR(0,CoolingOn),stopMelting) ! block collector pump, if temperature of ice storage is larger than 15Â°C
+** BlockCol      = stopMelting ! block collector pump, if temperature stop melting is active
+stopMelting   = 0!AND(GE(actualMonth,2)*LE(actualMonth,8),LT(VIceRatio,50.0)) ! Stop melting at end of winter, when Vice is smaller than 50%
+BlockDoubleCsHp = 0
+
+
+UNIT 63 TYPE 993     ! Input value recall (element RcC)
+PARAMETERS 1     
+9    ! 1: number of variables to be remembered
+**     
+INPUTS 9
+TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh
+0.0    20  0.0 0.0  0.0 0.0 0.0 0.0 0.0
+
+EQUATIONS 9              ! Recalled values for collector control
+TesOverheatRc = [63,1]     ! recalled value of boolean for storage protection, 0/1
+T10_Tes1Rc = [63,2]     ! recalled value from upper storage part for storage protection, °C
+BoAuxWWonRc = [63,3]     
+BoAuxSHonRc  = [63,4]     
+TTesDhwBotRc = [63,5]
+TTesShBotRc = [63,6]
+TAvgPCMRc = [63,7]
+BlockWsRc = [63,8]
+TPcmTooHighRc = [63,9]
+
+EQUATIONS 2
+qAux1_Tes1 = qAux1_Tes1_nom_kW*auxStoreDHWIsOn
+qAux1_Tes2  = qAux1_Tes2_nom_kW*auxStoreSHIsOn! kW
+
+CONSTANTS 7
+useFlowFromIce = 0
+MfrMaxHx = MAX(MfrMinHx*factorHxMax,SizeHpRatio*MfrHpEvapRef*MaxReducedMFlow) ! dont allow the heat pump to run with lower than 0.5 the nominal  mass flow
+MfrHpEvapUsed   = MAX(MIN(MfrHpEvapNom,MfrMaxHx),MfrMinHx) ! If we have a large HX area and the mass flow is too low get wet below the minimum mass flow to sovle the hx.
+MinMFlowPerHxM2 = 25  ! Gtype = 25 , ESSA = 18 to have similar mass flows
+factorHxMax     = 1.5 ! 1.5
+MfrMinHx = MIN(myHxArea*nRealHx*MinMFlowPerHxM2,SizeHpRatio*MfrHpEvapRef)
+MaxReducedMFlow = 0.8 ! find stable value
+
+EQUATIONS 2
+qAuxStoreDHW_KW = qHeatSource_Tes1
+qAuxStoreSH_KW = qHeatSource_Tes2
+
+
+*****************************************************
+*****Online Plotter*******
+*****************************************************
+
+UNIT 501 TYPE 65     ! Online Plotter HX
+PARAMETERS 12     
+10     ! 1 Nb. of left-axis variables
+0     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+100     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+60     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+-1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 10    
+CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM,TmaxIceTes BlockSeries 
+CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM,TmaxIceTes BlockSeries 
+LABELS  3     
+Temperatures  
+MassFlows   
+ControlNC

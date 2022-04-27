@@ -1,0 +1,195 @@
+?start: ddck
+
+ddck: block+
+
+?block: simulation_control | component_control | listing_control
+
+?simulation_control: version | simulation | tolerances | limits
+    | nan_check | overwrite_check | time_report | dfq | eqsolver | solver |
+    | assign | end | equations | constants
+
+simulation: "SIMULATION"i tstart tend delta_t
+
+tstart: number_or_private_var
+tend: number_or_private_var
+delta_t: number_or_private_var
+
+tolerances: "TOLERANCES"i ("-" integration_tol "-" convergance_tol | integration_tol convergance_tol)
+
+integration_tol: number_or_private_var
+convergance_tol: number_or_private_var
+
+limits: "LIMITS"i max_iterations_per_time_step max_warnings [trace_component_after_iterations]
+
+max_iterations_per_time_step: positive_int_or_private_var
+max_warnings: positive_int_or_private_var
+trace_component_after_iterations: positive_int_or_private_var
+
+nan_check: "NAN_CHECK"i bool_or_private_var
+
+nan_check_value: bool_or_private_var
+
+overwrite_check: "OVERWRITE_CHECK"i bool_or_private_var
+
+time_report: "TIME_REPORT"i bool_or_private_var
+
+dfq: "DFQ"i positive_int_or_private_var
+
+eqsolver: "EQSOLVER"i positive_int_or_private_var
+
+solver: "SOLVER"i positive_int_or_private_var [relax_factor_min relax_factor_max]
+
+relax_factor_min: number_or_private_var
+relax_factor_max: number_or_private_var
+
+end: "END"i
+
+?listing_control: width | list
+
+width: "WIDTH"i positive_int_or_private_var -> width
+
+list: "LIST"i
+
+?component_control: unit
+
+version: "VERSION"i version_number
+
+version_number: positive_int_or_private_var
+
+unit: header parameters [inputs [labels]]
+
+header: "UNIT"i unit_number "TYPE"i type_number [header_comment]
+
+header_comment: HEADER_COMMENT
+
+unit_number: POSITIVE_INT
+
+type_number: POSITIVE_INT
+
+parameters: "PARAMETERS"i ("0" | number_of_parameters parameter+)
+
+number_of_parameters: POSITIVE_INT | NAME
+
+parameter: variable_name
+    | SIGNED_NUMBER -> literal
+
+inputs: "INPUTS"i number_of_inputs input+
+
+number_of_inputs: POSITIVE_INT
+
+input: variable_name
+    | SIGNED_NUMBER -> literal
+    | ("0" "," "0" | "CONST") -> const
+
+labels: "LABELS"i number_of_labels (LABEL [","])* LABEL
+
+number_of_labels: POSITIVE_INT
+
+constants: "CONSTANTS"i number_of_constants equation+
+
+number_of_constants: POSITIVE_INT
+
+equations: "EQUATIONS"i number_of_equations equation+
+
+number_of_equations: POSITIVE_INT
+
+equation: assignment_target "=" sum
+
+assignment_target: explicit_var_name | unreferencable_variable_name
+
+?sum: product
+    | sum "+" product -> plus
+    | sum "-" product -> minus
+
+?product: power
+    | product "*" power -> times
+    | product "/" power -> divided_by
+
+?power: atom
+    | power ("^" | "**") atom -> to_power_of
+
+?atom: NUMBER -> number
+    | "-" atom -> negate
+    | variable_name
+    | output
+    | "(" sum ")"
+    | func_call
+
+?number_or_private_var: NUMBER -> value
+    | private_var
+
+?positive_int_or_private_var: POSITIVE_INT -> value
+    | private_var
+
+?bool_or_private_var: BOOL -> value
+    | private_var
+
+func_call: func_name func_args -> func_call
+
+func_args: "(" (sum ("," sum)* )? ")"
+
+func_name: NAME
+
+output: "[" unit_number "," output_number "]"
+
+output_number: INT
+
+?variable_name: explicit_var_name
+    | computed_var
+
+explicit_var_name: SHARED_VAR_NAME -> shared_var
+    | private_var
+
+unreferencable_variable_name: UNREFERENCABLE_NAME
+
+private_var: NAME
+
+assign: "ASSIGN" (file_path | "\"" file_path "\"") [logical_unit]
+
+file_path: FILE_PATH
+
+logical_unit: INT | NAME
+
+computed_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
+
+FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
+
+SHARED_VAR_NAME: "$" NAME
+
+PORT_NAME: NAME
+
+PORT_PROPERTY: "@" ("temp" | "mfr")
+
+DEFAULT_VARIABLE_NAME: NAME
+
+NAME: LETTER (LETTER|DIGIT|"_")*
+
+LABEL: /[^,\s]+/
+
+UNREFERENCABLE_NAME: LETTER (LETTER|DIGIT|"_"|"-")*
+
+POSITIVE_INT: POSITIVE_DIGIT DIGIT*
+
+POSITIVE_DIGIT: "1".."9"
+
+BOOL: "0" | "1"
+
+SIGNED_NUMBER: ("+"?|"-") NUMBER
+
+COMMENT: /^\s*\*[^\n]*\n?/m | /\![^\n]*/
+
+HEADER_COMMENT: /[^!\n]+/
+
+%import common.INT
+
+%import common.NUMBER
+
+%import common.LETTER
+
+%import common.DIGIT
+
+%import common.WS
+
+%ignore COMMENT
+
+%ignore WS

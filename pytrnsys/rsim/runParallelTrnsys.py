@@ -8,30 +8,31 @@ Date   : 30.09.2016
 ToDo
 """
 
-import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
-import pytrnsys.rsim.executeTrnsys as exeTrnsys
-import pytrnsys.trnsys_util.buildTrnsysDeck as build
-import numpy as num
-import pandas as pd
-import os
-import pytrnsys.pdata.processFiles
-import string
-import pytrnsys.rsim.runParallel as runPar
-import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
-import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
-import shutil
-import sys
 import imp
 import json
+import os
+import shutil
+import typing as _tp
 from copy import deepcopy
-import sys
+
+import numpy as num
+import pandas as pd
 import pkg_resources
+import sys
+
+import pytrnsys.rsim.executeTrnsys as exeTrnsys
+import pytrnsys.rsim.runParallel as runPar
+import pytrnsys.trnsys_util.buildTrnsysDeck as build
+import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
+import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.utils.log as log
+import pytrnsys.utils.result as _res
 
 try:
     import pytrnsys_examples
 except ImportError:
     pass
+
 
 # from sets import Set
 
@@ -62,6 +63,8 @@ class RunParallelTrnsys:
 
         self.pathConfig = pathConfig
 
+        self.ddckPlaceHolderValuesJsonPath = None
+
         self.defaultInputs()
         self.cmds = []
         if runPath == None:
@@ -84,7 +87,11 @@ class RunParallelTrnsys:
 
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
             self.getConfig()
-            self.runConfig()
+
+            result = self.runConfig()
+            if _res.isError(result):
+                _res.error(result).throw()
+
             self.runParallel()
         else:
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
@@ -150,7 +157,7 @@ class RunParallelTrnsys:
         cases = []
 
         for line in lines:
-            if line == "\n" or line[0]=="#":  # ignoring blank lines and lines starting with #
+            if line == "\n" or line[0] == "#":  # ignoring blank lines and lines starting with #
                 pass
             else:
                 cases.append(line[:-1])  # remove \n
@@ -168,8 +175,6 @@ class RunParallelTrnsys:
             # tests[i].setAddBuildingData(self.inputs["copyBuildingData"]) I comment it until we use again a case where we need this functionality. I guess we dont need this anymore.
             tests[i].loadDeck(check=self.inputs["checkDeck"])
 
-
-
             tests[i].changeParameter(self.parameters)
             if self.inputs["ignoreOnlinePlotter"] == True:
                 tests[i].ignoreOnlinePlotter()
@@ -179,11 +184,11 @@ class RunParallelTrnsys:
 
             # tests[i].setTrnsysVersion("TRNSYS17_EXE")
 
-            self.cmds.append(tests[i].getExecuteTrnsys(self.inputs,useDeckName=tests[i].nameDck))
+            self.cmds.append(tests[i].getExecuteTrnsys(self.inputs, useDeckName=tests[i].nameDck))
 
         self.runParallel()
 
-    def runConfig(self):
+    def runConfig(self) -> _res.Result[None]:
         """
         Runs the cases defined in the config file
 
@@ -231,14 +236,21 @@ class RunParallelTrnsys:
                         else:
                             self.nameBase = nameBase + "-" + os.path.split(sinkFile)[-1]
 
-                        self.buildTrnsysDeck()
+                        result = self.buildTrnsysDeck()
+
+                        if _res.isError(result):
+                            return _res.error(result)
+
                         self.createDecksFromVariant()
 
                         if self.foldersForDDckVariationUsed == True:
                             self.path = originalPath  # recall the original path, otherwise the next folder will be cerated inside the first
-
             else:
-                self.buildTrnsysDeck()
+                result = self.buildTrnsysDeck()
+
+                if _res.isError(result):
+                    return _res.error(result)
+
                 self.createDecksFromVariant()
 
     def createDecksFromVariant(self, fitParameters={}):
@@ -362,7 +374,7 @@ class RunParallelTrnsys:
 
         shutil.move(root_src_dir, root_target_dir)
 
-    def buildTrnsysDeck(self):
+    def buildTrnsysDeck(self) -> _res.Result[str]:
         """
         It builds a TRNSYS Deck from a listDdck with pathDdck using the BuildingTrnsysDeck Class.
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
@@ -373,14 +385,16 @@ class RunParallelTrnsys:
 
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck)
-        deck.readDeckList(
+        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self.ddckPlaceHolderValuesJsonPath)
+        result = deck.readDeckList(
             self.pathConfig,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
             dictPaths=self.dictDdckPaths,
             replaceLineList=self.replaceLines,
         )
-        # deck.createDependencyGraph()
+
+        if _res.isError(result):
+            return _res.error(result)
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
         deck.writeDeck(addedLines=deckExplanation)
@@ -389,7 +403,6 @@ class RunParallelTrnsys:
         deck.checkTrnsysDeck(deck.nameDeck, check=self.inputs["checkDeck"])
 
         if self.inputs["generateUnitTypesUsed"] == True:
-
             deck.saveUnitTypeFile()
 
         if self.inputs["addAutomaticEnergyBalance"] == True:
@@ -504,6 +517,8 @@ class RunParallelTrnsys:
             self.logger = log.setup_custom_logger("root", self.inputs["outputLevel"])
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
+        if "pathToConnectionInfo" in self.inputs:
+            self.ddckPlaceHolderValuesJsonPath = self.inputs["pathToConnectionInfo"]
         if self.inputs["addResultsFolder"] == False:
             pass
         else:

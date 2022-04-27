@@ -1,0 +1,159 @@
+*******************************
+**BEGIN Control-Cooling-888.ddck 
+**
+**Control BigIce
+*******************************
+    
+*****************************************
+** Author: Dani Carbonell        
+** Date:  23.04.2018    
+******************************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+********************************
+************ HYDRAULIC EXPORT
+********************************
+
+
+EQUATIONS 3
+*** Massflowrates
+xFracMixHxTes = SaV/100   !MS assumption Valve_W_Vell = 100 if ProWS and 0 if ProCS
+MfrPuCol = PuAOn*MfrCPri   !MS: PuAOn comes from the labview control - such we don't need to include ProXY here
+MfrEmulator = MfrE
+
+!MfrPuHpEvap = MfrHpEvapUsed*hpIsOn   !MS: from emulator - test rig Mfr
+
+*** here allow loading of SH-storage, too! Load Tes_SH xFracDivSolarDhwSh = 1! ???
+
+
+EQUATIONS 5
+MfrPuHxIce = MfrPuCol * xFracMixHxTes    !MS:check check here if this is the correct way around!!!
+TTesSolar = TPiColOut
+TPiIceToHpIn = TPiPuEvapOut   !MS inlet temperature for HX in PCM on HP side
+MfrPuEvaporator = MfrE
+MfrPiIceToHpIn = MfrPuEvaporator  !MS mass flow rate for HX in PCM on HP side
+
+
+
+CONSTANTS 3
+T_set_DivHpEvap = TEvapMaxHp
+TmaxIceTes = 30
+scalePipes = 1
+
+EQUATIONS 5
+QPcmFromCol_kW = sumQhxkW*xFracMixHxTes*pumpColOn
+QColToPcm_kW   = Pcoll_KW*xFracMixHxTes*pumpColOn
+QPcmToHp_kW    = sumQhxkW*GT(MfrE,0.1)       
+QColToTes_kW   = Pcoll_KW*NOT(xFracMixHxTes)*pumpColOn  
+TPiHPEvapOut = Teei
+
+CONSTANTS 6  ! Heat Pump: Size              
+TEvapMaxHp=25.0 ! value changed from original by executeTrnsys.py
+sizeHpNom = 10.0
+MfrHpEvapRef = 2400
+sizeHpUsed=1.0*10.227 ! value changed from original by executeTrnsys.py
+SizeHpRatio  = sizeHpUsed/sizeHpNom               
+MfrHpEvapNom = SizeHpRatio*MfrHpEvapRef
+
+********************************
+************ TEMPERAING VALVES
+********************************
+
+!UNIT 443 TYPE 811 ! Passive Divider for heating 
+!PARAMETERS 1
+!5 !Nb.of iterations before fixing the value 
+!INPUTS 4 
+!TPiIceToHp
+!TPiHpEvapOut
+!MfrPiHpEvapIn
+!T_set_DivHpEvap
+*** INITIAL INPUT VALUES
+!35.0 21.0 800.0 T_set_DivHpEvap
+!EQUATIONS 1
+!xFracDivHpEvap =  1.-[443,5]     !MS set to 0 -> no mixing valve just temperature from ice storage used! Change for CO2 tests!
+
+***************************************************
+******** Cooling Section***************************
+***************************************************
+
+CONSTANTS 2
+TPCMCoolStop = 24 ! Stop cooling if TAvgPCM is above this temperature
+dTCoolPCM = 1
+
+EQUATIONS 1
+CoolingOn = 0! OR(AND(AND(CoolingNeeded,LE(TAvgPCM,TPCMCooltSimEnd+dTCoolPCM)),CoolingOnRc),AND(CoolingNeeded,LE(TAvgPCM,TPCMCooltSimEnd))) !Deadband
+
+
+EQUATIONS 1
+pumpColOn = PuAOn
+*******************************************
+****** BLOCK PROGRAMS  ********************
+*******************************************
+
+!MS Block Programs not necessary -> done by labview control!
+
+
+!UNIT 63 TYPE 993     ! Input value recall (element RcC)
+!PARAMETERS 1     
+!9    ! 1: number of variables to be remembered
+**     
+!INPUTS 7
+!T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM TPcmTooHigh
+!20  0.0 0.0  0.0 0.0 0.0 0.0
+
+!EQUATIONS 7              ! Recalled values for collector control
+!TesOverheatRc = [63,1]     ! recalled value of boolean for storage protection, 0/1
+!T10_Tes1Rc = [63,1]     ! recalled value from upper storage part for storage protection, °C
+!BoAuxWWonRc = [63,2]     
+!BoAuxSHonRc  = [63,3]     
+!TTesDhwBotRc = [63,4]
+!TTesShBotRc = [63,5]
+!TAvgPCMRc = [63,6]
+!TPcmTooHighRc = [63,7]
+
+EQUATIONS 1
+TPiHpEvapIn = TEout
+
+UNIT 18 TYPE 993      !Changed automatically
+PARAMETERS 1     
+4   ! 1: number of variables to be remembered    
+INPUTS 4     
+TPCM2 TPiHPEvapOut vIceRatio TPiHpEvapIn      
+0.0  0.0 1 0 
+EQUATIONS 4    ! outputs of Input Value Recall
+TPCM2Rc = [18,1]      !Changed automatically
+TPiHPEvapOutRc = [18,2]      !Changed automatically
+vIceRatioRc = [18,3]      !Changed automatically
+!TsensorTesShRc = [18,4]      !Changed automatically
+TPiHpEvapInRc = [18,4]      !Changed automatically
+
+
+*****************************************************
+*****Online Plotter*******
+*****************************************************
+
+UNIT 501 TYPE 65     ! Online Plotter HX
+PARAMETERS 12     
+10     ! 1 Nb. of left-axis variables
+0     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+100     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+60     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+-1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 10    
+CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM,TmaxIceTes BlockSeries 
+CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM,TmaxIceTes BlockSeries 
+LABELS  3     
+Temperatures  
+MassFlows   
+ControlNC

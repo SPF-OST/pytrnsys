@@ -1,0 +1,518 @@
+*******************************
+**BEGIN TRIHP_Hyd_IceColLoop.ddck
+*******************************
+
+
+*****************************************
+** Whole system hydraulic section.
+** MFH with a combi-store and circulation losses loop and cooling
+** Version : v1
+** Last Changes: mschubert
+** Date: 24.02.2022
+******************************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+
+
+
+EQUATIONS 2
+qSysOut_PipeLoss = PipeLossTotal
+elSysOut_PuTot = PelPuDis_kW
+*******************************************************************
+******* BEGIN: Connexions with types
+*******************************************************************
+
+EQUATIONS 7
+TPiDivDhwShCol = Taai 
+TTeeHxToIce = Teei
+TDivSolarDhwSh = Taai
+TTeeSolarDhwSh = TPiColDivDhwSh
+TTeeColToHp = TPiIceToHp
+TRoomStore = 15						!changable by config file 
+TColl=TCollOut
+
+
+EQUATIONS 6
+*** Pump outlet temperatures
+TPuCol = TPiColPuIn
+TPuHxIce = TPiHxIceToPuIce
+TIceSlurryX0=TCsHx2o !solar loop
+TIceSlurryX1=TCsHx1o ! heat pump loop 
+THxColIceX0=TLoadOut_ColIce
+THxColIceX1=TsourceOut_ColIce !collector
+
+*****************************************************
+****** Connection for mass flow rate -> no mass flow solver! 
+*****************************************************
+
+EQUATIONS 26! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MfrPiDivDhwShCol_A = MfrPuCol * NOT(xFracMixHxTes)*pumpColOn
+MfrPiColDivDhwSh_A = MfrPuCol * NOT(xFracMixHxTes)*pumpColOn
+MfrPiColPuIn_A =  MfrPuCol
+MfrPiColIn_A =  MfrPuCol
+MfrPiColOut_A =  MfrPuCol
+MfrPiSolarToHxIce_A = MfrPuCol * xFracMixHxTes*pumpColOn
+MfrPiHxIceToSolar_A = MfrPuCol * xFracMixHxTes*pumpColOn
+
+
+MfrPiHxIceToPuIce_A = MfrPuHxIce
+MfrPiHxSolarIceIn_A = MfrPuHxIce
+MfrPiHxSolarIceOut_A = MfrPuHxIce
+
+MfrPiIceToHp_A = MfrE
+MfrPiIceToHpIn_A = MfrE
+
+MfrHxColIce-Side0_A = MfrPiHxSolarIceIn_A  !ice-side -> if Side1 in mass flow solver output refers to Side0 in connections
+MfrHxColIce-Side0_B = MfrPiHxSolarIceIn_A  !ice-side -> if Side1 in mass flow solver output refers to Side0 in connections
+MfrHxColIce-Side1_A = MfrPiSolarToHxIce_A  !solar-side -> if Side2 in mass flow solver output refers to Side2 in connections
+MfrHxColIce-Side1_B = MfrPiSolarToHxIce_A  !solar-side -> if Side2 in mass flow solver output refers to Side2 in connections
+
+MfrIceSlurry-Side0_A = MfrPiHxSolarIceIn_A  !Solar-side -> if Side1 in mass flow solver output refers to Side0 in connections
+MfrIceSlurry-Side0_B = MfrPiHxSolarIceIn_A
+MfrIceSlurry-Side1_A = MfrPiIceToHpIn_A  !HP-side -> if Side2 in mass flow solver output refers to Side2 in connections
+MfrIceSlurry-Side1_B = MfrPiIceToHpIn_A
+
+MfrMixHxTes_A = MfrPuCol 
+MfrMixHxTes_B = MfrPuCol * NOT(xFracMixHxTes)*pumpColOn
+MfrMixHxTes_C = MfrPuCol * xFracMixHxTes*pumpColOn
+
+MfrTeeDivTes_A = MfrPuCol
+MfrTeeDivTes_B = MfrPuCol * NOT(xFracMixHxTes)*pumpColOn
+MfrTeeDivTes_C = MfrPuCol * xFracMixHxTes*pumpColOn
+
+CONSTANTS 1
+PPiCircLoss_kW = 0.377    ! constant value in kW for circ losses calculated from annual losses
+
+*****************************************************
+****** ELECTRICIY CONSUMPTION OF PUMPS
+*****************************************************
+
+EQUATIONS 2 !to be defined by user and exported by GUI
+MfrPuHxIceNom  = MfrHpEvapNom  
+MfrPuColNom    = MfrCPriSpec*AcollAp              ! nominal mass flow rate, kg/h
+
+EQUATIONS 6     ! Electric pump power PuCol
+dpPuColNom_bar = 0.4                             ! Pressure-drop of loop at nominal mass flow, bar
+frMfrPuCol = MfrPuCol/MfrPuColNom            ! Flow rate fraction of nominal flow rate
+dpPuCol_bar = (frMfrPuCol)^2*dpPuColNom_bar  ! Pressure drop at actual mass flow rate, bar
+PflowPuCol_W = ((MfrPuCol/3600)/RhoBri)*dpPuCol_bar*100000  ! Required power to drive the flow, W
+etaPuCol = 0.12-0.00*(1-frMfrPuCol)           ! Pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+PelPuCol_kW = (PflowPuCol_W/1000)/etaPuCol  ! Required pump electric power, kW
+
+EQUATIONS 6     ! Electric pump power PuHxIce
+dpPuHxIceNom_bar = 0.2                             ! Pressure-drop of loop at nominal mass flow, bar
+frMfrPuHxIce = MfrPuHxIce/MfrPuHxIceNom            ! Flow rate fraction of nominal flow rate
+dpPuHxIce_bar = (frMfrPuHxIce)^2*dpPuHxIceNom_bar  ! Pressure drop at actual mass flow rate, bar
+PflowPuHxIce_W = ((MfrPuHxIce/3600)/RhoWat)*dpPuHxIce_bar*100000  ! Required power to drive the flow, W
+etaPuHxIce = 0.12-0.00*(1-frMfrPuHxIce)           ! Pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+PelPuHxIce_kW = (PflowPuHxIce_W/1000)/etaPuHxIce  ! Required pump electric power, kW
+
+
+EQUATIONS 1
+PelPuDis_kW        = PelPuCol_kW + PelPuHxIce_kW
+
+*****************************************************
+*** components for Collector-loop *******************
+*****************************************************
+
+UNIT 490 TYPE 931
+!PiDivDhwShCol
+PARAMETERS 6
+diPiDivDhwShCol
+LPiDivDhwShCol
+UPiDivDhwShCol
+RhoBri
+CPBri
+20
+INPUTS 4
+TMixHxTes
+MfrPiDivDhwShCol_A
+TRoomStore
+TDivSolarDhwSh
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 2
+**TPiDivDhwShCol= [490,1]
+PPiDivDhwShCol_kW= [490,3]/3600 !kW
+MfrPiDivDhwShCol= MfrPiDivDhwShCol_A
+
+
+UNIT 492 TYPE 931
+!PiColDivDhwSh
+PARAMETERS 6
+diPiColDivDhwSh
+LPiColDivDhwSh
+UPiColDivDhwSh
+RhoBri
+CPBri
+20
+INPUTS 4
+TTeeDivTes
+MfrPiColDivDhwSh_A
+TRoomStore
+TTeeSolarDhwSh
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColDivDhwSh= [492,1]
+PPiColDivDhwSh_kW= [492,3]/3600 !kW
+MfrPiColDivDhwSh= MfrPiColDivDhwSh_A
+
+UNIT 505 TYPE 931
+!PiColPuIn
+PARAMETERS 6
+diPiColPuIn
+LPiColPuIn
+UPiColPuIn
+RhoBri
+CPBri
+20
+INPUTS 4
+TMixHxTes
+MfrPiColPuIn_A
+TRoomStore
+TPuCol
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColPuIn= [505,1]
+PPiColPuIn_kW= [505,3]/3600 !kW
+MfrPiColPuIn= MfrPiColPuIn_A
+
+UNIT 506 TYPE 931
+!PiColIn
+PARAMETERS 6
+diPiColIn
+LPiColIn
+UPiColIn
+RhoBri
+CPBri
+20
+INPUTS 4
+TPuCol
+MfrPiColIn_A
+TRoomStore
+TColl
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColIn= [506,1]
+PPiColIn_kW= [506,3]/3600 !kW
+MfrPiColIn= MfrPiColIn_A
+
+
+UNIT 491 TYPE 931
+!PiColOut
+PARAMETERS 6
+diPiColOut
+LPiColOut
+UPiColOut
+RhoBri
+CPBri
+20
+INPUTS 4
+TColl
+MfrPiColOut_A
+TRoomStore
+TTeeDivTes
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColOut= [491,1]
+PPiColOut_kW= [491,3]/3600 !kW
+MfrPiColOut= MfrPiColOut_A
+
+UNIT 495 TYPE 931
+!PiSolarToHxIce
+PARAMETERS 6
+diPiSolarToHxIce
+LPiSolarToHxIce
+UPiSolarToHxIce
+RhoBri
+CPBri
+20
+INPUTS 4
+THxColIceX1
+MfrPiSolarToHxIce_A
+TRoomStore
+TTeeDivTes
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiSolarToHxIce= [495,1]
+PPiSolarToHxIce_kW= [495,3]/3600 !kW
+MfrPiSolarToHxIce= MfrPiSolarToHxIce_A
+
+UNIT 515 TYPE 931
+!PiHxIceToSolar
+PARAMETERS 6
+diPiHxIceToSolar
+LPiHxIceToSolar
+UPiHxIceToSolar
+RhoBri
+CPBri
+20
+INPUTS 4
+THxColIceX1
+MfrPiHxIceToSolar_A
+TRoomStore
+TMixHxTes
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxIceToSolar= [515,1]
+PPiHxIceToSolar_kW= [515,3]/3600 !kW
+MfrPiHxIceToSolar= MfrPiHxIceToSolar_A
+
+UNIT 131 TYPE 929 !Changed automatically
+PARAMETERS 0
+INPUTS 6
+MfrMixHxTes_A
+MfrMixHxTes_B
+MfrMixHxTes_C
+TPiColPuIn
+TPiDivDhwShCol
+TPiHxIceToSolar
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixHxTes= [131,1] !Changed automatically
+
+UNIT 163 TYPE 929 !Changed automatically
+PARAMETERS 0
+INPUTS 6
+MfrTeeDivTes_A
+MfrTeeDivTes_B
+MfrTeeDivTes_C
+TPiColOut
+TPiColDivDhwSh
+TPiSolarToHxIce
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeDivTes= [163,1] !Changed automatically
+
+*****************************************************
+*** components for Ice-Col-loop *********************
+*****************************************************
+UNIT 496 TYPE 931
+!PiHxIceToPuIce
+PARAMETERS 6
+diPiHxIceToPuIce
+LPiHxIceToPuIce
+UPiHxIceToPuIce
+RhoWat
+CPWat
+20
+INPUTS 4
+THxColIceX0
+MfrPiHxIceToPuIce_A
+TRoomStore
+TPuHxIce
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxIceToPuIce= [496,1]
+PPiHxIceToPuIce_kW= [496,3]/3600 !kW
+MfrPiHxIceToPuIce= MfrPiHxIceToPuIce_A
+
+UNIT 497 TYPE 931
+!PiHxSolarIceIn
+PARAMETERS 6
+diPiHxSolarIceIn
+LPiHxSolarIceIn
+UPiHxSolarIceIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuHxIce
+MfrPiHxSolarIceIn_A
+TRoomStore
+TIceSlurryX0
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxSolarIceIn= [497,1]
+PPiHxSolarIceIn_kW= [497,3]/3600 !kW
+MfrPiHxSolarIceIn= MfrPiHxSolarIceIn_A
+
+UNIT 498 TYPE 931
+!PiHxSolarIceOut
+PARAMETERS 6
+diPiHxSolarIceOut
+LPiHxSolarIceOut
+UPiHxSolarIceOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TIceSlurryX0
+MfrPiHxSolarIceOut_A
+TRoomStore
+THxColIceX0
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxSolarIceOut= [498,1]
+PPiHxSolarIceOut_kW= [498,3]/3600 !kW
+MfrPiHxSolarIceOut= MfrPiHxSolarIceOut_A
+
+
+
+*****************************************************
+*** components for connection ice to test rig-loop **
+*****************************************************
+
+UNIT 499 TYPE 931
+!PiIceToHp
+PARAMETERS 6
+diPiIceToHp
+LPiIceToHp
+UPiIceToHp
+RhoWat
+CPWat
+20
+INPUTS 4
+TIceSlurryX1
+MfrPiIceToHp_A
+TRoomStore
+TTeeColToHp
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiIceToHp= [499,1]
+PPiIceToHp_kW= [499,3]/3600 !kW
+MfrPiIceToHp= MfrPiIceToHp_A
+
+UNIT 501 TYPE 931
+!PiIceToHpIn
+PARAMETERS 6
+diPiIceToHpIn
+LPiIceToHpIn
+UPiIceToHpIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeHxToIce
+MfrPiIceToHpIn_A
+TRoomStore
+TIceSlurryX1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiIceToHpIn= [501,1]
+PPiIceToHpIn_kW= [501,3]/3600 !kW
+MfrPiIceToHpIn= MfrPiIceToHpIn_A
+
+
+
+
+*****************************************************
+*** Definition of Loops *****************************
+*****************************************************
+
+
+CONSTANTS 7
+scalePipes = 1
+** Fluid Loop : SolarLoop
+di_loop_4=0.10
+L_loop_4=5*scalePipes
+U_loop_4=5*scalePipes
+
+** Fluid Loop : IceLoop
+di_loop_6=0.05
+L_loop_6=2*scalePipes
+U_loop_6=5*scalePipes
+
+
+EQUATIONS 36
+
+******CollectorLoop****Fluid:Brine*******
+*** PiColOut
+diPiColOut=di_loop_4
+LPiColOut=L_loop_4
+UPiColOut=U_loop_4
+*** PiColIn
+diPiColIn=di_loop_4
+LPiColIn=L_loop_4
+UPiColIn=U_loop_4
+*** PiColDivDhwSh -> to test rig
+diPiColDivDhwSh=di_loop_4
+LPiColDivDhwSh=L_loop_4
+UPiColDivDhwSh=U_loop_4
+*** PiSolarToHxIce
+diPiSolarToHxIce=di_loop_4
+LPiSolarToHxIce=L_loop_4
+UPiSolarToHxIce=U_loop_4
+*** PiHxIceToSolar
+diPiHxIceToSolar=di_loop_4
+LPiHxIceToSolar=L_loop_4
+UPiHxIceToSolar=U_loop_4
+*** PiDivDhwShCol -> from test rig
+diPiDivDhwShCol=di_loop_4
+LPiDivDhwShCol=L_loop_4
+UPiDivDhwShCol=U_loop_4
+*** PiColPuIn
+diPiColPuIn=di_loop_4
+LPiColPuIn=L_loop_4
+UPiColPuIn=U_loop_4
+
+
+******IceLoop****Fluid:Water*******
+*** PiIceToHp -> to test rig
+diPiIceToHp=di_loop_6
+LPiIceToHp=L_loop_6
+UPiIceToHp=U_loop_6
+*** PiIceToHpIn -> from test rig
+diPiIceToHpIn=di_loop_6
+LPiIceToHpIn=L_loop_6
+UPiIceToHpIn=U_loop_6
+*** PiHxIceToPuIce
+diPiHxIceToPuIce=di_loop_6
+LPiHxIceToPuIce=L_loop_6
+UPiHxIceToPuIce=U_loop_6
+*** PiHxSolarIceIn
+diPiHxSolarIceIn=di_loop_6
+LPiHxSolarIceIn=L_loop_6
+UPiHxSolarIceIn=U_loop_6
+*** PiHxSolarIceOut
+diPiHxSolarIceOut=di_loop_6
+LPiHxSolarIceOut=L_loop_6
+UPiHxSolarIceOut=U_loop_6
+
+
+
+EQUATIONS 3
+PipeLoss4=PPiColOut_kW+PPiColIn_kW+PPiColDivDhwSh_kW+PPiSolarToHxIce_kW+PPiHxIceToSolar_kW+PPiColPuIn_kW+PPiDivDhwShCol_kW
+PipeLoss6 = PPiIceToHp_kW + PPiIceToHpIn_kW + PPiHxIceToPuIce_kW + PPiHxSolarIceIn_kW + PPiHxSolarIceOut_kW
+PipeLossTotal = PipeLoss4 + PipeLoss6
+**by now this is manually created
+
+
+
+***********************************
+** Monthly printer
+***********************************
+
+
+
+
+
+
+

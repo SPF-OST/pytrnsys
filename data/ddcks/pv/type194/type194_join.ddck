@@ -1,0 +1,138 @@
+*******************************
+**BEGIN pv_join.dck
+*******************************
+
+*****************************************
+** Contact person : Maike Schubert
+** Creation date  : 22.12.2021
+** Last changes   : 
+*****************************************
+
+***************************************************************************
+** Description: 
+** PV ddck for joining 2 PV fields
+** works in connection to type194_field1.ddck and type194_field2.ddck
+***************************************************************************
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** None
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 1
+elSysIn_PV       = PelArrayMPP1_kW + PelArrayMPP2_kW !DC Power provided by PV field
+** elSysOut_InvLoss = PvInverterLoss_kW  !JS: Only correct if there is no battery, otherwise the inverter losses have to be accounted for in the battery ddck.
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+
+**********************************************
+** Dependencies with overall variables 
+**
+** variableX from fileX
+**********************************************
+**tSky, tAmb, vWind, tAmbDewPoint
+** weatherDataFormat, unitWeatherData   from weatherDataFile
+
+
+** MS: get both PV fields together! 
+EQUATIONS 12   !, Output of PV collector
+PelMaxPower_kW = PelMaxPower1_kW + PelMaxPower2_kW   	! this corresponds to power at mpp after inverter (AC)
+PelArrayMPP_kW = PelArrayMPP1_kW + PelArrayMPP2_kW  	! this corresponds to power at mpp before inverter (DC)
+VelMp = VelMp1 + VelMp2  					! Voltage at MPP (including inverter effects)
+VelArrayMp = VelArrayMp1 + VelArrayMp2				! Voltage at MPP (NOT including inverter effects)
+PelPvRoofDC = PelPv1DC + PelPv2DC 	! Power DC in kJ/h
+PelPVDC = PelPVRoofDC				! Power DC in kJ/h
+PelPVRoof_kW = PelMaxPower_kW   	! Power AC in kW
+PelPVDC_kW = PelPV1DC_kW + PelPV2DC_kW  		! Power DC in kW
+PelPVAC_kW = PelPV1AC_kW + PelPV2AC_kW
+inverterEffDCAC_mp = 0.5*(inverterEff1DCAC_mp + inverterEff2DCAC_mp)		! MS: check this!
+inverterEffDCAC = MAX(inverterEffDCAC_mp,0.887) !MAX(inverterEffDCAC_mp,0.000000001) ! Prevent division by 0  JS: Set minimum to 0.887 because this efficiency is used by battery basic_battery.ddck
+PvInverterLoss_kW = PelPVDC_kW-PelPVAC_kW
+
+
+
+*******************************
+***** timestamp printer
+*******************************
+CONSTANTS 1
+unitTimestep2PV = 218
+
+
+ASSIGN temp\check1Pv.Plt unitTimestep2Pv
+UNIT 91 TYPE 25        !Changed automatically
+PARAMETERS 10     
+dtSim                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitTimestep2PV     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 9
+Time IT_PV1_kW IT_PV1_kW IT_H_kW PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW PelPV1DC_kW PelPV2DC_kW
+*******
+Time IT_PV1_kW IT_PV1_kW IT_H_kW PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW PelPV1DC_kW PelPV2DC_kW
+
+
+
+*******************************
+**Monthly printer
+*******************************
+
+CONSTANTS 1
+unitPrinterPV=308
+
+ASSIGN    temp\PV_MO.Prt      unitPrinterPV
+
+UNIT 308 Type 46    !, Printegrator Monthly Values for Electricity
+PARAMETERS 6
+unitPrinterPV  !, 1, Logical unit number, -
+-1   !, 2, Logical unit for monthly summaries, -
+1    !, 3, Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1   !, 4, Printing & integrating interval, h. -1 for monthly integration
+1    !, 5, Number of inputs to avoid integration, -
+1    !, 6, Output number to avoid integration
+INPUTS 4
+Time PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
+*******
+Time PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
+
+
+UNIT 155 TYPE 65     ! Online Plotter Collector (Element OpC)
+PARAMETERS 12     
+5     ! 1 Nb. of left-axis variables
+3     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+1000     ! 4 Left axis maximum
+0    ! 5 Right axis minimum
+1000     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 12
+Tamb  PelMaxPower_kW PelMaxPower1_kW PelMaxPower2_kW PelArrayMPP_kW  IT_H_KW  IB_H_kW  VelMp  VelArrayMp  inverterEffDCAC_mp inverterEff1DCAC_mp inverterEff2DCAC_mp 
+**     
+Tamb  PelMaxPower_kW PelMaxPower1_kW PelMaxPower2_kW PelArrayMPP_kW  IT_H_KW  IB_H_kW  VelMp  VelArrayMp  inverterEffDCAC_mp inverterEff1DCAC_mp inverterEff2DCAC_mp 
+LABELS  3    
+Pel
+Vel
+PV     
