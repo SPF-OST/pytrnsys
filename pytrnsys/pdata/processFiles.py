@@ -86,15 +86,8 @@ def purgueComments(lines, commentsChar):
                     if line[i] == comment:
                         if iComment == len(line):
                             iComment = i
-            #                        try:
-            #                            #checks if the previous character is a " so that we have "*
-            #                            if line[i-1]=='"':
-            #                                iComment=i-1
-            #                        except:
-            #                            pass
-            #                        break;
-            # We will eliminate from the commented index (character) to the end
 
+            # We will eliminate from the commented index (character) to the end
             iBlank = iComment
 
             # from the commented character to the beginning of the line

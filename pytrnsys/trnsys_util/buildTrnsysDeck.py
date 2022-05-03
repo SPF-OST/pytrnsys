@@ -110,7 +110,7 @@ class BuildTrnsysDeck:
 
         """
 
-        self.unitId = 9  # I start at 10 becasue it seems thta UNIT 4 and 6 can't be used?
+        self.unitId = 9  # I start at 10 becasue it seems that UNIT 4 and 6 can't be used?
 
         self.dependencies = {}
         self.definitions = {}
@@ -224,7 +224,7 @@ class BuildTrnsysDeck:
 
         ok = True
 
-        if self.dckAlreadyExists and self.overwriteForcedByUser == False:
+        if self.dckAlreadyExists and self.overwriteForcedByUser is False:
 
             window = tk.Tk()
             window.geometry("2x2+" + str(window.winfo_screenwidth()) + "+" + str(window.winfo_screenheight()))
