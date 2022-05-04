@@ -79,7 +79,8 @@ class BuildTrnsysDeck:
         if self._ddckPlaceHolderValuesJsonPath:
 
             if not self._ddckPlaceHolderValuesJsonPath.is_file():
-                return _res.Error(f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} does not exist.")
+                return _res.Error(
+                    f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} does not exist.")
 
             placeholderValues = _json.loads(self._ddckPlaceHolderValuesJsonPath.read_text())
 
@@ -353,8 +354,7 @@ class BuildTrnsysDeck:
         for index, line in enumerate(self.deckText):
             maxLineWidth = max(maxLineWidth, len(line))
             if maxLineWidth > 1000:
-                self.createWarningMessageBox("Default Limits Exceeded",
-                                             f"Line {index + 1} has {maxLineWidth} characters which exceeds the limit.")
+                self.logger.warning(f"Line {index + 1} has {maxLineWidth} characters which exceeds the limit.")
                 maxLineWidth = 0
 
             for constant in constantsToCheck:
@@ -377,16 +377,8 @@ class BuildTrnsysDeck:
         for constant, number in numOfTrnsysConstants.items():
             if (constant == "UNIT" and number > 1000) or (constant == "EQUATIONS" and number > 500) or (
                     constant == "PARAMETERS" and number > 2000) or (constant == "INPUTS" and number > 750):
-                self.createWarningMessageBox("Default Limits Exceeded",
-                                             f"There are {number} of {constant} which exceeds the limit")
+                self.logger.warning(f"There are {number} of {constant} which exceeds the limit")
 
         if maxNumberOfConstantsInABlock > 250:
-            self.createWarningMessageBox("Default Limits Exceeded",
-                                         f"There are {maxNumberOfConstantsInABlock} of components in one block which "
-                                         f"exceeds the limit")
-
-    def createWarningMessageBox(self, title, message):
-        window = tk.Tk()
-        window.geometry("2x2+" + str(window.winfo_screenwidth()) + "+" + str(window.winfo_screenheight()))
-        tkMessageBox.showwarning(title=title, message=message)
-        window.destroy()
+            self.logger.warning(
+                f"There are {maxNumberOfConstantsInABlock} of components in one block which exceeds the limit")
