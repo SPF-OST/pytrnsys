@@ -426,7 +426,7 @@ class DeckTrnsys:
 
             logger.debug("variation deck file at %s" % self.nameDck)
 
-            outfile = open(self.nameDck, "w")
+            outfile = open(self.nameDck, "w", encoding='windows-1252')
 
             outfile.writelines(lines)
             outfile.close()

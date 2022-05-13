@@ -281,7 +281,7 @@ def loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True):
         list of lines obateined form the deck without the comments
     """
 
-    infile = open(nameDck, "r")
+    infile = open(nameDck, "r", encoding='windows-1252')
 
     lines = infile.readlines()
 
