@@ -362,7 +362,7 @@ class BuildTrnsysDeck:
                 if match:
                     if constant == "UNIT":
                         numOfTrnsysConstants[constant] = numOfTrnsysConstants.get(constant, 0) + 1
-                    elif constant == "CONSTANTS":
+                    elif constant in ("CONSTANTS", "EQUATIONS"):
                         split = match.group().split()
                         numOfTrnsysConstants["EQUATIONS"] = numOfTrnsysConstants.get("EQUATIONS", 0) + int(split[1])
                         maxNumberOfConstantsInABlock = max(maxNumberOfConstantsInABlock, int(split[1]))
@@ -371,8 +371,6 @@ class BuildTrnsysDeck:
                         numOfTrnsysConstants[constant] = numOfTrnsysConstants.get(constant, 0) + int(split[1])
                         maxNumberOfConstantsInABlock = max(maxNumberOfConstantsInABlock, int(split[1]))
                     break
-                else:
-                    continue
 
         for constant, number in numOfTrnsysConstants.items():
             if (constant == "UNIT" and number > 1000) or (constant == "EQUATIONS" and number > 500) or (
