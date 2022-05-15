@@ -3,12 +3,15 @@
 
 import logging
 import os
+import pathlib as _pl
 import re
+import typing as _tp
 from string import digits
 
 import numpy as num
 
 import pytrnsys.pdata.processFiles as spfUtils
+import pytrnsys.utils.result as _res
 
 logger = logging.getLogger("root")
 
@@ -147,7 +150,7 @@ def ireplace(old, new, text):
         index_l = phraseStartingIndex(old, text)
         if index_l == -1:
             return text
-        text = text[:index_l] + new + text[index_l + len(old):]
+        text = text[:index_l] + new + text[index_l + len(old) :]
         idx = index_l + len(new)
     return text
 
@@ -281,7 +284,7 @@ def loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True):
         list of lines obateined form the deck without the comments
     """
 
-    infile = open(nameDck, "r", encoding='windows-1252')
+    infile = open(nameDck, "r", encoding="windows-1252")
 
     lines = infile.readlines()
 
@@ -302,7 +305,7 @@ def loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True):
     return linesChanged
 
 
-def checkEquationsAndConstants(lines, nameDck):
+def checkEquationsAndConstants(lines: _tp.Sequence[str], nameDck):
     for i in range(len(lines)):
 
         splitBlank = lines[i].split()
@@ -313,9 +316,9 @@ def checkEquationsAndConstants(lines, nameDck):
             lineError = i + 1
             try:
                 numberOfValues = int(splitBlank[1])
-            except:
-                raise ValueError(
-                    "checkEquationsAndConstants %s can't be split in line i:%d (missing number?)" % (splitBlank, i)
+            except ValueError:
+                return _res.Error(
+                    f"Cannot determine the number of equations or constants in {splitBlank} at {nameDck}:{i}"
                 )
 
             countedValues = 0  # start counting
@@ -331,12 +334,10 @@ def checkEquationsAndConstants(lines, nameDck):
                     countedValues = countedValues + 1
 
             if countedValues != numberOfValues:
-                parsedFile = "%s.parse" % nameDck
-                outfile = open(parsedFile, "w")
-                outfile.writelines(lines)
-                outfile.close()
+                parsedFile = _pl.Path(f"{nameDck}.parse")
+                parsedFile.write_text("\n".join(lines))
 
-                raise ValueError(
+                return _res.Error(
                     f"FATAL Error at {parsedFile}:{lineError}."
                     f" Number of expected {keyWord} was {numberOfValues} but got {countedValues}."
                 )
@@ -433,15 +434,15 @@ def readEnergyBalanceVariablesFromDeck(lines):
     for i in range(len(lines)):
 
         if (
-                len(lines[i].split("qSysIn_")) > 1
-                or len(lines[i].split("qSysOut_")) > 1
-                or len(lines[i].split("elSysIn_")) > 1
-                or len(lines[i].split("elSysOut_")) > 1
+            len(lines[i].split("qSysIn_")) > 1
+            or len(lines[i].split("qSysOut_")) > 1
+            or len(lines[i].split("elSysIn_")) > 1
+            or len(lines[i].split("elSysOut_")) > 1
         ):
             myEqualSplit = lines[i].split("=")
 
             if (
-                    len(myEqualSplit) > 1
+                len(myEqualSplit) > 1
             ):  # Otherwise if we add one of this variables in a printer it will copy the whole printer line here.
                 varBalance = myEqualSplit[0]
                 eBalance.append(varBalance.replace(" ", ""))
@@ -593,7 +594,7 @@ def changeAssignPath(lines, key, rootPath):
                 lineChanged = False
                 for j in range(len(splitPath)):
                     if splitPath[j].lower() == key:
-                        name = os.path.join(*splitPath[j + 1:])
+                        name = os.path.join(*splitPath[j + 1 :])
                         if len(splitBlank) > 2:
                             lineChanged = 'ASSIGN "%s" %s \n' % (os.path.join(rootPath, name), splitBlank[2])
                         else:

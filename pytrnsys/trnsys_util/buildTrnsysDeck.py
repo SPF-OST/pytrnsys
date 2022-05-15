@@ -268,10 +268,12 @@ class BuildTrnsysDeck:
             useDeckName=useDeckName, eraseBeginComment=False, eliminateComments=False
         )
 
-    def checkTrnsysDeck(self, nameDck, check=True):
+    def checkTrnsysDeck(self, nameDck, check=True) -> _res.Result[None]:
         lines = deckUtils.loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True)
         if check:
-            deckUtils.checkEquationsAndConstants(lines, self.nameDeck)
+            result = deckUtils.checkEquationsAndConstants(lines, self.nameDeck)
+            if _res.isError(result):
+                return _res.error(result)
 
         self.linesDeckReaded = lines
 
