@@ -398,7 +398,7 @@ def getTypeName(typeNum):
         return "Building ISO (SPF)"
     elif typeNum == 2:
         return "Collector controller (TRNSYS)"
-    elif typeNum == 935:
+    elif typeNum == 9351:
         return "Flow solver (SPF)"
     elif typeNum == 711:
         return "2D Ground model (SPF)"
