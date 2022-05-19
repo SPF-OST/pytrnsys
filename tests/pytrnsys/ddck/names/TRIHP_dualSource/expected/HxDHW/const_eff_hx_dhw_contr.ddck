@@ -37,8 +37,8 @@ TDhwSetPoint = Tdhwset
 ***********************************
 
 EQUATIONS 2
-TsourceDHWHXOut = TsourceDHWHXOutT !TSourceDHWHXIn-HTR_HXDHWHX/(MfrSourceDHWHXIn*cpWat+0.0000000000000000001)
-TLoadDHWHXOut = [501,7]		!Load side outlet temperature	C
+THxDHWOut1 = TsourceDHWHXOutT !TSourceDHWHXIn-HTR_HXDHWHX/(MfrSourceDHWHXIn*cpWat+0.0000000000000000001)
+THxDHWOut2 = [501,7]		!Load side outlet temperature	C
 
 
 

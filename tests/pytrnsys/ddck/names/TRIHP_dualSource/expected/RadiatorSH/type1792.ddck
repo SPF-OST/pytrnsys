@@ -29,7 +29,7 @@ TRdFl = TPiRadIn
 ***********************************
 
 EQUATIONS 1
-TRdRt = [42,1]  ! return temperature from space heat distribution system, °C
+TRadiatorSHOut = [42,1]  ! return temperature from space heat distribution system, °C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value
