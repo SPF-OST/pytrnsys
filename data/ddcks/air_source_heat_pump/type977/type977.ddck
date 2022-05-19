@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : D. Carbonell   
 ** Creation date  : 30.09.2016 
-** Last changes   : 07.03.2022 
+** Last changes   : 18.05.2022 
 *****************************************
 
 ***************************************************************************
@@ -20,15 +20,15 @@
 EQUATIONS 4
 ThpEvapIn = TAmb   
 MfrEvapIn = ABS(MfrHpEvapNom)     
-THpCondIn = @temp(input, TPiHpCondIn) 
-MfrCondIn = ABS(@mfr(input, MfrPiHpCondIn))
+THpCondIn = @temp(In, TPiHpCondIn) 
+MfrCondIn = ABS(@mfr(In, MfrPiHpCondIn))
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 2
 THpEvapOut = [162,1]		! 
-THpCondOut = [162,3]		! Temperature of the condenser (heat sink) outlet
+@temp(Out, THpCondOut) = [162,3]		! Temperature of the condenser (heat sink) outlet
 
 ******************************************************************************************
 ** outputs to energy balance in kWh
