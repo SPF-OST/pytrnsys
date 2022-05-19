@@ -27,8 +27,8 @@ MfrLoadIn = ABS(MfrPiHxCoolWatIn)
 ***********************************
 
 EQUATIONS 2
-TsourceOut = [500,1] 	!Source-side outlet temperature	C
-TLoadOut = [500,3] 		!Load side outlet temperature	C
+THxCoolOut1 = [500,1] 	!Source-side outlet temperature	C
+THxCoolOut2 = [500,3] 		!Load side outlet temperature	C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value

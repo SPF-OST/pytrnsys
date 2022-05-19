@@ -1,58 +1,88 @@
 {
     "FCU": {
-        "input": {
+        "In": {
             "@mfr": "MfrPiFCUIn",
             "@temp": "TPiFCUIn"
+        },
+        "Out": {
+            "@temp": "TFCUOut"
         }
     },
     "Ghx": {
-        "input": {
+        "In": {
             "@mfr": "MfrPiHxCoolBriOut",
             "@temp": "TPiHxCoolBriOut"
+        },
+        "Out": {
+            "@temp": "TGhxOut"
         }
     },
     "HP": {
-        "condenser1Input": {
+        "CondIn1": {
             "@mfr": "MfrPiHpCondIn",
             "@temp": "TPiHpCondIn"
         },
-        "condenser2Input": {
+        "CondIn2": {
             "@mfr": "MfrPiHpDesIn",
             "@temp": "TPiHpDesIn"
         },
-        "evaporatorInput": {
+        "CondOut1": {
+            "@temp": "THPCondOut1"
+        },
+        "CondOut2": {
+            "@temp": "THPCondOut2"
+        },
+        "EvapIn": {
             "@mfr": "MfrPiGhxToHP",
             "@temp": "TPiGhxToHP"
+        },
+        "EvapOut": {
+            "@temp": "THPEvapOut"
         }
     },
     "HxCool": {
-        "side1Input": {
+        "In1": {
             "@mfr": "MfrPiHpToHxCool",
             "@temp": "TPiHpToHxCool"
         },
-        "side2Input": {
+        "In2": {
             "@mfr": "MfrPiHxCoolWatIn",
             "@temp": "TPiHxCoolWatIn"
+        },
+        "Out1": {
+            "@temp": "THxCoolOut1"
+        },
+        "Out2": {
+            "@temp": "THxCoolOut2"
         }
     },
     "HxDHW": {
-        "side1Input": {
+        "In1": {
             "@mfr": "MfrPiDhwToHxDhw",
             "@temp": "TPiDhwToHxDhw"
         },
-        "side2Input": {
+        "In2": {
             "@mfr": "MfrPiSupplyToHxDhw",
             "@temp": "TPiSupplyToHxDhw"
+        },
+        "Out1": {
+            "@temp": "THxDHWOut1"
+        },
+        "Out2": {
+            "@temp": "THxDHWOut2"
         }
     },
     "RadiatorSH": {
-        "input": {
+        "In": {
             "@mfr": "MfrPiRadIn",
             "@temp": "TPiRadIn"
+        },
+        "Out": {
+            "@temp": "TRadiatorSHOut"
         }
     },
     "tapWater": {
-        "input": {
+        "In": {
             "@mfr": "MfrPiToDhwDem",
             "@temp": "TPiToDhwDem"
         }
