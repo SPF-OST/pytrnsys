@@ -39,6 +39,15 @@ class _CollectComputedVariables(_lvis.Visitor_Recursive):
         )
         self.computedVariables.append(computedVariable)
 
+    def computed_temp_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
+        portTemp = self._getChildToken("PORT_TEMP", tree)
+        portName = self._getChildToken("PORT_NAME", tree)
+        defaultVariableName = self._getChildToken("DEFAULT_VARIABLE_NAME", tree)
+        computedVariable = _ComputedVariable(
+            tree.meta.start_pos, tree.meta.end_pos, portTemp, portName, defaultVariableName
+        )
+        self.computedVariables.append(computedVariable)
+
     @staticmethod
     def _getChildToken(tokenType: str, tree: _lark.Tree) -> str:  # pylint: disable=invalid-name
         matchingChildTokens = [c for c in tree.children if isinstance(c, _lark.Token) and c.type == tokenType]
@@ -109,9 +118,8 @@ def _isEmpty(dictionary) -> bool:
     return not bool(dictionary)
 
 
-def _getComputedVariablesSortedByStartIndexAscending(
-    inputDdckFilePath: _pl.Path,
-) -> _res.Result[_tp.Sequence["_ComputedVariable"]]:
+def _getComputedVariablesSortedByStartIndexAscending(inputDdckFilePath: _pl.Path) -> _res.Result[
+    _tp.Sequence["_ComputedVariable"]]:
     result = _parse.parseDdck(inputDdckFilePath)
     if _res.isError(result):
         return _res.error(result)
