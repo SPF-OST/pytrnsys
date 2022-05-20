@@ -74,7 +74,7 @@ TtesForcePriorWs = 10
 TmaxSensibleTes = Tmax_Tes1   
 TmaxIceTes      = 50
 tempColAboveHpLimit = 3   
-nBeginCsPriority = 11 !DC-CLEAN check what it does internally, we should erase this 
+nBeginCsPriority = 9 !DC-CLEAN check what it does internally, we should erase this 
 nEndCsPriority   = 2  
 DeIcePossible    = 0
 
@@ -87,7 +87,7 @@ UdbProHp = 5     ! Upper deadband ProHp
 LdbProHp = 2     ! Lower deadband ProHp 
 UdbProWs = 7     ! Upper deadband ProWs 
 LdbProWs = 2     ! Lower deadband ProWs 
-UdbProCs = 6     ! Upper deadband ProCs
+UdbProCs = 4     ! Upper deadband ProCs
 LdbProCs = 2     ! Lower deadband ProCs 
 UdbProSeries = 4  ! -8 (PriorRoof) Upper deadband ProSeries with uncovered
 LdbProSeries = 1  ! -15(PriorRoof) Lower deadband ProSeries with uncovered

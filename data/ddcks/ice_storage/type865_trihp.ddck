@@ -1,0 +1,158 @@
+*******************************
+**BEGIN type865.ddck
+*******************************
+
+*****************************************
+** Contact person : M. Neugebauer  
+** Creation date  : 24.02.2022  
+** Last changes   : --.--.---- 
+*****************************************
+
+***************************************************************************
+** Description: 
+** 
+***************************************************************************
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS 4
+
+T1SlryTk = @temp(leftSideInput, TPiSlrySide1In) 					!MS: attention left and right is not correct here! 
+Mfr1SlryTk_kg_h = ABS(@mfr(leftSideInput, MfrPiIceToHpIn))		
+T2SlryTk = @temp(rightSideInput, TPiHxSolarIceIn)
+Mfr2SlryTk_kg_h = ABS(@mfr(rightSideInput, MfrPiHxSolarIceIn)) 			
+
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+EQUATIONS 3
+TLiqSlryTk = [130,5]
+TCsHx1o = TLiqSlryTk	! 5: liquid pcm temperature, deg C
+TCsHx2o = TLiqSlryTk		!MS: same value because new slurry storage has no control volumes up to now! 
+
+
+***********************************
+** additional "unknown" inputs
+***********************************
+EQUATIONS 2
+slryTkR2 = 0.0 			!MS: ice fraction of solar side -> no crystallizer there - no icing from there!
+slryTkTEnv = TRoomStore	!MS: for now just one TRoom Store?
+
+UNIT 130 TYPE 865    
+PARAMETERS 15  
+massSlryTk_kg			! 1: pcm mass, kg
+geoSlryTk				! 2: tank geometry: 0 = cuboid, 1 = cylinder
+widthSlryTk_m			! 3: tank width, m (diameter for cylinder)
+lengthSlryTk_m			! 4: tank length, m (only relevant for cuboid)
+maxSolFrSlryTk			! 5: maximum solid pcm mass fraction
+UWallSlryTk_W_m2K		! 6: U-value of tank wall, W/m^2K
+rhoPcmLiq_kg_m3			! 7: density of liquid pcm, kg/m^3
+rhoPcmSolid_kg_m3		! 8: density of solid pcm, kg/m^3
+cpPcmLiq_J_kgK			! 9: heat capacity of liquid pcm, J/kgK
+lambdaPcm_W_mK			! 10: thermal conductivity of pcm, W/mK
+TFreezePcm				! 11: freezing temperature of pcm, deg C
+hPcm_W_m2K				! 12: convection heat transfer coefficient of pcm, W/m^2K
+LPcm_J_kg				! 13: latent heat of pcm, J/kg
+solPcmIni				! 14: initial mass fraction of solid pcm
+TLiqPcmIni				! 15: initial temperature of liquid pcm, deg C
+INPUTS 7 	
+Mfr1SlryTk_kg_h			! 1: mass flow rate on port pair 1, kg/h
+slryTkR1				! 2: solid pcm fraction in port pair 1 mass flow
+T1SlryTk				! 3: inlet temperature of port pair 1, deg C
+Mfr2SlryTk_kg_h			! 4: mass flow rate on port pair 2, kg/h
+slryTkR2				! 5: solid pcm fraction in port pair 2 mass flow
+T2SlryTk				! 6: inlet temperature of port pair 2, deg C
+slryTkTEnv				! 7: temperature surrounding tank, deg C
+0 0 0 0 0 0 0
+
+EQUATIONS 11
+solMassSlryTk_kg = [130,1]		! 1: solid pcm mass, kg
+liqMassSlryTk_kg = [130,2]		! 2: liquid pcm mass, kg
+solVolSlryTk_m3 = [130,3]		! 3: solid pcm volume, m^3
+liqVolSlryTk_m3 = [130,4]		! 4: liquid pcm volume, m^3
+PWSolSlryTk_kW = [130,6]/1000	! 6: heating power through wall to solid, kW	
+PWLiqSlryTk_kW = [130,7]/1000	! 7: heating power through wall to liquid, kW	
+PWallSlryTk_kW	= [130,8]/1000	! 8: heating power through wall, kW
+PInSlryTk_kW = [130,9]/1000		! 9: heating power through input mass, kW
+PTrs1SlryTk_kW = [130,10]/1000	! 10: liquid solid heat transfer 1, kW
+PTrs2SlryTk_kW = [130,11]/1000	! 11: liquid solid heat transfer 2, kW
+
+solidFraction = solMassSlryTk_kg /(solMassSlryTk_kg + MAX(liqMassSlryTk_kg,0.1))
+*******************************
+** Monthly printers
+*******************************
+CONSTANTS 1
+unitPrintPcm = 229
+
+ASSIGN    temp\SLURRY_MO.Prt      unitPrintPcm     
+    
+UNIT 229 Type 46	! Printegrator Monthly Values for Heat Pump
+PARAMETERS 6     
+unitPrintPcm		! 1: Logical unit number, -
+-1     				! 2: Logical unit for monthly summaries, -
+1     				! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     				! 4: Printing & integrating interval, h. -1 for monthly integration
+1     				! 5: Number of inputs to avoid integration, -
+1     				! 6: Output number to avoid integration
+INPUTS 7
+TIME PWSolSlryTk_kW PWLiqSlryTk_kW PWallSlryTk_kW PInSlryTk_kW PTrs1SlryTk_kW PTrs2SlryTk_kW 	
+**
+TIME PWSolSlryTk_kW PWLiqSlryTk_kW PWallSlryTk_kW PInSlryTk_kW PTrs1SlryTk_kW PTrs2SlryTk_kW 
+
+*******************************
+** hourly printers
+*******************************
+CONSTANTS 1
+unitPrintPcmHour = 219
+
+ASSIGN temp\SLURRY_HR.Prt   unitPrintPcmHour     
+
+UNIT 219 TYPE 46     
+PARAMETERS 6    
+unitPrintPcmHour	! 1: Logical unit number, -
+-1     				! 2: Logical unit for monthly summaries, -
+1     				! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     				! 4: Printing & integrating interval, h. -1 for monthly integration
+1     				! 5: Number of inputs to avoid integration, -
+1     				! 6: Output number to avoid integration
+INPUTS 19
+TIME solMassSlryTk_kg liqMassSlryTk_kg TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 PWallSlryTk_kW PInSlryTk_kW PTrs1SlryTk_kW PTrs2SlryTk_kW slryTkR1 TSupercoolIn TPiSlrySide1In VIceRatio maxSolFrSlryTk solidFraction VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn
+**    
+TIME solMassSlryTk_kg liqMassSlryTk_kg TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 PWallSlryTk_kW PInSlryTk_kW PTrs1SlryTk_kW PTrs2SlryTk_kW slryTkR1 TSupercoolIn TPiSlrySide1In VIceRatio maxSolFrSlryTk solidFraction VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn
+
+*******************************
+** Online plotters
+*******************************
+UNIT 139 TYPE 65     ! Online Plotter Store (element OpS)
+PARAMETERS 12     
+10     	! 1 Nb. of left-axis variables
+10    	! 2 Nb. of right-axis variables
+-500   	! 3 Left axis minimum
+12000	! 4 Left axis maximum
+-15     ! 5 Right axis minimum
+35     	! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     	! 8 X-axis gridpoints
+0    	! 9 Shut off Online w/o removing
+-1     	! 10 Logical unit for output file
+0     	! 11 Output file units
+0     	! 12 Output file delimiter
+INPUTS 20
+solMassSlryTk_kg liqMassSlryTk_kg slryTkR1 TSupercoolIn TPiSlrySide1In Nix Nix Nix Nix Nix
+TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 PWallSlryTk_kW PInSlryTk_kW PTrs1SlryTk_kW PTrs2SlryTk_kW Nix Nix Nix
+**
+solMassSlryTk_kg liqMassSlryTk_kg slryTkR1 TSupercoolIn TPiSlrySide1In Nix Nix Nix Nix Nix
+TLiqSlryTk solVolSlryTk_m3  liqVolSlryTk_m3 PWallSlryTk_kW PInSlryTk_kW PTrs1SlryTk_kW PTrs2SlryTk_kW Nix Nix Nix
+LABELS  3     
+mass     
+volume_and_temperature
+slurry     
+**      
+
+*******************************
+**END type865.ddck
+*******************************

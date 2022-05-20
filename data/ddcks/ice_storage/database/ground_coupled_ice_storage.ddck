@@ -119,7 +119,7 @@ qPcmBocoCv1= QLossPCM1
 qPcmBocoCv2= QLossPCM2     			
 qPcmBocoCv3= QLossPCM3     			
 qPcmBocoCv4= QLossPCM4     			
-qPcmBocoCv5=QLossPCM5     			
+qPcmBocoCv5= QLossPCM5     			
 qPcmBocoCv6= QLossPCM6     			
 qPcmBocoCv7= QLossPCM7     			
 qPcmBocoCv8= QLossPCM8     			
@@ -293,12 +293,14 @@ TSENSOR10 = [305,33]
 **************************			
 ** Online plotters			
 *******************************			
-   			
-ASSIGN    temp\Ground_MO.Prt      222			
+
+CONSTANTS 1
+unitPrintGroundMo=229 			
+ASSIGN    temp\Ground_MO.Prt      unitPrintGroundMo			
 			
 UNIT 222 Type 46     ! Printegrator Monthly Values for System			
 PARAMETERS 5     			
-222   ! 1: Logical unit number, -			
+unitPrintGroundMo   ! 1: Logical unit number, -			
 -1    ! 2: Logical unit for monthly summaries, -			
 1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations			
 -1    ! 4: Printing & integrating interval, h. -1 for monthly integration			
