@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : D. Carbonell   
 ** Creation date  : 26.02.2021 
-** Last changes   : 18.05.2022
+** Last changes   : 20.05.2022
 *****************************************
 
 ***************************************************************************
@@ -72,11 +72,11 @@ MfrHpCondNom = SizeHpRatio*MfrHpCondRef		! adapt cond to corrected evap MfrHpEva
 timeHpBlock = 5
 
 CONSTANTS 5
-Moloss=0     
-Ctherm=4		!1     
-Ualoss=0     
-frCOP=1     
-frCond=1
+Moloss = 0     
+Ctherm = 4		!1     
+Ualoss = 0     
+frCOP = 1     
+frCond = 1
 
 ***********************************************
 ** Begin PD CONTROLLER (currently not active)

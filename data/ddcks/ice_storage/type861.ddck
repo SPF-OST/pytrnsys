@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : D. Carbonell   
 ** Creation date  : 05.10.2018   
-** Last changes   : 18.05.2022 
+** Last changes   : 20.05.2022 
 *****************************************
 
 ***************************************************************************
@@ -90,7 +90,7 @@ CONSTANTS 5
 TSubcool = -0.5     													! Temperature at which water starts to freeze on the Hx surfaces [�C]
 TiceIni = 30
 TiniPCM = GT(ratioIceBegin,0)*0+NOT(GT(ratioIceBegin,0))*TiceIni		! Tground		!TiniPCM=TGround  
-ratioIceBegin= 0 														! 0.5     
+ratioIceBegin = 0 														! 0.5     
 iceBlockIni = ratioIceBegin*VIceS*RHOWAT      							! iceBlockIni=0.15*VIceS*rhoIce 
 
 ***********************************

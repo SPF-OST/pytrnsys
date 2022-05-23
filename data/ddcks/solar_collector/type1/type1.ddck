@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : Dani Carbonell    
 ** Creation date  : 10.01.2010
-** Last changes   : 18.05.2022
+** Last changes   : 20.05.2022
 *****************************************
 
 ***************************************************************************
@@ -104,7 +104,7 @@ EQUATIONS 4
 Pcoll = [28,3]		!kJ/h
 PColl_kW = Pcoll/3600
 PColl_kWm2 = PColl_kW/(AcollAp+1e-30)   
-PColl_Wm2  = PColl_kWm2*1000   
+PColl_Wm2 = PColl_kWm2*1000   
 
 ***********************************
 ** Monthly printer

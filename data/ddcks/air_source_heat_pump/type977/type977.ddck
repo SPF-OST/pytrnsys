@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : D. Carbonell   
 ** Creation date  : 30.09.2016 
-** Last changes   : 18.05.2022 
+** Last changes   : 20.05.2022 
 *****************************************
 
 ***************************************************************************
@@ -36,7 +36,7 @@ THpEvapOut = [162,1]		!
 ******************************************************************************************
 EQUATIONS 3
 elSysIn_Q_HpCompD = PelAuxComp_kW 
-! elSysIn_Q_HpBkp =  PelAuxTot_kW - PelAuxComp_kW -> these are equal to each other, so elSysIn_Q_HpBkp is 0
+! elSysIn_Q_HpBkp = PelAuxTot_kW - PelAuxComp_kW -> these are equal to each other, so elSysIn_Q_HpBkp is 0
 qSysOut_HpLoss = PAuxDefrost_kW + PAuxLossStart_kW
 qSysIn_PauxEvap = PauxEvap_kW
 
