@@ -474,7 +474,7 @@ ASSIGN CCT_ColIce_Mfr.prt 464
 
 UNIT 464 TYPE 25! User defined Printer
 PARAMETERS 10
-dtSim! 1 Printing interval
+dtHour! 1 Printing interval
 tSimStrt! 2 tSimStrt time
 tSimEnd! 3 tSimEnd time
 464! 4 Logical unit
@@ -496,7 +496,7 @@ ASSIGN CCT_ColIce_T.prt 465
 
 UNIT 465 TYPE 25! User defined Printer
 PARAMETERS 10
-dtSim! 1 Printing interval
+dtHour! 1 Printing interval
 tSimStrt! 2 tSimStrt time
 tSimEnd! 3 tSimEnd time
 465! 4 Logical unit

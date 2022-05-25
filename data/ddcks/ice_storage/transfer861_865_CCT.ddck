@@ -14,14 +14,14 @@
 ** TODO: 
 ***************************************************************************
 
-EQUATIONS 5
+EQUATIONS 3
 !qBackUpTotal_kW = qAuxStoreSH_KW + qAuxStoreDHW_KW
 QPcmFromCol_kW = PIn2SlryTk_kW
 !QColToPcm_kW   = Pcoll_KW*(ProCs+ProDoubleHpCs)
 QPcmToHp_kW    = PIn1SlryTk_kW     
 QColToTes_kW   = Pcoll_KW*NOT(xFracMixHxTes)*pumpColOn  
-QColToDHW_kW   = QColToTes_kW*(1-xFracDivSolarDHWSH)
-QColToSH_kW	   = QColToTes_kW*xFracDivSolarDHWSH
+!QColToDHW_kW   = QColToTes_kW*(1-xFracDivSolarDHWSH)
+!QColToSH_kW	   = QColToTes_kW*xFracDivSolarDHWSH
 CONSTANTS 8
 VIceS = 2		!MS default - defined in config file
 thickFoam = 0.05     
@@ -87,43 +87,7 @@ BlockIceStore = NOT(BlockIceStoreRc)*GT(VIceRatioRc,VIceRatioMax*0.99)+BlockIceS
 *******************************
 ** hourly printers
 *******************************
-CONSTANTS 1
-unitPrintCheckHour = 219
 
-ASSIGN temp\CHECK_HR.Prt   unitPrintCheckHour     
-
-UNIT 219 TYPE 46     
-PARAMETERS 6    
-unitPrintCHECKHour	! 1: Logical unit number, -
--1     				! 2: Logical unit for monthly summaries, -
-1     				! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
-1     				! 4: Printing & integrating interval, h. -1 for monthly integration
-1     				! 5: Number of inputs to avoid integration, -
-1     				! 6: Output number to avoid integration
-INPUTS 27
-TIME TProCS ProCs ProWS ProHP ProSeries ProPar ProDoubleHpCs auxStoreDHWIsOn BoCst BlockCol MfrCollRc tCollInRc tcollOutRc TCollectorOn IT_Coll_Wm2 TCollOut TPiColIn TProAuxDhwTes TProWs TProCs TProAuxShTes Tamb TPiHpEvapIn TPiHpEvapOut TdhwSet Trdset
-**    
-TIME TProCS ProCs ProWS ProHP ProSeries ProPar ProDoubleHpCs auxStoreDHWIsOn BoCst BlockCol MfrCollRc tCollInRc tcollOutRc TCollectorOn IT_Coll_Wm2 TCollOut TPiColIn TProAuxDhwTes TProWs TProCs TProAuxShTes Tamb TPiHpEvapIn TPiHpEvapOut TdhwSet Trdset    ! Temp 1 Tcout
-
-
-
-CONSTANTS 1
-unitPrintCheck2Hour = 225
-
-ASSIGN temp\CHECK2_HR.Prt   unitPrintCheck2Hour     
-
-UNIT 219 TYPE 46     
-PARAMETERS 6    
-unitPrintCHECK2Hour	! 1: Logical unit number, -
--1     				! 2: Logical unit for monthly summaries, -
-1     				! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
-1     				! 4: Printing & integrating interval, h. -1 for monthly integration
-1     				! 5: Number of inputs to avoid integration, -
-1     				! 6: Output number to avoid integration
-INPUTS 33
-TIME TCollOut TPiColIn TProAuxDhwTes TProWs TProCs TProAuxShTes Tamb TPiHpEvapIn TPiHpEvapOut TdhwSet Trdset BlockHp BlockSeries BlockWs BlockCs BlockPar BlockDfCol BlockDfWs BlockDoubleCsHp priorProgramm HpIsOn HpIsBlock timeDfWs PriorWs stopMelting CoolingOn TPcmTooHigh TPcmTooHighRc TPcmTooHigh TAvgPCMRc TAvgPCM TmaxIceTes
-**
-TIME TCollOut TPiColIn TProAuxDhwTes TProWs TProCs TProAuxShTes Tamb TPiHpEvapIn TPiHpEvapOut TdhwSet Trdset BlockHp BlockSeries BlockWs BlockCs BlockPar BlockDfCol BlockDfWs BlockDoubleCsHp priorProgramm HpIsOn HpIsBlock timeDfWs PriorWs stopMelting CoolingOn TPcmTooHigh TPcmTooHighRc TPcmTooHigh TAvgPCMRc TAvgPCM TmaxIceTes
 
 
 *******************************

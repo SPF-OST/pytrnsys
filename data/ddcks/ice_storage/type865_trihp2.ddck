@@ -67,7 +67,7 @@ T2SlryTk				! 6: inlet temperature of port pair 2, deg C
 slryTkTEnv				! 7: temperature surrounding tank, deg C
 0 0 0 0 0 0 0
 
-EQUATIONS 11
+EQUATIONS 13
 solMassSlryTk_kg = [130,1]				! 1: solid pcm mass, kg
 liqMassSlryTk_kg = [130,2]				! 2: liquid pcm mass, kg
 solMassRatio = [130,3]					! 3: Ratio of solid pcm mass over total pcm mass
@@ -79,7 +79,8 @@ PIn2SlryTk_kW = [130,9]/1000			! 9: heating power through input mass of port pai
 PLatSlryTk_kW = [130,10]/1000	! 10: Change in latent heat (< 0: more ice, > 0: less ice), kWh
 PSensSlryTk_kW = [130,11]/1000	! 11: Change in sensible heat (< 0: colder, > 0: hotter), kWh
 PBalSlryTk_kW = [130,12]/1000	! 12: Heat balance (should be 0), kWh
-
+AddedSolidMass = [130,13]
+MassIceMelted = [130,14]
 *** MS: equations for automatic energy balance! 
 EQUATIONS 3
 qSysIn_WallGains = PWallSlryTk_kW  				! kW heat lost to the ground  
@@ -101,11 +102,11 @@ unitPrintPcm		! 1: Logical unit number, -
 -1     				! 4: Printing & integrating interval, h. -1 for monthly integration
 1     				! 5: Number of inputs to avoid integration, -
 1     				! 6: Output number to avoid integration
-INPUTS 7
+INPUTS 9
 
-TIME PIn1SlryTk_kW PIn2SlryTk_kW PWallSlryTk_kW PLatSlryTk_kW PSensSlryTk_kW PBalSlryTk_kW	
+TIME PIn1SlryTk_kW PIn2SlryTk_kW PWallSlryTk_kW PLatSlryTk_kW PSensSlryTk_kW PBalSlryTk_kW AddedSolidMass MassIceMelted
 **
-TIME PIn1SlryTk_kW PIn2SlryTk_kW PWallSlryTk_kW QLatSlryTk_kWh QSensSlryTk_kWh QBalSlryTk_kWh
+TIME PIn1SlryTk_kW PIn2SlryTk_kW PWallSlryTk_kW QLatSlryTk_kWh QSensSlryTk_kWh QBalSlryTk_kWh AddedSolidMass MassIceMelted
 
 *******************************
 ** hourly printers
@@ -124,10 +125,10 @@ unitPrintPcmHour	! 1: Logical unit number, -
 1     				! 5: Number of inputs to avoid integration, -
 1     				! 6: Output number to avoid integration
 
-INPUTS 20
-TIME solMassSlryTk_kg liqMassSlryTk_kg TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 PWallSlryTk_kW PIn1SlryTk_kW PIn2SlryTk_kW PLatSlryTk_kW PSensSlryTk_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h
+INPUTS 22
+TIME solMassSlryTk_kg liqMassSlryTk_kg TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 PWallSlryTk_kW PIn1SlryTk_kW PIn2SlryTk_kW PLatSlryTk_kW PSensSlryTk_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h AddedSolidMass MassIceMelted
 **
-TIME solMassSlryTk_kg liqMassSlryTk_kg TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 PWallSlryTk_kW PIn1SlryTk_kW PIn2SlryTk_kW QLatSlryTk_kWh QSensSlryTk_kWh slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h
+TIME solMassSlryTk_kg liqMassSlryTk_kg TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 PWallSlryTk_kW PIn1SlryTk_kW PIn2SlryTk_kW QLatSlryTk_kWh QSensSlryTk_kWh slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h AddedSolidMass MassIceMelted
 
 
 

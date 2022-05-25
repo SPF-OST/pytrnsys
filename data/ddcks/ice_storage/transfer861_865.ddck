@@ -32,20 +32,20 @@ maxIceFrac = 0.6
 VIceRatioMax = maxIceFrac*100    
 iceThick = 0 	!MS we never have ice on a HX
 
-EQUATIONS 6
-
+EQUATIONS 7
 VIceRatio = solMassRatio*100	! MS: Volume of PCM in tank now variable -> Mass is fixed!
 Tankheight = 4     							! Tank height	[m]
 Tankwidth = (VIceS/Tankheight)^(0.5)		! Tank width	[m]
-Lstore = ViceS/Tankheight/TankWidth 
-UFoam = lambdaFoam/thickFoam   
+AreaLat = 4*Tankheight*Tankwidth
+AreaTop = Tankwidth*Tankwidth 
+UFoam = (lambdaFoam/thickFoam)*AreaLat/(AreaLat+AreaTop)   
 VIceMax = VIceS*maxIceFrac
 
 EQUATIONS 20
 volSlryTkIni_m3 = VIceS 		! 1: pcm mass, m3
 geoSlryTk = 0 			! 2: tank geometry: 0 = cuboid, 1 = cylinder
 widthSlryTk_m = Tankwidth			! 3: tank width, m (diameter for cylinder)
-lengthSlryTk_m = Lstore 			! 4: tank length, m (only relevant for cuboid)
+lengthSlryTk_m = Tankwidth 			! 4: tank length, m (only relevant for cuboid)
 maxSolFrSlryTk = maxIceFrac		! 5: maximum solid pcm mass fraction
 UWallSlryTk_W_m2K = UFoam		! 6: U-value of tank wall, W/m^2K
 rhoPcmLiq_kg_m3 = RHOWAT			! 7: density of liquid pcm, kg/m^3

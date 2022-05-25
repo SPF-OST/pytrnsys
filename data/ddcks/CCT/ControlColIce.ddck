@@ -21,7 +21,7 @@
 
 EQUATIONS 3
 *** Massflowrates
-xFracMixHxTes = SaV/100   !MS assumption Valve_W_Vell = 100 if ProWS and 0 if ProCS
+xFracMixHxTes = SaAon   !MS assumption Valve_W_Vell = 100 if ProWS and 0 if ProCS
 MfrPuCol = PuAOn*MfrCPri   !MS: PuAOn comes from the labview control - such we don't need to include ProXY here
 MfrEmulator = MfrE
 
