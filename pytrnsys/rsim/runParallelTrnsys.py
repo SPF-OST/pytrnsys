@@ -71,6 +71,8 @@ class RunParallelTrnsys:
         else:
             self.path = runPath
 
+        self.logger = log.setup_custom_logger("root", "INFO")
+        
         if configFile is not None:
             self.readConfig(self.pathConfig, configFile)
 
@@ -94,10 +96,11 @@ class RunParallelTrnsys:
 
             self.runParallel()
         else:
-            self.logger = log.setup_custom_logger("root", "INFO")
             self.outputFileDebugRun = os.path.join(self.path, "debugParallelRun.dat")
             self.nameBase = name
             self.path = os.getcwd()
+
+        pass
 
     def setDeckName(self, _name):
         self.nameBase = _name
