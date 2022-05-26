@@ -70,9 +70,6 @@ class RunParallelTrnsys:
             self.path = os.getcwd()
         else:
             self.path = runPath
-
-        self.logger = log.setup_custom_logger("root", "INFO")
-        
         if configFile is not None:
             self.readConfig(self.pathConfig, configFile)
 
@@ -245,9 +242,7 @@ class RunParallelTrnsys:
                 result = self.buildTrnsysDeck()
 
                 if _res.isError(result):
-                    error = _res.error(result)
-                    self.logger.error(error.message)
-                    return error
+                    return _res.error(result)
 
                 self.createDecksFromVariant()
 
