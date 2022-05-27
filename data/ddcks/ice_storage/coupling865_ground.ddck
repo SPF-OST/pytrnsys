@@ -14,7 +14,7 @@
 ** TODO: 
 ***************************************************************************
 
-EQUATIONS 17  			
+EQUATIONS 16 			
 nCv = 10
 ATesGroundLatCv = ATesGroundLat/nCv
 TesToGroundFac = 1000. 
@@ -30,7 +30,6 @@ QLossPCM7_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv
 QLossPCM8_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
 QLossPCM9_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
 QLossPCM10_Wm2=-QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
-slryTkTEnvAvg = (TGBot + TG1 + TG2 + TG3 + TG4 + TG5 + TG6 + TG7 + TG8 + TG9 + TG10 + TGTop)/(nCv+2)
 slryTkTEnv    = TAvgGround
 
 *******************************
