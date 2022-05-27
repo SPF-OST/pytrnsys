@@ -16,9 +16,9 @@
 
 EQUATIONS 7
 qBackUpTotal_kW = qAuxStoreSH_KW + qAuxStoreDHW_KW
-QPcmFromCol_kW = PIn2SlryTk_kW
+QPcmFromCol_kW = QIn2SlurryTes_kW
 QColToPcm_kW   = Pcoll_KW*(ProCs+ProDoubleHpCs)
-QPcmToHp_kW    = PIn1SlryTk_kW     
+QPcmToHp_kW    = QIn1SlurryTes_kW     
 QColToTes_kW   = Pcoll_KW*NOT(xFracMixHxTes)*pumpColOn  
 QColToDHW_kW   = QColToTes_kW*(1-xFracDivSolarDHWSH)
 QColToSH_kW	   = QColToTes_kW*xFracDivSolarDHWSH
@@ -32,20 +32,19 @@ maxIceFrac = 0.6
 VIceRatioMax = maxIceFrac*100    
 iceThick = 0 	!MS we never have ice on a HX
 
-EQUATIONS 7
+EQUATIONS 5
 VIceRatio = solMassRatio*100	! MS: Volume of PCM in tank now variable -> Mass is fixed!
 Tankheight = 4     							! Tank height	[m]
 Tankwidth = (VIceS/Tankheight)^(0.5)		! Tank width	[m]
-AreaLat = 4*Tankheight*Tankwidth
-AreaTop = Tankwidth*Tankwidth 
-UFoam = (lambdaFoam/thickFoam)*AreaLat/(AreaLat+AreaTop)   
+UFoam = (lambdaFoam/thickFoam) ! DC Not it uses all area  *AreaLat/(AreaLat+AreaTop)   
 VIceMax = VIceS*maxIceFrac
 
-EQUATIONS 20
+EQUATIONS 21
 volSlryTkIni_m3 = VIceS 		! 1: pcm mass, m3
 geoSlryTk = 0 			! 2: tank geometry: 0 = cuboid, 1 = cylinder
 widthSlryTk_m = Tankwidth			! 3: tank width, m (diameter for cylinder)
-lengthSlryTk_m = Tankwidth 			! 4: tank length, m (only relevant for cuboid)
+TankLenght = ViceS/Tankheight/Tankwidth 
+lengthSlryTk_m = TankLenght ! DC TankL incorrect 			! 4: tank length, m (only relevant for cuboid)
 maxSolFrSlryTk = maxIceFrac		! 5: maximum solid pcm mass fraction
 UWallSlryTk_W_m2K = UFoam		! 6: U-value of tank wall, W/m^2K
 rhoPcmLiq_kg_m3 = RHOWAT			! 7: density of liquid pcm, kg/m^3
@@ -62,7 +61,7 @@ TLiqPcmIni = GT(ratioIceBegin,0)*0+NOT(GT(ratioIceBegin,0))*TiceIni		! 15: initi
 TsensorPcmControl = TCsHx2o	
 TPCM2 = TCsHx2o
 TPCM = TCsHx2o
-TAvgPCM = TCsHx2o
+TAvgPCM = TLiqSlryTk! DC ERROR TCsHx2o
 
 MassIce = solMassSlryTk_kg
 
@@ -80,7 +79,6 @@ BlockIceStoreRc = [126,1]
 EQUATIONS 2
 VIce    = solVolSlryTk_m3		! Volume of liquide water that is freezed [m3 - H2O(l)] = Mass Ice [kg] / Rho [kg/m3]  
 BlockIceStore = NOT(BlockIceStoreRc)*GT(VIceRatioRc,VIceRatioMax*0.99)+BlockIceStoreRc*GT(VIceRatioRc,VIceRatioMax*0.95)   
-
 
 
 

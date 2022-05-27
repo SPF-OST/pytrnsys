@@ -17,8 +17,16 @@
 ** If only one dependency defined here. 
 ** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
 *************************************************************************************************		
-**VIceS = 			
-**Tankheight = 			
+CONSTANTS 4
+VolGroundTes    = VIceS
+heightGroundTes = Tankheight
+widthGroundTes  = Tankwidth
+lenghtGroundTes = TankLenght
+
+CONSTANTS 3
+ATesGroundLat = 2*heightGroundTes*widthGroundTes+2*heightGroundTes*lenghtGroundTes
+ATesGroundTop = widthGroundTes*lenghtGroundTes 
+ATesGroundTotal = ATesGroundTop*2+ATesGroundLat
  			
 ***********************************			
 ** Generic variables			
@@ -32,7 +40,7 @@ TY2  = 10
 TY3  = 5     			
 nZonesX = 3     			
 nZonesY = 3     			
-RTank = (VIceS/(PI*Tankheight))^0.5     			
+RTank = (VolGroundTes/(PI*heightGroundTes))^0.5     			
 deepTankFromSurface = 1.3     			
 QGroundWater = 0     			
 nMaterials = 3     			
@@ -41,10 +49,10 @@ nInputsType709 = 14 + nCv
 cilCoord = 1 			
 albedo     = 0.25     			
 emissivity = 0.85     			
-HTank = Tankheight     			
+HTank = heightGroundTes     			
 			
 CONSTANTS 19   			
-modelForInitialTime = 1      ! 0=begin temperature defined, 1=analytical soluation 1D (to run all year and obtain initial state), 2=file 			
+modelForInitialTime = 1      ! 0=begin temperature defined, 1=analytical solution 1D (to run all year and obtain initial state), 2=file 			
 lambdaGround = 1.6     			
 rhoGround = 1400			
 cpGround = 1100  !    KiGa was 3300 - why such a big difference?			
@@ -58,7 +66,7 @@ xZone1 = RTank
 xZone2 = thickSand     			
 xZone3 = 16.     			
 yZone1 = 2    !  for KiGa 20. In Neubau changed to 2			
-yZone2 = Tankheight     			
+yZone2 = heightGroundTes     			
 yZone3 = deepTankFromSurface     			
 totalYZone = yzone1 + yZone2 + yZone3     			
 alphaMesh = 1.5      !0 regular, >1 concentration factor			
@@ -113,18 +121,18 @@ unitSaveData = unitTIni
 			
 EQUATIONS 13    			
 QIrradKW = qTopBoco*totalXZone*(1-albedo)/1000   			
-qPcmBocoBot= QLossPCMBot      !W/m2 of ground 2d model 0.5 becasue we only solve half 			
-qPcmBocoTop= QLossPCMTop     			
-qPcmBocoCv1= QLossPCM1     			
-qPcmBocoCv2= QLossPCM2     			
-qPcmBocoCv3= QLossPCM3     			
-qPcmBocoCv4= QLossPCM4     			
-qPcmBocoCv5= QLossPCM5     			
-qPcmBocoCv6= QLossPCM6     			
-qPcmBocoCv7= QLossPCM7     			
-qPcmBocoCv8= QLossPCM8     			
-qPcmBocoCv9= QLossPCM9     			
-qPcmBocoCv10=QLossPCM10     			
+qPcmBocoBot_Wm2= QLossPCMBot_Wm2 ! Heat input to the ground in W/m2 		
+qPcmBocoTop_Wm2= QLossPCMTop_Wm2 ! Heat input to the ground in W/m2     			
+qPcmBocoCv1_Wm2= QLossPCM1_Wm2   ! Heat input to the ground in W/m2   			
+qPcmBocoCv2_Wm2= QLossPCM2_Wm2   ! Heat input to the ground in W/m2 
+qPcmBocoCv3_Wm2= QLossPCM3_Wm2   ! Heat input to the ground in W/m2 
+qPcmBocoCv4_Wm2= QLossPCM4_Wm2   ! Heat input to the ground in W/m2 
+qPcmBocoCv5_Wm2= QLossPCM5_Wm2   ! Heat input to the ground in W/m2 
+qPcmBocoCv6_Wm2= QLossPCM6_Wm2   ! Heat input to the ground in W/m2 
+qPcmBocoCv7_Wm2= QLossPCM7_Wm2   ! Heat input to the ground in W/m2 
+qPcmBocoCv8_Wm2= QLossPCM8_Wm2   ! Heat input to the ground in W/m2 
+qPcmBocoCv9_Wm2= QLossPCM9_Wm2   ! Heat input to the ground in W/m2 
+qPcmBocoCv10_Wm2=QLossPCM10_Wm2  ! Heat input to the ground in W/m2 
      			
 CONSTANTS 13     			
 **Boco left     			
@@ -154,13 +162,6 @@ tTopBoco =tAmb          ! tSky
 qTopBoco =IT_H/3.6			
 			
 **ASSIGN    TGroundIni.dat  unitTIni     			
-			
-			
-			
-			
-			
-			
-			
 			
 UNIT 305 TYPE 709    			
 PARAMETERS nParType709	! number of Cv in fluid		
@@ -237,24 +238,19 @@ tLeftBoco qLeftBoco ULeftBoco
 tRightBoco qRightBoco URightBoco			
 tTopBoco qTopBoco UTopBoco			
 tBotBoco qBotBoco UBotBoco			
-qPcmBocoBot 			
-qPcmBocoCv1 qPcmBocoCv2 qPcmBocoCv3 qPcmBocoCv4 qPcmBocoCv5			
-qPcmBocoCv6 qPcmBocoCv7 qPcmBocoCv8 qPcmBocoCv9 qPcmBocoCv10			
-qPcmBocoTop			
+qPcmBocoBot_Wm2 			
+qPcmBocoCv1_Wm2 qPcmBocoCv2_Wm2 qPcmBocoCv3_Wm2 qPcmBocoCv4_Wm2 qPcmBocoCv5_Wm2			
+qPcmBocoCv6_Wm2 qPcmBocoCv7_Wm2 qPcmBocoCv8_Wm2 qPcmBocoCv9_Wm2 qPcmBocoCv10_Wm2			
+qPcmBocoTop_Wm2			
 *** INITIAL INPUT VALUES     			
 tLeftBoco qLeftBoco ULeftBoco			
 tRightBoco qRightBoco URightBoco			
 tTopBoco qTopBoco UTopBoco			
 tBotBoco qBotBoco UBotBoco			
-qPcmBocoBot 			
-qPcmBocoCv1 qPcmBocoCv2 qPcmBocoCv3 qPcmBocoCv4 qPcmBocoCv5			
-qPcmBocoCv6 qPcmBocoCv7 qPcmBocoCv8 qPcmBocoCv9 qPcmBocoCv10			
-qPcmBocoTop			
-			
-			
-			
-			
-			
+qPcmBocoBot_Wm2 			
+qPcmBocoCv1_Wm2 qPcmBocoCv2_Wm2 qPcmBocoCv3_Wm2 qPcmBocoCv4_Wm2 qPcmBocoCv5_Wm2			
+qPcmBocoCv6_Wm2 qPcmBocoCv7_Wm2 qPcmBocoCv8_Wm2 qPcmBocoCv9_Wm2 qPcmBocoCv10_Wm2			
+qPcmBocoTop_Wm2				
      			
 EQUATIONS 19     ! do not remove this line, it marks the start/end of a constants or equations block			
 qEGroundKW = [305,5]/1000			
@@ -289,6 +285,10 @@ TSENSOR7 = [305,30]
 TSENSOR8 = [305,31]			
 TSENSOR9 = [305,32]			
 TSENSOR10 = [305,33]			
+
+
+EQUATIONS 1
+TAvgGround    = ((TGBot+TGtop)*ATesGroundTop + (TG1 + TG2 + TG3 + TG4 + TG5 + TG6 + TG7 + TG8 + TG9 + TG10)*ATesGroundLat/nCv)/ATesGroundTotal
 			
 **************************			
 ** Online plotters			
@@ -314,8 +314,13 @@ qEGroundKW  qWGroundKW  qNGroundKW  qSGroundKW  qVGroundKW  qAcumGroundKW  qImbG
 *******************************
 ** hourly printers
 *******************************
+
+EQUATIONS 1
+qTesToGround_Wm2 = qPcmBocoBot_Wm2+qPcmBocoTop_Wm2+qPcmBocoCv1_Wm2+qPcmBocoCv2_Wm2+qPcmBocoCv3_Wm2+qPcmBocoCv4_Wm2+qPcmBocoCv5_Wm2+qPcmBocoCv6_Wm2+qPcmBocoCv7_Wm2+qPcmBocoCv8_Wm2+qPcmBocoCv9_Wm2+qPcmBocoCv10_Wm2   			
+
 CONSTANTS 1
 unitPrintGroundHour=223
+
 
 ASSIGN temp\Ground.hr   unitPrintGroundHour     
 
@@ -327,10 +332,10 @@ unitPrintGroundHour   ! 1: Logical unit number, -
 1     ! 4: Printing & integrating interval, h. -1 for monthly integration
 1     ! 5: Number of inputs to avoid integration, -
 1     ! 6: Output number to avoid integration
-INPUTS 11
-TIME TSENSOR1  TSENSOR2  TSENSOR3 TSENSOR4 TSENSOR5 TSENSOR6 TSENSOR7 TSENSOR8 TSENSOR9 TSENSOR10
+INPUTS 15
+TIME TAvgGround TSENSOR1  TSENSOR2  TSENSOR3 TSENSOR4 TSENSOR5 TSENSOR6 TSENSOR7 TSENSOR8 TSENSOR9 TSENSOR10 qTesToGround_Wm2 qPcmBocoBot_Wm2 qPcmBocoCv1_Wm2
 *****     
-TIME TSENSOR1  TSENSOR2  TSENSOR3 TSENSOR4 TSENSOR5 TSENSOR6 TSENSOR7 TSENSOR8 TSENSOR9 TSENSOR10
+TIME TAvgGround TSENSOR1  TSENSOR2  TSENSOR3 TSENSOR4 TSENSOR5 TSENSOR6 TSENSOR7 TSENSOR8 TSENSOR9 TSENSOR10 qTesToGround_Wm2 qPcmBocoBot_Wm2 qPcmBocoCv1_Wm2
 	
 *********************************			
 **END GroundCoupledIceStorage.dck			

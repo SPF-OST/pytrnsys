@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : M. Schubert
 ** Creation date  : 17.05.2022   
-** Last changes   : 17.05.2022 
+** Last changes   : 26.05.2022 (DC)
 *****************************************
 
 ***************************************************************************
@@ -14,23 +14,25 @@
 ** TODO: 
 ***************************************************************************
 
-EQUATIONS 14   			
-!QIrradKW = qTopBoco*totalXZone*(1-albedo)/1000   			
-QLossPCMBot= PWallSlryTk_kW/12      !W/m2 of ground 2d model 0.5 becasue we only solve half 			
-QLossPCMTop= PWallSlryTk_kW/12    			
-QLossPCM1= PWallSlryTk_kW/12      			
-QLossPCM2= PWallSlryTk_kW/12     			
-QLossPCM3= PWallSlryTk_kW/12    			
-QLossPCM4= PWallSlryTk_kW/12    			
-QLossPCM5= PWallSlryTk_kW/12     			
-QLossPCM6= PWallSlryTk_kW/12      			
-QLossPCM7= PWallSlryTk_kW/12      			
-QLossPCM8= PWallSlryTk_kW/12      			
-QLossPCM9= PWallSlryTk_kW/12      			
-QLossPCM10=PWallSlryTk_kW/12      			
-
-slryTkTEnv = (TGBot + TG1 + TG2 + TG3 + TG4 + TG5 + TG6 + TG7 + TG8 + TG9 + TG10 + TGTop)/12
+EQUATIONS 17  			
 nCv = 10
+ATesGroundLatCv = ATesGroundLat/nCv
+TesToGroundFac = 1000. 
+QLossPCMBot_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundTop      !W/m2 		
+QLossPCMTop_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundTop
+QLossPCM1_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv
+QLossPCM2_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv     			
+QLossPCM3_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv    			
+QLossPCM4_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv    			
+QLossPCM5_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv     			
+QLossPCM6_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
+QLossPCM7_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
+QLossPCM8_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
+QLossPCM9_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
+QLossPCM10_Wm2=-QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
+slryTkTEnvAvg = (TGBot + TG1 + TG2 + TG3 + TG4 + TG5 + TG6 + TG7 + TG8 + TG9 + TG10 + TGTop)/(nCv+2)
+slryTkTEnv    = TAvgGround
+
 *******************************
 **END transfer861_864.dck
 *******************************

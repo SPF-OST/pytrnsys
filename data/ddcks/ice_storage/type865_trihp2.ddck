@@ -5,13 +5,14 @@
 *****************************************
 ** Contact person : M. Neugebauer  
 ** Creation date  : 24.02.2022  
-** Last changes   : --.--.---- 
+** Last changes   : 27.05.2022 (DC) 
 *****************************************
 
 ***************************************************************************
 ** Description: 
 ** 
 ***************************************************************************
+
 
 ***********************************
 ** inputs from hydraulic solver
@@ -30,6 +31,15 @@ EQUATIONS 3
 TLiqSlryTk = [130,6]	! 6: liquid pcm temperature, deg C
 TCsHx1o = TLiqSlryTk	! 5: liquid pcm temperature, deg C
 TCsHx2o = TLiqSlryTk		!MS: same value because new slurry storage has no control volumes up to now! 
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 3
+qSysIn_WallGains = QWallSlurryTes_kW  	 ! kW heat lost to the ground  
+qSysOut_IceSenAcum = QSenSlurryTes_kW  ! kW sensible heat acumulated 
+qSysIn_IceMelt = QLatSlurryTes_kW		 ! kW latent heat for ice formed in Hx	
 
 
 ***********************************
@@ -68,24 +78,20 @@ slryTkTEnv				! 7: temperature surrounding tank, deg C
 0 0 0 0 0 0 0
 
 EQUATIONS 13
-solMassSlryTk_kg = [130,1]				! 1: solid pcm mass, kg
-liqMassSlryTk_kg = [130,2]				! 2: liquid pcm mass, kg
-solMassRatio = [130,3]					! 3: Ratio of solid pcm mass over total pcm mass
-solVolSlryTk_m3 = [130,4]				! 4: solid pcm volume, m^3
-liqVolSlryTk_m3 = [130,5]				! 5: liquid pcm volume, m^3
-PWallSlryTk_kW	= [130,7]/1000			! 7: heating power through wall, kW (< 0: tank losing energy, > 0: tank gaining energy)
-PIn1SlryTk_kW = [130,8]/1000			! 8: heating power through input mass of port pair 1, kW
-PIn2SlryTk_kW = [130,9]/1000			! 9: heating power through input mass of port pair 2, kW
-PLatSlryTk_kW = [130,10]/1000	! 10: Change in latent heat (< 0: more ice, > 0: less ice), kWh
-PSensSlryTk_kW = [130,11]/1000	! 11: Change in sensible heat (< 0: colder, > 0: hotter), kWh
-PBalSlryTk_kW = [130,12]/1000	! 12: Heat balance (should be 0), kWh
-AddedSolidMass = [130,13]
-MassIceMelted = [130,14]
-*** MS: equations for automatic energy balance! 
-EQUATIONS 3
-qSysIn_WallGains = PWallSlryTk_kW  				! kW heat lost to the ground  
-qSysOut_IceSenAcum = PSensSlryTk_kW  	! kW sensible heat acumulated 
-qSysIn_IceMelt = PLatSlryTk_kW		! kW latent heat for ice formed in Hx	
+solMassSlryTk_kg = [130,1]	! 1: solid pcm mass, kg
+liqMassSlryTk_kg = [130,2]	! 2: liquid pcm mass, kg
+solMassRatio     = [130,3]	! 3: Ratio of solid pcm mass over total pcm mass
+solVolSlryTk_m3  = [130,4]	! 4: solid pcm volume, m^3
+liqVolSlryTk_m3  = [130,5]	! 5: liquid pcm volume, m^3
+QWallSlurryTes_kW = [130,7]/1000  ! 7: heating power through wall, kW (< 0: tank losing energy, > 0: tank gaining energy)
+QIn1SlurryTes_kW  = [130,8]/1000  ! 8: heating power through input mass of port pair 1, kW
+QIn2SlurryTes_kW  = [130,9]/1000  ! 9: heating power through input mass of port pair 2, kW
+QLatSlurryTes_kW  = [130,10]/1000 ! 10: Change in latent heat (< 0: more ice, > 0: less ice), kWh
+QSenSlurryTes_kW  = [130,11]/1000 ! 11: Change in sensible heat (< 0: colder, > 0: hotter), kWh
+QBalSlurryTes_kW  = [130,12]/1000 ! 12: Heat balance (should be 0), kWh
+AddedSolidMass = 0 ![130,13]
+MassIceMelted = 0 ! [130,14]
+
 *******************************
 ** Monthly printers
 *******************************
@@ -104,9 +110,9 @@ unitPrintPcm		! 1: Logical unit number, -
 1     				! 6: Output number to avoid integration
 INPUTS 9
 
-TIME PIn1SlryTk_kW PIn2SlryTk_kW PWallSlryTk_kW PLatSlryTk_kW PSensSlryTk_kW PBalSlryTk_kW AddedSolidMass MassIceMelted
+TIME QIn1SlurryTes_kW QIn2SlurryTes_kW QWallSlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW QBalSlurryTes_kW AddedSolidMass MassIceMelted
 **
-TIME PIn1SlryTk_kW PIn2SlryTk_kW PWallSlryTk_kW QLatSlryTk_kWh QSensSlryTk_kWh QBalSlryTk_kWh AddedSolidMass MassIceMelted
+TIME QIn1SlurryTes_kW QIn2SlurryTes_kW QWallSlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW QBalSlurryTes_kW AddedSolidMass MassIceMelted
 
 *******************************
 ** hourly printers
@@ -125,12 +131,10 @@ unitPrintPcmHour	! 1: Logical unit number, -
 1     				! 5: Number of inputs to avoid integration, -
 1     				! 6: Output number to avoid integration
 
-INPUTS 22
-TIME solMassSlryTk_kg liqMassSlryTk_kg TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 PWallSlryTk_kW PIn1SlryTk_kW PIn2SlryTk_kW PLatSlryTk_kW PSensSlryTk_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h AddedSolidMass MassIceMelted
+INPUTS 25
+TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h slryTkTEnvAvg slryTkTEnv AddedSolidMass MassIceMelted
 **
-TIME solMassSlryTk_kg liqMassSlryTk_kg TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 PWallSlryTk_kW PIn1SlryTk_kW PIn2SlryTk_kW QLatSlryTk_kWh QSensSlryTk_kWh slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h AddedSolidMass MassIceMelted
-
-
+TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h slryTkTEnvAvg slryTkTEnv AddedSolidMass MassIceMelted
 
 
 *******************************

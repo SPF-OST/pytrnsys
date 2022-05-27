@@ -81,13 +81,13 @@ hFusion = 332500.00    		! [J/kg]
 ***********************************
 ** Storage related variables
 ***********************************
-CONSTANTS 5
+CONSTANTS 6
 VIceS = 2     								! Volume filed with water
 iceStorageGeometry = 0 						! 0  box, 1 cilinder
 Tankheight = 4     							! Tank height	[m]
 Tankwidth = (VIceS/Tankheight)^(0.5)		! Tank width	[m]
-Lstore = ViceS/Tankheight/TankWidth 
-    
+TankLenght = ViceS/Tankheight/TankWidth 
+Lstore = TankLenght
 ***********************************
 ** initial  values ****************
 ***********************************
@@ -323,18 +323,18 @@ VIce    = MassIce/RhoWat		! Volume of liquide water that is freezed [m3 - H2O(l)
 VIceMax = VIceS*maxIceFrac  
 BlockIceStore = NOT(BlockIceStoreRc)*GT(VIceRatioRc,VIceRatioMax*0.99)+BlockIceStoreRc*GT(VIceRatioRc,VIceRatioMax*0.95)   
    
-QLossPCMBot = [130,56]     
-QLossPCM1 = [130,57]      
-QLossPCM2 = [130,58]      
-QLossPCM3 = [130,59]      
-QLossPCM4 = [130,60]      
-QLossPCM5 = [130,61]      
-QLossPCM6 = [130,62]      
-QLossPCM7 = [130,63]      
-QLossPCM8 = [130,64]      
-QLossPCM9 = [130,65]      
-QLossPCM10 = [130,66]      
-QLossPCMTop = [130,67]      
+QLossPCMBot_Wm2 = [130,56]     
+QLossPCM1_Wm2 = [130,57]      
+QLossPCM2_Wm2 = [130,58]      
+QLossPCM3_Wm2 = [130,59]      
+QLossPCM4_Wm2 = [130,60]      
+QLossPCM5_Wm2 = [130,61]      
+QLossPCM6_Wm2 = [130,62]      
+QLossPCM7_Wm2 = [130,63]      
+QLossPCM8_Wm2 = [130,64]      
+QLossPCM9_Wm2 = [130,65]      
+QLossPCM10_Wm2 = [130,66]      
+QLossPCMTop_Wm2 = [130,67]      
 TGBotSideAv = [130,68]      
 TGTopSideAv = [130,69]      
 UBotOut = [130,70]      
