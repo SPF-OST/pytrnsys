@@ -39,7 +39,7 @@ TCsHx2o = TLiqSlryTk		!MS: same value because new slurry storage has no control 
 EQUATIONS 3
 qSysIn_WallGains = QWallSlurryTes_kW  	 ! kW heat lost to the ground  
 qSysOut_IceSenAcum = QSenSlurryTes_kW  ! kW sensible heat acumulated 
-qSysIn_IceMelt = QLatSlurryTes_kW		 ! kW latent heat for ice formed in Hx	
+qSysIn_IceMelt = -QLatSlurryTes_kW		 ! kW latent heat for ice formed in Hx	
 
 
 ***********************************
@@ -132,9 +132,9 @@ unitPrintPcmHour	! 1: Logical unit number, -
 1     				! 6: Output number to avoid integration
 
 INPUTS 25
-TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h slryTkTEnvAvg slryTkTEnv AddedSolidMass MassIceMelted
+TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h TAvgGround slryTkTEnv AddedSolidMass MassIceMelted
 **
-TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h slryTkTEnvAvg slryTkTEnv AddedSolidMass MassIceMelted
+TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h TAvgGround slryTkTEnv AddedSolidMass MassIceMelted
 
 
 *******************************
