@@ -16,10 +16,10 @@
 
 EQUATIONS 3
 !qBackUpTotal_kW = qAuxStoreSH_KW + qAuxStoreDHW_KW
-QPcmFromCol_kW = PIn2SlryTk_kW
+QPcmFromCol_kW = QIn2SlurryTes_kW
 !QColToPcm_kW   = Pcoll_KW*(ProCs+ProDoubleHpCs)
-QPcmToHp_kW    = PIn1SlryTk_kW     
-QColToTes_kW   = Pcoll_KW*NOT(xFracMixHxTes)*pumpColOn  
+QPcmToHp_kW    = QIn1SlurryTes_kW     
+QColToTes_kW   = Pcoll_KW*NOT(xFracMixHxTes)*pumpColOn 
 !QColToDHW_kW   = QColToTes_kW*(1-xFracDivSolarDHWSH)
 !QColToSH_kW	   = QColToTes_kW*xFracDivSolarDHWSH
 CONSTANTS 8

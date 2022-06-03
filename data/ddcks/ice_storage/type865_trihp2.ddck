@@ -131,10 +131,10 @@ unitPrintPcmHour	! 1: Logical unit number, -
 1     				! 5: Number of inputs to avoid integration, -
 1     				! 6: Output number to avoid integration
 
-INPUTS 25
-TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h TAvgGround slryTkTEnv AddedSolidMass MassIceMelted
+INPUTS 23
+TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h AddedSolidMass MassIceMelted
 **
-TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h TAvgGround slryTkTEnv AddedSolidMass MassIceMelted
+TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h AddedSolidMass MassIceMelted
 
 
 *******************************
