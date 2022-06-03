@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : Dani Carbonell (DC)
 ** Creation date  : 30.09.2016
-** Last changes   : 23.03.2022
+** Last changes   : 20.05.2022
 *****************************************
 
 ***************************************************************************
@@ -19,8 +19,8 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 2
-Tdhw = @temp(input, TPiDHWDemand)				! Warm water supply temperature from WW heat exchanger or mixing valve [�C]
-MfrDhw = ABS(@mfr(input, MfrPiDHWDemand))		! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
+Tdhw = @temp(In, TPiDHWDemand)				! Warm water supply temperature from WW heat exchanger or mixing valve [�C]
+MfrDhw = ABS(@mfr(In, MfrPiDHWDemand))		! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
 
 ***********************************
 ** outputs to hydraulic solver
@@ -53,7 +53,7 @@ MfrDHWset = dtDhwCorrect*MfrDHWreal
 ** Definition of DHW profile
 ***********************************
 CONSTANTS 1
-unitReadDhw=21
+unitReadDhw = 21
 **ASSIGN PATH$\ddck\demands\dhw\profiles\DhwForMFH6appartments_2min_tset55.dat unitReadDhw		! water draw profile
 ASSIGN PATH$\demands\dhw\profiles\DhwForMFH6appartments_2min_tset55.dat unitReadDhw				! water draw profile
 
