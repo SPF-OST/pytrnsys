@@ -5,7 +5,7 @@
 *****************************************
 ** Heat pump section.
 ** Version : v0.0
-** Last Changes: 18.05.2022      
+** Last Changes: 07.03.2022      
 ** Date: 30.09.2016    
 ******************************************
 
@@ -13,12 +13,12 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 6    
-THpDesIn = @temp(CondIn2, TPiHpDesIn)    
-MfrDesIn = ABS(@mfr(CondIn2, MfrPiHpDesIn))
-ThpEvapIn = @temp(EvapIn, TPiHpEvapIn)
-MfrEvapIn = ABS(@mfr(EvapIn, MfrPiHpEvapIn))  
-THpCondIn = @temp(CondIn1, TPiHpCondIn)
-MfrCondIn = ABS(@mfr(CondIn1, MfrPiHpCondIn))
+THpDesIn = @temp(condenser2Input, TPiHpDesIn)    
+MfrDesIn = ABS(@mfr(condenser2Input, MfrPiHpDesIn))
+ThpEvapIn = @temp(evaporatorInput, TPiHpEvapIn)
+MfrEvapIn = ABS(@mfr(evaporatorInput, MfrPiHpEvapIn))  
+THpCondIn = @temp(condenser1Input, TPiHpCondIn)
+MfrCondIn = ABS(@mfr(condenser1Input, MfrPiHpCondIn))
 
 ***********************************
 ** outputs to hydraulic solver
@@ -26,9 +26,9 @@ MfrCondIn = ABS(@mfr(CondIn1, MfrPiHpCondIn))
 EQUATIONS 4
 **THpDesOut = [162,1]
 **THpDesOut = HpDesIsOn*[163,3] + NOT(HpDesIsOn)*THpDesIn					! Temperature of the condenser (heat sink) outlet
-@temp(EvapOut, THpEvapOut) = [162,1] 
-@temp(CondOut1, THpCondOut) = THpCondIn+PauxCond_kW*3600/(MfrCondIn*cpWat+0.0000000001)		! Temperature of the condenser (heat sink) outlet
-@temp(CondOut2, THpDesOut) = THpDesIn+PauxDes_kW*3600/(MfrDesIn*cpWat+0.0000000001)			! Temperature of the condenser (heat sink) outlet
+THpEvapOut = [162,1] 
+THpCondOut = THpCondIn+PauxCond_kW*3600/(MfrCondIn*cpWat+0.0000000001)		! Temperature of the condenser (heat sink) outlet
+THpDesOut = THpDesIn+PauxDes_kW*3600/(MfrDesIn*cpWat+0.0000000001)			! Temperature of the condenser (heat sink) outlet
 HpDesIsOn = 0
 
 ******************************************************************************************

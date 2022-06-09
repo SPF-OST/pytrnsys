@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : Dani Carbonell    
 ** Creation date  : 10.01.2010
-** Last changes   : 20.05.2022
+** Last changes   : 04.03.2022
 *****************************************
 
 ***************************************************************************
@@ -17,14 +17,14 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 2     
-TCollIn = @temp(In, TPiColIn)			! �C
-MfrColl = ABS(@mfr(In, MfrPiColIn))		! MfrColl_B		! because its the other way around  
+TCollIn = @temp(input, TPiColIn)   			! �C
+MfrColl = ABS(@mfr(input, MfrPiColIn))		! MfrColl_B		! because its the other way around  
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 1
-@temp(Out, TCollOut) = [74,1]		! Temperature of collector loop - collector to pipe
+TCollOut = [74,1]		! Temperature of collector loop - collector to pipe
 
 ***********************************
 ** outputs to other ddck
@@ -162,7 +162,7 @@ EQUATIONS 4		! Collector ON-Signal and mass flow
 MfrCPri = pumpColOn*MfrPDRc		! MfrCPri = MfrPD*pumpColOn;		! old = MfrCPri = MfrPD*(BoCnoOn+ ProHt12+ProHt2)+MfrCPriNom*ProDfWs
 MfrPDNew = [157,1]        
 MfrPD = MfrPDRc              
-TProPID = TCollOut				! TpiColOutInUsed   
+TProPID= TCollOut				! TpiColOutInUsed   
     
 UNIT 71 TYPE 993		! Input value recall (element RcC)
 PARAMETERS 1     
@@ -269,7 +269,7 @@ iamBeamRad = [74,6]     								! No flow absorber temperature, �C
 Tabs = [74,4]     										! Mean absorber temperature, �C
 iaTrans = [74,7]     
 iaLong = [74,8]     
-specHeatGain = [74,9]     								! W/m2
+specHeatGain= [74,9]     								! W/m2
 pCollCondens = [74,10]     								! W/m2
 dTTamb = Tamb-TCollIn     
 pUncSpec = pColl/3.6/ACollAp/(ABS(dTTamb)+0.00001)		! W/m2/K    
@@ -296,7 +296,7 @@ PColl_kWm2 = PColl_kW/(AcollAp+1e-30)
 PCollCondens_kW = pCollCondens*AcollAp/1000     					! This is a part of PCollHeatGainUc!!
 PCollHeatGain_kW = specHeatGain*AcollAp/1000     					! It's almost the same like PCollUc_kW
 PRad_kW = pRadGain*AcollAp/1000     								! Not the same like P_Irrad_Unc_kW! This is with long wave radiation from the environment
-PGainAmbient_kW = PCollHeatGain_kW - PRad_kW - PCollCondens_kW		! Gains or losses to the ambinet.
+PGainAmbient_kW= PCollHeatGain_kW - PRad_kW - PCollCondens_kW		! Gains or losses to the ambinet.
 PCollAmbPos_kW = MAX(PGainAmbient_kW,0.0)
 PCollAmbNeg_kW = -MIN(PGainAmbient_kW,0.0)
 PCollPos_kW = MAX(PColl_kW,0.0)     

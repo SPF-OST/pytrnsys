@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : J. Schmidli   
 ** Creation date  : 21.04.2020  
-** Last changes   : 18.05.2022 
+** Last changes   : 23.03.2022 
 *****************************************
 
 ***************************************************************************
@@ -18,8 +18,8 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 2
-Tdhw = @temp(In, TPiDHWDemand)				! Warm water supply temperature from WW heat exchanger or mixing valve [�C]
-MfrDhw = ABS(@mfr(In, MfrPiDHWDemand))		! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
+Tdhw = @temp(input, TPiDHWDemand)      			! Warm water supply temperature from WW heat exchanger or mixing valve [�C]
+MfrDhw = ABS(@mfr(input, MfrPiDHWDemand))		! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
 
 ***********************************
 ** outputs to hydraulic solver

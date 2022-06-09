@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : Dani Carbonell    
 ** Creation date  : 10.01.2010
-** Last changes   : 20.05.2022
+** Last changes   : 04.03.2022
 *****************************************
 
 ***************************************************************************
@@ -17,14 +17,14 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 2     
-TCollIn = @temp(In, TPiColIn)			! �C
-MfrColl = ABS(@mfr(In, MfrPiColIn))		! MfrColl_B		! because its the other way around  
+TCollIn = @temp(input, TPiColIn)			! �C
+MfrColl = ABS(@mfr(input, MfrPiColIn))		! MfrColl_B		! because its the other way around  
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 1
-@temp(Out, TCollOut) = [74,1]		! Temperature of collector loop - collector to pipe
+TCollOut = [74,1]		! Temperature of collector loop - collector to pipe
 
 ***********************************
 ** outputs to other ddck
@@ -131,7 +131,7 @@ dMfrCMax = 4*MfrCPriNom
 dMfrCMin = -dMfrCMax     
 dTCollDf = 5     																						! Delta T Collector when Deicing with collectors is on
 **dTColl = GT(NOT(TimerBlockUnc)*isWinterMonth,0.5)*1+LT(NOT(TimerBlockUnc)*isWinterMonth,0.5)*7		! Delta T Collector when Collector is running
-**DfColOn = 0 																							! (ProDfSc+ProDfUc)   One of the deicing Programms with collectors is running
+**DfColOn =  0 																							! (ProDfSc+ProDfUc)   One of the deicing Programms with collectors is running
 **TCollSet = GT(DfColOn,0.51)*(TPiIceIn+dTCollDf)+LT(DfColOn,0.49)*(TPiColIn+dTColl)     				! Set delta T over the collector
 TCollSet = (TCollIn+dTCollDf)																			! Set delta T over the collector
 

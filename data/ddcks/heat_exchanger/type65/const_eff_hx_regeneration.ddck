@@ -5,24 +5,24 @@
 *****************************************
 ** Contact person : 
 ** Creation date  :  
-** Last changes   : 18.05.2022
+** Last changes   : 07.03.2022
 *****************************************
 
 ***********************************
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 4
-TSourceIn = @temp(In1, TColToGHXFl)
-MfrSourceIn = ABS(@mfr(In1, MfrColToGHXFl))
-TLoadIn = @temp(In2, THPPrimOut)
-MfrLoadIn = ABS(@mfr(In2, MfrHPPrimOut))
+TSourceIn = @temp(side1Input, TColToGHXFl)
+MfrSourceIn = ABS(@mfr(side1Input, MfrColToGHXFl))
+TLoadIn = @temp(side2Input, THPPrimOut)
+MfrLoadIn = ABS(@mfr(side2Input, MfrHPPrimOut))
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 2
-@temp(Out1, TsourceOut) = [14,1]		!Changed automatically
-@temp(Out2, TLoadOut) = [14,3]			!Changed automatically
+TsourceOut = [14,1]		!Changed automatically
+TLoadOut = [14,3]		!Changed automatically
 
 CONSTANTS 1
 HX_efficiency = 0.8

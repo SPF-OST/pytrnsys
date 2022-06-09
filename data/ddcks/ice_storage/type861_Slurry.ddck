@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : D. Carbonell   
 ** Creation date  : 05.10.2018   
-** Last changes   : 20.05.2022 
+** Last changes   : 04.03.2022 
 *****************************************
 
 ***************************************************************************
@@ -19,19 +19,19 @@
 ***********************************
 EQUATIONS 6		! Collector inlet temperature 
 **MfrPCMIceHX = MfrPiIceIn 
-TCsHx1i = @temp(LeftIn, TPiIceToHpIn)     
+TCsHx1i = @temp(leftSideInput, TPiIceToHpIn)     
 TCsHx1iRev = -1000		!TPiIceOutToHp      always positive flow
-MfrCsHx1i = ABS(@mfr(LeftIn, MfrPiIceToHpIn))
-TCsHx2i = @temp(RightIn, TPiHxSolarIceIn)
+MfrCsHx1i = ABS(@mfr(leftSideInput, MfrPiIceToHpIn))
+TCsHx2i = @temp(rightSideInput, TPiHxSolarIceIn)
 TCsHx2iRev = -1000		!TPiHxSolarIceOut      always positive flow
-MfrCsHx2i = ABS(@mfr(RightIn, MfrPiHxSolarIceIn))
+MfrCsHx2i = ABS(@mfr(rightSideInput, MfrPiHxSolarIceIn))
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 2
-@temp(LeftOut, TCsHx1o) = [130,13]		! Outlet temperature	[�C]
-@temp(RightOut, TCsHx2o) = [130,20]		! Outlet temperature	[�C]
+TCsHx1o = [130,13]		! Outlet temperature	[�C]
+TCsHx2o = [130,20]     	! Outlet temperature	[�C]
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value
@@ -319,7 +319,7 @@ EQUATIONS 1		! outputs of Input Value Recall
 BlockIceStoreRc = [126,1] 
      
 EQUATIONS 20
-VIce = MassIce/RhoWat		! Volume of liquide water that is freezed [m3 - H2O(l)] = Mass Ice [kg] / Rho [kg/m3]
+VIce    = MassIce/RhoWat		! Volume of liquide water that is freezed [m3 - H2O(l)] = Mass Ice [kg] / Rho [kg/m3]
 VIceMax = VIceS*maxIceFrac  
 BlockIceStore = NOT(BlockIceStoreRc)*GT(VIceRatioRc,VIceRatioMax*0.99)+BlockIceStoreRc*GT(VIceRatioRc,VIceRatioMax*0.95)   
    
