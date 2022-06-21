@@ -29,9 +29,9 @@ MfrCondDhwIn = ABS(MfrPiHpDesIn)	! Mass flow rate into dhw condenser, kg/h
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 3
-THpEvapOut = [162,1]	! Temperature of the evaporator outlet, deg C 
-THpCondDhwOut = [162,3]	! Temperature of the dhw condenser outlet, deg C 
-THpCondShOut = [162,5]	! Temperature of the sh condenser outlet, deg C 
+THPEvapOut = [162,1]	! Temperature of the evaporator outlet, deg C 
+THPCondOut2 = [162,3]	! Temperature of the dhw condenser outlet, deg C 
+THPCondOut1 = [162,5]	! Temperature of the sh condenser outlet, deg C 
 
 ******************************************************************************************
 ** outputs to energy balance in kWh

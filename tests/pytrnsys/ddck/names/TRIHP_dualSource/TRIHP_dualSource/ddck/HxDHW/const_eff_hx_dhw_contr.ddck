@@ -18,10 +18,10 @@
 ***********************************
 
 EQUATIONS 4
-TSourceDHWHXIn = @temp(side1Input, TPiHxDhwIn)
-MfrSourceDHWHXIn = ABS(@mfr(side1Input, MfrPiHxDhwIn))
-TLoadDHWHXIn = @temp(side2Input, TPiHxDhwSecIn)
-MfrLoadDHWHXIn = ABS(@mfr(side2Input, MfrPiHxDhwSecIn))
+TSourceDHWHXIn = @temp(In1, TPiHxDhwIn)
+MfrSourceDHWHXIn = ABS(@mfr(In1, MfrPiHxDhwIn))
+TLoadDHWHXIn = @temp(In2, TPiHxDhwSecIn)
+MfrLoadDHWHXIn = ABS(@mfr(In2, MfrPiHxDhwSecIn))
 
 
 *************************************************************************************************
@@ -37,8 +37,8 @@ TDhwSetPoint = Tdhwset
 ***********************************
 
 EQUATIONS 2
-TsourceDHWHXOut = TsourceDHWHXOutT !TSourceDHWHXIn-HTR_HXDHWHX/(MfrSourceDHWHXIn*cpWat+0.0000000000000000001)
-TLoadDHWHXOut = [501,7]		!Load side outlet temperature	C
+@temp(Out1, TsourceDHWHXOut) = TsourceDHWHXOutT !TSourceDHWHXIn-HTR_HXDHWHX/(MfrSourceDHWHXIn*cpWat+0.0000000000000000001)
+@temp(Out2, TLoadDHWHXOut) = [501,7]		!Load side outlet temperature	C
 
 
 
