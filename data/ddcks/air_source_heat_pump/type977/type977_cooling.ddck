@@ -6,7 +6,7 @@
 ** Deck for cooling 
 ** Contact person : Jeremias Schmidli
 ** Creation date  : 29.09.20, SCJ
-** Last changes   : 07.03.2022 
+** Last changes   : 18.05.2022 
 *****************************************
 
 ***************************************************************************
@@ -21,15 +21,15 @@
 EQUATIONS 4
 ThpEvapInCool = TAmb
 MfrEvapInCool = ABS(MfrHpEvapNom)
-THpCondInCool = @temp(input, TPiHpCondIn) 
-MfrCondInCool = ABS(@mfr(input, MfrPiHpCondIn))		!*0.5  !SCJ: reduce it, to have less switching...
+THpCondInCool = @temp(In, TPiHpCondIn) 
+MfrCondInCool = ABS(@mfr(In, MfrPiHpCondIn))		!*0.5  !SCJ: reduce it, to have less switching...
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 2
 THpEvapOutCool = [162,1]
-THpCondOutCool = [162,3]		! Temperature of the condenser (heat sink) outlet
+@temp(Out, THpCondOutCool) = [162,3]		! Temperature of the condenser (heat sink) outlet
 
 ******************************************************************************************
 ** outputs to energy balance in kWh
