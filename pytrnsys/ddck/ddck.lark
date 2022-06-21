@@ -95,7 +95,7 @@ number_of_equations: POSITIVE_INT
 
 equation: assignment_target "=" sum
 
-assignment_target: explicit_var_name | unreferencable_variable_name
+assignment_target: explicit_var_name | computed_output_var | unreferencable_variable_name
 
 ?sum: product
     | sum "+" product -> plus
@@ -135,11 +135,11 @@ output: "[" unit_number "," output_number "]"
 output_number: INT
 
 ?variable_name: computed_var
+    | computed_output_var
     | explicit_var_name
 
 explicit_var_name: SHARED_VAR_NAME -> shared_var
     | private_var
-    | computed_temp_var
 
 unreferencable_variable_name: UNREFERENCABLE_NAME
 
@@ -153,7 +153,7 @@ logical_unit: INT | NAME
 
 computed_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
 
-computed_temp_var: PORT_TEMP "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
+computed_output_var: "@temp" "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
 
 FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
 
@@ -162,8 +162,6 @@ SHARED_VAR_NAME: "$" NAME
 PORT_NAME: NAME
 
 PORT_PROPERTY: "@" ("temp" | "mfr")
-
-PORT_TEMP: "@temp"
 
 DEFAULT_VARIABLE_NAME: NAME
 
