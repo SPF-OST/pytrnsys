@@ -43,7 +43,7 @@ jobs:
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
-        name: test-results-and-coverage-report
+        name: test-results-and-coverage-report-linux
         path: test-results
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
@@ -75,7 +75,7 @@ jobs:
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
-        name: test-results-and-coverage-report
+        name: test-results-and-coverage-report-windows
         path: test-results
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
