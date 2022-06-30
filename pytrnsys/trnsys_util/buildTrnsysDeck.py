@@ -268,12 +268,17 @@ class BuildTrnsysDeck:
             useDeckName=useDeckName, eraseBeginComment=False, eliminateComments=False
         )
 
-    def checkTrnsysDeck(self, nameDck, check=True):
+    def checkTrnsysDeck(self, nameDck, check=True) -> _res.Result[None]:
         lines = deckUtils.loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True)
         if check:
-            deckUtils.checkEquationsAndConstants(lines, self.nameDeck)
+            try:
+                deckUtils.checkEquationsAndConstants(lines, self.nameDeck)
+            except ValueError as e:
+                return _res.Error(f"Error found in DDCK file `{nameDck}`: {e}.")
 
         self.linesDeckReaded = lines
+
+        return None
 
     def saveUnitTypeFile(self):
 

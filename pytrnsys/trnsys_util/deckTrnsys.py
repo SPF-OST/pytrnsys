@@ -250,7 +250,6 @@ class DeckTrnsys:
         self.eliminateComments = (
             True  # BE CAREFUL, THIS CAN CHANGE  [30,1] by [301] so it does not WORK !!!! DC: Is this updated?
         )
-        # self.loadDeck(self.nameDckPathOutput)
         self.loadDeck(self.nameDck)
 
         self.variablesNames = []
