@@ -18,20 +18,20 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 6
-THpEvapIn = @temp(evaporatorInput, TPiHpEvapIn)				! Temperature of the evaporator inlet, deg C    
-MfrEvapIn = ABS(@mfr(evaporatorInput, MfrPuHpEvap)) 		! Mass flow rate into evaporator, kg/h     
-THpCondShIn = @temp(condenser1Input, TPiHpCondShIn)			! Temperature of the sh condenser inlet, deg C        
-MfrCondShIn = ABS(@mfr(condenser1Input, MfrPiHpCondShIn))	! Mass flow rate into sh condenser, kg/h 
-THpCondDhwIn = @temp(condenser2Input, TPiHpCondDhwIn) 			! Temperature of the dhw condenser inlet, deg C        
-MfrCondDhwIn = ABS(@mfr(condenser2Input, MfrPiHpCondDhwIn))	! Mass flow rate into dhw condenser, kg/h 
+THpEvapIn = @temp(EvapIn, TPiHpEvapIn)				! Temperature of the evaporator inlet, deg C    
+MfrEvapIn = ABS(@mfr(EvapIn, MfrPuHpEvap)) 		! Mass flow rate into evaporator, kg/h     
+THpCondShIn = @temp(CondIn1, TPiHpCondShIn)			! Temperature of the sh condenser inlet, deg C        
+MfrCondShIn = ABS(@mfr(CondIn1, MfrPiHpCondShIn))	! Mass flow rate into sh condenser, kg/h 
+THpCondDhwIn = @temp(CondIn2, TPiHpCondDhwIn) 			! Temperature of the dhw condenser inlet, deg C        
+MfrCondDhwIn = ABS(@mfr(CondIn2, MfrPiHpCondDhwIn))	! Mass flow rate into dhw condenser, kg/h 
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 3
-THpEvapOut = [162,1]	! Temperature of the evaporator outlet, deg C 
-THpCondDhwOut = [162,3]	! Temperature of the dhw condenser outlet, deg C 
-THpCondShOut = [162,5]	! Temperature of the sh condenser outlet, deg C 
+@temp(EvapOut, THpEvapOut) = [162,1]	! Temperature of the evaporator outlet, deg C 
+@temp(CondOut2, THpCondDhwOut) = [162,3]	! Temperature of the dhw condenser outlet, deg C 
+@temp(CondOut1, THpCondShOut) = [162,5]	! Temperature of the sh condenser outlet, deg C 
 
 ******************************************************************************************
 ** outputs to energy balance in kWh

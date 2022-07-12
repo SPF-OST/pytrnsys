@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : Dani Carbonell   
 ** Creation date  : 30.09.2016
-** Last changes   : 07.03.2022
+** Last changes   : 18.05.2022
 *****************************************
 
 ***************************************************************************
@@ -21,13 +21,13 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 1
-TRdFl = @temp(input, TPiRadIn)    
+TRdFl = @temp(In, TPiRadIn)    
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 1
-TRdRt = [42,1]		! return temperature from space heat distribution system, °C
+@temp(Out, TRdRt) = [42,1]		! return temperature from space heat distribution system, °C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value

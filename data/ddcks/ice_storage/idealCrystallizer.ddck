@@ -1,0 +1,39 @@
+*******************************
+**BEGIN idealCrystallizer.dck
+*******************************
+
+*****************************************
+** Contact person : M. Schubert
+** Creation date  : 29.04.2022   
+** Last changes   : 29.04.2022 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Ideal Crystallizer releasing all latent heat or supercooled water at once resulting in a 
+** 0°C fluid with a certain percentage of mfr as ice.
+** TODO: 
+***************************************************************************
+
+***********************************
+** For now directly connected with the input of the ice slurry tank
+***********************************
+
+
+EQUATIONS 1
+TSupercoolIn = TPiIceToHpIn			!MS connection to hydraulics
+
+
+
+
+EQUATIONS 4
+
+BoSupercooling = LT(TSupercoolIn,-0.01)
+dTsupercool = -TSupercoolIn * BoSupercooling + 0.0* NOT(BoSupercooling)
+slryTkR1 = CPWAT_SI / LPcm_J_kg * dTsupercool 	!MS 0 if no supercooling -> correct? Fraction of iced mass flow rate		
+TPiSlrySide1In = 0.0* BoSupercooling + TSupercoolIn * NOT(BoSupercooling) 	!MS Input temperature PCM from Evaporator
+
+
+*******************************
+**END idealCrystallizer.ddck
+*******************************

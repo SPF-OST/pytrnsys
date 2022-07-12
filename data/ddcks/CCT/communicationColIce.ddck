@@ -38,8 +38,8 @@
 ************************************************
 CONSTANTS 4
  tSimStrt = 0
- tSimEnd = 504.0000000
- tSkip = 0
+ tSimEnd = 2400.0000000
+ tSkip = 0.000
  tCond = 0.0000000
  !dtSim = 0.0166660
 ******* this part will be changed by labview!
@@ -87,12 +87,12 @@ PAforecast_kW = Pcoll_kW			!MS: thermal collector power
 PEcorr_kW = 0	! Nur ein Type 56 Gebäude simuliert, korrektur mit gemitteltedn Daten des letzten Zeitschrittes feht noch
 PAcorr_kW = 0
 BoSkip = LT(time,tskip+dthour) 		
-OPMode = 5*NOT(SaV) + 6*SaV  !E-Loop nur off / normal operation und A-Loop conditioning mode and normal operation 
-OPModeE = 5  	!MS 5 wenn in Betrieb sonst Standby -> 4 (off) 
+OPMode = 5*SaAOn + 6*NOT(SaAOn)  !MS 5 normal operation wenn zum warmen Speicher (SaV=0)
+OPModeE = 5 !MS to be discussed! 
 TAout = TPiColOut
 TEout = TPiPuEvapIn
  
-PuAOn = SaAOn
+PuAOn = OR(SaAOn,SaV)  !MS SaAOn = 1 if warm storage loaded, SaV = 1 if cold storage is loaded
 TEmBox = TColl
 AlFlowSet = MfrPuCol * NOT(SaV) + 0* SaV
 
@@ -120,7 +120,7 @@ VIceRatio !MS: massIce/(ViceS*rhoIce)*100 (%)
 TEmBox
 TEout     ! Outlet temperature forecast for the HP loop in next simulation timestep (°C)
 PrioCol     !MS Priority for collector heat: 1: Col to PCM priority 0: col to warm storages priority
-HorizontalIrradiation   ! MS horizontal irradiation -> find threashold!! 
+IT_Coll_Wm2   ! MS Irradiation into collector plane -> W/m2 
 **  Initial values     
 0   0    04      0     2       20     0       20    15 0 0 0 0 0 
 LABELS 3     

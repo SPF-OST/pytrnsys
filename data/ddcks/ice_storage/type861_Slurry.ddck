@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : D. Carbonell   
 ** Creation date  : 05.10.2018   
-** Last changes   : 04.03.2022 
+** Last changes   : 20.05.2022 
 *****************************************
 
 ***************************************************************************
@@ -19,19 +19,19 @@
 ***********************************
 EQUATIONS 6		! Collector inlet temperature 
 **MfrPCMIceHX = MfrPiIceIn 
-TCsHx1i = @temp(leftSideInput, TPiIceToHpIn)     
+TCsHx1i = @temp(LeftIn, TPiIceToHpIn)     
 TCsHx1iRev = -1000		!TPiIceOutToHp      always positive flow
-MfrCsHx1i = ABS(@mfr(leftSideInput, MfrPiIceToHpIn))
-TCsHx2i = @temp(rightSideInput, TPiHxSolarIceIn)
+MfrCsHx1i = ABS(@mfr(LeftIn, MfrPiIceToHpIn))
+TCsHx2i = @temp(RightIn, TPiHxSolarIceIn)
 TCsHx2iRev = -1000		!TPiHxSolarIceOut      always positive flow
-MfrCsHx2i = ABS(@mfr(rightSideInput, MfrPiHxSolarIceIn))
+MfrCsHx2i = ABS(@mfr(RightIn, MfrPiHxSolarIceIn))
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 2
-TCsHx1o = [130,13]		! Outlet temperature	[�C]
-TCsHx2o = [130,20]     	! Outlet temperature	[�C]
+@temp(LeftOut, TCsHx1o) = [130,13]		! Outlet temperature	[�C]
+@temp(RightOut, TCsHx2o) = [130,20]		! Outlet temperature	[�C]
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value
@@ -81,13 +81,13 @@ hFusion = 332500.00    		! [J/kg]
 ***********************************
 ** Storage related variables
 ***********************************
-CONSTANTS 5
+CONSTANTS 6
 VIceS = 2     								! Volume filed with water
 iceStorageGeometry = 0 						! 0  box, 1 cilinder
 Tankheight = 4     							! Tank height	[m]
 Tankwidth = (VIceS/Tankheight)^(0.5)		! Tank width	[m]
-Lstore = ViceS/Tankheight/TankWidth 
-    
+TankLenght = ViceS/Tankheight/TankWidth 
+Lstore = TankLenght
 ***********************************
 ** initial  values ****************
 ***********************************
@@ -319,22 +319,22 @@ EQUATIONS 1		! outputs of Input Value Recall
 BlockIceStoreRc = [126,1] 
      
 EQUATIONS 20
-VIce    = MassIce/RhoWat		! Volume of liquide water that is freezed [m3 - H2O(l)] = Mass Ice [kg] / Rho [kg/m3]
+VIce = MassIce/RhoWat		! Volume of liquide water that is freezed [m3 - H2O(l)] = Mass Ice [kg] / Rho [kg/m3]
 VIceMax = VIceS*maxIceFrac  
 BlockIceStore = NOT(BlockIceStoreRc)*GT(VIceRatioRc,VIceRatioMax*0.99)+BlockIceStoreRc*GT(VIceRatioRc,VIceRatioMax*0.95)   
    
-QLossPCMBot = [130,56]     
-QLossPCM1 = [130,57]      
-QLossPCM2 = [130,58]      
-QLossPCM3 = [130,59]      
-QLossPCM4 = [130,60]      
-QLossPCM5 = [130,61]      
-QLossPCM6 = [130,62]      
-QLossPCM7 = [130,63]      
-QLossPCM8 = [130,64]      
-QLossPCM9 = [130,65]      
-QLossPCM10 = [130,66]      
-QLossPCMTop = [130,67]      
+QLossPCMBot_Wm2 = [130,56]     
+QLossPCM1_Wm2 = [130,57]      
+QLossPCM2_Wm2 = [130,58]      
+QLossPCM3_Wm2 = [130,59]      
+QLossPCM4_Wm2 = [130,60]      
+QLossPCM5_Wm2 = [130,61]      
+QLossPCM6_Wm2 = [130,62]      
+QLossPCM7_Wm2 = [130,63]      
+QLossPCM8_Wm2 = [130,64]      
+QLossPCM9_Wm2 = [130,65]      
+QLossPCM10_Wm2 = [130,66]      
+QLossPCMTop_Wm2 = [130,67]      
 TGBotSideAv = [130,68]      
 TGTopSideAv = [130,69]      
 UBotOut = [130,70]      

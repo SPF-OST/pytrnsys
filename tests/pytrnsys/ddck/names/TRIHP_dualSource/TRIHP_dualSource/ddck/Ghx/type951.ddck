@@ -20,8 +20,8 @@
 ***********************************
 
 EQUATIONS 3
-TGhxIn  = @temp(input, TPiGhxIn)   
-myMfrGhx = ABS(@mfr(input, MfrPiGhxIn))	!not possible to revert the flow
+TGhxIn  = @temp(In, TPiGhxIn)   
+myMfrGhx = ABS(@mfr(In, MfrPiGhxIn))	!not possible to revert the flow
 ** 
 MfrGhx = EQL(calcRand,1)*ABS(myMfrGhx)/nGhxProbes+NOT(EQL(calcRand,1))*ABS(myMfrGhx)
 
@@ -30,7 +30,7 @@ MfrGhx = EQL(calcRand,1)*ABS(myMfrGhx)/nGhxProbes+NOT(EQL(calcRand,1))*ABS(myMfr
 ***********************************
 
 EQUATIONS 1
-TGhxOut = [85,1]     
+@temp(Out, TGhxOut) = [85,1]     
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value

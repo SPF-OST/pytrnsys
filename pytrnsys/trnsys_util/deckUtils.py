@@ -1,18 +1,19 @@
 # pylint: skip-file
 # type: ignore
 
-import numpy as num
-import pytrnsys.pdata.processFiles as spfUtils
+import logging
 import os
 import re
 from string import digits
-import logging
+
+import numpy as num
+
+import pytrnsys.pdata.processFiles as spfUtils
 
 logger = logging.getLogger("root")
 
 
 def replaceAllUnits(linesRead, idBegin, TrnsysUnits, filesUnitUsedInDdck, filesUsedInDdck):
-
     unitId = idBegin
 
     for i in range(len(TrnsysUnits)):
@@ -30,7 +31,6 @@ def replaceAllUnits(linesRead, idBegin, TrnsysUnits, filesUnitUsedInDdck, filesU
             )
 
         except:
-            # print ("fileUnit is a string %s. Look for the string unit" % self.filesUnitUsedInDdck[i])
             for j in range(len(linesRead)):
                 splitEqual = linesRead[j].split("=")
 
@@ -47,7 +47,6 @@ def replaceAllUnits(linesRead, idBegin, TrnsysUnits, filesUnitUsedInDdck, filesU
 
 
 def readAllTypes(lines, sort=True):
-
     """
     It reads all types and units from a a list of lines readed from a deck file.
     It also reads the files used and which units are used for them. IN order to be able to change automatically the unit numbers afterwards
@@ -89,17 +88,7 @@ def readAllTypes(lines, sort=True):
                     filesUsedInDdck.append(splitBlank[1])
                 else:
                     filesWithoutUnit.append(splitBlank[1])
-
-                # if(i>1 and lines[i-1][0:5]=="LABELS"):
-                #     unitAssigned=False
-                #     filesWithoutUnit.append(splitBlank[1])
-                # else:
-                #     unitAssigned=True
-                #
-                # if(unitAssigned==True):
-
         except:
-            # raise ValueError('Logical ASSIGN number of the following ddck-line cannot be changed: '+line)
             pass
 
         try:
@@ -110,7 +99,6 @@ def readAllTypes(lines, sort=True):
                 unit = splitBlank[0].replace(" ", "")
 
                 if unit.lower() == "unit".lower() and types.lower() == "Type".lower():
-                    #                    print "unit:%s nUnit:%s types:%s ntype:%s"%(unit,nUnit,types,ntype)
                     TrnsysTypes.append(int(ntype))
                     TrnsysUnits.append(int(nUnit))
 
@@ -119,7 +107,6 @@ def readAllTypes(lines, sort=True):
 
     # We need to sort them for units. Otherwise when we change unit numbers we can change something already changed
     # for example we replace UNIT 400 for UNIT 20 and at the end we have UNIT 20 again and we change it for UNIT 100
-
     if sort == False:
         TrnsysTypesSorted = TrnsysTypes
         TrnsysUnitsSorted = TrnsysUnits
@@ -134,8 +121,12 @@ def readAllTypes(lines, sort=True):
             TrnsysTypesSorted.append(TrnsysTypes[k])
 
     # Check if any value is repeated.
-
     return TrnsysUnitsSorted, TrnsysTypesSorted, filesUsedInDdck, filesUnitUsedInDdck
+
+
+def phraseStartingIndex(phrase, text):
+    result = re.search(fr"\b{phrase}\b", text, re.IGNORECASE)
+    return result.start() if result is not None else -1
 
 
 def ireplace(old, new, text):
@@ -153,10 +144,10 @@ def ireplace(old, new, text):
     """
     idx = 0
     while idx < len(text):
-        index_l = text.lower().find(old.lower(), idx)
+        index_l = phraseStartingIndex(old, text)
         if index_l == -1:
             return text
-        text = text[:index_l] + new + text[index_l + len(old) :]
+        text = text[:index_l] + new + text[index_l + len(old):]
         idx = index_l + len(new)
     return text
 
@@ -184,12 +175,7 @@ def replaceUnitNumber(linesRead, oldUnit, newUnit):
         myAddText = "Changed automatically\n"
 
         for i in range(len(lines)):
-
-            mySplit = lines[i].split("!")
-
             if unitFromTypeChanged == False:
-
-                # newLine= lines[i].replace(oldString, newString)
                 newLine = ireplace(oldString, newString, lines[i])
 
                 if newLine != lines[i]:
@@ -203,10 +189,6 @@ def replaceUnitNumber(linesRead, oldUnit, newUnit):
             logger.warning("replacement FAILURE from %s to %s" % (oldUnit, newUnit))
         else:
             for i in range(len(lines)):
-
-                # oldString = "[%d," % (oldUnit)
-                # newString = "[%s," % (newUnit)
-
                 oldString = "%d," % (oldUnit)
                 newString = "%s," % (newUnit)
 
@@ -220,7 +202,6 @@ def replaceUnitNumber(linesRead, oldUnit, newUnit):
                 else:
                     newLine = mySplit[0]
 
-                replaced = False
                 if newLine != mySplit[0]:
                     myNewSplit = newLine.split("!")
                     lineWithoutBreak = myNewSplit[0].replace("\n", "")
@@ -228,7 +209,6 @@ def replaceUnitNumber(linesRead, oldUnit, newUnit):
 
 
 def getTypeFromUnit(myUnit, linesReadedNoComments):
-
     for i in range(len(linesReadedNoComments)):
 
         splitEquality = linesReadedNoComments[i].split()
@@ -251,7 +231,6 @@ def getTypeFromUnit(myUnit, linesReadedNoComments):
 
 
 def getDataFromDeck(linesReadedNoComments, myName, typeValue="string"):
-
     value = getMyDataFromDeck(linesReadedNoComments, myName)
 
     if value == None:
@@ -272,21 +251,15 @@ def getDataFromDeck(linesReadedNoComments, myName, typeValue="string"):
 
 
 def getMyDataFromDeck(linesReadedNoComments, myName):
-
     for i in range(len(linesReadedNoComments)):
 
         splitEquality = linesReadedNoComments[i].split("=")
-
-        found = False
         try:
             name = splitEquality[0].replace(" ", "")
-            value = splitEquality[1].replace(" ", "")
             value = splitEquality[1].replace("\n", "")
 
             if name.lower() == myName.lower():
-                found = True
                 return value
-
         except:
             pass
 
@@ -308,17 +281,17 @@ def loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True):
         list of lines obateined form the deck without the comments
     """
 
-    infile = open(nameDck, "r")
+    infile = open(nameDck, "r", encoding='windows-1252')
 
     lines = infile.readlines()
 
-    #        skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
+    # skypChar = None    #['*'] #This will eliminate the lines starting with skypChar
     if eraseBeginComment == True:
         skypChar = ["*", "!", "      \n"]  # ['*'] #This will eliminate the lines starting with skypChar
     else:
         skypChar = ["!", "      \n"]  # ['*'] #This will eliminate the lines starting with skypChar
 
-    replaceChar = None  # [',','\''] #This characters will be eliminated, so replaced by nothing
+    replaceChar = None  # [',','\''] # This characters will be eliminated, so replaced by nothing
 
     linesChanged = spfUtils.purgueLines(lines, skypChar, replaceChar, removeBlankLines=True)
 
@@ -330,7 +303,6 @@ def loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True):
 
 
 def checkEquationsAndConstants(lines, nameDck):
-    # lines=linesChanged
     for i in range(len(lines)):
 
         splitBlank = lines[i].split()
@@ -353,11 +325,8 @@ def checkEquationsAndConstants(lines, nameDck):
 
                 splitEquality = lines[i].split("=")
                 error = 1
-                #                    print "count=%d"%countedValues
-                #                    print splitEquality
 
                 if len(splitEquality) >= 2:
-                    #                        print "counting at %s"%(self.linesChanged[i])
                     error = 0
                     countedValues = countedValues + 1
 
@@ -374,7 +343,6 @@ def checkEquationsAndConstants(lines, nameDck):
 
 
 def getTypeName(typeNum):
-
     if typeNum == 888:
         return "General Controller (SPF)"
     if typeNum == 65:
@@ -429,7 +397,7 @@ def getTypeName(typeNum):
         return "Building ISO (SPF)"
     elif typeNum == 2:
         return "Collector controller (TRNSYS)"
-    elif typeNum == 935:
+    elif typeNum == 9351:
         return "Flow solver (SPF)"
     elif typeNum == 711:
         return "2D Ground model (SPF)"
@@ -465,15 +433,15 @@ def readEnergyBalanceVariablesFromDeck(lines):
     for i in range(len(lines)):
 
         if (
-            len(lines[i].split("qSysIn_")) > 1
-            or len(lines[i].split("qSysOut_")) > 1
-            or len(lines[i].split("elSysIn_")) > 1
-            or len(lines[i].split("elSysOut_")) > 1
+                len(lines[i].split("qSysIn_")) > 1
+                or len(lines[i].split("qSysOut_")) > 1
+                or len(lines[i].split("elSysIn_")) > 1
+                or len(lines[i].split("elSysOut_")) > 1
         ):
             myEqualSplit = lines[i].split("=")
 
             if (
-                len(myEqualSplit) > 1
+                    len(myEqualSplit) > 1
             ):  # Otherwise if we add one of this variables in a printer it will copy the whole printer line here.
                 varBalance = myEqualSplit[0]
                 eBalance.append(varBalance.replace(" ", ""))
@@ -488,8 +456,6 @@ def addEnergyBalanceMonthlyPrinter(unit, eBalance):
 
     Change JS: Calculate Energy Balance on monthly basis.
     """
-
-    # size = len(self.qBalanceIn)+len(self.qBalanceOut)+len(self.elBalanceIn)+len(self.elBalanceOut)
 
     ImbalanceString = "qImb = "
 
@@ -560,19 +526,6 @@ def addEnergyBalanceHourlyPrinter(unit, eBalance):
 
     """
 
-    # size = len(self.qBalanceIn)+len(self.qBalanceOut)+len(self.elBalanceIn)+len(self.elBalanceOut)
-
-    # ImbalanceString = 'qImb = '
-    #
-    # for q in eBalance:
-    #     if 'qSysOut' in q:
-    #         ImbalanceString += ' - ' + q
-    #
-    #     elif 'qSysIn' in q or 'elSysIn_Q' in q:
-    #         ImbalanceString += ' + ' + q
-    # if ImbalanceString == 'qImb = ':
-    #     ImbalanceString += '0'
-
     lines = []
     line = "***************************************************************\n"
     lines.append(line)
@@ -580,10 +533,6 @@ def addEnergyBalanceHourlyPrinter(unit, eBalance):
     lines.append(line)
     line = "***************************************************************\n"
     lines.append(line)
-    # line = "EQUATIONS 1\n";
-    # lines.append(line)
-    # line = ImbalanceString + '\n';
-    # lines.append(line)
     line = "CONSTANTS 1\n"
     lines.append(line)
     line = "unitPrintEBal_h=%d\n" % unit
@@ -615,8 +564,6 @@ def addEnergyBalanceHourlyPrinter(unit, eBalance):
     lines.append(line)
     line = "%s\n" % allvars
     lines.append(line)
-
-    # self.linesChanged=self.linesChanged+lines
     return lines
 
 
@@ -646,7 +593,7 @@ def changeAssignPath(lines, key, rootPath):
                 lineChanged = False
                 for j in range(len(splitPath)):
                     if splitPath[j].lower() == key:
-                        name = os.path.join(*splitPath[j + 1 :])
+                        name = os.path.join(*splitPath[j + 1:])
                         if len(splitBlank) > 2:
                             lineChanged = 'ASSIGN "%s" %s \n' % (os.path.join(rootPath, name), splitBlank[2])
                         else:

@@ -1,0 +1,22 @@
+*******************************			
+**BEGIN cellar_coupled_ice_storage_type865.ddck			
+*******************************			
+    			
+*****************************************
+** Contact person : D. Carbonell   
+** Creation date  : 26.05.2022
+** Last changes   : 
+*****************************************				
+			
+***********************************			
+** To be used with slurry PCM type865 			
+***********************************			
+			
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+
+EQUATIONS 1
+slryTkTEnv = TRoomStore

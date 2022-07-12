@@ -22,14 +22,14 @@
 ***********************************
 
 EQUATIONS 1
-TRdFl = @temp(input, TPiRadIn)   
+TRdFl = @temp(In, TPiRadIn)   
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 
 EQUATIONS 1
-TRdRt = [42,1]  ! return temperature from space heat distribution system, °C
+@temp(Out, TRdRt) = [42,1]  ! return temperature from space heat distribution system, °C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value

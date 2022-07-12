@@ -14,16 +14,18 @@ ToDo :
 
 # import CoolProp.CoolProp as cool
 
+
 try:
     from CoolProp.CoolProp import PropsSI
     from CoolProp.HumidAirProp import HAPropsSI, HAProps_Aux
 
     newVersion = True
 except:
+
     from CoolProp.CoolProp import Props
     from CoolProp.HumidAirProp import HAProps, HAProps_Aux
-
     newVersion = False
+
 import sys
 
 

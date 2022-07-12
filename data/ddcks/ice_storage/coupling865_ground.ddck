@@ -1,0 +1,37 @@
+*******************************
+**BEGIN coupling865_ground.dck
+*******************************
+
+*****************************************
+** Contact person : M. Schubert
+** Creation date  : 17.05.2022   
+** Last changes   : 26.05.2022 (DC)
+*****************************************
+
+***************************************************************************
+** Description: 
+** coupling between type 865 (slurry PCM) and ground_coupled_ice_storage.ddck
+** TODO: 
+***************************************************************************
+
+EQUATIONS 16 			
+nCv = 10
+ATesGroundLatCv = ATesGroundLat/nCv
+TesToGroundFac = 1000. 
+QLossPCMBot_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundTop      !W/m2 		
+QLossPCMTop_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundTop
+QLossPCM1_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv
+QLossPCM2_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv     			
+QLossPCM3_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv    			
+QLossPCM4_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv    			
+QLossPCM5_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv     			
+QLossPCM6_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
+QLossPCM7_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
+QLossPCM8_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
+QLossPCM9_Wm2= -QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
+QLossPCM10_Wm2=-QWallSlurryTes_kW*TesToGroundFac/ATesGroundLatCv      			
+slryTkTEnv    = TAvgGround
+
+*******************************
+**END transfer861_864.dck
+*******************************

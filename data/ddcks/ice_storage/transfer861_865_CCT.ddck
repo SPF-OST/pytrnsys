@@ -1,0 +1,95 @@
+*******************************
+**BEGIN transfer861_864.dck
+*******************************
+
+*****************************************
+** Contact person : M. Schubert
+** Creation date  : 02.05.2022   
+** Last changes   : 02.05.2022 
+*****************************************
+
+***************************************************************************
+** Description: 
+** transfer of variable names between old slurry tank type and new one
+** TODO: 
+***************************************************************************
+
+EQUATIONS 3
+!qBackUpTotal_kW = qAuxStoreSH_KW + qAuxStoreDHW_KW
+QPcmFromCol_kW = QIn2SlurryTes_kW
+!QColToPcm_kW   = Pcoll_KW*(ProCs+ProDoubleHpCs)
+QPcmToHp_kW    = QIn1SlurryTes_kW     
+QColToTes_kW   = Pcoll_KW*NOT(xFracMixHxTes)*pumpColOn 
+!QColToDHW_kW   = QColToTes_kW*(1-xFracDivSolarDHWSH)
+!QColToSH_kW	   = QColToTes_kW*xFracDivSolarDHWSH
+CONSTANTS 8
+VIceS = 2		!MS default - defined in config file
+thickFoam = 0.05     
+lambdaFoam = 0.041      
+ratioIceBegin = 0
+TiceIni = 30
+maxIceFrac = 0.6 
+VIceRatioMax = maxIceFrac*100    
+iceThick = 0 	!MS we never have ice on a HX
+
+EQUATIONS 6
+
+VIceRatio = solMassRatio*100	! MS: Volume of PCM in tank now variable -> Mass is fixed!
+Tankheight = 4     							! Tank height	[m]
+Tankwidth = (VIceS/Tankheight)^(0.5)		! Tank width	[m]
+Lstore = ViceS/Tankheight/TankWidth 
+UFoam = lambdaFoam/thickFoam   
+VIceMax = VIceS*maxIceFrac
+
+EQUATIONS 20
+volSlryTkIni_m3 = VIceS 		! 1: pcm mass, m3
+geoSlryTk = 0 			! 2: tank geometry: 0 = cuboid, 1 = cylinder
+widthSlryTk_m = Tankwidth			! 3: tank width, m (diameter for cylinder)
+lengthSlryTk_m = Lstore 			! 4: tank length, m (only relevant for cuboid)
+maxSolFrSlryTk = maxIceFrac		! 5: maximum solid pcm mass fraction
+UWallSlryTk_W_m2K = UFoam		! 6: U-value of tank wall, W/m^2K
+rhoPcmLiq_kg_m3 = RHOWAT			! 7: density of liquid pcm, kg/m^3
+rhoPcmSolid_kg_m3 = 917		! 8: density of solid pcm, kg/m^3
+cpPcmLiq_J_kgK = CPWAT_SI			! 9: heat capacity of liquid pcm, J/kgK
+lambdaPcm_W_mK = LAMWAT			! 10: thermal conductivity of pcm, W/mK
+TFreezePcm = 0.0			! 11: freezing temperature of pcm, deg C
+
+hPcm_W_m2K = 210			! 12: convection heat transfer coefficient of pcm, W/m^2K
+LPcm_J_kg = 334000			! 13: latent heat of pcm, J/kg
+solPcmIni = ratioIceBegin			! 14: initial mass fraction of solid pcm
+TLiqPcmIni = GT(ratioIceBegin,0)*0+NOT(GT(ratioIceBegin,0))*TiceIni		! 15: initial temperature of liquid pcm, deg C
+
+TsensorPcmControl = TCsHx2o	
+TPCM2 = TCsHx2o
+TPCM = TCsHx2o
+TAvgPCM = TCsHx2o
+
+MassIce = solMassSlryTk_kg
+
+
+UNIT 126 TYPE 993		! Input value recall (element RcB)
+PARAMETERS 1     
+1		! 1: number of variables to be remembered     
+INPUTS 1
+BlockIceStore
+0.0 
+     
+EQUATIONS 1		! outputs of Input Value Recall
+BlockIceStoreRc = [126,1] 
+     
+EQUATIONS 2
+VIce    = solVolSlryTk_m3		! Volume of liquide water that is freezed [m3 - H2O(l)] = Mass Ice [kg] / Rho [kg/m3]  
+BlockIceStore = NOT(BlockIceStoreRc)*GT(VIceRatioRc,VIceRatioMax*0.99)+BlockIceStoreRc*GT(VIceRatioRc,VIceRatioMax*0.95)   
+
+
+
+
+*******************************
+** hourly printers
+*******************************
+
+
+
+*******************************
+**END transfer861_864.dck
+*******************************

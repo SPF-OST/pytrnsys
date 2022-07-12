@@ -250,7 +250,6 @@ class DeckTrnsys:
         self.eliminateComments = (
             True  # BE CAREFUL, THIS CAN CHANGE  [30,1] by [301] so it does not WORK !!!! DC: Is this updated?
         )
-        # self.loadDeck(self.nameDckPathOutput)
         self.loadDeck(self.nameDck)
 
         self.variablesNames = []
@@ -426,7 +425,7 @@ class DeckTrnsys:
 
             logger.debug("variation deck file at %s" % self.nameDck)
 
-            outfile = open(self.nameDck, "w")
+            outfile = open(self.nameDck, "w", encoding='windows-1252')
 
             outfile.writelines(lines)
             outfile.close()

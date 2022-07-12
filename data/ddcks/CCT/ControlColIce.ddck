@@ -21,7 +21,7 @@
 
 EQUATIONS 3
 *** Massflowrates
-xFracMixHxTes = SaV/100   !MS assumption Valve_W_Vell = 100 if ProWS and 0 if ProCS
+xFracMixHxTes = SaAon   !MS assumption Valve_W_Vell = 100 if ProWS and 0 if ProCS
 MfrPuCol = PuAOn*MfrCPri   !MS: PuAOn comes from the labview control - such we don't need to include ProXY here
 MfrEmulator = MfrE
 
@@ -44,11 +44,8 @@ T_set_DivHpEvap = TEvapMaxHp
 TmaxIceTes = 30
 scalePipes = 1
 
-EQUATIONS 5
-QPcmFromCol_kW = sumQhxkW*xFracMixHxTes*pumpColOn
-QColToPcm_kW   = Pcoll_KW*xFracMixHxTes*pumpColOn
-QPcmToHp_kW    = sumQhxkW*GT(MfrE,0.1)       
-QColToTes_kW   = Pcoll_KW*NOT(xFracMixHxTes)*pumpColOn  
+EQUATIONS 1
+
 TPiHPEvapOut = Teei
 
 CONSTANTS 6  ! Heat Pump: Size              

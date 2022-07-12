@@ -259,7 +259,8 @@ CoHTransMode     	! 15: convective heat transfer coefficient to absorber with fr
 4 100 15 0 0 0 1 0 0 0     
 100 1 -1 0 -1     
 LABELS 1     
-ASSIGN O:\Kombiteststand\TRNSYS\TRIHP\simdata\IAM_Sample_SPFC910.iam     
+!ASSIGN O:\Kombiteststand\TRNSYS\TRIHP\simdata\IAM_Sample_SPFC910.iam     
+ASSIGN C:\Daten\GIT\pytrnsys\data\ddcks\solar_collector\type833\iam_data\IAM_Sample_SPFC910.iam     
     
 EQUATIONS 12		! Collector Outputs
 MfrCout = [74,2]     									! Massflow out of collector
@@ -323,11 +324,11 @@ unitPrintSol		! 1: Logical unit number, -
 -1     				! 4: Printing & integrating interval, h. -1 for monthly integration
 1     				! 5: Number of inputs to avoid integration, -
 1     				! 6: Output number to avoid integration
-INPUTS 20
-Time  QPcmFromCol_kW QColToPcm_kW QColToTes_kW Pcoll_kW  BoCst P_IRRAD_kW    PColl_kWm2  PCollOff_kW     PCollCondens_kW IT_Coll_kWm2
+INPUTS 19
+Time  QPcmFromCol_kW QColToTes_kW Pcoll_kW  BoCst P_IRRAD_kW    PColl_kWm2  PCollOff_kW     PCollCondens_kW IT_Coll_kWm2
 PCollHeatGain_kW  PRad_kW  PGainAmbient_kW  PCollNeg_kW  PCollPos_kW  PCollAmbPos_kW PCollAmbNeg_kW  Pcoll_kW  IT_Coll_kW   
 *****   
-Time QPcmFromCol_kW QColToPcm_kW QColToTes_kW Pcoll_kW  BoCst P_IRRAD_kW    PColl_kWm2 PCollOff_kW     PCollCondens_kW IT_Coll_kWm2
+Time QPcmFromCol_kW QColToTes_kW Pcoll_kW  BoCst P_IRRAD_kW    PColl_kWm2 PCollOff_kW     PCollCondens_kW IT_Coll_kWm2
 PCollHeatGain_kW  PRad_kW  PGainAmbient_kW  PCollNeg_kW  PCollPos_kW  PCollAmbPos_kW PCollAmbNeg_kW  Pcoll_kW  IT_Coll_kW  
 
 ***********************************

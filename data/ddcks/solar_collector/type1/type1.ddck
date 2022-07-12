@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : Dani Carbonell    
 ** Creation date  : 10.01.2010
-** Last changes   : 04.03.2022
+** Last changes   : 20.05.2022
 *****************************************
 
 ***************************************************************************
@@ -17,14 +17,14 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 2
-TCollIn = @temp(input, TPiColIn)
-MfrColl = ABS(@mfr(input, MfrPiColIn))
+TCollIn = @temp(In, TPiColIn)
+MfrColl = ABS(@mfr(In, MfrPiColIn))
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 1
-TCollOut = [28,1]
+@temp(Out, TCollOut) = [28,1]
 
 ***********************************
 ** outputs to other ddck
@@ -104,7 +104,7 @@ EQUATIONS 4
 Pcoll = [28,3]		!kJ/h
 PColl_kW = Pcoll/3600
 PColl_kWm2 = PColl_kW/(AcollAp+1e-30)   
-PColl_Wm2  = PColl_kWm2*1000   
+PColl_Wm2 = PColl_kWm2*1000   
 
 ***********************************
 ** Monthly printer
