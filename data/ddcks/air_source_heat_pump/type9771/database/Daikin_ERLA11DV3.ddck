@@ -1,0 +1,111 @@
+*************************************
+** BEGIN Daikin_ERLA11DV3.ddck
+*************************************
+    
+*************************************
+** Contact person : M. Neugebauer   
+** Creation date  : 20.07.2022
+** Last changes   : --.--.---- 
+*************************************
+
+*************************************
+** Description: 
+** heat pump coefficient ddck for model 9771
+*************************************
+
+CHPM_c1 = EQL(pwrRate, 30)*CHPM_30_1 + EQL(pwrRate, 50)*CHPM_50_1 + EQL(pwrRate, 70)*CHPM_70_1 + EQL(pwrRate, 90)*CHPM_90_1 + EQL(pwrRate, 100)*CHPM_100_1
+CHPM_c2	= EQL(pwrRate, 30)*CHPM_30_2 + EQL(pwrRate, 50)*CHPM_50_2 + EQL(pwrRate, 70)*CHPM_70_2 + EQL(pwrRate, 90)*CHPM_90_2 + EQL(pwrRate, 100)*CHPM_100_2
+CHPM_c3	= EQL(pwrRate, 30)*CHPM_30_3 + EQL(pwrRate, 50)*CHPM_50_3 + EQL(pwrRate, 70)*CHPM_70_3 + EQL(pwrRate, 90)*CHPM_90_3 + EQL(pwrRate, 100)*CHPM_100_3 
+CHPM_c4	= EQL(pwrRate, 30)*CHPM_30_4 + EQL(pwrRate, 50)*CHPM_50_4 + EQL(pwrRate, 70)*CHPM_70_4 + EQL(pwrRate, 90)*CHPM_90_4 + EQL(pwrRate, 100)*CHPM_100_4
+CHPM_c5 = EQL(pwrRate, 30)*CHPM_30_5 + EQL(pwrRate, 50)*CHPM_50_5 + EQL(pwrRate, 70)*CHPM_70_5 + EQL(pwrRate, 90)*CHPM_90_5 + EQL(pwrRate, 100)*CHPM_100_5
+CHPM_c6	= EQL(pwrRate, 30)*CHPM_30_6 + EQL(pwrRate, 50)*CHPM_50_6 + EQL(pwrRate, 70)*CHPM_70_6 + EQL(pwrRate, 90)*CHPM_90_6 + EQL(pwrRate, 100)*CHPM_100_6
+COP_c1 =  EQL(pwrRate, 30)* COP_30_1 + EQL(pwrRate, 50)* COP_50_1 + EQL(pwrRate, 70)* COP_70_1 + EQL(pwrRate, 90)* COP_90_1 + EQL(pwrRate, 100)* COP_100_1	
+COP_c2 =  EQL(pwrRate, 30)* COP_30_2 + EQL(pwrRate, 50)* COP_50_2 + EQL(pwrRate, 70)* COP_70_2 + EQL(pwrRate, 90)* COP_90_2 + EQL(pwrRate, 100)* COP_100_2	
+COP_c3 =  EQL(pwrRate, 30)* COP_30_3 + EQL(pwrRate, 50)* COP_50_3 + EQL(pwrRate, 70)* COP_70_3 + EQL(pwrRate, 90)* COP_90_3 + EQL(pwrRate, 100)* COP_100_3	
+COP_c4 =  EQL(pwrRate, 30)* COP_30_4 + EQL(pwrRate, 50)* COP_50_4 + EQL(pwrRate, 70)* COP_70_4 + EQL(pwrRate, 90)* COP_90_4 + EQL(pwrRate, 100)* COP_100_4	
+COP_c5 =  EQL(pwrRate, 30)* COP_30_5 + EQL(pwrRate, 50)* COP_50_5 + EQL(pwrRate, 70)* COP_70_5 + EQL(pwrRate, 90)* COP_90_5 + EQL(pwrRate, 100)* COP_100_5	
+COP_c6 =  EQL(pwrRate, 30)* COP_30_6 + EQL(pwrRate, 50)* COP_50_6 + EQL(pwrRate, 70)* COP_70_6 + EQL(pwrRate, 90)* COP_90_6 + EQL(pwrRate, 100)* COP_100_6	  
+
+*************************************
+** coefficients for 30 % power
+*************************************
+CHPM_30_1 = 4.9263
+CHPM_30_2 = 36.9866
+CHPM_30_3 = -7.3974
+CHPM_30_4 = -16.8841
+CHPM_30_5 = 79.6363
+CHPM_30_6 = 13.3608
+COP_30_1  = 12.8677
+COP_30_2  = 78.5179
+COP_30_3  = -97.2147
+COP_30_4  = -298.7574
+COP_30_5  = 183.7841
+COP_30_6  = 209.1721
+
+*************************************
+** coefficients for 50 % power
+*************************************
+CHPM_50_1 = 7.4465
+CHPM_50_2 = 51.3808
+CHPM_50_3 = -29.7272
+CHPM_50_4 = -77.4480
+CHPM_50_5 = 90.0520
+CHPM_50_6 = 66.7335
+COP_50_1  = 13.1282
+COP_50_2  = 95.8083
+COP_50_3  = -100.8906
+COP_50_4  = -399.4986
+COP_50_5  = 257.6963
+COP_50_6  = 220.6511
+
+*************************************
+** coefficients for 70 % power
+*************************************
+CHPM_70_1 = 8.3119
+CHPM_70_2 = 55.2567
+CHPM_70_3 = -16.1297
+CHPM_70_4 = -30.5436
+CHPM_70_5 = 70.2948
+CHPM_70_6 = 0.5844
+COP_70_1  = 13.3328
+COP_70_2  = 110.9084
+COP_70_3  = -107.2743
+COP_70_4  = -499.8098
+COP_70_5  = 329.3904
+COP_70_6  = 253.5016
+
+*************************************
+** coefficients for 90 % power
+*************************************
+CHPM_90_1 = 9.3618
+CHPM_90_2 = 63.2004
+CHPM_90_3 = -0.2416
+CHPM_90_4 = -88.1141
+CHPM_90_5 = -13.3598
+CHPM_90_6 = -50.5286
+COP_90_1  = 10.6906
+COP_90_2  = 104.1161
+COP_90_3  = -75.9370
+COP_90_4  = -481.4110
+COP_90_5  = 336.2058
+COP_90_6  = 167.6867
+
+*************************************
+** coefficients for 100 % power
+*************************************
+CHPM_100_1 = 9.5798
+CHPM_100_2 = 68.2748
+CHPM_100_3 = 13.0915
+CHPM_100_4 = -115.3055
+CHPM_100_5 = -12.0090
+CHPM_100_6 = -95.8452
+COP_100_1  = 8.3381
+COP_100_2  = 98.1260
+COP_100_3  = -46.7594
+COP_100_4  = -417.4888
+COP_100_5  = 405.1945
+COP_100_6  = 77.2383
+
+*************************************
+** END Daikin_ERLA11DV3.ddck
+*************************************

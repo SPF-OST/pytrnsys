@@ -133,8 +133,25 @@ PelAuxCtr_kW = 0
 EQUATIONS 1
 tAmbHp = 15
 
-UNIT 162 TYPE 977	! Compression Heat Pump Model v401
-PARAMETERS 28     
+UNIT 162 TYPE 9771	! Compression Heat Pump Model
+PARAMETERS 16     
+tauWPstart			! 1: tau_start, s
+tauWPstop			! 2: tau_stop, s
+TWPEvapIce			! 3: tevapIce, �C
+EtaDefrost			! 4: eta_defrost, -
+PelWPVen			! 5: ventilator electricity consumption, kW
+PelAuxCtr_kW		! 6: controller electricity consumption, kW
+TminEvapTout		! 7: tevap,min, �C
+TEvapMaxHp			! 8: tevap,max, �C
+0					! 9: tcond,min, �C
+tCondMaxHp			! 10: tcond,max, �C
+CpEvap				! 11: cp,evap, kJ/kgK
+CpWat				! 12: cp,cond, kJ/kgK
+timeHpBlock			! 13: tau_error, hr
+Moloss				! 14: 0-3
+Ctherm				! 15: kJ/K
+Ualoss				! 16: W/k
+INPUTS 21  
 CHPM_c1				! 1: c1
 CHPM_c2				! 2: c2
 CHPM_c3				! 3: c3
@@ -146,33 +163,16 @@ COP_c2				! 8: cop2
 COP_c3				! 9: cop3
 COP_c4				! 10: cop4
 COP_c5				! 11: cop5
-COP_c6				! 12: cop6
-tauWPstart			! 13: tau_start, s
-tauWPstop			! 14: tau_stop, s
-TWPEvapIce			! 15: tevapIce, �C
-EtaDefrost			! 16: eta_defrost, -
-PelWPVen			! 17: ventilator electricity consumption, kW
-PelAuxCtr_kW		! 18: controller electricity consumption, kW
-TminEvapTout		! 19: tevap,min, �C
-TEvapMaxHp			! 20: tevap,max, �C
-0					! 21: tcond,min, �C
-tCondMaxHp			! 22: tcond,max, �C
-CpEvap				! 23: cp,evap, kJ/kgK
-CpWat				! 24: cp,cond, kJ/kgK
-timeHpBlock			! 25: tau_error, hr
-Moloss				! 26: 0-3
-Ctherm				! 27: kJ/K
-Ualoss				! 28: W/k
-INPUTS 9     
-ThpEvapIn			! 1: tevap,in, �C
-MfrEvapIn			! 2: Mfr,evap,in, kg/h
-THpCondIn			! 3: tcond,in, �C
-MfrCondIn			! DC LET IS AS IT WAS BEFORE (CHECK) MfrHpCond !      ! 4: Mfr,cond,in, kg/h
-myHpIsOn			! 5: gamma_ON, -
-RHamb_1				! 6: RH_air_in
-tAmbHp				! 7
-frCond				! 8
-frCOP				! 9
+COP_c6				! 12: cop6  
+ThpEvapIn			! 13: tevap,in, �C
+MfrEvapIn			! 14: Mfr,evap,in, kg/h
+THpCondIn			! 15: tcond,in, �C
+MfrCondIn			! DC LET IS AS IT WAS BEFORE (CHECK) MfrHpCond !      ! 16: Mfr,cond,in, kg/h
+myHpIsOn			! 17: gamma_ON, -
+RHamb_1				! 18: RH_air_in
+tAmbHp				! 19
+frCond				! 20
+frCOP				! 21
 0  0  0  0  0  0.5 21 1 1     
     
 EQUATIONS 11		! Heat Pump: Outputs
