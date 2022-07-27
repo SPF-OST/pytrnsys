@@ -17,6 +17,7 @@ import numpy as np
 import time
 import datetime
 import gc
+import re
 
 
 class loadBaseNumpy:
@@ -25,8 +26,7 @@ class loadBaseNumpy:
         # internal data
 
         self.fileNameWithExtension = _name
-        name = _name.split(".")
-        self.fileName = name[0]
+        self.fileName = re.search("(.+?)(\.[^.]*$|$)", _name).group()
 
         #        self.rootPath=os.getcwd()
         #        print self.rootPath
