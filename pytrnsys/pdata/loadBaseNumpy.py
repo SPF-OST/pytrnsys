@@ -26,7 +26,7 @@ class loadBaseNumpy:
         # internal data
 
         self.fileNameWithExtension = _name
-        self.fileName = re.search("(.+?)(\.[^.]*$|$)", _name).group()
+        self.fileName = re.search("(.+?)(\.[^.]*$|$)", _name).group(1)
 
         #        self.rootPath=os.getcwd()
         #        print self.rootPath
