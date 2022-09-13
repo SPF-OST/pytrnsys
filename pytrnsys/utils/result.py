@@ -13,6 +13,10 @@ class Error:  # pylint: disable= too-few-public-methods
     def throw(self):
         raise RuntimeError(f"En error has occurred: {self.message}")
 
+    def withContext(self, context: str) -> "Error":
+        messageWithMoreContext = f"{context}: {self.message}"
+        return Error(messageWithMoreContext)
+
 
 Result = _tp.Union[_T, Error]
 

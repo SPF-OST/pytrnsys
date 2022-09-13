@@ -76,24 +76,29 @@ class BuildTrnsysDeck:
     def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path) -> _res.Result[str]:
         componentName = ddckFilePath.parent.name
 
-        if self._ddckPlaceHolderValuesJsonPath:
+        if not self._ddckPlaceHolderValuesJsonPath:
+            return _replace.replacePrivateAndComputedVariablesWithDefaults()
 
-            if not self._ddckPlaceHolderValuesJsonPath.is_file():
-                return _res.Error(
-                    f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} does not exist.")
+        if not self._ddckPlaceHolderValuesJsonPath.is_file():
+            return _res.Error(
+                f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} does not exist."
+            )
 
+        try:
             placeholderValues = _json.loads(self._ddckPlaceHolderValuesJsonPath.read_text())
+        except _json.JSONDecodeError as exception:
+            return _res.Error(
+                f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} is not a valid JSON file: {exception}"
+            )
 
-            if componentName in placeholderValues:
-                namesByPort = placeholderValues[componentName]
-                result = _replace.replaceComputedVariablesWithNames(ddckFilePath, namesByPort)
+        if componentName in placeholderValues:
+            namesByPort = placeholderValues[componentName]
+            result = _replace.replacePrivateAndComputedVariables(ddckFilePath, componentName, namesByPort)
 
-                if _res.isError(result):
-                    return _res.error(result)
+            if _res.isError(result):
+                return _res.error(result)
 
-                return _res.value(result)
-
-        return _replace.replaceComputedVariablesWithDefaults(ddckFilePath)
+            return _res.value(result)
 
     def readDeckList(
             self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]

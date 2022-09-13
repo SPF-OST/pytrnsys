@@ -138,12 +138,14 @@ output_number: INT
     | computed_output_var
     | explicit_var_name
 
-explicit_var_name: SHARED_VAR_NAME -> shared_var
+explicit_var_name: shared_var
     | private_var
 
 unreferencable_variable_name: UNREFERENCABLE_NAME
 
-private_var: NAME
+private_var: ":" NAME
+
+shared_var: NAME
 
 assign: "ASSIGN" (file_path | "\"" file_path "\"") [logical_unit]
 
@@ -156,8 +158,6 @@ computed_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
 computed_output_var: "@temp" "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
 
 FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
-
-SHARED_VAR_NAME: "$" NAME
 
 PORT_NAME: NAME
 
