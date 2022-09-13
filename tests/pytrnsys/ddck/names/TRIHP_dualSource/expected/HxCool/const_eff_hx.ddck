@@ -18,17 +18,17 @@
 ***********************************
 EQUATIONS 4
 TSourceIn = TPiHpToHxCool
-MfrSourceIn = ABS(MfrPiHpToHxCool)
+MfrSourceIn = ABS(MHxCoolSide1_A)
 TLoadIn = TPiHxCoolWatIn
-MfrLoadIn = ABS(MfrPiHxCoolWatIn)
+MfrLoadIn = ABS(MHxCoolSide2_A)
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 
 EQUATIONS 2
-THxCoolOut1 = [500,1] 	!Source-side outlet temperature	C
-THxCoolOut2 = [500,3] 		!Load side outlet temperature	C
+THxCoolSide1 = [500,1] 	!Source-side outlet temperature	C
+THxCoolSide2 = [500,3] 		!Load side outlet temperature	C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value

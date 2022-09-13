@@ -17,24 +17,24 @@
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 *************************************
 EQUATIONS 3
-qSysOut_TesDhwLoss = QLoss_Tes1
-qSysOut_TesDhwAcum = QAcum_Tes1
-elSysIn_Q_TesDhwAux = qHeatSource_Tes1
+qSysOut_DhwLoss = QLoss_Tes1
+qSysOut_DhwAcum = QAcum_Tes1
+elSysIn_Q_DhwAux = qHeatSource_Tes1
 
 *************************************
 *** Inputs from hydraulic solver ****
 *************************************
 EQUATIONS 3
 Tdp1In_Tes1 = TPiHpToTesDhwIn
-Mfrdp1_Tes1 = MfrPiHpToTesDhwIn
+Mfrdp1_Tes1 = MDhwDpL95_35_A
 Tdp1InRev_Tes1 = TPiHpToTesDhwOut
 EQUATIONS 3
 Tdp2In_Tes1 = TPiTesDhwIn
-Mfrdp2_Tes1 = MfrPiTesDhwIn
+Mfrdp2_Tes1 = MDhwDpR5_95_A
 Tdp2InRev_Tes1 = TPiTesDhwOut
 EQUATIONS 3
 Tdp3In_Tes1 = TPiCircIn
-Mfrdp3_Tes1 = MfrPiCircIn
+Mfrdp3_Tes1 = MDhwDpR70_90_A
 Tdp3InRev_Tes1 = TPiCircOut
 CONSTANTS 2
 zAux1_Tes1=0.00
@@ -45,9 +45,9 @@ qAux1_Tes1=0.00
 *************************************
 EQUATIONS 3
 *** direct port outputs
-Tdp1Out_Tes1=[50,1] ! 
-Tdp2Out_Tes1=[50,3] ! 
-Tdp3Out_Tes1=[50,5] ! 
+TDhwDpL95_35=[50,1]
+TDhwDpR5_95=[50,3]
+TDhwDpR70_90=[50,5]
 
 *************************************
 ****** Parameters of Type1924 *******
@@ -301,6 +301,6 @@ T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1
 LABELS  3         
 Temperatures  
 MassFlows  
-Tes%d 
+Tes1
 
 

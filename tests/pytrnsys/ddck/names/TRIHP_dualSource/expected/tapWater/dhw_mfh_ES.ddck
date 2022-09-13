@@ -21,7 +21,7 @@
 
 EQUATIONS 2
 Tdhw = TPiToDhwDem   		! Warm water supply temperature from WW heat exchanger or mixing valve [�C]
-MfrDhw = ABS(MfrPiToDhwDem)	! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
+MfrDhw = ABS(MtapWater_A)	! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
 
 ***********************************
 ** outputs to hydraulic solver

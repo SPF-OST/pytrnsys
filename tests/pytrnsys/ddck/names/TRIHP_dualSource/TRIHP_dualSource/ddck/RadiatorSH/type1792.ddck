@@ -46,7 +46,7 @@ elSysOut_PuShDemand	= PelPuSh_kW  ! To be moved and generated automatically to h
 ***********************************
 
 EQUATIONS 6
-myTrdSet = TrdSet
+:myTrdSet = TrdSet
 myCoolingOn = BoFC  !only for FREE cooling
 myAreaBui = AreaBui
 myTroomRc = TroomRc

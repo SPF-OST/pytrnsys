@@ -29,7 +29,7 @@ TRdFl = TPiRadIn
 ***********************************
 
 EQUATIONS 1
-TRadiatorSHOut = [42,1]  ! return temperature from space heat distribution system, °C
+TRadiatorSH = [42,1]  ! return temperature from space heat distribution system, °C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value
@@ -46,7 +46,7 @@ elSysOut_PuShDemand	= PelPuSh_kW  ! To be moved and generated automatically to h
 ***********************************
 
 EQUATIONS 6
-myTrdSet = TrdSet
+RadiatorSHmyTrdSet = TrdSet
 myCoolingOn = BoFC  !only for FREE cooling
 myAreaBui = AreaBui
 myTroomRc = TroomRc

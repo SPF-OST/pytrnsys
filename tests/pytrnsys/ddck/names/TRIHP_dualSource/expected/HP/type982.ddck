@@ -19,19 +19,21 @@
 ***********************************
 EQUATIONS 6
 THpEvapIn = TPiGhxToHP				! Temperature of the evaporator inlet, deg C    
-MfrEvapIn = ABS(MfrPiGhxToHP) 		! Mass flow rate into evaporator, kg/h     
-THpCondShIn = TPiHpCondIn			! Temperature of the sh condenser inlet, deg C        
-MfrCondShIn = ABS(MfrPiHpCondIn)	! Mass flow rate into sh condenser, kg/h 
-THpCondDhwIn = TPiHpDesIn 			! Temperature of the dhw condenser inlet, deg C        
-MfrCondDhwIn = ABS(MfrPiHpDesIn)	! Mass flow rate into dhw condenser, kg/h 
+MfrEvapIn = ABS(MHPEvap_A) 		! Mass flow rate into evaporator, kg/h     
+CpHpEvapIn = Lloop5Cp
+RhoHpEvapIn = Lloop5Rho
+THpCondShIn = TPiHpCondIn			! Temperature of the sh condenser inlet, deg C
+MfrCondShIn = ABS(MHPCond1_A)	! Mass flow rate into sh condenser, kg/h
+THpCondDhwIn = TPiHpDesIn 			! Temperature of the dhw condenser inlet, deg C
+MfrCondDhwIn = ABS(MHPCond2_A)	! Mass flow rate into dhw condenser, kg/h
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 3
-THPEvapOut = [162,1]	! Temperature of the evaporator outlet, deg C 
-THPCondOut2 = [162,3]	! Temperature of the dhw condenser outlet, deg C 
-THPCondOut1 = [162,5]	! Temperature of the sh condenser outlet, deg C 
+THPEvap = [162,1]	! Temperature of the evaporator outlet, deg C 
+THPCond2 = [162,3]	! Temperature of the dhw condenser outlet, deg C
+THPCond1 = [162,5]	! Temperature of the sh condenser outlet, deg C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh
