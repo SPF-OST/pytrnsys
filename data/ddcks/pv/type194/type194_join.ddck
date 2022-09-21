@@ -114,25 +114,25 @@ Time PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW
 Time PelPVDC_kW  PelPVRoof_kW PvInverterLoss_kW 
 
 
-UNIT 155 TYPE 65     ! Online Plotter Collector (Element OpC)
-PARAMETERS 12     
-5     ! 1 Nb. of left-axis variables
-3     ! 2 Nb. of right-axis variables
-0     ! 3 Left axis minimum
-1000     ! 4 Left axis maximum
-0    ! 5 Right axis minimum
-1000     ! 6 Right axis maximum
-nPlotsPerSim     ! 7 Number of plots per simulation
-12     ! 8 X-axis gridpoints
-1     ! 9 Shut off Online w/o removing
--1     ! 10 Logical unit for output file
-0     ! 11 Output file units
-0     ! 12 Output file delimiter
-INPUTS 12
-Tamb  PelMaxPower_kW PelMaxPower1_kW PelMaxPower2_kW PelArrayMPP_kW  IT_H_KW  IB_H_kW  VelMp  VelArrayMp  inverterEffDCAC_mp inverterEff1DCAC_mp inverterEff2DCAC_mp 
+!UNIT 155 TYPE 65     ! Online Plotter Collector (Element OpC)
+!PARAMETERS 12     
+!5     ! 1 Nb. of left-axis variables
+!3     ! 2 Nb. of right-axis variables
+!0     ! 3 Left axis minimum
+!1000     ! 4 Left axis maximum
+!0    ! 5 Right axis minimum
+!1000     ! 6 Right axis maximum
+!nPlotsPerSim     ! 7 Number of plots per simulation
+!12     ! 8 X-axis gridpoints
+!1     ! 9 Shut off Online w/o removing
+!-1     ! 10 Logical unit for output file
+!0     ! 11 Output file units
+!0     ! 12 Output file delimiter
+!INPUTS 12
+!Tamb  PelMaxPower_kW PelMaxPower1_kW PelMaxPower2_kW PelArrayMPP_kW  IT_H_KW  IB_H_kW  VelMp  VelArrayMp  inverterEffDCAC_mp inverterEff1DCAC_mp inverterEff2DCAC_mp 
 **     
-Tamb  PelMaxPower_kW PelMaxPower1_kW PelMaxPower2_kW PelArrayMPP_kW  IT_H_KW  IB_H_kW  VelMp  VelArrayMp  inverterEffDCAC_mp inverterEff1DCAC_mp inverterEff2DCAC_mp 
-LABELS  3    
-Pel
-Vel
-PV     
+!Tamb  PelMaxPower_kW PelMaxPower1_kW PelMaxPower2_kW PelArrayMPP_kW  IT_H_KW  IB_H_kW  VelMp  VelArrayMp  inverterEffDCAC_mp inverterEff1DCAC_mp inverterEff2DCAC_mp 
+!LABELS  3    
+!Pel
+!Vel
+!PV     

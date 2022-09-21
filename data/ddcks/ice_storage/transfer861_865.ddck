@@ -45,7 +45,7 @@ geoSlryTk = 0 			! 2: tank geometry: 0 = cuboid, 1 = cylinder
 widthSlryTk_m = Tankwidth			! 3: tank width, m (diameter for cylinder)
 TankLenght = ViceS/Tankheight/Tankwidth 
 lengthSlryTk_m = TankLenght ! DC TankL incorrect 			! 4: tank length, m (only relevant for cuboid)
-maxSolFrSlryTk = maxIceFrac		! 5: maximum solid pcm mass fraction
+maxSolFrSlryTk = 0.55		! 5: maximum solid pcm mass fraction
 UWallSlryTk_W_m2K = UFoam		! 6: U-value of tank wall, W/m^2K
 rhoPcmLiq_kg_m3 = RHOWAT			! 7: density of liquid pcm, kg/m^3
 rhoPcmSolid_kg_m3 = 917		! 8: density of solid pcm, kg/m^3

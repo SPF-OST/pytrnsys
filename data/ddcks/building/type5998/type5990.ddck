@@ -37,7 +37,7 @@ EQUATIONS 1
 CoolingNeeded = OR(AND(GE(TroomRc,TroomSetCool-dTCool),CoolingNeededRc),GE(TroomRc,TroomSetCool))*GT(Tamb24,17) !Deadband
 CONSTANTS 1
 unitReadBui = 53
- ASSIGN  C:\Daten\OngoingProject\TRI-HP\WP7\SimProp\TUpdateBui_cool.txt unitReadBui
+ ASSIGN  C:\Daten\GIT\pytrnsys\data\ddcks\building\type5998\database\TUpdateBui_cool.txt unitReadBui
 UNIT 47 TYPE 9      !Changed automatically
 PARAMETERS 14
 5    !-, 1, Mode
