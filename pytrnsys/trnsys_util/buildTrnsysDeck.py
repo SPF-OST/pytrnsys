@@ -91,14 +91,13 @@ class BuildTrnsysDeck:
                 f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} is not a valid JSON file: {exception}"
             )
 
-        if componentName in placeholderValues:
-            namesByPort = placeholderValues[componentName]
-            result = _replace.replacePrivateAndComputedVariables(ddckFilePath, componentName, namesByPort)
+        computedNamesByPort = placeholderValues.get(componentName, dict())
+        result = _replace.replacePrivateAndComputedVariables(ddckFilePath, componentName, computedNamesByPort)
 
-            if _res.isError(result):
-                return _res.error(result)
+        if _res.isError(result):
+            return _res.error(result)
 
-            return _res.value(result)
+        return _res.value(result)
 
     def readDeckList(
             self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
@@ -321,7 +320,7 @@ class BuildTrnsysDeck:
         outfile = open(nameFile, "w")
         outfile.writelines(lines)
 
-    def automaticEnegyBalanceStaff(self):
+    def addAutomaticEnergyBalancePrinters(self):
         """
         It reads and generates a onthly printer for energy system calculations in an automatic way
         It needs the data read by checkTrnsysDeck
@@ -330,11 +329,11 @@ class BuildTrnsysDeck:
         unitId = self.unitId + 1
 
         lines = deckUtils.addEnergyBalanceMonthlyPrinter(unitId, eBalance)
-        self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
+        self.deckText = self.deckText + lines
 
         unitId = self.unitId + 2
         lines = deckUtils.addEnergyBalanceHourlyPrinter(unitId, eBalance)
-        self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
+        self.deckText = self.deckText + lines
 
     def replaceLines(self, replaceList):
         """

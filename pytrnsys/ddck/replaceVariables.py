@@ -85,7 +85,7 @@ def replacePrivateAndComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path) 
 
     result = _getPrivateAndComputedVariables(inputDdckContent)
     if _res.isError(result):
-        moreSpecificError = _res.error(result).withContext(f"An error was found in ddck file {inputDdckContent}")
+        moreSpecificError = _res.error(result).withContext(f"An error was found in ddck file {inputDdckFilePath}")
         return moreSpecificError
     privateVariables, computedVariables = _res.value(result)
 
@@ -104,13 +104,13 @@ def replacePrivateAndComputedVariablesWithDefaults(inputDdckFilePath: _pl.Path) 
 
 
 def replacePrivateAndComputedVariables(
-    inputDdckFilePath: _pl.Path, componentName: str, namesByPort: dict
+    inputDdckFilePath: _pl.Path, componentName: str, computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]]
 ) -> _res.Result[str]:
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
     result = _getPrivateAndComputedVariables(inputDdckContent)
     if _res.isError(result):
-        moreSpecificError = _res.error(result).withContext(f"An error was found in ddck file {inputDdckContent}")
+        moreSpecificError = _res.error(result).withContext(f"An error was found in ddck file {inputDdckFilePath}")
         return moreSpecificError
     privateVariables, computedVariables = _res.value(result)
 
@@ -118,11 +118,11 @@ def replacePrivateAndComputedVariables(
 
     computedNames = []
     for computedVariable in computedVariables:
-        namesForPort = namesByPort.get(computedVariable.portName, {})
-        if _isEmpty(namesForPort):
+        computedNamesForPort = computedNamesByPort.get(computedVariable.portName)
+        if not computedNamesForPort:
             return _res.Error(f"Unknown port `{computedVariable.portName}` in {inputDdckFilePath.name}")
 
-        computedName = namesForPort.get(computedVariable.portProperty)
+        computedName = computedNamesForPort.get(computedVariable.portProperty)
         if not computedName:
             return _res.Error(
                 f"Unknown property `{computedVariable.portProperty}` in for port `{computedVariable.portName}` in "
@@ -139,7 +139,11 @@ def replacePrivateAndComputedVariables(
 
 
 def _replacePrivateAndComputedVariables(
-    inputDdckContent, privateVariables, computedVariables, privateNames, computedNames
+    inputDdckContent: str,
+    privateVariables: _tp.Sequence[_PrivateVariable],
+    computedVariables: _tp.Sequence[_ComputedVariable],
+    privateNames: _tp.Sequence[str],
+    computedNames: _tp.Sequence[str]
 ):
     sortedTokens, sortedReplacements = _getSortedTokensAndReplacements(
         privateVariables, computedVariables, privateNames, computedNames
@@ -153,9 +157,18 @@ def _getSortedTokensAndReplacements(
     computedVariables: _tp.Sequence[_ComputedVariable],
     replacementsForPrivateVariables: _tp.Sequence[str],
     replacementsForComputedVariables: _tp.Sequence[str],
-) -> _tp.Sequence[_tp.Tuple[_Token, str]]:
+) -> _tp.Tuple[_tp.Sequence[_Token], _tp.Sequence[str]]:
+    if not len(privateVariables) == len(replacementsForPrivateVariables):
+        raise ValueError("`privateVariables` and `replacementForPrivateVariables` must be of the same length.")
+
+    if not len(computedVariables) == len(replacementsForComputedVariables):
+        raise ValueError("`computedVariables` and `replacementsForComputedVariables` must be of the same length.")
+
     tokens = [*privateVariables, *computedVariables]
     replacements = [*replacementsForPrivateVariables, *replacementsForComputedVariables]
+
+    if len(tokens) == len(replacements) == 0:
+        return [], []
 
     tokenAndReplacements = zip(tokens, replacements)
 
@@ -164,10 +177,6 @@ def _getSortedTokensAndReplacements(
     sortedTokens, sortedReplacements = zip(*sortedTokenAndReplacements)
 
     return sortedTokens, sortedReplacements
-
-
-def _isEmpty(dictionary) -> bool:
-    return not bool(dictionary)
 
 
 def _getPrivateAndComputedVariables(

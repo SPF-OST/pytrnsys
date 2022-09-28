@@ -10,43 +10,43 @@ ddck: block+
 
 simulation: "SIMULATION"i tstart tend delta_t
 
-tstart: number_or_private_var
-tend: number_or_private_var
-delta_t: number_or_private_var
+tstart: number_or_explicit_var
+tend: number_or_explicit_var
+delta_t: number_or_explicit_var
 
 tolerances: "TOLERANCES"i ("-" integration_tol "-" convergance_tol | integration_tol convergance_tol)
 
-integration_tol: number_or_private_var
-convergance_tol: number_or_private_var
+integration_tol: number_or_explicit_var
+convergance_tol: number_or_explicit_var
 
 limits: "LIMITS"i max_iterations_per_time_step max_warnings [trace_component_after_iterations]
 
-max_iterations_per_time_step: positive_int_or_private_var
-max_warnings: positive_int_or_private_var
-trace_component_after_iterations: positive_int_or_private_var
+max_iterations_per_time_step: positive_int_or_explicit_var
+max_warnings: positive_int_or_explicit_var
+trace_component_after_iterations: positive_int_or_explicit_var
 
-nan_check: "NAN_CHECK"i bool_or_private_var
+nan_check: "NAN_CHECK"i bool_or_explicit_var
 
-nan_check_value: bool_or_private_var
+nan_check_value: bool_or_explicit_var
 
-overwrite_check: "OVERWRITE_CHECK"i bool_or_private_var
+overwrite_check: "OVERWRITE_CHECK"i bool_or_explicit_var
 
-time_report: "TIME_REPORT"i bool_or_private_var
+time_report: "TIME_REPORT"i bool_or_explicit_var
 
-dfq: "DFQ"i positive_int_or_private_var
+dfq: "DFQ"i positive_int_or_explicit_var
 
-eqsolver: "EQSOLVER"i positive_int_or_private_var
+eqsolver: "EQSOLVER"i positive_int_or_explicit_var
 
-solver: "SOLVER"i positive_int_or_private_var [relax_factor_min relax_factor_max]
+solver: "SOLVER"i positive_int_or_explicit_var [relax_factor_min relax_factor_max]
 
-relax_factor_min: number_or_private_var
-relax_factor_max: number_or_private_var
+relax_factor_min: number_or_explicit_var
+relax_factor_max: number_or_explicit_var
 
 end: "END"i
 
 ?listing_control: width | list
 
-width: "WIDTH"i positive_int_or_private_var -> width
+width: "WIDTH"i positive_int_or_explicit_var -> width
 
 list: "LIST"i
 
@@ -54,7 +54,7 @@ list: "LIST"i
 
 version: "VERSION"i version_number
 
-version_number: positive_int_or_private_var
+version_number: positive_int_or_explicit_var
 
 unit: header parameters [inputs [labels]]
 
@@ -70,14 +70,14 @@ parameters: "PARAMETERS"i ("0" | number_of_parameters parameter+)
 
 number_of_parameters: POSITIVE_INT | NAME
 
-parameter: variable_name
+parameter: variable
     | SIGNED_NUMBER -> literal
 
 inputs: "INPUTS"i number_of_inputs input+
 
 number_of_inputs: POSITIVE_INT
 
-input: variable_name
+input: variable
     | SIGNED_NUMBER -> literal
     | ("0" "," "0" | "CONST") -> const
 
@@ -95,7 +95,7 @@ number_of_equations: POSITIVE_INT
 
 equation: assignment_target "=" sum
 
-assignment_target: explicit_var_name | computed_output_var | unreferencable_variable_name
+assignment_target: explicit_var | computed_output_var | unreferencable_var
 
 ?sum: product
     | sum "+" product -> plus
@@ -110,19 +110,19 @@ assignment_target: explicit_var_name | computed_output_var | unreferencable_vari
 
 ?atom: NUMBER -> number
     | "-" atom -> negate
-    | variable_name
+    | variable
     | output
     | "(" sum ")"
     | func_call
 
-?number_or_private_var: NUMBER -> value
-    | private_var
+?number_or_explicit_var: NUMBER -> value
+    | explicit_var
 
-?positive_int_or_private_var: POSITIVE_INT -> value
-    | private_var
+?positive_int_or_explicit_var: POSITIVE_INT -> value
+    | explicit_var
 
-?bool_or_private_var: BOOL -> value
-    | private_var
+?bool_or_explicit_var: BOOL -> value
+    | explicit_var
 
 func_call: func_name func_args -> func_call
 
@@ -134,14 +134,13 @@ output: "[" unit_number "," output_number "]"
 
 output_number: INT
 
-?variable_name: computed_var
-    | computed_output_var
-    | explicit_var_name
+?variable: computed_var
+    | explicit_var
 
-explicit_var_name: shared_var
+explicit_var: shared_var
     | private_var
 
-unreferencable_variable_name: UNREFERENCABLE_NAME
+unreferencable_var: UNREFERENCABLE_NAME
 
 private_var: ":" NAME
 
@@ -151,11 +150,11 @@ assign: "ASSIGN" (file_path | "\"" file_path "\"") [logical_unit]
 
 file_path: FILE_PATH
 
-logical_unit: INT | NAME
+logical_unit: INT | variable
 
 computed_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
 
-computed_output_var: "@temp" "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
+computed_output_var: /@temp!?/ "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
 
 FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
 

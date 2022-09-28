@@ -71,7 +71,7 @@ class TestDdckGeneration:
     def testReplaceComputedVariablesWithDefaults(self):  # pylint: disable=no-self-use
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input.ddck"
         expectedDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_expected.ddck"
-        actualDdckContent = _replace.replacePrivateAndComputedVariablesWithDefaults()
+        actualDdckContent = _replace.replacePrivateAndComputedVariablesWithDefaults(inputDdckFilePath)
         assert actualDdckContent == expectedDdckFilePath.read_text()
 
     @_pt.mark.parametrize("ddckFile", _REPLACE_WITH_NAME_TEST_CASES)
@@ -81,7 +81,7 @@ class TestDdckGeneration:
 
         names = ddckPlaceHolderValues.get(ddckFile.componentName) or {}
 
-        result = _replace.replacePrivateAndComputedVariables(ddckFile.input, names)
+        result = _replace.replacePrivateAndComputedVariables(ddckFile.input, ddckFile.componentName, names)
         _res.throwIfError(result)
         actualDdckContent = _res.value(result)
 
