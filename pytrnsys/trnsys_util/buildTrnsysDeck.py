@@ -77,7 +77,7 @@ class BuildTrnsysDeck:
         componentName = ddckFilePath.parent.name
 
         if not self._ddckPlaceHolderValuesJsonPath:
-            return _replace.replacePrivateAndComputedVariablesWithDefaults()
+            return _replace.replacePrivateAndComputedVariablesWithDefaults(ddckFilePath)
 
         if not self._ddckPlaceHolderValuesJsonPath.is_file():
             return _res.Error(
