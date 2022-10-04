@@ -23,7 +23,9 @@
 EQUATIONS 4
 ThpEvapIn = @temp(EvapIn, TPiHpEvapIn)   !@connector   
 MfrEvapIn = ABS(@mfr(EvapIn, MfrPuHpEvap))     
-THpCondIn = @temp(CondIn, TPiHpCondIn)      
+CphpEvapIn = @cp(EvapIn, CPWAT)
+RhohpEvapIn = @rho(EvapIn, RHOWAT)
+THpCondIn = @temp(CondIn, TPiHpCondIn)
 MfrCondIn = ABS(@mfr(CondIn, MfrPiHpCondIn))
 
 ***********************************
@@ -31,7 +33,7 @@ MfrCondIn = ABS(@mfr(CondIn, MfrPiHpCondIn))
 ***********************************
 EQUATIONS 2
 @temp(EvapOut, THpEvapOut) = [162,1]     ! 
-@temp(CondOut, THpCondOut) = [162,3]     ! Temperature of the condenser (heat sink) outlet
+@temp(CondOut) = [162,3]     ! Temperature of the condenser (heat sink) outlet
 
 ******************************************************************************************
 ** outputs to energy balance in kWh

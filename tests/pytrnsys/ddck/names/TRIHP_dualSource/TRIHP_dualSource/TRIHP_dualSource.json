@@ -52,13 +52,14 @@
             "BlockDisplayName": "PuHpShCond",
             "BlockName": "Pump",
             "Id": 1617,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
             "blockPosition": [
                 -820.0,
                 -289.0
             ],
             "flippedH": false,
             "flippedV": false,
+            "massFlowRateInKgPerH": 500,
             "portsIdsIn": [
                 1618
             ],
@@ -397,13 +398,14 @@
             "BlockDisplayName": "PuHpEvap",
             "BlockName": "Pump",
             "Id": 364,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
             "blockPosition": [
                 -860.0,
                 80.0
             ],
             "flippedH": false,
             "flippedV": false,
+            "massFlowRateInKgPerH": 500,
             "portsIdsIn": [
                 365
             ],
@@ -439,13 +441,14 @@
             "BlockDisplayName": "PuHpDhwCond",
             "BlockName": "Pump",
             "Id": 3802,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
             "blockPosition": [
                 -781.0,
                 -549.0
             ],
             "flippedH": false,
             "flippedV": false,
+            "massFlowRateInKgPerH": 500,
             "portsIdsIn": [
                 3803
             ],
@@ -527,13 +530,14 @@
             "BlockDisplayName": "PuSH",
             "BlockName": "Pump",
             "Id": 54,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
             "blockPosition": [
                 -319.0,
                 -290.0
             ],
             "flippedH": false,
             "flippedV": false,
+            "massFlowRateInKgPerH": 500,
             "portsIdsIn": [
                 55
             ],
@@ -548,13 +552,14 @@
             "BlockDisplayName": "PuDhw",
             "BlockName": "Pump",
             "Id": 5955,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
             "blockPosition": [
                 -420.0,
                 -311.0
             ],
             "flippedH": false,
             "flippedV": false,
+            "massFlowRateInKgPerH": 500,
             "portsIdsIn": [
                 5956
             ],
@@ -591,13 +596,14 @@
             "BlockDisplayName": "PuCirc",
             "BlockName": "Pump",
             "Id": 5989,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
             "blockPosition": [
                 -220.0,
                 -420.0
             ],
             "flippedH": false,
             "flippedV": false,
+            "massFlowRateInKgPerH": 500,
             "portsIdsIn": [
                 5990
             ],
@@ -753,13 +759,14 @@
             "BlockDisplayName": "PuFCU",
             "BlockName": "Pump",
             "Id": 7544,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
             "blockPosition": [
                 -202.0,
                 -22.0
             ],
             "flippedH": false,
             "flippedV": false,
+            "massFlowRateInKgPerH": 500,
             "portsIdsIn": [
                 7545
             ],
@@ -878,7 +885,7 @@
         },
         "Connection-3830": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 857,
             "diameterInCm": 2,
             "fromPortId": 1619,
@@ -909,7 +916,7 @@
         },
         "Connection-5976": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1353,
             "diameterInCm": 2,
             "fromPortId": 3264,
@@ -936,7 +943,7 @@
         },
         "Connection-6007": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1361,
             "diameterInCm": 2,
             "fromPortId": 5982,
@@ -963,7 +970,7 @@
         },
         "Connection-6010": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1362,
             "diameterInCm": 2,
             "fromPortId": 5991,
@@ -990,7 +997,7 @@
         },
         "Connection-6013": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1363,
             "diameterInCm": 2,
             "fromPortId": 5980,
@@ -1021,7 +1028,7 @@
         },
         "Connection-6039": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1371,
             "diameterInCm": 2,
             "fromPortId": 6035,
@@ -1048,7 +1055,7 @@
         },
         "Connection-6049": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1375,
             "diameterInCm": 2,
             "fromPortId": 56,
@@ -1079,7 +1086,7 @@
         },
         "Connection-6081": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1385,
             "diameterInCm": 2,
             "fromPortId": 5318,
@@ -1106,7 +1113,7 @@
         },
         "Connection-6085": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1387,
             "diameterInCm": 2,
             "fromPortId": 3804,
@@ -1137,7 +1144,7 @@
         },
         "Connection-6098": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1390,
             "diameterInCm": 2,
             "fromPortId": 6091,
@@ -1164,7 +1171,7 @@
         },
         "Connection-6134": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1402,
             "diameterInCm": 2,
             "fromPortId": 3777,
@@ -1191,7 +1198,7 @@
         },
         "Connection-6195": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1422,
             "diameterInCm": 2,
             "fromPortId": 3066,
@@ -1222,7 +1229,7 @@
         },
         "Connection-6206": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1425,
             "diameterInCm": 2,
             "fromPortId": 3067,
@@ -1249,7 +1256,7 @@
         },
         "Connection-6209": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1426,
             "diameterInCm": 2,
             "fromPortId": 6202,
@@ -1280,7 +1287,7 @@
         },
         "Connection-6230": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1433,
             "diameterInCm": 2,
             "fromPortId": 6089,
@@ -1311,7 +1318,7 @@
         },
         "Connection-6234": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1435,
             "diameterInCm": 2,
             "fromPortId": 174,
@@ -1342,7 +1349,7 @@
         },
         "Connection-6237": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1436,
             "diameterInCm": 2,
             "fromPortId": 5317,
@@ -1373,7 +1380,7 @@
         },
         "Connection-6245": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1440,
             "diameterInCm": 2,
             "fromPortId": 2028,
@@ -1404,7 +1411,7 @@
         },
         "Connection-6255": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1444,
             "diameterInCm": 2,
             "fromPortId": 80,
@@ -1435,7 +1442,7 @@
         },
         "Connection-6261": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1446,
             "diameterInCm": 2,
             "fromPortId": 311,
@@ -1466,7 +1473,7 @@
         },
         "Connection-6264": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1447,
             "diameterInCm": 2,
             "fromPortId": 5957,
@@ -1497,7 +1504,7 @@
         },
         "Connection-6271": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1450,
             "diameterInCm": 2,
             "fromPortId": 6191,
@@ -1528,7 +1535,7 @@
         },
         "Connection-6275": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1452,
             "diameterInCm": 2,
             "fromPortId": 6213,
@@ -1559,7 +1566,7 @@
         },
         "Connection-6278": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1453,
             "diameterInCm": 2,
             "fromPortId": 188,
@@ -1590,7 +1597,7 @@
         },
         "Connection-6281": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1454,
             "diameterInCm": 2,
             "fromPortId": 6033,
@@ -1621,7 +1628,7 @@
         },
         "Connection-6293": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1458,
             "diameterInCm": 2,
             "fromPortId": 184,
@@ -1652,7 +1659,7 @@
         },
         "Connection-6297": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1460,
             "diameterInCm": 2,
             "fromPortId": 53,
@@ -1683,7 +1690,7 @@
         },
         "Connection-6300": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1461,
             "diameterInCm": 2,
             "fromPortId": 61,
@@ -1714,7 +1721,7 @@
         },
         "Connection-7414": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1709,
             "diameterInCm": 2,
             "fromPortId": 366,
@@ -1745,7 +1752,7 @@
         },
         "Connection-7417": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1710,
             "diameterInCm": 2,
             "fromPortId": 6162,
@@ -1776,7 +1783,7 @@
         },
         "Connection-7423": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1712,
             "diameterInCm": 2,
             "fromPortId": 136,
@@ -1803,7 +1810,7 @@
         },
         "Connection-7426": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1713,
             "diameterInCm": 2,
             "fromPortId": 135,
@@ -1834,7 +1841,7 @@
         },
         "Connection-7557": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1744,
             "diameterInCm": 2,
             "fromPortId": 7541,
@@ -1865,7 +1872,7 @@
         },
         "Connection-7560": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1745,
             "diameterInCm": 2,
             "fromPortId": 7546,
@@ -1896,7 +1903,7 @@
         },
         "Connection-7563": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1746,
             "diameterInCm": 2,
             "fromPortId": 7543,
@@ -1923,7 +1930,7 @@
         },
         "Connection-7566": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1747,
             "diameterInCm": 2,
             "fromPortId": 7549,
@@ -1954,7 +1961,7 @@
         },
         "Connection-7577": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1750,
             "diameterInCm": 2,
             "fromPortId": 7573,
@@ -1985,7 +1992,7 @@
         },
         "Connection-7580": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1751,
             "diameterInCm": 2,
             "fromPortId": 7551,
@@ -2016,7 +2023,7 @@
         },
         "Connection-7782": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1797,
             "diameterInCm": 2,
             "fromPortId": 1983,
@@ -2047,7 +2054,7 @@
         },
         "Connection-7785": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1798,
             "diameterInCm": 2,
             "fromPortId": 7780,
@@ -2078,7 +2085,7 @@
         },
         "Connection-7788": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1799,
             "diameterInCm": 2,
             "fromPortId": 7779,
@@ -2105,7 +2112,7 @@
         },
         "Connection-7793": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1802,
             "diameterInCm": 2,
             "fromPortId": 139,
@@ -2136,7 +2143,7 @@
         },
         "Connection-7796": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1803,
             "diameterInCm": 2,
             "fromPortId": 178,
@@ -2167,7 +2174,7 @@
         },
         "Connection-7864": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1819,
             "diameterInCm": 2,
             "fromPortId": 3082,
@@ -2198,7 +2205,7 @@
         },
         "Connection-7865": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1820,
             "diameterInCm": 2,
             "fromPortId": 312,
@@ -2229,7 +2236,7 @@
         },
         "Connection-7867": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1822,
             "diameterInCm": 2,
             "fromPortId": 4283,
@@ -2260,7 +2267,7 @@
         },
         "Connection-7868": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1823,
             "diameterInCm": 2,
             "fromPortId": 6163,
@@ -2291,7 +2298,7 @@
         },
         "Connection-7869": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1824,
             "diameterInCm": 2,
             "fromPortId": 6073,
@@ -2322,7 +2329,7 @@
         },
         "Connection-7870": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1825,
             "diameterInCm": 2,
             "fromPortId": 6164,
@@ -2353,7 +2360,7 @@
         },
         "Connection-7872": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1827,
             "diameterInCm": 2,
             "fromPortId": 185,
@@ -2380,7 +2387,7 @@
         },
         "Connection-7873": {
             ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "__version__": "f03faf46-4d0e-4407-a604-90925d83d43a",
             "connectionId": 1828,
             "diameterInCm": 2,
             "fromPortId": 179,
@@ -2410,20 +2417,20 @@
             "uValueInWPerM2K": 0.8333
         },
         "IDs": {
-            "GlobalId": 7888,
+            "GlobalId": 7889,
             "__idDct__": true,
-            "globalConnID": 1843,
-            "trnsysID": 2597
+            "globalConnID": 1844,
+            "trnsysID": 2598
         },
         "Strings": {
-            "DiagramName": "base.json",
-            "ProjectFolder": "C:\\GIT\\pytrnsys_gui\\tests\\trnsysGUI\\automaticConnection\\data\\dualSource\\base",
+            "DiagramName": "TRIHP_dualSource.json",
+            "ProjectFolder": "C:\\Users\\damian.birchler\\src\\pytrnsys\\wd1\\pytrnsys\\tests\\pytrnsys\\ddck\\names\\TRIHP_dualSource\\TRIHP_dualSource",
             "__nameDct__": true
         }
     },
     "hydraulicLoops": [
         {
-            "__version__": "0047cab1-dd67-42ee-af45-5e5d30d97a92",
+            "__version__": "990b8023-eb4b-408e-8d54-23caa5916b2a",
             "connectionsTrnsysId": [
                 1976,
                 2539,
@@ -2443,10 +2450,11 @@
             ],
             "fluidName": "water",
             "hasUserDefinedName": false,
-            "name": "loop1"
+            "name": "loop1",
+            "useLoopWideDefaults": false
         },
         {
-            "__version__": "0047cab1-dd67-42ee-af45-5e5d30d97a92",
+            "__version__": "990b8023-eb4b-408e-8d54-23caa5916b2a",
             "connectionsTrnsysId": [
                 2021,
                 1938,
@@ -2458,10 +2466,11 @@
             ],
             "fluidName": "water",
             "hasUserDefinedName": false,
-            "name": "loop2"
+            "name": "loop2",
+            "useLoopWideDefaults": false
         },
         {
-            "__version__": "0047cab1-dd67-42ee-af45-5e5d30d97a92",
+            "__version__": "990b8023-eb4b-408e-8d54-23caa5916b2a",
             "connectionsTrnsysId": [
                 1948,
                 1950,
@@ -2472,10 +2481,11 @@
             ],
             "fluidName": "water",
             "hasUserDefinedName": false,
-            "name": "loop3"
+            "name": "loop3",
+            "useLoopWideDefaults": false
         },
         {
-            "__version__": "0047cab1-dd67-42ee-af45-5e5d30d97a92",
+            "__version__": "990b8023-eb4b-408e-8d54-23caa5916b2a",
             "connectionsTrnsysId": [
                 2058,
                 2050,
@@ -2490,10 +2500,11 @@
             ],
             "fluidName": "water",
             "hasUserDefinedName": false,
-            "name": "loop4"
+            "name": "loop4",
+            "useLoopWideDefaults": false
         },
         {
-            "__version__": "0047cab1-dd67-42ee-af45-5e5d30d97a92",
+            "__version__": "990b8023-eb4b-408e-8d54-23caa5916b2a",
             "connectionsTrnsysId": [
                 2544,
                 2545,
@@ -2503,12 +2514,13 @@
                 1993,
                 2419
             ],
-            "fluidName": "water",
+            "fluidName": "brine",
             "hasUserDefinedName": false,
-            "name": "loop5"
+            "name": "loop5",
+            "useLoopWideDefaults": false
         },
         {
-            "__version__": "0047cab1-dd67-42ee-af45-5e5d30d97a92",
+            "__version__": "990b8023-eb4b-408e-8d54-23caa5916b2a",
             "connectionsTrnsysId": [
                 2468,
                 2467,
@@ -2519,7 +2531,8 @@
             ],
             "fluidName": "water",
             "hasUserDefinedName": false,
-            "name": "loop6"
+            "name": "loop6",
+            "useLoopWideDefaults": false
         }
     ]
 }

@@ -5,7 +5,7 @@ import typing as _tp
 
 import pytest as _pt
 
-import pytrnsys.ddck.replaceVariables as _replace
+import pytrnsys.ddck.replaceTokens as _replace
 import pytrnsys.utils.result as _res
 
 _REPLACE_WITH_DEFAULTS_DATA_DIR = _pl.Path(__file__).parent / "defaults"
@@ -68,20 +68,34 @@ _REPLACE_WITH_NAME_TEST_CASES = [_pt.param(p, id=p.testId) for p in getDdckFiles
 
 
 class TestDdckGeneration:
-    def testReplaceComputedVariablesWithDefaults(self):  # pylint: disable=no-self-use
+    def testReplaceTokensWithDefaults(self):
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input.ddck"
         expectedDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_expected.ddck"
-        actualDdckContent = _replace.replacePrivateAndComputedVariablesWithDefaults(inputDdckFilePath)
+        actualDdckContent = _replace.replaceTokensWithDefaults(inputDdckFilePath)
         assert actualDdckContent == expectedDdckFilePath.read_text()
 
+    def testReplaceTokensWithDefaultsMissingDefault(self):
+        inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input_missing_default.ddck"
+        result = _replace.replaceTokensWithDefaults(inputDdckFilePath)
+        assert _res.isError(result)
+        error = _res.error(result)
+        print(error.message)
+        assert error.message == """\
+No placeholder values were provided and the computed variables at the following location
+(line number: column number) don't have default values in the file type977_v1_input_missing_default.ddck:
+\t26:14
+\t27:13
+\t28:15
+"""
+
     @_pt.mark.parametrize("ddckFile", _REPLACE_WITH_NAME_TEST_CASES)
-    def testReplaceComputedVariablesWithName(self, ddckFile: _DdckFile):  # pylint: disable=no-self-use
+    def testReplaceTokens(self, ddckFile: _DdckFile):
         serializedDdckPlaceHolderValues = ddckFile.ddckPlaceHoldervaluesFilePath.read_text(encoding="utf8")
         ddckPlaceHolderValues = _json.loads(serializedDdckPlaceHolderValues)
 
         names = ddckPlaceHolderValues.get(ddckFile.componentName) or {}
 
-        result = _replace.replacePrivateAndComputedVariables(ddckFile.input, ddckFile.componentName, names)
+        result = _replace.replaceTokens(ddckFile.input, ddckFile.componentName, names)
         _res.throwIfError(result)
         actualDdckContent = _res.value(result)
 

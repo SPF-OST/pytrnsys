@@ -95,7 +95,7 @@ number_of_equations: POSITIVE_INT
 
 equation: assignment_target "=" sum
 
-assignment_target: explicit_var | computed_output_var | unreferencable_var
+?assignment_target: explicit_var | computed_output_var | unreferencable_var
 
 ?sum: product
     | sum "+" product -> plus
@@ -152,15 +152,15 @@ file_path: FILE_PATH
 
 logical_unit: INT | variable
 
-computed_var: PORT_PROPERTY "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
+computed_var: PORT_PROPERTY "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ]")"
 
-computed_output_var: /@temp!?/ "(" PORT_NAME ","  DEFAULT_VARIABLE_NAME ")"
+computed_output_var: "@temp" "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ] ")"
 
 FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
 
 PORT_NAME: NAME
 
-PORT_PROPERTY: "@" ("temp" | "mfr")
+PORT_PROPERTY: "@" ("temp" | "mfr" | "cp" | "rho")
 
 DEFAULT_VARIABLE_NAME: NAME
 

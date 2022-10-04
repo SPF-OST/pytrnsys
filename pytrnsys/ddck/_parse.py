@@ -1,10 +1,9 @@
-import pathlib as _pl
 import pkgutil as _pu
 
 import lark as _lark
 
-import pytrnsys.utils.result as _res
 import pytrnsys.ddck as _ddck
+import pytrnsys.utils.result as _res
 
 
 def _createParser() -> _lark.Lark:
