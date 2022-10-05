@@ -32,7 +32,11 @@ MfrCondIn = ABS(@mfr(CondIn, MfrPiHpCondIn))
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 2
-@temp(EvapOut, THpEvapOut) = [162,1]     !
+@temp(EvapOut) = @temp(EvapIn, TPiHpEvapIn) / 3
+@temp(CondOut) = [162,3]     ! Temperature of the condenser (heat sink) outlet
+
+EQUATIONS 2
+@temp(EvapOut, THpEvapOut) = @temp(EvapIn, TPiHpEvapIn) / 3
 @temp(CondOut) = [162,3]     ! Temperature of the condenser (heat sink) outlet
 
 ******************************************************************************************

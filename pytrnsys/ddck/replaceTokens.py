@@ -28,12 +28,36 @@ class _Token:
         lengthChange = lengthAfterReplacing - lengthBeforeReplacing
         return lengthChange
 
+    def __post_init__(self):
+        if self.startIndex > self.endIndex:
+            raise ValueError("End index must be greater than end index.")
+
+        if self.startIndex < 0 or self.endIndex < 0:
+            raise ValueError("Start and end index must be > 0.")
+
 
 @_dc.dataclass
 class _ComputedVariable(_Token):  # pylint: disable=too-few-public-methods
     portProperty: str
     portName: str
     defaultVariableName: _tp.Optional[str]
+
+
+@_dc.dataclass
+class _EquationsCounter(_Token):
+    numberOfEquations: int
+    numberOfOutputAssignmentsWithoutDefaults: int
+
+    def __post_init__(self):
+        if self.numberOfOutputAssignmentsWithoutDefaults > self.numberOfEquations:
+            raise ValueError(
+                "The number of equations cannot be greater than the number of output assignments without defaults."
+            )
+
+
+@_dc.dataclass
+class _Equations(_Token):
+    pass
 
 
 @_dc.dataclass
@@ -46,14 +70,30 @@ class _PrivateVariable(_Token):
     name: str
 
 
+def _createComputedVariable(tree, portProperty):
+    portName = _getChildTokenValue("PORT_NAME", tree)
+    defaultVariableName = _getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", tree)
+    computedVariable = _ComputedVariable(
+        tree.meta.line,
+        tree.meta.column,
+        tree.meta.start_pos,
+        tree.meta.end_pos,
+        portProperty,
+        portName,
+        defaultVariableName,
+    )
+    return computedVariable
+
+
 class _CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
     def __init__(self):
         self.computedVariables: list[_ComputedVariable] = []
         self.privateVariables: list[_PrivateVariable] = []
 
     def computed_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
-        portProperty = _getChildTokenValue("PORT_PROPERTY", tree)
-        self._addComputedVar(tree, portProperty)
+        propertyName = _getChildTokenValue("PORT_PROPERTY", tree)
+        computedVariable = _createComputedVariable(tree, propertyName)
+        self.computedVariables.append(computedVariable)
 
     def private_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         name = _getChildTokenValue("NAME", tree)
@@ -62,31 +102,60 @@ class _CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
         )
         self.privateVariables.append(privateVariable)
 
-    def _addComputedVar(self, tree: _lark.Tree, portProperty: str) -> None:
-        portName = _getChildTokenValue("PORT_NAME", tree)
-        defaultVariableName = _getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", tree)
-        computedVariable = _ComputedVariable(
-            tree.meta.line,
-            tree.meta.column,
-            tree.meta.start_pos,
-            tree.meta.end_pos,
-            portProperty,
-            portName,
-            defaultVariableName,
-        )
-        self.computedVariables.append(computedVariable)
-
 
 class _WithPlaceholdersJSONCollectTokensVisitor(_CollectTokensVisitorBase):
     def computed_output_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
-        self._addComputedVar(tree, portProperty="@temp")
+        computedVariable = _createComputedVariable(tree, "@temp")
+        self.computedVariables.append(computedVariable)
 
 
 class _WithoutPlaceholdersJSONCollectTokensVisitor(_CollectTokensVisitorBase):
     def __init__(self):
         super().__init__()
 
-        self.outputVariableAssignments: list[_OutputVariableAssignment] = []
+        self.outputVariableAssignmentsToRemove: list[_OutputVariableAssignment] = []
+        self.equationsCountersToAdjust: list[_EquationsCounter] = []
+        self.equationsBlocksToRemove: list[_Equations] = []
+
+    def equations(self, tree: _lark.Tree) -> None:
+        equationsVisitor = _WithoutPlaceholdersJSONCollectEquationsTokensVisitor()
+        equationsVisitor.visit(tree)
+
+        self.computedVariables.extend(equationsVisitor.outputVariablesWithDefault)
+
+        assignments = equationsVisitor.outputVariableWithoutDefaultAssignments
+        if not assignments:
+            return
+
+        nEquationsTree = _getSubtree("number_of_equations", tree)
+        nEquationsAsString = _getChildTokenValue("POSITIVE_INT", nEquationsTree)
+        nEquations = int(nEquationsAsString)
+
+        numberOfOutputAssignmentsWithoutDefaults = len(assignments)
+
+        if nEquations == numberOfOutputAssignmentsWithoutDefaults:
+            equationsBlockToRemove = _Equations(tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos)
+            self.equationsBlocksToRemove.append(equationsBlockToRemove)
+            return
+
+        self.outputVariableAssignmentsToRemove.extend(assignments)
+
+        equationsCounter = _EquationsCounter(
+            nEquationsTree.meta.line,
+            nEquationsTree.meta.column,
+            nEquationsTree.meta.start_pos,
+            nEquationsTree.meta.end_pos,
+            nEquations,
+            numberOfOutputAssignmentsWithoutDefaults,
+        )
+        self.equationsCountersToAdjust.append(equationsCounter)
+
+
+class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(_lvis.Visitor_Recursive):
+    def __init__(self):
+        super().__init__()
+        self.outputVariablesWithDefault: list[_ComputedVariable] = []
+        self.outputVariableWithoutDefaultAssignments: list[_OutputVariableAssignment] = []
 
     def equation(self, tree: _lark.Tree) -> None:
         assert len(tree.children) == 2
@@ -98,22 +167,24 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(_CollectTokensVisitorBase):
 
         defaultVariableName = _getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", assignmentTarget)
         if defaultVariableName:
-            self._addComputedVar(assignmentTarget, portProperty="@temp")
+            computedVariable = _createComputedVariable(assignmentTarget, "@temp")
+            self.outputVariablesWithDefault.append(computedVariable)
             return
 
         portName = _getChildTokenValue("PORT_NAME", assignmentTarget)
         outputVariableAssignment = _OutputVariableAssignment(
             tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos, portName
         )
-        self.outputVariableAssignments.append(outputVariableAssignment)
+
+        self.outputVariableWithoutDefaultAssignments.append(outputVariableAssignment)
 
 
 def _getChildTokenValue(tokenType: str, tree: _lark.Tree) -> str:
-    valueOrNone = _getChildTokenValueOrNone(tokenType, tree)
-    if not valueOrNone:
-        raise ValueError(f"Tree doesn't contain a direct child token of type {tokenType}.")
+    tokenValueOrNone = _getChildTokenValueOrNone(tokenType, tree)
+    if not tokenValueOrNone:
+        raise ValueError(f"`{tree.data}` doesn't contain a direct child token of type `{tokenType}`.")
 
-    return valueOrNone
+    return tokenValueOrNone
 
 
 def _getChildTokenValueOrNone(tokenType: str, tree: _lark.Tree) -> _tp.Optional[str]:
@@ -129,6 +200,15 @@ def _getChildTokenValueOrNone(tokenType: str, tree: _lark.Tree) -> _tp.Optional[
     matchingChildToken = matchingChildTokens[0]
 
     return matchingChildToken.value
+
+
+def _getSubtree(treeData: str, tree: _lark.Tree) -> _lark.Tree:
+    subtrees = [c for c in tree.children if isinstance(c, _lark.Tree) and c.data == treeData]
+
+    if len(subtrees) != 1:
+        raise ValueError(f"None or more than one `{treeData}` subtree found for `{tree.data}.")
+
+    return subtrees[0]
 
 
 def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
@@ -157,14 +237,31 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
     defaultNamesForComputedVariables = [_tp.cast(str, v.defaultVariableName) for v in visitor.computedVariables]
 
     emptyReplacementTextsForOutputVariableAssignments = [
-        f"! Assignment to temperature at {a.portName} removed by pytrnsys" for a in visitor.outputVariableAssignments
+        f"! Assignment to temperature at `{a.portName}` removed by pytrnsys"
+        for a in visitor.outputVariableAssignmentsToRemove
     ]
 
-    tokens = [*visitor.privateVariables, *visitor.computedVariables, *visitor.outputVariableAssignments]
+    adjustedEquationsCounters = [
+        f"{c.numberOfEquations - c.numberOfOutputAssignmentsWithoutDefaults}" for c in visitor.equationsCountersToAdjust
+    ]
+
+    emptyReplacementTextForEquationsBlocksToRemove = [
+        "! Empty EQUATIONS block removed by pytrnsys" for _ in visitor.equationsBlocksToRemove
+    ]
+
+    tokens = [
+        *visitor.privateVariables,
+        *visitor.computedVariables,
+        *visitor.outputVariableAssignmentsToRemove,
+        *visitor.equationsCountersToAdjust,
+        *visitor.equationsBlocksToRemove,
+    ]
     replacements = [
         *defaultNamesForPrivateVariables,
         *defaultNamesForComputedVariables,
         *emptyReplacementTextsForOutputVariableAssignments,
+        *adjustedEquationsCounters,
+        *emptyReplacementTextForEquationsBlocksToRemove,
     ]
 
     outputDdckContent = _replaceTokensWithReplacements(inputDdckContent, tokens, replacements)
@@ -227,7 +324,10 @@ def _getComputedNames(
 
 def _replaceTokensWithReplacements(inputDdckContent: str, tokens: _tp.Sequence[_Token], replacements: _tp.Sequence[str]):
     sortedTokens, sortedReplacements = _getSortedTokensAndReplacements(tokens, replacements)
-    outputDdckContent = _replaceSortedNonOverlappingTokens(inputDdckContent, sortedTokens, sortedReplacements)
+    sortedTokensWithoutCovers, sortedReplacementsWithoutCovers = _removeCoveredTokens(sortedTokens, sortedReplacements)
+    outputDdckContent = _replaceSortedNonOverlappingTokens(
+        inputDdckContent, sortedTokensWithoutCovers, sortedReplacementsWithoutCovers
+    )
     return outputDdckContent
 
 
@@ -240,13 +340,42 @@ def _getSortedTokensAndReplacements(
     if len(tokens) == len(replacements) == 0:
         return [], []
 
+    if len(tokens) == len(replacements) == 1:
+        return tokens, replacements
+
     tokenAndReplacements = zip(tokens, replacements)
 
-    sortedTokenAndReplacements = list(sorted(tokenAndReplacements, key=lambda t: t[0].startIndex))
+    def getTokenStartIndex(tokenAndReplacement: _tp.Tuple[_Token, str]) -> int:
+        return tokenAndReplacement[0].startIndex
+
+    sortedTokenAndReplacements = list(sorted(tokenAndReplacements, key=getTokenStartIndex))
 
     sortedTokens, sortedReplacements = zip(*sortedTokenAndReplacements)
 
     return sortedTokens, sortedReplacements
+
+
+def _removeCoveredTokens(
+    sortedTokens: _tp.Sequence[_Token], sortedReplacements: _tp.Sequence[str]
+) -> _tp.Tuple[_tp.Sequence[_Token], _tp.Sequence[str]]:
+    if len(sortedTokens) == len(sortedReplacements) <= 1:
+        return sortedTokens, sortedReplacements
+
+    tokensWithoutOverlap = [sortedTokens[0]]
+    replacementsWithoutOverlap = [sortedReplacements[0]]
+    for token, replacement in zip(sortedTokens[1:], sortedReplacements[1:]):
+        lastTokenWithoutOverlap = tokensWithoutOverlap[-1]
+        if lastTokenWithoutOverlap.endIndex < token.startIndex:
+            tokensWithoutOverlap.append(token)
+            replacementsWithoutOverlap.append(replacement)
+            continue
+
+        if lastTokenWithoutOverlap.endIndex >= token.endIndex:
+            continue
+
+        raise ValueError("Tokens must either not overlap or fully cover each other.")
+
+    return tokensWithoutOverlap, replacementsWithoutOverlap
 
 
 def _replaceSortedNonOverlappingTokens(
@@ -256,13 +385,13 @@ def _replaceSortedNonOverlappingTokens(
         raise ValueError("`tokens` and `replacements` must be of the same length.")
 
     if len(tokens) > 1:
-        previousAndCurrentTokens = zip(tokens[:-1], tokens[1:])
+        previousAndCurrentTokens = list(zip(tokens[:-1], tokens[1:]))
 
         areTokensSorted = all(p.startIndex < c.startIndex for p, c in previousAndCurrentTokens)
         if not areTokensSorted:
             raise ValueError("`tokens` must be sorted by start index ascending.")
 
-        doAnyTokensOverlap = any(p.endIndex > c.startIndex for p, c in previousAndCurrentTokens)
+        doAnyTokensOverlap = any(p.endIndex >= c.startIndex for p, c in previousAndCurrentTokens)
         if doAnyTokensOverlap:
             raise ValueError("`tokens` must not overlap.")
 
