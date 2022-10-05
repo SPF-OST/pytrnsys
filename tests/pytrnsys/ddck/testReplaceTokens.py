@@ -83,16 +83,14 @@ class TestReplaceTokens:
         assert _res.isError(result)
         error = _res.error(result)
         print(error.message)
-        assert (
-            error.message
-            == """\
-No placeholder values were provided and the computed variables at the following location
-(line number: column number) don't have default values in the file type977_v1_input_missing_default.ddck:
+        expectedErrorMessage = """\
+An error occurred while substituting the defaults for the placeholders in file type977_v1_input_missing_default.ddck:
+No placeholder values were provided for the computed variables at the following locations (line number:column number):
 \t26:14
 \t27:13
 \t28:15
 """
-        )
+        assert error.message == expectedErrorMessage
 
     @staticmethod
     @_pt.mark.parametrize("ddckFile", _REPLACE_WITH_NAME_PROJECTS_TEST_CASES)
@@ -126,7 +124,7 @@ No placeholder values were provided and the computed variables at the following 
         assert _res.isError(result)
         error = _res.error(result)
         print(error.message)
-        assert (
-            error.message
-            == "Error replacing placeholders in file type951_non_existent_port.ddck: : Unknown port `HotIn`."
-        )
+        expectedErrorMessage = """\
+Error replacing placeholders in file type951_non_existent_port.ddck:
+Unknown port `HotIn`."""
+        assert error.message == expectedErrorMessage

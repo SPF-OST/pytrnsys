@@ -223,14 +223,36 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
     visitor = _WithoutPlaceholdersJSONCollectTokensVisitor()
     visitor.visit(tree)
 
+    replacementsResult = _getReplacements(visitor)
+    if _res.isError(replacementsResult):
+        moreSpecificError = _res.error(replacementsResult).withContext(
+            f"An error occurred while substituting the defaults for the placeholders in file {inputDdckFilePath.name}"
+        )
+        return moreSpecificError
+    replacements = _res.value(replacementsResult)
+
+    tokens = [
+        *visitor.privateVariables,
+        *visitor.computedVariables,
+        *visitor.outputVariableAssignmentsToRemove,
+        *visitor.equationsCountersToAdjust,
+        *visitor.equationsBlocksToRemove,
+    ]
+
+    outputDdckContent = _replaceTokensWithReplacements(inputDdckContent, tokens, replacements)
+
+    return outputDdckContent
+
+
+def _getReplacements(visitor: _WithoutPlaceholdersJSONCollectTokensVisitor) -> _res.Result[_tp.Sequence[str]]:
     defaultNamesForPrivateVariables = [v.name for v in visitor.privateVariables]
 
     computedVariablesWithoutDefaultName = [v for v in visitor.computedVariables if not v.defaultVariableName]
     if any(computedVariablesWithoutDefaultName):
         formattedLocations = "\n".join(f"\t{v.startLine}:{v.startColumn}" for v in computedVariablesWithoutDefaultName)
         errorMessage = (
-            "No placeholder values were provided and the computed variables at the following location\n"
-            f"(line number: column number) don't have default values in the file {inputDdckFilePath.name}:\n"
+            "No placeholder values were provided for the computed variables at the following locations "
+            f"(line number:column number):\n"
             f"{formattedLocations}\n"
         )
         return _res.Error(errorMessage)
@@ -249,13 +271,6 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
         "! Empty EQUATIONS block removed by pytrnsys" for _ in visitor.equationsBlocksToRemove
     ]
 
-    tokens = [
-        *visitor.privateVariables,
-        *visitor.computedVariables,
-        *visitor.outputVariableAssignmentsToRemove,
-        *visitor.equationsCountersToAdjust,
-        *visitor.equationsBlocksToRemove,
-    ]
     replacements = [
         *defaultNamesForPrivateVariables,
         *defaultNamesForComputedVariables,
@@ -264,9 +279,7 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
         *emptyReplacementTextForEquationsBlocksToRemove,
     ]
 
-    outputDdckContent = _replaceTokensWithReplacements(inputDdckContent, tokens, replacements)
-
-    return outputDdckContent
+    return replacements
 
 
 def replaceTokens(
@@ -289,7 +302,7 @@ def replaceTokens(
     computedNamesResult = _getComputedNames(visitor.computedVariables, computedNamesByPort)
     if _res.isError(computedNamesResult):
         error = _res.error(computedNamesResult).withContext(
-            f"Error replacing placeholders in file {inputDdckFilePath.name}: "
+            f"Error replacing placeholders in file {inputDdckFilePath.name}"
         )
         return error
     computedNames = _res.value(computedNamesResult)

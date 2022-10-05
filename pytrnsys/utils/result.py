@@ -14,7 +14,7 @@ class Error:  # pylint: disable= too-few-public-methods
         raise RuntimeError(f"En error has occurred: {self.message}")
 
     def withContext(self, context: str) -> "Error":
-        messageWithMoreContext = f"{context}: {self.message}"
+        messageWithMoreContext = f"{context}:\n{self.message}"
         return Error(messageWithMoreContext)
 
 
