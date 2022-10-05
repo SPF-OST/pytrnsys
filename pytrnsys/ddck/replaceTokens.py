@@ -1,5 +1,6 @@
 import abc as _abc
 import dataclasses as _dc
+import functools as _ft
 import pathlib as _pl
 import typing as _tp
 
@@ -358,14 +359,30 @@ def _getSortedTokensAndReplacements(
 
     tokenAndReplacements = zip(tokens, replacements)
 
-    def getTokenStartIndex(tokenAndReplacement: _tp.Tuple[_Token, str]) -> int:
-        return tokenAndReplacement[0].startIndex
-
-    sortedTokenAndReplacements = list(sorted(tokenAndReplacements, key=getTokenStartIndex))
+    key = _ft.cmp_to_key(_compareTokensEarliestAndLongestFirst)
+    sortedTokenAndReplacements = list(sorted(tokenAndReplacements, key=key))
 
     sortedTokens, sortedReplacements = zip(*sortedTokenAndReplacements)
 
     return sortedTokens, sortedReplacements
+
+
+def _compareTokensEarliestAndLongestFirst(
+    tokenAndReplacement1: _tp.Tuple[_Token, str], tokenAndReplacement2: _tp.Tuple[_Token, str]
+) -> int:
+    token1 = tokenAndReplacement1[0]
+    token2 = tokenAndReplacement2[0]
+
+    if token1.startIndex < token2.startIndex:
+        return -1
+
+    if token1.startIndex > token2.startIndex:
+        return 1
+
+    if token1.endIndex == token2.endIndex:
+        return 0
+
+    return -1 if token1.endIndex > token2.endIndex else 1
 
 
 def _removeCoveredTokens(
