@@ -10,6 +10,7 @@ import pytrnsys.utils.result as _res
 
 _REPLACE_WITH_DEFAULTS_DATA_DIR = _pl.Path(__file__).parent / "defaults"
 _REPLACE_WITH_NAMES_DATA_DIR = _pl.Path(__file__).parent / "names"
+_REPLACE_WITH_NAMES_IN_PROJECTS_DATA_DIR = _pl.Path(__file__).parent / "names_in_projects"
 
 
 class _Paths:  # pylint: disable=too-few-public-methods
@@ -38,8 +39,8 @@ class _DdckFile:  # pylint: disable=too-few-public-methods
         return relativeInputPath.as_posix()
 
 
-def getDdckFiles() -> _tp.Iterable[_DdckFile]:
-    for projectDirPath in _REPLACE_WITH_NAMES_DATA_DIR.iterdir():
+def getProjectsDdckFiles() -> _tp.Iterable[_DdckFile]:
+    for projectDirPath in _REPLACE_WITH_NAMES_IN_PROJECTS_DATA_DIR.iterdir():
         assert projectDirPath.is_dir()
 
         paths = _Paths(projectDirPath)
@@ -64,10 +65,10 @@ def getDdckFiles() -> _tp.Iterable[_DdckFile]:
             )
 
 
-_REPLACE_WITH_NAME_TEST_CASES = [_pt.param(p, id=p.testId) for p in getDdckFiles()]
+_REPLACE_WITH_NAME_PROJECTS_TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjectsDdckFiles()]
 
 
-class TestDdckGeneration:
+class TestReplaceTokens:
     @staticmethod
     def testReplaceTokensWithDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input.ddck"
@@ -82,17 +83,20 @@ class TestDdckGeneration:
         assert _res.isError(result)
         error = _res.error(result)
         print(error.message)
-        assert error.message == """\
+        assert (
+            error.message
+            == """\
 No placeholder values were provided and the computed variables at the following location
 (line number: column number) don't have default values in the file type977_v1_input_missing_default.ddck:
 \t26:14
 \t27:13
 \t28:15
 """
+        )
 
     @staticmethod
-    @_pt.mark.parametrize("ddckFile", _REPLACE_WITH_NAME_TEST_CASES)
-    def testReplaceTokens(ddckFile: _DdckFile):
+    @_pt.mark.parametrize("ddckFile", _REPLACE_WITH_NAME_PROJECTS_TEST_CASES)
+    def testReplaceTokensInProject(ddckFile: _DdckFile):
         serializedDdckPlaceHolderValues = ddckFile.ddckPlaceHoldervaluesFilePath.read_text(encoding="utf8")
         ddckPlaceHolderValues = _json.loads(serializedDdckPlaceHolderValues)
 
@@ -106,3 +110,23 @@ No placeholder values were provided and the computed variables at the following 
         ddckFile.actual.write_text(actualDdckContent)
 
         assert ddckFile.actual.read_text() == ddckFile.expected.read_text(encoding="windows-1252")
+
+    @staticmethod
+    def testReplaceTokensNonexistentPort() -> None:
+        inputDdckFilePath = _REPLACE_WITH_NAMES_DATA_DIR / "type951_non_existent_port.ddck"
+        componentName = "Ghx"
+        computedNamesByPort = {"In": {"@temp": "TFoo", "@Mfr": "MBar"}, "Out": {"@temp": "TGhx"}}
+
+        result = _replace.replaceTokens(
+            inputDdckFilePath,
+            componentName,
+            computedNamesByPort,
+        )
+
+        assert _res.isError(result)
+        error = _res.error(result)
+        print(error.message)
+        assert (
+            error.message
+            == "Error replacing placeholders in file type951_non_existent_port.ddck: : Unknown port `HotIn`."
+        )

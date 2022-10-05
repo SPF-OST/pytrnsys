@@ -179,7 +179,9 @@ def replaceTokens(
 
     treeResult = _parse.parseDdck(inputDdckContent)
     if _res.isError(treeResult):
-        moreSpecificError = _res.error(treeResult).withContext(f"An error was found in ddck file {inputDdckFilePath}")
+        moreSpecificError = _res.error(treeResult).withContext(
+            f"An error was found in ddck file {inputDdckFilePath.name}"
+        )
         return moreSpecificError
     tree = _res.value(treeResult)
 
@@ -190,7 +192,7 @@ def replaceTokens(
     computedNamesResult = _getComputedNames(visitor.computedVariables, computedNamesByPort)
     if _res.isError(computedNamesResult):
         error = _res.error(computedNamesResult).withContext(
-            f"Error replacing placeholders in file {inputDdckFilePath}: "
+            f"Error replacing placeholders in file {inputDdckFilePath.name}: "
         )
         return error
     computedNames = _res.value(computedNamesResult)
