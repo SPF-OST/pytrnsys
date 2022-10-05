@@ -17,17 +17,17 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 4
-TSourceIn_ColIce = @temp(In1, TPiSolarToHxIce)
-MfrSourceIn_ColIce = ABS(@mfr(In1, MfrPiSolarToHxIce))
-TLoadIn_ColIce = @temp(In2, TPiHxSolarIceOut)
-MfrLoadIn_ColIce = ABS(@mfr(In2, MfrPiHxSolarIceOut))
+TSourceIn_ColIce = @temp(Side1In, TPiSolarToHxIce)
+MfrSourceIn_ColIce = ABS(@mfr(Side1In, MfrPiSolarToHxIce))
+TLoadIn_ColIce = @temp(Side2In, TPiHxSolarIceOut)
+MfrLoadIn_ColIce = ABS(@mfr(Side2In, MfrPiHxSolarIceOut))
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 2
-@temp(Out1, TsourceOut_ColIce) = [500,1]		! Source-side outlet temperature	C
-@temp(Out2, TLoadOut_ColIce) = [500,3]			! Load side outlet temperature	C
+@temp(Side1Out, TsourceOut_ColIce) = [500,1]		! Source-side outlet temperature	C
+@temp(Side2Out, TLoadOut_ColIce) = [500,3]			! Load side outlet temperature	C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value
