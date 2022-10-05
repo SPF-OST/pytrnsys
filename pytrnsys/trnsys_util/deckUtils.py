@@ -319,16 +319,13 @@ def checkEquationsAndConstants(lines, nameDck):
                 )
 
             countedValues = 0  # start counting
-            error = 0
-            while error == 0:
-                i = i + 1
+            for j in range(i + 1, len(lines)):
+                splitEquality = lines[j].split("=")
 
-                splitEquality = lines[i].split("=")
-                error = 1
+                if len(splitEquality) < 2:
+                    break
 
-                if len(splitEquality) >= 2:
-                    error = 0
-                    countedValues = countedValues + 1
+                countedValues = countedValues + 1
 
             if countedValues != numberOfValues:
                 parsedFile = "%s.parse" % nameDck

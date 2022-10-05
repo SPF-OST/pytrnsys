@@ -20,10 +20,10 @@
 ** inputs from hydraulic solver
 ******************************************************************************************
 EQUATIONS 6
-THxRevLeftTop = @temp(In1, TPiHxLeftTop)			! 1: Left top side inlet temperature, deg C
-MfrHxRevLDown = @mfr(In1, MfrPiHxLeftTop)			! 2: Left side downwards flow rate, kg/h
-THxRevRightBot = @temp(In2, TPiHxRightBottom)		! 3: Right bottom side inlet temperature, deg C
-MfrHxRevRUp	= @mfr(In2, MfrPiHxRightBottom)			! 4: Right side upwards flow rate, kg/h
+THxRevLeftTop = @temp(Side1In, TPiHxLeftTop)			! 1: Left top side inlet temperature, deg C
+MfrHxRevLDown = @mfr(Side1In, MfrPiHxLeftTop)			! 2: Left side downwards flow rate, kg/h
+THxRevRightBot = @temp(Side2In, TPiHxRightBottom)		! 3: Right bottom side inlet temperature, deg C
+MfrHxRevRUp	= @mfr(Side2InIn, MfrPiHxRightBottom)			! 4: Right side upwards flow rate, kg/h
 THxRevLeftBot = TPiHxLeftBottom						! 5: Left bottom side inlet temperature, deg C
 THxRevRightTop = TPiHxRightTop						! 6: Right top side inlet temperature, deg C
 
@@ -31,8 +31,8 @@ THxRevRightTop = TPiHxRightTop						! 6: Right top side inlet temperature, deg C
 ** outputs to hydraulic solver
 ******************************************************************************************
 EQUATIONS 2
-@temp(Out1, THxOutLeft) = [2,1]			! 1: Left side outlet temperature, deg C 
-@temp(Out2, THxOutRight) = [2,3]		! 3: Right side outlet temperature, deg C
+@temp(Side1Out, THxOutLeft) = [2,1]			! 1: Left side outlet temperature, deg C
+@temp(Side2Out, THxOutRight) = [2,3]		! 3: Right side outlet temperature, deg C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh

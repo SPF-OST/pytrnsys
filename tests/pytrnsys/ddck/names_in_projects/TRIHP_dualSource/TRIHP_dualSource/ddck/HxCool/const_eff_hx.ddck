@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : Mattia Battaglia
 ** Creation date  : 12.19   
-** Last changes   : 18.05.2022
+** Last changes   : 04.2020 MB
 *****************************************
 
 ***********************************
@@ -25,9 +25,10 @@ MfrLoadIn = ABS(@mfr(Side2In, MfrPiHxCoolWatIn))
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
+
 EQUATIONS 2
-@temp(Side1Out, TsourceOut) = [500,1]		!Source-side outlet temperature	C
-@temp(Side2Out, TLoadOut) = [500,3]			!Load side outlet temperature	C
+@temp(Side1Out, TsourceOut) = [500,1] 	!Source-side outlet temperature	C
+@temp(Side2Out, TLoadOut) = [500,3] 		!Load side outlet temperature	C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value
@@ -37,41 +38,43 @@ EQUATIONS 2
 ***********************************
 ** Dependencies with other ddck
 ***********************************
+
+
 CONSTANTS 1
 HX_efficiency = 0.95
 
-UNIT 500 TYPE 91		! Heat Exchanger with Constant Effectiveness
+UNIT 500 TYPE 91 		! Heat Exchanger with Constant Effectiveness
 PARAMETERS 3
-HX_efficiency		! 1: HX Efficiency [-]
-CPBRI				! 2: Specific heat of source side fluid [kJ/kgK]
-CPWAT     			! 3: Specific heat of load side fluid [kJ/kgK]
+HX_efficiency			!1: HX Efficiency [-]
+CPBRI					!2: Specific heat of source side fluid [kJ/kgK]
+CPWAT     				 !3: Specific heat of load side fluid [kJ/kgK]
 INPUTS 4
-TSourceIn		! Source side inlet temperature	C
-MfrSourceIn		! Source side flow rate	kg/hr
-TLoadIn			! Load side inlet temperature	C
-MfrLoadIn		! Load side flow rate	kg/hr
+TSourceIn				!Source side inlet temperature	C
+MfrSourceIn				!Source side flow rate	kg/hr
+TLoadIn					!Load side inlet temperature	C
+MfrLoadIn				!Load side flow rate	kg/hr
 TSourceIn MfrSourceIn TLoadIn MfrLoadIn
 
 EQUATIONS 4
-MfrSource = [500,2]		! Source side flow rate	kg/hr
-MrfLoad = [500,4]		! Load side flow rate	kg/hr
-HTR_HX = [500,5]		! Heat transfer rate	kJ/hr
-OHTC_HX = [500,6]		! Overall heat transfer coefficient	kJ/hr.K
+MfrSource = [500,2]		!Source side flow rate	kg/hr
+MrfLoad = [500,4]		!Load side flow rate	kg/hr
+HTR_HX = [500,5]		!Heat transfer rate	kJ/hr
+OHTC_HX = [500,6]		!Overall heat transfer coefficient	kJ/hr.K
 
-!UNIT 501 TYPE 65		! Online Plotter HX
+!UNIT 501 TYPE 65     ! Online Plotter HX
 !PARAMETERS 12
-!2					! 1: Nb. of left-axis variables
-!4					! 2: Nb. of right-axis variables
-!0					! 3: Left axis minimum
-!6000				! 4: Left axis maximum
-!0					! 5: Right axis minimum
-!60					! 6: Right axis maximum
-!nPlotsPerSim		! 7: Number of plots per simulation
-!12					! 8: X-axis gridpoints
-!1					! 9: Shut off Online w/o removing
-!-1					! 10: Logical unit for output file
-!0					! 11: Output file units
-!0					! 12: Output file delimiter
+!2     ! 1 Nb. of left-axis variables
+!4     ! 2 Nb. of right-axis variables
+!0     ! 3 Left axis minimum
+!6000     ! 4 Left axis maximum
+!0     ! 5 Right axis minimum
+!60     ! 6 Right axis maximum
+!nPlotsPerSim     ! 7 Number of plots per simulation
+!12     ! 8 X-axis gridpoints
+!1     ! 9 Shut off Online w/o removing
+!-1     ! 10 Logical unit for output file
+!0     ! 11 Output file units
+!0     ! 12 Output file delimiter
 !INPUTS 6
 !MfrSourceIn	MfrLoadIn TSourceIn TLoadIn TsourceOut CoolingOn
 !MfrSourceIn	MfrLoadIn TSourceIn TLoadIn TsourceOut CoolingOn
@@ -80,6 +83,7 @@ OHTC_HX = [500,6]		! Overall heat transfer coefficient	kJ/hr.K
 !Temperatures
 !HX
 !
+
 
 *******************************
 **END Const_eff_HX.ddck
