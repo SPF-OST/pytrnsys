@@ -396,27 +396,38 @@ class ProcessTrnsysDf:
         self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
         self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
 
-        self.yearlyMin = {value + "_Min": round(self.steDataDf[value].min(),2) for value in self.steDataDf.columns}
-        self.yearlyMax = {value + "_Max": round(self.steDataDf[value].max(),2) for value in self.steDataDf.columns}
-        self.yearlyAvg = {value + "_Avg": round(self.steDataDf[value].mean(),2) for value in self.steDataDf.columns}
+        for value in self.steDataDf.columns:
+            self.yearlyMin[value + "_Min"] = round(self.steDataDf[value].min(),2)
+            self.yearlyMax[value + "_Max"] = round(self.steDataDf[value].max(),2)
+            self.yearlyAvg[value + "_Avg"] = round(self.steDataDf[value].mean(),2)
+
         self.yearlyEnd = {value + "_End": round(self.steDataDf[value][-1],2) for value in self.steDataDf.columns}
 
         for column in self.monDataDf.columns:
             self.monDataDf["Cum_" + column] = self.monDataDf[column].cumsum()
         self.calcConfigEquations()
 
-        # We recalculate all to capture also variables that were calculated from equations, while at the same time
-        # having all read-in variables feature _Tot, _Min, _Max and _Avg; should be improved
+        for value in self.monDataDf.columns:
+            if not(value in self.yearlySums):
+                self.yearlySums[value + "_Tot"] = self.monDataDf[value].sum()
 
-        self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
-        self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
-        self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-        self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
+        for value in self.houDataDf.columns:
+            if not (value in self.yearlyMin):
+                self.yearlyMin[value + "_Min"] = self.houDataDf[value].min()
+                self.yearlyMax[value + "_Max"] = self.houDataDf[value].max()
+                self.yearlyAvg[value + "_Avg"] = self.houDataDf[value].mean()
 
-        self.yearlyMin = {value + "_Min": round(self.steDataDf[value].min(), 2) for value in self.steDataDf.columns}
-        self.yearlyMax = {value + "_Max": round(self.steDataDf[value].max(), 2) for value in self.steDataDf.columns}
-        self.yearlyAvg = {value + "_Avg": round(self.steDataDf[value].mean(), 2) for value in self.steDataDf.columns}
-        self.yearlyEnd = {value + "_End": round(self.steDataDf[value][-1], 2) for value in self.steDataDf.columns}
+        for value in self.steDataDf.columns:
+            if not (value in self.yearlyMin):
+                self.yearlyMin[value + "_Min"] = round(self.steDataDf[value].min(),2)
+                self.yearlyMax[value + "_Max"] = round(self.steDataDf[value].max(),2)
+                self.yearlyAvg[value + "_Avg"] = round(self.steDataDf[value].mean(),2)
+                self.yearlyEnd[value + "_End"] = round(self.steDataDf[value][-1],2)
+
+        variablesWithTimeStepANDHourlyData = list(set(self.houDataDf.columns) & set(self.steDataDf.columns))
+        # for variable in variablesWithTimeStepANDHourlyData:
+        # IMPLEMENT logger warning here about intersection between timestep and hourly variables (logger currently not
+        # imported to the local class.)
 
         try:
             self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
