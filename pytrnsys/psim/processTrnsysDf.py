@@ -110,6 +110,19 @@ class ProcessTrnsysDf:
     def setIndividualFiles(self, individualFiles):
         self.individualFiles = individualFiles
 
+    def getHourlyDataFrame(self):
+        return self.houDataDf
+    def getDailyDataFrame(self):
+        return self.dayDataDf
+    def getMonthlyDataFrame(self):
+        return self.monDataDf
+    def getTimeStepDataFrame(self):
+        return self.steDataDf
+    def getYearlySums(self,name):
+        return self.yearlySums["%s"%(name+"_Tot")]
+    def getDeckData(self):
+        return self.deckData
+
     def setLatexNamesFile(self, file):
         if file is not None:
             self.doc.getLatexNamesDict(file=file)
@@ -311,7 +324,11 @@ class ProcessTrnsysDf:
         self.resultsPath = _outputPath
         self.fileNameListToRead = _fileNameListToRead
 
-    def loadFiles(self):
+    def setResultsPathRelative(self,pathRelative):
+
+        return os.path.join(self.outputPath + pathRelative)
+
+    def loadFiles(self,doConfigCalculation=True):
 
         self.setLoaderParameters()
         locale.setlocale(locale.LC_ALL, "enn")
@@ -403,7 +420,8 @@ class ProcessTrnsysDf:
 
         for column in self.monDataDf.columns:
             self.monDataDf["Cum_" + column] = self.monDataDf[column].cumsum()
-        self.calcConfigEquations()
+        if(doConfigCalculation):
+            self.calcConfigEquations()
 
         # We recalculate all to capture also variables that were calculated from equations, while at the same time
         # having all read-in variables feature _Tot, _Min, _Max and _Avg; should be improved
@@ -2200,26 +2218,32 @@ class ProcessTrnsysDf:
                         value = jointDicts[key]
                     self.resultsDict[key] = value
 
+        self.saveResultsFile(self.resultsDict)
+
+    def saveResultsFile(self,resultsDict):
+
             pathParameterJson = os.path.join(self.outputPath, self.fileName + ".json")
             if os.path.isfile(pathParameterJson):
                 with open(pathParameterJson, "r") as file:
                     parameterDictionary = json.load(file)
-                    self.resultsDict.update(parameterDictionary)
+                    # self.resultsDict.update(parameterDictionary)
+                    resultsDict.update(parameterDictionary)
+
 
             fileName = self.fileName + "-results.json"
             fileNamePath = os.path.join(self.outputPath, fileName)
 
             if os.path.isfile(fileNamePath):
 
-                tempDict = self.resultsDict
+                tempDict = resultsDict
 
                 with open(fileNamePath, "r") as file:
-                    self.resultsDict = json.load(file)
+                    resultsDict = json.load(file)
 
-                self.resultsDict.update(tempDict)
+                resultsDict.update(tempDict)
 
             with open(fileNamePath, "w") as fp:
-                json.dump(self.resultsDict, fp, indent=2, separators=(",", ": "), sort_keys=True)
+                json.dump(resultsDict, fp, indent=2, separators=(",", ": "), sort_keys=True)
 
     def saveHourlyToCsv(self):
         """

@@ -683,6 +683,10 @@ class RunParallelTrnsys:
 
         exec("scalingVariable=" + self.inputs["scalingVariable"], globals(), resultsDict)
         loadDemand = resultsDict["scalingVariable"]
+
+        exec("scalingElDemandVariable=" + self.inputs["scalingElDemandVariable"], globals(), resultsDict)
+        loadElDemand = resultsDict["scalingElDemandVariable"]
+
         exec("scaleHP=" + self.inputs["scaleHP"], globals(), resultsDict)
         loadHPsize = resultsDict["scaleHP"]
 
@@ -691,6 +695,10 @@ class RunParallelTrnsys:
                 if self.variablesOutput[j][1] == "sizeHpUsed":
                     self.variablesOutput[j][i] = (
                             str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadHPsize, 3))
+                    )
+                elif self.variablesOutput[j][1] == "AreaPvRoof":
+                    self.variablesOutput[j][i] = (
+                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadElDemand, 3))
                     )
                 else:
                     self.variablesOutput[j][i] = (

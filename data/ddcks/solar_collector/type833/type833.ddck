@@ -17,14 +17,15 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 2     
-TCollIn = @temp(In, TPiColIn)			! �C
+TCollIn = @temp(In, TPiColIn)			! oC
 MfrColl = ABS(@mfr(In, MfrPiColIn))		! MfrColl_B		! because its the other way around  
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
-EQUATIONS 1
-@temp(Out, TCollOut) = [74,1]		! Temperature of collector loop - collector to pipe
+EQUATIONS 2
+TCollOut = [74,1]
+@temp(Out) = TCollOut		! Temperature of collector loop - collector to pipe
 
 ***********************************
 ** outputs to other ddck
@@ -35,7 +36,7 @@ EQUATIONS 1
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
 EQUATIONS 2
-qSysIn_Collector = PColl_kW  
+@Qbalance(qSysIn_Collector) = PColl_kW  
 elSysOut_PuSolar = PelPuC_kW
 
 *************************************************************************************************
