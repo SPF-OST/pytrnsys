@@ -684,11 +684,17 @@ class RunParallelTrnsys:
         exec("scalingVariable=" + self.inputs["scalingVariable"], globals(), resultsDict)
         loadDemand = resultsDict["scalingVariable"]
 
-        exec("scalingElDemandVariable=" + self.inputs["scalingElDemandVariable"], globals(), resultsDict)
-        loadElDemand = resultsDict["scalingElDemandVariable"]
+        try:
+            exec("scalingElDemandVariable=" + self.inputs["scalingElDemandVariable"], globals(), resultsDict)
+            loadElDemand = resultsDict["scalingElDemandVariable"]
+        except:
+            pass
 
-        exec("scaleHP=" + self.inputs["scaleHP"], globals(), resultsDict)
-        loadHPsize = resultsDict["scaleHP"]
+        try:
+            exec("scaleHP=" + self.inputs["scaleHP"], globals(), resultsDict)
+            loadHPsize = resultsDict["scaleHP"]
+        except:
+            pass
 
         for j in range(len(self.variablesOutput)):
             for i in range(2, len(self.variablesOutput[j]), 1):
