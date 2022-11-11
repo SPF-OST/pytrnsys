@@ -1,0 +1,31 @@
+*********************************************
+** BEGIN AHCN9a.ddck
+*********************************************
+** Heat pump data for HAHCN9a heat pump
+** Author : Martin Neugebauer
+*********************************************
+CONSTANTS 21
+TEvapMaxHp = 80
+sizeHpNom = 10.0
+MfrHpCondRef = 1500
+MfrHpEvapRef = 5000
+COPNom = 4.0
+TEvapMax = 35
+CHPM_c1 = sizeHpRatio*4.2965
+CHPM_c2 = sizeHpRatio*81.7143
+CHPM_c3 = sizeHpRatio*73.0322
+CHPM_c4 = sizeHpRatio*-152.4054
+CHPM_c5 = sizeHpRatio*583.2136
+CHPM_c6 = sizeHpRatio*-280.6302
+COP_c1 = 3.3770
+COP_c2 = 36.4204
+COP_c3 = 15.1541
+COP_c4 = -104.6609
+COP_c5 = 257.4518
+COP_c6 = -108.8033
+TMinEvapTin = -20.000000
+TMinEvapTout = TMinEvapTin - 3
+TCondMaxHp = 70
+*********************************************
+** END AHCN9a.ddck
+*********************************************sizeHpRatio
