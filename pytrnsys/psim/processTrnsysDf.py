@@ -101,6 +101,8 @@ class ProcessTrnsysDf:
         self.yearlySums = {}
         self.yearlyMin = {}
         self.yearlyMax = {}
+        self.yearlyEnd = {}
+
         self.cumSumEnd = {}
 
     def setInputs(self, inputs):
