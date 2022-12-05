@@ -1,11 +1,11 @@
 *************************************************
-**BEGIN flat_plate_heat_exchanger.ddck
+**BEGIN capillar_mat_gtype_heat_exchangers.ddck
 *************************************************
     
 *****************************************
 ** Contact person : D. Carbonell   
 ** Creation date  : 05.10.2018   
-** Last changes   : 30.04.20, MB 
+** Last changes   : 24.11.2022 name file 
 *****************************************
 
 ***********************************
