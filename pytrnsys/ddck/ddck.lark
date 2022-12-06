@@ -56,7 +56,7 @@ version: "VERSION"i version_number
 
 version_number: positive_int_or_explicit_var
 
-unit: header parameters [inputs [labels]]
+unit: header [parameters] [inputs [labels]]
 
 header: "UNIT"i unit_number "TYPE"i type_number [header_comment]
 
