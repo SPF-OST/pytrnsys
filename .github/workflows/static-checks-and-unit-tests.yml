@@ -82,5 +82,6 @@ jobs:
     - name: Trigger build of `pytrnsys-gui` executable
       uses: peter-evans/repository-dispatch@v2
       with:
+        repository: SPF-OST/pytrnsys-gui
         token: ${{ secrets.PYTRNSYS_GUI_REPO_ACCESS_TOKEN }}
         event-type: run-tests-and-build-executable
