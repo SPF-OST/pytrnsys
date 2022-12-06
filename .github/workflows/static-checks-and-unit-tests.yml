@@ -79,3 +79,8 @@ jobs:
         path: test-results
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+    - name: Trigger build of `pytrnsys-gui` executable
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.PYTRNSYS_GUI_REPO_ACCESS_TOKEN }}
+        event-type: run-tests-and-build-executable
