@@ -127,7 +127,7 @@ class ProcessParallelTrnsys:
         self.defaultInputs()
         self.filteredfolder = [".gle"]
 
-        self.logger = log.get_or_create_custom_logger("root", self.inputs["outputLevel"])
+        self.logger = log.getOrCreateCustomLogger("root", self.inputs["outputLevel"])
 
     def defaultInputs(self):
 
