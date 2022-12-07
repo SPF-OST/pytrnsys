@@ -1,19 +1,27 @@
-# pylint: skip-file
-# type: ignore
+import logging as _log
+import typing as _tp
+import pathlib as _pl
 
-import logging
 
-
-def setup_custom_logger(name, level):
-    if logging.getLogger(name).hasHandlers():
-        return logging.getLogger(name)
+def get_or_create_custom_logger(name: str, level: str, logFilePath: _tp.Optional[_pl.Path] = None) -> _log.Logger:
+    if _log.getLogger(name).hasHandlers():
+        return _log.getLogger(name)
     else:
-        formatter = logging.Formatter(fmt="%(asctime)s - %(levelname)s - %(module)s - %(message)s")
+        formatter = _log.Formatter(fmt="%(asctime)s - %(levelname)s - %(module)s - %(message)s")
 
-        handler = logging.StreamHandler()
-        handler.setFormatter(formatter)
+        streamHandler = _log.StreamHandler()
+        handlers = [streamHandler]
+        streamHandler.setFormatter(formatter)
 
-        logger = logging.getLogger(name)
+        if logFilePath:
+            fileHandler = _log.FileHandler(logFilePath, mode="a")
+            handlers.append(fileHandler)
+
+        logger = _log.getLogger(name)
         logger.setLevel(level)
-        logger.addHandler(handler)
+
+        for handler in handlers:
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+
         return logger

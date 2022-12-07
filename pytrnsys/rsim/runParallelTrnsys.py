@@ -485,7 +485,7 @@ class RunParallelTrnsys:
         try:
             self.logger = logging.getLogger("root")
         except:
-            self.logger = log.setup_custom_logger("root", self.inputs["outputLevel"])
+            self.logger = log.get_or_create_custom_logger("root", self.inputs["outputLevel"])
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
         if "pathToConnectionInfo" in self.inputs:
