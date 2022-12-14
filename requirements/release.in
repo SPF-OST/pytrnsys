@@ -1,4 +1,3 @@
--r dev-3rd-party.in
+-r release-3rd-party.in
 
 -e file:.#egg=pytrnsys
-
