@@ -1,0 +1,29 @@
+The coefficients are fitted using Average Temperature model and equation quadratic
+Date: Fri Nov 11 13:12:27 2022
+Author: martin.neugebauer
+
+CoefQCond
+  4.2965
+ 81.7143
+ 73.0322
+-152.4054
+583.2136
+-280.6302
+
+CoefCOP
+  3.3770
+ 36.4204
+ 15.1541
+-104.6609
+257.4518
+-108.8033
+
+CoefQCond    CoefCOP
+  4.2965	  3.3770
+ 81.7143	 36.4204
+ 73.0322	 15.1541
+-152.4054	-104.6609
+583.2136	257.4518
+-280.6302	-108.8033
+CoefQCond = [4.2965,81.7143,73.0322,-152.4054,583.2136,-280.6302]
+CoefQCop = [3.3770,36.4204,15.1541,-104.6609,257.4518,-108.8033]

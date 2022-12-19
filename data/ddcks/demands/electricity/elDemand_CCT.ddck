@@ -90,7 +90,7 @@ PelHH_kW = frPelHH*PelHhDr_kW    !kW, um Faktor fr korrigierter HH-Strom
 
 CONSTANTS 1
 unitReadEl_3 = 106
- ASSIGN  C:\Daten\OngoingProject\TRI-HP\Simulations\DataHHCCT.txt unitReadEl_3
+ ASSIGN  C:\Daten\GIT\pytrnsys\data\ddcks\demands\electricity\profiles\DataHHCCT.txt unitReadEl_3
 UNIT 105 TYPE 9     !Changed automatically
 PARAMETERS 10
 6    !-, 1, Mode

@@ -22,16 +22,20 @@
 
 EQUATIONS 4
 ThpEvapIn = TPiHpEvapIn   !@connector   
-MfrEvapIn = ABS(MfrPuHpEvap)     
-THpCondIn = TPiHpCondIn      
+MfrEvapIn = ABS(MfrPuHpEvap)
+CphpEvapIn = CPWAT
+RhohpEvapIn = RHOWAT
+THpCondIn = TPiHpCondIn
 MfrCondIn = ABS(MfrPiHpCondIn)
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
-EQUATIONS 2
-THpEvapOut = [162,1]     ! 
-THpCondOut = [162,3]     ! Temperature of the condenser (heat sink) outlet
+! Empty EQUATIONS block removed by pytrnsys     ! Temperature of the condenser (heat sink) outlet
+
+EQUATIONS 1
+THpEvapOut = TPiHpEvapIn / 3
+! Assignment to temperature at `CondOut` removed by pytrnsys     ! Temperature of the condenser (heat sink) outlet
 
 ******************************************************************************************
 ** outputs to energy balance in kWh

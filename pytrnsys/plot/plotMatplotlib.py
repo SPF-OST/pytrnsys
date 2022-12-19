@@ -310,7 +310,8 @@ class PlotMatplotlib:
             monthSequence = defMonths.copy()
             monthSequence.append(yearTag)
 
-            plot.set_xticklabels(monthSequence, rotation="45")
+            # plot.set_xticklabels(monthSequence, rotation="45")
+            plot.set_xticklabels(monthSequence, rotation="vertical")
 
             namePdf = "%s.%s" % (nameFile, self.extensionPlot)
             nameWithPath = "%s\%s" % (self.path, namePdf)
@@ -1052,7 +1053,8 @@ class PlotMatplotlib:
             box = plot.get_position()
             plot.set_position([box.x0, box.y0, box.width * 0.8 / 12 * nMonth, box.height])
             plot.set_xticks(ind)
-            plot.set_xticklabels([monthSequence[i] for i in showMonths], rotation="45")
+            # plot.set_xticklabels([monthSequence[i] for i in showMonths], rotation="45")
+            plot.set_xticklabels([monthSequence[i] for i in showMonths], rotation="vertical")
 
             allbar = []
             for b in bar:

@@ -16,17 +16,17 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 4
-TSourceDHWHXIn = @temp(In1, TPiHxDhwIn)
-MfrSourceDHWHXIn = ABS(@mfr(In1, MfrPuDHW))
-TLoadDHWHXIn = @temp(In2, TPiHxDhwSecIn)
-MfrLoadDHWHXIn = ABS(@mfr(In2, MfrPiHxDhwSecIn))
+TSourceDHWHXIn = @temp(Side1In, TPiHxDhwIn)
+MfrSourceDHWHXIn = ABS(@mfr(Side1In, MfrPuDHW))
+TLoadDHWHXIn = @temp(Side2In, TPiHxDhwSecIn)
+MfrLoadDHWHXIn = ABS(@mfr(Side2In, MfrPiHxDhwSecIn))
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 2
-@temp(Out1, TsourceDHWHXOut) = [500,5]		! Source-side outlet temperature	C
-@temp(Out2, TLoadDHWHXOut) = [500,7]		! Load side outlet temperature	C
+@temp(Side1Out, TsourceDHWHXOut) = [500,5]		! Source-side outlet temperature	C
+@temp(Side2Out, TLoadDHWHXOut) = [500,7]		! Load side outlet temperature	C
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value

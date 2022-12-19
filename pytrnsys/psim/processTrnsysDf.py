@@ -101,6 +101,8 @@ class ProcessTrnsysDf:
         self.yearlySums = {}
         self.yearlyMin = {}
         self.yearlyMax = {}
+        self.yearlyEnd = {}
+
         self.cumSumEnd = {}
 
     def setInputs(self, inputs):
@@ -109,6 +111,19 @@ class ProcessTrnsysDf:
 
     def setIndividualFiles(self, individualFiles):
         self.individualFiles = individualFiles
+
+    def getHourlyDataFrame(self):
+        return self.houDataDf
+    def getDailyDataFrame(self):
+        return self.dayDataDf
+    def getMonthlyDataFrame(self):
+        return self.monDataDf
+    def getTimeStepDataFrame(self):
+        return self.steDataDf
+    def getYearlySums(self,name):
+        return self.yearlySums["%s"%(name+"_Tot")]
+    def getDeckData(self):
+        return self.deckData
 
     def setLatexNamesFile(self, file):
         if file is not None:
@@ -311,7 +326,11 @@ class ProcessTrnsysDf:
         self.resultsPath = _outputPath
         self.fileNameListToRead = _fileNameListToRead
 
-    def loadFiles(self):
+    def setResultsPathRelative(self,pathRelative):
+
+        return os.path.join(self.outputPath + pathRelative)
+
+    def loadFiles(self,doConfigCalculation=True):
 
         self.setLoaderParameters()
         locale.setlocale(locale.LC_ALL, "enn")
@@ -396,27 +415,39 @@ class ProcessTrnsysDf:
         self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
         self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
 
-        self.yearlyMin = {value + "_Min": round(self.steDataDf[value].min(),2) for value in self.steDataDf.columns}
-        self.yearlyMax = {value + "_Max": round(self.steDataDf[value].max(),2) for value in self.steDataDf.columns}
-        self.yearlyAvg = {value + "_Avg": round(self.steDataDf[value].mean(),2) for value in self.steDataDf.columns}
+        for value in self.steDataDf.columns:
+            self.yearlyMin[value + "_Min"] = round(self.steDataDf[value].min(),2)
+            self.yearlyMax[value + "_Max"] = round(self.steDataDf[value].max(),2)
+            self.yearlyAvg[value + "_Avg"] = round(self.steDataDf[value].mean(),2)
+
         self.yearlyEnd = {value + "_End": round(self.steDataDf[value][-1],2) for value in self.steDataDf.columns}
 
         for column in self.monDataDf.columns:
             self.monDataDf["Cum_" + column] = self.monDataDf[column].cumsum()
-        self.calcConfigEquations()
+        if(doConfigCalculation):
+            self.calcConfigEquations()
 
-        # We recalculate all to capture also variables that were calculated from equations, while at the same time
-        # having all read-in variables feature _Tot, _Min, _Max and _Avg; should be improved
+        for value in self.monDataDf.columns:
+            if not(value in self.yearlySums):
+                self.yearlySums[value + "_Tot"] = self.monDataDf[value].sum()
 
-        self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
-        self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
-        self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-        self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
+        for value in self.houDataDf.columns:
+            if not (value in self.yearlyMin):
+                self.yearlyMin[value + "_Min"] = self.houDataDf[value].min()
+                self.yearlyMax[value + "_Max"] = self.houDataDf[value].max()
+                self.yearlyAvg[value + "_Avg"] = self.houDataDf[value].mean()
 
-        self.yearlyMin = {value + "_Min": round(self.steDataDf[value].min(), 2) for value in self.steDataDf.columns}
-        self.yearlyMax = {value + "_Max": round(self.steDataDf[value].max(), 2) for value in self.steDataDf.columns}
-        self.yearlyAvg = {value + "_Avg": round(self.steDataDf[value].mean(), 2) for value in self.steDataDf.columns}
-        self.yearlyEnd = {value + "_End": round(self.steDataDf[value][-1], 2) for value in self.steDataDf.columns}
+        for value in self.steDataDf.columns:
+            if not (value in self.yearlyMin):
+                self.yearlyMin[value + "_Min"] = round(self.steDataDf[value].min(),2)
+                self.yearlyMax[value + "_Max"] = round(self.steDataDf[value].max(),2)
+                self.yearlyAvg[value + "_Avg"] = round(self.steDataDf[value].mean(),2)
+                self.yearlyEnd[value + "_End"] = round(self.steDataDf[value][-1],2)
+
+        variablesWithTimeStepANDHourlyData = list(set(self.houDataDf.columns) & set(self.steDataDf.columns))
+        # for variable in variablesWithTimeStepANDHourlyData:
+        # IMPLEMENT logger warning here about intersection between timestep and hourly variables (logger currently not
+        # imported to the local class.)
 
         try:
             self.myShortMonths = utils.getShortMonthyNameArray(self.monDataDf["Month"].values)
@@ -2200,26 +2231,32 @@ class ProcessTrnsysDf:
                         value = jointDicts[key]
                     self.resultsDict[key] = value
 
+        self.saveResultsFile(self.resultsDict)
+
+    def saveResultsFile(self,resultsDict):
+
             pathParameterJson = os.path.join(self.outputPath, self.fileName + ".json")
             if os.path.isfile(pathParameterJson):
                 with open(pathParameterJson, "r") as file:
                     parameterDictionary = json.load(file)
-                    self.resultsDict.update(parameterDictionary)
+                    # self.resultsDict.update(parameterDictionary)
+                    resultsDict.update(parameterDictionary)
+
 
             fileName = self.fileName + "-results.json"
             fileNamePath = os.path.join(self.outputPath, fileName)
 
             if os.path.isfile(fileNamePath):
 
-                tempDict = self.resultsDict
+                tempDict = resultsDict
 
                 with open(fileNamePath, "r") as file:
-                    self.resultsDict = json.load(file)
+                    resultsDict = json.load(file)
 
-                self.resultsDict.update(tempDict)
+                resultsDict.update(tempDict)
 
             with open(fileNamePath, "w") as fp:
-                json.dump(self.resultsDict, fp, indent=2, separators=(",", ": "), sort_keys=True)
+                json.dump(resultsDict, fp, indent=2, separators=(",", ": "), sort_keys=True)
 
     def saveHourlyToCsv(self):
         """

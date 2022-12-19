@@ -137,34 +137,7 @@ TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liq
 TIME solMassSlryTk_kg liqMassSlryTk_kg slryTkTEnv TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 QWallSlurryTes_kW QIn1SlurryTes_kW QIn2SlurryTes_kW QLatSlurryTes_kW QSenSlurryTes_kW slryTkR1 TSupercoolIn TPiSlrySide1In maxSolFrSlryTk VIceRatio PPiHxSolarIceIn_kW TPiHxSolarIceIn Mfr1SlryTk_kg_h Mfr2SlryTk_kg_h AddedSolidMass MassIceMelted
 
 
-*******************************
-** Online plotters
-*******************************
-UNIT 139 TYPE 65     ! Online Plotter Store (element OpS)
-PARAMETERS 12     
-10     	! 1 Nb. of left-axis variables
-10    	! 2 Nb. of right-axis variables
--500   	! 3 Left axis minimum
-12000	! 4 Left axis maximum
--15     ! 5 Right axis minimum
-35     	! 6 Right axis maximum
-nPlotsPerSim     ! 7 Number of plots per simulation
-12     	! 8 X-axis gridpoints
-0    	! 9 Shut off Online w/o removing
--1     	! 10 Logical unit for output file
-0     	! 11 Output file units
-0     	! 12 Output file delimiter
-INPUTS 20
-solMassSlryTk_kg liqMassSlryTk_kg slryTkR1 TSupercoolIn TPiSlrySide1In Nix Nix Nix Nix Nix
-TLiqSlryTk solVolSlryTk_m3 liqVolSlryTk_m3 PWallSlryTk_kW PInSlryTk_kW PTrs1SlryTk_kW PTrs2SlryTk_kW Nix Nix Nix
-**
-solMassSlryTk_kg liqMassSlryTk_kg slryTkR1 TSupercoolIn TPiSlrySide1In Nix Nix Nix Nix Nix
-TLiqSlryTk solVolSlryTk_m3  liqVolSlryTk_m3 PWallSlryTk_kW PInSlryTk_kW PTrs1SlryTk_kW PTrs2SlryTk_kW Nix Nix Nix
-LABELS  3     
-mass     
-volume_and_temperature
-slurry     
-**      
+
 
 *******************************
 **END type865.ddck

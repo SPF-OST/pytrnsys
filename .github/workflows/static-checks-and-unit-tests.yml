@@ -30,7 +30,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install wheel
-        pip install -r requirements/ci/test/requirements.txt
+        pip install -r requirements/test.txt
     - name: Static type checking with mypy
       run: python dev-tools/runStaticChecksAndUnitTests.py --type
     - name: Lint with pylint
@@ -65,7 +65,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install wheel
-        pip install -r requirements\ci\test\requirements.txt
+        pip install -r requirements\test.txt
     - name: Static type checking with mypy
       run: python dev-tools\runStaticChecksAndUnitTests.py --type
     - name: Lint with pylint
@@ -79,3 +79,9 @@ jobs:
         path: test-results
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+    - name: Trigger build of `pytrnsys-gui` executable
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        repository: SPF-OST/pytrnsys_gui
+        token: ${{ secrets.PYTRNSYS_GUI_REPO_ACCESS_TOKEN }}
+        event-type: run-tests-and-build-executable

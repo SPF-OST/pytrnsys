@@ -35,7 +35,7 @@
 ***********************************************************
 CONSTANTS 1
 unitReadWeather = 35
- ASSIGN  C:\Daten\OngoingProject\TRI-HP\WP7\SimProp\DataWeatherCCT_cool.txt unitReadWeather   
+ ASSIGN C:\Daten\GIT\pytrnsys\data\ddcks\weather\DataWeatherCCT_cool.txt unitReadWeather   
 UNIT 33 TYPE 9      !Changed automatically
 PARAMETERS 202
 5     ! 1 Mode

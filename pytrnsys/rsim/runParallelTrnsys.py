@@ -382,7 +382,7 @@ class RunParallelTrnsys:
             deck.saveUnitTypeFile()
 
         if self.inputs["addAutomaticEnergyBalance"] == True:
-            deck.automaticEnegyBalanceStaff()
+            deck.addAutomaticEnergyBalancePrinters()
             deck.writeDeck()  # Deck rewritten with added printer
 
         deck.analyseDck()
@@ -485,7 +485,7 @@ class RunParallelTrnsys:
         try:
             self.logger = logging.getLogger("root")
         except:
-            self.logger = log.setup_custom_logger("root", self.inputs["outputLevel"])
+            self.logger = log.getOrCreateCustomLogger("root", self.inputs["outputLevel"])
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
         if "pathToConnectionInfo" in self.inputs:
@@ -683,14 +683,28 @@ class RunParallelTrnsys:
 
         exec("scalingVariable=" + self.inputs["scalingVariable"], globals(), resultsDict)
         loadDemand = resultsDict["scalingVariable"]
-        exec("scaleHP=" + self.inputs["scaleHP"], globals(), resultsDict)
-        loadHPsize = resultsDict["scaleHP"]
+
+        try:
+            exec("scalingElDemandVariable=" + self.inputs["scalingElDemandVariable"], globals(), resultsDict)
+            loadElDemand = resultsDict["scalingElDemandVariable"]
+        except:
+            pass
+
+        try:
+            exec("scaleHP=" + self.inputs["scaleHP"], globals(), resultsDict)
+            loadHPsize = resultsDict["scaleHP"]
+        except:
+            pass
 
         for j in range(len(self.variablesOutput)):
             for i in range(2, len(self.variablesOutput[j]), 1):
                 if self.variablesOutput[j][1] == "sizeHpUsed":
                     self.variablesOutput[j][i] = (
                             str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadHPsize, 3))
+                    )
+                elif self.variablesOutput[j][1] == "AreaPvRoof":
+                    self.variablesOutput[j][i] = (
+                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadElDemand, 3))
                     )
                 else:
                     self.variablesOutput[j][i] = (

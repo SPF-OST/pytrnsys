@@ -1,0 +1,3 @@
+-r test-3rd-party.in
+
+-e file:.#egg=pytrnsys

@@ -1,0 +1,35 @@
+*******************************
+**BEGIN City.dck
+*******************************
+
+*****************************************
+** Weather data section. V0
+** Last Changes: Dani Carbonell
+** Date: 30.09.2016    
+******************************************
+
+** Normal Building Simulation     
+** City Name = Adelboden, CH     
+CONSTANTS 7    
+Lat = 46.10     ! Latitude, °
+TambD = -1     ! ambient design temperature of heating system, °C
+TambAvg = 12.08    ! average outdoor temperature, °C
+dTambAmpl = 9.3     ! amplitude of outside temperature, K
+tTambShift = 488     ! Offset of outside air temperature minimum , h
+ddTcwOffset = 40     ! time shift of minimum cold water temperature, d
+altid = 209     
+
+CONSTANTS 4
+formatWeatherData = 2! 1 = user format, 2 = Standard weather file in the TMY2 format
+unitWeatherData=38
+unitWeatherData2=39
+unitWeatherData3=40
+
+ASSIGN PATH$\weather\TM2\Locarno-hour.tm2 unitWeatherData
+ASSIGN PATH$\weather\TM2\Locarno-hour.tm2 unitWeatherData2
+ASSIGN PATH$\weather\TM2\Locarno-hour.tm2 unitWeatherData3
+
+
+*******************************
+**END City.dck
+*******************************
