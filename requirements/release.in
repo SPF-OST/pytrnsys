@@ -1,0 +1,3 @@
+-r release-3rd-party.in
+
+pytrnsys==0.7.1

@@ -1,0 +1,10 @@
+-r test-3rd-party.in
+
+wheel
+
+pip-compile-multi
+black
+
+Sphinx
+sphinx_rtd_theme
+recommonmark
