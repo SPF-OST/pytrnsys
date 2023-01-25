@@ -33,8 +33,9 @@ MfrCondIn = ABS(MfrPiHpCondIn)
 ***********************************
 ! Empty EQUATIONS block removed by pytrnsys     ! Temperature of the condenser (heat sink) outlet
 
-EQUATIONS 1
+EQUATIONS 2
 THpEvapOut = TPiHpEvapIn / 3
+xxx = 42
 ! Assignment to temperature at `CondOut` removed by pytrnsys     ! Temperature of the condenser (heat sink) outlet
 
 ******************************************************************************************
