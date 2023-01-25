@@ -160,7 +160,7 @@ FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
 
 PORT_NAME: NAME
 
-PORT_PROPERTY: "@" ("temp" | "mfr" | "cp" | "rho")
+PORT_PROPERTY: "@" ("temp" | "revtemp" | "mfr" | "cp" | "rho")
 
 DEFAULT_VARIABLE_NAME: NAME
 
