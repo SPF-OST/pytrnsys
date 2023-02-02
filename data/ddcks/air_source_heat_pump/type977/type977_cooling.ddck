@@ -19,10 +19,10 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 4
-ThpEvapInCool = TAmb
-MfrEvapInCool = ABS(MfrHpEvapNom)
-THpCondInCool = @temp(In, TPiHpCondIn) 
-MfrCondInCool = ABS(@mfr(In, MfrPiHpCondIn))		!*0.5  !SCJ: reduce it, to have less switching...
+ThpEvapInCool = @temp(In, TPiHpCondIn) ! SCJ: this differentce of condenser and evaporator is caused because this ashp is only a virtual one, used for cooling. 
+MfrEvapInCool = ABS(MfrPiHpCondIn) ! SCJ: this differentce of condenser and evaporator is caused because this ashp is only a virtual one, used for cooling. 
+THpCondInCool = TAmb
+MfrCondInCool = ABS(@mfr(In, MfrHpEvapNom))		!*0.5  !SCJ: reduce it, to have less switching... ! SCJ: this differentce of condenser and evaporator is caused because this ashp is only a virtual one, used for cooling. 
 
 ***********************************
 ** outputs to hydraulic solver

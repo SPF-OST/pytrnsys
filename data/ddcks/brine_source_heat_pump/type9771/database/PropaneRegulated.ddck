@@ -1,0 +1,94 @@
+*********************************************
+** BEGIN PropaneHP prototype TriHP project - variable compressor speed
+*********************************************
+** Heat pump data for prototype heat pump from HEIM with Propane
+** Data obtained from project TriHP
+** Author : Maike Schubert
+*********************************************
+CONSTANTS 7
+TEvapMaxHp = 40
+sizeHpNom = 10.0
+MfrHpCondRef = 3000
+MfrHpEvapRef = 2400
+COPNom = 4.68 ! at B0W35
+TEvapMax = 25
+tCondMaxHp = 70
+
+!fitting values for nominal compressor speed -> best performance for DHW production
+CONSTANTS 12
+CHPM_c1DHW = sizeHpRatio*13.6269
+CHPM_c2DHW = sizeHpRatio*124.0220
+CHPM_c3DHW = sizeHpRatio*-31.0440
+CHPM_c4DHW = sizeHpRatio*-311.0369
+CHPM_c5DHW = sizeHpRatio*-125.1203
+CHPM_c6DHW = sizeHpRatio*45.9838
+COP_c1DHW = 9.1557
+COP_c2DHW = 68.5839
+COP_c3DHW = -47.9229
+COP_c4DHW = -267.0802
+COP_c5DHW = 86.7612
+COP_c6DHW = 78.5615
+
+
+
+!fitting values for minimum compressor speed -> best performance for SH production
+CONSTANTS 12
+CHPM_c1SH = sizeHpRatio*6.0662
+CHPM_c2SH = sizeHpRatio*59.9798
+CHPM_c3SH = sizeHpRatio*-10.6479
+CHPM_c4SH = sizeHpRatio*-192.6346
+CHPM_c5SH = sizeHpRatio*56.7545
+CHPM_c6SH = sizeHpRatio*6.0667
+COP_c1SH = 11.6610
+COP_c2SH = 84.8195
+COP_c3SH = -70.5077
+COP_c4SH = -342.3452
+COP_c5SH = 94.7171
+COP_c6SH = 126.8698
+
+
+
+!fitting values given to the heat pump depending on SH or DHW mode
+CONSTANTS 12
+CHPM_c1 = CHPM_c1DHW*HPforDHWisNeeded+ CHPM_c1SH*HPforSHisNeeded+ CHPM_c1DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+CHPM_c2 = CHPM_c2DHW*HPforDHWisNeeded + CHPM_c2SH*HPforSHisNeeded + CHPM_c2DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+CHPM_c3 = CHPM_c3DHW*HPforDHWisNeeded + CHPM_c3SH*HPforSHisNeeded + CHPM_c3DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+CHPM_c4 = CHPM_c4DHW*HPforDHWisNeeded + CHPM_c4SH*HPforSHisNeeded + CHPM_c4DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+CHPM_c5 = CHPM_c5DHW*HPforDHWisNeeded + CHPM_c5SH*HPforSHisNeeded + CHPM_c5DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+CHPM_c6 = CHPM_c6DHW*HPforDHWisNeeded + CHPM_c6SH*HPforSHisNeeded + CHPM_c6DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+COP_c1 = COP_c1DHW*HPforDHWisNeeded + COP_c1SH*HPforSHisNeeded + COP_c1DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+COP_c2 = COP_c2DHW*HPforDHWisNeeded + COP_c2SH*HPforSHisNeeded + COP_c2DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+COP_c3 = COP_c3DHW*HPforDHWisNeeded + COP_c3SH*HPforSHisNeeded + COP_c3DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+COP_c4 = COP_c4DHW*HPforDHWisNeeded + COP_c4SH*HPforSHisNeeded+ COP_c4DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+COP_c5 = COP_c5DHW*HPforDHWisNeeded + COP_c5SH*HPforSHisNeeded + COP_c5DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+COP_c6 = COP_c6DHW*HPforDHWisNeeded + COP_c6SH*HPforSHisNeeded + COP_c6DHW*(NOT(HPforDHWisNeeded)*NOT(HPforSHisNeeded))
+
+CONSTANTS 3
+TMinEvapTin = -2
+TMinEvapTout = TMinEvapTin - 3
+cpEvap = cpWat
+ 
+ 
+ 
+CONSTANTS 1
+unitPrinterHPcheck = 209
+ASSIGN temp\CheckHPType.Plt unitPrinterHPcheck 
+UNIT 208 TYPE 25       !Changed automatically
+PARAMETERS 10     
+dtPrUser                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitPrinterHPcheck     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 9
+Time HPforDHWisNeeded HPforSHisNeeded CHPM_c1 COP_c1 CHPM_c1DHW CHPM_c1SH COP_c1DHW COP_c1SH
+Time HPforDHWisNeeded HPforSHisNeeded CHPM_c1 COP_c1 CHPM_c1DHW CHPM_c1SH COP_c1DHW COP_c1SH
+*******************************************
+ 
+ 
+ 
