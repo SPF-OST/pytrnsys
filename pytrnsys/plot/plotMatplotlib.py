@@ -584,7 +584,7 @@ class PlotMatplotlib:
             else:
                 yearTag = "Jahr/%d" % yearlyFactor
 
-        plot.set_xticklabels([monthSequence[i] for i in showMonths], rotation="45")
+        plot.set_xticklabels([monthSequence[i] for i in showMonths], rotation="vertical")
 
         namePdf = "%s.%s" % (nameFile, self.extensionPlot)
         nameWithPath = "%s\%s" % (self.path, namePdf)
