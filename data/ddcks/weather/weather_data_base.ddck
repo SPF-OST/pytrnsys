@@ -4,7 +4,7 @@
     
 *****************************************
 ** Contact person : Dani Carbonell    
-** Last changes   : 04.2020
+** Last changes   : 16.01.2023 SCHJ
 *****************************************
 
 ****************************************************
@@ -25,6 +25,8 @@
 ** DEFINITION of OVERALL VARIABLES
 ** This variables will be used in all decks. Keep this nomenclature in Ddck
 ** To clean what is strictly necessary DC
+** Changes: 
+** 16.01.2023 - correct east facing facade if turned (AA_E) - SCHJ
 *****************************************************************************
 
 EQUATIONS 11
@@ -129,7 +131,7 @@ TcwAvg = TambAvg
 TURN = 0.0     
 AA_N = 180.0 + TURN     
 AA_S = TURN     
-AA_E = 270.0      
+AA_E = 270.0 + TURN   
 AA_W = 90.0 + TURN     
 groundRef = 0.2
 slope90 = 90.0
