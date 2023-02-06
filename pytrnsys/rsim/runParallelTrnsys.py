@@ -613,7 +613,8 @@ class RunParallelTrnsys:
     def writeRunLogFile(self):
         logfile = open(os.path.join(self.path, "runLogFile.config"), "w")
         username = os.getenv("username")
-        logfile.write("# Run created by " + username + "\n")
+        if username != None:
+            logfile.write("# Run created by " + username + "\n")
         logfile.write("# Ddck repositories used:\n")
         try:
             imp.find_module("git")
