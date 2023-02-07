@@ -2020,7 +2020,7 @@ class ProcessTrnsysDf:
                     inVar, legend, "", nameFile, 10, self.myShortMonths, plotEmf=self.inputs["plotEmf"]
                 )
                 caption = titlePlot
-                tableNames = ["Month"] + legend
+                tableNames = ["Month"] + legend + ["Total"]
                 var = inVar
                 var.append(sum(inVar))
                 self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)

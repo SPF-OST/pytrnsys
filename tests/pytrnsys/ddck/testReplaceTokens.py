@@ -110,6 +110,30 @@ No placeholder values were provided for the computed variables at the following 
         assert ddckFile.actual.read_text() == ddckFile.expected.read_text(encoding="windows-1252")
 
     @staticmethod
+    def testReplaceTokens():
+        type861DirPath = _REPLACE_WITH_NAMES_DATA_DIR / "type861"
+        inputDdckFilePath = type861DirPath / "input.ddck"
+
+        componentName = "IceStore"
+        computedNamesByPort = {
+            "In": {"@temp": "TIn", "@mfr": "MIn", "@cp": "CPWAT", "@rho": "RHOWAT"},
+            "Out": {"@temp": "TOut", "@revtemp": "TOutRev"},
+        }
+
+        result = _replace.replaceTokens(
+            inputDdckFilePath,
+            componentName,
+            computedNamesByPort,
+        )
+
+        assert not _res.isError(result)
+
+        value = _res.value(result)
+        print(value)
+        expectedOutputDdckFilePath = type861DirPath / "expected_output.ddck"
+        assert value == expectedOutputDdckFilePath.read_text(encoding="utf8")
+
+    @staticmethod
     def testReplaceTokensNonexistentPort() -> None:
         inputDdckFilePath = _REPLACE_WITH_NAMES_DATA_DIR / "type951_non_existent_port.ddck"
         componentName = "Ghx"
