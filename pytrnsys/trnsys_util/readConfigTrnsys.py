@@ -63,6 +63,12 @@ class ReadConfigTrnsys:
         lines = processFiles.purgueLines(lines, skypChar, None, removeBlankLines=True, removeBlankSpaces=False)
         lines = processFiles.purgueComments(lines, skypChar)
 
+        if name == "run.config":
+            # This should allow this info to be removed from the run.config file.
+            inputs["pathToConnectionInfo"] = os.path.join(path, "DdckPlaceHolderValues.json")
+            inputs["PROJECT$"] = os.path.join(path, "ddck")
+            inputs["projectPath"] = path
+
         if "calcMonthly" not in inputs:
             inputs["calcMonthly"] = []
 
