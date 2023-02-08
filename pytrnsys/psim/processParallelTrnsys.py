@@ -129,7 +129,7 @@ class ProcessParallelTrnsys:
 
         self.logger = log.getOrCreateCustomLogger("root", self.inputs["outputLevel"])
 
-    def defaultInputs(self):
+    def defaultInputs(self, pathBase=None):
 
         self.inputs = {}
         self.inputs["plotStyle"] = "line"
@@ -147,7 +147,10 @@ class ProcessParallelTrnsys:
         self.inputs[
             "forceProcess"
         ] = True  # even if results file exist it proceess the results, otherwise it checks if it exists
-        self.inputs["pathBase"] = os.getcwd()
+        if pathBase:
+            self.inputs["pathBase"] = pathBase
+        else:
+            self.inputs["pathBase"] = os.getcwd()
         self.inputs["setPrintDataForGle"] = True
         self.inputs["firstConsideredTime"] = None  # Be carefull here. Thsi will not be proprly filtered
         self.inputs["buildingArea"] = 1072.0
@@ -179,6 +182,7 @@ class ProcessParallelTrnsys:
         self.configPath = path
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated)
+        self.inputs["pathBase"] = path
         self.logger.setLevel(self.inputs["outputLevel"])
         if "latexNames" in self.inputs.keys():
             if ":" not in self.inputs["latexNames"]:
