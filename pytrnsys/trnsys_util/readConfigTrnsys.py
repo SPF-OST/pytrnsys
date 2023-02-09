@@ -49,7 +49,8 @@ class ReadConfigTrnsys:
     def __init__(self):
         pass
 
-    def str2bool(self, v):
+    @staticmethod
+    def str2bool(v):
         return v.lower() in ("yes", "true", "t", "1")
 
     def readFile(self, path, name, inputs, parseFileCreated=True, controlDataType=True):
