@@ -1,0 +1,42 @@
+############# GENERIC##############################
+
+bool ignoreOnlinePlotter  True
+int reduceCpu  4
+bool parseFileCreated True
+bool runCases True
+bool checkDeck True
+string outputLevel "INFO"
+string pathToConnectionInfo "C:\Users\epic.user\EpicSimulation\DdckPlaceHolderValues.json"
+
+############# AUTOMATIC WORK BOOL##############################
+
+bool doAutoUnitNumbering True
+bool generateUnitTypesUsed True
+bool addAutomaticEnergyBalance True
+
+#############PATHS################################
+
+string PROJECT$ "C:\Users\epic.user\EpicSimulation\ddck"
+string trnsysExePath "C:\Trnsys18\Exe\TRNExe.exe"
+
+################SCALING#########################
+
+string scaling "False" #"toDemand"
+string projectPath "C:\Users\epic.user\EpicSimulation"
+string nameRef "DoublePipeDebug"
+string runType "runFromConfig"
+
+#############FIXED CHANGED IN DDCK##################
+
+deck START 0    # 0 is midnight new year
+deck STOP  8760 # 8760 for a year
+deck dtSim 1    # time step in hours
+
+#############USED DDCKs##################
+
+PROJECT$ generic\head
+PROJECT$ control\hydraulic_control
+PROJECT$ hydraulic\hydraulic
+PROJECT$ QSrc1\QSrc
+PROJECT$ generic\end
+
