@@ -64,11 +64,6 @@ class ReadConfigTrnsys:
         lines = processFiles.purgueLines(lines, skypChar, None, removeBlankLines=True, removeBlankSpaces=False)
         lines = processFiles.purgueComments(lines, skypChar)
 
-        if name == "run.config":
-            # This should allow this info to be removed from the run.config file.
-            inputs["pathToConnectionInfo"] = os.path.join(path, "DdckPlaceHolderValues.json")
-            inputs["PROJECT$"] = os.path.join(path, "ddck")
-            inputs["projectPath"] = path
 
         if "calcMonthly" not in inputs:
             inputs["calcMonthly"] = []
@@ -118,7 +113,12 @@ class ReadConfigTrnsys:
             outfile.writelines(lines)
             outfile.close()
 
+        addPathToConnectionInfo = True
+        addProjects = True
+        addProjectPath = True
+
         for i in range(len(lines)):
+            # todo: use enumerate
 
             if lines[i][-1:] == "\n":
                 lines[i] = lines[i][0:-1]
@@ -130,6 +130,13 @@ class ReadConfigTrnsys:
             elif splitLine[0] == "int":
                 inputs[splitLine[1]] = int(splitLine[2])
             elif splitLine[0] == "string":
+                if 'string pathToConnectionInfo ' in lines[i]:
+                    addPathToConnectionInfo = False
+                if 'string PROJECT$ ' in lines[i]:
+                    addProjects = False
+                if 'string projectPath ' in lines[i]:
+                    addProjectPath = False
+
                 if len(splitLine) != 3:
                     splitString = ""
                     for i in range(len(splitLine) - 2):
@@ -207,5 +214,19 @@ class ReadConfigTrnsys:
                     raise ValueError("type of data %s unknown" % splitLine[0])
                 else:
                     pass
+
+        if "run.config" in name:
+            # This should allow this info to be removed from the run.config file.
+            if addPathToConnectionInfo:
+                info = os.path.join(path, "DdckPlaceHolderValues.json")
+                inputs["pathToConnectionInfo"] = info
+                lines.append('string pathToConnectionInfo ' + info)
+            if addProjects:
+                info = os.path.join(path, "ddck")
+                inputs["PROJECT$"] = info
+                lines.append('string PROJECT$ ' + info)
+            if addProjectPath:
+                inputs["projectPath"] = path
+                lines.append('string projectPath ' + str(path))
 
         return lines
