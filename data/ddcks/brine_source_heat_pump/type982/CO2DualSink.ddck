@@ -1,0 +1,128 @@
+**************************************************
+** BEGIN CO2 dual sink parameters and nominal characteristics 
+**************************************************
+** Heat pump data for CO2 dual sink
+** Data obtained from experiments (Maike Schubert)
+** See pytrnsys_trihp\pytrnsys_trihp\heatPumpFit
+** Author : Martin Neugebauer, 
+** 06.02.2023 IGG Coefficients and modes, MfrHpCond1Ref, MfrHpCond2Ref
+** 13.02.2023 IGG MfrHpCond1Ref = 1148
+**************************************************
+
+*********************************
+** constants independent of modes
+*********************************
+CONSTANTS 5
+sizeHpNom = 10 !12 IGG From 2nd Campaign Pdhw=7.78 kW at Te0-Tc20 and Psh=6.5kW at Te0-Tc20
+
+MfrHpCond1Ref = 1148 !SH IGG 10 kW  deltaT 7.5C
+MfrHpCond2Ref = 246 !DHW IGG 10 kW  deltaT 35.0C
+TMinEvapTout = TMinEvapTin - 3
+tCondMaxHp = 80
+
+*********************************
+** TO BE CHECKED
+*********************************
+EQUATIONS 4
+MfrHpEvapRef = 2870	! kg/h IGG 10 kW  deltaT 3.0C
+TEvapMaxHp = 35		! deg C
+TMinEvapTin = -8		! deg C !allows 0°C from ice storage!
+cpEvap = cpWat		! kJ/kgK  ! changed from Bri to Wat as CO2 HP has water at evap - MS
+
+********************************************************************
+** adjustements to HpSinkMode (1: dhw only, 2: sh only, 3: parallel)
+********************************************************************
+CONSTANTS 54	! Coefficients for the )different modes
+M_3_a_1	=	sizeHpRatio*	(-20.1039)
+M_3_a_2	=	sizeHpRatio*	(-33.6022)
+M_3_a_3	=	sizeHpRatio*	177.6564
+M_3_a_4	=	sizeHpRatio*	338.862
+M_3_a_5	=	sizeHpRatio*	(-601.1853)
+M_3_a_6	=	sizeHpRatio*	(-204.7739)
+M_3_a_7	=	sizeHpRatio*	219.5552
+M_3_a_8	=	sizeHpRatio*	(-41.4751)
+M_3_a_9	=	sizeHpRatio*	(-1012.5977)
+M_3_a_10	=	sizeHpRatio*	(-227.4919)
+M_3_b_1	=	sizeHpRatio*	34.3005
+M_3_b_2	=	sizeHpRatio*	96.1353
+M_3_b_3	=	sizeHpRatio*	(-96.6213)
+M_3_b_4	=	sizeHpRatio*	(-452.8842)
+M_3_b_5	=	sizeHpRatio*	462.928
+M_3_b_6	=	sizeHpRatio*	65.9709
+M_3_b_7	=	sizeHpRatio*	(-445.1922)
+M_3_b_8	=	sizeHpRatio*	104.7086
+M_3_b_9	=	sizeHpRatio*	452.1272
+M_3_b_10	=	sizeHpRatio*	1674.4754
+M_3_c_1	=		24.2842
+M_3_c_2	=		101.2165
+M_3_c_3	=		-98.4692
+M_3_c_4	=		-383.6586
+M_3_c_5	=		320.1959
+M_3_c_6	=		152.0039
+M_3_c_7	=		-191.118
+M_3_c_8	=		-101.477
+M_3_c_9	=		139.6222
+M_3_c_10	=		786.5268
+
+M_1_a_1 = sizeHpRatio * 6.0189
+M_1_a_2 = sizeHpRatio * 45.8228
+M_1_a_3 = sizeHpRatio * 32.6197
+M_1_a_4 = sizeHpRatio * (-50.3932)
+M_1_a_5 = sizeHpRatio * (-289.3841)
+M_1_a_6 = sizeHpRatio * (-168.6521)
+M_1_c_1 = 13.2154
+M_1_c_2 = 60.1421
+M_1_c_3 = -94.1101
+M_1_c_4 = -239.8028
+M_1_c_5 = 83.8106
+M_1_c_6 = 216.0724
+
+M_2_b_1 = sizeHpRatio * 7.0333
+M_2_b_2 = sizeHpRatio * 36.8381
+M_2_b_3 = sizeHpRatio * (-13.8671)
+M_2_b_4 = sizeHpRatio * (-22.1837)
+M_2_b_5 = sizeHpRatio * 105.2752
+M_2_b_6 = sizeHpRatio * 39.6461
+M_2_c_1 = 12.0711
+M_2_c_2 = 89.7392
+M_2_c_3 = -91.2049
+M_2_c_4 = -500.3787
+M_2_c_5 = 220.667
+M_2_c_6	= 203.8438
+
+
+EQUATIONS 31	! Conditional setup of coefficients
+***HPforSHisNeeded and HPforDHWisNeeded from type888
+
+HpSinkMode = HPforDHWisNeeded*NOT(HPforSHisNeeded)+2*NOT(HPforDHWisNeeded)*HPforSHisNeeded+3*HPforDHWisNeeded*HPforSHisNeeded
+
+Coeff_a1 = EQL(HpSinkMode,1)* M_1_a_1 + EQL(HpSinkMode,3)* M_3_a_1
+Coeff_a2 = EQL(HpSinkMode,1)* M_1_a_2 + EQL(HpSinkMode,3)* M_3_a_2
+Coeff_a3 = EQL(HpSinkMode,1)* M_1_a_3 + EQL(HpSinkMode,3)* M_3_a_3
+Coeff_a4 = EQL(HpSinkMode,1)* M_1_a_4 + EQL(HpSinkMode,3)* M_3_a_4
+Coeff_a5 = EQL(HpSinkMode,1)* M_1_a_5 + EQL(HpSinkMode,3)* M_3_a_5
+Coeff_a6 = EQL(HpSinkMode,1)* M_1_a_6 + EQL(HpSinkMode,3)* M_3_a_6
+Coeff_a7 = EQL(HpSinkMode,3)* M_3_a_7
+Coeff_a8 = EQL(HpSinkMode,3)* M_3_a_8
+Coeff_a9 = EQL(HpSinkMode,3)* M_3_a_9
+Coeff_a10 = EQL(HpSinkMode,3)* M_3_a_10
+Coeff_b1 = EQL(HpSinkMode,2)* M_2_b_1 + EQL(HpSinkMode,3)* M_3_b_1
+Coeff_b2 = EQL(HpSinkMode,2)* M_2_b_2 + EQL(HpSinkMode,3)* M_3_b_2
+Coeff_b3 = EQL(HpSinkMode,3)* M_3_b_3
+Coeff_b4 = EQL(HpSinkMode,3)* M_3_b_4
+Coeff_b5 = EQL(HpSinkMode,2)* M_2_b_5 + EQL(HpSinkMode,3)* M_3_b_5
+Coeff_b6 = EQL(HpSinkMode,3)* M_3_b_6
+Coeff_b7 = EQL(HpSinkMode,2)* M_2_b_3 + EQL(HpSinkMode,3)* M_3_b_7
+Coeff_b8 = EQL(HpSinkMode,2)* M_2_b_4 + EQL(HpSinkMode,3)* M_3_b_8
+Coeff_b9 = EQL(HpSinkMode,3)* M_3_b_9
+Coeff_b10 = EQL(HpSinkMode,2)* M_2_b_6 + EQL(HpSinkMode,3)* M_3_b_10
+Coeff_c1 = EQL(HpSinkMode,1)* M_1_c_1 + EQL(HpSinkMode,2)* M_2_c_1 + EQL(HpSinkMode,3)* M_3_c_1
+Coeff_c2 = EQL(HpSinkMode,1)* M_1_c_2 + EQL(HpSinkMode,2)* M_2_c_2 + EQL(HpSinkMode,3)* M_3_c_2
+Coeff_c3 = EQL(HpSinkMode,1)* M_1_c_3 + EQL(HpSinkMode,3)* M_3_c_3
+Coeff_c4 = EQL(HpSinkMode,1)* M_1_c_4 + EQL(HpSinkMode,3)* M_3_c_4
+Coeff_c5 = EQL(HpSinkMode,1)* M_1_c_5 + EQL(HpSinkMode,2)* M_2_c_5 + EQL(HpSinkMode,3)* M_3_c_5
+Coeff_c6 = EQL(HpSinkMode,1)* M_1_c_6 + EQL(HpSinkMode,3)* M_3_c_6
+Coeff_c7 = EQL(HpSinkMode,2)* M_2_c_3 + EQL(HpSinkMode,3)* M_3_c_7
+Coeff_c8 = EQL(HpSinkMode,2)* M_2_c_4 + EQL(HpSinkMode,3)* M_3_c_8
+Coeff_c9 = EQL(HpSinkMode,3)* M_3_c_9
+Coeff_c10 = EQL(HpSinkMode,2)* M_2_c_6 + EQL(HpSinkMode,3)* M_3_c_10
