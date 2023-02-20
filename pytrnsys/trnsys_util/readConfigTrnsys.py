@@ -1,7 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/python
+# !/usr/bin/python
 """
 Main class to read the config file for running and processing
 Author : Daniel Carbonell
@@ -9,14 +9,8 @@ Date   : 01-10-2018
 ToDo:   Copy config file to results folder automatically
 """
 
-import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
-import pytrnsys.rsim.executeTrnsys as exeTrnsys
-import pytrnsys.trnsys_util.buildTrnsysDeck as build
-import numpy as num
 import os
 import pytrnsys.pdata.processFiles as processFiles
-import string
-import pytrnsys.rsim.runParallel as runPar
 
 
 def getCityFromConfig(lines):
@@ -63,7 +57,6 @@ class ReadConfigTrnsys:
 
         lines = processFiles.purgueLines(lines, skypChar, None, removeBlankLines=True, removeBlankSpaces=False)
         lines = processFiles.purgueComments(lines, skypChar)
-
 
         if "calcMonthly" not in inputs:
             inputs["calcMonthly"] = []
@@ -116,6 +109,7 @@ class ReadConfigTrnsys:
         addPathToConnectionInfo = True
         addProjects = True
         addProjectPath = True
+        addPathBase = True
 
         for i in range(len(lines)):
             # todo: use enumerate
@@ -136,17 +130,19 @@ class ReadConfigTrnsys:
                     addProjects = False
                 if 'string projectPath ' in lines[i]:
                     addProjectPath = False
+                if 'string pathBase ' in lines[i]:
+                    addPathBase = False
 
                 if len(splitLine) != 3:
                     splitString = ""
-                    for i in range(len(splitLine) - 2):
-                        if i == 0:
-                            splitString += splitLine[i + 2][1:]
+                    for j in range(len(splitLine) - 2):
+                        if j == 0:
+                            splitString += splitLine[j + 2][1:]
                             splitString += " "
-                        elif i == len(splitLine) - 3:
-                            splitString += splitLine[i + 2][:-1]
+                        elif j == len(splitLine) - 3:
+                            splitString += splitLine[j + 2][:-1]
                         else:
-                            splitString += splitLine[i + 2]
+                            splitString += splitLine[j + 2]
                             splitString += " "
                     inputs[splitLine[1]] = splitString
                     # raise ValueError("Error in string : %s"%lines[i])
@@ -157,8 +153,8 @@ class ReadConfigTrnsys:
                     inputs[splitLine[1]] = []
 
                 newElement = []
-                for i in range(len(splitLine) - 2):
-                    strEl = splitLine[i + 2][1:-1]  # I delete the "
+                for j in range(len(splitLine) - 2):
+                    strEl = splitLine[j + 2][1:-1]  # I delete the "
                     newElement.append(strEl)
                 inputs[splitLine[1]].append(newElement)
 
@@ -215,8 +211,15 @@ class ReadConfigTrnsys:
                 else:
                     pass
 
+        lines, inputs = self._addMissingDefaultPaths(addPathBase, addPathToConnectionInfo, addProjectPath, addProjects, inputs, lines,
+                                     name, path)
+
+        return lines
+
+    @staticmethod
+    def _addMissingDefaultPaths(addPathBase, addPathToConnectionInfo, addProjectPath, addProjects, inputs, lines,
+                                name, path):
         if "run.config" in name:
-            # This should allow this info to be removed from the run.config file.
             if addPathToConnectionInfo:
                 info = os.path.join(path, "DdckPlaceHolderValues.json")
                 inputs["pathToConnectionInfo"] = info
@@ -229,4 +232,9 @@ class ReadConfigTrnsys:
                 inputs["projectPath"] = path
                 lines.append('string projectPath ' + str(path))
 
-        return lines
+        elif "process.config" in name:
+            if addPathBase:
+                inputs["pathBase"] = path
+                lines.append("string pathBase " + str(path))
+
+        return lines, inputs
