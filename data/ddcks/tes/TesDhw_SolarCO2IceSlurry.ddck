@@ -66,7 +66,7 @@ ratioTes1 = Vol_Tes1 / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
 zInDp1_Tes1=0.95
-zOutDp1_Tes1=0.35
+zOutDp1_Tes1=0.05 !DC we should take the coldest point to send to the gas cooler 
 *********Connecting values of DIRECT PORT=2***********
 CONSTANTS 2
 zInDp2_Tes1=0.70
@@ -317,7 +317,7 @@ zero zero zero zero zero zero zero zero zero zero
 UNIT 501 TYPE 65     ! Online Plotter HX 
 PARAMETERS 12   
 10     ! 1 Nb. of left-axis variables 
-0     ! 2 Nb. of right-axis variables
+4     ! 2 Nb. of right-axis variables
 0     ! 3 Left axis minimum 
 100     ! 4 Left axis maximum -
 0     ! 5 Right axis minimum 
@@ -328,9 +328,14 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 -1     ! 10 Logical unit for output file 
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
-INPUTS 10     
+INPUTS 14     
 T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1 
+TPiHxDhwSecIn TPiDhwSecOut TPiHxDhwIn TPiHxDhwOut
+
+*****
 T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1 
+TPiHxDhwSecIn TPiDhwSecOut TPiHxDhwIn TPiHxDhwOut
+
 LABELS  3         
 Temperatures  
 MassFlows  

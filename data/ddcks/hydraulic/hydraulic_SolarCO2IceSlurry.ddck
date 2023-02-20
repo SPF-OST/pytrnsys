@@ -42,6 +42,10 @@ TTesIceSlurryRight = TCsHx2o
 THxColIceSide1 = TLoadOut_ColIce
 THxColIceSide2 = TSourceOut_ColIce
 
+CONSTANTS 2
+lenghPipeEvap = 2*SizeHpRatio
+dPipeEvap = 0.05*SizeHpRatio
+
 *****************************************************
 ****** ELECTRICIY CONSUMPTION OF PUMPS
 *****************************************************
@@ -1510,8 +1514,8 @@ MFrPiHxSolarIceIn = MPiHxSolarIceIn_A
 UNIT 497 TYPE 931
 ! PiIceToHp
 PARAMETERS 6
-0.05 ! diameter [m]
-2.0 ! length [m]
+dPipeEvap ! diameter [m]
+lenghPipeEvap ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
@@ -1607,8 +1611,8 @@ MPiHpToIce2 = MPiHpToIce2_A
 UNIT 501 TYPE 931
 ! PiHpOutPu
 PARAMETERS 6
-0.05 ! diameter [m]
-2.0 ! length [m]
+dPipeEvap ! diameter [m]
+lenghPipeEvap ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
@@ -1815,8 +1819,8 @@ MConn1139 = MConn1139_A
 UNIT 510 TYPE 931
 ! PiHpEvapMix
 PARAMETERS 6
-0.05 ! diameter [m]
-2.0 ! length [m]
+dPipeEvap ! diameter [m]
+lenghPipeEvap ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
@@ -1985,8 +1989,8 @@ MFrPiHxDhwSecIn = MPiHxDhwSecIn_A
 UNIT 517 TYPE 931
 ! PiHpEvapIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
+dPipeEvap ! diameter [m]
+lenghPipeEvap ! length [m]
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
@@ -2010,8 +2014,8 @@ MFrPiHpEvapIn = MPiHpEvapIn_A
 UNIT 518 TYPE 931
 ! PiHpEvapOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
+dPipeEvap ! diameter [m]
+lenghPipeEvap ! length [m]
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]

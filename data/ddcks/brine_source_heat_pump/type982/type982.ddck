@@ -221,7 +221,7 @@ QHpDefrost_kW = [162,14]					! Defrosting losses, kW
 !HpIsBlock = [162,21]						! Boolean on whether HP is blocked
 
 EQUATIONS 3
-HpIsBlock = BlockIceStore			! OR([162,21],BrineTooColdTimer)! as brine is never too cold
+HpIsBlock = OR(BlockIceStore,[162,21])			! OR([162,21],BrineTooColdTimer)! as brine is never too cold
 BrineTooCold = OR(LT(THpEvapIn,TMinEvapTin),(LT(THpEvapOut,TMinEvapTout)))
 QHpSink_kW = QHpCondDhw_kW + QHpCondSh_kW		! Overall heat output, kW
 
@@ -245,12 +245,12 @@ BrineTooColdTimer = [163,1]
 
 UNIT 82 TYPE 993      ! Input value recall (element RcA) DC CHANGED
 PARAMETERS 1     
-5   ! 1: number of variables to be remembered
-INPUTS 5    
-HpIsBlock THpCondDhwOut THpCondShOut myHpIsOn MfrHpPDRc   
-0  0  0  0  0 !0 0  
+7   ! 1: number of variables to be remembered
+INPUTS 7    
+HpIsBlock THpCondDhwOut THpCondShOut myHpIsOn MfrHpPDRc  THpCondDhwIn THpCondShIn 
+0  0  0  0  0 0 0  
 
-EQUATIONS 7
+EQUATIONS 9
 BoHpStart = myHpIsOn*NOT(myHpIsOnRc)
 HpStartPerH = BoHpStart/dtsim
 HpIsBlockRc = [82,1]
@@ -258,6 +258,8 @@ THpDhwOutRc = [82,2]
 THpShOutRc = [82,3]
 myHpIsOnRc = [82,4]
 MfrHpPDRc = [82,5]
+THpCondDhwInRc = [82,6]
+THpCondShInRc = [82,7]
 
 EQUATIONS 3
 dtEvap = THpEvapIn-THpEvapOut
@@ -314,9 +316,9 @@ PARAMETERS 12
 10				! 1 Nb. of left-axis variables
 10				! 2 Nb. of right-axis variables
 -10				! 3 Left axis minimum
-70				! 4 Left axis maximum
+90				! 4 Left axis maximum
 0				! 5 Right axis minimum
-100				! 6 Right axis maximum
+6000			! 6 Right axis maximum
 nPlotsPerSim	! 7 Number of plots per simulation
 12				! 8 X-axis gridpoints
 1				! 9 Shut off Online w/o removing
@@ -324,11 +326,11 @@ nPlotsPerSim	! 7 Number of plots per simulation
 0				! 11 Output file units
 0				! 12 Output file delimiter
 INPUTS 20
-THpEvapIn THpEvapOut THpCondDhwIn THpCondDhwOut THpCondShIn THpCondShOut myHpIsOn HpIsBlock Nix Nix
-MfrEvapIn MfrCondDhwIn MfrCondShIn QHpEvap_kW QHpCondDhw_kW QHpCondSh_kW QHpSink_kW frCond dtEvap dtCondSh
+THpEvapIn THpEvapOut THpCondDhwIn THpCondDhwOut THpCondShIn THpCondShOut myHpIsOn HpIsBlock xFracDivHpEvap Nix
+MfrEvapIn MfrCondDhwIn MfrCondShIn QHpEvap_kW QHpCondDhw_kW QHpCondSh_kW QHpSink_kW dtCondDhw dtEvap dtCondSh
 **
-THpEvapIn THpEvapOut THpCondDhwIn THpCondDhwOut THpCondShIn THpCondShOut myHpIsOn HpIsBlock Nix Nix
-MfrEvapIn MfrCondDhwIn MfrCondShIn QHpEvap_kW QHpCondDhw_kW QHpCondSh_kW QHpSink_kW frCond dtEvap dtCondSh
+THpEvapIn THpEvapOut THpCondDhwIn THpCondDhwOut THpCondShIn THpCondShOut myHpIsOn HpIsBlock xFracDivHpEvap Nix
+MfrEvapIn MfrCondDhwIn MfrCondShIn QHpEvap_kW QHpCondDhw_kW QHpCondSh_kW QHpSink_kW dtCondDhw dtEvap dtCondSh
 LABELS  3     
 Temperatures     
 massFlow_and_Heat_transf     

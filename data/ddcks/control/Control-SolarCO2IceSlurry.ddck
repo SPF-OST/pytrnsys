@@ -35,10 +35,11 @@ xFracMixHxTes = AND(NOT(OR(ProWs,ProPar)),NOT(blockCol))
 **MfrPuCol = pumpColOn*(ProWs*MfrCPri+MfrCPriNom*(ProCs+ProDoubleHpCs)) !+ProSeries*MfrSeries)
 MfrPuCol = pumpColOn*MfrCPri*(ProWs+ProCs+ProPar+ProDoubleHpCs) !+ProSeries*MfrSeries)
 
-MfrPuDHW = MfrSrcDHWHXUsed!NOT(GT(MfrDHWset,0))*150+GT(MfrDHWset,0)*MfrDHWset
-MfrPuCirc = NOT(GT(MfrDHWset,0))*150
-MfrPuHpEvap = MfrHpEvapUsed*hpIsOn
-MfrPuHpCond1 = MfrHpCond1Nom*hpIsOn*HPforSHisNeeded !IGG
+MfrPuDHW =  NOT(GT(MfrDHWset,0))*MfrPuCircNom+GT(MfrDHWset,0)*MfrSrcDHWHXUsed 
+MfrPuCirc = NOT(GT(MfrDHWset,0))*MfrPuCircNom
+MfrPuHpEvap = MfrHpEvapUsed*hpIsOn*OR(HPforSHisNeeded,HPforDHWisNeeded)
+**MfrPuHpCond1 = NOT(HPforDHWisNeeded)*MfrHpCond1Nom*hpIsOn*HPforSHisNeeded+ HPforDHWisNeeded*MfrHpCond1Nom*hpIsOn*HPforSHisNeeded*0.5!DC. reduce mass flow rate in SH when parallel
+MfrPuHpCond1 = MfrHpCond1Nom*hpIsOn*HPforSHisNeeded
 MfrPiHpCondShIn = MfrPuHpCond1 !IGG
 MfrPuHpCond2 = MfrHpCond2Nom*hpIsOn*HPforDHWisNeeded !IGG
 MfrPiHpCondDhwIn =MfrPuHpCond2 !IGG
@@ -78,7 +79,7 @@ MfrPuHxIce = MfrPuCol*(ProCs+ProDoubleHpCs)
 CONSTANTS 3
 T_set_DivSH=T_set_d
 T_set_MixCirc=TdhwSet
-T_set_DivHpEvap=25
+T_set_DivHpEvap=7
 
 EQUATIONS 1
 T_set_cool = MIN(Tamb-5,TRdRt)
@@ -127,19 +128,33 @@ EQUATIONS 2
 xFracDivSH_cool = CoolingOnRC*([24,5]) 
 xFracDivSH = xFracDivSH_heat + xFracDivSH_cool 
 
+**UNIT 443 TYPE 811 ! Passive Divider for heating 
+**PARAMETERS 1
+**5 !Nb.of iterations before fixing the value 
+**INPUTS 4 
+**TPiIceToHpRc
+**TPiHpEvapMixRc
+**MfrPiHpEvapInRc
+**T_set_DivHpEvap
+***** INITIAL INPUT VALUES
+**35.0 21.0 800.0 T_set_DivHpEvap
+**EQUATIONS 1
+**xFracDivHpEvap =  1.-[443,5] !Dc the heat pump does not accept values above 7 °C
+
 UNIT 443 TYPE 811 ! Passive Divider for heating 
 PARAMETERS 1
 5 !Nb.of iterations before fixing the value 
 INPUTS 4 
-TPiIceToHp
+TPiIceToHp 
 TPiHpEvapMix
 MfrPiHpEvapIn
 T_set_DivHpEvap
 *** INITIAL INPUT VALUES
-35.0 21.0 800.0 T_set_DivHpEvap
-EQUATIONS 1
-xFracDivHpEvap =  0 ! 1.-[443,5]
-
+35.0 21.0 2000.0 T_set_DivHpEvap
+EQUATIONS 3
+mixDivHpEvap =  1-[443,5] !Dc the heat pump does not accept values above 7 °C ->0 means no mix, 1 fully mix
+doMixHpEvap  = 1
+xFracDivHpEvap = doMixHpEvap*mixDivHpEvapRc
 ***************************************************
 ******** Cooling Section***************************
 ***************************************************
@@ -184,13 +199,14 @@ BlockDoubleCsHp = 0
 
 UNIT 63 TYPE 993     ! Input value recall (element RcC)
 PARAMETERS 1     
-9    ! 1: number of variables to be remembered
+10    ! 1: number of variables to be remembered
 **     
-INPUTS 9
-TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh
-0.0    20  0.0 0.0  0.0 0.0 0.0 0.0 0.0
+INPUTS 10
+TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh mixDivHpEvap
+**
+0.0  20  0.0 0.0  0.0 0.0 0.0 0.0 0.0 0.0
 
-EQUATIONS 9              ! Recalled values for collector control
+EQUATIONS 10            ! Recalled values for collector control
 TesOverheatRc = [63,1]     ! recalled value of boolean for storage protection, 0/1
 T10_Tes1Rc = [63,2]     ! recalled value from upper storage part for storage protection, °C
 BoAuxWWonRc = [63,3]     
@@ -200,6 +216,8 @@ TTesShBotRc = [63,6]
 TAvgPCMRc = [63,7]
 BlockWsRc = [63,8]
 TPcmTooHighRc = [63,9]
+mixDivHpEvapRc = [63,10]
+
 
 EQUATIONS 2
 qAux1_Tes1 = qAux1_Tes1_nom_kW*auxStoreDHWIsOn
@@ -238,9 +256,9 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 10    
-CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM TmaxIceTes BlockSeries 
-CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM TmaxIceTes BlockSeries 
+CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes  TAvgPCM TmaxIceTes xFracDivHpEvap Nix
+CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes  TAvgPCM TmaxIceTes xFracDivHpEvap Nix
 LABELS  3     
 Temperatures  
 MassFlows   
-ControlNC
+Hyd
