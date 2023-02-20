@@ -3,226 +3,149 @@ import pytest as _pt
 
 import pytrnsys.trnsys_util.readConfigTrnsys as _rct
 
-DATA_DIR_PATH = _pl.Path(__file__).parent / "data"
+_DATA_DIR_PATH = _pl.Path(__file__).parent / "data"
 
-ORIGINAL_LINES = ['bool ignoreOnlinePlotter  True',
-                  'int reduceCpu  4',
-                  'bool parseFileCreated True',
-                  'bool runCases True',
-                  'bool checkDeck True',
-                  'string outputLevel "INFO"',
-                  'string pathToConnectionInfo '
-                  '"C:\\Users\\epic.user\\EpicSimulation\\DdckPlaceHolderValues.json"',
-                  'bool doAutoUnitNumbering True',
-                  'bool generateUnitTypesUsed True',
-                  'bool addAutomaticEnergyBalance True',
-                  'string PROJECT$ '
-                  '"C:\\Users\\epic.user\\EpicSimulation\\ddck"',
-                  'string trnsysExePath "C:\\Trnsys18\\Exe\\TRNExe.exe"',
-                  'string scaling "False"',
-                  'string projectPath '
-                  '"C:\\Users\\epic.user\\EpicSimulation"',
-                  'string nameRef "DoublePipeDebug"',
-                  'string runType "runFromConfig"',
-                  'deck START 0',
-                  'deck STOP  8760',
-                  'deck dtSim 1',
-                  'PROJECT$ generic\\head',
-                  'PROJECT$ control\\hydraulic_control',
-                  'PROJECT$ hydraulic\\hydraulic',
-                  'PROJECT$ QSrc1\\QSrc',
-                  'PROJECT$ generic\\end']
 
-LINES_WITHOUT = ['bool ignoreOnlinePlotter  True',
-                 'int reduceCpu  4',
-                 'bool parseFileCreated True',
-                 'bool runCases True',
-                 'bool checkDeck True',
-                 'string outputLevel "INFO"',
-                 'bool doAutoUnitNumbering True',
-                 'bool generateUnitTypesUsed True',
-                 'bool addAutomaticEnergyBalance True',
-                 'string trnsysExePath "C:\\Trnsys18\\Exe\\TRNExe.exe"',
-                 'string scaling "False"',
-                 'string nameRef "DoublePipeDebug"',
-                 'string runType "runFromConfig"',
-                 'deck START 0',
-                 'deck STOP  8760',
-                 'deck dtSim 1',
-                 'PROJECT$ generic\\head',
-                 'PROJECT$ control\\hydraulic_control',
-                 'PROJECT$ hydraulic\\hydraulic',
-                 'PROJECT$ QSrc1\\QSrc',
-                 'PROJECT$ generic\\end',
-                 'string pathToConnectionInfo '
-                 f'{DATA_DIR_PATH}\\DdckPlaceHolderValues.json',
-                 'string PROJECT$ '
-                 f'{DATA_DIR_PATH}\\ddck',
-                 'string projectPath '
-                 f'{DATA_DIR_PATH}']
+def _getLines(_PATH=None, _without=False):
+    _LINES = ['bool ignoreOnlinePlotter  True',
+              'int reduceCpu  4',
+              'bool parseFileCreated True',
+              'bool runCases True',
+              'bool checkDeck True',
+              'string outputLevel "INFO"', ]
+    if not _without:
+        _LINES += ['string pathToConnectionInfo '
+                   '"C:\\Users\\epic.user\\EpicSimulation\\DdckPlaceHolderValues.json"', ]  # this one
+    _LINES += ['bool doAutoUnitNumbering True',
+               'bool generateUnitTypesUsed True',
+               'bool addAutomaticEnergyBalance True', ]
+    if not _without:
+        _LINES += ['string PROJECT$ '
+                   '"C:\\Users\\epic.user\\EpicSimulation\\ddck"', ]
+    _LINES += ['string trnsysExePath "C:\\Trnsys18\\Exe\\TRNExe.exe"',
+               'string scaling "False"', ]
+    if not _without:
+        _LINES += ['string projectPath '
+                   '"C:\\Users\\epic.user\\EpicSimulation"', ]
+    _LINES += ['string nameRef "DoublePipeDebug"',
+               'string runType "runFromConfig"',
+               'deck START 0',
+               'deck STOP  8760',
+               'deck dtSim 1',
+               'PROJECT$ generic\\head',
+               'PROJECT$ control\\hydraulic_control',
+               'PROJECT$ hydraulic\\hydraulic',
+               'PROJECT$ QSrc1\\QSrc',
+               'PROJECT$ generic\\end']
+    if _without:
+        _LINES += ['string pathToConnectionInfo '
+                   f'{_PATH}\\DdckPlaceHolderValues.json',
+                   'string PROJECT$ '
+                   f'{_PATH}\\ddck',
+                   'string projectPath '
+                   f'{_PATH}']
+    return _LINES
 
-PROCESS_ORIGINAL_LINES = ['bool processParallel False',
-                          'bool processQvsT False',
-                          'bool cleanModeLatex False',
-                          'bool forceProcess  True',
-                          'bool setPrintDataForGle True',
-                          'bool isTrnsys True',
-                          'int reduceCpu 1',
-                          'string outputLevel "DEBUG"',
-                          'bool createLatexPdf True',
-                          'bool calculateHeatDemand True',
-                          'int yearReadedInMonthlyFile -1',
-                          'int firstMonthUsed 0',
-                          'int numberOfYearsInHourlyFile 1',
-                          'string latexNames "latexNames.json"',
-                          'string pathBase "C:\\Users\\epic.user\\EpicSimulation"',
-                          'string dllTrnsysPath "C:\\Trnsys18\\UserLib\\ReleaseDlls"',
-                          'stringArray plotHourly "TInQSrc1"']
 
-PROCESS_LINES_WITHOUT = ['bool processParallel False',
-                         'bool processQvsT False',
-                         'bool cleanModeLatex False',
-                         'bool forceProcess  True',
-                         'bool setPrintDataForGle True',
-                         'bool isTrnsys True',
-                         'int reduceCpu 1',
-                         'string outputLevel "DEBUG"',
-                         'bool createLatexPdf True',
-                         'bool calculateHeatDemand True',
-                         'int yearReadedInMonthlyFile -1',
-                         'int firstMonthUsed 0',
-                         'int numberOfYearsInHourlyFile 1',
-                         'string latexNames "latexNames.json"',
-                         'string dllTrnsysPath "C:\\Trnsys18\\UserLib\\ReleaseDlls"',
-                         'stringArray plotHourly "TInQSrc1"',
-                         'string pathBase '
-                         f'{DATA_DIR_PATH}']
+_ORIGINAL_LINES = _getLines()
+_LINES_WITHOUT = _getLines(_DATA_DIR_PATH, _without=True)
 
-ORIGINAL_INPUTS = {'PROJECT$': 'C:\\Users\\epic.user\\EpicSimulation\\ddck',
-                   'addAutomaticEnergyBalance': True,
-                   'calc': [],
-                   'calcCumSumHourly': [],
-                   'calcCumSumTimeStep': [],
-                   'calcDaily': [],
-                   'calcHourly': [],
-                   'calcHourlyTest': [],
-                   'calcMonthly': [],
-                   'calcMonthlyFromHourly': [],
-                   'calcMonthlyMax': [],
-                   'calcMonthlyMin': [],
-                   'calcMonthlyTest': [],
-                   'calcTest': [],
-                   'calcTimeStep': [],
-                   'calcTimeStepTest': [],
-                   'checkDeck': True,
-                   'doAutoUnitNumbering': True,
-                   'generateUnitTypesUsed': True,
-                   'ignoreOnlinePlotter': True,
-                   'nameRef': 'DoublePipeDebug',
-                   'outputLevel': 'INFO',
-                   'parseFileCreated': True,
-                   'pathToConnectionInfo': 'C:\\Users\\epic.user\\EpicSimulation\\DdckPlaceHolderValues.json',
-                   'projectPath': 'C:\\Users\\epic.user\\EpicSimulation',
-                   'reduceCpu': 4,
-                   'runCases': True,
-                   'runType': 'runFromConfig',
-                   'scaling': 'False',
-                   'trnsysExePath': 'C:\\Trnsys18\\Exe\\TRNExe.exe'}
 
-INPUTS_WITHOUT = {'PROJECT$': f'{DATA_DIR_PATH}\\ddck',
-                  'addAutomaticEnergyBalance': True,
-                  'calc': [],
-                  'calcCumSumHourly': [],
-                  'calcCumSumTimeStep': [],
-                  'calcDaily': [],
-                  'calcHourly': [],
-                  'calcHourlyTest': [],
-                  'calcMonthly': [],
-                  'calcMonthlyFromHourly': [],
-                  'calcMonthlyMax': [],
-                  'calcMonthlyMin': [],
-                  'calcMonthlyTest': [],
-                  'calcTest': [],
-                  'calcTimeStep': [],
-                  'calcTimeStepTest': [],
-                  'checkDeck': True,
-                  'doAutoUnitNumbering': True,
-                  'generateUnitTypesUsed': True,
-                  'ignoreOnlinePlotter': True,
-                  'nameRef': 'DoublePipeDebug',
-                  'outputLevel': 'INFO',
-                  'parseFileCreated': True,
-                  'pathToConnectionInfo': f'{DATA_DIR_PATH}\\DdckPlaceHolderValues.json',
-                  'projectPath': _pl.WindowsPath(f'{DATA_DIR_PATH}'),
-                  'reduceCpu': 4,
-                  'runCases': True,
-                  'runType': 'runFromConfig',
-                  'scaling': 'False',
-                  'trnsysExePath': 'C:\\Trnsys18\\Exe\\TRNExe.exe'}
+def _getProcessLines(_PATH=None, _without=False):
+    _LINES = ['bool processParallel False',
+              'bool processQvsT False',
+              'bool cleanModeLatex False',
+              'bool forceProcess  True',
+              'bool setPrintDataForGle True',
+              'bool isTrnsys True',
+              'int reduceCpu 1',
+              'string outputLevel "DEBUG"',
+              'bool createLatexPdf True',
+              'bool calculateHeatDemand True',
+              'int yearReadedInMonthlyFile -1',
+              'int firstMonthUsed 0',
+              'int numberOfYearsInHourlyFile 1',
+              'string latexNames "latexNames.json"', ]
+    if not _without:
+        _LINES += ['string pathBase "C:\\Users\\epic.user\\EpicSimulation"', ]
+    _LINES += ['string dllTrnsysPath "C:\\Trnsys18\\UserLib\\ReleaseDlls"',
+               'stringArray plotHourly "TInQSrc1"']
+    if _without:
+        _LINES += ['string pathBase '
+                   f'{_DATA_DIR_PATH}']
+    return _LINES
 
-INPUTS_PROCESS = {'calc': [],
-                  'calcCumSumHourly': [],
-                  'calcCumSumTimeStep': [],
-                  'calcDaily': [],
-                  'calcHourly': [],
-                  'calcHourlyTest': [],
-                  'calcMonthly': [],
-                  'calcMonthlyFromHourly': [],
-                  'calcMonthlyMax': [],
-                  'calcMonthlyMin': [],
-                  'calcMonthlyTest': [],
-                  'calcTest': [],
-                  'calcTimeStep': [],
-                  'calcTimeStepTest': [],
-                  'calculateHeatDemand': True,
-                  'cleanModeLatex': False,
-                  'createLatexPdf': True,
-                  'dllTrnsysPath': 'C:\\Trnsys18\\UserLib\\ReleaseDlls',
-                  'firstMonthUsed': 0,
-                  'forceProcess': True,
-                  'isTrnsys': True,
-                  'latexNames': 'latexNames.json',
-                  'numberOfYearsInHourlyFile': 1,
-                  'outputLevel': 'DEBUG',
-                  'pathBase': 'C:\\Users\\epic.user\\EpicSimulation',
-                  'plotHourly': [['TInQSrc1']],
-                  'processParallel': False,
-                  'processQvsT': False,
-                  'reduceCpu': 1,
-                  'setPrintDataForGle': True,
-                  'yearReadedInMonthlyFile': -1}
 
-INPUTS_PROCESS_WITHOUT = {'calc': [],
-                          'calcCumSumHourly': [],
-                          'calcCumSumTimeStep': [],
-                          'calcDaily': [],
-                          'calcHourly': [],
-                          'calcHourlyTest': [],
-                          'calcMonthly': [],
-                          'calcMonthlyFromHourly': [],
-                          'calcMonthlyMax': [],
-                          'calcMonthlyMin': [],
-                          'calcMonthlyTest': [],
-                          'calcTest': [],
-                          'calcTimeStep': [],
-                          'calcTimeStepTest': [],
-                          'calculateHeatDemand': True,
-                          'cleanModeLatex': False,
-                          'createLatexPdf': True,
-                          'dllTrnsysPath': 'C:\\Trnsys18\\UserLib\\ReleaseDlls',
-                          'firstMonthUsed': 0,
-                          'forceProcess': True,
-                          'isTrnsys': True,
-                          'latexNames': 'latexNames.json',
-                          'numberOfYearsInHourlyFile': 1,
-                          'outputLevel': 'DEBUG',
-                          'plotHourly': [['TInQSrc1']],
-                          'processParallel': False,
-                          'processQvsT': False,
-                          'reduceCpu': 1,
-                          'setPrintDataForGle': True,
-                          'yearReadedInMonthlyFile': -1,
-                          'pathBase': _pl.WindowsPath(f'{DATA_DIR_PATH}')}
+_PROCESS_ORIGINAL_LINES = _getProcessLines()
+_PROCESS_LINES_WITHOUT = _getProcessLines(_PATH=_DATA_DIR_PATH, _without=True)
+
+
+def _getInputs(_PATH=None, _without=False, configType='run'):
+    _inputs = {'calc': [],
+               'calcCumSumHourly': [],
+               'calcCumSumTimeStep': [],
+               'calcDaily': [],
+               'calcHourly': [],
+               'calcHourlyTest': [],
+               'calcMonthly': [],
+               'calcMonthlyFromHourly': [],
+               'calcMonthlyMax': [],
+               'calcMonthlyMin': [],
+               'calcMonthlyTest': [],
+               'calcTest': [],
+               'calcTimeStep': [],
+               'calcTimeStepTest': [],
+               'reduceCpu': 4,
+               }
+    if configType == 'run':
+        _inputs['PROJECT$'] = 'C:\\Users\\epic.user\\EpicSimulation\\ddck'
+        _inputs['addAutomaticEnergyBalance'] = True
+        _inputs['checkDeck'] = True
+        _inputs['doAutoUnitNumbering'] = True
+        _inputs['generateUnitTypesUsed'] = True
+        _inputs['ignoreOnlinePlotter'] = True
+        _inputs['nameRef'] = 'DoublePipeDebug'
+        _inputs['outputLevel'] = 'INFO'
+        _inputs['parseFileCreated'] = True
+        _inputs['pathToConnectionInfo'] = 'C:\\Users\\epic.user\\EpicSimulation\\DdckPlaceHolderValues.json'
+        _inputs['projectPath'] = 'C:\\Users\\epic.user\\EpicSimulation'
+        _inputs['runCases'] = True
+        _inputs['runType'] = 'runFromConfig'
+        _inputs['scaling'] = 'False'
+        _inputs['trnsysExePath'] = 'C:\\Trnsys18\\Exe\\TRNExe.exe'
+        if _without:
+            _inputs['PROJECT$'] = f'{_DATA_DIR_PATH}\\ddck'
+            _inputs['pathToConnectionInfo'] = f'{_DATA_DIR_PATH}\\DdckPlaceHolderValues.json'
+            _inputs['projectPath'] = _pl.WindowsPath(f'{_DATA_DIR_PATH}')
+
+    elif configType == 'process':
+        _inputs['calculateHeatDemand'] = True
+        _inputs['cleanModeLatex'] = False
+        _inputs['createLatexPdf'] = True
+        _inputs['dllTrnsysPath'] = 'C:\\Trnsys18\\UserLib\\ReleaseDlls'
+        _inputs['firstMonthUsed'] = 0
+        _inputs['forceProcess'] = True
+        _inputs['isTrnsys'] = True
+        _inputs['latexNames'] = 'latexNames.json'
+        _inputs['numberOfYearsInHourlyFile'] = 1
+        _inputs['outputLevel'] = 'DEBUG'
+        _inputs['pathBase'] = 'C:\\Users\\epic.user\\EpicSimulation'
+        _inputs['plotHourly'] = [['TInQSrc1']]
+        _inputs['processParallel'] = False
+        _inputs['processQvsT'] = False
+        _inputs['reduceCpu'] = 1
+        _inputs['setPrintDataForGle'] = True
+        _inputs['yearReadedInMonthlyFile'] = -1
+        if _without:
+            _inputs['pathBase'] = _pl.WindowsPath(f'{_DATA_DIR_PATH}')
+
+    return _inputs
+
+
+_ORIGINAL_INPUTS = _getInputs()
+_INPUTS_WITHOUT = _getInputs(_DATA_DIR_PATH, _without=True)
+_INPUTS_PROCESS = _getInputs(configType='process')
+_INPUTS_PROCESS_WITHOUT = _getInputs(_DATA_DIR_PATH, configType='process', _without=True)
 
 
 class TestReadConfigTrnsys:
@@ -245,28 +168,28 @@ class TestReadConfigTrnsys:
 
     def testReadFileRunConfig(self):
         name = "run.config_with_absolute_paths"
-        lines = self.reader.readFile(DATA_DIR_PATH, name, self.inputs,
+        lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs,
                                      parseFileCreated=False, controlDataType=False)
-        assert lines == ORIGINAL_LINES
-        assert self.inputs == ORIGINAL_INPUTS
+        assert lines == _ORIGINAL_LINES
+        assert self.inputs == _ORIGINAL_INPUTS
 
     def testReadFileRunConfigWithoutAnyPaths(self):
         name = "run.config_without_any_paths"
-        lines = self.reader.readFile(DATA_DIR_PATH, name, self.inputs,
+        lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs,
                                      parseFileCreated=False, controlDataType=False)
-        assert self.inputs == INPUTS_WITHOUT
-        assert lines == LINES_WITHOUT
+        assert self.inputs == _INPUTS_WITHOUT
+        assert lines == _LINES_WITHOUT
 
     def testReadFileProcessConfig(self):
         name = "process.config_with_absolute_paths"
-        lines = self.reader.readFile(DATA_DIR_PATH, name, self.inputs,
+        lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs,
                                      parseFileCreated=False, controlDataType=False)
-        assert self.inputs == INPUTS_PROCESS
-        assert lines == PROCESS_ORIGINAL_LINES
+        assert self.inputs == _INPUTS_PROCESS
+        assert lines == _PROCESS_ORIGINAL_LINES
 
     def testReadFileProcessConfigWithoutPaths(self):
         name = "process.config_without_paths"
-        lines = self.reader.readFile(DATA_DIR_PATH, name, self.inputs,
+        lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs,
                                      parseFileCreated=False, controlDataType=False)
-        assert self.inputs == INPUTS_PROCESS_WITHOUT
-        assert lines == PROCESS_LINES_WITHOUT
+        assert self.inputs == _INPUTS_PROCESS_WITHOUT
+        assert lines == _PROCESS_LINES_WITHOUT

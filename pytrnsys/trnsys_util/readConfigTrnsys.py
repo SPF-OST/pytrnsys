@@ -211,8 +211,8 @@ class ReadConfigTrnsys:
                 else:
                     pass
 
-        lines, inputs = self._addMissingDefaultPaths(addPathBase, addPathToConnectionInfo, addProjectPath, addProjects, inputs, lines,
-                                     name, path)
+        lines, inputs = self._addMissingDefaultPaths(addPathBase, addPathToConnectionInfo, addProjectPath, addProjects,
+                                                     inputs, lines, name, path)
 
         return lines
 
