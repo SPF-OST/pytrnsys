@@ -13,7 +13,7 @@
 ** constants independent of modes
 *********************************
 CONSTANTS 5
-sizeHpNom = 6.5 ! 10 !12 IGG From 2nd Campaign Pdhw=7.78 kW at Te0-Tc20 and Psh=6.5kW at Te0-Tc20
+sizeHpNom = 6.5 ! 10 GG From 2nd Campaign Pdhw=7.78 kW at Te0-Tc20 and Psh=6.5kW at Te0-Tc20
 MfrHpCond1Ref = 746!SH IGG 10 kW  deltaT 7.5C
 MfrHpCond2Ref = 160  !DHW IGG 10 kW  deltaT 35.0C
 TMinEvapTout = TMinEvapTin - 3
