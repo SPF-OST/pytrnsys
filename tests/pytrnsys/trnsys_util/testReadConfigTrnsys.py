@@ -116,7 +116,7 @@ def _getInputs(path=None, without=False, configType='run'):
         if without:
             inputs['PROJECT$'] = f'{path}\\ddck'
             inputs['pathToConnectionInfo'] = f'{path}\\DdckPlaceHolderValues.json'
-            inputs['projectPath'] = _pl.WindowsPath(f'{path}')
+            inputs['projectPath'] = _pl.Path(f'{path}')
 
     elif configType == 'process':
         inputs['calculateHeatDemand'] = True
@@ -137,7 +137,7 @@ def _getInputs(path=None, without=False, configType='run'):
         inputs['setPrintDataForGle'] = True
         inputs['yearReadedInMonthlyFile'] = -1
         if without:
-            inputs['pathBase'] = _pl.WindowsPath(f'{path}')
+            inputs['pathBase'] = _pl.Path(f'{path}')
 
     return inputs
 
