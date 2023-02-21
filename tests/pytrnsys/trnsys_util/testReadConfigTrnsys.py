@@ -1,5 +1,6 @@
 import pathlib as _pl
 import pytest as _pt
+import os as _os
 
 import pytrnsys.trnsys_util.readConfigTrnsys as _rct
 
@@ -39,9 +40,9 @@ def _getLines(path=None, without=False):
               'PROJECT$ generic\\end']
     if without:
         lines += ['string pathToConnectionInfo '
-                  f'{path}\\DdckPlaceHolderValues.json',
+                  f'{_os.path.join(path, "DdckPlaceHolderValues.json")}',
                   'string PROJECT$ '
-                  f'{path}\\ddck',
+                  f'{_os.path.join(path, "ddck")}',
                   'string projectPath '
                   f'{path}']
     return lines
@@ -114,8 +115,8 @@ def _getInputs(path=None, without=False, configType='run'):
         inputs['scaling'] = 'False'
         inputs['trnsysExePath'] = 'C:\\Trnsys18\\Exe\\TRNExe.exe'
         if without:
-            inputs['PROJECT$'] = f'{path}\\ddck'
-            inputs['pathToConnectionInfo'] = f'{path}\\DdckPlaceHolderValues.json'
+            inputs['PROJECT$'] = f'{_os.path.join(path, "ddck")}'
+            inputs['pathToConnectionInfo'] = f'{_os.path.join(path, "DdckPlaceHolderValues.json")}'
             inputs['projectPath'] = _pl.Path(f'{path}')
 
     elif configType == 'process':
