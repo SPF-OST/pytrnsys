@@ -7,27 +7,27 @@ _DATA_DIR_PATH = _pl.Path(__file__).parent / "data"
 
 
 def _getLines(path=None, without=False):
-    LINES = ['bool ignoreOnlinePlotter  True',
+    lines = ['bool ignoreOnlinePlotter  True',
              'int reduceCpu  4',
              'bool parseFileCreated True',
              'bool runCases True',
              'bool checkDeck True',
              'string outputLevel "INFO"', ]
     if not without:
-        LINES += ['string pathToConnectionInfo '
+        lines += ['string pathToConnectionInfo '
                   '"C:\\Users\\epic.user\\EpicSimulation\\DdckPlaceHolderValues.json"', ]  # this one
-    LINES += ['bool doAutoUnitNumbering True',
+    lines += ['bool doAutoUnitNumbering True',
               'bool generateUnitTypesUsed True',
               'bool addAutomaticEnergyBalance True', ]
     if not without:
-        LINES += ['string PROJECT$ '
+        lines += ['string PROJECT$ '
                   '"C:\\Users\\epic.user\\EpicSimulation\\ddck"', ]
-    LINES += ['string trnsysExePath "C:\\Trnsys18\\Exe\\TRNExe.exe"',
+    lines += ['string trnsysExePath "C:\\Trnsys18\\Exe\\TRNExe.exe"',
               'string scaling "False"', ]
     if not without:
-        LINES += ['string projectPath '
+        lines += ['string projectPath '
                   '"C:\\Users\\epic.user\\EpicSimulation"', ]
-    LINES += ['string nameRef "DoublePipeDebug"',
+    lines += ['string nameRef "DoublePipeDebug"',
               'string runType "runFromConfig"',
               'deck START 0',
               'deck STOP  8760',
@@ -38,13 +38,13 @@ def _getLines(path=None, without=False):
               'PROJECT$ QSrc1\\QSrc',
               'PROJECT$ generic\\end']
     if without:
-        LINES += ['string pathToConnectionInfo '
+        lines += ['string pathToConnectionInfo '
                   f'{path}\\DdckPlaceHolderValues.json',
                   'string PROJECT$ '
                   f'{path}\\ddck',
                   'string projectPath '
                   f'{path}']
-    return LINES
+    return lines
 
 
 _ORIGINAL_LINES = _getLines()
@@ -52,7 +52,7 @@ _LINES_WITHOUT = _getLines(_DATA_DIR_PATH, without=True)
 
 
 def _getProcessLines(path=None, without=False):
-    LINES = ['bool processParallel False',
+    lines = ['bool processParallel False',
              'bool processQvsT False',
              'bool cleanModeLatex False',
              'bool forceProcess  True',
@@ -67,13 +67,13 @@ def _getProcessLines(path=None, without=False):
              'int numberOfYearsInHourlyFile 1',
              'string latexNames "latexNames.json"', ]
     if not without:
-        LINES += ['string pathBase "C:\\Users\\epic.user\\EpicSimulation"', ]
-    LINES += ['string dllTrnsysPath "C:\\Trnsys18\\UserLib\\ReleaseDlls"',
+        lines += ['string pathBase "C:\\Users\\epic.user\\EpicSimulation"', ]
+    lines += ['string dllTrnsysPath "C:\\Trnsys18\\UserLib\\ReleaseDlls"',
               'stringArray plotHourly "TInQSrc1"']
     if without:
-        LINES += ['string pathBase '
+        lines += ['string pathBase '
                   f'{path}']
-    return LINES
+    return lines
 
 
 _PROCESS_ORIGINAL_LINES = _getProcessLines()
