@@ -6,25 +6,25 @@ import pytrnsys.trnsys_util.readConfigTrnsys as _rct
 _DATA_DIR_PATH = _pl.Path(__file__).parent / "data"
 
 
-def _getLines(_PATH=None, _without=False):
+def _getLines(path=None, without=False):
     _LINES = ['bool ignoreOnlinePlotter  True',
               'int reduceCpu  4',
               'bool parseFileCreated True',
               'bool runCases True',
               'bool checkDeck True',
               'string outputLevel "INFO"', ]
-    if not _without:
+    if not without:
         _LINES += ['string pathToConnectionInfo '
                    '"C:\\Users\\epic.user\\EpicSimulation\\DdckPlaceHolderValues.json"', ]  # this one
     _LINES += ['bool doAutoUnitNumbering True',
                'bool generateUnitTypesUsed True',
                'bool addAutomaticEnergyBalance True', ]
-    if not _without:
+    if not without:
         _LINES += ['string PROJECT$ '
                    '"C:\\Users\\epic.user\\EpicSimulation\\ddck"', ]
     _LINES += ['string trnsysExePath "C:\\Trnsys18\\Exe\\TRNExe.exe"',
                'string scaling "False"', ]
-    if not _without:
+    if not without:
         _LINES += ['string projectPath '
                    '"C:\\Users\\epic.user\\EpicSimulation"', ]
     _LINES += ['string nameRef "DoublePipeDebug"',
@@ -37,21 +37,21 @@ def _getLines(_PATH=None, _without=False):
                'PROJECT$ hydraulic\\hydraulic',
                'PROJECT$ QSrc1\\QSrc',
                'PROJECT$ generic\\end']
-    if _without:
+    if without:
         _LINES += ['string pathToConnectionInfo '
-                   f'{_PATH}\\DdckPlaceHolderValues.json',
+                   f'{path}\\DdckPlaceHolderValues.json',
                    'string PROJECT$ '
-                   f'{_PATH}\\ddck',
+                   f'{path}\\ddck',
                    'string projectPath '
-                   f'{_PATH}']
+                   f'{path}']
     return _LINES
 
 
 _ORIGINAL_LINES = _getLines()
-_LINES_WITHOUT = _getLines(_DATA_DIR_PATH, _without=True)
+_LINES_WITHOUT = _getLines(_DATA_DIR_PATH, without=True)
 
 
-def _getProcessLines(_PATH=None, _without=False):
+def _getProcessLines(path=None, without=False):
     _LINES = ['bool processParallel False',
               'bool processQvsT False',
               'bool cleanModeLatex False',
@@ -66,21 +66,21 @@ def _getProcessLines(_PATH=None, _without=False):
               'int firstMonthUsed 0',
               'int numberOfYearsInHourlyFile 1',
               'string latexNames "latexNames.json"', ]
-    if not _without:
+    if not without:
         _LINES += ['string pathBase "C:\\Users\\epic.user\\EpicSimulation"', ]
     _LINES += ['string dllTrnsysPath "C:\\Trnsys18\\UserLib\\ReleaseDlls"',
                'stringArray plotHourly "TInQSrc1"']
-    if _without:
+    if without:
         _LINES += ['string pathBase '
-                   f'{_DATA_DIR_PATH}']
+                   f'{path}']
     return _LINES
 
 
 _PROCESS_ORIGINAL_LINES = _getProcessLines()
-_PROCESS_LINES_WITHOUT = _getProcessLines(_PATH=_DATA_DIR_PATH, _without=True)
+_PROCESS_LINES_WITHOUT = _getProcessLines(path=_DATA_DIR_PATH, without=True)
 
 
-def _getInputs(_PATH=None, _without=False, configType='run'):
+def _getInputs(path=None, without=False, configType='run'):
     _inputs = {'calc': [],
                'calcCumSumHourly': [],
                'calcCumSumTimeStep': [],
@@ -113,10 +113,10 @@ def _getInputs(_PATH=None, _without=False, configType='run'):
         _inputs['runType'] = 'runFromConfig'
         _inputs['scaling'] = 'False'
         _inputs['trnsysExePath'] = 'C:\\Trnsys18\\Exe\\TRNExe.exe'
-        if _without:
-            _inputs['PROJECT$'] = f'{_DATA_DIR_PATH}\\ddck'
-            _inputs['pathToConnectionInfo'] = f'{_DATA_DIR_PATH}\\DdckPlaceHolderValues.json'
-            _inputs['projectPath'] = _pl.WindowsPath(f'{_DATA_DIR_PATH}')
+        if without:
+            _inputs['PROJECT$'] = f'{path}\\ddck'
+            _inputs['pathToConnectionInfo'] = f'{path}\\DdckPlaceHolderValues.json'
+            _inputs['projectPath'] = _pl.WindowsPath(f'{path}')
 
     elif configType == 'process':
         _inputs['calculateHeatDemand'] = True
@@ -136,16 +136,16 @@ def _getInputs(_PATH=None, _without=False, configType='run'):
         _inputs['reduceCpu'] = 1
         _inputs['setPrintDataForGle'] = True
         _inputs['yearReadedInMonthlyFile'] = -1
-        if _without:
-            _inputs['pathBase'] = _pl.WindowsPath(f'{_DATA_DIR_PATH}')
+        if without:
+            _inputs['pathBase'] = _pl.WindowsPath(f'{path}')
 
     return _inputs
 
 
 _ORIGINAL_INPUTS = _getInputs()
-_INPUTS_WITHOUT = _getInputs(_DATA_DIR_PATH, _without=True)
+_INPUTS_WITHOUT = _getInputs(_DATA_DIR_PATH, without=True)
 _INPUTS_PROCESS = _getInputs(configType='process')
-_INPUTS_PROCESS_WITHOUT = _getInputs(_DATA_DIR_PATH, configType='process', _without=True)
+_INPUTS_PROCESS_WITHOUT = _getInputs(_DATA_DIR_PATH, without=True, configType='process')
 
 
 class TestReadConfigTrnsys:
