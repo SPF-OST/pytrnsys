@@ -1,6 +1,6 @@
 import pathlib as _pl
-import pytest as _pt
 import os as _os
+import pytest as _pt
 
 import pytrnsys.trnsys_util.readConfigTrnsys as _rct
 
