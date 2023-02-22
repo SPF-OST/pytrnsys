@@ -2231,7 +2231,7 @@ class ProcessTrnsysDf:
                         value = jointDicts[key]
                     self.resultsDict[key] = value
 
-        self.saveResultsFile(self.resultsDict)
+            self.saveResultsFile(self.resultsDict)
 
     def saveResultsFile(self,resultsDict):
 
