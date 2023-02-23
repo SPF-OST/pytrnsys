@@ -63,7 +63,7 @@ TSetSh  = [2,7]
 
 CONSTANTS 12
 tavgTamb = 96  ! time for averaging of outdoor temperature for the evaluation of heating season or no heating season, h
-offsetDhw = 6  ! Usually we had it at 7.5 . This means the heat pump would need to reach TdhwSet+7.5 !!
+offsetDhw = 5  ! Usually we had it at 7.5 . This means the heat pump would need to reach TdhwSet+7.5 !!
 onsetDhw  = 2 !
 TwwStAuxOFF = tDhwSet+offsetDhw  ! Stop heating DHW if TStoreUp > TWWStAuxOFF
 TwwStAuxON  = tDhwSet+onsetDhw   ! Start heating DHW if TStoreDhwBot < TwwStAuxON

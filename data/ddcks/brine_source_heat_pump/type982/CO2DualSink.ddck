@@ -14,8 +14,8 @@
 *********************************
 CONSTANTS 5
 sizeHpNom = 6.5 ! 10 GG From 2nd Campaign Pdhw=7.78 kW at Te0-Tc20 and Psh=6.5kW at Te0-Tc20
-MfrHpCond1Ref = 746!SH IGG 10 kW  deltaT 7.5C
-MfrHpCond2Ref = 160  !DHW IGG 10 kW  deltaT 35.0C
+MfrHpCond1Ref = 746 !SH IGG 6.5 kW  deltaT 7.5C
+MfrHpCond2Ref = 160  !DHW IGG 6.5 kW  deltaT 35.0C
 TMinEvapTout = TMinEvapTin - 3
 tCondMaxHp = 80
 
@@ -23,7 +23,7 @@ tCondMaxHp = 80
 ** TO BE CHECKED
 *********************************
 EQUATIONS 4
-MfrHpEvapRef = 1865	! kg/h IGG 10 kW  deltaT 3.0C
+MfrHpEvapRef = 1865	! kg/h IGG 6.5 kW  deltaT 3.0C
 TEvapMaxHp = 35		! deg C
 TMinEvapTin = -8		! deg C !allows 0°C from ice storage!
 cpEvap = cpWat		! kJ/kgK  ! changed from Bri to Wat as CO2 HP has water at evap - MS

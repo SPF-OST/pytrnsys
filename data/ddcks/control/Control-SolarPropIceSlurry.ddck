@@ -9,6 +9,7 @@
 ** Date:  23.04.2018   
 ** update: 03.05.2022: MS changed mass flow in evaporator loop to be independent of HX 
 ** size in the ice slurry tank (using real slurry tank type 865) 
+** update 22.02.2023 IGG improve stratification in tank. Parametrize MfrPuCircNom
 ******************************************
 
 ******************************************************************************************
@@ -21,7 +22,7 @@
 ********************************
 
 
-EQUATIONS 15
+EQUATIONS 17
 *** Massflowrates
 **MfrSeries = 0 !does not exist 
 MfrPuSH = MfrBuiRd
@@ -34,14 +35,17 @@ xFracMixHxTes = AND(NOT(OR(ProWs,ProPar)),NOT(blockCol))
 **MfrPuCol = pumpColOn*(ProWs*MfrCPri+MfrCPriNom*(ProCs+ProDoubleHpCs)) !+ProSeries*MfrSeries)
 MfrPuCol = pumpColOn*MfrCPri*(ProWs+ProCs+ProPar+ProDoubleHpCs) !+ProSeries*MfrSeries)
 
-MfrPuDHW = MfrSrcDHWHXUsed!NOT(GT(MfrDHWset,0))*150+GT(MfrDHWset,0)*MfrDHWset
-MfrPuCirc = NOT(GT(MfrDHWset,0))*150
+MfrPuDHW =  NOT(GT(MfrDHWset,0))*LT(TPiPuCircOut_Rc,TPiPuCircOutmin)*MfrPuCircNom+GT(MfrDHWset,0)*MfrSrcDHWHXUsed !IGG Improving stratification NOT(GT(MfrDHWset,0))*MfrPuCircNom+GT(MfrDHWset,0)*MfrSrcDHWHXUsed 
+MfrPuCirc = NOT(GT(MfrDHWset,0))*LT(TPiPuCircOut_Rc,TPiPuCircOutmin)*MfrPuCircNom !IGG Improving stratification NOT(GT(MfrDHWset,0))*MfrPuCircNom
 MfrPuHpEvap = MfrHpEvapUsed*hpIsOn
 MfrPuHpCond = MfrHpCondNom*hpIsOn
 *** here allow loading of SH-storage, too! Load Tes_SH xFracDivSolarDhwSh = 1! ???
 xFracDivSolarDhwSh = GT(TTesDhwBotRc,TTesShBotRc)*BoHS !AND(AND(GT(TTesDhwBotRc+UdbProWs,TCollExpectedRc),LT(TTesShBotRc, TCollExpectedRc)),BoHS) !AND(AND(GT(T1_Tes1,TCollExpected),LT(TsensorTesSh, TCollExpected)),BoHS)
-xFracDivDhw = NOT(GT(MfrDHWset,0))
-xFracDivDhwOut = NOT(GT(MfrDHWset,0))
+xFracDivDhw = GT(TPiPuDhwOut,TRetStratif) !IGG improving stratification NOT(GT(MfrDHWset,0))
+xFracDivDhwOut = GT(TPiPuDhwOut,TRetStratif) !IGG improving stratification NOT(GT(MfrDHWset,0))
+
+TRetStratif = 30.0 !IGG Better not recall as it changes from timestep to timestep
+TPiPuCircOutmin = 50.0 ! IGG  Minimum temperature to switch on recirculation
 
 EQUATIONS 12
 TTesDhwAuxOff = T8_Tes1
