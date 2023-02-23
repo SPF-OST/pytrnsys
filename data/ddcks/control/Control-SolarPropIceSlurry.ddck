@@ -184,7 +184,7 @@ PARAMETERS 1
 **     
 INPUTS 9
 TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh TPiPuCircOut
-0.0    20  0.0 0.0  0.0 0.0 0.0 0.0 0.0
+0.0    20  0.0 0.0  0.0 0.0 0.0 0.0 0.0 0.0 
 
 EQUATIONS 10              ! Recalled values for collector control
 TesOverheatRc = [63,1]     ! recalled value of boolean for storage protection, 0/1
