@@ -180,13 +180,13 @@ BlockDoubleCsHp = 0
 
 UNIT 63 TYPE 993     ! Input value recall (element RcC)
 PARAMETERS 1     
-9    ! 1: number of variables to be remembered
+10    ! 1: number of variables to be remembered
 **     
 INPUTS 9
-TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh
+TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh TPiPuCircOut
 0.0    20  0.0 0.0  0.0 0.0 0.0 0.0 0.0
 
-EQUATIONS 9              ! Recalled values for collector control
+EQUATIONS 10              ! Recalled values for collector control
 TesOverheatRc = [63,1]     ! recalled value of boolean for storage protection, 0/1
 T10_Tes1Rc = [63,2]     ! recalled value from upper storage part for storage protection, °C
 BoAuxWWonRc = [63,3]     
@@ -196,6 +196,7 @@ TTesShBotRc = [63,6]
 TAvgPCMRc = [63,7]
 BlockWsRc = [63,8]
 TPcmTooHighRc = [63,9]
+TPiPuCircOut_Rc = [63,10]
 
 EQUATIONS 2
 qAux1_Tes1 = qAux1_Tes1_nom_kW*auxStoreDHWIsOn
