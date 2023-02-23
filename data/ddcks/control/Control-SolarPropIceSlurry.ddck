@@ -182,7 +182,7 @@ UNIT 63 TYPE 993     ! Input value recall (element RcC)
 PARAMETERS 1     
 10    ! 1: number of variables to be remembered
 **     
-INPUTS 9
+INPUTS 10
 TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh TPiPuCircOut
 0.0    20  0.0 0.0  0.0 0.0 0.0 0.0 0.0 0.0 
 
