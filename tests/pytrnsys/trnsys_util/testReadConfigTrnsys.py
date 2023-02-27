@@ -19,7 +19,7 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
     ]
     if not basePath:
         lines += [
-            'string pathToConnectionInfo "C:\\Users\\epic.user\\EpicSimulation\\DdckPlaceHolderValues.json"',
+            r'string pathToConnectionInfo "C:\Users\epic.user\EpicSimulation\DdckPlaceHolderValues.json"',
         ]
     lines += [
         "bool doAutoUnitNumbering True",
@@ -28,15 +28,15 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
     ]
     if not basePath:
         lines += [
-            'string PROJECT$ "C:\\Users\\epic.user\\EpicSimulation\\ddck"',
+            r'string PROJECT$ "C:\Users\epic.user\EpicSimulation\ddck"',
         ]
     lines += [
-        'string trnsysExePath "C:\\Trnsys18\\Exe\\TRNExe.exe"',
+        r'string trnsysExePath "C:\Trnsys18\Exe\TRNExe.exe"',
         'string scaling "False"',
     ]
     if not basePath:
         lines += [
-            'string projectPath "C:\\Users\\epic.user\\EpicSimulation"',
+            r'string projectPath "C:\Users\epic.user\EpicSimulation"',
         ]
     lines += [
         'string nameRef "DoublePipeDebug"',
@@ -44,11 +44,11 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
         "deck START 0",
         "deck STOP  8760",
         "deck dtSim 1",
-        "PROJECT$ generic\\head",
-        "PROJECT$ control\\hydraulic_control",
-        "PROJECT$ hydraulic\\hydraulic",
-        "PROJECT$ QSrc1\\QSrc",
-        "PROJECT$ generic\\end",
+        r"PROJECT$ generic\head",
+        r"PROJECT$ control\hydraulic_control",
+        r"PROJECT$ hydraulic\hydraulic",
+        r"PROJECT$ QSrc1\QSrc",
+        r"PROJECT$ generic\end",
     ]
     if basePath:
         lines += [
@@ -82,9 +82,9 @@ def _getProcessLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
     ]
     if not basePath:
         lines += [
-            'string pathBase "C:\\Users\\epic.user\\EpicSimulation"',
+            r'string pathBase "C:\Users\epic.user\EpicSimulation"',
         ]
-    lines += ['string dllTrnsysPath "C:\\Trnsys18\\UserLib\\ReleaseDlls"', 'stringArray plotHourly "TInQSrc1"']
+    lines += [r'string dllTrnsysPath "C:\Trnsys18\UserLib\ReleaseDlls"', 'stringArray plotHourly "TInQSrc1"']
     if basePath:
         lines += [f"string pathBase {basePath}"]
     return lines
@@ -115,7 +115,7 @@ def _getInputs(
         "reduceCpu": 4,
     }
     if configType == "run":
-        inputs["PROJECT$"] = "C:\\Users\\epic.user\\EpicSimulation\\ddck"
+        inputs["PROJECT$"] = r"C:\Users\epic.user\EpicSimulation\ddck"
         inputs["addAutomaticEnergyBalance"] = True
         inputs["checkDeck"] = True
         inputs["doAutoUnitNumbering"] = True
@@ -124,12 +124,12 @@ def _getInputs(
         inputs["nameRef"] = "DoublePipeDebug"
         inputs["outputLevel"] = "INFO"
         inputs["parseFileCreated"] = True
-        inputs["pathToConnectionInfo"] = "C:\\Users\\epic.user\\EpicSimulation\\DdckPlaceHolderValues.json"
-        inputs["projectPath"] = "C:\\Users\\epic.user\\EpicSimulation"
+        inputs["pathToConnectionInfo"] = r"C:\Users\epic.user\EpicSimulation\DdckPlaceHolderValues.json"
+        inputs["projectPath"] = r"C:\Users\epic.user\EpicSimulation"
         inputs["runCases"] = True
         inputs["runType"] = "runFromConfig"
         inputs["scaling"] = "False"
-        inputs["trnsysExePath"] = "C:\\Trnsys18\\Exe\\TRNExe.exe"
+        inputs["trnsysExePath"] = r"C:\Trnsys18\Exe\TRNExe.exe"
         if basePath:
             inputs["PROJECT$"] = str(basePath / "ddck")
             inputs["pathToConnectionInfo"] = str(basePath / "DdckPlaceHolderValues.json")
@@ -139,14 +139,14 @@ def _getInputs(
         inputs["calculateHeatDemand"] = True
         inputs["cleanModeLatex"] = False
         inputs["createLatexPdf"] = True
-        inputs["dllTrnsysPath"] = "C:\\Trnsys18\\UserLib\\ReleaseDlls"
+        inputs["dllTrnsysPath"] = r"C:\Trnsys18\UserLib\ReleaseDlls"
         inputs["firstMonthUsed"] = 0
         inputs["forceProcess"] = True
         inputs["isTrnsys"] = True
         inputs["latexNames"] = "latexNames.json"
         inputs["numberOfYearsInHourlyFile"] = 1
         inputs["outputLevel"] = "DEBUG"
-        inputs["pathBase"] = "C:\\Users\\epic.user\\EpicSimulation"
+        inputs["pathBase"] = r"C:\Users\epic.user\EpicSimulation"
         inputs["plotHourly"] = [["TInQSrc1"]]
         inputs["processParallel"] = False
         inputs["processQvsT"] = False
