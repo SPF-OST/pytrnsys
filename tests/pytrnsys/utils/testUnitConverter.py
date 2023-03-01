@@ -104,6 +104,10 @@ class TestUnitConverter:
     def testGetConversionFactor(self, name, factor):
         result = self.converter.getConversionFactor(name)
 
+    def testGetConversionFactorRaises(self):
+        with _pt.raises(ValueError):
+            self.converter.getConversionFactor("test")
+
     def testGetAvailableConversions(self):
         names = self.converter.getAvailableConversions()
         assert names == _CONVERSION_NAMES
@@ -112,3 +116,12 @@ class TestUnitConverter:
     def testConversionsUsingConstantConverter(self, name, factor):
         self.converter.setConversionFactor(name)
         assert self.converter.convert(1) == factor
+
+    @_pt.mark.parametrize("name, factor", _CONVERSION_NAME_CASES)
+    def testConversionsOverridingAssignedFactor(self, name, factor):
+        self.converter.setConversionFactor("kPaToBar")
+        assert self.converter.convert(1, desiredConversionFactor=name) == factor
+
+    @_pt.mark.parametrize("name, factor", _CONVERSION_NAME_CASES)
+    def testConversionsWithoutAssigningFactorBeforehand(self, name, factor):
+        assert self.converter.convert(1, desiredConversionFactor=name) == factor
