@@ -13,10 +13,9 @@ _RELATIVE_PATH2 = _pl.Path(".")
 
 def _isRelativePath(basePath):
     path = str(basePath)
-    if (path == ".") or (path == ".."):
+    if path in [".", ".."]:
         return True
-    else:
-        return False
+    return False
 
 
 def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
