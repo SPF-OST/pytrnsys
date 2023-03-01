@@ -106,8 +106,11 @@ def _getProcessLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
         lines += [
             r'string pathBase "C:\Users\epic.user\EpicSimulation"',
         ]
+    elif _isRelativePath(basePath):
+        lines += [f"string pathBase \"{basePath}\""]
+
     lines += [r'string dllTrnsysPath "C:\Trnsys18\UserLib\ReleaseDlls"', 'stringArray plotHourly "TInQSrc1"']
-    if basePath:
+    if basePath and not _isRelativePath(basePath):
         lines += [f"string pathBase {basePath}"]
     return lines
 
@@ -173,14 +176,20 @@ def _getInputs(
         inputs["latexNames"] = "latexNames.json"
         inputs["numberOfYearsInHourlyFile"] = 1
         inputs["outputLevel"] = "DEBUG"
-        inputs["pathBase"] = r"C:\Users\epic.user\EpicSimulation"
+
+        if _isRelativePath(basePath):
+            inputs["pathBase"] = str(basePath)
+        else:
+            inputs["pathBase"] = r"C:\Users\epic.user\EpicSimulation"
+
         inputs["plotHourly"] = [["TInQSrc1"]]
         inputs["processParallel"] = False
         inputs["processQvsT"] = False
         inputs["reduceCpu"] = 1
         inputs["setPrintDataForGle"] = True
         inputs["yearReadedInMonthlyFile"] = -1
-        if basePath:
+
+        if basePath and not _isRelativePath(basePath):
             inputs["pathBase"] = basePath
 
     return inputs
@@ -252,3 +261,15 @@ class TestReadConfigTrnsys:
         lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
         assert self.inputs == _INPUTS_PROCESS_WITHOUT_PATHS
         assert lines == _PROCESS_LINES_WITHOUT_PATHS
+
+    def testReadFileProcessConfigWithRelativePaths(self):
+        name = "process.config_with_relative_paths"
+        lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
+        assert self.inputs == _INPUTS_PROCESS_WITH_RELATIVE_PATHS
+        assert lines == _PROCESS_LINES_WITH_RELATIVE_PATHS
+
+    def testReadFileProcessConfigWithRelativePaths2(self):
+        name = "process.config_with_relative_paths2"
+        lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
+        assert self.inputs == _INPUTS_PROCESS_WITH_RELATIVE_PATHS2
+        assert lines == _PROCESS_LINES_WITH_RELATIVE_PATHS2
