@@ -182,6 +182,7 @@ class ProcessParallelTrnsys:
         self.configPath = path
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated)
+        #self.inputs["pathBase"] = path
         self.logger.setLevel(self.inputs["outputLevel"])
         if "latexNames" in self.inputs.keys():
             if ":" not in self.inputs["latexNames"]:

@@ -22,7 +22,7 @@
 ********************************
 
 
-EQUATIONS 17
+EQUATIONS 15
 *** Massflowrates
 **MfrSeries = 0 !does not exist 
 MfrPuSH = MfrBuiRd
@@ -35,17 +35,14 @@ xFracMixHxTes = AND(NOT(OR(ProWs,ProPar)),NOT(blockCol))
 **MfrPuCol = pumpColOn*(ProWs*MfrCPri+MfrCPriNom*(ProCs+ProDoubleHpCs)) !+ProSeries*MfrSeries)
 MfrPuCol = pumpColOn*MfrCPri*(ProWs+ProCs+ProPar+ProDoubleHpCs) !+ProSeries*MfrSeries)
 
-MfrPuDHW =  NOT(GT(MfrDHWset,0))*LT(TPiPuCircOut_Rc,TPiPuCircOutmin)*MfrPuCircNom+GT(MfrDHWset,0)*MfrSrcDHWHXUsed !IGG Improving stratification NOT(GT(MfrDHWset,0))*MfrPuCircNom+GT(MfrDHWset,0)*MfrSrcDHWHXUsed 
-MfrPuCirc = NOT(GT(MfrDHWset,0))*LT(TPiPuCircOut_Rc,TPiPuCircOutmin)*MfrPuCircNom !IGG Improving stratification NOT(GT(MfrDHWset,0))*MfrPuCircNom
+MfrPuDHW = MfrSrcDHWHXUsed!NOT(GT(MfrDHWset,0))*MfrPuCircNom+GT(MfrDHWset,0)*MfrDHWset
+MfrPuCirc = 0*NOT(GT(MfrDHWset,0))*MfrPuCircNom ! IGG NOT(GT(MfrDHWset,0))*150
 MfrPuHpEvap = MfrHpEvapUsed*hpIsOn
 MfrPuHpCond = MfrHpCondNom*hpIsOn
 *** here allow loading of SH-storage, too! Load Tes_SH xFracDivSolarDhwSh = 1! ???
 xFracDivSolarDhwSh = GT(TTesDhwBotRc,TTesShBotRc)*BoHS !AND(AND(GT(TTesDhwBotRc+UdbProWs,TCollExpectedRc),LT(TTesShBotRc, TCollExpectedRc)),BoHS) !AND(AND(GT(T1_Tes1,TCollExpected),LT(TsensorTesSh, TCollExpected)),BoHS)
-xFracDivDhw = GT(TPiPuDhwOut,TRetStratif) !IGG improving stratification NOT(GT(MfrDHWset,0))
-xFracDivDhwOut = GT(TPiPuDhwOut,TRetStratif) !IGG improving stratification NOT(GT(MfrDHWset,0))
-
-TRetStratif = 30.0 !IGG Better not recall as it changes from timestep to timestep
-TPiPuCircOutmin = 50.0 ! IGG  Minimum temperature to switch on recirculation
+xFracDivDhw = NOT(GT(MfrDHWset,0))
+xFracDivDhwOut = NOT(GT(MfrDHWset,0))
 
 EQUATIONS 12
 TTesDhwAuxOff = T8_Tes1
@@ -180,13 +177,13 @@ BlockDoubleCsHp = 0
 
 UNIT 63 TYPE 993     ! Input value recall (element RcC)
 PARAMETERS 1     
-10    ! 1: number of variables to be remembered
+9    ! 1: number of variables to be remembered
 **     
-INPUTS 10
-TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh TPiPuCircOut
-0.0    20  0.0 0.0  0.0 0.0 0.0 0.0 0.0 0.0 
+INPUTS 9
+TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh
+0.0    20  0.0 0.0  0.0 0.0 0.0 0.0 0.0
 
-EQUATIONS 10              ! Recalled values for collector control
+EQUATIONS 9              ! Recalled values for collector control
 TesOverheatRc = [63,1]     ! recalled value of boolean for storage protection, 0/1
 T10_Tes1Rc = [63,2]     ! recalled value from upper storage part for storage protection, °C
 BoAuxWWonRc = [63,3]     
@@ -196,7 +193,6 @@ TTesShBotRc = [63,6]
 TAvgPCMRc = [63,7]
 BlockWsRc = [63,8]
 TPcmTooHighRc = [63,9]
-TPiPuCircOut_Rc = [63,10]
 
 EQUATIONS 2
 qAux1_Tes1 = qAux1_Tes1_nom_kW*auxStoreDHWIsOn

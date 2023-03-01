@@ -4,6 +4,12 @@
 *******************************
 **BEGIN BW-HeatPump.dck
 *******************************
+*****************************************
+** Contact person : xxx    
+** Creation date  : xxx
+** Last changes   : 19.12.2022 IGG Added control power
+*****************************************
+
 EQUATIONS 4
 ThpEvapIn = TPiHpEvapIn   
 MfrEvapIn = ABS(MfrPuHpEvap)     
@@ -70,7 +76,7 @@ tauWPstop = 20
 TWPEvapIce = -100
 EtaDefrost = 0.4
 PelWPVen = 0
-PelHpCtr_kW = 0
+PelHpCtr_kW = 0.040 ! IGG
 UNIT 94 TYPE 9771	 !Changed automatically
 PARAMETERS 16     
 tauWPstart			! 1: tau_start, s

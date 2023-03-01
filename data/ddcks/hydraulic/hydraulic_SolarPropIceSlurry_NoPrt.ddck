@@ -2253,77 +2253,77 @@ PipeLoss_LoopDHWCirc = PPiPuCircIn_kW+PPiPuCircOut_kW+PPiDhwSecOut_kW+PPiHxDhwSe
 spPipeIntTot = (spPipeEnIntTot - [100,1]) / dtSim / 3600 ! kW
 spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
 
-ASSIGN SolarPropIceSlurry_Mfr.prt 528
+***ASSIGN SolarPropIceSlurry_Mfr.prt 528
 
-UNIT 528 TYPE 25! User defined Printer
-PARAMETERS 10
-dtSim! 1 Printing interval
-START! 2 Start time
-STOP! 3 Stop time
-528! 4 Logical unit
-0! 5 Units printing mode
-0! 6 Relative or absolute start time
--1! 7 Overwrite or Append
--1! 8 Print header
-0! 9 Delimiter
-1! 10 Print labels
+***UNIT 528 TYPE 25! User defined Printer
+***PARAMETERS 10
+***dtSim! 1 Printing interval
+***START! 2 Start time
+***STOP! 3 Stop time
+***528! 4 Logical unit
+***0! 5 Units printing mode
+***0! 6 Relative or absolute start time
+***-1! 7 Overwrite or Append
+***-1! 8 Print header
+***0! 9 Delimiter
+***1! 10 Print labels
 
-INPUTS 65
-xFracDivSH xFracDivHp xFracDivSHCool xFracMixHxTes MPiHxCoolWatIn MPiHpToTesDhwIn xFracDivSolarDhwSh MPiOutHxTesSh
-xFracDivDhw xFracDivDhwOut MPiHpToSh MPiShToTeeShHp MPiHpToSHDiffTop MPiTeeMixSHIn MPiSHInMix MPiTesDhwIn
-MPiCircIn MPiTesDhwOut MPiCircOut MPiHxDhwIn MPiDhwDemand MPiDhwMains MPiSHOutMix MPiRadIn
-MPiRadOut MPiDivSHCool MPiHpToSHDiffBot MPiHxCoolWatOut MPiOutHxTes MPiInHxTesSh MPiHpToTesDHWOut MPiSHToHP
-MPiHPToTeeHpToSh MPiHpInPu MPiDivDhwShCol MPiColOut MPiColDivDhwSh MPiHxCoolBriOut MPiHxCoolBriIn MPiSolarToHxIce
-MPiHxSolarIceIn MPiIceToHp MPiIceToHxCool MPiIceToHpIn MPiHpToIce2 MPiHpEvapOut MPiHpOutPu MPiColPuIn
-MPiColIn MPiPuDhwOut MPiHxDhwOut MPiPuCircIn MPiPuCircOut xFracDivHpEvap MConn1139 MPiHpEvapMix
-MPiHpEvapIn MPiInHxTes MPiHxIceToSolar MPiHxIceToPuIce MPiHxSolarIceOut MPiDhwSecOut MPiHxDhwSecIn MPiHpCondOut
-MPiHpCondIn
-
-***
-xFracDivSH xFracDivHp xFracDivSHCool xFracMixHxTes MPiHxCoolWatIn MPiHpToTesDhwIn xFracDivSolarDhwSh MPiOutHxTesSh
-xFracDivDhw xFracDivDhwOut MPiHpToSh MPiShToTeeShHp MPiHpToSHDiffTop MPiTeeMixSHIn MPiSHInMix MPiTesDhwIn
-MPiCircIn MPiTesDhwOut MPiCircOut MPiHxDhwIn MPiDhwDemand MPiDhwMains MPiSHOutMix MPiRadIn
-MPiRadOut MPiDivSHCool MPiHpToSHDiffBot MPiHxCoolWatOut MPiOutHxTes MPiInHxTesSh MPiHpToTesDHWOut MPiSHToHP
-MPiHPToTeeHpToSh MPiHpInPu MPiDivDhwShCol MPiColOut MPiColDivDhwSh MPiHxCoolBriOut MPiHxCoolBriIn MPiSolarToHxIce
-MPiHxSolarIceIn MPiIceToHp MPiIceToHxCool MPiIceToHpIn MPiHpToIce2 MPiHpEvapOut MPiHpOutPu MPiColPuIn
-MPiColIn MPiPuDhwOut MPiHxDhwOut MPiPuCircIn MPiPuCircOut xFracDivHpEvap MConn1139 MPiHpEvapMix
-MPiHpEvapIn MPiInHxTes MPiHxIceToSolar MPiHxIceToPuIce MPiHxSolarIceOut MPiDhwSecOut MPiHxDhwSecIn MPiHpCondOut
-MPiHpCondIn
-
-
-ASSIGN SolarPropIceSlurry_T.prt 529
-
-UNIT 529 TYPE 25! User defined Printer
-PARAMETERS 10
-dtSim! 1 Printing interval
-START! 2 Start time
-STOP! 3 Stop time
-529! 4 Logical unit
-0! 5 Units printing mode
-0! 6 Relative or absolute start time
--1! 7 Overwrite or Append
--1! 8 Print header
-0! 9 Delimiter
-1! 10 Print labels
-
-INPUTS 57
-TPiHxCoolWatIn TPiHpToTesDhwIn TPiOutHxTesSh TPiHpToSh TPiShToTeeShHp TPiHpToSHDiffTop TPiTeeMixSHIn TPiSHInMix
-TPiTesDhwIn TPiCircIn TPiTesDhwOut TPiCircOut TPiHxDhwIn TPiDhwDemand TPiDhwMains TPiSHOutMix
-TPiRadIn TPiRadOut TPiDivSHCool TPiHpToSHDiffBot TPiHxCoolWatOut TPiOutHxTes TPiInHxTesSh TPiHpToTesDHWOut
-TPiSHToHP TPiHPToTeeHpToSh TPiHpInPu TPiDivDhwShCol TPiColOut TPiColDivDhwSh TPiHxCoolBriOut TPiHxCoolBriIn
-TPiSolarToHxIce TPiHxSolarIceIn TPiIceToHp TPiIceToHxCool TPiIceToHpIn TPiHpToIce2 TPiHpEvapOut TPiHpOutPu
-TPiColPuIn TPiColIn TPiPuDhwOut TPiHxDhwOut TPiPuCircIn TPiPuCircOut TConn1139 TPiHpEvapMix
-TPiHpEvapIn TPiInHxTes TPiHxIceToSolar TPiHxIceToPuIce TPiHxSolarIceOut TPiDhwSecOut TPiHxDhwSecIn TPiHpCondOut
-TPiHpCondIn
+***INPUTS 65
+***xFracDivSH xFracDivHp xFracDivSHCool xFracMixHxTes MPiHxCoolWatIn MPiHpToTesDhwIn xFracDivSolarDhwSh MPiOutHxTesSh
+***xFracDivDhw xFracDivDhwOut MPiHpToSh MPiShToTeeShHp MPiHpToSHDiffTop MPiTeeMixSHIn MPiSHInMix MPiTesDhwIn
+***MPiCircIn MPiTesDhwOut MPiCircOut MPiHxDhwIn MPiDhwDemand MPiDhwMains MPiSHOutMix MPiRadIn
+***MPiRadOut MPiDivSHCool MPiHpToSHDiffBot MPiHxCoolWatOut MPiOutHxTes MPiInHxTesSh MPiHpToTesDHWOut MPiSHToHP
+***MPiHPToTeeHpToSh MPiHpInPu MPiDivDhwShCol MPiColOut MPiColDivDhwSh MPiHxCoolBriOut MPiHxCoolBriIn MPiSolarToHxIce
+***MPiHxSolarIceIn MPiIceToHp MPiIceToHxCool MPiIceToHpIn MPiHpToIce2 MPiHpEvapOut MPiHpOutPu MPiColPuIn
+***MPiColIn MPiPuDhwOut MPiHxDhwOut MPiPuCircIn MPiPuCircOut xFracDivHpEvap MConn1139 MPiHpEvapMix
+***MPiHpEvapIn MPiInHxTes MPiHxIceToSolar MPiHxIceToPuIce MPiHxSolarIceOut MPiDhwSecOut MPiHxDhwSecIn MPiHpCondOut
+***MPiHpCondIn
 
 ***
-TPiHxCoolWatIn TPiHpToTesDhwIn TPiOutHxTesSh TPiHpToSh TPiShToTeeShHp TPiHpToSHDiffTop TPiTeeMixSHIn TPiSHInMix
-TPiTesDhwIn TPiCircIn TPiTesDhwOut TPiCircOut TPiHxDhwIn TPiDhwDemand TPiDhwMains TPiSHOutMix
-TPiRadIn TPiRadOut TPiDivSHCool TPiHpToSHDiffBot TPiHxCoolWatOut TPiOutHxTes TPiInHxTesSh TPiHpToTesDHWOut
-TPiSHToHP TPiHPToTeeHpToSh TPiHpInPu TPiDivDhwShCol TPiColOut TPiColDivDhwSh TPiHxCoolBriOut TPiHxCoolBriIn
-TPiSolarToHxIce TPiHxSolarIceIn TPiIceToHp TPiIceToHxCool TPiIceToHpIn TPiHpToIce2 TPiHpEvapOut TPiHpOutPu
-TPiColPuIn TPiColIn TPiPuDhwOut TPiHxDhwOut TPiPuCircIn TPiPuCircOut TConn1139 TPiHpEvapMix
-TPiHpEvapIn TPiInHxTes TPiHxIceToSolar TPiHxIceToPuIce TPiHxSolarIceOut TPiDhwSecOut TPiHxDhwSecIn TPiHpCondOut
-TPiHpCondIn
+***xFracDivSH xFracDivHp xFracDivSHCool xFracMixHxTes MPiHxCoolWatIn MPiHpToTesDhwIn xFracDivSolarDhwSh MPiOutHxTesSh
+***xFracDivDhw xFracDivDhwOut MPiHpToSh MPiShToTeeShHp MPiHpToSHDiffTop MPiTeeMixSHIn MPiSHInMix MPiTesDhwIn
+***MPiCircIn MPiTesDhwOut MPiCircOut MPiHxDhwIn MPiDhwDemand MPiDhwMains MPiSHOutMix MPiRadIn
+***MPiRadOut MPiDivSHCool MPiHpToSHDiffBot MPiHxCoolWatOut MPiOutHxTes MPiInHxTesSh MPiHpToTesDHWOut MPiSHToHP
+***MPiHPToTeeHpToSh MPiHpInPu MPiDivDhwShCol MPiColOut MPiColDivDhwSh MPiHxCoolBriOut MPiHxCoolBriIn MPiSolarToHxIce
+***MPiHxSolarIceIn MPiIceToHp MPiIceToHxCool MPiIceToHpIn MPiHpToIce2 MPiHpEvapOut MPiHpOutPu MPiColPuIn
+***MPiColIn MPiPuDhwOut MPiHxDhwOut MPiPuCircIn MPiPuCircOut xFracDivHpEvap MConn1139 MPiHpEvapMix
+***MPiHpEvapIn MPiInHxTes MPiHxIceToSolar MPiHxIceToPuIce MPiHxSolarIceOut MPiDhwSecOut MPiHxDhwSecIn MPiHpCondOut
+***MPiHpCondIn
+
+
+***ASSIGN SolarPropIceSlurry_T.prt 529
+
+***UNIT 529 TYPE 25! User defined Printer
+***PARAMETERS 10
+***dtSim! 1 Printing interval
+***START! 2 Start time
+***STOP! 3 Stop time
+***529! 4 Logical unit
+***0! 5 Units printing mode
+***0! 6 Relative or absolute start time
+***-1! 7 Overwrite or Append
+***-1! 8 Print header
+***0! 9 Delimiter
+***1! 10 Print labels
+
+***INPUTS 57
+***TPiHxCoolWatIn TPiHpToTesDhwIn TPiOutHxTesSh TPiHpToSh TPiShToTeeShHp TPiHpToSHDiffTop TPiTeeMixSHIn TPiSHInMix
+***TPiTesDhwIn TPiCircIn TPiTesDhwOut TPiCircOut TPiHxDhwIn TPiDhwDemand TPiDhwMains TPiSHOutMix
+***TPiRadIn TPiRadOut TPiDivSHCool TPiHpToSHDiffBot TPiHxCoolWatOut TPiOutHxTes TPiInHxTesSh TPiHpToTesDHWOut
+***TPiSHToHP TPiHPToTeeHpToSh TPiHpInPu TPiDivDhwShCol TPiColOut TPiColDivDhwSh TPiHxCoolBriOut TPiHxCoolBriIn
+***TPiSolarToHxIce TPiHxSolarIceIn TPiIceToHp TPiIceToHxCool TPiIceToHpIn TPiHpToIce2 TPiHpEvapOut TPiHpOutPu
+***TPiColPuIn TPiColIn TPiPuDhwOut TPiHxDhwOut TPiPuCircIn TPiPuCircOut TConn1139 TPiHpEvapMix
+***TPiHpEvapIn TPiInHxTes TPiHxIceToSolar TPiHxIceToPuIce TPiHxSolarIceOut TPiDhwSecOut TPiHxDhwSecIn TPiHpCondOut
+***TPiHpCondIn
+
+***
+***TPiHxCoolWatIn TPiHpToTesDhwIn TPiOutHxTesSh TPiHpToSh TPiShToTeeShHp TPiHpToSHDiffTop TPiTeeMixSHIn TPiSHInMix
+***TPiTesDhwIn TPiCircIn TPiTesDhwOut TPiCircOut TPiHxDhwIn TPiDhwDemand TPiDhwMains TPiSHOutMix
+***TPiRadIn TPiRadOut TPiDivSHCool TPiHpToSHDiffBot TPiHxCoolWatOut TPiOutHxTes TPiInHxTesSh TPiHpToTesDHWOut
+***TPiSHToHP TPiHPToTeeHpToSh TPiHpInPu TPiDivDhwShCol TPiColOut TPiColDivDhwSh TPiHxCoolBriOut TPiHxCoolBriIn
+***TPiSolarToHxIce TPiHxSolarIceIn TPiIceToHp TPiIceToHxCool TPiIceToHpIn TPiHpToIce2 TPiHpEvapOut TPiHpOutPu
+***TPiColPuIn TPiColIn TPiPuDhwOut TPiHxDhwOut TPiPuCircIn TPiPuCircOut TConn1139 TPiHpEvapMix
+***TPiHpEvapIn TPiInHxTes TPiHxIceToSolar TPiHxIceToPuIce TPiHxSolarIceOut TPiDhwSecOut TPiHxDhwSecIn TPiHpCondOut
+***TPiHpCondIn
 
 

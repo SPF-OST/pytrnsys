@@ -47,11 +47,12 @@ TretSHtype888 = THpCondIn !For compatibility this must be defined in the control
 ** outputs to other ddck
 ***********************************
 
-EQUATIONS 7
+EQUATIONS 8
 BoHS = [2,1]!*NOT(isSummer)     ! Boolean for heating season on, 0/1
 isSummer = GE(MOD(time,8760),4344)*LE(MOD(time,8760),5832)! 
 HpForDHWIsNeeded = [2,2]
-HpForSHIsNeeded  = [2,3]
+forceCO2Parallel = NOT(MoWW)*HpForDHWIsNeeded*LT(THpCondDhwInRc+2,THpCondShInRc)*LT(TsensorTesShRc,40)*BoHS
+HpForSHIsNeeded  = NOT(HpForDHWIsNeeded)*[2,3]+ forceCO2Parallel!I charge SH if possible when DHW charge to force parallel
 TRdSet = Max([2,4],Troom) !CHANGED DC      ! space heating flow setpoint,  �C
 tScSet  = [2,5]
 TSetSh  = [2,7]
@@ -83,7 +84,7 @@ m_Rd   = 1.0    ! heating curve exponent 1:linear 1.4 getting flatter at low T
 
 CONSTANTS 6
 
-MoWW = 1 !0 = room heating and warm water may be done at the same time
+MoWW = 1 ! IGG 0 = room heating and warm water may be done at the same time
 **		 !1 = Warm water priority disables room heating mode
 **		 
 MoRH = 3 !1 = ON if Heating Season is on and not blocked by WWMode; 

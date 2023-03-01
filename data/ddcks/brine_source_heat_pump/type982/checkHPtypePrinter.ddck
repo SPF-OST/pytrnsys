@@ -1,0 +1,32 @@
+***********************************
+**BEGIN check HPtype printer
+***********************************
+    
+
+
+CONSTANTS 1
+unitPrinterHptype = 224   
+
+ASSIGN temp\debugHPtype.Plt   unitPrinterHptype     
+
+
+     
+UNIT 224 TYPE 25      ! User defined Printer
+PARAMETERS 10     
+dtPrUser                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitPrinterHptype     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 34
+THpEvapIn MfrEvapIn THpCondDhwIn THpCondDhwOut MfrCondDhwIn THpCondShIn MfrCondShIn myHpIsOn RHamb_1 tAmbHp frCond frCOP MfrHpEvapOut MfrHpCondDhwOut MfrHpCondShOut PelHpComp_kW PelHpTot_kW QHpEvap_kW QHpCondDhw_kW QHpCondSh_kW COQHp QHpLossStart_kW QHpDefrost_kW 
+T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1 HPSinkMode
+******     
+THpEvapIn MfrEvapIn THpCondDhwIn THpCondDhwOut MfrCondDhwIn THpCondShIn MfrCondShIn myHpIsOn RHamb_1 tAmbHp frCond frCOP
+MfrHpEvapOut MfrHpCondDhwOut MfrHpCondShOut PelHpComp_kW PelHpTot_kW QHpEvap_kW QHpCondDhw_kW QHpCondSh_kW COQHp QHpLossStart_kW QHpDefrost_kW 
+T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1 HPSinkMode

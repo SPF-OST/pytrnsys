@@ -1275,7 +1275,7 @@ class PlotMatplotlib:
             box = plot.get_position()
             plot.set_position([box.x0, box.y0, box.width * 0.8 / (nDays - 1) * nDays, box.height])
             plot.set_xticks(ind)
-            plot.set_xticklabels(dayLabel, rotation="45")
+            plot.set_xticklabels(dayLabel, rotation="vertical")
 
             allbar = []
             for b in bar:

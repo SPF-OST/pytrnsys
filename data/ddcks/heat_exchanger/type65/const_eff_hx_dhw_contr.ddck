@@ -47,10 +47,11 @@ MfrSrcDHWHXUsed = MAX(MaxMfrSrcDHWHX*(1-fractionOfBypass)-MinMfrSrcDHWHx,0)+MinM
 ***********************************
 ** Generic variables
 ***********************************
-CONSTANTS 3
+CONSTANTS 4
 HX_efficiencyDHWHX = 1
+minFlowDHwHx = 30
 MaxMfrSrcDHWHX = 700*scaleDHW
-MinMfrSrcDHWHx = 70*scaleDHW
+MinMfrSrcDHWHx = minFlowDHwHx*scaleDHW
 
 UNIT 500 TYPE 652
 PARAMETERS 4

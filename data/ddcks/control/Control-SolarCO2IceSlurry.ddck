@@ -1,5 +1,5 @@
 *******************************
-**BEGIN Control-IceSlurryPropane_SlrTk.ddck 
+**BEGIN Control-SolarCo2IceSlurry.ddck 
 **
 **Control Ice-Slurry with slurry tank
 *******************************
@@ -9,6 +9,7 @@
 ** Date:  23.04.2018   
 ** update: 03.05.2022: MS changed mass flow in evaporator loop to be independent of HX 
 ** size in the ice slurry tank (using real slurry tank type 865) 
+** update: 06.02.2023 IGG updated to CO2 (type982 and double circuits for HPCO2)
 ** update 22.02.2023 IGG improve stratification in tank. Parametrize MfrPuCircNom
 ******************************************
 
@@ -22,13 +23,13 @@
 ********************************
 
 
-EQUATIONS 17
+EQUATIONS 18
 *** Massflowrates
 **MfrSeries = 0 !does not exist 
 MfrPuSH = MfrBuiRd
 MfrsupplyWater = MfrDHWset
-MfrCW= MfrDHWset
-xFracDivHp = NOT(BoAuxWWonRc)
+!MfrCW= MfrDHWset !IGG NOT USED
+!xFracDivHp = NOT(BoAuxWWonRc) !IGG NOT USED
 MfrPuCool = 0!MfrPiHxCoolWatIn 
 xFracDivSHCool = CoolingOnRc
 xFracMixHxTes = AND(NOT(OR(ProWs,ProPar)),NOT(blockCol)) 
@@ -37,8 +38,12 @@ MfrPuCol = pumpColOn*MfrCPri*(ProWs+ProCs+ProPar+ProDoubleHpCs) !+ProSeries*MfrS
 
 MfrPuDHW =  NOT(GT(MfrDHWset,0))*LT(TPiPuCircOut_Rc,TPiPuCircOutmin)*MfrPuCircNom+GT(MfrDHWset,0)*MfrSrcDHWHXUsed !IGG Improving stratification NOT(GT(MfrDHWset,0))*MfrPuCircNom+GT(MfrDHWset,0)*MfrSrcDHWHXUsed 
 MfrPuCirc = NOT(GT(MfrDHWset,0))*LT(TPiPuCircOut_Rc,TPiPuCircOutmin)*MfrPuCircNom !IGG Improving stratification NOT(GT(MfrDHWset,0))*MfrPuCircNom
-MfrPuHpEvap = MfrHpEvapUsed*hpIsOn
-MfrPuHpCond = MfrHpCondNom*hpIsOn
+MfrPuHpEvap = MfrHpEvapUsed*hpIsOn*OR(HPforSHisNeeded,HPforDHWisNeeded)
+**MfrPuHpCond1 = NOT(HPforDHWisNeeded)*MfrHpCond1Nom*hpIsOn*HPforSHisNeeded+ HPforDHWisNeeded*MfrHpCond1Nom*hpIsOn*HPforSHisNeeded*0.5!DC. reduce mass flow rate in SH when parallel
+MfrPuHpCond1 = MfrHpCond1Nom*hpIsOn*HPforSHisNeeded
+MfrPiHpCondShIn = MfrPuHpCond1 !IGG
+MfrPuHpCond2 = MfrHpCond2Nom*hpIsOn*HPforDHWisNeeded !IGG
+MfrPiHpCondDhwIn =MfrPuHpCond2 !IGG
 *** here allow loading of SH-storage, too! Load Tes_SH xFracDivSolarDhwSh = 1! ???
 xFracDivSolarDhwSh = GT(TTesDhwBotRc,TTesShBotRc)*BoHS !AND(AND(GT(TTesDhwBotRc+UdbProWs,TCollExpectedRc),LT(TTesShBotRc, TCollExpectedRc)),BoHS) !AND(AND(GT(T1_Tes1,TCollExpected),LT(TsensorTesSh, TCollExpected)),BoHS)
 xFracDivDhw = GT(TPiPuDhwOut,TRetStratif) !IGG improving stratification NOT(GT(MfrDHWset,0))
@@ -47,7 +52,7 @@ xFracDivDhwOut = GT(TPiPuDhwOut,TRetStratif) !IGG improving stratification NOT(G
 TRetStratif = 30.0 !IGG Better not recall as it changes from timestep to timestep
 TPiPuCircOutmin = 50.0 ! IGG  Minimum temperature to switch on recirculation
 
-EQUATIONS 12
+EQUATIONS 16
 TTesDhwAuxOff = T8_Tes1
 TTesDhwAuxOn  = T9_Tes1
 TTesDhwBot = T2_Tes1
@@ -60,6 +65,10 @@ TTesSolar = TProWs
 TsensorTesSh = T7_Tes2
 TPROAUXShTes = T9_Tes2
 TdhwSet = TdhwSetProfile
+THpCondIn = (THpCondDhwIn + THpCondShIn) / 2.0 !IGG
+TPiHpCondShIn = TPiHpCondIn1 !IGG
+TPiHpCondDhwIn = TPiHpCondIn2  !IGG
+TPiHpToTesDhwIn = THpCondDhwOut ! IGG
 
 EQUATIONS 1
 MfrPuHxIce = MfrPuCol*(ProCs+ProDoubleHpCs)
@@ -74,7 +83,7 @@ MfrPuHxIce = MfrPuCol*(ProCs+ProDoubleHpCs)
 CONSTANTS 3
 T_set_DivSH=T_set_d
 T_set_MixCirc=TdhwSet
-T_set_DivHpEvap=25
+T_set_DivHpEvap=7
 
 EQUATIONS 1
 T_set_cool = MIN(Tamb-5,TRdRt)
@@ -123,19 +132,33 @@ EQUATIONS 2
 xFracDivSH_cool = CoolingOnRC*([24,5]) 
 xFracDivSH = xFracDivSH_heat + xFracDivSH_cool 
 
+**UNIT 443 TYPE 811 ! Passive Divider for heating 
+**PARAMETERS 1
+**5 !Nb.of iterations before fixing the value 
+**INPUTS 4 
+**TPiIceToHpRc
+**TPiHpEvapMixRc
+**MfrPiHpEvapInRc
+**T_set_DivHpEvap
+***** INITIAL INPUT VALUES
+**35.0 21.0 800.0 T_set_DivHpEvap
+**EQUATIONS 1
+**xFracDivHpEvap =  1.-[443,5] !Dc the heat pump does not accept values above 7 °C
+
 UNIT 443 TYPE 811 ! Passive Divider for heating 
 PARAMETERS 1
 5 !Nb.of iterations before fixing the value 
 INPUTS 4 
-TPiIceToHp
+TPiIceToHp 
 TPiHpEvapMix
 MfrPiHpEvapIn
 T_set_DivHpEvap
 *** INITIAL INPUT VALUES
-35.0 21.0 800.0 T_set_DivHpEvap
-EQUATIONS 1
-xFracDivHpEvap =  0 ! 1.-[443,5]
-
+35.0 21.0 2000.0 T_set_DivHpEvap
+EQUATIONS 3
+mixDivHpEvap =  1-[443,5] !Dc the heat pump does not accept values above 7 °C ->0 means no mix, 1 fully mix
+doMixHpEvap  = 0 !IGG 1
+xFracDivHpEvap = doMixHpEvap*mixDivHpEvapRc
 ***************************************************
 ******** Cooling Section***************************
 ***************************************************
@@ -150,7 +173,7 @@ CoolingOn = 0! OR(AND(AND(CoolingNeeded,LE(TAvgPCM,TPCMCoolStop+dTCoolPCM)),Cool
 
 EQUATIONS 4
 BoAuxWWon = HpForDHWIsNeeded*NOT(HpIsBlock) ! JS: Do not block HP during summer (we need it for cooling)
-BoAuxSHon = HpForSHIsNeeded*NOT(BoAuxWWon)*NOT(HpIsBLock) !DC CHANGED TO AVOID RUNNING THE LOOP WITHOUT POWER     ! Auxiliary heater space heating mode, 0/1
+BoAuxSHon = HpForSHIsNeeded*NOT(HpIsBLock) ! IGG HpForSHIsNeeded*NOT(BoAuxWWon)*NOT(HpIsBLock) !DC CHANGED TO AVOID RUNNING THE LOOP WITHOUT POWER     ! Auxiliary heater space heating mode, 0/1
 HpIsOn = OR(BoAuxWWonRc,BoAuxSHonRc)*NOT(BlockIceStoreRc)     ! Auxiliary heater on for DHW or SH, 0/1
 **HpIsOn = OR(BoAuxWWon,BoAuxSHon)*NOT(BlockIceStoreRc)     ! Auxiliary heater on for DHW or SH, 0/1
 
@@ -180,13 +203,14 @@ BlockDoubleCsHp = 0
 
 UNIT 63 TYPE 993     ! Input value recall (element RcC)
 PARAMETERS 1     
-10    ! 1: number of variables to be remembered
+11    ! 1: number of variables to be remembered
 **     
-INPUTS 10
-TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh TPiPuCircOut
-0.0    20  0.0 0.0  0.0 0.0 0.0 0.0 0.0 0.0 
+INPUTS 11
+TesOverheat   T10_Tes1 BoAuxWWon BoAuxSHon TTesDhwBot TTesShBot TAvgPCM BlockWs TPcmTooHigh mixDivHpEvap TPiPuCircOut
+**
+0.0  20  0.0 0.0  0.0 0.0 0.0 0.0 0.0 0.0 0.0
 
-EQUATIONS 10              ! Recalled values for collector control
+EQUATIONS 11            ! Recalled values for collector control
 TesOverheatRc = [63,1]     ! recalled value of boolean for storage protection, 0/1
 T10_Tes1Rc = [63,2]     ! recalled value from upper storage part for storage protection, °C
 BoAuxWWonRc = [63,3]     
@@ -196,7 +220,8 @@ TTesShBotRc = [63,6]
 TAvgPCMRc = [63,7]
 BlockWsRc = [63,8]
 TPcmTooHighRc = [63,9]
-TPiPuCircOut_Rc = [63,10]
+mixDivHpEvapRc = [63,10]
+TPiPuCircOut_Rc = [63,11]
 
 EQUATIONS 2
 qAux1_Tes1 = qAux1_Tes1_nom_kW*auxStoreDHWIsOn
@@ -235,9 +260,9 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 10    
-CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM TmaxIceTes BlockSeries 
-CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes BlockCs TAvgPCM TmaxIceTes BlockSeries 
+CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes  TAvgPCM TmaxIceTes xFracDivHpEvap Nix
+CoolingOn CoolingOnRc TProWs TMax_Tes1 T10_Tes1Rc xFracMixHxTes  TAvgPCM TmaxIceTes xFracDivHpEvap Nix
 LABELS  3     
 Temperatures  
 MassFlows   
-ControlNC
+Hyd

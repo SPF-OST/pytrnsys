@@ -2233,7 +2233,7 @@ class ProcessTrnsysDf:
 
             self.saveResultsFile(self.resultsDict)
 
-    def saveResultsFile(self,resultsDict):
+    def saveResultsFile(self, resultsDict):
 
             pathParameterJson = os.path.join(self.outputPath, self.fileName + ".json")
             if os.path.isfile(pathParameterJson):
