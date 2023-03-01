@@ -157,8 +157,8 @@ def _getInputs(
         inputs["scaling"] = "False"
         inputs["trnsysExePath"] = r"C:\Trnsys18\Exe\TRNExe.exe"
         if basePath:
-            inputs["PROJECT$"] = str(_os.path.join(basePath, "ddck"))
-            inputs["pathToConnectionInfo"] = str(_os.path.join(basePath, "DdckPlaceHolderValues.json"))
+            inputs["PROJECT$"] = _os.path.join(basePath, "ddck")
+            inputs["pathToConnectionInfo"] = _os.path.join(basePath, "DdckPlaceHolderValues.json")
             if _isRelativePath(basePath):
                 inputs["projectPath"] = str(basePath)
             else:
