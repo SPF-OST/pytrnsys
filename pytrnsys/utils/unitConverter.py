@@ -1,6 +1,6 @@
 
 
-class UnitConverter: # pylint: disable=too-many-public-methods
+class UnitConverter:  # pylint: disable=too-many-public-methods
     def __init__(self):
         self.unit = ""
         self._conversionFactor = None
