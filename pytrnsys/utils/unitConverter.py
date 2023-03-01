@@ -1,10 +1,6 @@
-# pylint:
-# type: ignore
-
-# !/usr/bin/python
 
 
-class UnitConverter:
+class UnitConverter: # pylint: disable=too-many-public-methods
     def __init__(self):
         self.unit = ""
         self._conversionFactor = None
@@ -36,20 +32,20 @@ class UnitConverter:
         self._conversionFactor = self.getConversionFactor(name)
 
     def convert(self, value, desiredConversionFactor=None):
-        # todo: add error handling
         if not desiredConversionFactor:
             factor = self._conversionFactor
         else:
             factor = self.getConversionFactor(desiredConversionFactor)
+
         return factor * value
 
-    def getConversionFactor(self, type):
-        if type in self.getAvailableConversions():
-            return self._factors[type]
-        else:
-            raise ValueError(f"Unkown conversion type: {type}")
+    def getConversionFactor(self, conversionType):
+        if conversionType in self.getAvailableConversions():
+            return self._factors[conversionType]
 
-    # todo: Have these point to "getConversionFactor" using method string, or remove this functionality entirely.
+        raise ValueError(f"Unkown conversion type: {conversionType}")
+
+    # Have these point to "getConversionFactor" using method string, or remove this functionality entirely.
     # PRESSURE
 
     def getkPaToBar(self):

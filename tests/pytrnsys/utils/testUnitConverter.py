@@ -103,6 +103,7 @@ class TestUnitConverter:
     @_pt.mark.parametrize("name, factor", _CONVERSION_NAME_CASES)
     def testGetConversionFactor(self, name, factor):
         result = self.converter.getConversionFactor(name)
+        assert result == factor
 
     def testGetConversionFactorRaises(self):
         with _pt.raises(ValueError):
