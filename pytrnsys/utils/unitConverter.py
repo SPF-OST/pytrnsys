@@ -1,3 +1,8 @@
+def __getattr__(name: str) -> any:
+    if name == "UnitConverter":
+        raise ValueError
+    else:
+        return getattr(UnitConverter(), name)
 
 
 class UnitConverter:  # pylint: disable=too-many-public-methods
@@ -24,6 +29,29 @@ class UnitConverter:  # pylint: disable=too-many-public-methods
             "kJhToW": 1.0 / 3.6,
             "WTokJh": 3.6,
         }
+        self._conversion_methods = {
+            "getkPaToBar": "kPaToBar",
+            "getPaToBar": "PaToBar",
+            "getBarToPa": "BarToPa",
+            "getPaToMca": "PaToMca",
+            "getPaToMmca": "PaToMmca",
+            "getBarToMmca": "BarToMmca",
+            "getPaTokgCm2": "PaTokgCm2",
+            "getkgCm2ToPa": "kgCm2ToPa",
+            "getPsiToPa": "PsiToPa",
+            "getPaToPsi": "PaToPsi",
+            "getJTokWh": "JTokWh",
+            "getkWhToJ": "kWhToJ",
+            "getkWhToMJ": "kWhToMJ",
+            "getJToMWh": "JToMWh",
+            "getkJToMWh": "kJToMWh",
+            "getMJTokWh": "MJTokWh",
+            "getkJhToW": "kJhToW",
+            "getWTokJh": "WTokJh",
+            "getKJhToW": "kJhToW",
+            "getWToKJh": "WTokJh",
+        }
+        self._method = None
 
     def getAvailableConversions(self):
         return list(self._factors.keys())
@@ -45,70 +73,12 @@ class UnitConverter:  # pylint: disable=too-many-public-methods
 
         raise ValueError(f"Unkown conversion type: {conversionType}")
 
-    # Have these point to "getConversionFactor" using method string, or remove this functionality entirely.
-    # PRESSURE
+    def __getattr__(self, item):
+        self._method = self._conversion_methods[item]
+        return self._helperFunction
 
-    def getkPaToBar(self):
-        return self.getConversionFactor("kPaToBar")
-
-    def getPaToBar(self):
-        return self.getConversionFactor("PaToBar")
-
-    def getBarToPa(self):
-        return self.getConversionFactor("BarToPa")
-
-    def getPaToMca(self):
-        return self.getConversionFactor("PaToMca")
-
-    def getPaToMmca(self):
-        return self.getConversionFactor("PaToMmca")
-
-    def getBarToMmca(self):
-        return self.getConversionFactor("BarToMmca")
-
-    def getPaTokgCm2(self):
-        return self.getConversionFactor("PaTokgCm2")
-
-    def getkgCm2ToPa(self):
-        return self.getConversionFactor("kgCm2ToPa")
-
-    def getPsiToPa(self):
-        return self.getConversionFactor("PsiToPa")
-
-    def getPaToPsi(self):
-        return self.getConversionFactor("PaToPsi")
-
-    # Energy
-
-    def getJTokWh(self):
-        return self.getConversionFactor("JTokWh")
-
-    def getkWhToJ(self):
-        return self.getConversionFactor("kWhToJ")
-
-    def getkWhToMJ(self):
-        return self.getConversionFactor("kWhToMJ")
-
-    def getJToMWh(self):
-        return self.getConversionFactor("JToMWh")
-
-    def getkJToMWh(self):
-        return self.getConversionFactor("kJToMWh")
-
-    def getMJTokWh(self):
-        return self.getConversionFactor("MJTokWh")
-
-    def getkJhToW(self):
-        return self.getConversionFactor("kJhToW")
-
-    def getKJhToW(self):
-        return self.getConversionFactor("kJhToW")
-
-    def getWTokJh(self):
-        return self.getConversionFactor("WTokJh")
-
-    def getWToKJh(self):
-        return self.getConversionFactor("WTokJh")
+    def _helperFunction(self):
+        return self.getConversionFactor(self._method)
 
 
 #    /* Power */
@@ -144,87 +114,3 @@ class UnitConverter:  # pylint: disable=too-many-public-methods
 #    inline double FToC(double tF) const {return (tF-32.)/1.8;};
 #    inline double CToF(double tC)  const {return (tC*1.8+32.);};
 
-_converter = UnitConverter()
-
-
-def getkPaToBar():
-    return _converter.getkPaToBar()
-
-
-def getPaToBar():
-    return _converter.getPaToBar()
-
-
-def getBarToPa():
-    return _converter.getBarToPa()
-
-
-def getPaToMmca():
-    return _converter.getPaToMmca()
-
-
-def getPaToMca():
-    return _converter.getPaToMca()
-
-
-def getBarToMmca():
-    return _converter.getBarToMmca()
-
-
-def getPaTokgCm2():
-    return _converter.getPaTokgCm2()
-
-
-def getkgCm2ToPa():
-    return _converter.getkgCm2ToPa()
-
-
-def getPsiToPa():
-    return _converter.getPsiToPa()
-
-
-def getPaToPsi():
-    return _converter.getPaToPsi()
-
-
-# Energy
-
-
-def getJTokWh():
-    return _converter.getJTokWh()
-
-
-def getkWhToJ():
-    return _converter.getkWhToJ()
-
-
-def getkWhToMJ():
-    return _converter.getkWhToMJ()
-
-
-def getJToMWh():
-    return _converter.getJToMWh()
-
-
-def getkJToMWh():
-    return _converter.getkJToMWh()
-
-
-def getMJTokWh():
-    return _converter.getMJTokWh()
-
-
-def getKJhToW():
-    return _converter.getKJhToW()
-
-
-def getkJhToW():
-    return _converter.getkJhToW()
-
-
-def getWToKJh():
-    return _converter.getWTokJh()
-
-
-def getWTokJh():
-    return _converter.getWTokJh()
