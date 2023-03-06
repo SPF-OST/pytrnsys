@@ -72,12 +72,12 @@ class UnitConverter:
         elif self._conversionFactor:
             factor = self._conversionFactor
         else:
-            raise ValueError(f"Conversion factor not given. Either use UnitConverter.setConversionFactor, "
-                             f"or provide a desiredConversionFactor.")
+            raise ValueError("Conversion factor not given. Either use UnitConverter.setConversionFactor, "
+                             "or provide a desiredConversionFactor.")
 
         return factor * value
 
-    def getConversionFactor(self, conversionType: str) -> float:
+    def getConversionFactor(self, conversionType: _typ.Optional[str]) -> float:
         if conversionType in self.getAvailableConversions():
             return self._factors[conversionType]
 

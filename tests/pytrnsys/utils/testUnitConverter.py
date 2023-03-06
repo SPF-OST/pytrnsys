@@ -90,6 +90,7 @@ class TestGetAttrFromModule:
     @staticmethod
     def testIgnoreEntirely():
         assert hasattr(_uc.dummyFunction, '__call__')
+        assert not _uc.dummyFunction()
 
     @staticmethod
     def testGetAttrFromModuleRaises():
@@ -145,7 +146,6 @@ class TestUnitConverter:
     def testConversionsWithoutAssigningFactorBeforehand(self, name, factor):
         assert self.converter.convert(1, desiredConversionFactor=name) == factor
 
-    @_pt.mark.parametrize("name, factor", _CONVERSION_NAME_CASES)
-    def testConversionsWithoutFactorRaises(self, name, factor):
+    def testConversionsWithoutFactorRaises(self):
         with _pt.raises(ValueError):
             self.converter.convert(1)
