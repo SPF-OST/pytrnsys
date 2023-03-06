@@ -95,6 +95,8 @@ def getNameFromUserName():
         return "Martin Granzotto"
     elif userName == "dphilipp":
         return "Daniel Philippen"
+    elif userName == "alex.hobe":
+        return "Dr. Alex Hobé"
     else:
         return userName
 
@@ -109,6 +111,8 @@ def getEmailFromUserName():
         return "martin.granzotto@spf.ch"
     elif userName == "dphilipp":
         return "daniel.philippen@spf.ch"
+    elif userName == "alex.hobe":
+        return f"{userName}@ost.ch"
     else:
         return userName
 

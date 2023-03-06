@@ -1,3 +1,4 @@
+import os as _os
 import pathlib as _pl
 import typing as _tp
 
@@ -6,6 +7,15 @@ import pytest as _pt
 import pytrnsys.trnsys_util.readConfigTrnsys as _rct
 
 _DATA_DIR_PATH = _pl.Path(__file__).parent / "data"
+_RELATIVE_PATH = _pl.Path("..")
+_RELATIVE_PATH2 = _pl.Path(".")
+
+
+def _isRelativePath(basePath):
+    path = str(basePath)
+    if path in [".", ".."]:
+        return True
+    return False
 
 
 def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
@@ -21,6 +31,9 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
         lines += [
             r'string pathToConnectionInfo "C:\Users\epic.user\EpicSimulation\DdckPlaceHolderValues.json"',
         ]
+    elif _isRelativePath(basePath):
+        lines += [f"string pathToConnectionInfo \"{_os.path.join(basePath, 'DdckPlaceHolderValues.json')}\"", ]
+
     lines += [
         "bool doAutoUnitNumbering True",
         "bool generateUnitTypesUsed True",
@@ -30,6 +43,9 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
         lines += [
             r'string PROJECT$ "C:\Users\epic.user\EpicSimulation\ddck"',
         ]
+    elif _isRelativePath(basePath):
+        lines += [f"string PROJECT$ \"{_os.path.join(basePath, 'ddck')}\"", ]
+
     lines += [
         r'string trnsysExePath "C:\Trnsys18\Exe\TRNExe.exe"',
         'string scaling "False"',
@@ -38,6 +54,9 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
         lines += [
             r'string projectPath "C:\Users\epic.user\EpicSimulation"',
         ]
+    elif _isRelativePath(basePath):
+        lines += [f"string projectPath \"{basePath}\"", ]
+
     lines += [
         'string nameRef "DoublePipeDebug"',
         'string runType "runFromConfig"',
@@ -50,7 +69,7 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
         r"PROJECT$ QSrc1\QSrc",
         r"PROJECT$ generic\end",
     ]
-    if basePath:
+    if basePath and not _isRelativePath(basePath):
         lines += [
             f"string pathToConnectionInfo {basePath / 'DdckPlaceHolderValues.json'}",
             f"string PROJECT$ {basePath / 'ddck'}",
@@ -61,6 +80,8 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
 
 _LINES_RUN = _getRunLines(basePath=None)
 _LINES_RUN_WITHOUT_PATHS = _getRunLines(basePath=_DATA_DIR_PATH)
+_LINES_RUN_WITH_RELATIVE_PATHS = _getRunLines(basePath=_RELATIVE_PATH)
+_LINES_RUN_WITH_RELATIVE_PATHS2 = _getRunLines(basePath=_RELATIVE_PATH2)
 
 
 def _getProcessLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
@@ -84,14 +105,19 @@ def _getProcessLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
         lines += [
             r'string pathBase "C:\Users\epic.user\EpicSimulation"',
         ]
+    elif _isRelativePath(basePath):
+        lines += [f"string pathBase \"{basePath}\""]
+
     lines += [r'string dllTrnsysPath "C:\Trnsys18\UserLib\ReleaseDlls"', 'stringArray plotHourly "TInQSrc1"']
-    if basePath:
+    if basePath and not _isRelativePath(basePath):
         lines += [f"string pathBase {basePath}"]
     return lines
 
 
 _PROCESS_LINES = _getProcessLines(basePath=None)
 _PROCESS_LINES_WITHOUT_PATHS = _getProcessLines(basePath=_DATA_DIR_PATH)
+_PROCESS_LINES_WITH_RELATIVE_PATHS = _getProcessLines(basePath=_RELATIVE_PATH)
+_PROCESS_LINES_WITH_RELATIVE_PATHS2 = _getProcessLines(basePath=_RELATIVE_PATH2)
 
 
 def _getInputs(
@@ -131,9 +157,12 @@ def _getInputs(
         inputs["scaling"] = "False"
         inputs["trnsysExePath"] = r"C:\Trnsys18\Exe\TRNExe.exe"
         if basePath:
-            inputs["PROJECT$"] = str(basePath / "ddck")
-            inputs["pathToConnectionInfo"] = str(basePath / "DdckPlaceHolderValues.json")
-            inputs["projectPath"] = basePath
+            inputs["PROJECT$"] = _os.path.join(basePath, "ddck")
+            inputs["pathToConnectionInfo"] = _os.path.join(basePath, "DdckPlaceHolderValues.json")
+            if _isRelativePath(basePath):
+                inputs["projectPath"] = str(basePath)
+            else:
+                inputs["projectPath"] = basePath
 
     elif configType == "process":
         inputs["calculateHeatDemand"] = True
@@ -146,14 +175,20 @@ def _getInputs(
         inputs["latexNames"] = "latexNames.json"
         inputs["numberOfYearsInHourlyFile"] = 1
         inputs["outputLevel"] = "DEBUG"
-        inputs["pathBase"] = r"C:\Users\epic.user\EpicSimulation"
+
+        if _isRelativePath(basePath):
+            inputs["pathBase"] = str(basePath)
+        else:
+            inputs["pathBase"] = r"C:\Users\epic.user\EpicSimulation"
+
         inputs["plotHourly"] = [["TInQSrc1"]]
         inputs["processParallel"] = False
         inputs["processQvsT"] = False
         inputs["reduceCpu"] = 1
         inputs["setPrintDataForGle"] = True
         inputs["yearReadedInMonthlyFile"] = -1
-        if basePath:
+
+        if basePath and not _isRelativePath(basePath):
             inputs["pathBase"] = basePath
 
     return inputs
@@ -161,8 +196,12 @@ def _getInputs(
 
 _INPUTS_RUN = _getInputs(basePath=None, configType="run")
 _INPUTS_RUN_WITHOUT_PATHS = _getInputs(basePath=_DATA_DIR_PATH, configType="run")
+_INPUTS_RUN_WITH_RELATIVE_PATHS = _getInputs(basePath=_RELATIVE_PATH, configType="run")
+_INPUTS_RUN_WITH_RELATIVE_PATHS2 = _getInputs(basePath=_RELATIVE_PATH2, configType="run")
 _INPUTS_PROCESS = _getInputs(basePath=None, configType="process")
 _INPUTS_PROCESS_WITHOUT_PATHS = _getInputs(basePath=_DATA_DIR_PATH, configType="process")
+_INPUTS_PROCESS_WITH_RELATIVE_PATHS = _getInputs(basePath=_RELATIVE_PATH, configType="process")
+_INPUTS_PROCESS_WITH_RELATIVE_PATHS2 = _getInputs(basePath=_RELATIVE_PATH2, configType="process")
 
 
 class TestReadConfigTrnsys:
@@ -198,6 +237,20 @@ class TestReadConfigTrnsys:
         assert self.inputs == _INPUTS_RUN_WITHOUT_PATHS
         assert lines == _LINES_RUN_WITHOUT_PATHS
 
+    @_pt.mark.windows
+    def testReadFileRunConfigWithRelativePaths(self):
+        name = "run.config_with_relative_paths"
+        lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
+        assert self.inputs == _INPUTS_RUN_WITH_RELATIVE_PATHS
+        assert lines == _LINES_RUN_WITH_RELATIVE_PATHS
+
+    @_pt.mark.windows
+    def testReadFileRunConfigWithRelativePaths2(self):
+        name = "run.config_with_relative_paths2"
+        lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
+        assert self.inputs == _INPUTS_RUN_WITH_RELATIVE_PATHS2
+        assert lines == _LINES_RUN_WITH_RELATIVE_PATHS2
+
     def testReadFileProcessConfig(self):
         name = "process.config_with_absolute_paths"
         lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
@@ -209,3 +262,15 @@ class TestReadConfigTrnsys:
         lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
         assert self.inputs == _INPUTS_PROCESS_WITHOUT_PATHS
         assert lines == _PROCESS_LINES_WITHOUT_PATHS
+
+    def testReadFileProcessConfigWithRelativePaths(self):
+        name = "process.config_with_relative_paths"
+        lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
+        assert self.inputs == _INPUTS_PROCESS_WITH_RELATIVE_PATHS
+        assert lines == _PROCESS_LINES_WITH_RELATIVE_PATHS
+
+    def testReadFileProcessConfigWithRelativePaths2(self):
+        name = "process.config_with_relative_paths2"
+        lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
+        assert self.inputs == _INPUTS_PROCESS_WITH_RELATIVE_PATHS2
+        assert lines == _PROCESS_LINES_WITH_RELATIVE_PATHS2
