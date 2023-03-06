@@ -237,12 +237,14 @@ class TestReadConfigTrnsys:
         assert self.inputs == _INPUTS_RUN_WITHOUT_PATHS
         assert lines == _LINES_RUN_WITHOUT_PATHS
 
+    @_pt.mark.windows
     def testReadFileRunConfigWithRelativePaths(self):
         name = "run.config_with_relative_paths"
         lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
         assert self.inputs == _INPUTS_RUN_WITH_RELATIVE_PATHS
         assert lines == _LINES_RUN_WITH_RELATIVE_PATHS
 
+    @_pt.mark.windows
     def testReadFileRunConfigWithRelativePaths2(self):
         name = "run.config_with_relative_paths2"
         lines = self.reader.readFile(_DATA_DIR_PATH, name, self.inputs, parseFileCreated=False, controlDataType=False)
