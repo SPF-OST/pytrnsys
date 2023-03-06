@@ -1,15 +1,17 @@
-def __getattr__(name: str) -> any:
+
+
+# this function is ignored when a function exists.
+def __getattr__(name: str):
     if name == "UnitConverter":
         raise ValueError
-    else:
-        return getattr(UnitConverter(), name)
+    return getattr(UnitConverter(), name)
 
 
-class UnitConverter:  # pylint: disable=too-many-public-methods
+class UnitConverter:
     def __init__(self):
-        self.unit = ""
-        self._conversionFactor = None
-        self._factors = {
+        self.unit: str = ""
+        self._conversionFactor: float = None
+        self._factors: dict = {
             "kPaToBar": 1.0 / 101.3,
             "PaToBar": 1.0 / 101300,
             "BarToPa": 101300.0,
@@ -29,7 +31,7 @@ class UnitConverter:  # pylint: disable=too-many-public-methods
             "kJhToW": 1.0 / 3.6,
             "WTokJh": 3.6,
         }
-        self._conversion_methods = {
+        self._conversionMethods: dict = {
             "getkPaToBar": "kPaToBar",
             "getPaToBar": "PaToBar",
             "getBarToPa": "BarToPa",
@@ -51,15 +53,15 @@ class UnitConverter:  # pylint: disable=too-many-public-methods
             "getKJhToW": "kJhToW",
             "getWToKJh": "WTokJh",
         }
-        self._method = None
+        self._method: str = None
 
-    def getAvailableConversions(self):
+    def getAvailableConversions(self) -> list:
         return list(self._factors.keys())
 
-    def setConversionFactor(self, name):
+    def setConversionFactor(self, name: str):
         self._conversionFactor = self.getConversionFactor(name)
 
-    def convert(self, value, desiredConversionFactor=None):
+    def convert(self, value: float, desiredConversionFactor=None) -> float:
         if not desiredConversionFactor:
             factor = self._conversionFactor
         else:
@@ -67,19 +69,23 @@ class UnitConverter:  # pylint: disable=too-many-public-methods
 
         return factor * value
 
-    def getConversionFactor(self, conversionType):
+    def getConversionFactor(self, conversionType: str) -> float:
         if conversionType in self.getAvailableConversions():
             return self._factors[conversionType]
 
         raise ValueError(f"Unkown conversion type: {conversionType}")
 
-    def __getattr__(self, item):
-        self._method = self._conversion_methods[item]
+    def __getattr__(self, item: str):
+        self._method = self._conversionMethods[item]
         return self._helperFunction
 
-    def _helperFunction(self):
+    def _helperFunction(self) -> float:
         return self.getConversionFactor(self._method)
 
+
+def dummyFunction():
+    # Used to test the __getattr__ implementation
+    pass
 
 #    /* Power */
 #
@@ -113,4 +119,3 @@ class UnitConverter:  # pylint: disable=too-many-public-methods
 #
 #    inline double FToC(double tF) const {return (tF-32.)/1.8;};
 #    inline double CToF(double tC)  const {return (tC*1.8+32.);};
-

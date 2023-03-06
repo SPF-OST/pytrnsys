@@ -86,6 +86,21 @@ def testGetRelativeErrorZeros():
     assert _getRelativeError(0.0, 0.0) == 0
 
 
+class TestGetAttrFromModule:
+    def testIgnoreEntirely(self):
+        assert hasattr(_uc.dummyFunction, '__call__')
+
+    def testGetAttrFromModuleRaises(self):
+        with _pt.raises(ValueError):
+            _uc.__getattr__("UnitConverter")
+
+    def testGetAttrFromModuleDoesNotRaise(self):
+        try:
+            _uc.UnitConverter
+        except ValueError as e:
+            _pt.fail(f"Unexpected exception: {e}")
+
+
 class TestUnitConverter:
     def setup(self):
         self.converter = _uc.UnitConverter()  # pylint: disable=attribute-defined-outside-init
