@@ -87,18 +87,21 @@ def testGetRelativeErrorZeros():
 
 
 class TestGetAttrFromModule:
-    def testIgnoreEntirely(self):
+    @staticmethod
+    def testIgnoreEntirely():
         assert hasattr(_uc.dummyFunction, '__call__')
 
-    def testGetAttrFromModuleRaises(self):
+    @staticmethod
+    def testGetAttrFromModuleRaises():
         with _pt.raises(ValueError):
             _uc.__getattr__("UnitConverter")
 
-    def testGetAttrFromModuleDoesNotRaise(self):
+    @staticmethod
+    def testGetAttrFromModuleDoesNotRaise():
         try:
             _uc.UnitConverter
-        except ValueError as e:
-            _pt.fail(f"Unexpected exception: {e}")
+        except ValueError:
+            _pt.fail(f"Unexpected exception: {ValueError}")
 
 
 class TestUnitConverter:

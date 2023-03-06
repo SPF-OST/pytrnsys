@@ -1,7 +1,12 @@
 
 
+import typing as _typ
+
+
+# BEGIN-NOSCAN
 # this function is ignored when a function exists.
 def __getattr__(name: str):
+    # END-NOSCAN
     if name == "UnitConverter":
         raise ValueError
     return getattr(UnitConverter(), name)
@@ -10,7 +15,8 @@ def __getattr__(name: str):
 class UnitConverter:
     def __init__(self):
         self.unit: str = ""
-        self._conversionFactor: float = None
+        self._conversionFactor: _typ.Optional[float] = None
+        self._method: _typ.Optional[str] = None
         self._factors: dict = {
             "kPaToBar": 1.0 / 101.3,
             "PaToBar": 1.0 / 101300,
@@ -53,7 +59,6 @@ class UnitConverter:
             "getKJhToW": "kJhToW",
             "getWToKJh": "WTokJh",
         }
-        self._method: str = None
 
     def getAvailableConversions(self) -> list:
         return list(self._factors.keys())
