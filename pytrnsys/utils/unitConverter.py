@@ -67,10 +67,13 @@ class UnitConverter:
         self._conversionFactor = self.getConversionFactor(name)
 
     def convert(self, value: float, desiredConversionFactor=None) -> float:
-        if not desiredConversionFactor:
+        if desiredConversionFactor:
+            factor = self.getConversionFactor(desiredConversionFactor)
+        elif self._conversionFactor:
             factor = self._conversionFactor
         else:
-            factor = self.getConversionFactor(desiredConversionFactor)
+            raise ValueError(f"Conversion factor not given. Either use UnitConverter.setConversionFactor, "
+                             f"or provide a desiredConversionFactor.")
 
         return factor * value
 

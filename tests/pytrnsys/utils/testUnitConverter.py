@@ -144,3 +144,8 @@ class TestUnitConverter:
     @_pt.mark.parametrize("name, factor", _CONVERSION_NAME_CASES)
     def testConversionsWithoutAssigningFactorBeforehand(self, name, factor):
         assert self.converter.convert(1, desiredConversionFactor=name) == factor
+
+    @_pt.mark.parametrize("name, factor", _CONVERSION_NAME_CASES)
+    def testConversionsWithoutFactorRaises(self, name, factor):
+        with _pt.raises(ValueError):
+            self.converter.convert(1)
