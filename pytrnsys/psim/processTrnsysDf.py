@@ -89,6 +89,9 @@ class ProcessTrnsysDf:
         self.addPlotToLaTeX = {}
         self.readTrnsysFiles = readTrnsysFiles.ReadTrnsysFiles(self.tempFolderEnd)
 
+        self.printDataForGle=False
+
+
         # self.tInEvapHpMonthlyMax = num.zeros(12,float)
         # self.tInEvapHpMonthlyMin = num.zeros(12,float)
         # self.tInEvapHpMonthlyAv  = num.zeros(12,float)
@@ -1233,7 +1236,7 @@ class ProcessTrnsysDf:
             #                            sizeBox=15)
 
     def loadQvsTConfig(
-        self, df, inputs, year=False, useOnlyOneYear=False, monthsSplit=[], normalized=False, cut=False, factor=1
+        self, df, inputs, year=False, useOnlyOneYear=False, monthsSplit=[], normalized=False, cut=False, factor=1, _printEvery=1
     ):
 
         self.QvsTInput = inputs
@@ -1272,7 +1275,7 @@ class ProcessTrnsysDf:
 
         fileName = "QvsT"
 
-        self.plot.calcAndPrintQVersusT(fileName, tFlow, eCum, legend, printEvery=100, normalized=normalized, cut=cut)
+        self.plot.calcAndPrintQVersusT(fileName, tFlow, eCum, legend, printEvery=_printEvery, normalized=normalized, cut=cut)
 
         namePdf = self.plot.gle.executeGLE(fileName + ".gle")
 
@@ -1601,6 +1604,111 @@ class ProcessTrnsysDf:
             #                                       addLines=addLines)
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
+    def getHourlyBalanceDf(self,daySelected,_unit="kWh"):
+
+        if _unit == "kWh":
+            myUnit = 1.0
+        elif _unit == "MWh":
+            myUnit = 1000.0
+        elif _unit == "GWh":
+            myUnit = 1e6
+        else:
+            raise ValueError("unit %s not considered" % _unit)
+
+        hourlyBalanceDf = pd.DataFrame()
+
+        selectedDays_list = daySelected  # eval(daysSelected.split()[0])
+
+        nr = len(selectedDays_list)
+
+        selectedDays = datetime.strptime(selectedDays_list, "%Y,%m,%d")
+
+        getDate = datetime(year=2018, month=1, day=1) + pd.to_timedelta(self.houDataDf["Time"], unit="h")
+        df_selectedDay = self.houDataDf
+        df_selectedDay["Date"] = getDate
+
+        DaysSelected = pd.DataFrame()
+
+        min_time = selectedDays
+        # max_time = selectedDays + pd.to_timedelta(23, unit="h") #DC to check
+        max_time = selectedDays + pd.to_timedelta(24, unit="h")
+
+        df_DataSelected = df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
+
+        hourlyBalanceDf["Date"] = df_DataSelected["Date"]
+        
+        for name in df_DataSelected.columns:
+
+            found = False
+
+            try:
+                if name[0:7] == "qSysIn_" or name[0:10] == "elSysOut_Q_" or name[0:10] == "elSysIn_Q_":
+                    hourlyBalanceDf[self.getNiceLatexNames(name)] = df_DataSelected[name].values / myUnit
+
+                elif name[0:8] == "qSysOut_":
+                    hourlyBalanceDf[self.getNiceLatexNames(name)] = -df_DataSelected[name].values / myUnit
+
+            except:
+                pass
+
+        return hourlyBalanceDf
+
+    def getHourlyBalance(self,daySelected,_unit="kWh"):
+
+        if _unit == "kWh":
+            myUnit = 1.0
+        elif _unit == "MWh":
+            myUnit = 1000.0
+        elif _unit == "GWh":
+            myUnit = 1e6
+        else:
+            raise ValueError("unit %s not considered" % _unit)
+
+        inVar = []
+        outVar = []
+        legendsIn = []
+        legendsOut = []
+
+        selectedDays_list = daySelected  # eval(daysSelected.split()[0])
+
+        nr = len(selectedDays_list)
+
+        selectedDays = datetime.strptime(selectedDays_list, "%Y,%m,%d")
+
+        getDate = datetime(year=2018, month=1, day=1) + pd.to_timedelta(self.houDataDf["Time"], unit="h")
+        df_selectedDay = self.houDataDf
+        df_selectedDay["Date"] = getDate
+
+        DaysSelected = pd.DataFrame()
+
+        min_time = selectedDays
+        # max_time = selectedDays + pd.to_timedelta(23, unit="h") #DC to check
+        max_time = selectedDays + pd.to_timedelta(24, unit="h")
+
+        df_DataSelected = df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
+
+        DaysSelected = df_DataSelected
+
+        for name in DaysSelected.columns:
+
+            found = False
+
+            try:
+                if name[0:7] == "qSysIn_" or name[0:10] == "elSysOut_Q_" or name[0:10] == "elSysIn_Q_":
+                    # inVar.append(self.monData[name])
+                    inVar.append(DaysSelected[name].values / myUnit)
+                    legendsIn.append(self.getNiceLatexNames(name))
+
+                elif name[0:8] == "qSysOut_":
+                    # outVar.append(self.monData[name])
+                    outVar.append(DaysSelected[name].values / myUnit)
+
+                    legendsOut.append(self.getNiceLatexNames(name))
+            except:
+                pass
+
+        return inVar,legendsIn,outVar,legendsOut
+
     def addHeatBalanceHourly(self, daySelected, printData=False, unit="kWh"):
 
         if unit == "kWh":
@@ -1635,7 +1743,8 @@ class ProcessTrnsysDf:
         DaysSelected = pd.DataFrame()
 
         min_time = selectedDays
-        max_time = selectedDays + pd.to_timedelta(23, unit="h")
+        # max_time = selectedDays + pd.to_timedelta(23, unit="h") #DC to check
+        max_time = selectedDays + pd.to_timedelta(24, unit="h")
 
         df_DataSelected = df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
 
@@ -1677,6 +1786,7 @@ class ProcessTrnsysDf:
                 XLabel,
                 nameFile,
                 unit,
+                printImb=True,
                 useYear=False,
                 printData=self.printDataForGle,
                 plotEmf=self.inputs["plotEmf"],
@@ -2059,15 +2169,21 @@ class ProcessTrnsysDf:
             line = self.getNiceLatexNames("PpenSH_kW") + " & %2.1f& &  \\\\ \n" % (self.yearlySums["PpenSH_kW_Tot"])
             lines = lines + line
 
-        line = "Simulation Time & %.1f (min/year) & \\\\ \n" % (self.calcTime / self.nYearsSimulated)
+        try:
+            line = "Simulation Time & %.1f (min/year) & \\\\ \n" % (self.calcTime / self.nYearsSimulated)
+        except:
+            print("It is very likely that the log file to calculate the simulationTime does not exist.")
         lines = lines + line
-        if self.nItProblems == 0:
-            line = "$nIte_{erro}$ & %s & (%s) \\\\ \n" % (0, 0)
-            lines = lines + line
-        else:
-            ite = self.nItProblems.split("(")
-            line = "$nIte_{erro}$ & %s & (%s) \\\\ \n" % (ite[0], ite[1].split(")")[0])
-            lines = lines + line
+        try:
+            if self.nItProblems == 0:
+                line = "$nIte_{erro}$ & %s & (%s) \\\\ \n" % (0, 0)
+                lines = lines + line
+            else:
+                ite = self.nItProblems.split("(")
+                line = "$nIte_{erro}$ & %s & (%s) \\\\ \n" % (ite[0], ite[1].split(")")[0])
+                lines = lines + line
+        except:
+            print("It is very likely that the log file to calculate the iteration problems does not exist.")
 
         line = "\\hline \\\\ \n"
         lines = lines + line
