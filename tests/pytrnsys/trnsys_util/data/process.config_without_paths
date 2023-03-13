@@ -1,0 +1,47 @@
+# Overall processing variables
+bool processParallel False
+bool processQvsT False
+#bool maxMinAvoided False
+bool cleanModeLatex False
+bool forceProcess  True #even if results file exist it proceess the results, otherwise it checks if it exists
+bool setPrintDataForGle True
+bool isTrnsys True
+int reduceCpu 1
+string outputLevel "DEBUG"
+
+bool createLatexPdf True
+bool calculateHeatDemand True
+# bool dailyBalance True
+
+# Sorting the results (so far only one year can be analysed and displayed)
+int yearReadedInMonthlyFile -1
+int firstMonthUsed 0 # 6     # 0=January 1=February 6=July 7=August
+int numberOfYearsInHourlyFile 1 #20
+
+# Paths
+string latexNames "latexNames.json"
+string dllTrnsysPath "C:\Trnsys18\UserLib\ReleaseDlls"
+
+# Calculations of monthly values
+# calcMonthly hpSPF = (Pdhw_kW+qSysOut_BuiDemand)/ElHpTot_kW
+
+# Calculations of scalar values
+# calc Q_SH = PheatBui_kW_Tot
+# calc Q_DHW = Pdhw_kW_Tot
+# calc Q_yearly = Pdhw_kW_Tot + PheatBui_kW_Tot
+# calc E_yearly = elSysIn_Q_HpComp_Tot
+# calc E_PV = elSysIn_PV_Tot
+# calc VTes = Vol_Tes1
+# calc SPF = (Pdhw_kW_Tot+qSysOut_BuiDemand_Tot)/ElHpTot_kW_Tot
+
+
+# Additional content of the pdf
+#stringArray caseDefinition "Vol_Tes1" "Vol_Tes2"
+#stringArray monthlyBalance "PelPVRoof_kW" "-PvToBat_kW" "-PvToHeatSys_kW" "-PvToHH_kW" "-PvToGrid_kW"
+stringArray plotHourly "TInQSrc1"
+
+########## results file array #############
+#stringArray results "sizeHpNom"  "MfrHpCondNom"  "START"  "STOP" "SPF" "altid" "lGhxProbes"  #values to be printed to json
+#stringArray plotTimestepQvsT "PRdIn_kW" "TRdFl" "PRdIn_kW" "TRdRt" "QHpCond_kW" "THpCondOut" "QHpEvap_kW" "ThpEvapIn" "Pdhw_kW" "TPiDHWDemand" "QHpDes_kW" "THpDesOut" "PPiCircLoss_kW" "TLoadDHWHXIn" "PPiCircLoss_kW" "TLoadDHWHXOut" "Qghx_kW" "TGHXout"
+#stringArray QvsTnormalized "PRdIn_kW" "Pdhw_kW" "PPiCircLoss_kW" # this line is needed for definition of the heat to which the plot should be normalized!
+#stringArray comparePlot "lGhxProbes" "SPF" "altid"

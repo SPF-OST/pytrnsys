@@ -698,7 +698,7 @@ UNIT 460 TYPE 931
 ! PiOutHxTesSh
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1262,7 +1262,7 @@ UNIT 486 TYPE 931
 ! PiOutHxTes
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1301,7 +1301,7 @@ UNIT 488 TYPE 931
 ! PiInHxTesSh
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1340,7 +1340,7 @@ UNIT 490 TYPE 931
 ! PiDivDhwShCol
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1364,7 +1364,7 @@ UNIT 491 TYPE 931
 ! PiColOut
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1388,7 +1388,7 @@ UNIT 492 TYPE 931
 ! PiColDivDhwSh
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1461,7 +1461,7 @@ UNIT 495 TYPE 931
 ! PiSolarToHxIce
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1632,7 +1632,7 @@ UNIT 502 TYPE 931
 ! PiColPuIn
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1656,7 +1656,7 @@ UNIT 503 TYPE 931
 ! PiColIn
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1729,7 +1729,7 @@ UNIT 506 TYPE 931
 ! PiPuCircIn
 PARAMETERS 6
 0.05 ! diameter [m]
-10.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
@@ -1753,7 +1753,7 @@ UNIT 507 TYPE 931
 ! PiPuCircOut
 PARAMETERS 6
 0.05 ! diameter [m]
-10.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
@@ -1840,7 +1840,7 @@ UNIT 511 TYPE 931
 ! PiInHxTes
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1864,7 +1864,7 @@ UNIT 512 TYPE 931
 ! PiHxIceToSolar
 PARAMETERS 6
 0.1 ! diameter [m]
-5.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
@@ -1937,7 +1937,7 @@ UNIT 515 TYPE 931
 ! PiDhwSecOut
 PARAMETERS 6
 0.05 ! diameter [m]
-10.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
@@ -1961,7 +1961,7 @@ UNIT 516 TYPE 931
 ! PiHxDhwSecIn
 PARAMETERS 6
 0.05 ! diameter [m]
-10.0 ! length [m]
+2.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]

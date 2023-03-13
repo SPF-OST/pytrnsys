@@ -9,6 +9,7 @@
 ** Date:  23.04.2018   
 ** update: 03.05.2022: MS changed mass flow in evaporator loop to be independent of HX 
 ** size in the ice slurry tank (using real slurry tank type 865) 
+** update 22.02.2023 IGG improve stratification in tank. Parametrize MfrPuCircNom
 ******************************************
 
 ******************************************************************************************
@@ -34,8 +35,8 @@ xFracMixHxTes = AND(NOT(OR(ProWs,ProPar)),NOT(blockCol))
 **MfrPuCol = pumpColOn*(ProWs*MfrCPri+MfrCPriNom*(ProCs+ProDoubleHpCs)) !+ProSeries*MfrSeries)
 MfrPuCol = pumpColOn*MfrCPri*(ProWs+ProCs+ProPar+ProDoubleHpCs) !+ProSeries*MfrSeries)
 
-MfrPuDHW = MfrSrcDHWHXUsed!NOT(GT(MfrDHWset,0))*150+GT(MfrDHWset,0)*MfrDHWset
-MfrPuCirc = 0*NOT(GT(MfrDHWset,0))*150 ! IGG NOT(GT(MfrDHWset,0))*150
+MfrPuDHW = MfrSrcDHWHXUsed!NOT(GT(MfrDHWset,0))*MfrPuCircNom+GT(MfrDHWset,0)*MfrDHWset
+MfrPuCirc = 0*NOT(GT(MfrDHWset,0))*MfrPuCircNom ! IGG NOT(GT(MfrDHWset,0))*150
 MfrPuHpEvap = MfrHpEvapUsed*hpIsOn
 MfrPuHpCond = MfrHpCondNom*hpIsOn
 *** here allow loading of SH-storage, too! Load Tes_SH xFracDivSolarDhwSh = 1! ???

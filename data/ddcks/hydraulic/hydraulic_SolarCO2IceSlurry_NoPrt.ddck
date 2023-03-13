@@ -42,6 +42,10 @@ TTesIceSlurryRight = TCsHx2o
 THxColIceSide1 = TLoadOut_ColIce
 THxColIceSide2 = TSourceOut_ColIce
 
+CONSTANTS 2
+lenghPipeEvap = 2*SizeHpRatio
+dPipeEvap = 0.05*SizeHpRatio
+
 *****************************************************
 ****** ELECTRICIY CONSUMPTION OF PUMPS
 *****************************************************
@@ -1510,8 +1514,8 @@ MFrPiHxSolarIceIn = MPiHxSolarIceIn_A
 UNIT 497 TYPE 931
 ! PiIceToHp
 PARAMETERS 6
-0.05 ! diameter [m]
-2.0 ! length [m]
+dPipeEvap ! diameter [m]
+lenghPipeEvap ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
@@ -1607,8 +1611,8 @@ MPiHpToIce2 = MPiHpToIce2_A
 UNIT 501 TYPE 931
 ! PiHpOutPu
 PARAMETERS 6
-0.05 ! diameter [m]
-2.0 ! length [m]
+dPipeEvap ! diameter [m]
+lenghPipeEvap ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
@@ -1729,7 +1733,7 @@ UNIT 506 TYPE 931
 ! PiPuCircIn
 PARAMETERS 6
 0.05 ! diameter [m]
-10.0 ! length [m]
+15.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
@@ -1753,7 +1757,7 @@ UNIT 507 TYPE 931
 ! PiPuCircOut
 PARAMETERS 6
 0.05 ! diameter [m]
-10.0 ! length [m]
+15.0 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
@@ -1815,8 +1819,8 @@ MConn1139 = MConn1139_A
 UNIT 510 TYPE 931
 ! PiHpEvapMix
 PARAMETERS 6
-0.05 ! diameter [m]
-2.0 ! length [m]
+dPipeEvap ! diameter [m]
+lenghPipeEvap ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
@@ -1937,7 +1941,7 @@ UNIT 515 TYPE 931
 ! PiDhwSecOut
 PARAMETERS 6
 0.05 ! diameter [m]
-10.0 ! length [m]
+2.5 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
@@ -1961,7 +1965,7 @@ UNIT 516 TYPE 931
 ! PiHxDhwSecIn
 PARAMETERS 6
 0.05 ! diameter [m]
-10.0 ! length [m]
+2.5 ! length [m]
 4.999680000000001 ! U-value [kJ/(h*m^2*K)]  (= 1.3888 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
@@ -1985,8 +1989,8 @@ MFrPiHxDhwSecIn = MPiHxDhwSecIn_A
 UNIT 517 TYPE 931
 ! PiHpEvapIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
+dPipeEvap ! diameter [m]
+lenghPipeEvap ! length [m]
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
@@ -2010,8 +2014,8 @@ MFrPiHpEvapIn = MPiHpEvapIn_A
 UNIT 518 TYPE 931
 ! PiHpEvapOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
+dPipeEvap ! diameter [m]
+lenghPipeEvap ! length [m]
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
@@ -2193,7 +2197,7 @@ spPipeEnIntTot
 EQUATIONS 5
 spPipeConvectedTot = PPiHxCoolWatInConv_kW+PPiOutHxTesShConv_kW+PPiHpToShConv_kW+PPiShToTeeShHpConv_kW+PPiHpToSHDiffTopConv_kW+PPiTeeMixSHInConv_kW+PPiSHInMixConv_kW+PPiTesDhwInConv_kW+PPiCircInConv_kW+PPiTesDhwOutConv_kW+PPiCircOutConv_kW+PPiHxDhwInConv_kW+PPiDhwDemandConv_kW+PPiDhwMainsConv_kW+PPiSHOutMixConv_kW+PPiRadInConv_kW+PPiRadOutConv_kW+PPiDivSHCoolConv_kW+PPiHpToSHDiffBotConv_kW+PPiHxCoolWatOutConv_kW+PPiOutHxTesConv_kW+PPiInHxTesShConv_kW+PPiDivDhwShColConv_kW+PPiColOutConv_kW+PPiColDivDhwShConv_kW+PPiHxCoolBriOutConv_kW+PPiHxCoolBriInConv_kW+PPiSolarToHxIceConv_kW+PPiHxSolarIceInConv_kW+PPiIceToHpConv_kW+PPiIceToHxCoolConv_kW+PPiIceToHpInConv_kW+PPiHpToIce2Conv_kW+PPiHpOutPuConv_kW+PPiColPuInConv_kW+PPiColInConv_kW+PPiPuDhwOutConv_kW+PPiHxDhwOutConv_kW+PPiPuCircInConv_kW+PPiPuCircOutConv_kW+PConn1139Conv_kW+PPiHpEvapMixConv_kW+PPiInHxTesConv_kW+PPiHxIceToSolarConv_kW+PPiHxIceToPuIceConv_kW+PPiHxSolarIceOutConv_kW+PPiDhwSecOutConv_kW+PPiHxDhwSecInConv_kW+PPiHpEvapInConv_kW+PPiHpEvapOutConv_kW+PPiHpCondIn1Conv_kW+PPiHpToTesDHWOutConv_kW+PPiHpCondIn2Conv_kW+PPiHpCondOut2Conv_kW+PPiHpCondOut1Conv_kW+PPiHpInPuConv_kW
 PipeLossTot = PPiHxCoolWatIn_kW+PPiOutHxTesSh_kW+PPiHpToSh_kW+PPiShToTeeShHp_kW+PPiHpToSHDiffTop_kW+PPiTeeMixSHIn_kW+PPiSHInMix_kW+PPiTesDhwIn_kW+PPiCircIn_kW+PPiTesDhwOut_kW+PPiCircOut_kW+PPiHxDhwIn_kW+PPiDhwDemand_kW+PPiDhwMains_kW+PPiSHOutMix_kW+PPiRadIn_kW+PPiRadOut_kW+PPiDivSHCool_kW+PPiHpToSHDiffBot_kW+PPiHxCoolWatOut_kW+PPiOutHxTes_kW+PPiInHxTesSh_kW+PPiDivDhwShCol_kW+PPiColOut_kW+PPiColDivDhwSh_kW+PPiHxCoolBriOut_kW+PPiHxCoolBriIn_kW+PPiSolarToHxIce_kW+PPiHxSolarIceIn_kW+PPiIceToHp_kW+PPiIceToHxCool_kW+PPiIceToHpIn_kW+PPiHpToIce2_kW+PPiHpOutPu_kW+PPiColPuIn_kW+PPiColIn_kW+PPiPuDhwOut_kW+PPiHxDhwOut_kW+PPiPuCircIn_kW+PPiPuCircOut_kW+PConn1139_kW+PPiHpEvapMix_kW+PPiInHxTes_kW+PPiHxIceToSolar_kW+PPiHxIceToPuIce_kW+PPiHxSolarIceOut_kW+PPiDhwSecOut_kW+PPiHxDhwSecIn_kW+PPiHpEvapIn_kW+PPiHpEvapOut_kW+PPiHpCondIn1_kW+PPiHpToTesDHWOut_kW+PPiHpCondIn2_kW+PPiHpCondOut2_kW+PPiHpCondOut1_kW+PPiHpInPu_kW
-PipeLoss_LoopDHWCirc = PPiPuCircIn_kW+PPiPuCircOut_kW+PPiCircOut_kW+PPiHxDhwIn_kW +PPiDhwSecOut_kW+PPiPuDhwOut_kW+PPiHxDhwOut_kW+PPiHxDhwSecIn_kW +PPiCircIn_kW
+PipeLoss_LoopDHWCirc = PPiPuCircIn_kW+PPiPuCircOut_kW+PPiDhwSecOut_kW+PPiHxDhwSecIn_kW+PPiDhwMains_kW+PPiDhwDemand_kW
 *** here pytrnsys gui should export pipe looses by circuit
 *** here pytrnsys gui should export pipe looses by circuit
 *** here pytrnsys gui should export pipe looses by circuit

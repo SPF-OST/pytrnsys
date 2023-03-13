@@ -149,7 +149,7 @@ Tini_Tes1=60.       ! 6: oC, initial temperature
 nCvMax_Tes1=400     ! 7: -, minimum relative plug height
 nCvMin_Tes1=20      ! 8: -, maximum relative plug height
 maxTDiff_Tes1=0.015 ! 9: K, maximum temperature difference between plugs
-readMode_Tes1=0     ! 10: 1: from table, 0: Tini and CapTot
+readMode_Tes1=1     ! 10: 1: from table, 0: Tini and CapTot
 Tref_Tes1=273.15    ! 11: oC, reference temperature
 Tmax_Tes1=80.       ! 6: oC, initial temperature
 CONSTANTS 10
@@ -258,6 +258,10 @@ zero zero zero zero zero zero zero zero zero zero
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero 
+*****************LABELS****************
+*for start profile
+LABELS 1     
+C:\Daten\GIT\pytrnsys\data\ddcks\tes\profiles\DHW_CCT
 *****************OUTPUTS****************
 EQUATIONS 3
 Qdp1_Tes1=[50,31] ! 
@@ -317,7 +321,7 @@ zero zero zero zero zero zero zero zero zero zero
 UNIT 501 TYPE 65     ! Online Plotter HX 
 PARAMETERS 12   
 10     ! 1 Nb. of left-axis variables 
-0     ! 2 Nb. of right-axis variables
+4     ! 2 Nb. of right-axis variables
 0     ! 3 Left axis minimum 
 100     ! 4 Left axis maximum -
 0     ! 5 Right axis minimum 
@@ -328,9 +332,14 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 -1     ! 10 Logical unit for output file 
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
-INPUTS 10     
+INPUTS 14     
 T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1 
+TPiHxDhwSecIn TPiDhwSecOut TPiHxDhwIn TPiHxDhwOut
+
+*****
 T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1 
+TPiHxDhwSecIn TPiDhwSecOut TPiHxDhwIn TPiHxDhwOut
+
 LABELS  3         
 Temperatures  
 MassFlows  

@@ -77,8 +77,8 @@ zInDp3_Tes1=0.05
 zOutDp3_Tes1=0.95
 *********Connecting values of HX=1***********
 CONSTANTS 4
-zInhx1_Tes1=0.30
-zOuthx1_Tes1=0.05
+zInhx1_Tes1=0.45
+zOuthx1_Tes1=MAX(0.05,zInhx1_Tes1-0.40)
 Cphx1_Tes1=Lloop2Cp
 Rhohx1_Tes1=Lloop2Rho
 *********Constant of DIRECT PORT=1***********

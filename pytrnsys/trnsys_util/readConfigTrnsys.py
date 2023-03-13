@@ -1,7 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/python
+# !/usr/bin/python
 """
 Main class to read the config file for running and processing
 Author : Daniel Carbonell
@@ -9,14 +9,8 @@ Date   : 01-10-2018
 ToDo:   Copy config file to results folder automatically
 """
 
-import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
-import pytrnsys.rsim.executeTrnsys as exeTrnsys
-import pytrnsys.trnsys_util.buildTrnsysDeck as build
-import numpy as num
 import os
 import pytrnsys.pdata.processFiles as processFiles
-import string
-import pytrnsys.rsim.runParallel as runPar
 
 
 def getCityFromConfig(lines):
@@ -49,7 +43,8 @@ class ReadConfigTrnsys:
     def __init__(self):
         pass
 
-    def str2bool(self, v):
+    @staticmethod
+    def str2bool(v):
         return v.lower() in ("yes", "true", "t", "1")
 
     def readFile(self, path, name, inputs, parseFileCreated=True, controlDataType=True):
@@ -63,76 +58,48 @@ class ReadConfigTrnsys:
         lines = processFiles.purgueLines(lines, skypChar, None, removeBlankLines=True, removeBlankSpaces=False)
         lines = processFiles.purgueComments(lines, skypChar)
 
-        if "calcMonthly" not in inputs:
-            inputs["calcMonthly"] = []
-
-        if "calcMonthlyTest" not in inputs:
-            inputs["calcMonthlyTest"] = []
-
-        if "calcMonthlyMax" not in inputs:
-            inputs["calcMonthlyMax"] = []
-
-        if "calcMonthlyMin" not in inputs:
-            inputs["calcMonthlyMin"] = []
-
-        if "calcHourly" not in inputs:
-            inputs["calcHourly"] = []
-
-        if "calcMonthlyFromHourly" not in inputs:
-            inputs["calcMonthlyFromHourly"] = []
-
-        if "calcDaily" not in inputs:
-            inputs["calcDaily"] = []
-
-        if "calc" not in inputs:
-            inputs["calc"] = []
-
-        if "calcTest" not in inputs:
-            inputs["calcTest"] = []
-
-        if "calcCumSumHourly" not in inputs:
-            inputs["calcCumSumHourly"] = []
-
-        if "calcHourlyTest" not in inputs:  # dirty trick to calculate after calcCumSumHourly DC
-            inputs["calcHourlyTest"] = []
-
-        if "calcTimeStep" not in inputs:
-            inputs["calcTimeStep"] = []
-
-        if "calcTimeStepTest" not in inputs:
-            inputs["calcTimeStepTest"] = []
-
-        if "calcCumSumTimeStep" not in inputs:
-            inputs["calcCumSumTimeStep"] = []
+        inputs = self._addMissingFields(inputs)
 
         if parseFileCreated:
-            parsedFile = "%s.parse.dat" % configFile
-            outfile = open(parsedFile, "w")
-            outfile.writelines(lines)
-            outfile.close()
+            self._createParseFile(configFile, lines)
 
-        for i in range(len(lines)):
+        addPathToConnectionInfo = True
+        addProjects = True
+        addProjectPath = True
+        addPathBase = True
 
-            if lines[i][-1:] == "\n":
-                lines[i] = lines[i][0:-1]
+        for i, line in enumerate(lines):
 
-            splitLine = lines[i].split()
+            if line[-1:] == "\n":
+                line = line[0:-1]
+                lines[i] = line
+
+            splitLine = line.split()
 
             if splitLine[0] == "bool":
                 inputs[splitLine[1]] = self.str2bool(splitLine[2])
             elif splitLine[0] == "int":
                 inputs[splitLine[1]] = int(splitLine[2])
             elif splitLine[0] == "string":
+                if 'string pathToConnectionInfo ' in line:
+                    addPathToConnectionInfo = False
+                if 'string PROJECT$ ' in line:
+                    addProjects = False
+                if 'string projectPath ' in line:
+                    addProjectPath = False
+                if 'string pathBase ' in line:
+                    addPathBase = False
+
                 if len(splitLine) != 3:
                     splitString = ""
-                    for i in range(len(splitLine) - 2):
-                        if i == 0:
-                            splitString += splitLine[i + 2][1:]
+                    for j in range(len(splitLine) - 2):
+                        if j == 0:
+                            splitString += splitLine[j + 2][1:]
                             splitString += " "
-                        elif i == len(splitLine) - 3:
-                            splitString += splitLine[i + 2][:-1]
+                        elif j == len(splitLine) - 3:
+                            splitString += splitLine[j + 2][:-1]
                         else:
-                            splitString += splitLine[i + 2]
+                            splitString += splitLine[j + 2]
                             splitString += " "
                     inputs[splitLine[1]] = splitString
                     # raise ValueError("Error in string : %s"%lines[i])
@@ -143,8 +110,8 @@ class ReadConfigTrnsys:
                     inputs[splitLine[1]] = []
 
                 newElement = []
-                for i in range(len(splitLine) - 2):
-                    strEl = splitLine[i + 2][1:-1]  # I delete the "
+                for j in range(len(splitLine) - 2):
+                    strEl = splitLine[j + 2][1:-1]  # I delete the "
                     newElement.append(strEl)
                 inputs[splitLine[1]].append(newElement)
 
@@ -201,4 +168,69 @@ class ReadConfigTrnsys:
                 else:
                     pass
 
+        lines, inputs = self._addMissingDefaultPaths(addPathBase, addPathToConnectionInfo, addProjectPath, addProjects,
+                                                     inputs, lines, name, path)
+
         return lines
+
+    @staticmethod
+    def _createParseFile(configFile, lines):
+        parsedFile = "%s.parse.dat" % configFile
+        outfile = open(parsedFile, "w")
+        outfile.writelines(lines)
+        outfile.close()
+
+    @staticmethod
+    def _addMissingFields(inputs):
+        if "calcMonthly" not in inputs:
+            inputs["calcMonthly"] = []
+        if "calcMonthlyTest" not in inputs:
+            inputs["calcMonthlyTest"] = []
+        if "calcMonthlyMax" not in inputs:
+            inputs["calcMonthlyMax"] = []
+        if "calcMonthlyMin" not in inputs:
+            inputs["calcMonthlyMin"] = []
+        if "calcHourly" not in inputs:
+            inputs["calcHourly"] = []
+        if "calcMonthlyFromHourly" not in inputs:
+            inputs["calcMonthlyFromHourly"] = []
+        if "calcDaily" not in inputs:
+            inputs["calcDaily"] = []
+        if "calc" not in inputs:
+            inputs["calc"] = []
+        if "calcTest" not in inputs:
+            inputs["calcTest"] = []
+        if "calcCumSumHourly" not in inputs:
+            inputs["calcCumSumHourly"] = []
+        if "calcHourlyTest" not in inputs:  # dirty trick to calculate after calcCumSumHourly DC
+            inputs["calcHourlyTest"] = []
+        if "calcTimeStep" not in inputs:
+            inputs["calcTimeStep"] = []
+        if "calcTimeStepTest" not in inputs:
+            inputs["calcTimeStepTest"] = []
+        if "calcCumSumTimeStep" not in inputs:
+            inputs["calcCumSumTimeStep"] = []
+
+        return inputs
+
+    @staticmethod
+    def _addMissingDefaultPaths(addPathBase, addPathToConnectionInfo, addProjectPath, addProjects, inputs, lines,
+                                name, path):
+        if "run.config" in name:
+            if addPathToConnectionInfo:
+                info = os.path.join(path, "DdckPlaceHolderValues.json")
+                inputs["pathToConnectionInfo"] = info
+                lines.append('string pathToConnectionInfo ' + info)
+            if addProjects:
+                info = os.path.join(path, "ddck")
+                inputs["PROJECT$"] = info
+                lines.append('string PROJECT$ ' + info)
+            if addProjectPath:
+                inputs["projectPath"] = path
+                lines.append('string projectPath ' + str(path))
+
+        elif "process.config" in name and addPathBase:
+            inputs["pathBase"] = path
+            lines.append("string pathBase " + str(path))
+
+        return lines, inputs
