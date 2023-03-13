@@ -452,7 +452,7 @@ class ProcessParallelTrnsys:
             # maximum number of processes at once:
             maxNumberOfCPU = min(run.getNumberOfCPU() - self.inputs["reduceCpu"], len(fileName))
 
-            pool = mp.Pool(processes=1)
+            pool = mp.Pool(processes=maxNumberOfCPU) #Dc bak to previous. Not sure why it was changed
 
             results = pool.map(processDataGeneral, casesInputs)
 
