@@ -472,6 +472,9 @@ class ProcessParallelTrnsys:
 
             self.calcCost(fileNameList)
 
+        if "pathInfoToJson" in self.inputs.keys(): #first add
+            self.transferPathInfoToJson()
+            
         if "acrossSetsCalc" in self.inputs.keys():
             self.logger.info("Calculating across sets")
             self.calculationsAcrossSets()
@@ -505,8 +508,7 @@ class ProcessParallelTrnsys:
         if "scatterPlot" in self.inputs.keys():
             self.scatterPlot()
 
-        if "pathInfoToJson" in self.inputs.keys():
-            self.transferPathInfoToJson()
+      
 
         if "jsonCalc" in self.inputs.keys():
             self.calculateInJson()
