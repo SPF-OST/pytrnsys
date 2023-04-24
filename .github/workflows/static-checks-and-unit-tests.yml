@@ -85,3 +85,4 @@ jobs:
         repository: SPF-OST/pytrnsys_gui
         token: ${{ secrets.PYTRNSYS_GUI_REPO_ACCESS_TOKEN }}
         event-type: run-tests-and-build-executable
+        client-payload: '{"type": "run-tests-and-build-executable"}'
