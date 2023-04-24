@@ -87,8 +87,7 @@ class ProcessTrnsysDf:
         self.addPlotToLaTeX = {}
         self.readTrnsysFiles = readTrnsysFiles.ReadTrnsysFiles(self.tempFolderEnd)
 
-        self.printDataForGle=False
-
+        self.printDataForGle = False
 
         # self.tInEvapHpMonthlyMax = num.zeros(12,float)
         # self.tInEvapHpMonthlyMin = num.zeros(12,float)
@@ -115,14 +114,19 @@ class ProcessTrnsysDf:
 
     def getHourlyDataFrame(self):
         return self.houDataDf
+
     def getDailyDataFrame(self):
         return self.dayDataDf
+
     def getMonthlyDataFrame(self):
         return self.monDataDf
+
     def getTimeStepDataFrame(self):
         return self.steDataDf
-    def getYearlySums(self,name):
-        return self.yearlySums["%s"%(name+"_Tot")]
+
+    def getYearlySums(self, name):
+        return self.yearlySums["%s" % (name + "_Tot")]
+
     def getDeckData(self):
         return self.deckData
 
@@ -327,11 +331,11 @@ class ProcessTrnsysDf:
         self.resultsPath = _outputPath
         self.fileNameListToRead = _fileNameListToRead
 
-    def setResultsPathRelative(self,pathRelative):
+    def setResultsPathRelative(self, pathRelative):
 
         return os.path.join(self.outputPath + pathRelative)
 
-    def loadFiles(self,doConfigCalculation=True):
+    def loadFiles(self, doConfigCalculation=True):
 
         self.setLoaderParameters()
         locale.setlocale(locale.LC_ALL, "enn")
@@ -417,19 +421,19 @@ class ProcessTrnsysDf:
         self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
 
         for value in self.steDataDf.columns:
-            self.yearlyMin[value + "_Min"] = round(self.steDataDf[value].min(),2)
-            self.yearlyMax[value + "_Max"] = round(self.steDataDf[value].max(),2)
-            self.yearlyAvg[value + "_Avg"] = round(self.steDataDf[value].mean(),2)
+            self.yearlyMin[value + "_Min"] = round(self.steDataDf[value].min(), 2)
+            self.yearlyMax[value + "_Max"] = round(self.steDataDf[value].max(), 2)
+            self.yearlyAvg[value + "_Avg"] = round(self.steDataDf[value].mean(), 2)
 
-        self.yearlyEnd = {value + "_End": round(self.steDataDf[value][-1],2) for value in self.steDataDf.columns}
+        self.yearlyEnd = {value + "_End": round(self.steDataDf[value][-1], 2) for value in self.steDataDf.columns}
 
         for column in self.monDataDf.columns:
             self.monDataDf["Cum_" + column] = self.monDataDf[column].cumsum()
-        if(doConfigCalculation):
+        if doConfigCalculation:
             self.calcConfigEquations()
 
         for value in self.monDataDf.columns:
-            if not(value in self.yearlySums):
+            if not (value in self.yearlySums):
                 self.yearlySums[value + "_Tot"] = self.monDataDf[value].sum()
 
         for value in self.houDataDf.columns:
@@ -440,10 +444,10 @@ class ProcessTrnsysDf:
 
         for value in self.steDataDf.columns:
             if not (value in self.yearlyMin):
-                self.yearlyMin[value + "_Min"] = round(self.steDataDf[value].min(),2)
-                self.yearlyMax[value + "_Max"] = round(self.steDataDf[value].max(),2)
-                self.yearlyAvg[value + "_Avg"] = round(self.steDataDf[value].mean(),2)
-                self.yearlyEnd[value + "_End"] = round(self.steDataDf[value][-1],2)
+                self.yearlyMin[value + "_Min"] = round(self.steDataDf[value].min(), 2)
+                self.yearlyMax[value + "_Max"] = round(self.steDataDf[value].max(), 2)
+                self.yearlyAvg[value + "_Avg"] = round(self.steDataDf[value].mean(), 2)
+                self.yearlyEnd[value + "_End"] = round(self.steDataDf[value][-1], 2)
 
         variablesWithTimeStepANDHourlyData = list(set(self.houDataDf.columns) & set(self.steDataDf.columns))
         # for variable in variablesWithTimeStepANDHourlyData:
@@ -530,7 +534,7 @@ class ProcessTrnsysDf:
                 logger.warning("scatterHourly not generated.")
                 continue
 
-            logger.info("Generating scatterHourly %s %s..." %(xVariable, yVariable))
+            logger.info("Generating scatterHourly %s %s..." % (xVariable, yVariable))
 
             if "latexNames" in self.inputs.keys():
                 if ":" in self.inputs["latexNames"]:
@@ -543,7 +547,7 @@ class ProcessTrnsysDf:
 
             fig1, ax1 = plt.subplots(constrained_layout=True)
 
-            ax1.plot(xDf, yDf, "o", color='b', markersize=1)
+            ax1.plot(xDf, yDf, "o", color="b", markersize=1)
             ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
             ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
 
@@ -555,7 +559,7 @@ class ProcessTrnsysDf:
                 line = str(xDf.iloc[i]) + "\t" + str(yDf.iloc[i])
                 lines += line + "\n"
 
-            pathFolder = os.path.join(self.executingPath,self.folderName)
+            pathFolder = os.path.join(self.executingPath, self.folderName)
 
             outfile = open(os.path.join(pathFolder, fileName + ".dat"), "w")
             outfile.writelines(lines)
@@ -564,17 +568,33 @@ class ProcessTrnsysDf:
             fig1.savefig(os.path.join(pathFolder, fileName + ".png"), bbox_inches="tight")
             plt.close()
 
-    def outlinePlotter(self, axis, outlinePoints, color='k', label = None):
+    def outlinePlotter(self, axis, outlinePoints, color="k", label=None):
         if label == None:
-            axis.plot([outlinePoints[-1][0], outlinePoints[0][0]], [outlinePoints[-1][1], outlinePoints[0][1]],
-                      linestyle='-', markersize=0, color=color)
+            axis.plot(
+                [outlinePoints[-1][0], outlinePoints[0][0]],
+                [outlinePoints[-1][1], outlinePoints[0][1]],
+                linestyle="-",
+                markersize=0,
+                color=color,
+            )
         else:
-            axis.plot([outlinePoints[-1][0], outlinePoints[0][0]], [outlinePoints[-1][1], outlinePoints[0][1]],
-                      linestyle='-', markersize=0, color=color, label=label)
+            axis.plot(
+                [outlinePoints[-1][0], outlinePoints[0][0]],
+                [outlinePoints[-1][1], outlinePoints[0][1]],
+                linestyle="-",
+                markersize=0,
+                color=color,
+                label=label,
+            )
 
-        for i in range(0,len(outlinePoints)-1):
-            axis.plot([outlinePoints[i][0], outlinePoints[i+1][0]], [outlinePoints[i][1], outlinePoints[i+1][1]],
-                      linestyle='-', markersize=0, color=color)
+        for i in range(0, len(outlinePoints) - 1):
+            axis.plot(
+                [outlinePoints[i][0], outlinePoints[i + 1][0]],
+                [outlinePoints[i][1], outlinePoints[i + 1][1]],
+                linestyle="-",
+                markersize=0,
+                color=color,
+            )
 
     def comfortHourly(self):
         for plotVariables in self.inputs["comfortHourly"]:
@@ -587,8 +607,8 @@ class ProcessTrnsysDf:
                 variableStartIndex = 1
             elif plotVariables[0] == "Dahlheimer":
                 variableStartIndex = 1
-                comfortBoundary = [(17,75), (21,65), (22,35), (19,35)]
-                acceptableBoundary = [(16,75), (17,85), (21,80), (25,60), (27,30), (26,20), (20,20), (17,35)]
+                comfortBoundary = [(17, 75), (21, 65), (22, 35), (19, 35)]
+                acceptableBoundary = [(16, 75), (17, 85), (21, 80), (25, 60), (27, 30), (26, 20), (20, 20), (17, 35)]
 
             xVariable = plotVariables[variableStartIndex]
             yVariable = plotVariables[variableStartIndex + 1]
@@ -606,7 +626,7 @@ class ProcessTrnsysDf:
                 logger.warning("comfortHourly not generated.")
                 continue
 
-            logger.info("Generating comfortHourly %s %s..." %(xVariable, yVariable))
+            logger.info("Generating comfortHourly %s %s..." % (xVariable, yVariable))
 
             if "latexNames" in self.inputs.keys():
                 if ":" in self.inputs["latexNames"]:
@@ -619,24 +639,42 @@ class ProcessTrnsysDf:
 
             fig1, ax1 = plt.subplots(constrained_layout=True)
 
-            ax1.plot(xDf[xDf.index.month == 3], yDf[xDf.index.month == 3], "o", color='lime', markersize=0.25, label = 'Mar-May')
-            ax1.plot(xDf[xDf.index.month == 4], yDf[xDf.index.month == 4], "o", color='lime', markersize=0.25)
-            ax1.plot(xDf[xDf.index.month == 5], yDf[xDf.index.month == 5], "o", color='lime', markersize=0.25)
-            ax1.plot(xDf[xDf.index.month == 6], yDf[xDf.index.month == 6], "o", color='r', markersize=0.25, label = 'Jun-Aug')
-            ax1.plot(xDf[xDf.index.month == 7], yDf[xDf.index.month == 7], "o", color='r', markersize=0.25)
-            ax1.plot(xDf[xDf.index.month == 8], yDf[xDf.index.month == 8], "o", color='r', markersize=0.25)
-            ax1.plot(xDf[xDf.index.month == 9], yDf[xDf.index.month == 9], "o", color='orange', markersize=0.25, label = 'Sep-Nov')
-            ax1.plot(xDf[xDf.index.month == 10], yDf[xDf.index.month == 10], "o", color='orange', markersize=0.25)
-            ax1.plot(xDf[xDf.index.month == 11], yDf[xDf.index.month == 11], "o", color='orange', markersize=0.25)
-            ax1.plot(xDf[xDf.index.month == 12], yDf[xDf.index.month == 12], "o", color='b', markersize=0.25, label = 'Dec-Feb')
-            ax1.plot(xDf[xDf.index.month == 1], yDf[xDf.index.month == 1], "o", color='b', markersize=0.25)
-            ax1.plot(xDf[xDf.index.month == 2], yDf[xDf.index.month == 2], "o", color='b', markersize=0.25)
+            ax1.plot(
+                xDf[xDf.index.month == 3],
+                yDf[xDf.index.month == 3],
+                "o",
+                color="lime",
+                markersize=0.25,
+                label="Mar-May",
+            )
+            ax1.plot(xDf[xDf.index.month == 4], yDf[xDf.index.month == 4], "o", color="lime", markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 5], yDf[xDf.index.month == 5], "o", color="lime", markersize=0.25)
+            ax1.plot(
+                xDf[xDf.index.month == 6], yDf[xDf.index.month == 6], "o", color="r", markersize=0.25, label="Jun-Aug"
+            )
+            ax1.plot(xDf[xDf.index.month == 7], yDf[xDf.index.month == 7], "o", color="r", markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 8], yDf[xDf.index.month == 8], "o", color="r", markersize=0.25)
+            ax1.plot(
+                xDf[xDf.index.month == 9],
+                yDf[xDf.index.month == 9],
+                "o",
+                color="orange",
+                markersize=0.25,
+                label="Sep-Nov",
+            )
+            ax1.plot(xDf[xDf.index.month == 10], yDf[xDf.index.month == 10], "o", color="orange", markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 11], yDf[xDf.index.month == 11], "o", color="orange", markersize=0.25)
+            ax1.plot(
+                xDf[xDf.index.month == 12], yDf[xDf.index.month == 12], "o", color="b", markersize=0.25, label="Dec-Feb"
+            )
+            ax1.plot(xDf[xDf.index.month == 1], yDf[xDf.index.month == 1], "o", color="b", markersize=0.25)
+            ax1.plot(xDf[xDf.index.month == 2], yDf[xDf.index.month == 2], "o", color="b", markersize=0.25)
 
             self.outlinePlotter(ax1, comfortBoundary)
             if acceptableBoundary:
-                self.outlinePlotter(ax1, acceptableBoundary, color='grey')
+                self.outlinePlotter(ax1, acceptableBoundary, color="grey")
 
-            ax1.legend(loc = 'best', markerscale = 10)
+            ax1.legend(loc="best", markerscale=10)
             ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
             ax1.set_ylabel(self.doc.getNiceLatexNames(yVariable))
 
@@ -648,7 +686,7 @@ class ProcessTrnsysDf:
                 line = str(xDf.iloc[i]) + "\t" + str(yDf.iloc[i])
                 lines += line + "\n"
 
-            pathFolder = os.path.join(self.executingPath,self.folderName)
+            pathFolder = os.path.join(self.executingPath, self.folderName)
 
             outfile = open(os.path.join(pathFolder, fileName + ".dat"), "w")
             outfile.writelines(lines)
@@ -658,7 +696,7 @@ class ProcessTrnsysDf:
             plt.close()
 
     def addQvsTPlot(self):
-        if (os.getenv("GLE_EXE") == None):
+        if os.getenv("GLE_EXE") == None:
             logger.warning("No gle environment defined!")
             logger.warning("QvsTPlot can only be used with existing gle environment.")
             return
@@ -1120,7 +1158,7 @@ class ProcessTrnsysDf:
             # self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
             self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
 
-        for equation in (self.inputs["calcTimeStep"]):
+        for equation in self.inputs["calcTimeStep"]:
             kwargs = {"local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax}}
             scalars = kwargs["local_dict"].keys()
             splitEquation = equation.split("=")
@@ -1143,7 +1181,7 @@ class ProcessTrnsysDf:
                         myValue = "cumsum_" + value
                         self.steDataDf[myValue] = self.steDataDf[value].cumsum()
                         # self.cumSumEnd = {myValue + "_End": self.steDataDf[myValue][-1]}
-                        self.cumSumEnd.update({myValue + "_End": round(self.steDataDf[myValue][-1],2)})
+                        self.cumSumEnd.update({myValue + "_End": round(self.steDataDf[myValue][-1], 2)})
 
         for equation in self.inputs[
             "calcTimeStepTest"
@@ -1227,7 +1265,16 @@ class ProcessTrnsysDf:
             #                            sizeBox=15)
 
     def loadQvsTConfig(
-        self, df, inputs, year=False, useOnlyOneYear=False, monthsSplit=[], normalized=False, cut=False, factor=1, _printEvery=1
+        self,
+        df,
+        inputs,
+        year=False,
+        useOnlyOneYear=False,
+        monthsSplit=[],
+        normalized=False,
+        cut=False,
+        factor=1,
+        _printEvery=1,
     ):
 
         self.QvsTInput = inputs
@@ -1266,7 +1313,9 @@ class ProcessTrnsysDf:
 
         fileName = "QvsT"
 
-        self.plot.calcAndPrintQVersusT(fileName, tFlow, eCum, legend, printEvery=_printEvery, normalized=normalized, cut=cut)
+        self.plot.calcAndPrintQVersusT(
+            fileName, tFlow, eCum, legend, printEvery=_printEvery, normalized=normalized, cut=cut
+        )
 
         namePdf = self.plot.gle.executeGLE(fileName + ".gle")
 
@@ -1496,7 +1545,9 @@ class ProcessTrnsysDf:
             min_time = selectedDays[i]
             max_time = selectedDays[i] + pd.to_timedelta(23, unit="h")
 
-            df_DataSelected = df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
+            df_DataSelected = df_selectedDay[
+                (df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)
+            ]
             Test = pd.DataFrame(df_DataSelected.sum(), df_DataSelected.columns)
             Test2 = Test.T
             Test2["Date"] = min_time.date()
@@ -1574,7 +1625,7 @@ class ProcessTrnsysDf:
             #                                       addLines=addLines)
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
-    def getHourlyBalanceDf(self,daySelected,_unit="kWh"):
+    def getHourlyBalanceDf(self, daySelected, _unit="kWh"):
 
         myUnit = self._getConversionFactor(_unit)
 
@@ -1583,7 +1634,7 @@ class ProcessTrnsysDf:
         df_DataSelected = self._getSelectedData(daySelected)
 
         hourlyBalanceDf["Date"] = df_DataSelected["Date"]
-        
+
         for name in df_DataSelected.columns:
             try:
                 if name[0:7] == "qSysIn_" or name[0:10] == "elSysOut_Q_" or name[0:10] == "elSysIn_Q_":
@@ -1597,14 +1648,14 @@ class ProcessTrnsysDf:
 
         return hourlyBalanceDf
 
-    def getHourlyBalance(self,daySelected,_unit="kWh"):
+    def getHourlyBalance(self, daySelected, _unit="kWh"):
 
         myUnit = self._getConversionFactor(_unit)
 
         df_DataSelected = self._getSelectedData(daySelected)
 
         DaysSelected = df_DataSelected
-        
+
         inVar = []
         outVar = []
         legendsIn = []
@@ -1622,7 +1673,7 @@ class ProcessTrnsysDf:
             except:
                 pass
 
-        return inVar,legendsIn,outVar,legendsOut
+        return inVar, legendsIn, outVar, legendsOut
 
     def _getSelectedData(self, daySelected) -> pd.DataFrame:
         selectedDays_list = daySelected
@@ -1862,7 +1913,7 @@ class ProcessTrnsysDf:
                 if plotStyle == "relative":
                     nameFile = nameFile + "_relative"
                 titlePlot = "Balance"
-                titleOfPlot = (titlePlot)
+                titleOfPlot = titlePlot
                 namePdf = self.plot.plotMonthlyBalanceDf(
                     inVar,
                     [],
@@ -1885,7 +1936,6 @@ class ProcessTrnsysDf:
                 self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
 
                 self.addPlotToLaTeX = {namePdf: caption}
-
 
     def addHeatingLimitFit(self):
         """
@@ -1913,11 +1963,11 @@ class ProcessTrnsysDf:
 
             doPlot = True
 
-            if 'noPlot' in inputs:
+            if "noPlot" in inputs:
                 doPLot = False
 
             if self.inputs["isTrnsys"]:
-                climate = os.path.split(self.executingPath)[-1].split('_')[-1]
+                climate = os.path.split(self.executingPath)[-1].split("_")[-1]
             else:
                 climate = self.deckData["Umgebungstemperatur"]
             climateDataPath = (
@@ -1935,14 +1985,13 @@ class ProcessTrnsysDf:
                 yAxisVariable = self.houDataDf[yAxisVariableName][0:8760]
                 fileName = "HeatingLimit_hourly"
 
-
             if self.inputs["isTrnsys"]:
                 titleOfPlot = self.fileName + " (" + climate + ")"
             else:
                 titleOfPlot = self.deckData["Simulation_MFH"] + " (" + climate + ")"
 
-            if yAxisVariableName == 'qSysIn_Heat':
-                yAxisVariableName = '$P_H$ [W]'
+            if yAxisVariableName == "qSysIn_Heat":
+                yAxisVariableName = "$P_H$ [W]"
 
             if timeStep == "hourly":
                 namePdf = self.plot.plotHeatingLimitFit(
@@ -1952,7 +2001,7 @@ class ProcessTrnsysDf:
                     timeStep,
                     title=titleOfPlot,
                     yLabel=yAxisVariableName,
-                    doPlot=doPlot
+                    doPlot=doPlot,
                 )
             elif timeStep == "daily":
                 namePdf, fitted_H, fitted_HG, RSquared = self.plot.plotHeatingLimitFit(
@@ -1962,8 +2011,8 @@ class ProcessTrnsysDf:
                     timeStep,
                     title=titleOfPlot,
                     yLabel=yAxisVariableName,
-                    doPlot=doPlot
-                    )
+                    doPlot=doPlot,
+                )
 
                 pathResultsJson = os.path.join(self.outputPath, self.fileName + "-results.json")
                 if os.path.isfile(pathResultsJson):
@@ -2261,28 +2310,27 @@ class ProcessTrnsysDf:
 
     def saveResultsFile(self, resultsDict):
 
-            pathParameterJson = os.path.join(self.outputPath, self.fileName + ".json")
-            if os.path.isfile(pathParameterJson):
-                with open(pathParameterJson, "r") as file:
-                    parameterDictionary = json.load(file)
-                    # self.resultsDict.update(parameterDictionary)
-                    resultsDict.update(parameterDictionary)
+        pathParameterJson = os.path.join(self.outputPath, self.fileName + ".json")
+        if os.path.isfile(pathParameterJson):
+            with open(pathParameterJson, "r") as file:
+                parameterDictionary = json.load(file)
+                # self.resultsDict.update(parameterDictionary)
+                resultsDict.update(parameterDictionary)
 
+        fileName = self.fileName + "-results.json"
+        fileNamePath = os.path.join(self.outputPath, fileName)
 
-            fileName = self.fileName + "-results.json"
-            fileNamePath = os.path.join(self.outputPath, fileName)
+        if os.path.isfile(fileNamePath):
 
-            if os.path.isfile(fileNamePath):
+            tempDict = resultsDict
 
-                tempDict = resultsDict
+            with open(fileNamePath, "r") as file:
+                resultsDict = json.load(file)
 
-                with open(fileNamePath, "r") as file:
-                    resultsDict = json.load(file)
+            resultsDict.update(tempDict)
 
-                resultsDict.update(tempDict)
-
-            with open(fileNamePath, "w") as fp:
-                json.dump(resultsDict, fp, indent=2, separators=(",", ": "), sort_keys=True)
+        with open(fileNamePath, "w") as fp:
+            json.dump(resultsDict, fp, indent=2, separators=(",", ": "), sort_keys=True)
 
     def saveHourlyToCsv(self):
         """
@@ -2295,10 +2343,6 @@ class ProcessTrnsysDf:
                 pathFile = os.path.join(self.outputPath, stringArray[0] + ".csv")
                 self.houDataDf[stringArray[1:]].to_csv(pathFile, sep=";")
 
-
-
-
-
     def saveTSToCsv(self):
         """
         Saves timestep printer values to csv files. config file key is stringArray "timestepToCsv" nameOfFile [variables,...]
@@ -2309,7 +2353,6 @@ class ProcessTrnsysDf:
             for stringArray in self.inputs["timestepToCsv"]:
                 pathFile = os.path.join(self.outputPath, stringArray[0] + ".csv")
                 self.steDataDf[stringArray[1:]].to_csv(pathFile, sep=";")
-
 
     def plot_as_emf(self, figure, **kwargs):
         if "inkscape" in self.inputs:
