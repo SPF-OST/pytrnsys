@@ -11,31 +11,29 @@ Date   : 2018
 ToDo :
 """
 
-import os, subprocess
-import string, shutil
-import pytrnsys.pdata.processFiles as spfUtils
+import json
+import locale
+import logging
+import os
+import re
+import subprocess
+import typing as tp
+from datetime import datetime
+from string import ascii_letters, digits
 
-# import pytrnsys.psim.processMonthlyDataBase as  monthlyData  # changed in order to clean the processing of files
-import pytrnsys.utils.utilsSpf as utils
-import time
-import numpy as num
 import matplotlib.pyplot as plt
-import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
-import pytrnsys.utils.unitConverter as unit
+import numpy as num
+import pandas as pd
+
+import pytrnsys.plot.plotBokeh as pltB
+import pytrnsys.plot.plotMatplotlib as plot
+import pytrnsys.report.latexReport as latex
 import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
 import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
+import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
+import pytrnsys.utils.unitConverter as unit
+import pytrnsys.utils.utilsSpf as utils
 from pytrnsys.psim.simulationLoader import SimulationLoader
-import pandas as pd
-import pytrnsys.report.latexReport as latex
-import pytrnsys.plot.plotMatplotlib as plot
-import json
-import pytrnsys.plot.plotBokeh as pltB
-from string import ascii_letters, digits, whitespace
-import locale
-import re
-import logging
-from calendar import monthrange
-from datetime import datetime, timedelta
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -806,14 +804,7 @@ class ProcessTrnsysDf:
 
     def addDemands(self, unit="kWh"):
 
-        if unit == "kWh":
-            myUnit = 1.0
-        elif unit == "MWh":
-            myUnit = 1000.0
-        elif unit == "GWh":
-            myUnit = 1e6
-        else:
-            raise ValueError("unit %s not considered" % unit)
+        myUnit = self._getConversionFactor(unit)
 
         legend = ["Month"] + self.legendQ + ["Total"]
 
@@ -1308,14 +1299,7 @@ class ProcessTrnsysDf:
             self.plot.calcAndPrintQVersusT(fileName, tFlow, eCum, legend, printEvery=100)
 
     def addElBalance(self, unit="kWh"):
-        if unit == "kWh":
-            myUnit = 1.0
-        elif unit == "MWh":
-            myUnit = 1000.0
-        elif unit == "GWh":
-            myUnit = 1e6
-        else:
-            raise ValueError("unit %s not considered" % unit)
+        myUnit = self._getConversionFactor(unit)
         inVar = []
         outVar = []
         legendsIn = []
@@ -1388,14 +1372,7 @@ class ProcessTrnsysDf:
 
     def addHeatBalance(self, printData=False, unit="kWh"):
 
-        if unit == "kWh":
-            myUnit = 1.0
-        elif unit == "MWh":
-            myUnit = 1000.0
-        elif unit == "GWh":
-            myUnit = 1e6
-        else:
-            raise ValueError("unit %s not considered" % unit)
+        myUnit = self._getConversionFactor(unit)
 
         inVar = []
         outVar = []
@@ -1470,14 +1447,7 @@ class ProcessTrnsysDf:
 
     def addHeatBalanceDaily(self, month, printData=False, unit="kWh"):
 
-        if unit == "kWh":
-            myUnit = 1.0
-        elif unit == "MWh":
-            myUnit = 1000.0
-        elif unit == "GWh":
-            myUnit = 1e6
-        else:
-            raise ValueError("unit %s not considered" % unit)
+        myUnit = self._getConversionFactor(unit)
 
         inVar = []
         outVar = []
@@ -1606,41 +1576,15 @@ class ProcessTrnsysDf:
 
     def getHourlyBalanceDf(self,daySelected,_unit="kWh"):
 
-        if _unit == "kWh":
-            myUnit = 1.0
-        elif _unit == "MWh":
-            myUnit = 1000.0
-        elif _unit == "GWh":
-            myUnit = 1e6
-        else:
-            raise ValueError("unit %s not considered" % _unit)
+        myUnit = self._getConversionFactor(_unit)
 
         hourlyBalanceDf = pd.DataFrame()
 
-        selectedDays_list = daySelected  # eval(daysSelected.split()[0])
-
-        nr = len(selectedDays_list)
-
-        selectedDays = datetime.strptime(selectedDays_list, "%Y,%m,%d")
-
-        getDate = datetime(year=2018, month=1, day=1) + pd.to_timedelta(self.houDataDf["Time"], unit="h")
-        df_selectedDay = self.houDataDf
-        df_selectedDay["Date"] = getDate
-
-        DaysSelected = pd.DataFrame()
-
-        min_time = selectedDays
-        # max_time = selectedDays + pd.to_timedelta(23, unit="h") #DC to check
-        max_time = selectedDays + pd.to_timedelta(24, unit="h")
-
-        df_DataSelected = df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
+        df_DataSelected = self._getSelectedData(daySelected)
 
         hourlyBalanceDf["Date"] = df_DataSelected["Date"]
         
         for name in df_DataSelected.columns:
-
-            found = False
-
             try:
                 if name[0:7] == "qSysIn_" or name[0:10] == "elSysOut_Q_" or name[0:10] == "elSysIn_Q_":
                     hourlyBalanceDf[self.getNiceLatexNames(name)] = df_DataSelected[name].values / myUnit
@@ -1655,6 +1599,44 @@ class ProcessTrnsysDf:
 
     def getHourlyBalance(self,daySelected,_unit="kWh"):
 
+        myUnit = self._getConversionFactor(_unit)
+
+        df_DataSelected = self._getSelectedData(daySelected)
+
+        DaysSelected = df_DataSelected
+        
+        inVar = []
+        outVar = []
+        legendsIn = []
+        legendsOut = []
+
+        for name in DaysSelected.columns:
+            try:
+                if name[0:7] == "qSysIn_" or name[0:10] == "elSysOut_Q_" or name[0:10] == "elSysIn_Q_":
+                    inVar.append(DaysSelected[name].values / myUnit)
+                    legendsIn.append(self.getNiceLatexNames(name))
+
+                elif name[0:8] == "qSysOut_":
+                    outVar.append(DaysSelected[name].values / myUnit)
+                    legendsOut.append(self.getNiceLatexNames(name))
+            except:
+                pass
+
+        return inVar,legendsIn,outVar,legendsOut
+
+    def _getSelectedData(self, daySelected) -> pd.DataFrame:
+        selectedDays_list = daySelected
+        selectedDays = datetime.strptime(selectedDays_list, "%Y,%m,%d")
+        getDate = datetime(year=2018, month=1, day=1) + pd.to_timedelta(self.houDataDf["Time"], unit="h")
+        df_selectedDay = self.houDataDf
+        df_selectedDay["Date"] = getDate
+        min_time = selectedDays
+        max_time = selectedDays + pd.to_timedelta(24, unit="h")
+        df_DataSelected = df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
+        return df_DataSelected
+
+    @staticmethod
+    def _getConversionFactor(_unit: tp.Literal["kWh", "MWh", "GWh"]) -> float:
         if _unit == "kWh":
             myUnit = 1.0
         elif _unit == "MWh":
@@ -1663,90 +1645,18 @@ class ProcessTrnsysDf:
             myUnit = 1e6
         else:
             raise ValueError("unit %s not considered" % _unit)
-
-        inVar = []
-        outVar = []
-        legendsIn = []
-        legendsOut = []
-
-        selectedDays_list = daySelected  # eval(daysSelected.split()[0])
-
-        nr = len(selectedDays_list)
-
-        selectedDays = datetime.strptime(selectedDays_list, "%Y,%m,%d")
-
-        getDate = datetime(year=2018, month=1, day=1) + pd.to_timedelta(self.houDataDf["Time"], unit="h")
-        df_selectedDay = self.houDataDf
-        df_selectedDay["Date"] = getDate
-
-        DaysSelected = pd.DataFrame()
-
-        min_time = selectedDays
-        # max_time = selectedDays + pd.to_timedelta(23, unit="h") #DC to check
-        max_time = selectedDays + pd.to_timedelta(24, unit="h")
-
-        df_DataSelected = df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
-
-        DaysSelected = df_DataSelected
-
-        for name in DaysSelected.columns:
-
-            found = False
-
-            try:
-                if name[0:7] == "qSysIn_" or name[0:10] == "elSysOut_Q_" or name[0:10] == "elSysIn_Q_":
-                    # inVar.append(self.monData[name])
-                    inVar.append(DaysSelected[name].values / myUnit)
-                    legendsIn.append(self.getNiceLatexNames(name))
-
-                elif name[0:8] == "qSysOut_":
-                    # outVar.append(self.monData[name])
-                    outVar.append(DaysSelected[name].values / myUnit)
-
-                    legendsOut.append(self.getNiceLatexNames(name))
-            except:
-                pass
-
-        return inVar,legendsIn,outVar,legendsOut
+        return myUnit
 
     def addHeatBalanceHourly(self, daySelected, printData=False, unit="kWh"):
 
-        if unit == "kWh":
-            myUnit = 1.0
-        elif unit == "MWh":
-            myUnit = 1000.0
-        elif unit == "GWh":
-            myUnit = 1e6
-        else:
-            raise ValueError("unit %s not considered" % unit)
+        myUnit = self._getConversionFactor(unit)
 
         inVar = []
         outVar = []
         legendsIn = []
         legendsOut = []
 
-        selectedDays_list = daySelected  # eval(daysSelected.split()[0])
-
-        nr = len(selectedDays_list)
-
-        selectedDays = datetime.strptime(selectedDays_list, "%Y,%m,%d")
-
-        # period = selectedDays  # +pd.to_timedelta('1 day')
-        # month = datetime.strptime(self.firstMonth, '%B').month,
-        getDate = datetime(year=2018, month=1, day=1) + pd.to_timedelta(self.houDataDf["Time"], unit="h")
-        df_selectedDay = self.houDataDf
-        df_selectedDay["Date"] = getDate
-        #  df_selectedDay["Date"] = df_selectedDay["DateTime"].date()
-        #  Test = df_selectedDay.groupby("Date").cumsum()
-
-        # Test = pd.DataFrame()
-        DaysSelected = pd.DataFrame()
-
-        min_time = selectedDays
-        # max_time = selectedDays + pd.to_timedelta(23, unit="h") #DC to check
-        max_time = selectedDays + pd.to_timedelta(24, unit="h")
-
-        df_DataSelected = df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
+        df_DataSelected = self._getSelectedData(daySelected)
 
         DaysSelected = df_DataSelected
 
