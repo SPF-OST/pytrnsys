@@ -289,10 +289,8 @@ def replaceTokens(
     inputDdckFilePath: _pl.Path, componentName: str, computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]]
 ) -> _res.Result[str]:
     if not inputDdckFilePath.is_file():
-        return _res.Error(
-            f"Could not replace placeholders in file {inputDdckFilePath}: the file does not exist."
-        )
-    
+        return _res.Error(f"Could not replace placeholders in file {inputDdckFilePath}: the file does not exist.")
+
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
     treeResult = _parse.parseDdck(inputDdckContent)
