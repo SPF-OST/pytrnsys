@@ -12,7 +12,7 @@ colorama==0.4.4
     # via
     #   pylint
     #   pytest
-coverage[toml]==5.5
+coverage[toml]==7.2.3
     # via pytest-cov
 diff-pdf-visually==1.5.1
     # via -r requirements\test-3rd-party.in
@@ -49,11 +49,10 @@ pytest-html==3.2.0
 pytest-metadata==1.11.0
     # via pytest-html
 toml==0.10.2
-    # via
-    #   coverage
-    #   pylint
+    # via pylint
 tomli==2.0.1
     # via
+    #   coverage
     #   mypy
     #   pytest
 wheel==0.36.2
