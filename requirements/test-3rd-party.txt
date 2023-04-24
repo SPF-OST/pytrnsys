@@ -32,6 +32,8 @@ mypy-extensions==1.0.0
     # via mypy
 pluggy==0.13.1
     # via pytest
+py==1.11.0
+    # via pytest-html
 pylint==2.9.3
     # via -r requirements\test-3rd-party.in
 pytest==7.3.1
@@ -42,7 +44,7 @@ pytest==7.3.1
     #   pytest-metadata
 pytest-cov==4.0.0
     # via -r requirements\test-3rd-party.in
-pytest-html==3.1.1
+pytest-html==3.2.0
     # via -r requirements\test-3rd-party.in
 pytest-metadata==1.11.0
     # via pytest-html
