@@ -706,9 +706,7 @@ class ProcessTrnsysDf:
                 InputListQvsT = self.inputs["plotHourlyQvsT"][0]
                 QvsTDf = self.houDataDf
                 logger.debug("hourlyUsed")
-                self.loadQvsTConfig(
-                    QvsTDf, InputListQvsT, "plotQvsTconfigured", monthsSplit=monthsSplit, normalized=True, cut=False
-                )
+                self.loadQvsTConfig(QvsTDf, InputListQvsT, monthsSplit=monthsSplit, cut=False)
             if "plotTimestepQvsT" in self.inputs.keys():
                 InputListQvsT = self.inputs["plotTimestepQvsT"][0]
                 QvsTDf = self.steDataDf
@@ -721,9 +719,7 @@ class ProcessTrnsysDf:
                 self.loadQvsTConfig(
                     QvsTDf,
                     InputListQvsT,
-                    "plotQvsTconfigured",
                     monthsSplit=monthsSplit,
-                    normalized=True,
                     cut=False,
                     factor=factorForHour,
                 )
@@ -1268,10 +1264,7 @@ class ProcessTrnsysDf:
         self,
         df,
         inputs,
-        year=False,
-        useOnlyOneYear=False,
         monthsSplit=[],
-        normalized=False,
         cut=False,
         factor=1,
         _printEvery=1,
