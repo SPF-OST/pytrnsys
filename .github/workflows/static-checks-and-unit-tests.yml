@@ -32,14 +32,14 @@ jobs:
         python -m pip install wheel
         pip install -r requirements/test.txt
     - name: Static type checking with mypy
-      run: python dev-tools/runStaticChecksAndUnitTests.py --type
+      run: python dev-tools/devTools.py --type
     - name: Lint with pylint
-      run: python dev-tools/runStaticChecksAndUnitTests.py --lint --keep-results
+      run: python dev-tools/devTools.py --lint --keep-results
     - name: Generate class and package diagrams
       run: |
-        python dev-tools/runStaticChecksAndUnitTests.py --diagram --keep-results
+        python dev-tools/devTools.py --diagram --keep-results
     - name: Test with pytest
-      run: python dev-tools/runStaticChecksAndUnitTests.py --unit "not manual and not windows and not tool" --keep-results
+      run: python dev-tools/devTools.py --unit "not manual and not windows and not tool" --keep-results
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
@@ -72,11 +72,11 @@ jobs:
         venv\Scripts\python -m pip install wheel
         venv\Scripts\python -m pip install -r requirements/test.txt
     - name: Static type checking with mypy
-      run: venv\Scripts\python dev-tools\runStaticChecksAndUnitTests.py --type
+      run: venv\Scripts\python dev-tools\devTools.py --type
     - name: Lint with pylint
-      run: venv\Scripts\python dev-tools\runStaticChecksAndUnitTests.py --lint --keep-results
+      run: venv\Scripts\python dev-tools\devTools.py --lint --keep-results
     - name: Test with pytest
-      run: venv\Scripts\python dev-tools/runStaticChecksAndUnitTests.py --unit "not manual and not linux and not tool" --keep-results
+      run: venv\Scripts\python dev-tools\devTools.py --unit "not manual and not linux and not tool" --keep-results
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
