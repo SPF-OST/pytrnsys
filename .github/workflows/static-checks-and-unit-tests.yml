@@ -50,7 +50,10 @@ jobs:
 
   test-windows:
 
-    runs-on: [self-hosted, bachtel]
+    runs-on:
+      - self-hosted
+      - bachtel
+      - etzel
     strategy:
       matrix:
         python-version: [3.9]
