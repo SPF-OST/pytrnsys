@@ -72,10 +72,6 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.4
     # via sphinx
-tomli==2.0.1
-    # via
-    #   build
-    #   pep517
 toposort==1.7
     # via pip-compile-multi
 urllib3==1.26.4
