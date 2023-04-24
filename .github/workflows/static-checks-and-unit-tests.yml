@@ -52,7 +52,7 @@ jobs:
 
     runs-on:
       - self-hosted
-      - bachtel
+      - spf-windows-gh-runners
     steps:
     - uses: actions/checkout@v2
     - name: Remove old venv
