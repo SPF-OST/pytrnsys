@@ -50,7 +50,7 @@ jobs:
 
   test-windows:
 
-    runs-on: [self-hosted, etzel]
+    runs-on: [self-hosted, bachtel]
     strategy:
       matrix:
         python-version: [3.9]
