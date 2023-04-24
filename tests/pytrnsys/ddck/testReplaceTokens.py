@@ -85,7 +85,7 @@ class TestReplaceTokens:
         print(error.message)
         expectedErrorMessage = """\
 An error occurred while substituting the defaults for the placeholders in file type977_v1_input_missing_default.ddck:
-No placeholder values were provided for the computed variables at the following locations (line number:column number):
+No default values were provided for the computed variables at the following locations (line number:column number):
 \t26:14
 \t27:13
 \t28:15

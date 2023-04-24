@@ -226,7 +226,7 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
     visitor = _WithoutPlaceholdersJSONCollectTokensVisitor()
     visitor.visit(tree)
 
-    replacementsResult = _getReplacements(visitor)
+    replacementsResult = _getDefaultReplacements(visitor)
     if _res.isError(replacementsResult):
         moreSpecificError = _res.error(replacementsResult).withContext(
             f"An error occurred while substituting the defaults for the placeholders in file {inputDdckFilePath.name}"
@@ -247,14 +247,14 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
     return outputDdckContent
 
 
-def _getReplacements(visitor: _WithoutPlaceholdersJSONCollectTokensVisitor) -> _res.Result[_tp.Sequence[str]]:
+def _getDefaultReplacements(visitor: _WithoutPlaceholdersJSONCollectTokensVisitor) -> _res.Result[_tp.Sequence[str]]:
     defaultNamesForPrivateVariables = [v.name for v in visitor.privateVariables]
 
     computedVariablesWithoutDefaultName = [v for v in visitor.computedVariables if not v.defaultVariableName]
     if any(computedVariablesWithoutDefaultName):
         formattedLocations = "\n".join(f"\t{v.startLine}:{v.startColumn}" for v in computedVariablesWithoutDefaultName)
         errorMessage = (
-            "No placeholder values were provided for the computed variables at the following locations "
+            "No default values were provided for the computed variables at the following locations "
             f"(line number:column number):\n"
             f"{formattedLocations}\n"
         )
