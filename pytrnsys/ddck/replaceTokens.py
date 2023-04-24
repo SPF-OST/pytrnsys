@@ -135,7 +135,9 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(_CollectTokensVisitorBase):
         numberOfOutputAssignmentsWithoutDefaults = len(assignments)
 
         if nEquations == numberOfOutputAssignmentsWithoutDefaults:
-            equationsBlockToRemove = _Equations(tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos)
+            equationsBlockToRemove = _Equations(
+                tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos
+            )
             self.equationsBlocksToRemove.append(equationsBlockToRemove)
             return
 
@@ -286,6 +288,11 @@ def _getReplacements(visitor: _WithoutPlaceholdersJSONCollectTokensVisitor) -> _
 def replaceTokens(
     inputDdckFilePath: _pl.Path, componentName: str, computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]]
 ) -> _res.Result[str]:
+    if not inputDdckFilePath.is_file():
+        return _res.Error(
+            f"Could not replace placeholders in file {inputDdckFilePath}: the file does not exist."
+        )
+    
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
     treeResult = _parse.parseDdck(inputDdckContent)
@@ -336,7 +343,9 @@ def _getComputedNames(
     return computedNames
 
 
-def _replaceTokensWithReplacements(inputDdckContent: str, tokens: _tp.Sequence[_Token], replacements: _tp.Sequence[str]):
+def _replaceTokensWithReplacements(
+    inputDdckContent: str, tokens: _tp.Sequence[_Token], replacements: _tp.Sequence[str]
+):
     sortedTokens, sortedReplacements = _getSortedTokensAndReplacements(tokens, replacements)
     sortedTokensWithoutCovers, sortedReplacementsWithoutCovers = _removeCoveredTokens(sortedTokens, sortedReplacements)
     outputDdckContent = _replaceSortedNonOverlappingTokens(
