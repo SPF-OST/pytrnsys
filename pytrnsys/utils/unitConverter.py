@@ -1,151 +1,99 @@
-# pylint: skip-file
-# type: ignore
-
-#!/usr/bin/python
-
-"""
-File to do basic conversion units
-Author : Daniel Carbonell
-Date   : 2014
-ToDo :
-"""
 
 
-def getkPaToBar():
-    return 1.0 / 101.3
+import typing as _typ
 
 
-def getPaToBar():
-    return 1.0 / 101300
-
-
-def getBarToPa():
-    return 101300.0
-
-
-def getPaToMmca():
-    return 1.0 / 9.80665
-
-
-def getPaToMca():
-    return 1.0 / 9806.65
-
-
-def getBarToMmca():
-    return 101300.0 / 9.80665
-
-
-def getPaTokgCm2():
-    return 1.0 / 98066.52
-
-
-def getkgCm2ToPa():
-    return 98066.52
-
-
-def getPsiToPa():
-    return 6894.757293178
-
-
-def getPaToPsi():
-    return 0.000145038
-
-
-# Energy
-
-
-def getJTokWh():
-    return 1e-6 / 3.6
-
-
-def getkWhToJ():
-    return 3.6 * 1e6
-
-
-def getkWhToMJ():
-    return 3.6
-
-
-def getJToMWh():
-    return 1e-9 / 3.6
-
-
-def getkJToMWh():
-    return 1e-6 / 3.6
-
-
-def getMJTokWh():
-    return 1.0 / 3.6
-
-
-def getKJhToW():
-    return 1.0 / 3.6
-
-
-def getWToKJh():
-    return 3.6
+# BEGIN-NOSCAN
+# this function is ignored when a function exists.
+def __getattr__(name: str):
+    # END-NOSCAN
+    if name == "UnitConverter":
+        raise ValueError
+    return getattr(UnitConverter(), name)
 
 
 class UnitConverter:
     def __init__(self):
+        self.unit: str = ""
+        self._conversionFactor: _typ.Optional[float] = None
+        self._method: _typ.Optional[str] = None
+        self._factors: dict = {
+            "kPaToBar": 1.0 / 101.3,
+            "PaToBar": 1.0 / 101300,
+            "BarToPa": 101300.0,
+            "PaToMca": 1.0 / 9806.65,
+            "PaToMmca": 1.0 / 9.80665,
+            "BarToMmca": 101300.0 / 9.80665,
+            "PaTokgCm2": 1.0 / 98066.52,
+            "kgCm2ToPa": 98066.52,
+            "PsiToPa": 6894.757293178,
+            "PaToPsi": 0.000145038,
+            "JTokWh": 1e-6 / 3.6,
+            "kWhToJ": 3.6 * 1e6,
+            "kWhToMJ": 3.6,
+            "JToMWh": 1e-9 / 3.6,
+            "kJToMWh": 1e-6 / 3.6,
+            "MJTokWh": 1.0 / 3.6,
+            "kJhToW": 1.0 / 3.6,
+            "WTokJh": 3.6,
+        }
+        self._conversionMethods: dict = {
+            "getkPaToBar": "kPaToBar",
+            "getPaToBar": "PaToBar",
+            "getBarToPa": "BarToPa",
+            "getPaToMca": "PaToMca",
+            "getPaToMmca": "PaToMmca",
+            "getBarToMmca": "BarToMmca",
+            "getPaTokgCm2": "PaTokgCm2",
+            "getkgCm2ToPa": "kgCm2ToPa",
+            "getPsiToPa": "PsiToPa",
+            "getPaToPsi": "PaToPsi",
+            "getJTokWh": "JTokWh",
+            "getkWhToJ": "kWhToJ",
+            "getkWhToMJ": "kWhToMJ",
+            "getJToMWh": "JToMWh",
+            "getkJToMWh": "kJToMWh",
+            "getMJTokWh": "MJTokWh",
+            "getkJhToW": "kJhToW",
+            "getWTokJh": "WTokJh",
+            "getKJhToW": "kJhToW",
+            "getWToKJh": "WTokJh",
+        }
 
-        unit = ""
+    def getAvailableConversions(self) -> list:
+        return list(self._factors.keys())
 
-    # PRESSURE
+    def setConversionFactor(self, name: str):
+        self._conversionFactor = self.getConversionFactor(name)
 
-    def getkPaToBar(self):
-        return 1.0 / 101.3
+    def convert(self, value: float, desiredConversionFactor=None) -> float:
+        if desiredConversionFactor:
+            factor = self.getConversionFactor(desiredConversionFactor)
+        elif self._conversionFactor:
+            factor = self._conversionFactor
+        else:
+            raise ValueError("Conversion factor not given. Either use UnitConverter.setConversionFactor, "
+                             "or provide a desiredConversionFactor.")
 
-    def getPaToBar(self):
-        return 1.0 / 101300
+        return factor * value
 
-    def getBarToPa(self):
-        return 101300.0
+    def getConversionFactor(self, conversionType: _typ.Optional[str]) -> float:
+        if conversionType in self.getAvailableConversions():
+            return self._factors[conversionType]
 
-    def getPaToMmca(self):
-        return 1.0 / 9.80665
+        raise ValueError(f"Unkown conversion type: {conversionType}")
 
-    def getPaToMca(self):
-        return 1.0 / 9806.65
+    def __getattr__(self, item: str):
+        self._method = self._conversionMethods[item]
+        return self._helperFunction
 
-    def getBarToMmca(self):
-        return 101300.0 / 9.80665
+    def _helperFunction(self) -> float:
+        return self.getConversionFactor(self._method)
 
-    def getPaTokgCm2(self):
-        return 1.0 / 98066.52
 
-    def getkgCm2ToPa(self):
-        return 98066.52
-
-    def getPsiToPa(self):
-        return 6894.757293178
-
-    def getPaToPsi(self):
-        return 0.000145038
-
-    # Energy
-
-    def getJTokWh(self):
-        return 1e-6 / 3.6
-
-    def getkWhToJ(self):
-        return 3.6 * 1e6
-
-    def getJToMWh(self):
-        return 1e-9 / 3.6
-
-    def getkJToMWh(self):
-        return 1e-6 / 3.6
-
-    def getMJTokWh(self):
-        return 1.0 / 3.6
-
-    def getKJhToW(self):
-        return 1.0 / 3.6
-
-    def getWToKJh(self):
-        return 3.6
-
+def dummyFunction():
+    # Used to test the __getattr__ implementation
+    pass
 
 #    /* Power */
 #
