@@ -278,7 +278,7 @@ class BuildTrnsysDeck:
             try:
                 deckUtils.checkEquationsAndConstants(lines, self.nameDeck)
             except ValueError as e:
-                return _res.Error(f"Error found in DDCK file `{nameDck}`: {e}.")
+                return _res.Error(f"Error found in deck file `{nameDck}`: {e}.")
 
         self.linesDeckReaded = lines
 
