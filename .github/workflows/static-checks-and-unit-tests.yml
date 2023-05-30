@@ -32,14 +32,14 @@ jobs:
         python -m pip install wheel
         pip install -r requirements/test.txt
     - name: Static type checking with mypy
-      run: python dev-tools/runStaticChecksAndUnitTests.py --type
+      run: python dev-tools/devTools.py --type
     - name: Lint with pylint
-      run: python dev-tools/runStaticChecksAndUnitTests.py --lint --keep-results
+      run: python dev-tools/devTools.py --lint --keep-results
     - name: Generate class and package diagrams
       run: |
-        python dev-tools/runStaticChecksAndUnitTests.py --diagram --keep-results
+        python dev-tools/devTools.py --diagram --keep-results
     - name: Test with pytest
-      run: python dev-tools/runStaticChecksAndUnitTests.py --unit "not manual and not windows and not tool" --keep-results
+      run: python dev-tools/devTools.py --unit "not manual and not windows and not tool" --keep-results
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
@@ -50,28 +50,29 @@ jobs:
 
   test-windows:
 
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version: [3.9]
-
+    runs-on:
+      - self-hosted
+      - spf-windows-gh-runners
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    - name: Remove old venv
+      run: |
+        if (Test-Path -LiteralPath venv) {
+          Remove-Item -LiteralPath venv -Recurse
+        }
+    - name: Create virtual environment
+      run: py -3.9 -m venv venv
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install wheel
-        pip install -r requirements\test.txt
+        venv\Scripts\python -m pip install --upgrade pip
+        venv\Scripts\python -m pip install wheel
+        venv\Scripts\python -m pip install -r requirements/test.txt
     - name: Static type checking with mypy
-      run: python dev-tools\runStaticChecksAndUnitTests.py --type
+      run: venv\Scripts\python dev-tools\devTools.py --type
     - name: Lint with pylint
-      run: python dev-tools\runStaticChecksAndUnitTests.py --lint --keep-results
+      run: venv\Scripts\python dev-tools\devTools.py --lint --keep-results
     - name: Test with pytest
-      run: python dev-tools/runStaticChecksAndUnitTests.py --unit "not manual and not linux and not tool" --keep-results
+      run: venv\Scripts\python dev-tools\devTools.py --unit "not manual and not linux and not tool" --keep-results
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
@@ -85,3 +86,4 @@ jobs:
         repository: SPF-OST/pytrnsys_gui
         token: ${{ secrets.PYTRNSYS_GUI_REPO_ACCESS_TOKEN }}
         event-type: run-tests-and-build-executable
+        client-payload: '{"type": "run-tests-and-build-executable"}'

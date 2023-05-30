@@ -74,7 +74,7 @@ six==1.15.0
     #   python-dateutil
 tornado==6.1
     # via bokeh
-typing-extensions==3.7.4.3
+typing-extensions==4.5.0
     # via bokeh
 
 # The following packages are considered to be unsafe in a requirements file:

@@ -7,7 +7,6 @@ import shutil
 import logging as log
 
 import pytest
-import diff_pdf_visually as dpdf
 
 import pytrnsys.cost_calculation as cc
 
@@ -111,6 +110,8 @@ class Helper:
             self._assertTextFileEqual(relativeContainingDirPath, resultJsonName)
 
     def _assertPdfEqual(self, relativeContainingDirPath, pdfFileName):
+        import diff_pdf_visually as dpdf
+
         expectedPath, actualPath = self._getExpectedAndActualPath(
             relativeContainingDirPath, pdfFileName
         )

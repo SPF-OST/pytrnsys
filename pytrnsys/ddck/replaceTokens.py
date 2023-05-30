@@ -135,7 +135,9 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(_CollectTokensVisitorBase):
         numberOfOutputAssignmentsWithoutDefaults = len(assignments)
 
         if nEquations == numberOfOutputAssignmentsWithoutDefaults:
-            equationsBlockToRemove = _Equations(tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos)
+            equationsBlockToRemove = _Equations(
+                tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos
+            )
             self.equationsBlocksToRemove.append(equationsBlockToRemove)
             return
 
@@ -224,7 +226,7 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
     visitor = _WithoutPlaceholdersJSONCollectTokensVisitor()
     visitor.visit(tree)
 
-    replacementsResult = _getReplacements(visitor)
+    replacementsResult = _getDefaultReplacements(visitor)
     if _res.isError(replacementsResult):
         moreSpecificError = _res.error(replacementsResult).withContext(
             f"An error occurred while substituting the defaults for the placeholders in file {inputDdckFilePath.name}"
@@ -245,14 +247,14 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
     return outputDdckContent
 
 
-def _getReplacements(visitor: _WithoutPlaceholdersJSONCollectTokensVisitor) -> _res.Result[_tp.Sequence[str]]:
+def _getDefaultReplacements(visitor: _WithoutPlaceholdersJSONCollectTokensVisitor) -> _res.Result[_tp.Sequence[str]]:
     defaultNamesForPrivateVariables = [v.name for v in visitor.privateVariables]
 
     computedVariablesWithoutDefaultName = [v for v in visitor.computedVariables if not v.defaultVariableName]
     if any(computedVariablesWithoutDefaultName):
         formattedLocations = "\n".join(f"\t{v.startLine}:{v.startColumn}" for v in computedVariablesWithoutDefaultName)
         errorMessage = (
-            "No placeholder values were provided for the computed variables at the following locations "
+            "No default values were provided for the computed variables at the following locations "
             f"(line number:column number):\n"
             f"{formattedLocations}\n"
         )
@@ -286,6 +288,9 @@ def _getReplacements(visitor: _WithoutPlaceholdersJSONCollectTokensVisitor) -> _
 def replaceTokens(
     inputDdckFilePath: _pl.Path, componentName: str, computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]]
 ) -> _res.Result[str]:
+    if not inputDdckFilePath.is_file():
+        return _res.Error(f"Could not replace placeholders in file {inputDdckFilePath}: the file does not exist.")
+
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
     treeResult = _parse.parseDdck(inputDdckContent)
@@ -336,7 +341,9 @@ def _getComputedNames(
     return computedNames
 
 
-def _replaceTokensWithReplacements(inputDdckContent: str, tokens: _tp.Sequence[_Token], replacements: _tp.Sequence[str]):
+def _replaceTokensWithReplacements(
+    inputDdckContent: str, tokens: _tp.Sequence[_Token], replacements: _tp.Sequence[str]
+):
     sortedTokens, sortedReplacements = _getSortedTokensAndReplacements(tokens, replacements)
     sortedTokensWithoutCovers, sortedReplacementsWithoutCovers = _removeCoveredTokens(sortedTokens, sortedReplacements)
     outputDdckContent = _replaceSortedNonOverlappingTokens(

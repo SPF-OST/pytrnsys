@@ -20,7 +20,7 @@ certifi==2020.12.5
     # via requests
 chardet==4.0.0
     # via requests
-click==7.1.2
+click==8.1.3
     # via
     #   black
     #   pip-compile-multi
@@ -39,9 +39,9 @@ pathspec==0.8.1
     # via black
 pep517==0.13.0
     # via build
-pip-compile-multi==2.6.1
+pip-compile-multi==2.6.2
     # via -r requirements\dev-3rd-party.in
-pip-tools==6.10.0
+pip-tools==6.13.0
     # via pip-compile-multi
 pygments==2.8.1
     # via sphinx
@@ -72,12 +72,10 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.4
     # via sphinx
-tomli==2.0.1
-    # via
-    #   build
-    #   pep517
 toposort==1.7
     # via pip-compile-multi
+typed-ast==1.5.4
+    # via black
 urllib3==1.26.4
     # via requests
 
