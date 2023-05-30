@@ -123,7 +123,7 @@ MfrGHXNOM    				! 5: mass flow rate of the brine used to calculate the heat tra
 rGroundOut        			! 6: radius of outer boundary r_m of simulation area, m
 rAvgGRound   				! 7 radius for average temperature
 gridFactor   				! 8: grid factor f, -
-lghxProbes   				! 9: length of heat exchanger probe (Sondenlänge), m
+lGhxProbes   				! 9: length of heat exchanger probe (Sondenlänge), m
 dghxProbes   				! 10: inner diameter of the pipes, m
 dBorehole         			! 11: borehole diameter, m
 axialTGradient       		! 12: axial temperature gradient (downward) in the earth at the start of the simulation, K/m
@@ -179,12 +179,11 @@ TRT = [85,6]							! K temp. drop at RANDAUSSEN
 !TGHXmon6 = [59,44]     ! T(indexAxial,dimRad=6)
 !TGHXmon7 = [59,49]     ! T(indexAxial,boco)
 
-EQUATIONS 5
-TGhxMon1 = [85,47]		! T(1,boco)
-TGhxMon2 = [85,48]		! T(2,boco)
-TGhxMon3 = [85,49]		! T(3,boco)
-TGhxMon4 = [85,50]		! T(4,boco
-TGhxMon5 = [85,51]		! T(5,boco)
+EQUATIONS 4
+TGhxGroundBoco   = [85,49]		! T(3,boco)
+TGhxGroundFiller = [85,19]      ! filler temperatura material half of the borehole lenght T(3,filler)
+TGhxGroundLayer1 = [85,24]      ! ground temperature 1st layer half of the borehole lenght T(3,1st layer)
+TGhxGroundLayer2 = [85,29]      ! ground temperature 2nd layer half of the borehole lenght T(3,2nd layer)
 
 ***********************************
 ** Monthly printer
@@ -230,10 +229,10 @@ unitPrinterGhxHr		! 1: Logical unit number, -
 6             			! 11: Output number to avoid integration
 7             			! 12: Output number to avoid integration
 8             			! 13: Output number to avoid integration
-INPUTS 11
-TGHXout TRT TGhxIn   TGHXmon1   TGHXmon2  TGHXmon3  TGHXmon4  TGHXmon5   Qghx_kW 	QGhx_kWExt	QGhx_kWReg
+INPUTS 10
+TGhxOut TRT TGhxIn   TGhxGroundBoco   TGhxGroundFiller  TGhxGroundLayer1  TGhxGroundLayer2   Qghx_kW 	QGhx_kWExt	QGhx_kWReg
 **  Labels     
-TGHXout TRT TGhxIn   TGHXmon1   TGHXmon2  TGHXmon3  TGHXmon4  TGHXmon5   Qghx_kW    QGhx_kWExt	QGhx_kWReg
+TGhxOut TRT TGhxIn   TGhxGroundBoco   TGhxGroundFiller  TGhxGroundLayer1  TGhxGroundLayer2   Qghx_kW 	QGhx_kWExt	QGhx_kWReg
 
 ***********************************
 ** Online plotter
@@ -255,9 +254,9 @@ PARAMETERS 12
 0     		! 12: Output file delimiter
 INPUTS 8
 **  1     2     3       4      5          
-TGHXout TRT TGhxIn   TGHXmon1  TGHXmon5 MfrGHX  MfrGHXout Qghx_kW  
+TGhxOut TRT TGhxIn   TGHXmon1  TGHXmon5 MfrGHX  MfrGHXout Qghx_kW  
 ****
-TGHXout TRT TGhxIn   TGHXmon1  TGHXmon5 MfrGHX  MfrGHXout Qghx_kW  
+TGhxOut TRT TGhxIn   TGHXmon1  TGHXmon5 MfrGHX  MfrGHXout Qghx_kW  
 ** INPUT LABELS     
 LABELS  3
 Temperatures     
