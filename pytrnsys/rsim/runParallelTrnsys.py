@@ -4,10 +4,10 @@
 import imp
 import json
 import os
+import pathlib as _pl
 import shutil
 import typing as _tp
 from copy import deepcopy
-import pathlib as _pl
 
 import numpy as num
 import pandas as pd
@@ -17,6 +17,7 @@ import pytrnsys.rsim.runParallel as runPar
 import pytrnsys.trnsys_util.buildTrnsysDeck as build
 import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
+import pytrnsys.trnsys_util.replaceAssignStatements as _ras
 import pytrnsys.utils.log as log
 import pytrnsys.utils.result as _res
 
@@ -83,7 +84,8 @@ class RunParallelTrnsys:
             self.nameBase = name
             self.path = os.getcwd()
 
-        pass
+        self._assignStatements: list[_ras.AssignStatement] = []
+        self._ddckFilePathWithComponentNames: list[build.DdckFilePathWithComponentName] = []
 
     def setDeckName(self, _name):
         self.nameBase = _name
@@ -312,6 +314,8 @@ class RunParallelTrnsys:
 
             tests[i].changeParameter(localCopyPar)
 
+            tests[i].changeAssignStatementsBasedOnUnitVariables(self._assignStatements)
+
             if self.inputs["ignoreOnlinePlotter"] == True:
                 tests[i].ignoreOnlinePlotter()
 
@@ -344,7 +348,9 @@ class RunParallelTrnsys:
 
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self.ddckPlaceHolderValuesJsonPath)
+        deck = build.BuildTrnsysDeck(
+            self.path, self.nameBase, self._ddckFilePathWithComponentNames, self.ddckPlaceHolderValuesJsonPath
+        )
         result = deck.readDeckList(
             self.pathConfig,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
@@ -518,18 +524,23 @@ class RunParallelTrnsys:
         found = False
         nCharacters = len(source)
 
-        for i in range(len(self.listDdck)):
-            mySource = self.listDdck[i][
-                -nCharacters:
-            ]  # I read only the last characters with the same size as the end file
+        for i in range(len(self._ddckFilePathWithComponentNames)):
+            ddckFilePathWithComponentName = self._ddckFilePathWithComponentNames[i]
+
+            ddckFilePath = str(ddckFilePathWithComponentName.path)
+
+            mySource = ddckFilePath[-nCharacters:]  # I read only the last characters with the same size as the end file
             if mySource == source:
-                newDDck = self.listDdck[i][0:-nCharacters] + end
-                self.dictDdckPaths[newDDck] = self.dictDdckPaths[self.listDdck[i]]
-                self.listDdck[i] = newDDck
+                newDdckFilePath = ddckFilePath[0:-nCharacters] + end
+                self.dictDdckPaths[newDdckFilePath] = self.dictDdckPaths[ddckFilePath]
+                newDdckFilePathWithComponentName = build.DdckFilePathWithComponentName(
+                    _pl.Path(newDdckFilePath), ddckFilePathWithComponentName.componentName
+                )
+                self._ddckFilePathWithComponentNames[i] = newDdckFilePathWithComponentName
 
                 found = True
 
-        if found == False:
+        if not found:
             self.logger.warning("change File was not able to change %s by %s" % (source, end))
 
     def getConfig(self):
@@ -548,8 +559,9 @@ class RunParallelTrnsys:
 
         self.variation = []  # parametric studies
         self.parDeck = []  # fixed values changed in all simulations
-        self.listDdck = []
+        self._ddckFilePathWithComponentNames = []
         self.parameters = {}  # deck parameters fixed for all simulations
+        self._assignStatements = []
         self.listFit = {}
         self.listFitObs = []
         self.listDdckPaths = set()
@@ -586,6 +598,23 @@ class RunParallelTrnsys:
                         self.parameters[splitLine[1]] = float(splitLine[2])
                     else:
                         self.parameters[splitLine[1]] = splitLine[2]
+
+            elif splitLine[0] == "assign":
+                errorMessage = f"""\
+Invalid syntax: {line}. Usage:
+    assign <new-path> <unit-variable-name>
+"""
+                if len(splitLine) != 3:
+                    raise ValueError(errorMessage)
+
+                _, newPath, unitVariableName = splitLine
+
+                if unitVariableName.isdigit() or "\\" in unitVariableName:
+                    raise ValueError(errorMessage)
+
+                assignStatement = _ras.AssignStatement(newPath, unitVariableName)
+
+                self._assignStatements.append(assignStatement)
 
             elif splitLine[0] == "replace":
                 splitString = line.split('$"')
@@ -633,7 +662,8 @@ class RunParallelTrnsys:
                 else:
                     self._raiseDdckReferenceErrorMessage(line, basePathVariableName, str(relativeDdckFilePath))
 
-                self.listDdck.append(str(ddckFilePath))
+                ddckFilePathWithComponentName = build.DdckFilePathWithComponentName(ddckFilePath, componentName)
+                self._ddckFilePathWithComponentNames.append(ddckFilePathWithComponentName)
                 self.listDdckPaths.add(str(basePath))
                 self.dictDdckPaths[str(ddckFilePath)] = str(basePath)
             else:
@@ -671,7 +701,7 @@ when the component name should be deduced from the ddck file's containing direct
 
 when you want to give the component name explicitly by <component-name>
 """
-        raise ValueError(errorMessage, splitLine)
+        raise ValueError(errorMessage)
 
     def copyConfigFile(self, configPath, configName):
 

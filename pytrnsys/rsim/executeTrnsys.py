@@ -1,19 +1,14 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/python
-"""
-Author : Dani Carbonell
-Date   : 30.09.2016
-ToDo
-"""
-
+import logging
 import os
-import string, shutil
-import pytrnsys.pdata.processFiles as spfUtils
+import shutil
+import typing as tp
+
 import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
 import pytrnsys.trnsys_util.deckUtils as deckUtils
-import logging
+import pytrnsys.trnsys_util.replaceAssignStatements as _ras
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -134,13 +129,18 @@ class ExecuteTrnsys:
         )
 
         if check == True:
-            deckUtils.checkEquationsAndConstants(lines,nameDck)
+            deckUtils.checkEquationsAndConstants(lines, nameDck)
 
     def changeParameter(self, _parameters):
 
         self.deckTrnsys.changeParameter(_parameters)
 
         # with this function we obtain some data from the deck file.
+
+    def changeAssignStatementsBasedOnUnitVariables(
+        self, newAssignStatements: tp.Sequence[_ras.AssignStatement]
+    ) -> None:
+        self.deckTrnsys.changeAssignStatementsBasedOnUnitVariables(newAssignStatements)
 
     def getDataFromDeck(self, myName):
 
@@ -166,7 +166,9 @@ class ExecuteTrnsys:
         logger.debug("PathOutput %s" % self.pathOutput)
 
         if len(fileSource) >= 260:
-            raise Exception("fileSource has a length of %d >= 260 exceeding Windows path length limit." % len(fileSource))
+            raise Exception(
+                "fileSource has a length of %d >= 260 exceeding Windows path length limit." % len(fileSource)
+            )
         if len(fileEnd) >= 260:
             raise Exception("fileEnd has a length of %d >= 260 exceeding Windows path length limit." % len(fileEnd))
 

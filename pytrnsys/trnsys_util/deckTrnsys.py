@@ -1,19 +1,14 @@
 # pylint: skip-file
 # type: ignore
-
-#!/usr/bin/python
-"""
-Author : Dani Carbonell
-Date   : 30.09.2016
-ToDo :  the double comment.
-Now Only one comment is erased, so that if we hve ! comment1 ! comment2 only the commen2 will be erased
-"""
-
-import os
-import string, shutil
-import pytrnsys.trnsys_util.deckUtils as deckUtils
-import re
 import logging
+import os
+import pathlib as pl
+import re
+import shutil
+import typing as tp
+
+import pytrnsys.trnsys_util.deckUtils as deckUtils
+import pytrnsys.trnsys_util.replaceAssignStatements as _ras
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -425,10 +420,22 @@ class DeckTrnsys:
 
             logger.debug("variation deck file at %s" % self.nameDck)
 
-            outfile = open(self.nameDck, "w", encoding='windows-1252')
+            outfile = open(self.nameDck, "w", encoding="windows-1252")
 
             outfile.writelines(lines)
             outfile.close()
+
+    def changeAssignStatementsBasedOnUnitVariables(
+        self, newAssignStatements: tp.Sequence[_ras.AssignStatement]
+    ) -> None:
+
+        originalDeckContent = "".join(self.linesDeck)
+        updatedDeckContent = _ras.replaceAssignStatementsBasedOnUnitVariables(
+            originalDeckContent, newAssignStatements
+        )
+
+        deckFilePath = pl.Path(self.nameDck)
+        deckFilePath.write_text(updatedDeckContent)
 
     def getTypeFromUnit(self, myUnit):
 

@@ -66,10 +66,10 @@ class BuildTrnsysDeck:
         self.existingDckUnchecked = True
         self.dckAlreadyExists = True
 
-    def loadDeck(self, _path, _name) -> _res.Result[_tp.Tuple[str, str, str]]:
+    def loadDeck(self, _path: str, _name: str, componentName: str) -> _res.Result[_tp.Tuple[str, str, str]]:
         ddckFilePath = _pl.Path(_path) / f"{_name}.{self.extOneSheetDeck}"
 
-        result = self._replacePlaceholdersAndGetContent(ddckFilePath)
+        result = self._replacePlaceholdersAndGetContent(ddckFilePath, componentName)
         if _res.isError(result):
             return _res.error(result)
         ddckContent = _res.value(result)
@@ -88,9 +88,7 @@ class BuildTrnsysDeck:
 
         return lines[0:3]  # only returns the caption with the info of the file
 
-    def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path) -> _res.Result[str]:
-        componentName = ddckFilePath.parent.name
-
+    def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path, componentName: str) -> _res.Result[str]:
         if not self._ddckPlaceHolderValuesJsonPath:
             return _replace.replaceTokensWithDefaults(ddckFilePath)
 
@@ -147,7 +145,9 @@ class BuildTrnsysDeck:
                 absoluteDdckFileDirPath = _pl.Path(pathConfig) / ddckFileDirPath
                 dictPaths[str(ddckFilePath)] = str(absoluteDdckFileDirPath / ddckFilePath)
 
-            result = self.loadDeck(str(absoluteDdckFileDirPath), ddckFileName)
+            result = self.loadDeck(
+                str(absoluteDdckFileDirPath), ddckFileName, ddckFilePathWithComponentName.componentName
+            )
 
             if _res.isError(result):
                 return _res.error(result)
