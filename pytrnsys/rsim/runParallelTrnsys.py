@@ -1,23 +1,16 @@
 # pylint: skip-file
 # type: ignore
 
-# !/usr/bin/python
-"""
-Author : Dani Carbonell
-Date   : 30.09.2016
-ToDo
-"""
-
 import imp
 import json
 import os
 import shutil
+import typing as _tp
 from copy import deepcopy
+import pathlib as _pl
 
 import numpy as num
 import pandas as pd
-import pkg_resources
-import sys
 
 import pytrnsys.rsim.executeTrnsys as exeTrnsys
 import pytrnsys.rsim.runParallel as runPar
@@ -26,14 +19,6 @@ import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.utils.log as log
 import pytrnsys.utils.result as _res
-
-try:
-    import pytrnsys_examples
-except ImportError:
-    pass
-
-
-# from sets import Set
 
 
 class RunParallelTrnsys:
@@ -535,8 +520,8 @@ class RunParallelTrnsys:
 
         for i in range(len(self.listDdck)):
             mySource = self.listDdck[i][
-                       -nCharacters:
-                       ]  # I read only the last characters with the same size as the end file
+                -nCharacters:
+            ]  # I read only the last characters with the same size as the end file
             if mySource == source:
                 newDDck = self.listDdck[i][0:-nCharacters] + end
                 self.dictDdckPaths[newDDck] = self.dictDdckPaths[self.listDdck[i]]
@@ -631,10 +616,26 @@ class RunParallelTrnsys:
                 self.listFitObs.append(splitLine[1])
 
             elif splitLine[0] in self.inputs.keys():
-                fullPath = os.path.join(self.inputs[splitLine[0]], splitLine[1])
-                self.listDdck.append(fullPath)
-                self.listDdckPaths.add(self.inputs[splitLine[0]])
-                self.dictDdckPaths[fullPath] = self.inputs[splitLine[0]]
+                nParts = len(splitLine)
+                if nParts < 2:
+                    self._raiseDdckReferenceErrorMessage(line, "<path-variable-name>", "<ddck-file-name>")
+
+                basePathVariableName = splitLine[0]
+                relativeDdckFilePath = _pl.Path(splitLine[1])
+
+                basePath = _pl.Path(self.inputs[basePathVariableName])
+                ddckFilePath = basePath / relativeDdckFilePath
+
+                if nParts == 2:
+                    componentName = ddckFilePath.parent.name
+                elif nParts == 4 and splitLine[2] == "as":
+                    componentName = splitLine[3]
+                else:
+                    self._raiseDdckReferenceErrorMessage(line, basePathVariableName, str(relativeDdckFilePath))
+
+                self.listDdck.append(str(ddckFilePath))
+                self.listDdckPaths.add(str(basePath))
+                self.dictDdckPaths[str(ddckFilePath)] = str(basePath)
             else:
                 pass
 
@@ -653,6 +654,24 @@ class RunParallelTrnsys:
             self.foldersForDDckVariationUsed = True
         else:
             self.foldersForDDckVariationUsed = False
+
+    @staticmethod
+    def _raiseDdckReferenceErrorMessage(
+        actualLine: str, pathVariableName: str, relativeDdckFilePathString: str
+    ) -> _tp.NoReturn:
+        errorMessage = f"""\
+Invalid syntax: {actualLine}.
+
+Correct possibilities are:
+
+    {pathVariableName} {relativeDdckFilePathString}
+
+when the component name should be deduced from the ddck file's containing directory's name or
+    {pathVariableName} {relativeDdckFilePathString} as <component-name>
+
+when you want to give the component name explicitly by <component-name>
+"""
+        raise ValueError(errorMessage, splitLine)
 
     def copyConfigFile(self, configPath, configName):
 
@@ -700,28 +719,13 @@ class RunParallelTrnsys:
             for i in range(2, len(self.variablesOutput[j]), 1):
                 if self.variablesOutput[j][1] == "sizeHpUsed":
                     self.variablesOutput[j][i] = (
-                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadHPsize, 3))
+                        str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadHPsize, 3))
                     )
                 elif self.variablesOutput[j][1] == "AreaPvRoof":
                     self.variablesOutput[j][i] = (
-                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadElDemand, 3))
+                        str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadElDemand, 3))
                     )
                 else:
                     self.variablesOutput[j][i] = (
-                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadDemand, 3))
+                        str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadDemand, 3))
                     )
-
-
-def run():
-    if len(sys.argv) > 1:
-        pathBase, configFile = os.path.split(sys.argv[1])
-    else:
-        configFileFullPath = pkg_resources.resource_filename("pytrnsys_examples", "solar_dhw/run_solar_dhw.config")
-        pathBase, configFile = os.path.split(configFileFullPath)
-    if ":" not in pathBase:
-        pathBase = os.path.join(os.getcwd(), pathBase)
-    RunParallelTrnsys(pathBase, configFile=configFile)
-
-
-if __name__ == "__main__":
-    run()
