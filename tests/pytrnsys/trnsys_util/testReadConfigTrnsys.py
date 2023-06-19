@@ -6,7 +6,7 @@ import pytest as _pt
 
 import pytrnsys.trnsys_util.readConfigTrnsys as _rct
 
-_DATA_DIR_PATH = _pl.Path(__file__).parent / "data"
+_DATA_DIR_PATH = _pl.Path(__file__).parent / "data" / "readConfigTrnsys"
 _RELATIVE_PATH = _pl.Path("..")
 _RELATIVE_PATH2 = _pl.Path(".")
 
