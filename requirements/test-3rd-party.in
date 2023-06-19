@@ -7,5 +7,6 @@ pytest-cov
 pytest-html
 mypy
 pylint
+black
 
 diff-pdf-visually
