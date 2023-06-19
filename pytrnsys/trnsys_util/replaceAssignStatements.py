@@ -22,18 +22,11 @@ def replaceAssignStatementsBasedOnUnitVariables(
     if not newAssignStatements:
         return originalDeckContent
 
-    statementsByLowerCaseFoldedName = {s.unitVariableName.casefold(): s for s in newAssignStatements}
+    statementsByCaseFoldedName = {s.unitVariableName.casefold(): s for s in newAssignStatements}
 
     unprocessedDeckContent = _io.StringIO(originalDeckContent)
     updatedDeckContent = _io.StringIO()
     for match in _CHANGE_ASSIGN_STATEMENT_PATTERN.finditer(originalDeckContent):
-        unitVariableName = match.group("unitVariable")
-
-        caseFoldedVariable = unitVariableName.casefold()
-        assignmentStatement = statementsByLowerCaseFoldedName.get(caseFoldedVariable)
-        if not assignmentStatement:
-            continue
-
         _replaceAssignStatementBasedOnUnitVariable(
             match, assignmentStatement, unprocessedDeckContent, updatedDeckContent
         )
@@ -47,11 +40,14 @@ def replaceAssignStatementsBasedOnUnitVariables(
 
 def _replaceAssignStatementBasedOnUnitVariable(
     match: _re.Match,
-    assignmentStatement: AssignStatement,
     unprocessedDeckContent: _io.StringIO,
     updatedDeckContent: _io.StringIO,
+    statementsByCaseFoldedName: _tp.Mapping[str, AssignStatement],
 ) -> None:
     unitVariableName = match.group(_UNIT_VARIABLE_GROUP_NAME)
+
+    caseFoldedName = unitVariableName.casefold()
+    newAssignStatement = statementsByCaseFoldedName.get(caseFoldedName)
 
     currentMatchStart = match.start()
     unchangedPartBetweenLastAndCurrentAssign = unprocessedDeckContent.read(currentMatchStart)
@@ -61,6 +57,9 @@ def _replaceAssignStatementBasedOnUnitVariable(
     originalAssignStatementLength = len(originalAssignStatement)
     _ = unprocessedDeckContent.read(originalAssignStatementLength)
 
-    newPath = assignmentStatement.path
-    updatedAssignStatement = f"ASSIGN {newPath} {unitVariableName}"
-    updatedDeckContent.write(updatedAssignStatement)
+    if newAssignStatement:
+        newPath = newAssignStatement.path
+        updatedAssignStatement = f"ASSIGN {newPath} {newAssignStatement.unitVariableName}"
+        updatedDeckContent.write(updatedAssignStatement)
+    else:
+        updatedDeckContent.write(originalAssignStatement)
