@@ -12,14 +12,14 @@ import pytrnsys.utils.utilsSpf as utils
 
 
 class ProcessMonthlyDataBase:
-    def __init__(self, _path, _name, language="en"):
-        self.fileName = _name
-        self.outputPath = _path + "\%s" % self.fileName
-        self.executingPath = _path
+    def __init__(self, path, name, language="en"):
+        self.fileName = name
+        self.outputPath = path + "\%s" % self.fileName
+        self.executingPath = path
 
         # Internal data
 
-        self.fileNameWithExtension = _name
+        self.fileNameWithExtension = name
         self.titleOfLatex = "$%s$" % self.fileName
         self.folderName = self.fileName
 
@@ -920,7 +920,7 @@ class ProcessMonthlyDataBase:
                     self.qSolarToSystem[i]
                     + self.qWcpHP[i]
                     + auxHeater
-                    + self.PElTotalDis[i] * self.percentageOfPumpToHeat
+                    + self.pElTotalDis[i] * self.percentageOfPumpToHeat
                     - self.qLossPipeSystem[i]
                     - self.qLossTes[i]
                     - self.qLossConTnk[i]
@@ -934,7 +934,7 @@ class ProcessMonthlyDataBase:
                     + self.qEvapHP[i]
                     + self.qWcpHP[i]
                     + auxHeater
-                    + self.PElTotalDis[i] * self.percentageOfPumpToHeat
+                    + self.pElTotalDis[i] * self.percentageOfPumpToHeat
                     - self.qLossPipeSystem[i]
                     - self.qLossTes[i]
                     - self.qLossConTnk[i]
@@ -961,7 +961,7 @@ class ProcessMonthlyDataBase:
                     self.qDHW[i],
                     self.qSH[i],
                     bal,
-                    self.PElTotal[i],
+                    self.pElTotal[i],
                 )
             )
             lines = lines + line
@@ -981,7 +981,7 @@ class ProcessMonthlyDataBase:
             sum(self.qDHW),
             sum(self.qSH),
             Imb,
-            sum(self.PElTotal),
+            sum(self.pElTotal),
         )
 
         lines = lines + line
@@ -1592,11 +1592,8 @@ class ProcessMonthlyDataBase:
         Imb = 0.0
 
         for i in range(12):
-            #            SPFhpsTnk = (self.qTesFromHp[i]+self.qHpToSh[i]+self.qSolarToTes[i])/(self.PElTotal[i]+self.qWcpHP[i]+1e-30)
-            #            imb = self.qTesFromHp[i]+ self.qSolarToTes[i]-self.qLossTes[i]- self.qLossConTnk[i]-self.qOutFromTes[i]
-
             SPFhpsTnk = (self.qTesFromHp[i] + self.qHpToSh[i] + self.qTesFromSolar[i]) / (
-                self.PElTotal[i] + self.qWcpHP[i] + 1e-30
+                self.pElTotal[i] + self.qWcpHP[i] + 1e-30
             )
             imb = (
                 self.qTesFromHp[i]
@@ -1620,7 +1617,7 @@ class ProcessMonthlyDataBase:
                     self.qTesDhwFromHp[i],
                     self.qHpToSh[i],
                     self.qTesFromElRot[i],
-                    self.PElTotal[i],
+                    self.pElTotal[i],
                     self.qTesFromSolar[i] + self.qTesFromHp[i],
                     self.qOutFromTes[i],
                     self.qLossTes[i],
@@ -1635,7 +1632,7 @@ class ProcessMonthlyDataBase:
             lines = lines + line
 
         yearSPFhpsTnk = (sum(self.qTesFromHp) + sum(self.qTesFromSolar) + sum(self.qHpToSh)) / (
-            sum(self.PElTotal) + sum(self.qWcpHP) + 1e-30
+            sum(self.pElTotal) + sum(self.qWcpHP) + 1e-30
         )
 
         line = "\\hline\n"
@@ -1649,7 +1646,7 @@ class ProcessMonthlyDataBase:
                 sum(self.qTesDhwFromHp),
                 sum(self.qHpToSh),
                 sum(self.qTesFromElRot),
-                sum(self.PElTotal),
+                sum(self.pElTotal),
                 sum(self.qTesFromSolar) + sum(self.qTesFromHp),
                 sum(self.qOutFromTes),
                 sum(self.qLossTes),
