@@ -214,7 +214,7 @@ class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(_lvis.Visitor_Recurs
 
         assignmentTarget = tree.children[0]
         assert isinstance(assignmentTarget, _lark.Tree)
-        if not assignmentTarget.data == "computed_output_temp_var":
+        if assignmentTarget.data != "computed_output_temp_var":
             return
 
         defaultVariableName = _getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", assignmentTarget)

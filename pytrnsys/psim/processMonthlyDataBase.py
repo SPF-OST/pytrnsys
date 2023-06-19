@@ -1,23 +1,14 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-This is the Base Class for reading and processing TRNSYS monthly results.
-Author : Dani Carbonell
-Date   : 2018
-ToDo   : THIS FILE IS TO BE DEPRECATED !!!
-"""
+import os
 
-import string, os, time, sys
-import pytrnsys.pdata.processFiles as spfUtils
-import pytrnsys.utils.utilsSpf as utils
-import pytrnsys.report.latexReport as latex
 import matplotlib.pyplot as plt
 import numpy as num
-import matplotlib
+
 import pytrnsys.plot.plotMatplotlib as plot
+import pytrnsys.report.latexReport as latex
+import pytrnsys.utils.utilsSpf as utils
 
 
 class ProcessMonthlyDataBase:
@@ -388,23 +379,6 @@ class ProcessMonthlyDataBase:
         barQAuxPEl = plot.bar(
             ind - 0.5 * width, qAuxHeaterTotal, width, color="0.50", bottom=(qSolarToSystem + qEvapHP + qElHeatPump)
         )
-        barPipeGain = plot.bar(
-            ind - 0.5 * width,
-            qGainPipeSystem,
-            width,
-            color="g",
-            bottom=(qSolarToSystem + qEvapHP + qElHeatPump + qAuxHeaterTotal),
-        )
-
-        #        barQPenalty   = plot.bar(ind-0.5*width, qPenalty, width, color='#99FF99',bottom=(qSolarToSystem+qElHeatPump+qElHeater+qGainPcm))
-        #        barImbPos     = plot.bar(ind-0.5*width, imbPos, width, color='k',bottom=(qSolarToSystem+qElHeatPump+qElHeater+qGainPcm+qPenalty))
-        barImbPos = plot.bar(
-            ind - 0.5 * width,
-            imbPos,
-            width,
-            color="k",
-            bottom=(qSolarToSystem + qEvapHP + qElHeatPump + qAuxHeaterTotal + qGainPipeSystem),
-        )
 
         barQDHW = plot.bar(ind - 0.5 * width, -qDHW, width, color="b")
         barQSH = plot.bar(ind - 0.5 * width, -qSH, width, color="r", bottom=-(qDHW))
@@ -510,7 +484,6 @@ class ProcessMonthlyDataBase:
 
     def plotMonthlyEnergyBalanceByKwargs(self, **kwargs):
         N = 13
-        width = 0.35  # the width of the bars
         ind = num.arange(N)  # the x locations for the groups
 
         fig = plt.figure(1, figsize=(12, 8))
@@ -520,7 +493,6 @@ class ProcessMonthlyDataBase:
         imbPos = num.zeros(13)
         imbNeg = num.zeros(13)
         bottomNeg = num.zeros(13)
-        bottomPos = num.zeros(13)
         bal = num.zeros(13)
 
         for name, values in kwargs.items():
@@ -531,16 +503,7 @@ class ProcessMonthlyDataBase:
                 imbNeg[i] = -max(bal, 0.0)
                 imbPos[i] = -min(bal, 0.0)
 
-            bar = plot.bar(ind - 0.5 * width, values, width, label=name)
             bottomNeg = bottomNeg + (values < 0).astype(float) * values
-            bottomPos = bottomNeg + (values > 0).astype(float) * values
-
-        if self.useImbalanceInLegendPlot:
-            barImbNeg = plot.bar(ind - 0.5 * width, imbNeg, width, color="k", bottom=bottomNeg, label="Imbalance")
-            barImbPos = plot.bar(ind - 0.5 * width, imbNeg, width, color="k", bottom=bottomPos)
-        else:
-            barImbNeg = plot.bar(ind - 0.5 * width, imbNeg, width, color="k", bottom=bottomNeg)
-            barImbPos = plot.bar(ind - 0.5 * width, imbNeg, width, color="k", bottom=bottomPos)
 
         plot.set_ylabel("$Q$ $[kWh]$", size=25)
 
@@ -595,7 +558,6 @@ class ProcessMonthlyDataBase:
             imbPos[i] = -min(bal, 0.0)
 
         bar1 = plot.bar(ind - 0.5 * width, qSolarToSystem, width, color="#FFCC33")
-        barImbPos = plot.bar(ind - 0.5 * width, imbPos, width, color="k", bottom=(qSolarToSystem))
 
         bar2 = plot.bar(ind - 0.5 * width, -qSolarToTes, width, color="#33FF33")
         bar3 = plot.bar(ind - 0.5 * width, -qLossPipeSolarLoop, width, color="#CC0000", bottom=-(qSolarToTes))

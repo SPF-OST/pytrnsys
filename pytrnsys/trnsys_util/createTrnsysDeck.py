@@ -58,9 +58,8 @@ class CreateTrnsysDeck:
                         # If the name has 00 means 0. because the fileName will suffer from having points as names.
                         if valuesOfVariationInFile == "00":
                             valuesOfVariation = "0." + valuesOfVariationInFile[2:]
-                            print("Comma found valueFile=%s valueUsed=%s") % (
-                                valuesOfVariationInFile,
-                                valuesOfVariation,
+                            print(
+                                "Comma found valueFile=%s valueUsed=%s" % (valuesOfVariationInFile, valuesOfVariation)
                             )
                         else:
                             valuesOfVariation = valuesOfVariationInFile

@@ -37,13 +37,13 @@ class DdckFilePathWithComponentName:
 class BuildTrnsysDeck:
     def __init__(
         self,
-        _pathDeck,
-        _nameDeck,
+        pathDeck,
+        nameDeck,
         ddckFilePathsWithComponentName: _tp.Sequence[DdckFilePathWithComponentName],
         ddckPlaceHolderValuesJsonPath,
     ):
-        self.pathDeck = _pathDeck
-        self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
+        self.pathDeck = pathDeck
+        self.nameDeck = self.pathDeck + "\%s.dck" % nameDeck
 
         self._ddckPlaceHolderValuesJsonPath = (
             _pl.Path(ddckPlaceHolderValuesJsonPath) if ddckPlaceHolderValuesJsonPath else None
@@ -65,8 +65,8 @@ class BuildTrnsysDeck:
         self.existingDckUnchecked = True
         self.dckAlreadyExists = True
 
-    def loadDeck(self, _path: str, _name: str, componentName: str) -> _res.Result[_tp.Tuple[str, str, str]]:
-        ddckFilePath = _pl.Path(_path) / f"{_name}.{self.extOneSheetDeck}"
+    def loadDeck(self, path: str, name: str, componentName: str) -> _res.Result[_tp.Tuple[str, str, str]]:
+        ddckFilePath = _pl.Path(path) / f"{name}.{self.extOneSheetDeck}"
 
         result = self._replacePlaceholdersAndGetContent(ddckFilePath, componentName)
         if _res.isError(result):
