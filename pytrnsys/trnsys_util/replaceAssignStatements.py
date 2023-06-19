@@ -26,10 +26,13 @@ def replaceAssignStatementsBasedOnUnitVariables(
 
     unprocessedDeckContent = _io.StringIO(originalDeckContent)
     updatedDeckContent = _io.StringIO()
-    for match in _CHANGE_ASSIGN_STATEMENT_PATTERN.finditer(originalDeckContent):
+    previousMatch: _tp.Optional[_re.Match] = None
+    for currentMatch in _CHANGE_ASSIGN_STATEMENT_PATTERN.finditer(originalDeckContent):
         _replaceAssignStatementBasedOnUnitVariable(
-            match, unprocessedDeckContent, updatedDeckContent, newStatementsByCaseFoldedName
+            previousMatch, currentMatch, unprocessedDeckContent, updatedDeckContent, newStatementsByCaseFoldedName
         )
+
+        previousMatch = currentMatch
 
     unchangedPartBetweenLastAssignIfAnyAndEnd = unprocessedDeckContent.read()
     updatedDeckContent.write(unchangedPartBetweenLastAssignIfAnyAndEnd)
@@ -39,21 +42,22 @@ def replaceAssignStatementsBasedOnUnitVariables(
 
 
 def _replaceAssignStatementBasedOnUnitVariable(
-    match: _re.Match,
+    previousMatch: _tp.Optional[_re.Match],
+    currentMatch: _re.Match,
     unprocessedDeckContent: _io.StringIO,
     updatedDeckContent: _io.StringIO,
     newStatementsByCaseFoldedName: _tp.Mapping[str, AssignStatement],
 ) -> None:
-    unitVariableName = match.group(_UNIT_VARIABLE_GROUP_NAME)
+    unitVariableName = currentMatch.group(_UNIT_VARIABLE_GROUP_NAME)
 
     caseFoldedName = unitVariableName.casefold()
     newAssignStatement = newStatementsByCaseFoldedName.get(caseFoldedName)
 
-    currentMatchStart = match.start()
-    unchangedPartBetweenLastAndCurrentAssign = unprocessedDeckContent.read(currentMatchStart)
-    updatedDeckContent.write(unchangedPartBetweenLastAndCurrentAssign)
+    unchangedPartLength = currentMatch.start() - previousMatch.end() if previousMatch else currentMatch.start()
+    unchangedPart = unprocessedDeckContent.read(unchangedPartLength)
+    updatedDeckContent.write(unchangedPart)
 
-    originalAssignStatement = match.group()
+    originalAssignStatement = currentMatch.group()
     originalAssignStatementLength = len(originalAssignStatement)
     _ = unprocessedDeckContent.read(originalAssignStatementLength)
 
