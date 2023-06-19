@@ -154,7 +154,7 @@ logical_unit: INT | variable
 
 computed_var: PORT_PROPERTY "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ]")"
 
-computed_output_var: computed_output_temp_var | computed_output_energy_var
+?computed_output_var: computed_output_temp_var | computed_output_energy_var
 
 computed_output_temp_var: "@temp" "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ] ")"
 
