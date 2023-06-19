@@ -103,7 +103,6 @@ class LatexReport:
         self.cleanMode = _mode
 
     def setDocumentClass(self, _name):
-
         self.documentClass = _name
 
     def setAuthor(self, _name):
@@ -123,7 +122,6 @@ class LatexReport:
         self.subTitle = _name
 
     def cleanFiles(self):
-
         for plotName in self.plotsAdded:
             pdfWithPath = "%s\\%s" % (self.outputPath, plotName)
 
@@ -144,7 +142,6 @@ class LatexReport:
         logFileEnd = logFile
 
         if moveToTrnsysLogFile == True:
-
             logFileEnd = "%s\%s.TRNSYS.log" % (self.outputPath, self.fileName)
 
             try:
@@ -170,7 +167,8 @@ class LatexReport:
                 "--clean",
                 f"--tex-option=-output-directory={self.outputPath}",
                 "--silent",
-                self.fileNameTexWithPath]
+                self.fileNameTexWithPath,
+            ]
         elif LatexPackage == "pdflatex":
             cmd = ["pdflatex", "--silent", self.fileNameTex]
         else:
@@ -221,7 +219,6 @@ class LatexReport:
             self.cleanFiles()
 
     def addBeginDocument(self):
-
         line = "\\documentclass[english]{%s}\n" % (self.documentClass)
         self.lines = self.lines + line
         line = "\\usepackage{subfigure}\n"
@@ -260,7 +257,6 @@ class LatexReport:
         self.lines = self.lines + line
 
     def addEndDocumentAndCreateTexFile(self):
-
         line = "\\end{document}\n"
         self.lines = self.lines + line
 
@@ -272,22 +268,18 @@ class LatexReport:
         outfile.close()
 
     def addSection(self, line):
-
         lines = "\\section{%s}\n" % line
         self.lines = self.lines + lines
 
     def addUserTex(self, lines):
-
         self.lines = self.lines + lines
 
     def clearPage(self):
-
         line = " \\clearpage \n"
 
         self.lines = self.lines + line
 
     def addPlotShort(self, namePdf, caption="any", label="any"):
-
         self.plotsAdded.append(namePdf)
 
         line = "\\begin{figure}[!ht]\n"
@@ -345,7 +337,6 @@ class LatexReport:
         self.lines = self.lines + line
 
     def addTable(self, _caption, _names, _units, _label, _linesResults, useFormula=False, addCaptionLines=False):
-
         line = "\\begin{table}[!ht]\n"
         self.lines = self.lines + line
         line = "\\centering\n"
@@ -383,7 +374,6 @@ class LatexReport:
             self.lines = self.lines + line
 
         for i in range(len(_names)):
-
             if useFormula:
                 _names[i] = "$%s$" % _names[i]
 
@@ -453,7 +443,6 @@ class LatexReport:
         self.lines = self.lines + line
 
     def addPandasTable(self, _caption, _sizeBox, _units, _label, _pandasTable, useFormula=False, addCaptionLines=False):
-
         line = "\\begin{table}[!ht]\n"
         self.lines = self.lines + line
 
@@ -495,7 +484,6 @@ class LatexReport:
         lenghName=0.47,
         lenghRest=0.05,
     ):
-
         line = "\\begin{tiny}\n"
         self.lines = self.lines + line
 
@@ -520,7 +508,6 @@ class LatexReport:
             self.lines = self.lines + line
 
         for i in range(len(_names)):
-
             if useFormula:
                 _names[i] = "$%s$" % _names[i]
 
@@ -590,7 +577,6 @@ class LatexReport:
         self.lines = self.lines + line
 
     def addTableMonthly(self, var, names, _units, caption, label, begin=0, nMonth=12, addLines=False, sizeBox=None):
-
         if len(names) != len(_units):
             units = []
             for i in range(len(names)):
@@ -637,7 +623,6 @@ class LatexReport:
         return lines
 
     def addTableMonthlyDf(self, var, names, _units, caption, label, defMonths, addLines=False, sizeBox=None):
-
         if len(names) != len(_units):
             units = []
             for i in range(len(names)):

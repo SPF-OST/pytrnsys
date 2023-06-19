@@ -26,7 +26,6 @@ class ExecuteTrnsys:
     """
 
     def __init__(self, _path, _name):
-
         self.fileName = _name  # _name.split('.')[0]
         self.path = _path
         self.nameDck = os.path.join(self.path, _name + ".dck")
@@ -79,11 +78,9 @@ class ExecuteTrnsys:
         self.nameDckPathOutput = os.path.join(self.pathOutput, _name + ".dck")
 
     def setPackageNameTrnsysFiles(self, name):
-
         self.deckTrnsys.setPackageNameTrnsysFiles(name)
 
     def ignoreOnlinePlotter(self, useOutputDeck=False):
-
         nameDck = self.deckTrnsys.nameDck
         nameDckPathOutput = self.deckTrnsys.nameDckPathOutput
 
@@ -95,7 +92,6 @@ class ExecuteTrnsys:
         self.deckTrnsys.nameDck = nameDck
 
     def changeNameOfDeck(self, newName):
-
         self.nameDck = os.path.join(self.path, newName + ".dck")
         self.pathOutput = os.path.join(self.path, newName)
         self.titleOfLatex = "%s" % newName
@@ -111,12 +107,10 @@ class ExecuteTrnsys:
             self.filesOutputPath = self.pathOutput
 
     def createDeckBackUp(self):
-
         nameDeckBck = "%s-bck" % self.nameDck
         shutil.copy(self.nameDck, nameDeckBck)
 
     def loadDeck(self, useDeckName=False, check=False, eliminateComments=False, useDeckOutputPath=False):
-
         if useDeckName == False:
             nameDck = self.fileName  # self.nameDckPathOutput
         else:
@@ -132,7 +126,6 @@ class ExecuteTrnsys:
             deckUtils.checkEquationsAndConstants(lines, nameDck)
 
     def changeParameter(self, _parameters):
-
         self.deckTrnsys.changeParameter(_parameters)
 
         # with this function we obtain some data from the deck file.
@@ -143,11 +136,9 @@ class ExecuteTrnsys:
         self.deckTrnsys.changeAssignStatementsBasedOnUnitVariables(newAssignStatements)
 
     def getDataFromDeck(self, myName):
-
         return self.deckTrnsys.getDataFromDeck(myName)
 
     def cleanFilesForRunning(self):
-
         for folder in self.foldersForRunning:
             folderWithPath = os.path.join(self.pathOutput, folder)
             shutil.rmtree(folderWithPath)
@@ -179,7 +170,6 @@ class ExecuteTrnsys:
             logger.warning("FAIL to move the file %s to %s" % (name, fileEnd))
 
     def copyFileFromSource(self, name):
-
         fileSource = os.path.join(self.path, name)
         fileEnd = os.path.join(self.pathOutput, name)
 
@@ -190,7 +180,6 @@ class ExecuteTrnsys:
             logger.warning("FAIL to copy the file %s to %s" % (name, fileEnd))
 
     def copyFolderFrom(self, sourcePath, name):
-
         folderSource = os.path.join(sourcePath, name)
         folderEnd = os.path.join(self.pathOutput, name)
 
@@ -204,7 +193,6 @@ class ExecuteTrnsys:
         self.trnsysVersion = version
 
     def getExecuteTrnsys(self, inputDict, useDeckName=False):
-
         if inputDict["ignoreOnlinePlotter"] == True:
             if self.removePopUpWindow == True:
                 ext = " /H"
@@ -229,7 +217,6 @@ class ExecuteTrnsys:
         return cmd
 
     def executeTrnsys(self, useDeckName=False):
-
         # use this '"%s"' to handle blank spaces in executable name like Program Files/
         myCmd = '"%s"' % self.getExecuteTrnsys(useDeckName)
 
@@ -241,7 +228,6 @@ class ExecuteTrnsys:
             self.cleanFilesForRunning()
 
     def cleanAndCreateResultsTempFolder(self):
-
         try:
             logger.debug("removing temp : %s " % self.tempFolderEnd)
             shutil.rmtree(self.tempFolderEnd)
@@ -253,7 +239,6 @@ class ExecuteTrnsys:
             pass
 
     def movingAuxFiles(self):
-
         nameSource = self.path + "\\%s.log" % self.fileName
         nameOut = self.pathOutput + "\\%s.log" % self.fileName
 

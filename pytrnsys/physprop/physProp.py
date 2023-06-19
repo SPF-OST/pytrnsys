@@ -21,9 +21,9 @@ try:
 
     newVersion = True
 except:
-
     from CoolProp.CoolProp import Props
     from CoolProp.HumidAirProp import HAProps, HAProps_Aux
+
     newVersion = False
 
 import sys
@@ -31,7 +31,6 @@ import sys
 
 class PhysProp:
     def __init__(self):
-
         self.name = ""
         self.concentration = 0.0  # in 100%
 
@@ -55,7 +54,6 @@ class PhysProp:
         self.constantMuIsSet = False
 
     def setUseConstantProperties(self, use):
-
         self.useConstantProperties = use
 
     def setConstantCp(self, cp):
@@ -63,28 +61,23 @@ class PhysProp:
         self.constantCp = cp
 
     def setConstantRho(self, rho):
-
         self.constantRhoIsSet = True
         self.constantRho = rho
 
     def setConstantMu(self, mu):
-
         self.constantMuIsSet = True
         self.constantMu = mu
 
     def setConstantLambda(self, _lambda):
-
         self.constantLambdaIsSet = True
         self.constantLambda = _lambda
 
     def setName(self, _name):
-
         self.nameIsSet = True
         self.name = _name
 
     # conc in %
     def setConcentration(self, conc):
-
         self.concentrationIsSet = True
 
         self.concentration = conc
@@ -109,7 +102,6 @@ class PhysProp:
 
     # T in oC Rho out in      kg/m3
     def getRho(self, T):
-
         if self.useConstantProperties:
             if self.constantRhoIsSet == False:
                 print("FATAL ERROR setConstantRho must be defined if constant properties are used")
@@ -130,7 +122,6 @@ class PhysProp:
 
     # T in oC Cp out in      J/kg/k
     def getCp(self, T):
-
         if self.useConstantProperties:
             if self.constantCpIsSet == False:
                 print("FATAL ERROR setConstartCp must be defined if constant properties are used")
@@ -155,7 +146,6 @@ class PhysProp:
 
     # T in oC Mu (dynamic viscosity) out in    Pa*s
     def getMu(self, T):
-
         if self.useConstantProperties:
             if self.constantMuIsSet == False:
                 print("FATAL ERROR setConstartMu must be defined if constant properties are used")
@@ -171,7 +161,6 @@ class PhysProp:
     # T in oC Lambda (thermal conductivity) iut in W/k
 
     def getLambda(self, T):
-
         if self.useConstantProperties:
             if self.constantMuIsSet == False:
                 print("FATAL ERROR setConstartMu must be defined if constant properties are used")
@@ -192,7 +181,6 @@ class PhysProp:
                     return Props("L", "T", T + 0.1 + 273.15, "P", self.pressure, self.name) * 1000.0
 
     def getEnthalpy(self, T):
-
         if self.useConstantProperties:
             if self.constantEnthalpyIsSet == False:
                 print("FATAL ERROR setConstantEnthalpy must be defined if constant properties are used")
@@ -208,7 +196,6 @@ class PhysProp:
     #            return (HAPropsSI('H','T',298.15,'P',101325,'R',0.5))
 
     def getTemperature(self, h):
-
         if newVersion == True:
             return PropsSI("T", "H", h / 1000.0, "P", self.pressure, self.name) - 273.15
         else:
@@ -224,7 +211,6 @@ class PhysProp:
             sys.exit(0)
 
     def getSaturationProperties(self, propertie, valueAtSat):
-
         # Temperature at saturation from pressure
 
         if propertie == "T":
@@ -320,7 +306,6 @@ class PhysProp:
 
 class HumidAirProp:
     def __init__(self):
-
         self.humidityRatio = 0.0  # kg water / kg dry air [0-1]
         self.vDryAir = 0.0  # m3 Water / kg dry air
         self.vMoistAir = 0.0  # m3 water / kg moist air
@@ -329,7 +314,6 @@ class HumidAirProp:
 
     #
     def getEnthalpy(self, temp, humidityRatio):
-
         return HAProps("H", "T", temp + 273.15, "P", 101325, "R", humidityRatio)  # J/kg dry air
 
     def getSaturatedProperties(self, name, h):

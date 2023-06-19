@@ -42,7 +42,6 @@ class BuildTrnsysDeck:
         ddckFilePathsWithComponentName: _tp.Sequence[DdckFilePathWithComponentName],
         ddckPlaceHolderValuesJsonPath,
     ):
-
         self.pathDeck = _pathDeck
         self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
 
@@ -197,11 +196,11 @@ class BuildTrnsysDeck:
         e = Graph("ER", filename="er.gv", node_attr={"color": "lightblue2", "style": "filled"})
         e.attr("node", shape="box")
         variables_global = ["cpwat", "rhowat", "nix", "tamb", "dtsim", "cpbri", "rhobri", "pi", "stop", "start", "zero"]
-        for (key, value) in self.dependencies.items():
+        for key, value in self.dependencies.items():
             e.node(key)
 
-        for (key, value) in self.dependencies.items():
-            for (keyDef, valueDef) in self.definitions.items():
+        for key, value in self.dependencies.items():
+            for keyDef, valueDef in self.definitions.items():
                 edgelLabel = ""
                 for dependency in value:
                     if dependency in valueDef and dependency not in variables_global:
@@ -236,7 +235,6 @@ class BuildTrnsysDeck:
         ok = True
 
         if self.dckAlreadyExists and self.overwriteForcedByUser is False:
-
             window = tk.Tk()
             window.geometry("2x2+" + str(window.winfo_screenwidth()) + "+" + str(window.winfo_screenheight()))
             ok = tkMessageBox.askokcancel(
@@ -286,7 +284,6 @@ class BuildTrnsysDeck:
         return None
 
     def saveUnitTypeFile(self):
-
         (self.TrnsysUnits, self.TrnsysTypes, self.filesUsedInDdck, self.filesUnitUsedInDdck) = deckUtils.readAllTypes(
             self.deckText, sort=False
         )
@@ -294,7 +291,6 @@ class BuildTrnsysDeck:
         self.writeTrnsysTypesUsed("UnitsType.info")
 
     def writeTrnsysTypesUsed(self, name):
-
         lines = "UNIT\tTYPE\tName\n"
 
         for i in range(len(self.TrnsysTypes)):

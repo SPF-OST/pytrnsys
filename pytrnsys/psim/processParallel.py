@@ -42,7 +42,6 @@ def getNumberOfCPU():
 
 
 def getCpuHexadecimal(cpu):
-
     #    Core # = Decimal = Hexadecimal = BitMask
     #    Core 1 = 1 = 01 = 00000001
     #    Core 2 = 2 = 02 = 00000010
@@ -163,7 +162,6 @@ def processParallel(cmds, reduceCpu=0, outputFile=False, estimedCPUTime=1):
         caseNr += 1
 
     def done(p):
-
         return p.poll() is not None
 
     def success(p):
@@ -183,9 +181,7 @@ def processParallel(cmds, reduceCpu=0, outputFile=False, estimedCPUTime=1):
     running = True
 
     while running:
-
         for core in cP.keys():
-
             p = cP[core]["process"]
             # start processes:
             if (not p) and cP[core]["cmd"]:
@@ -197,7 +193,6 @@ def processParallel(cmds, reduceCpu=0, outputFile=False, estimedCPUTime=1):
 
             if p:
                 if done(p):
-
                     if success(p):
                         if outputFile != False:
                             #                        lines = "Finished simulated case %d\n"%(k,p.stdout.read(),p.stderr.read())
@@ -230,7 +225,6 @@ def processParallel(cmds, reduceCpu=0, outputFile=False, estimedCPUTime=1):
                         fail()
 
         if all(process == 0 for process in activeP) and not openCmds:
-
             #        if not processes and not newCmds:
             break
         else:

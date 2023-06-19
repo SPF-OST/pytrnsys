@@ -167,6 +167,4 @@ def _writeScriptFile(
     if shallPlotUncertainties:
         plot.getEasyErrorPlot(outputFileStem, f"{outputFileStem}.dat", columnHeaders)
     else:
-        plot.getEasyPlot(
-            outputFileStem, f"{outputFileStem}.dat", columnHeaders, inputsAsPairs=True
-        )
+        plot.getEasyPlot(outputFileStem, f"{outputFileStem}.dat", columnHeaders, inputsAsPairs=True)

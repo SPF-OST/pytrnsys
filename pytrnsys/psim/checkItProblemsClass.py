@@ -21,11 +21,9 @@ import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
 
 class checkIterationProblemsClass(processTrnsys.ProcessTrnsysBase):
     def __init__(self, _path, _name):
-
         processTrnsys.ProcessTrnsysBase.__init__(self, _path, _name)
 
     def loadStatus(self, _name):
-
         useOnlyOneYear = False
         firstConsideredTime = None
         year = False
@@ -53,7 +51,6 @@ class checkIterationProblemsClass(processTrnsys.ProcessTrnsysBase):
 
     # This is for cases where the file has been generated with the standard process
     def readItProblemsFile(self, name):
-
         nameWithPath = os.path.join(self.outputPath, name)
 
         itFile = load.loadBaseNumpy(nameWithPath)
@@ -63,7 +60,6 @@ class checkIterationProblemsClass(processTrnsys.ProcessTrnsysBase):
     # Here we read the log file as done in the process class without having to print the file and to actually process
     # the whole case only for the it Problems
     def readItProblemsFromLog(self):
-
         log = LogTrnsys.LogTrnsys(self.outputPath, self.fileName)
         log.loadLog()
         log.getMyDataFromLog()
@@ -88,7 +84,6 @@ class checkIterationProblemsClass(processTrnsys.ProcessTrnsysBase):
             self.namesUnitsItProblems.append(listNames)
 
     def writeItFileWithSatus(self, name, limit=100):
-
         lines = ""
         line = "Number of iteration problems %f\n " % len(self.hourWhereItProblems)
         lines = lines + line

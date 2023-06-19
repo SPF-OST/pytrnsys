@@ -15,16 +15,17 @@ import time
 
 class DebugProcess:
     def __init__(self, _path, _fileName, cases):
-
         self.nameRunFile = _path + "\\" + _fileName
         self.cases = cases
 
     def start(self):
-
         linesRun = ""
 
         for i in range(len(self.cases)):
-            line = "Case :%s will be processed at :%s (from DebugProcess class)\n" % (self.cases[i], time.strftime("%c"))
+            line = "Case :%s will be processed at :%s (from DebugProcess class)\n" % (
+                self.cases[i],
+                time.strftime("%c"),
+            )
             linesRun = linesRun + line
 
         line = "============ALREADY PROCESSED==============\n"
@@ -34,20 +35,17 @@ class DebugProcess:
         outfileRun.close()
 
     def addCase(self, i):
-
         line = "Case :%s has been processed %s (from DebugProcess class)\n" % (self.cases[i], time.strftime("%c"))
         outfileRun = open(self.nameRunFile, "a")
         outfileRun.writelines(line)
         outfileRun.close()
 
     def addLines(self, lines):
-
         outfileRun = open(self.nameRunFile, "a")
         outfileRun.writelines(lines)
         outfileRun.close()
 
     def finish(self):
-
         line = "processTRNSYS SUCCESFULLY FINISHED"
         outfileRun = open(self.nameRunFile, "a")
         outfileRun.writelines(line)

@@ -25,7 +25,6 @@ class ResultsProcessedFile:
     """
 
     def __init__(self, _path):
-
         self.path = _path
         self.cases = []
         self.filteredfolder = [".gle"]
@@ -36,7 +35,6 @@ class ResultsProcessedFile:
                 return float(lines.split("\t")[1])
 
     def readResultsData(self, resultType="dat", completeFolder=True, fileNameList=None):
-
         pathFolder = self.path
 
         if completeFolder:
@@ -51,7 +49,6 @@ class ResultsProcessedFile:
         self.results = []
 
         for name in self.fileName:
-
             dictRes = {}
 
             if resultType == "dat":
@@ -88,7 +85,6 @@ class ResultsProcessedFile:
 
     # to be moved to a child class since it is case dependent.
     def plotSPfVsAcolViceDeprecated(self):
-
         spf = []
         aCol = []
         vIce = []
@@ -115,7 +111,6 @@ class ResultsProcessedFile:
         fig.savefig(self.spfVsAcolPdf)
 
     def createLatexSimulationReport(self):
-
         self.plotT = False
 
         self.plots()

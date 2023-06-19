@@ -27,7 +27,6 @@ logger = logging.getLogger("root")
 
 class PlotGround:
     def __init__(self, _path, _name):
-
         self.outputPath = _path
         self.nameWithExtension = _name
         self.name = _name.split(".")[0]
@@ -37,7 +36,6 @@ class PlotGround:
         self.addSizeInNames = False
 
     def readTemperatureField(self, name):
-
         self.T = num.arange(len(self.xPoints) * len(self.yPoints), dtype=float).reshape(
             len(self.xPoints), len(self.yPoints)
         )
@@ -52,7 +50,6 @@ class PlotGround:
 
         j = len(self.yPoints) - 1
         for line in lines:
-
             splittedLines = line.split()
             splittedLines = [float(list_item) for list_item in splittedLines]
 
@@ -70,7 +67,6 @@ class PlotGround:
         self.T[TX - 1][TY - 1] = self.T[TX - 1][TY - 2]
 
     def plotLines(self, name, x, y):
-
         #        print "sizeX%d sizeY:%d"% (len(self.xPoints),len(self.yPoints))
 
         self.yLine = interpolation.getVectorIn2DMatrix(self.xPoints, self.yPoints, self.T, "x", x)
@@ -115,7 +111,6 @@ class PlotGround:
         outfile.close()
 
     def loadGroundField(self):
-
         nameGroundWithPath = "%s\%s" % (self.outputPath, self.nameWithExtension)
 
         logger.debug(nameGroundWithPath)
@@ -130,7 +125,6 @@ class PlotGround:
         self.yPoints = []
 
         for line in lines:
-
             splittedLines = line.split()
             splittedLines = [float(list_item) for list_item in splittedLines]
 
@@ -147,7 +141,6 @@ class PlotGround:
         self.yPoints = num.array(yPoints)
 
     def plotGroundMesh(self):
-
         fig = plt.figure(1, figsize=(12, 8))
 
         axes = fig.add_subplot(111)
@@ -203,7 +196,6 @@ class PlotGround:
         fig.clear()
 
     def plotTwelveGround(self, name, hour):
-
         size = 50
 
         # be carefull. This is wrong we must use nodx and not vclx
@@ -241,7 +233,6 @@ class PlotGround:
         fig.clear()
 
     def plotNGround(self, name, hour, tRange, plotEmf=False):
-
         size = 50
 
         nPlots = len(hour)
@@ -290,7 +281,6 @@ class PlotGround:
 
         fig.savefig(self.nameGroundWithPath1)
         if plotEmf:
-
             nameEmfWithPath = "%s\%s" % (self.outputPath, nameFile)
 
             self._plot_as_emf(fig, filename=nameEmfWithPath)
@@ -299,7 +289,6 @@ class PlotGround:
         return os.path.basename(self.nameGroundWithPath1)
 
     def _plot_as_emf(self, figure, **kwargs):
-
         inkscape_path = kwargs.get("inkscape", "C://Inkscape//inkscape.exe")
         filepath = kwargs.get("filename", None)
 
@@ -315,7 +304,6 @@ class PlotGround:
             os.remove(svg_filepath)
 
     def plotTGround(self, name, hour):
-
         fig = plt.figure()
         plot = fig.add_subplot(1, 1, 1)
 
@@ -342,7 +330,12 @@ class PlotGround:
         cbar.update_ticks()
 
         if self.addSizeInNames:
-            myName = "%s/%s-T-TX%dTY%d.pdf" % (self.outputPath, name.split(".")[0], len(self.xPoints), len(self.yPoints))
+            myName = "%s/%s-T-TX%dTY%d.pdf" % (
+                self.outputPath,
+                name.split(".")[0],
+                len(self.xPoints),
+                len(self.yPoints),
+            )
         else:
             myName = "%s/%s-T.pdf" % (self.outputPath, name.split(".")[0])
 

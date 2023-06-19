@@ -24,7 +24,6 @@ import os
 
 class ReadTrnsysFiles:
     def __init__(self, _path):
-
         self.path = _path
 
         self.clean()
@@ -32,11 +31,9 @@ class ReadTrnsysFiles:
         self.pathWithoutTemp = self.path[:-5]
 
     def setPath(self, _path):
-
         self.path = _path
 
     def clean(self):
-
         self.userDefinedFileIsReaded = False
         self.monthlyFileIsReaded = False
         self.hourlyFileIsReaded = False
@@ -46,7 +43,6 @@ class ReadTrnsysFiles:
         self.numberOfMonthsSimulated = 0
 
     def readUserDefinedFiles(self, _nameFile, skypedLines=0, firstConsideredTime=8760, useOnlyOneYear=False):
-
         self.clean()
 
         self.userDefinedFileIsReaded = True
@@ -86,7 +82,6 @@ class ReadTrnsysFiles:
         print("time[i-1]:%f time[i]:%f k:%d" % (time[k - 1], time[k], k))
 
         if useOnlyOneYear == True:
-
             last = 0
             for i in range(k, len(time)):
                 if time[i] >= (firstConsideredTime + 8760):
@@ -110,7 +105,6 @@ class ReadTrnsysFiles:
     # saving the whole memory in python which sometimes is out of space
 
     def readUserDefinedFilesYear(self, _nameFile, year, skypedLines=0):
-
         self.clean()
 
         self.userDefinedFileIsReaded = True
@@ -136,7 +130,6 @@ class ReadTrnsysFiles:
         self.load.variables = myVarWithoutFirstTimes.T
 
     def readHourlyFiles(self, _nameFile, skypedLines=1, firstConsideredTime=8760):
-
         self.clean()
 
         self.hourlyFileIsReaded = True
@@ -160,12 +153,9 @@ class ReadTrnsysFiles:
 
             if k == 0:
                 for i in range(len(linesWithSign)):
-
                     self.name.append(linesWithSign[i])
             else:
-
                 if len(linesWithSign) > 0:
-
                     if k == 1:
                         initialTime = linesWithSign[0]
                         if firstConsideredTime == None:
@@ -180,7 +170,6 @@ class ReadTrnsysFiles:
         infile.close()
 
     def readHourlyBuildingFile(self, _nameFile):
-
         self.clean()
 
         self.hourlyFileIsReaded = True
@@ -214,9 +203,7 @@ class ReadTrnsysFiles:
             #                       print linesWithSign[i]
             # to avoid reading units
             elif k >= indexTime:
-
                 if len(linesWithSign) > 0:
-
                     time = float(linesWithSign[0])
 
                     if k == indexTime and time == 8016:
@@ -237,7 +224,6 @@ class ReadTrnsysFiles:
         infile.close()
 
     def getIndexAndTagNames(self, lines, name, myYear, firstMonth):
-
         indexToStart = 0
         year = 0
 
@@ -245,7 +231,6 @@ class ReadTrnsysFiles:
         #         print lines
 
         for k in range(len(lines)):
-
             splitLine = lines[k].split()
 
             #            print splitLine[0]
@@ -277,7 +262,6 @@ class ReadTrnsysFiles:
         return indexToStart
 
     def readMonthlyFiles(self, _nameFile, firstMonth="January", myYear=-1):
-
         print("namefile %s" % _nameFile)
 
         self.clean()
@@ -321,22 +305,18 @@ class ReadTrnsysFiles:
                 if utils.isMonthName(splitLine[0]) == False:
                     pass
                 else:
-
                     # I think this is not necessary anymore !!!!!!!!!!!!!
                     if k == self.indexToStart and splitLine[0] == "December":  # Neglect the first December month
                         pass
                     else:
-
                         nMonth = nMonth + 1
 
                         #                        print "MONTH index :%d nMonth: %d" %(m,nMonth)
 
                         for i in range(len(self.name)):
-
                             self.variables[i][m] = splitLine[i + 1]
             #
             except:
-
                 pass
 
         infile.close()
@@ -355,7 +335,6 @@ class ReadTrnsysFiles:
     #
 
     def readDeck(self, path, name):
-
         self.deck = deckTrnsys.DeckTrnsys(path, name)
         self.deck.loadDeck()
         self.deckVariables = self.deck.getAllDataFromDeck()
@@ -393,7 +372,6 @@ class ReadTrnsysFiles:
     #     outfile.writelines(lines)
 
     def getDataFromDeck(self, myName, typeValue="double", ifNotFoundEqualToZero=False):
-
         try:
             value = self.deck.getDataFromDeck(myName, typeValue)
             if value == None and ifNotFoundEqualToZero == True:
@@ -409,22 +387,18 @@ class ReadTrnsysFiles:
         print(value)
 
     def getTypeFromUnit(self, myUnit):
-
         return self.deck.getTypeFromUnit(myUnit)
 
     #   Return the array with the seleted name
 
     def getFromVariables(self, name):
-
         for j in range(len(self.name)):
-
             if self.name[j].lower() == name.lower():
                 #                 print "Im in j:%d nameVar:%s name:%s" % (j,self.namesVariables[j],name)
                 return self.variables[j][:]
         return None
 
     def get(self, name, ifNotFoundEqualToZero=False):
-
         if self.userDefinedFileIsReaded:
             #            value =  self.getFromVariables(name)
             value = self.load.get(name)
@@ -441,9 +415,7 @@ class ReadTrnsysFiles:
             return value
 
     def getFromList(self, name):
-
         for j in range(len(self.name)):
-
             #             print "name:%s name%s" % (self.name[j].lower(),name.lower())
 
             if self.name[j].lower() == name.lower():
@@ -457,5 +429,4 @@ class ReadTrnsysFiles:
         return None
 
     def cleanMemory(self):
-
         self.load.cleanMemory()

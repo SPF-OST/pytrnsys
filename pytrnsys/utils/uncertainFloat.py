@@ -18,6 +18,7 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
     BEWARE: This class does *not* handle correlation, i.e. 2x-x != x and
     it assumes extrema are attained at the input values' extrema.
     """
+
     mean: float
     toLowerBound: float = 0
     toUpperBound: float = 0

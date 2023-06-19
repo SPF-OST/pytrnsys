@@ -44,7 +44,7 @@ class TestConditionHandler:
             [["sizeHpUsed=30.0"], dict(sizeHpUsed=40), False],
             [["city=BAS", "30<sizeHpUsed<50", "VIceS>28"], dict(city="BAS", sizeHpUsed=30, VIceS=28.0676), False],
             [["city=BAS", "30<=sizeHpUsed<50", "VIceS>28"], dict(city="BAS", sizeHpUsed=30, VIceS=28.0676), True],
-        ]
+        ],
     )
     def test(self, serializedConditions: tp.Sequence[str], resultsDict: ResultsDict, areConditionsFulfilled: bool):
         conditions = conds.createConditions(serializedConditions)

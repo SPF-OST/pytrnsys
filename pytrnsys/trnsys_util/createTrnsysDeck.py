@@ -16,7 +16,6 @@ logger = logging.getLogger("root")
 
 class CreateTrnsysDeck:
     def __init__(self, _path, _name, _variations):
-
         self.originalName = _name
         self.path = _path
         self.originalDeckName = os.path.join(self.path, self.originalName + ".dck")
@@ -46,9 +45,7 @@ class CreateTrnsysDeck:
 
         if self.combineAllCases == False:
             for i in range(len(self.variations)):
-
                 for j in range(len(self.variations[i])):
-
                     if j == 0:
                         # A comprensible name to be used as a tag in the file
                         nameLabelOfVariation = self.variations[i][j]
@@ -61,7 +58,10 @@ class CreateTrnsysDeck:
                         # If the name has 00 means 0. because the fileName will suffer from having points as names.
                         if valuesOfVariationInFile == "00":
                             valuesOfVariation = "0." + valuesOfVariationInFile[2:]
-                            print("Comma found valueFile=%s valueUsed=%s") % (valuesOfVariationInFile, valuesOfVariation)
+                            print("Comma found valueFile=%s valueUsed=%s") % (
+                                valuesOfVariationInFile,
+                                valuesOfVariation,
+                            )
                         else:
                             valuesOfVariation = valuesOfVariationInFile
                         #                            print "Comma NOT found valueFile=%s valueUsed=%s" % (valuesOfVariationInFile,valuesOfVariation)
@@ -113,10 +113,8 @@ class CreateTrnsysDeck:
 
             if len(self.variations) > 0:
                 for j in range(2, len(self.variations[0])):
-
                     variationsLine = ""
                     for nvar in range(len(self.variations)):
-
                         valuesOfVariationInFile = self.variations[nvar][j]
 
                         # If I write variation = ["","","GFX",...] then I add the name to the deck but no variation is used
@@ -202,10 +200,8 @@ class CreateTrnsysDeck:
 
         if len(self.variations) > 0:
             for j in range(2, len(self.variations[0])):
-
                 variationsLine = ""
                 for nvar in range(len(self.variations)):
-
                     valuesOfVariationInFile = self.variations[nvar][j]
                     if "*" in str(valuesOfVariationInFile):
                         valuesOfVariationInFile = valuesOfVariationInFile.replace("*", "x")
@@ -249,7 +245,8 @@ class CreateTrnsysDeck:
                 if successfulCases != None:
                     if (nameDeck + ".dck") in successfulCases:
                         logger.info(
-                            (nameDeck + ".dck") + " was already successfully run before and hence won't be created again"
+                            (nameDeck + ".dck")
+                            + " was already successfully run before and hence won't be created again"
                         )
                         continue
 
@@ -289,7 +286,6 @@ class CreateTrnsysDeck:
         return self.deckOutputs
 
     def getParameters(self, i):
-
         return self.myListOfParameterDicts[i]
 
 

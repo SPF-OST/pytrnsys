@@ -45,7 +45,6 @@ class RunParallelTrnsys:
     """
 
     def __init__(self, pathConfig, name="pytrnsysRun", configFile=None, runPath=None):
-
         self.pathConfig = pathConfig
 
         self.ddckPlaceHolderValuesJsonPath = None
@@ -94,7 +93,6 @@ class RunParallelTrnsys:
         self.path = path
 
     def defaultInputs(self):
-
         self.inputs = {}
         self.inputs["ignoreOnlinePlotter"] = False
         self.inputs["removePopUpWindow"] = False
@@ -122,7 +120,6 @@ class RunParallelTrnsys:
         self.variablesOutput = []
 
     def readFromFolder(self, pathRun):
-
         fileNames = [name for name in os.listdir(pathRun) if os.path.isdir(pathRun + "\\" + name)]
 
         returnNames = []
@@ -135,7 +132,6 @@ class RunParallelTrnsys:
         return returnNames
 
     def readCasesToRun(self, pathRun, nameFileWithCasesToRun):
-
         fileToRunWithPath = os.path.join(pathRun, nameFileWithCasesToRun)
         file = open(fileToRunWithPath, "r")
         lines = file.readlines()
@@ -150,11 +146,9 @@ class RunParallelTrnsys:
         return cases
 
     def runFromNames(self, path, fileNames):
-
         tests = []
         self.cmds = []
         for i in range(len(fileNames)):
-
             tests.append(exeTrnsys.ExecuteTrnsys(path, fileNames[i]))
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
             tests[i].loadDeck(check=self.inputs["checkDeck"])
@@ -239,7 +233,6 @@ class RunParallelTrnsys:
                 self.createDecksFromVariant()
 
     def createDecksFromVariant(self, fitParameters={}):
-
         variations = self.variablesOutput
         parameters = self.parameters
         parameters.update(fitParameters)
@@ -285,7 +278,6 @@ class RunParallelTrnsys:
         variablePath = self.path
 
         for i in range(len(fileName)):
-
             self.logger.debug("name to run :%s" % fileName[i])
 
             # if useLocationStructure:
@@ -465,7 +457,6 @@ class RunParallelTrnsys:
         logfile.close()
 
     def readConfig(self, path, name, parseFileCreated=False):
-
         """
         It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
         It also loads the readed lines into self.lines
@@ -573,7 +564,6 @@ class RunParallelTrnsys:
         self.replaceLines = []
 
         for line in self.lines:
-
             splitLine = line.split()
             if splitLine[0] == "variation":
                 variation = []
@@ -704,7 +694,6 @@ when you want to give the component name explicitly by <component-name>
         raise ValueError(errorMessage)
 
     def copyConfigFile(self, configPath, configName):
-
         configFile = os.path.join(configPath, configName)
         dstPath = os.path.join(configPath, self.inputs["addResultsFolder"], configName)
         shutil.copyfile(configFile, dstPath)

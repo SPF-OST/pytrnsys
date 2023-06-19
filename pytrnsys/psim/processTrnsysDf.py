@@ -49,7 +49,6 @@ class ProcessTrnsysDf:
     """"""
 
     def __init__(self, _path, _name, language="en", individualFile=False):
-
         self.fileName = _name
         if individualFile:
             self.outputPath = _path
@@ -151,7 +150,6 @@ class ProcessTrnsysDf:
         self.buildingArea = area
 
     def setTrnsysDllPath(self, path):
-
         self.trnsysDllPath = path
 
     def setBuildingArea(self, area):
@@ -161,7 +159,6 @@ class ProcessTrnsysDf:
         self.trnsysVersion = version
 
     def setPrintDataForGle(self, printData):
-
         self.printDataForGle = printData
 
     def process(self):
@@ -206,7 +203,6 @@ class ProcessTrnsysDf:
         self.addResultsFile()
 
     def loadHourlyFile(self, pathFile):
-
         file = pd.read_csv(pathFile, header=0, delimiter=";").rename(columns=lambda x: x.strip())
 
         file.set_index("Time", inplace=True, drop=False)
@@ -218,7 +214,6 @@ class ProcessTrnsysDf:
         self.houDataDf = pd.merge(self.houDataDf, file[cols_to_use], left_index=True, right_index=True, how="outer")
 
     def loadDailyFile(self, pathFile):
-
         file = pd.read_csv(pathFile, header=0, delimiter=";").rename(columns=lambda x: x.strip())
 
         file.set_index("Time", inplace=True, drop=False)
@@ -229,7 +224,6 @@ class ProcessTrnsysDf:
         self.dayDataDf = pd.merge(self.dayDataDf, file[cols_to_use], left_index=True, right_index=True, how="outer")
 
     def loadMonthlyFile(self, pathFile):
-
         file = pd.read_csv(pathFile, header=0, delimiter=";")  # .rename(columns=lambda x: x.strip())
 
         file["Number"] = file.index + pd.to_datetime(file["Time"][0].strip(), format="%B").month
@@ -288,7 +282,6 @@ class ProcessTrnsysDf:
             self.deckData.update(parameterDictionary)
 
     def loadAndProcessTrnsys(self):
-
         # self.inputs['fileOutputPath'] = "C:\Daten\OngoingProject\BigIce\PassiveCoolingFlatPlate\BigIce-MFH-TestPassiveCoolTest\temp"
         # self.inputs['listOfFiles'] = ["PCMOut.Plt"]
         # self.definedResultsFileToRead(self.inputs['fileOutputPath'],self.inputs['listOfFiles'])
@@ -309,7 +302,6 @@ class ProcessTrnsysDf:
         #     self.calcCost()
 
     def setLoaderParameters(self):
-
         self.monthlyUsed = True
         self.hourlyUsed = True
         self.timeStepUsed = True
@@ -332,11 +324,9 @@ class ProcessTrnsysDf:
         self.fileNameListToRead = _fileNameListToRead
 
     def setResultsPathRelative(self, pathRelative):
-
         return os.path.join(self.outputPath + pathRelative)
 
     def loadFiles(self, doConfigCalculation=True):
-
         self.setLoaderParameters()
         locale.setlocale(locale.LC_ALL, "enn")
 
@@ -462,7 +452,6 @@ class ProcessTrnsysDf:
         logger.info("Completed loading files of " + self.fileName)
 
     def addBokehPlot(self):
-
         if "plotHourly" in self.inputs.keys():
             for varToPlot in self.inputs["plotHourly"]:
                 self.pltB.createBokehPlot(self.houDataDf, self.outputPath, self.fileName + "hourly", varToPlot)
@@ -480,7 +469,6 @@ class ProcessTrnsysDf:
                 )
 
     def addMonthlyPlots(self):
-
         if "plotMonthly" in self.inputs.keys():
             #
             for i in range(len(self.inputs["plotMonthly"])):
@@ -505,7 +493,6 @@ class ProcessTrnsysDf:
                 logger.debug("%s monthly plot" % namePdf)
 
     def addHourlyPlots(self):
-
         if "plotHourly" in self.inputs.keys():
             self.pltB.createBokehPlot(self.houDataDf, self.outputPath, self.fileName, self.inputs["plotHourly"][0])
 
@@ -517,7 +504,6 @@ class ProcessTrnsysDf:
 
     def scatterHourly(self):
         for plotVariables in self.inputs["scatterHourly"]:
-
             xVariable = plotVariables[0]
             yVariable = plotVariables[1]
 
@@ -598,7 +584,6 @@ class ProcessTrnsysDf:
 
     def comfortHourly(self):
         for plotVariables in self.inputs["comfortHourly"]:
-
             variableStartIndex = 0
             comfortBoundary = [(20, 30), (20, 70), (26, 70), (26, 30)]
             acceptableBoundary = []
@@ -727,11 +712,9 @@ class ProcessTrnsysDf:
                 pass
 
     def executeLatexFile(self):
-
         self.doc.executeLatexFile(moveToTrnsysLogFile=True, runTwice=False)
 
     def doLatexPdf(self, documentClass="SPFShortReportIndex"):
-
         self.createLatex(documentClass=documentClass)
 
         self.executeLatexFile()
@@ -780,7 +763,6 @@ class ProcessTrnsysDf:
         self.saveTSToCsv()
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
-
         self.doc.documentClass = documentClass
 
         self.doc.setTitle(self.titleOfLatex)
@@ -793,7 +775,6 @@ class ProcessTrnsysDf:
         self.doc.addEndDocumentAndCreateTexFile()
 
     def calculateDemands(self):
-
         self.qDemandVector = []
         self.elDemandVector = []
         self.qDemandDf = pd.DataFrame()
@@ -802,15 +783,12 @@ class ProcessTrnsysDf:
         # self.elDemandDf = pd.DataFrame()
 
         for name in self.monDataDf.columns:
-
             if len(name) > 9 and ((name[0:9] == "elSysOut_") or (name[0:9] == "elSysIn_Q")):
-
                 if (name[-6:] == "Demand") or (name[-1] == "D"):
                     self.elDemandVector.append(self.monDataDf[name])  # Why not .values ??
                     self.legendEl.append(self.getNiceLatexNames(name))
 
             elif len(name) > 8 and name[0:8] == "qSysOut_":
-
                 if (name[-6:] == "Demand") or (name[-1] == "D"):
                     self.qDemandVector.append(self.monDataDf[name].values)
                     self.qDemandDf = self.qDemandDf + self.monDataDf[name]
@@ -837,7 +815,6 @@ class ProcessTrnsysDf:
         # pass
 
     def addDemands(self, unit="kWh"):
-
         myUnit = self._getConversionFactor(unit)
 
         legend = ["Month"] + self.legendQ + ["Total"]
@@ -861,7 +838,6 @@ class ProcessTrnsysDf:
 
     def addSPFSystem(self, printData=True):
         if max(self.qDemand) > 0 and not isinstance(self.elHeatSysTotal, int):
-
             self.SpfShpDis = num.zeros(13)  # SPF_shp including el. demand of cond., evap., and solar loop pumps
             self.SpfShpDisPen = num.zeros(13)  # SPF_shp with penalties for low room or DHW temperature
             self.SpfShpDisPlus = num.zeros(13)  # SPF_shp with all pumps (including SH and DHW circulation pump)
@@ -962,7 +938,6 @@ class ProcessTrnsysDf:
                 self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def addEPFSystem(self, printData=True):
-
         self.elSys = num.zeros(12)
         self.elH = num.zeros(12)
         self.elPv = num.zeros(12)
@@ -1211,7 +1186,6 @@ class ProcessTrnsysDf:
 
     def addPlotConfigEquation(self):
         for equation in self.inputs["calcMonthly"]:
-
             parameters = re.findall(r"[\w']+", equation)
 
             # monplot = sns.barplot(x=self.monDataDf['Month'], y=self.monDataDf[parameters[0]], color="blue")
@@ -1269,7 +1243,6 @@ class ProcessTrnsysDf:
         factor=1,
         _printEvery=1,
     ):
-
         self.QvsTInput = inputs
 
         tFlow = []
@@ -1288,7 +1261,6 @@ class ProcessTrnsysDf:
             normalized = False
 
         for i in range(0, len(self.QvsTInput)):
-
             # legend.append(jsonDict["legend"])
             if i % 2 == 0:
                 eCum.append(abs(df[self.QvsTInput[i]].values) * factor / norm)
@@ -1330,7 +1302,6 @@ class ProcessTrnsysDf:
             legend = []
 
             for i in range(0, len(self.test)):
-
                 if i % 2 == 0:
                     eCum.append(abs(df[self.QvsTInput[i]]) * factor / norm)
                     name = self.QvsTInput[i]
@@ -1348,7 +1319,6 @@ class ProcessTrnsysDf:
         legendsOut = []
 
         for name in self.monDataDf.columns:
-
             found = False
 
             try:
@@ -1413,7 +1383,6 @@ class ProcessTrnsysDf:
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def addHeatBalance(self, printData=False, unit="kWh"):
-
         myUnit = self._getConversionFactor(unit)
 
         inVar = []
@@ -1423,7 +1392,6 @@ class ProcessTrnsysDf:
 
         # for name in self.monData.keys():
         for name in self.monDataDf.columns:
-
             found = False
 
             try:
@@ -1488,7 +1456,6 @@ class ProcessTrnsysDf:
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def addHeatBalanceDaily(self, month, printData=False, unit="kWh"):
-
         myUnit = self._getConversionFactor(unit)
 
         inVar = []
@@ -1534,7 +1501,6 @@ class ProcessTrnsysDf:
         # Test = pd.DataFrame()
         DaysSelected = pd.DataFrame()
         for i in Days:
-
             min_time = selectedDays[i]
             max_time = selectedDays[i] + pd.to_timedelta(23, unit="h")
 
@@ -1548,7 +1514,6 @@ class ProcessTrnsysDf:
             DaysSelected = DaysSelected.append(Test2)
 
         for name in DaysSelected.columns:
-
             found = False
 
             try:
@@ -1575,7 +1540,6 @@ class ProcessTrnsysDf:
         xLegend = "Month " + month
 
         if len(inVar) > 0 or len(outVar) > 0:
-
             namePdf = self.plot.plotDailyBalanceDf(
                 inVar,
                 outVar,
@@ -1619,7 +1583,6 @@ class ProcessTrnsysDf:
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def getHourlyBalanceDf(self, daySelected, _unit="kWh"):
-
         myUnit = self._getConversionFactor(_unit)
 
         hourlyBalanceDf = pd.DataFrame()
@@ -1642,7 +1605,6 @@ class ProcessTrnsysDf:
         return hourlyBalanceDf
 
     def getHourlyBalance(self, daySelected, _unit="kWh"):
-
         myUnit = self._getConversionFactor(_unit)
 
         df_DataSelected = self._getSelectedData(daySelected)
@@ -1692,7 +1654,6 @@ class ProcessTrnsysDf:
         return myUnit
 
     def addHeatBalanceHourly(self, daySelected, printData=False, unit="kWh"):
-
         myUnit = self._getConversionFactor(unit)
 
         inVar = []
@@ -1705,7 +1666,6 @@ class ProcessTrnsysDf:
         DaysSelected = df_DataSelected
 
         for name in DaysSelected.columns:
-
             found = False
 
             try:
@@ -1730,7 +1690,6 @@ class ProcessTrnsysDf:
 
         nameFile = "HeatHourly_" + XLabel
         if len(inVar) > 0 or len(outVar) > 0:
-
             namePdf = self.plot.plotDailyBalanceDf(
                 inVar,
                 outVar,
@@ -1774,7 +1733,6 @@ class ProcessTrnsysDf:
             self.doc.addPlotShort(namePdf, caption=caption, label=nameFile)
 
     def calculateElHeatConsumption(self):
-
         inVar = []
         outVar = []
         self.legendsElHeatConsumption = []
@@ -1791,7 +1749,6 @@ class ProcessTrnsysDf:
         # self.elHeatSysMatrix_allPumps = []
 
         for name in self.monDataDf.columns:
-
             found = False
 
             try:
@@ -1851,7 +1808,6 @@ class ProcessTrnsysDf:
         self.elHeatSysTotalPlus = sum(self.elHeatSysMatrixPlus)
 
     def addElConsumption(self):
-
         nameFile = "elHeatSysMonthly"
 
         legend = self.legendsElHeatConsumption
@@ -1948,7 +1904,6 @@ class ProcessTrnsysDf:
 
         """
         if "fitHeatingLimit" in self.inputs.keys():
-
             inputs = self.inputs["fitHeatingLimit"][0]
 
             yAxisVariableName = inputs[0]
@@ -2009,7 +1964,6 @@ class ProcessTrnsysDf:
 
                 pathResultsJson = os.path.join(self.outputPath, self.fileName + "-results.json")
                 if os.path.isfile(pathResultsJson):
-
                     with open(pathResultsJson, "r") as file:
                         resultsDict = json.load(file)
 
@@ -2092,7 +2046,6 @@ class ProcessTrnsysDf:
     def addCaseDefinition(
         self,
     ):
-
         caption = "General data"
         names = ["", "", "", ""]
         units = None
@@ -2145,7 +2098,6 @@ class ProcessTrnsysDf:
         self.doc.addTable(caption, names, units, label, lines, useFormula=True)
 
     def addTemperatureFreq(self, printData=False):
-
         if "plotT" in self.inputs.keys():
             if len(self.inputs["plotT"]) > 0:
                 for name in self.inputs["plotT"][0]:
@@ -2173,7 +2125,6 @@ class ProcessTrnsysDf:
         return None
 
     def loadDll(self):
-
         self.log = LogTrnsys.LogTrnsys(self.outputPath, self.fileName)
         self.log.loadLog()
         self.log.getMyDataFromLog()
@@ -2184,7 +2135,6 @@ class ProcessTrnsysDf:
         self.nItProblems = self.log.numberOfFailedIt
 
     def getVersionsDll(self):
-
         if 0:
             raise ValueError("Deprecated. File created in simulaiton folder. To be improved")
             #
@@ -2209,9 +2159,7 @@ class ProcessTrnsysDf:
                     self.buildingModel = "ISO"
 
     def getDllVersionFromType(self, typeNumber):
-
         if self.trnsysDllPath == False:
-
             if self.trnsysVersion == "standard":
                 trnsysExe = os.getenv("TRNSYS_EXE")
 
@@ -2247,14 +2195,12 @@ class ProcessTrnsysDf:
         return dllVersion
 
     def getTagLabel(self, label):
-
         return "#=======================================\n#%s :%s\n#=======================================\n" % (
             self.nameClass,
             label,
         )
 
     def setPathReadTrnsysFile(self, _path):
-
         self.readTrnsysFiles.setPath(_path)
 
     def addResultsFile(self):
@@ -2302,7 +2248,6 @@ class ProcessTrnsysDf:
             self.saveResultsFile(self.resultsDict)
 
     def saveResultsFile(self, resultsDict):
-
         pathParameterJson = os.path.join(self.outputPath, self.fileName + ".json")
         if os.path.isfile(pathParameterJson):
             with open(pathParameterJson, "r") as file:
@@ -2314,7 +2259,6 @@ class ProcessTrnsysDf:
         fileNamePath = os.path.join(self.outputPath, fileName)
 
         if os.path.isfile(fileNamePath):
-
             tempDict = resultsDict
 
             with open(fileNamePath, "r") as file:

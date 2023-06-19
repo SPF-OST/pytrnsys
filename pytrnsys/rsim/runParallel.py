@@ -142,11 +142,9 @@ def runParallel(
     #########################
 
     def done(p):
-
         return p.poll() is not None
 
     def success(p):
-
         fullDckFilePath = p.args.split(" ")[-2]
         (logFilePath, dckFileName) = os.path.split(fullDckFilePath)
         logFileName = os.path.splitext(dckFileName)[0]
@@ -186,13 +184,10 @@ def runParallel(
     startTime = time.time()
 
     while running:
-
         for core in cP.keys():
-
             p = cP[core]["process"]
             # start processes:
             if (not p) and cP[core]["cmd"]:
-
                 dckName = cP[core]["cmd"].split("\\")[-1].split(" ")[0]
                 if trackingFile != None:
                     with open(trackingFile, "r") as file:
@@ -213,11 +208,8 @@ def runParallel(
             # if process is finished, assign new command:
 
             if p:
-
                 if done(p):
-
                     if success(p):
-
                         if outputFile != False:
                             #                        lines = "Finished simulated case %d\n"%(k,p.stdout.read(),p.stderr.read())
 
@@ -374,7 +366,6 @@ def runParallel(
         #
 
         if all(process == 0 for process in activeP) and not openCmds:
-
             #        if not processes and not newCmds:
             break
         else:
@@ -382,7 +373,6 @@ def runParallel(
 
 
 def sortCommandList(cmds, keyWord):
-
     """
     function to put all commands that contain a keyWord string on top of a command list, so they will be evaluated first.
 

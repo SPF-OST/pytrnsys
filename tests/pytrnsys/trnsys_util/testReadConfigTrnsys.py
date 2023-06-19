@@ -32,7 +32,9 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
             r'string pathToConnectionInfo "C:\Users\epic.user\EpicSimulation\DdckPlaceHolderValues.json"',
         ]
     elif _isRelativePath(basePath):
-        lines += [f"string pathToConnectionInfo \"{_os.path.join(basePath, 'DdckPlaceHolderValues.json')}\"", ]
+        lines += [
+            f"string pathToConnectionInfo \"{_os.path.join(basePath, 'DdckPlaceHolderValues.json')}\"",
+        ]
 
     lines += [
         "bool doAutoUnitNumbering True",
@@ -44,7 +46,9 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
             r'string PROJECT$ "C:\Users\epic.user\EpicSimulation\ddck"',
         ]
     elif _isRelativePath(basePath):
-        lines += [f"string PROJECT$ \"{_os.path.join(basePath, 'ddck')}\"", ]
+        lines += [
+            f"string PROJECT$ \"{_os.path.join(basePath, 'ddck')}\"",
+        ]
 
     lines += [
         r'string trnsysExePath "C:\Trnsys18\Exe\TRNExe.exe"',
@@ -55,7 +59,9 @@ def _getRunLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
             r'string projectPath "C:\Users\epic.user\EpicSimulation"',
         ]
     elif _isRelativePath(basePath):
-        lines += [f"string projectPath \"{basePath}\"", ]
+        lines += [
+            f'string projectPath "{basePath}"',
+        ]
 
     lines += [
         'string nameRef "DoublePipeDebug"',
@@ -106,7 +112,7 @@ def _getProcessLines(basePath: _tp.Optional[_pl.Path]) -> _tp.Sequence[str]:
             r'string pathBase "C:\Users\epic.user\EpicSimulation"',
         ]
     elif _isRelativePath(basePath):
-        lines += [f"string pathBase \"{basePath}\""]
+        lines += [f'string pathBase "{basePath}"']
 
     lines += [r'string dllTrnsysPath "C:\Trnsys18\UserLib\ReleaseDlls"', 'stringArray plotHourly "TInQSrc1"']
     if basePath and not _isRelativePath(basePath):

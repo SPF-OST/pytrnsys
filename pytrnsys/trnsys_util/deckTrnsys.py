@@ -25,7 +25,6 @@ class DeckTrnsys:
     """
 
     def __init__(self, _path, _name):
-
         self.extensionDeck = "dck"
 
         self.setPathAndNames(_path, _name)
@@ -46,11 +45,9 @@ class DeckTrnsys:
         self.packageNameTrnsysFiles = "None"
 
     def setPackageNameTrnsysFiles(self, name):
-
         self.packageNameTrnsysFiles = name
 
     def setPathAndNames(self, _path, _name):
-
         self.fileName = _name  # _name.split('.')[0]
         self.path = _path
         self.nameDck = self.path + "\%s.%s" % (_name, self.extensionDeck)
@@ -67,7 +64,6 @@ class DeckTrnsys:
         self.eliminateComments = comment
 
     def changeNameOfDeck(self, newName):
-
         self.nameDck = self.path + "\%s.%s" % (newName, self.extensionDeck)
         self.pathOutput = self.path + "\%s" % newName
         self.titleOfLatex = "%s" % newName
@@ -78,7 +74,6 @@ class DeckTrnsys:
             self.filesOutputPath = self.pathOutput
 
     def createDeckBackUp(self):
-
         nameDeckBck = "%s-bck" % self.nameDck
         shutil.copy(self.nameDck, nameDeckBck)
 
@@ -93,7 +88,6 @@ class DeckTrnsys:
         """
 
         if useDeckName == False:
-
             if useDeckOutputPath == True:
                 nameDck = self.nameDckPathOutput
             else:
@@ -114,7 +108,6 @@ class DeckTrnsys:
         return lines
 
     def writeDeck(self):
-
         tempName = "%s" % self.nameDck
         print("tempName:%s" % tempName)
         tempFile = open(tempName, "w")
@@ -134,7 +127,6 @@ class DeckTrnsys:
                     splitPath = splitBlank[1].split("\\")
                     lineChanged = False
                     for j in range(len(splitPath)):
-
                         if splitPath[j] in inputsDict.keys():
                             name = os.path.join(
                                 *splitPath[j + 1 :]
@@ -170,7 +162,6 @@ class DeckTrnsys:
                 pass
 
     def ignoreOnlinePlotter(self):
-
         jBegin = 0
         jEnd = 0
         found = False
@@ -178,7 +169,6 @@ class DeckTrnsys:
         plotterFound = 0
 
         for i in range(len(self.linesDeck)):
-
             splitBlank = self.linesDeck[i].split()
 
             #            if(jBegin>0 and i>jBegin+30):
@@ -188,11 +178,9 @@ class DeckTrnsys:
 
             if found == True:
                 try:
-
                     #                  print splitBlank[0].replace(" ","").lower()
 
                     if splitBlank[0].replace(" ", "").lower() == "LABELS".lower():
-
                         nLabelString = splitBlank[1].replace(" ", "")
                         nLabel = int(nLabelString)
 
@@ -241,7 +229,6 @@ class DeckTrnsys:
         return None
 
     def getVariables(self):
-
         self.eliminateComments = (
             True  # BE CAREFUL, THIS CAN CHANGE  [30,1] by [301] so it does not WORK !!!! DC: Is this updated?
         )
@@ -251,7 +238,6 @@ class DeckTrnsys:
         self.variablesResults = []
 
         for i in range(len(self.linesDeck)):
-
             splitEquality = self.linesDeck[i].split("=")
             try:
                 myName = splitEquality[0].replace(" ", "")
@@ -267,7 +253,6 @@ class DeckTrnsys:
 
         lines = ""
         for name in self.variablesNames:
-
             count = 0
             resFound = ""
             for res in self.variablesResults:
@@ -288,7 +273,6 @@ class DeckTrnsys:
         outfile.close()
 
     def changeParameter(self, _parameters):
-
         lines = self.linesDeck
 
         #         print "linesDeck"
@@ -297,11 +281,9 @@ class DeckTrnsys:
         #         print _parameters
 
         if _parameters != None:
-
             self.parameters = _parameters
 
             for i in range(len(lines)):
-
                 splitEquality = lines[i].split("=")
                 splitBlank = lines[i].split()
 
@@ -314,7 +296,6 @@ class DeckTrnsys:
 
                 try:
                     if splitBlank[0] == "ASSIGN":
-
                         #                         print "Im IN %s %s %s " % (splitBlank[0],splitBlank[1],splitBlank[2])
 
                         fileNameWithoutCommas = splitBlank[1].replace('"', "")
@@ -377,9 +358,7 @@ class DeckTrnsys:
                         #                             print "lineChanged-0 : %s pathOut:%s nameSplied:%s" % (self.linesDeck[i],self.pathOutput,nameSplited[1])
 
                         except:
-
                             if nameSplited[0] == "Temp_zone.BAL" or nameSplited[0] == "Energy_zone.BAL":
-
                                 myFileInNewPath = self.filesOutputPath + "\\" + nameSplited[0]
                                 lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
                 #                                 print "lineChanged-1 : %s pathOut:%s nameSplited:%s" % (self.linesDeck[i],self.pathOutput,nameSplited[0])
@@ -399,7 +378,6 @@ class DeckTrnsys:
                     #                     print myName,value
 
                     for key in self.parameters.keys():
-
                         # print ("IN TRY key:%s"%key)
 
                         #                         myName = string.replace(name," ","")
@@ -428,25 +406,19 @@ class DeckTrnsys:
     def changeAssignStatementsBasedOnUnitVariables(
         self, newAssignStatements: tp.Sequence[_ras.AssignStatement]
     ) -> None:
-
         originalDeckContent = "".join(self.linesDeck)
-        updatedDeckContent = _ras.replaceAssignStatementsBasedOnUnitVariables(
-            originalDeckContent, newAssignStatements
-        )
+        updatedDeckContent = _ras.replaceAssignStatementsBasedOnUnitVariables(originalDeckContent, newAssignStatements)
 
         deckFilePath = pl.Path(self.nameDck)
         deckFilePath.write_text(updatedDeckContent)
 
     def getTypeFromUnit(self, myUnit):
-
         return deckUtils.getTypeFromUnit(myUnit, self.linesDeck)
 
     def getDataFromDeck(self, myName, typeValue="double"):
-
         return deckUtils.getDataFromDeck(self.linesDeck, myName, typeValue=typeValue)
 
     def getAllDataFromDeck(self):
-
         linesDeck = self.linesDeck
 
         self.deckVariables = {}
@@ -466,7 +438,6 @@ class DeckTrnsys:
                         float(value)
                 except:
                     if "[" not in line:
-
                         parts = re.split(r"[*/+-]", value.replace(r"(", "").replace(r")", ""))
                         for part1 in parts:
                             reValue = self.getDataFromDeckRecursively(part1, linesDeck)
