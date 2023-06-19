@@ -206,7 +206,7 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         cmd = [
             _SCRIPTS_DIR / "pytest",
             "-v",
-            "--cov=trnsysGUI",
+            "--cov=pytrnsys",
             f"--cov-report=html:{testResultsDirPath / 'coverage-html'}",
             f"--cov-report=lcov:{testResultsDirPath / 'coverage.lcov'}",
             "--cov-report=term",
