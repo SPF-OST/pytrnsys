@@ -152,7 +152,7 @@ EQUATIONS 4
         result = _rtph.replaceTokensInString(
             inputContent,
             componentName,
-            computedNamesByPort=dict(),
+            computedNamesByPort={},
         )
 
         assert not _res.isError(result)
