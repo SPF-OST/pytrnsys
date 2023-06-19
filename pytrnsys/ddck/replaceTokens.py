@@ -1,5 +1,6 @@
 import abc as _abc
 import dataclasses as _dc
+import enum as _enum
 import functools as _ft
 import pathlib as _pl
 import typing as _tp
@@ -71,7 +72,35 @@ class _PrivateVariable(_Token):
     name: str
 
 
-def _createComputedVariable(tree, portProperty):
+class _EnergyDirection(_enum.Enum):
+    IN = "In"
+    OUT = "Out"
+
+
+_TERMINAL_TO_ENERGY_DIRECTION = {"in": _EnergyDirection.IN, "out": _EnergyDirection.OUT}
+
+
+class _EnergyQuality(_enum.Enum):
+    HEAT = "q"
+    ELECTRICITY = "el"
+
+
+_TERMINAL_TO_ENERGY_QUALITY = {"heat": _EnergyQuality.HEAT, "el": _EnergyQuality.ELECTRICITY}
+
+
+@_dc.dataclass
+class _ComputedEnergyVariable(_Token):
+    direction: _EnergyDirection
+    quality: _EnergyQuality
+    category: str
+    subCategories: _tp.Sequence[str]
+
+    def __post_init__(self):
+        if any(":" in sc for sc in self.subCategories):
+            raise ValueError("""Sub-categories mustn't contain ":".""")
+
+
+def _createComputedVariable(tree: _lark.Tree, portProperty: str) -> _ComputedVariable:
     portName = _getChildTokenValue("PORT_NAME", tree)
     defaultVariableName = _getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", tree)
     computedVariable = _ComputedVariable(
@@ -87,14 +116,34 @@ def _createComputedVariable(tree, portProperty):
 
 
 class _CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
-    def __init__(self):
-        self.computedVariables: list[_ComputedVariable] = []
+    def __init__(self) -> None:
         self.privateVariables: list[_PrivateVariable] = []
+        self.computedHydraulicVariables: list[_ComputedVariable] = []
+        self.computedEnergyVariables: list[_ComputedEnergyVariable] = []
 
     def computed_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         propertyName = _getChildTokenValue("PORT_PROPERTY", tree)
         computedVariable = _createComputedVariable(tree, propertyName)
-        self.computedVariables.append(computedVariable)
+        self.computedHydraulicVariables.append(computedVariable)
+
+    def computed_output_energy_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
+        direction = _getChildTokenValue("ENERGY_DIRECTION", tree)
+        quality = _getChildTokenValue("ENERGY_QUALITY", tree)
+        categoryOrLocal = _getChildTokenValue("CATEGORY_OR_LOCAL", tree)
+        categories = _getChildTokenValues("CATEGORY", tree)
+
+        computedEnergyVariable = _ComputedEnergyVariable(
+            tree.meta.line,
+            tree.meta.column,
+            tree.meta.start_pos,
+            tree.meta.end_pos,
+            _TERMINAL_TO_ENERGY_DIRECTION[direction],
+            _TERMINAL_TO_ENERGY_QUALITY[quality],
+            categoryOrLocal,
+            categories,
+        )
+
+        self.computedEnergyVariables.append(computedEnergyVariable)
 
     def private_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         name = _getChildTokenValue("NAME", tree)
@@ -105,13 +154,13 @@ class _CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
 
 class _WithPlaceholdersJSONCollectTokensVisitor(_CollectTokensVisitorBase):
-    def computed_output_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
+    def computed_output_temp_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         computedVariable = _createComputedVariable(tree, "@temp")
-        self.computedVariables.append(computedVariable)
+        self.computedHydraulicVariables.append(computedVariable)
 
 
 class _WithoutPlaceholdersJSONCollectTokensVisitor(_CollectTokensVisitorBase):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.outputVariableAssignmentsToRemove: list[_OutputVariableAssignment] = []
@@ -122,7 +171,7 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(_CollectTokensVisitorBase):
         equationsVisitor = _WithoutPlaceholdersJSONCollectEquationsTokensVisitor()
         equationsVisitor.visit(tree)
 
-        self.computedVariables.extend(equationsVisitor.outputVariablesWithDefault)
+        self.computedHydraulicVariables.extend(equationsVisitor.outputVariablesWithDefault)
 
         assignments = equationsVisitor.outputVariableWithoutDefaultAssignments
         if not assignments:
@@ -155,7 +204,7 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(_CollectTokensVisitorBase):
 
 
 class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(_lvis.Visitor_Recursive):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.outputVariablesWithDefault: list[_ComputedVariable] = []
         self.outputVariableWithoutDefaultAssignments: list[_OutputVariableAssignment] = []
@@ -191,18 +240,20 @@ def _getChildTokenValue(tokenType: str, tree: _lark.Tree) -> str:
 
 
 def _getChildTokenValueOrNone(tokenType: str, tree: _lark.Tree) -> _tp.Optional[str]:
-    matchingChildTokens = [c for c in tree.children if isinstance(c, _lark.Token) and c.type == tokenType]
+    values = _getChildTokenValues(tokenType, tree)
 
-    nMatches = len(matchingChildTokens)
-    if nMatches == 0:
+    nValues = len(values)
+    if nValues == 0:
         return None
 
-    if nMatches > 1:
+    if nValues > 1:
         raise ValueError(f"More than one token of type {tokenType} found.")
 
-    matchingChildToken = matchingChildTokens[0]
+    return values[0]
 
-    return matchingChildToken.value
+
+def _getChildTokenValues(tokenType: str, tree: _lark.Tree) -> _tp.Sequence[str]:
+    return [c.value for c in tree.children if isinstance(c, _lark.Token) and c.type == tokenType]
 
 
 def _getSubtree(treeData: str, tree: _lark.Tree) -> _lark.Tree:
@@ -214,7 +265,7 @@ def _getSubtree(treeData: str, tree: _lark.Tree) -> _lark.Tree:
     return subtrees[0]
 
 
-def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
+def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path, componentName: str) -> _res.Result[str]:
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
     result = _parse.parseDdck(inputDdckContent)
@@ -226,7 +277,7 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
     visitor = _WithoutPlaceholdersJSONCollectTokensVisitor()
     visitor.visit(tree)
 
-    replacementsResult = _getDefaultReplacements(visitor)
+    replacementsResult = _getDefaultReplacements(visitor, componentName)
     if _res.isError(replacementsResult):
         moreSpecificError = _res.error(replacementsResult).withContext(
             f"An error occurred while substituting the defaults for the placeholders in file {inputDdckFilePath.name}"
@@ -236,7 +287,8 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
 
     tokens = [
         *visitor.privateVariables,
-        *visitor.computedVariables,
+        *visitor.computedHydraulicVariables,
+        *visitor.computedEnergyVariables,
         *visitor.outputVariableAssignmentsToRemove,
         *visitor.equationsCountersToAdjust,
         *visitor.equationsBlocksToRemove,
@@ -247,10 +299,12 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path) -> _res.Result[str]:
     return outputDdckContent
 
 
-def _getDefaultReplacements(visitor: _WithoutPlaceholdersJSONCollectTokensVisitor) -> _res.Result[_tp.Sequence[str]]:
-    defaultNamesForPrivateVariables = [v.name for v in visitor.privateVariables]
+def _getDefaultReplacements(
+    visitor: _WithoutPlaceholdersJSONCollectTokensVisitor, componentName: str
+) -> _res.Result[_tp.Sequence[str]]:
+    privateNames = _getPrivateNames(visitor.privateVariables, componentName)
 
-    computedVariablesWithoutDefaultName = [v for v in visitor.computedVariables if not v.defaultVariableName]
+    computedVariablesWithoutDefaultName = [v for v in visitor.computedHydraulicVariables if not v.defaultVariableName]
     if any(computedVariablesWithoutDefaultName):
         formattedLocations = "\n".join(f"\t{v.startLine}:{v.startColumn}" for v in computedVariablesWithoutDefaultName)
         errorMessage = (
@@ -259,7 +313,11 @@ def _getDefaultReplacements(visitor: _WithoutPlaceholdersJSONCollectTokensVisito
             f"{formattedLocations}\n"
         )
         return _res.Error(errorMessage)
-    defaultNamesForComputedVariables = [_tp.cast(str, v.defaultVariableName) for v in visitor.computedVariables]
+    defaultNamesForComputedVariables = [
+        _tp.cast(str, v.defaultVariableName) for v in visitor.computedHydraulicVariables
+    ]
+
+    computedEnergyNames = _getComputedEnergyNames(visitor.computedEnergyVariables, componentName)
 
     emptyReplacementTextsForOutputVariableAssignments = [
         f"! Assignment to temperature at `{a.portName}` removed by pytrnsys"
@@ -275,8 +333,9 @@ def _getDefaultReplacements(visitor: _WithoutPlaceholdersJSONCollectTokensVisito
     ]
 
     replacements = [
-        *defaultNamesForPrivateVariables,
+        *privateNames,
         *defaultNamesForComputedVariables,
+        *computedEnergyNames,
         *emptyReplacementTextsForOutputVariableAssignments,
         *adjustedEquationsCounters,
         *emptyReplacementTextForEquationsBlocksToRemove,
@@ -293,35 +352,62 @@ def replaceTokens(
 
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
-    treeResult = _parse.parseDdck(inputDdckContent)
+    return replaceTokensInString(inputDdckContent, componentName, computedNamesByPort, inputDdckFilePath)
+
+
+def replaceTokensInString(  # pylint: disable=too-many-locals
+    content: str,
+    componentName: str,
+    computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]],
+    inputDdckFilePath: _tp.Optional[_pl.Path] = None,
+) -> _res.Result[str]:
+    treeResult = _parse.parseDdck(content)
     if _res.isError(treeResult):
+        error = _res.error(inputDdckFilePath)
+
+        if not inputDdckFilePath:
+            return error
+
         moreSpecificError = _res.error(treeResult).withContext(
             f"An error was found in ddck file {inputDdckFilePath.name}"
         )
+
         return moreSpecificError
     tree = _res.value(treeResult)
 
     visitor = _WithPlaceholdersJSONCollectTokensVisitor()
     visitor.visit(tree)
 
-    privateNames = [f"{componentName}{v.name}" for v in visitor.privateVariables]
-    computedNamesResult = _getComputedNames(visitor.computedVariables, computedNamesByPort)
-    if _res.isError(computedNamesResult):
-        error = _res.error(computedNamesResult).withContext(
-            f"Error replacing placeholders in file {inputDdckFilePath.name}"
-        )
+    privateNames = _getPrivateNames(visitor.privateVariables, componentName)
+
+    computedHydraulicNamesResult = _getComputedHydraulicNames(visitor.computedHydraulicVariables, computedNamesByPort)
+    if _res.isError(computedHydraulicNamesResult):
+        if inputDdckFilePath:
+            contextMessage = f"Error replacing placeholders in file {inputDdckFilePath.name}"
+        else:
+            contextMessage = "Error replacing placeholders"
+
+        error = _res.error(computedHydraulicNamesResult).withContext(contextMessage)
+
         return error
-    computedNames = _res.value(computedNamesResult)
+    computedHydraulicNames = _res.value(computedHydraulicNamesResult)
 
-    tokens = [*visitor.privateVariables, *visitor.computedVariables]
-    replacements = [*privateNames, *computedNames]
+    computedEnergyNames = _getComputedEnergyNames(visitor.computedEnergyVariables, componentName)
 
-    outputDdckContent = _replaceTokensWithReplacements(inputDdckContent, tokens, replacements)
+    tokens = [*visitor.privateVariables, *visitor.computedHydraulicVariables, *visitor.computedEnergyVariables]
+    replacements = [*privateNames, *computedHydraulicNames, *computedEnergyNames]
+
+    outputDdckContent = _replaceTokensWithReplacements(content, tokens, replacements)
 
     return outputDdckContent
 
 
-def _getComputedNames(
+def _getPrivateNames(privateVariables: _tp.Sequence[_PrivateVariable], componentName: str) -> _tp.Sequence[str]:
+    privateNames = [f"{componentName}{v.name}" for v in privateVariables]
+    return privateNames
+
+
+def _getComputedHydraulicNames(
     computedVariables: _tp.Sequence[_ComputedVariable], computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]]
 ) -> _res.Result[_tp.Sequence[str]]:
     computedNames = []
@@ -341,9 +427,38 @@ def _getComputedNames(
     return computedNames
 
 
+def _getComputedEnergyNames(
+    computedEnergyVariables: _tp.Sequence[_ComputedEnergyVariable], componentName: str
+) -> _tp.Sequence[str]:
+    return [_getComputedEnergyName(v, componentName) for v in computedEnergyVariables]
+
+
+def _getComputedEnergyName(computedEnergyVariable: _ComputedEnergyVariable, componentName: str) -> str:
+    quality = computedEnergyVariable.quality.value
+
+    direction = computedEnergyVariable.direction.value
+
+    variableCategory = computedEnergyVariable.category
+    category = componentName if variableCategory == ":" else variableCategory
+
+    capitalizedSubcategories = [_capitalizeFirstLetter(c) for c in computedEnergyVariable.subCategories]
+    jointSubcategories = "".join(c for c in capitalizedSubcategories)
+
+    computedName = f"{quality}Sys{direction}_{category}{jointSubcategories}"
+
+    return computedName
+
+
+def _capitalizeFirstLetter(string: str) -> str:
+    if not string:
+        return ""
+
+    return f"{string[0].upper()}{string[1:]}"
+
+
 def _replaceTokensWithReplacements(
     inputDdckContent: str, tokens: _tp.Sequence[_Token], replacements: _tp.Sequence[str]
-):
+) -> str:
     sortedTokens, sortedReplacements = _getSortedTokensAndReplacements(tokens, replacements)
     sortedTokensWithoutCovers, sortedReplacementsWithoutCovers = _removeCoveredTokens(sortedTokens, sortedReplacements)
     outputDdckContent = _replaceSortedNonOverlappingTokens(

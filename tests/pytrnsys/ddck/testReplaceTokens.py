@@ -73,13 +73,13 @@ class TestReplaceTokens:
     def testReplaceTokensWithDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input.ddck"
         expectedDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_expected.ddck"
-        actualDdckContent = _replace.replaceTokensWithDefaults(inputDdckFilePath)
+        actualDdckContent = _replace.replaceTokensWithDefaults(inputDdckFilePath, componentName="IGNORED")
         assert actualDdckContent == expectedDdckFilePath.read_text()
 
     @staticmethod
     def testReplaceTokensWithDefaultsMissingInputVariableDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input_missing_default.ddck"
-        result = _replace.replaceTokensWithDefaults(inputDdckFilePath)
+        result = _replace.replaceTokensWithDefaults(inputDdckFilePath, componentName="IGNORED")
         assert _res.isError(result)
         error = _res.error(result)
         print(error.message)
@@ -110,7 +110,7 @@ No default values were provided for the computed variables at the following loca
         assert ddckFile.actual.read_text() == ddckFile.expected.read_text(encoding="windows-1252")
 
     @staticmethod
-    def testReplaceTokens():
+    def testReplaceComputedVariables():
         type861DirPath = _REPLACE_WITH_NAMES_DATA_DIR / "type861"
         inputDdckFilePath = type861DirPath / "input.ddck"
 
@@ -132,6 +132,46 @@ No default values were provided for the computed variables at the following loca
         print(value)
         expectedOutputDdckFilePath = type861DirPath / "expected_output.ddck"
         assert value == expectedOutputDdckFilePath.read_text(encoding="utf8")
+
+    @staticmethod
+    def testReplaceEnergyVariables():
+        componentName = "QSnk60"
+        inputContent = """\
+******************************************************************************************
+** outputs to energy balance in kW
+******************************************************************************************
+EQUATIONS 4
+@energy(in, el, :, hp, comp) = :PelAuxComp_kW
+@energy(out, heat, :, demand) = :P
+@energy(out, heat, :, tess, loss) = :dQlossTess
+@energy(out, heat, :, tess, acum) = :dQ
+*********************************
+"""
+
+        result = _replace.replaceTokensInString(
+            inputContent,
+            componentName,
+            computedNamesByPort=dict(),
+        )
+
+        assert not _res.isError(result)
+
+        actualOutput = _res.value(result)
+        print(actualOutput)
+
+        expectedOutput = """\
+******************************************************************************************
+** outputs to energy balance in kW
+******************************************************************************************
+EQUATIONS 4
+elSysIn_QSnk60HpComp = QSnk60PelAuxComp_kW
+qSysOut_QSnk60Demand = QSnk60P
+qSysOut_QSnk60TessLoss = QSnk60dQlossTess
+qSysOut_QSnk60TessAcum = QSnk60dQ
+*********************************
+"""
+
+        assert actualOutput == expectedOutput
 
     @staticmethod
     def testReplaceTokensNonexistentPort() -> None:

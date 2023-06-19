@@ -90,7 +90,7 @@ class BuildTrnsysDeck:
 
     def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path, componentName: str) -> _res.Result[str]:
         if not self._ddckPlaceHolderValuesJsonPath:
-            return _replace.replaceTokensWithDefaults(ddckFilePath)
+            return _replace.replaceTokensWithDefaults(ddckFilePath, componentName)
 
         if not self._ddckPlaceHolderValuesJsonPath.is_file():
             return _res.Error(
