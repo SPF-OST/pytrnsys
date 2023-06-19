@@ -22,13 +22,13 @@ def replaceAssignStatementsBasedOnUnitVariables(
     if not newAssignStatements:
         return originalDeckContent
 
-    statementsByCaseFoldedName = {s.unitVariableName.casefold(): s for s in newAssignStatements}
+    newStatementsByCaseFoldedName = {s.unitVariableName.casefold(): s for s in newAssignStatements}
 
     unprocessedDeckContent = _io.StringIO(originalDeckContent)
     updatedDeckContent = _io.StringIO()
     for match in _CHANGE_ASSIGN_STATEMENT_PATTERN.finditer(originalDeckContent):
         _replaceAssignStatementBasedOnUnitVariable(
-            match, assignmentStatement, unprocessedDeckContent, updatedDeckContent
+            match, unprocessedDeckContent, updatedDeckContent, newStatementsByCaseFoldedName
         )
 
     unchangedPartBetweenLastAssignIfAnyAndEnd = unprocessedDeckContent.read()
@@ -42,12 +42,12 @@ def _replaceAssignStatementBasedOnUnitVariable(
     match: _re.Match,
     unprocessedDeckContent: _io.StringIO,
     updatedDeckContent: _io.StringIO,
-    statementsByCaseFoldedName: _tp.Mapping[str, AssignStatement],
+    newStatementsByCaseFoldedName: _tp.Mapping[str, AssignStatement],
 ) -> None:
     unitVariableName = match.group(_UNIT_VARIABLE_GROUP_NAME)
 
     caseFoldedName = unitVariableName.casefold()
-    newAssignStatement = statementsByCaseFoldedName.get(caseFoldedName)
+    newAssignStatement = newStatementsByCaseFoldedName.get(caseFoldedName)
 
     currentMatchStart = match.start()
     unchangedPartBetweenLastAndCurrentAssign = unprocessedDeckContent.read(currentMatchStart)

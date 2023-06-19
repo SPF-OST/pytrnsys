@@ -5,7 +5,8 @@ import typing as _tp
 
 import pytest as _pt
 
-import pytrnsys.ddck.replaceTokens as _replace
+import pytrnsys.ddck.replaceTokens.placeholders as _rtph
+import pytrnsys.ddck.replaceTokens.withoutPlaceholders as _rtwph
 import pytrnsys.utils.result as _res
 
 _REPLACE_WITH_DEFAULTS_DATA_DIR = _pl.Path(__file__).parent / "defaults"
@@ -73,13 +74,13 @@ class TestReplaceTokens:
     def testReplaceTokensWithDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input.ddck"
         expectedDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_expected.ddck"
-        actualDdckContent = _replace.replaceTokensWithDefaults(inputDdckFilePath, componentName="IGNORED")
+        actualDdckContent = _rtwph.replaceTokensWithDefaults(inputDdckFilePath, componentName="IGNORED")
         assert actualDdckContent == expectedDdckFilePath.read_text()
 
     @staticmethod
     def testReplaceTokensWithDefaultsMissingInputVariableDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input_missing_default.ddck"
-        result = _replace.replaceTokensWithDefaults(inputDdckFilePath, componentName="IGNORED")
+        result = _rtwph.replaceTokensWithDefaults(inputDdckFilePath, componentName="IGNORED")
         assert _res.isError(result)
         error = _res.error(result)
         print(error.message)
@@ -100,7 +101,7 @@ No default values were provided for the computed variables at the following loca
 
         names = ddckPlaceHolderValues.get(ddckFile.componentName) or {}
 
-        result = _replace.replaceTokens(ddckFile.input, ddckFile.componentName, names)
+        result = _rtph.replaceTokens(ddckFile.input, ddckFile.componentName, names)
         _res.throwIfError(result)
         actualDdckContent = _res.value(result)
 
@@ -120,7 +121,7 @@ No default values were provided for the computed variables at the following loca
             "Out": {"@temp": "TOut", "@revtemp": "TOutRev"},
         }
 
-        result = _replace.replaceTokens(
+        result = _rtph.replaceTokens(
             inputDdckFilePath,
             componentName,
             computedNamesByPort,
@@ -148,7 +149,7 @@ EQUATIONS 4
 *********************************
 """
 
-        result = _replace.replaceTokensInString(
+        result = _rtph.replaceTokensInString(
             inputContent,
             componentName,
             computedNamesByPort=dict(),
@@ -179,7 +180,7 @@ qSysOut_QSnk60TessAcum = QSnk60dQ
         componentName = "Ghx"
         computedNamesByPort = {"In": {"@temp": "TFoo", "@Mfr": "MBar"}, "Out": {"@temp": "TGhx"}}
 
-        result = _replace.replaceTokens(
+        result = _rtph.replaceTokens(
             inputDdckFilePath,
             componentName,
             computedNamesByPort,

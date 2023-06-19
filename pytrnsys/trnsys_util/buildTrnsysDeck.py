@@ -16,7 +16,8 @@ import tkinter as tk
 import typing as _tp
 from tkinter import messagebox as tkMessageBox
 
-import pytrnsys.ddck.replaceTokens as _replace
+import pytrnsys.ddck.replaceTokens.placeholders as _rtph
+import pytrnsys.ddck.replaceTokens.withoutPlaceholders as _rtwph
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deck
 import pytrnsys.trnsys_util.deckUtils as deckUtils
@@ -89,7 +90,7 @@ class BuildTrnsysDeck:
 
     def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path, componentName: str) -> _res.Result[str]:
         if not self._ddckPlaceHolderValuesJsonPath:
-            return _replace.replaceTokensWithDefaults(ddckFilePath, componentName)
+            return _rtwph.replaceTokensWithDefaults(ddckFilePath, componentName)
 
         if not self._ddckPlaceHolderValuesJsonPath.is_file():
             return _res.Error(
@@ -104,7 +105,7 @@ class BuildTrnsysDeck:
             )
 
         computedNamesByPort = placeholderValues.get(componentName, dict())
-        result = _replace.replaceTokens(ddckFilePath, componentName, computedNamesByPort)
+        result = _rtph.replaceTokens(ddckFilePath, componentName, computedNamesByPort)
 
         if _res.isError(result):
             return _res.error(result)
