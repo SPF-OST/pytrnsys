@@ -74,6 +74,10 @@ nightSetBack = NIX
 TScSetWW = 0.
 TScSetRH = 0.	 
 dTdbHS = 1 ! heating season stops when outdoor temp. rises above TstartHS + dTdbHS
+
+** CONSTANTS 1
+** factorCircToSh = 0.5 !How much of circulation losses go to SH
+
 **BoSH=LT(TsensorTesSh,45)
 **BoWW=GT(TwwStAuxON+5,TsensorTesDhw)     
 
@@ -140,7 +144,7 @@ TsensorTesSh    ! 6: TrhStUp:upper temperature measured for room heating (on)
 TretSHtype888    ! 7 : THpsCondIn    11: TrhStLo: lower temperature measured for room heating (off)
 dt_rh_on    ! 8: TrhON: temperature (difference) for room heating on
 dt_rh_off   ! 9: TrhOFF: temperature (difference) for room heating off
-tRoomSet    ! 10: TroomSet: room set-point for heating curve calculation
+Tsp    ! 10: Tsp: room set-point for heating curve calculation
 Tamb24      ! 11: Tamb: is used for flow temperature calculation according to heating curve
 nightSetBack ! 12: dTnight: night-time room set-point reduction
 TScSetWW     ! 13: TScSetWW: Set-point temperature for the heat source in warm water mode. Absolute value in �C if temperature setpoint mode for warm water MoTww = 1, relative value in K if MoTww = 2 or 3
@@ -158,8 +162,7 @@ INPUTS 1
 Tamb     ! T_ambient
 *** INITIAL INPUT VALUES     
 21     
-EQUATIONS 1     
-Tamb24 = [4,1]      ! 24h average of Tamb, �C
+
 
 CONSTANTS 1
 addPrinterType888 = 1  ! -1: removing , 1 : add
@@ -179,11 +182,11 @@ addPrinterType888     ! 9 Shut off Online w/o removing
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 20     
-TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn HpIsBlock Nix  Nix Nix
-HpForDHWIsNeeded HpForSHIsNeeded BoHS Nix Nix  tScSet TSetSh TRdSet Nix Nix
+TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn HpIsBlock BlockHp  Nix Nix
+HpForDHWIsNeeded HpForSHIsNeeded BoHS auxStoreDHWIsOn auxStoreSHIsOn  tScSet TSetSh TRdSet Nix Nix
 **
-TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn HpIsBlock Nix  Nix Nix
-HpForDHWIsNeeded HpForSHIsNeeded BoHs Nix Nix tScSet TSetSh TRdSet Nix Nix
+TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn HpIsBlock BlockHp  Nix Nix
+HpForDHWIsNeeded HpForSHIsNeeded BoHs auxStoreDHWIsOn auxStoreSHIsOn tScSet TSetSh TRdSet Nix Nix
 LABELS  3     
 Temperatures     
 Boolean     
