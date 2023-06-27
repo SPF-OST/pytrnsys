@@ -1,0 +1,33 @@
+*******************************
+**BEGIN fixed_efficiency_Inverter.dck
+*******************************
+
+
+*****************************************
+** Contact person : Dani Carbonell    
+** Creation date  : 01.08.19
+** Last changes   : 27.06.2023 Jeremias Schmidli - Adapted from fronius_symo_inverter.ddck
+*****************************************
+
+***************************************************************************
+** Description: 
+** inverter database ddck - this is a dummy ddck to be used for a constant efficiency of the inverter, in case there is PV and a Battery in the system.
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** None
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None
+CONSTANTS 1
+unitReadInvPv=124
+
+CONSTANTS 3
+PvMaxPInv = 12500
+PvMaxVInv = 1000
+PvMinVInv = 200
+
+ASSIGN PATH$\pv\type194\database\fixed_efficiency_Inverter_95.dat unitReadInvPv

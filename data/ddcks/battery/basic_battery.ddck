@@ -61,7 +61,7 @@ PelFuelCell_kW = 0
 PelFuelCellToBat_kW = 0
 PelFuelCellToBui_kW = 0
 
-CONSTANTS 14   ! Battery
+CONSTANTS 13   ! Battery
 minElBatFactor = 0.02
 CapBatMaxT0_kWh = 50    !kWh, Maximale Batteriekapazität zur Zeit 0 [kWh]
 maxBatteryPower_kW = CapBatMaxT0_kWh * 12./50.    !kW, Maximum battery charging power [kW]
@@ -72,11 +72,11 @@ PelBatStandby_kW = 0.005   !kW, Standbyverluste + Reglerverbrauch Batterie
 CapBatMax_kWh = CapBatMaxT0_kWh    !kW, Zeitabhängige Batteriekapazität [kWh]
 FrBatSOCmin = 0.1    !0-1, Minimaler Ladeanteil der Batterie
 SocBatMin_kWh = FrBatSOCmin*CapBatMax_kWh    !kWh, Minimale Ladekapazität der Batterie
-batInvEffDCAC = 0.96
+** batInvEffDCAC = 0.96
 batInvEffDCDC = 0.98
-frBatWRloss = 0.025 !0.08 ! 0.025 leads to a roundtrip efficiency of 0.95 (more realistic according to BAME)
+frBatWRloss = 0.025 ! 0.025 leads to a roundtrip efficiency of 0.95 (more realistic according to BAME), 0.08 includes both the (dis)charging efficiency (about 97.5% one way) as well as the ACDCInverter efficiency (about 95% one way).
 effBatDischarge = 1-frBatWRloss
-effBatCharge = 1-frBatWRloss
+effBatCharge = batInvEffDCDC*(1-frBatWRloss)
 
 **maxInverterPower = 12 !kW maximum AC from DC coming from PV or battery
 **maxELizer_kW = 4.6
@@ -220,10 +220,10 @@ unitPrinterBat_ts     ! 4 Logical unit
 -1     ! 8 Print header
 0     ! 9 Delimiter
 1     ! 10 Print labels
-INPUTS 10
-SOCBat_kWh SOCBat   PvToBat_kW  PelFromBat_kW  PelBatWRLoss_kW  PelBatLoss_kW  PelBatTimeLoss_kW  PelBatStandby_kW  PelFromBatToHH_kW PelBatToHeatSys_kW PelUsedTotal_kW
+INPUTS 11
+SOCBat_kWh SOCBat   PvToBat_kW  PelFromBat_kW  PelBatWRLoss_kW  PelBatLoss_kW  PelBatTimeLoss_kW  PelBatStandby_kW  PelFromBatToHH_kW PelBatToHeatSys_kW PelUsedTotal_kW inverterEffDCAC
 *******
-SOCBat_kWh SOCBat   PvToBat_kW  PelFromBat_kW  PelBatWRLoss_kW  PelBatLoss_kW  PelBatTimeLoss_kW  PelBatStandby_kW  PelFromBatToHH_kW PelBatToHeatSys_kW PelUsedTotal_kW
+SOCBat_kWh SOCBat   PvToBat_kW  PelFromBat_kW  PelBatWRLoss_kW  PelBatLoss_kW  PelBatTimeLoss_kW  PelBatStandby_kW  PelFromBatToHH_kW PelBatToHeatSys_kW PelUsedTotal_kW inverterEffDCAC
 
 
 
@@ -242,9 +242,9 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 8
-elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  nix  nix  SOCBat_kWh  BoBatFull  SOCBat  
+elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  inverterEffDCAC  PelFromBat_kW  SOCBat_kWh  BoBatFull  SOCBat  
 **     
-elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  nix  nix  SOCBat_kWh  BoBatFull  SOCBat 
+elSysIn_PV  PvToBatDC_kW  PelFromBat_kW  inverterEffDCAC  PelFromBat_kW  SOCBat_kWh  BoBatFull  SOCBat 
 LABELS  3    
 Pel
 SoC
