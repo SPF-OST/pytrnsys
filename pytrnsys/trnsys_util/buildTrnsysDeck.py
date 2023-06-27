@@ -318,6 +318,15 @@ class BuildTrnsysDeck:
         lines = deckUtils.addEnergyBalanceHourlyPrinter(unitId, eBalance)
         self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
 
+        unitId = self.unitId + 3
+        lines = deckUtils.addElectricityBalanceHourlyPrinter(unitId, eBalance)
+        self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
+
+        unitId = self.unitId + 4
+        lines = deckUtils.addElectricityBalanceTimestepPrinter(unitId, eBalance)
+        self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
+
+
         self.writeDeck()  # Deck rewritten with added printer
 
     def replaceLines(self, replaceList):
