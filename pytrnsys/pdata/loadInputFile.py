@@ -13,7 +13,6 @@ import numpy as np
 
 class loadInputFile:
     def __init__(self, _name):
-
         # internal data
 
         self.fileNameWithExtension = _name
@@ -31,7 +30,6 @@ class loadInputFile:
         self.doubleLine = "=============loadInputFile========================="
 
     def loadFile(self, skypChar=None, replaceChar=None, skypedLines=0, splitArgument=None, verbose=True, indexToRead=1):
-
         if verbose:
             print("%s" % self.doubleLine)
             print("Reading the file: %s " % self.fileNameWithExtension)
@@ -71,9 +69,7 @@ class loadInputFile:
         infile.close()
 
     def get(self, name, ifNotFoundEqualToZero=False):
-
         for j in range(self.numberOfVariables):
-
             #             print "j:%d nameVar:%s name:%s" % (j,self.namesVariables[j],name)
 
             if self.namesVariables[j].lower() == name.lower():
@@ -85,6 +81,5 @@ class loadInputFile:
             return None
 
     def cleanMemory(self):
-
         del self.variables
         del self.namesVariables

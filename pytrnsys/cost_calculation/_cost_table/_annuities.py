@@ -41,7 +41,8 @@ def createLines(output: _output.Output):
 
     residualCost = output.residualCost.annuity
     line = (
-        rf" & Share of Residual Value &&& & {residualCost:2.0f} /a " rf"({residualCost * 100 / output.annuity:2.0f}\%)\\"
+        rf" & Share of Residual Value &&& & {residualCost:2.0f} /a "
+        rf"({residualCost * 100 / output.annuity:2.0f}\%)\\"
     )
     lines += line + "\n"
 

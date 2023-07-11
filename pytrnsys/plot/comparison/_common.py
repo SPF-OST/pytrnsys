@@ -184,8 +184,7 @@ class Series:
 
         if not self.chunk:
             return [
-                f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.groupingValue.value})"
-                for sign in signs
+                f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.groupingValue.value})" for sign in signs
             ]
 
         return [

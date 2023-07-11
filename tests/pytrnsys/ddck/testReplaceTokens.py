@@ -5,7 +5,8 @@ import typing as _tp
 
 import pytest as _pt
 
-import pytrnsys.ddck.replaceTokens as _replace
+import pytrnsys.ddck.replaceTokens.placeholders as _rtph
+import pytrnsys.ddck.replaceTokens.withoutPlaceholders as _rtwph
 import pytrnsys.utils.result as _res
 
 _REPLACE_WITH_DEFAULTS_DATA_DIR = _pl.Path(__file__).parent / "defaults"
@@ -73,13 +74,13 @@ class TestReplaceTokens:
     def testReplaceTokensWithDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input.ddck"
         expectedDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_expected.ddck"
-        actualDdckContent = _replace.replaceTokensWithDefaults(inputDdckFilePath)
+        actualDdckContent = _rtwph.replaceTokensWithDefaults(inputDdckFilePath, componentName="IGNORED")
         assert actualDdckContent == expectedDdckFilePath.read_text()
 
     @staticmethod
     def testReplaceTokensWithDefaultsMissingInputVariableDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input_missing_default.ddck"
-        result = _replace.replaceTokensWithDefaults(inputDdckFilePath)
+        result = _rtwph.replaceTokensWithDefaults(inputDdckFilePath, componentName="IGNORED")
         assert _res.isError(result)
         error = _res.error(result)
         print(error.message)
@@ -100,7 +101,7 @@ No default values were provided for the computed variables at the following loca
 
         names = ddckPlaceHolderValues.get(ddckFile.componentName) or {}
 
-        result = _replace.replaceTokens(ddckFile.input, ddckFile.componentName, names)
+        result = _rtph.replaceTokens(ddckFile.input, ddckFile.componentName, names)
         _res.throwIfError(result)
         actualDdckContent = _res.value(result)
 
@@ -110,7 +111,7 @@ No default values were provided for the computed variables at the following loca
         assert ddckFile.actual.read_text() == ddckFile.expected.read_text(encoding="windows-1252")
 
     @staticmethod
-    def testReplaceTokens():
+    def testReplaceComputedVariables():
         type861DirPath = _REPLACE_WITH_NAMES_DATA_DIR / "type861"
         inputDdckFilePath = type861DirPath / "input.ddck"
 
@@ -120,7 +121,7 @@ No default values were provided for the computed variables at the following loca
             "Out": {"@temp": "TOut", "@revtemp": "TOutRev"},
         }
 
-        result = _replace.replaceTokens(
+        result = _rtph.replaceTokens(
             inputDdckFilePath,
             componentName,
             computedNamesByPort,
@@ -129,9 +130,48 @@ No default values were provided for the computed variables at the following loca
         assert not _res.isError(result)
 
         value = _res.value(result)
-        print(value)
+
         expectedOutputDdckFilePath = type861DirPath / "expected_output.ddck"
         assert value == expectedOutputDdckFilePath.read_text(encoding="utf8")
+
+    @staticmethod
+    def testReplaceEnergyVariables():
+        componentName = "QSnk60"
+        inputContent = """\
+******************************************************************************************
+** outputs to energy balance in kW
+******************************************************************************************
+EQUATIONS 4
+@energy(in, el, :, hp, comp) = :PelAuxComp_kW
+@energy(out, heat, :, demand) = :P
+@energy(out, heat, :, tess, loss) = :dQlossTess
+@energy(out, heat, :, tess, acum) = :dQ
+*********************************
+"""
+
+        result = _rtph.replaceTokensInString(
+            inputContent,
+            componentName,
+            computedNamesByPort={},
+        )
+
+        assert not _res.isError(result)
+
+        actualOutput = _res.value(result)
+
+        expectedOutput = """\
+******************************************************************************************
+** outputs to energy balance in kW
+******************************************************************************************
+EQUATIONS 4
+elSysIn_QSnk60HpComp = QSnk60PelAuxComp_kW
+qSysOut_QSnk60Demand = QSnk60P
+qSysOut_QSnk60TessLoss = QSnk60dQlossTess
+qSysOut_QSnk60TessAcum = QSnk60dQ
+*********************************
+"""
+
+        assert actualOutput == expectedOutput
 
     @staticmethod
     def testReplaceTokensNonexistentPort() -> None:
@@ -139,7 +179,7 @@ No default values were provided for the computed variables at the following loca
         componentName = "Ghx"
         computedNamesByPort = {"In": {"@temp": "TFoo", "@Mfr": "MBar"}, "Out": {"@temp": "TGhx"}}
 
-        result = _replace.replaceTokens(
+        result = _rtph.replaceTokens(
             inputDdckFilePath,
             componentName,
             computedNamesByPort,

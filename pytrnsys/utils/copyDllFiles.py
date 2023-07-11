@@ -7,7 +7,6 @@ from shutil import copy2
 
 
 def dllCopy():
-
     dllDestinationDirectory = "C:\\Trnsys17\\UserLib\\ReleaseDLLs"
 
     if os.path.exists(dllDestinationDirectory):

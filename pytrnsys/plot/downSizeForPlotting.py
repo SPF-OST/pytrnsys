@@ -21,7 +21,6 @@ logger = logging.getLogger("root")
 
 class DownSizeForPlotting:
     def __init__(self, _path, _name):
-
         self.name = _name.split(".")[0]
         self.path = _path
         self.fileNameWithPath = "%s\\%s" % (_path, _name)
@@ -33,7 +32,6 @@ class DownSizeForPlotting:
         self.doubleLine = "==========DownSizeExp======================="
 
     def downSize(self, timeStepOld, timeStepNew, skypedLines=0):
-
         self.timeStepOld = timeStepOld
         self.timeStepNew = timeStepNew
         self.skypLine = int(self.timeStepNew / self.timeStepOld)
@@ -52,14 +50,12 @@ class DownSizeForPlotting:
 
         count = 0
         for i in range(self.load.numberOfDataPoints):
-
             count = count + 1
             if count == self.skypLine or i == 1:
                 count = 0
                 allLine = self.load.variables.T[i][:]
 
                 if self.modifyFirstColumTime:
-
                     allLine[0] = (self.timeOld[i] + tBegin) / 3600.0
 
                 self.variablesDownSized.append(allLine)
@@ -68,7 +64,6 @@ class DownSizeForPlotting:
     #                print "TIME:%f is whole. Used for new time step data" % (self.timeOld[i])
 
     def cut(self, _timeBegin, _timeEnd, timeStepOld, timeStepNew, skypedLines=0):
-
         self.timeStepOld = timeStepOld
         self.timeStepNew = timeStepNew
         self.skypLine = int(self.timeStepNew / self.timeStepOld)
@@ -81,7 +76,6 @@ class DownSizeForPlotting:
 
         count = 0
         for i in range(self.load.numberOfDataPoints):
-
             count = count + 1
             if count == self.skypLine or i == 1:
                 count = 0
@@ -90,7 +84,6 @@ class DownSizeForPlotting:
                 self.variablesDownSized.append(allLine)
 
     def recalculateColumn(self, column, factor):
-
         for k in range(len(column)):
             for j in range(len(self.variablesDownSized[0])):
                 if j + 1 == column[k]:

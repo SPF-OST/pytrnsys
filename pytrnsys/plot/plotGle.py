@@ -21,7 +21,6 @@ logger = logging.getLogger("root")
 
 class PlotGle:
     def __init__(self, path):
-
         self.path = path
 
         self.useMarkers = True
@@ -73,8 +72,7 @@ class PlotGle:
     def setUseMarkers(self, use):
         self.useMarkers = use
 
-    def getFigCaption(self,addXSpace=False):
-
+    def getFigCaption(self, addXSpace=False):
         lines = ""
 
         line = "sizeX = 15\n"
@@ -87,8 +85,8 @@ class PlotGle:
         lines = lines + line
         line = "sizeYT = ny*sizeY\n"
         lines = lines + line
-        if(addXSpace!=False):
-            line = "sizeXT = nx*sizeX+5+%d\n"%addXSpace
+        if addXSpace != False:
+            line = "sizeXT = nx*sizeX+5+%d\n" % addXSpace
         else:
             line = "sizeXT = nx*sizeX+5\n"
 
@@ -127,7 +125,6 @@ class PlotGle:
         return lines
 
     def getCaptionGraph(self):
-
         lines = ""
         line = "begin graph\n"
         lines = lines + line
@@ -143,55 +140,67 @@ class PlotGle:
         return lines
 
     def getEasyPlot(self, nameGleFile, fileNameData, legends, useSameStyle=True, inputsAsPairs=False):
-        
         lines = self.getFigCaption()
 
-        lines = lines+self.getCaptionGraph()
-        
-        lines = lines+"\tfileData$=\"%s\"\n"%fileNameData
-        
-        col1=1
-        col2=2
+        lines = lines + self.getCaptionGraph()
 
-        if (inputsAsPairs):
-            mySize = int(len(legends)/2)
+        lines = lines + '\tfileData$="%s"\n' % fileNameData
+
+        col1 = 1
+        col2 = 2
+
+        if inputsAsPairs:
+            mySize = int(len(legends) / 2)
         else:
             mySize = len(legends)
 
         for i in range(mySize):
-
             line = "\tdata fileData$ d%d=c%d,c%d  ignore 0\n" % (i + 1, col1, col2)
             lines = lines + line
 
-            if (inputsAsPairs):
-                legendLine = "$%s$"%legends[col2-1]
+            if inputsAsPairs:
+                legendLine = "$%s$" % legends[col2 - 1]
             else:
                 legendLine = legends[i]
 
-
-            if(useSameStyle):
-                if self.useMarkers==True:
-                    line="\td%d marker myMarker1$ msize markerSize line lstyle myStyle1 lwidth lSize color %s key \"%s\"\n"%(i+1,self.colorGLE[i],legendLine)
+            if useSameStyle:
+                if self.useMarkers == True:
+                    line = (
+                        '\td%d marker myMarker1$ msize markerSize line lstyle myStyle1 lwidth lSize color %s key "%s"\n'
+                        % (i + 1, self.colorGLE[i], legendLine)
+                    )
                     lines = lines + line
                 else:
-                    line="\td%d line lstyle myStyle1 lwidth lSize color %s key \"%s\"\n"%(i+1,self.colorGLE[i],legendLine)
+                    line = '\td%d line lstyle myStyle1 lwidth lSize color %s key "%s"\n' % (
+                        i + 1,
+                        self.colorGLE[i],
+                        legendLine,
+                    )
                     lines = lines + line
             else:
                 if self.useMarkers == True:
-                    line="\td%d marker myMarker%d$ msize markerSize line lstyle myStyle%d lwidth lSize color %s key \"%s\"\n"%(i+1,i+1,i+1,self.colorGLE[i],legendLine)
+                    line = (
+                        '\td%d marker myMarker%d$ msize markerSize line lstyle myStyle%d lwidth lSize color %s key "%s"\n'
+                        % (i + 1, i + 1, i + 1, self.colorGLE[i], legendLine)
+                    )
                     lines = lines + line
                 else:
-                    line="\td%d line lstyle myStyle%d lwidth lSize color %s key \"%s\"\n"%(i+1,i+1,self.colorGLE[i],legendLine)
+                    line = '\td%d line lstyle myStyle%d lwidth lSize color %s key "%s"\n' % (
+                        i + 1,
+                        i + 1,
+                        self.colorGLE[i],
+                        legendLine,
+                    )
                     lines = lines + line
 
-            if(inputsAsPairs):
-                col1=col1+2
-                col2=col2+2
+            if inputsAsPairs:
+                col1 = col1 + 2
+                col2 = col2 + 2
             else:
-                col2=col2+1
+                col2 = col2 + 1
 
-        line="key pos tr hei sizeLegend offset  -0.5 0\n"
-        lines = lines+line
+        line = "key pos tr hei sizeLegend offset  -0.5 0\n"
+        lines = lines + line
         line = "end graph\n"
         lines = lines + line
 
@@ -202,47 +211,49 @@ class PlotGle:
         outfile.close()
 
     def getEasyErrorPlot(self, nameGleFile, fileNameData, legends, useSameStyle=True):
-
         lines = self.getFigCaption(addXSpace=10)
         lines = lines + "myErrorWidth=0.1\n"
 
         lines = lines + self.getCaptionGraph()
 
-        lines = lines + "\tfileData$=\"%s\"\n" % fileNameData
+        lines = lines + '\tfileData$="%s"\n' % fileNameData
 
         col = 1
 
         mySize = int(len(legends) / 2)
 
         i = 1
-        iLegend=1
+        iLegend = 1
         for j in range(mySize):
-
-            line = "\tdata fileData$ d%d=c%d,c%d  ignore 0\n" % (i, col,col+3)
+            line = "\tdata fileData$ d%d=c%d,c%d  ignore 0\n" % (i, col, col + 3)
             lines = lines + line
-            line = "\tdata fileData$ d%d=c%d,c%d  ignore 0\n" % (i + 1, col+1,col+4)
+            line = "\tdata fileData$ d%d=c%d,c%d  ignore 0\n" % (i + 1, col + 1, col + 4)
             lines = lines + line
-            line = "\tdata fileData$ d%d=c%d,c%d  ignore 0\n" % (i + 2, col+2,col+5)
+            line = "\tdata fileData$ d%d=c%d,c%d  ignore 0\n" % (i + 2, col + 2, col + 5)
             lines = lines + line
-            line = "\tlet d%d = d%d-d%d\n"%(i+100,i+1,i)
+            line = "\tlet d%d = d%d-d%d\n" % (i + 100, i + 1, i)
             lines = lines + line
-            line = "\tlet d%d = d%d-d%d\n"%(i+102,i+2,i+1)
+            line = "\tlet d%d = d%d-d%d\n" % (i + 102, i + 2, i + 1)
             lines = lines + line
 
             legendLine = "$%s$" % legends[iLegend]
-            iLegend=iLegend+2
+            iLegend = iLegend + 2
 
             if self.useMarkers == True:
-                line = "\td%d marker myMarker1$ msize markerSize line lstyle myStyle1 lwidth lSize color %s errdown d%d errup d%d errWidth myErrorWidth key \"%s\"\n" % (
-                i + 1, self.colorGLE[i],i+100,i+102,legendLine)
+                line = (
+                    '\td%d marker myMarker1$ msize markerSize line lstyle myStyle1 lwidth lSize color %s errdown d%d errup d%d errWidth myErrorWidth key "%s"\n'
+                    % (i + 1, self.colorGLE[i], i + 100, i + 102, legendLine)
+                )
                 lines = lines + line
             else:
-                line = "\td%d line lstyle myStyle1 lwidth lSize color %s errdown d%d errup d%d errWidth myErrorWidth key \"%s\"\n" % (
-                i + 1, self.colorGLE[i],i+100,i+102,legendLine)
+                line = (
+                    '\td%d line lstyle myStyle1 lwidth lSize color %s errdown d%d errup d%d errWidth myErrorWidth key "%s"\n'
+                    % (i + 1, self.colorGLE[i], i + 100, i + 102, legendLine)
+                )
                 lines = lines + line
 
-            i=i+3
-            col=col+6
+            i = i + 3
+            col = col + 6
 
         line = "key pos tr hei sizeLegend offset  -0.5 0\n"
         lines = lines + line
@@ -256,7 +267,6 @@ class PlotGle:
         outfile.close()
 
     def getBarPlot(self, nameGleFile, fileNameData, legends, xnames=None, xmin=0.5, xmax=13.5):
-
         lines = self.getFigCaption()
         lines = lines + self.getCaptionGraph()
 
@@ -282,18 +292,15 @@ class PlotGle:
             lines = lines + line
 
         for i in range(len(legends)):
-
             line = "\tdata fileData$ d%d=c%d,c%d  ignore 0\n" % (i + 1, col1, col2)
             lines = lines + line
             col2 = col2 + 1
 
         for i in range(len(legends), 0, -1):
-
             line = "\tbar d%d fill %s\n" % (i, self.colorGLE[i])
             lines = lines + line
 
         for i in range(len(legends)):
-
             line = '\td%d key "%s" \n' % (i + 1, legends[i])
             lines = lines + line
 
@@ -310,7 +317,6 @@ class PlotGle:
         outfile.close()
 
     def getBarBalancePlot(self, nameGleFile, fileNameData, legends, sizeIn, sizeOut, xnames=None):
-
         lines = ""
         if len(legends) != (sizeIn + sizeOut):
             lines = "!This case will not work because size of legend:%d is different from sizeIn:%d + sizeOut%d\n" % (
@@ -349,7 +355,6 @@ class PlotGle:
             lines = lines + line
 
         for i in range(len(legends)):
-
             line = "\tdata fileData$ d%d=c%d,c%d  ignore 0\n" % (i + 1, col1, col2)
             lines = lines + line
             col2 = col2 + 1
@@ -384,7 +389,6 @@ class PlotGle:
         outfile.close()
 
     def createFunction(self, name, nCases, col1, col2, xtitle, ytitle):
-
         nameFunc = name + "_func"
 
         lines = ""
@@ -433,7 +437,6 @@ class PlotGle:
         outfile.close()
 
     def createGleQvsT(self, fileName, legends, normalized=False):
-
         nVar = len(legends)
 
         lines = ""
@@ -505,9 +508,7 @@ class PlotGle:
         outfile.writelines(lines)
         outfile.close()
 
-    def executeGLE(self, fileName,fileExtension="pdf"):
-
-   
+    def executeGLE(self, fileName, fileExtension="pdf"):
         gleExe = os.getenv("GLE_EXE")
         if not os.path.exists(gleExe):
             gleExe = "gle.exe"
@@ -529,7 +530,6 @@ class PlotGle:
         return namePdf
 
     def createLatexFromGlePlots(self, namePlots, latexFile, titleLatex, subTileLatex):
-
         doc = latex.LatexReport(self.path, latexFile)
         doc.setCleanMode(False)
         doc.setTitle(titleLatex)
@@ -538,7 +538,6 @@ class PlotGle:
         doc.addBeginDocument()
 
         for i in range(len(namePlots)):
-
             nameWithPath = self.executeGLE(namePlots[i])
 
             doc.addPlot(nameWithPath, "caption", "Fig%d" % i, 12)
@@ -547,7 +546,6 @@ class PlotGle:
         doc.executeLatexFile()
 
     def changeDataFromGleTextFile(self, namePlots, parametersDict, modifyNameGle=False):
-
         for i in range(len(namePlots)):
             if modifyNameGle == True:
                 nameGleOut = namePlots[i].split(".")[0] + "-mod.gle"
@@ -569,7 +567,6 @@ class PlotGle:
                         logger.debug("key:%s- myName:%s-" % (key, myName))
 
                         if key == myName:
-
                             myNewLine = "%s=%s ! value changed from original by plotGle.py\n" % (
                                 key,
                                 parametersDict[key],

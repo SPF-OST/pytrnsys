@@ -20,10 +20,7 @@ class TestCostCalculation:
 
     @pytest.mark.ci
     @pytest.mark.linux
-    @pytest.mark.parametrize(
-        ["costConfigFileName", "resultsDirName"],
-        CONFIG_FILE_RESULTS_DIR_PAIRS
-    )
+    @pytest.mark.parametrize(["costConfigFileName", "resultsDirName"], CONFIG_FILE_RESULTS_DIR_PAIRS)
     def test(
         self,
         costConfigFileName: str,
@@ -93,9 +90,7 @@ class Helper:
     def _assertOutputFilesEqual(self):
         for resultsJsonFilePath in self._expectedResultsDir.rglob("*-results.json"):
             simulationName = resultsJsonFilePath.name[: -len("-results.json")]
-            relativeContainingDirPath = resultsJsonFilePath.parent.relative_to(
-                self._expectedResultsDir
-            )
+            relativeContainingDirPath = resultsJsonFilePath.parent.relative_to(self._expectedResultsDir)
 
             costPlotName = f"costShare-{simulationName}.pdf"
             self._assertPdfEqual(relativeContainingDirPath, costPlotName)
@@ -112,15 +107,11 @@ class Helper:
     def _assertPdfEqual(self, relativeContainingDirPath, pdfFileName):
         import diff_pdf_visually as dpdf
 
-        expectedPath, actualPath = self._getExpectedAndActualPath(
-            relativeContainingDirPath, pdfFileName
-        )
+        expectedPath, actualPath = self._getExpectedAndActualPath(relativeContainingDirPath, pdfFileName)
         assert dpdf.pdfdiff(actualPath, expectedPath)
 
     def _assertTextFileEqual(self, relativeContainingDirPath, texFileName):
-        expectedPath, actualPath = self._getExpectedAndActualPath(
-            relativeContainingDirPath, texFileName
-        )
+        expectedPath, actualPath = self._getExpectedAndActualPath(relativeContainingDirPath, texFileName)
         assert actualPath.read_text() == expectedPath.read_text()
 
     def _getExpectedAndActualPath(self, relativeContainingDirPath, fileName):

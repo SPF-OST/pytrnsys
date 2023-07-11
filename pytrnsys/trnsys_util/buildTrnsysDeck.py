@@ -1,6 +1,11 @@
 # pylint: skip-file
 # type: ignore
 
+"""
+This class uses a list of ddck files to built a complete TRNSYS deck file
+"""
+
+import dataclasses as _dc
 import io as _io
 import json as _json
 import logging
@@ -11,7 +16,8 @@ import tkinter as tk
 import typing as _tp
 from tkinter import messagebox as tkMessageBox
 
-import pytrnsys.ddck.replaceTokens as _replace
+import pytrnsys.ddck.replaceTokens.placeholders as _rtph
+import pytrnsys.ddck.replaceTokens.withoutPlaceholders as _rtwph
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deck
 import pytrnsys.trnsys_util.deckUtils as deckUtils
@@ -21,22 +27,31 @@ import pytrnsys.utils.result as _res
 logger = logging.getLogger("root")
 # stop propagting to root logger
 logger.propagate = False
-"""
-This class uses a list of ddck files to built a complete TRNSYS deck file
-"""
+
+
+@_dc.dataclass
+class DdckFilePathWithComponentName:
+    path: _pl.Path
+    componentName: str
 
 
 class BuildTrnsysDeck:
-    def __init__(self, _pathDeck, _nameDeck, _nameList, ddckPlaceHolderValuesJsonPath):
+    def __init__(
+        self,
+        pathDeck,
+        nameDeck,
+        ddckFilePathsWithComponentName: _tp.Sequence[DdckFilePathWithComponentName],
+        ddckPlaceHolderValuesJsonPath,
+    ):
+        self.pathDeck = pathDeck
+        self.nameDeck = self.pathDeck + "\%s.dck" % nameDeck
 
-        self.pathDeck = _pathDeck
-        self.nameDeck = self.pathDeck + "\%s.dck" % _nameDeck
-
-        self._ddckPlaceHolderValuesJsonPath = _pl.Path(
-            ddckPlaceHolderValuesJsonPath) if ddckPlaceHolderValuesJsonPath else None
+        self._ddckPlaceHolderValuesJsonPath = (
+            _pl.Path(ddckPlaceHolderValuesJsonPath) if ddckPlaceHolderValuesJsonPath else None
+        )
 
         self.oneSheetList = []
-        self.nameList = _nameList
+        self._ddckFilePathsWithComponentName = ddckFilePathsWithComponentName
         self.deckText = []
 
         self.overwriteForcedByUser = False
@@ -51,10 +66,10 @@ class BuildTrnsysDeck:
         self.existingDckUnchecked = True
         self.dckAlreadyExists = True
 
-    def loadDeck(self, _path, _name) -> _res.Result[_tp.Tuple[str, str, str]]:
-        ddckFilePath = _pl.Path(_path) / f"{_name}.{self.extOneSheetDeck}"
+    def loadDeck(self, path: str, name: str, componentName: str) -> _res.Result[_tp.Tuple[str, str, str]]:
+        ddckFilePath = _pl.Path(path) / f"{name}.{self.extOneSheetDeck}"
 
-        result = self._replacePlaceholdersAndGetContent(ddckFilePath)
+        result = self._replacePlaceholdersAndGetContent(ddckFilePath, componentName)
         if _res.isError(result):
             return _res.error(result)
         ddckContent = _res.value(result)
@@ -73,11 +88,9 @@ class BuildTrnsysDeck:
 
         return lines[0:3]  # only returns the caption with the info of the file
 
-    def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path) -> _res.Result[str]:
-        componentName = ddckFilePath.parent.name
-
+    def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path, componentName: str) -> _res.Result[str]:
         if not self._ddckPlaceHolderValuesJsonPath:
-            return _replace.replaceTokensWithDefaults(ddckFilePath)
+            return _rtwph.replaceTokensWithDefaults(ddckFilePath, componentName)
 
         if not self._ddckPlaceHolderValuesJsonPath.is_file():
             return _res.Error(
@@ -92,7 +105,7 @@ class BuildTrnsysDeck:
             )
 
         computedNamesByPort = placeholderValues.get(componentName, dict())
-        result = _replace.replaceTokens(ddckFilePath, componentName, computedNamesByPort)
+        result = _rtph.replaceTokens(ddckFilePath, componentName, computedNamesByPort)
 
         if _res.isError(result):
             return _res.error(result)
@@ -100,7 +113,7 @@ class BuildTrnsysDeck:
         return _res.value(result)
 
     def readDeckList(
-            self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
+        self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
     ) -> _res.Result[None]:
         """
 
@@ -121,62 +134,50 @@ class BuildTrnsysDeck:
 
         self.dependencies = {}
         self.definitions = {}
-        for i in range(len(self.nameList)):
+        for ddckFilePathWithComponentName in self._ddckFilePathsWithComponentName:
+            ddckFilePath = ddckFilePathWithComponentName.path
+            ddckFileName = ddckFilePath.name
 
-            split = self.nameList[i].split("\\")
-
-            if self.nameList[i][1] == ":":  # absolute path
-
-                nameList = split[-1]
-                pathVec = split[:-1]
-                pathList = ""
-                for j in range(len(pathVec)):
-                    if j == 0:
-                        pathList = pathVec[j]
-                    else:
-                        pathList = pathList + "\\" + pathVec[j]
+            ddckFileDirPath = ddckFilePath.parent
+            if ddckFileDirPath.is_absolute():
+                absoluteDdckFileDirPath = ddckFileDirPath
             else:
+                absoluteDdckFileDirPath = _pl.Path(pathConfig) / ddckFileDirPath
+                dictPaths[str(ddckFilePath)] = str(absoluteDdckFileDirPath / ddckFilePath)
 
-                nameList = split[-1]
-                pathVec = split[:-1]
-                pathList = pathConfig
-                for j in range(len(pathVec)):
-                    pathList = pathList + "\\" + pathVec[j]
-                dictPaths[self.nameList[i]] = os.path.join(pathConfig, dictPaths[self.nameList[i]])
-
-            result = self.loadDeck(pathList, nameList)
+            result = self.loadDeck(
+                str(absoluteDdckFileDirPath), ddckFileName, ddckFilePathWithComponentName.componentName
+            )
 
             if _res.isError(result):
                 return _res.error(result)
 
             firstThreeLines = _res.value(result)
 
-            ddck = trnsysComponent.TrnsysComponent(pathList, nameList)
+            ddck = trnsysComponent.TrnsysComponent(absoluteDdckFileDirPath, ddckFileName)
             definedVariables, requiredVariables = ddck.getVariables()
             if (
-                    "printer" not in nameList
-                    and "Printer" not in nameList
-                    and "Control" not in nameList
-                    and "control" not in nameList
-                    and "BigIceCoolingTwoStorages" not in nameList
+                "printer" not in ddckFileName
+                and "Printer" not in ddckFileName
+                and "Control" not in ddckFileName
+                and "control" not in ddckFileName
+                and "BigIceCoolingTwoStorages" not in ddckFileName
             ):
-                self.dependencies[nameList] = requiredVariables - definedVariables
-                self.definitions[nameList] = definedVariables
+                self.dependencies[ddckFileName] = requiredVariables - definedVariables
+                self.definitions[ddckFileName] = definedVariables
 
             self.replaceLines(replaceLineList)
-            self.linesChanged = deckUtils.changeAssignPath(
-                self.linesChanged, "path$", dictPaths[os.path.join(self.nameList[i])]
-            )
+            self.linesChanged = deckUtils.changeAssignPath(self.linesChanged, "path$", str(ddckFilePath))
             addedLines = firstThreeLines + self.linesChanged
 
             caption = (
-                    "**********************************************************************\n** %s.ddck from %s \n**********************************************************************\n"
-                    % (nameList, pathList)
+                "**********************************************************************\n** %s.ddck from %s \n**********************************************************************\n"
+                % (ddckFileName, absoluteDdckFileDirPath)
             )
 
             if doAutoUnitNumbering:
                 (unit, types, fileAssign, fileAssignUnit) = deckUtils.readAllTypes(addedLines)
-                logger.debug("Replacemenet of Units of file:%s" % nameList)
+                logger.debug("Replacemenet of Units of file:%s" % ddckFileName)
                 self.unitId = deckUtils.replaceAllUnits(addedLines, self.unitId, unit, fileAssignUnit, fileAssign)
 
                 unitModifiedLines = [line.replace("£", "") for line in addedLines]
@@ -196,11 +197,11 @@ class BuildTrnsysDeck:
         e = Graph("ER", filename="er.gv", node_attr={"color": "lightblue2", "style": "filled"})
         e.attr("node", shape="box")
         variables_global = ["cpwat", "rhowat", "nix", "tamb", "dtsim", "cpbri", "rhobri", "pi", "stop", "start", "zero"]
-        for (key, value) in self.dependencies.items():
+        for key, value in self.dependencies.items():
             e.node(key)
 
-        for (key, value) in self.dependencies.items():
-            for (keyDef, valueDef) in self.definitions.items():
+        for key, value in self.dependencies.items():
+            for keyDef, valueDef in self.definitions.items():
                 edgelLabel = ""
                 for dependency in value:
                     if dependency in valueDef and dependency not in variables_global:
@@ -235,13 +236,12 @@ class BuildTrnsysDeck:
         ok = True
 
         if self.dckAlreadyExists and self.overwriteForcedByUser is False:
-
             window = tk.Tk()
             window.geometry("2x2+" + str(window.winfo_screenwidth()) + "+" + str(window.winfo_screenheight()))
             ok = tkMessageBox.askokcancel(
                 title="Processing Trnsys",
                 message="Do you want override %s ?\n If parallel simulations most likely accepting this will ovrewrite all the rest too. Think of it twice !! "
-                        % tempName,
+                % tempName,
             )
             window.destroy()
 
@@ -249,7 +249,7 @@ class BuildTrnsysDeck:
                 self.overwriteForcedByUser = True
 
         if ok:
-            tempFile = open(tempName, "w", encoding='windows-1252')
+            tempFile = open(tempName, "w", encoding="windows-1252")
             if addedLines != None:
                 text = addedLines + self.deckText
             else:
@@ -285,7 +285,6 @@ class BuildTrnsysDeck:
         return None
 
     def saveUnitTypeFile(self):
-
         (self.TrnsysUnits, self.TrnsysTypes, self.filesUsedInDdck, self.filesUnitUsedInDdck) = deckUtils.readAllTypes(
             self.deckText, sort=False
         )
@@ -293,7 +292,6 @@ class BuildTrnsysDeck:
         self.writeTrnsysTypesUsed("UnitsType.info")
 
     def writeTrnsysTypesUsed(self, name):
-
         lines = "UNIT\tTYPE\tName\n"
 
         for i in range(len(self.TrnsysTypes)):
@@ -367,7 +365,7 @@ class BuildTrnsysDeck:
                 maxLineWidth = 0
 
             for constant in constantsToCheck:
-                match = _re.search(fr"^\b{constant}\s*\d+\b", line, _re.MULTILINE)
+                match = _re.search(rf"^\b{constant}\s*\d+\b", line, _re.MULTILINE)
                 if match:
                     if constant == "UNIT":
                         numOfTrnsysConstants[constant] = numOfTrnsysConstants.get(constant, 0) + 1
@@ -382,10 +380,15 @@ class BuildTrnsysDeck:
                     break
 
         for constant, number in numOfTrnsysConstants.items():
-            if (constant == "UNIT" and number > 1000) or (constant == "EQUATIONS" and number > 500) or (
-                    constant == "PARAMETERS" and number > 2000) or (constant == "INPUTS" and number > 750):
+            if (
+                (constant == "UNIT" and number > 1000)
+                or (constant == "EQUATIONS" and number > 500)
+                or (constant == "PARAMETERS" and number > 2000)
+                or (constant == "INPUTS" and number > 750)
+            ):
                 self.logger.warning(f"There are {number} of {constant} which exceeds the limit")
 
         if maxNumberOfConstantsInABlock > 250:
             self.logger.warning(
-                f"There are {maxNumberOfConstantsInABlock} of components in one block which exceeds the limit")
+                f"There are {maxNumberOfConstantsInABlock} of components in one block which exceeds the limit"
+            )

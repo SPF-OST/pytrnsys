@@ -36,7 +36,6 @@ class PlotBokeh:
     """
 
     def __init__(self):
-
         self.counter = 0
         self.fileNameUsed = []
 
@@ -44,7 +43,6 @@ class PlotBokeh:
         self.plotHeight = 600  # 250
 
     def createBokehPlot(self, df, path, fileName, inputKeys, showPlot=False, sortPlots=True):
-
         if fileName in self.fileNameUsed:
             self.counter += 1
             useCounter = True
@@ -110,7 +108,6 @@ class PlotBokeh:
         for key in plotsDict:
             keysList.append(key)
         for i in range(plotCount):
-
             key = keysList[i]
 
             if i == 0:

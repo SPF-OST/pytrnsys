@@ -123,14 +123,12 @@ class ProcessParallelTrnsys:
     """
 
     def __init__(self):
-
         self.defaultInputs()
         self.filteredfolder = [".gle"]
 
         self.logger = log.getOrCreateCustomLogger("root", self.inputs["outputLevel"])
 
     def defaultInputs(self, pathBase=None):
-
         self.inputs = {}
         self.inputs["plotStyle"] = "line"
         self.inputs["isTrnsys"] = True
@@ -182,7 +180,7 @@ class ProcessParallelTrnsys:
         self.configPath = path
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated)
-        #self.inputs["pathBase"] = path
+        # self.inputs["pathBase"] = path
         self.logger.setLevel(self.inputs["outputLevel"])
         if "latexNames" in self.inputs.keys():
             if ":" not in self.inputs["latexNames"]:
@@ -191,7 +189,6 @@ class ProcessParallelTrnsys:
             self.individualFile = True
 
     def getBaseClass(self, classProcessing, pathFolder, fileName):
-
         return processTrnsys.ProcessTrnsysDf(pathFolder, fileName, individualFile=self.individualFile)
 
     def isStringNumber(self, sample):
@@ -216,7 +213,6 @@ class ProcessParallelTrnsys:
             return False
 
     def loadPlotJson(self, filePath):
-
         with open(filePath, "r") as file:
             plotParDict = json.load(file)
 
@@ -247,7 +243,6 @@ class ProcessParallelTrnsys:
             os.remove(os.path.join(self.inputs["pathBase"], "Summary.dat"))
 
         if (self.inputs["typeOfProcess"] == "completeFolder") or (self.inputs["typeOfProcess"] == "json"):
-
             pathFolder = self.inputs["pathBase"]
 
             if self.inputs["typeOfProcess"] == "completeFolder":
@@ -321,13 +316,11 @@ class ProcessParallelTrnsys:
             self.filesReturn.append(os.path.join(pathFolder, name, name) + ".dck")
 
         elif self.inputs["typeOfProcess"] == "citiesFolder":
-
             for city in self.inputs["cities"]:
                 pathFolder = os.path.join(self.inputs["pathBase"], city)
                 fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
 
                 for name in fileName:
-
                     folderUsed = True
                     for i in range(len(self.filteredfolder)):
                         if name == self.filteredfolder[i]:
@@ -359,7 +352,9 @@ class ProcessParallelTrnsys:
                                 else:
                                     for i in range(self.inputs["numberOfYearsInHourlyFile"]):
                                         inputs.append(copy.deepcopy(self.inputs))
-                                        inputs[i]["yearReadedInMonthlyFile"] = self.inputs["yearReadedInMonthlyFile"] + i
+                                        inputs[i]["yearReadedInMonthlyFile"] = (
+                                            self.inputs["yearReadedInMonthlyFile"] + i
+                                        )
                                         casesInputs.append((baseClass, pathFolder, name, inputs[i]))
                             else:
                                 casesInputs.append((baseClass, pathFolder, name, self.inputs))
@@ -387,10 +382,8 @@ class ProcessParallelTrnsys:
                 fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
 
                 for name in fileName:
-
                     for type in self.inputs["fileTypes"][0]:
                         if type in name:
-
                             folderUsed = True
                             for i in range(len(self.filteredfolder)):
                                 if name == self.filteredfolder[i]:
@@ -445,14 +438,13 @@ class ProcessParallelTrnsys:
 
         typeOfProcess = self.inputs["typeOfProcess"]
         if self.inputs["processParallel"] == True:
-
             debug = debugProcess.DebugProcess(pathFolder, "FileProcessed.dat", fileName)
             debug.start()
 
             # maximum number of processes at once:
             maxNumberOfCPU = min(run.getNumberOfCPU() - self.inputs["reduceCpu"], len(fileName))
 
-            pool = mp.Pool(processes=maxNumberOfCPU) #Dc bak to previous. Not sure why it was changed
+            pool = mp.Pool(processes=maxNumberOfCPU)  # Dc bak to previous. Not sure why it was changed
 
             results = pool.map(processDataGeneral, casesInputs)
 
@@ -472,9 +464,9 @@ class ProcessParallelTrnsys:
 
             self.calcCost(fileNameList)
 
-        if "pathInfoToJson" in self.inputs.keys(): #first add
+        if "pathInfoToJson" in self.inputs.keys():  # first add
             self.transferPathInfoToJson()
-            
+
         if "acrossSetsCalc" in self.inputs.keys():
             self.logger.info("Calculating across sets")
             self.calculationsAcrossSets()
@@ -507,8 +499,6 @@ class ProcessParallelTrnsys:
 
         if "scatterPlot" in self.inputs.keys():
             self.scatterPlot()
-
-      
 
         if "jsonCalc" in self.inputs.keys():
             self.calculateInJson()
@@ -574,7 +564,6 @@ class ProcessParallelTrnsys:
                     conditionList.append(conditionDict[conditionEntry] == resultsDict[conditionEntry])
 
                 if all(conditionList):
-
                     if "[" not in xAxisVariable:
                         xAxis = resultsDict[xAxisVariable]
                     else:
@@ -712,7 +701,6 @@ class ProcessParallelTrnsys:
                     conditionList.append(conditionDict[conditionEntry] == resultsDict[conditionEntry])
 
                 if all(conditionList):
-
                     conditionNeverMet = False
 
                     if resultsDict[seriesVariable] not in seriesColors.keys():
@@ -747,7 +735,9 @@ class ProcessParallelTrnsys:
                     pass
 
             if conditionNeverMet:
-                self.logger.warning('The following conditions from "comparePlotConditional" were never met all at once:')
+                self.logger.warning(
+                    'The following conditions from "comparePlotConditional" were never met all at once:'
+                )
                 for entry in conditionDict:
                     self.logger.warning("%s = %s" % (entry, str(conditionDict[entry])))
                 self.logger.warning("The respective plot cannot be generated")
@@ -798,7 +788,6 @@ class ProcessParallelTrnsys:
                 labelBarPlot = []
                 keyBarPlot = []
                 for key in plotXDict[chunk].keys():
-
                     index = num.argsort(plotXDict[chunk][key])
                     myX = num.array(plotXDict[chunk][key])[index]
                     myY = num.array(plotYDict[chunk][key])[index]
@@ -849,7 +838,6 @@ class ProcessParallelTrnsys:
             if 0:
                 for X, Y in zip(myX, myY):
                     for chunk, style in zip(plotXDict.keys(), styles):
-
                         for key in plotXDict[chunk].keys():  # the varables that appear in the legend
                             index = num.argsort(plotXDict[chunk][key])
                             myX = num.array(plotXDict[chunk][key])[index]
@@ -862,7 +850,6 @@ class ProcessParallelTrnsys:
             else:
                 for i in range(mySize):
                     for chunk, style in zip(plotXDict.keys(), styles):
-
                         for key in plotXDict[chunk].keys():  # the varables that appear in the legend
                             index = num.argsort(plotXDict[chunk][key])
                             myX = num.array(plotXDict[chunk][key])[index]
@@ -1056,7 +1043,6 @@ class ProcessParallelTrnsys:
             conditionsFulfilled = conditions.doResultsSatisfyConditions(resultsDict)
 
             if conditionsFulfilled:
-
                 conditionNeverMet = False
 
                 if resultsDict[seriesVariable] not in seriesColors.keys():
@@ -1238,7 +1224,6 @@ class ProcessParallelTrnsys:
                     conditionList.append(conditionDict[conditionEntry] == resultsDict[conditionEntry])
 
                 if all(conditionList):
-
                     # if equationVariable not in seriesColors.keys():
                     #    seriesColors[equationVariable] = colors[colorsCounter]
                     #    colorsCounter += 1
@@ -1367,7 +1352,6 @@ class ProcessParallelTrnsys:
 
             for i in range(mySize):
                 for chunk, style in zip(plotXDict.keys(), styles):
-
                     index = num.argsort(plotXDict[chunk][globalXAxisVariable])
                     myX = num.array(plotXDict[chunk][globalXAxisVariable])[index]
                     for key in equationDict.keys():  # the varables that appear in the legend
@@ -1528,7 +1512,11 @@ class ProcessParallelTrnsys:
                 )
             else:
                 ax1.plot(
-                    xDict[entry], yDict[entry], "d", color=colors[colorsCounter], label=self.doc.getNiceLatexNames(entry)
+                    xDict[entry],
+                    yDict[entry],
+                    "d",
+                    color=colors[colorsCounter],
+                    label=self.doc.getNiceLatexNames(entry),
                 )
             colorsCounter += 1
             colorsCounter = colorsCounter % len(colors)
@@ -1536,7 +1524,9 @@ class ProcessParallelTrnsys:
             ax1.legend(loc="best")
         ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
         if differencePlot:
-            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariables[0]) + " / " + self.doc.getNiceLatexNames(yVariables[1]))
+            ax1.set_ylabel(
+                self.doc.getNiceLatexNames(yVariables[0]) + " / " + self.doc.getNiceLatexNames(yVariables[1])
+            )
         else:
             ax1.set_ylabel(self.doc.getNiceLatexNames(yVariables[0]))
 
@@ -1749,7 +1739,6 @@ class ProcessParallelTrnsys:
         fig.savefig(os.path.join(pathFolder, name + ".png"), dpi=500)
 
     def changeFile(self, source, end):
-
         # todo: this function is currently not working
 
         found = False

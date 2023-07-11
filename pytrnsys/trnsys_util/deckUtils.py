@@ -21,7 +21,6 @@ def replaceAllUnits(linesRead, idBegin, TrnsysUnits, filesUnitUsedInDdck, filesU
         replaceUnitNumber(linesRead, int(TrnsysUnits[i]), "£" + str(unitId))
 
     for i in range(len(filesUnitUsedInDdck)):
-
         try:
             filesUnitUsedInDdck[i] = int(filesUnitUsedInDdck[i])
 
@@ -78,7 +77,6 @@ def readAllTypes(lines, sort=True):
 
     filesWithoutUnit = []
     for i in range(len(lines)):
-
         splitBlank = lines[i].split()
 
         try:
@@ -125,7 +123,7 @@ def readAllTypes(lines, sort=True):
 
 
 def phraseStartingIndex(phrase, text):
-    result = re.search(fr"\b{phrase}\b", text, re.IGNORECASE)
+    result = re.search(rf"\b{phrase}\b", text, re.IGNORECASE)
     return result.start() if result is not None else -1
 
 
@@ -147,7 +145,7 @@ def ireplace(old, new, text):
         index_l = phraseStartingIndex(old, text)
         if index_l == -1:
             return text
-        text = text[:index_l] + new + text[index_l + len(old):]
+        text = text[:index_l] + new + text[index_l + len(old) :]
         idx = index_l + len(new)
     return text
 
@@ -163,7 +161,6 @@ def replaceUnitNumber(linesRead, oldUnit, newUnit):
     if oldUnit == newUnit:
         pass
     else:
-
         oldString = "UNIT %d" % (oldUnit)
         newString = "UNIT %s" % (newUnit)
 
@@ -210,7 +207,6 @@ def replaceUnitNumber(linesRead, oldUnit, newUnit):
 
 def getTypeFromUnit(myUnit, linesReadedNoComments):
     for i in range(len(linesReadedNoComments)):
-
         splitEquality = linesReadedNoComments[i].split()
 
         try:
@@ -220,7 +216,6 @@ def getTypeFromUnit(myUnit, linesReadedNoComments):
             ntype = splitEquality[3].replace(" ", "")
 
             if unit.lower() == "unit".lower() and types.lower() == "Type".lower():
-
                 if nUnit.lower() == myUnit.lower():
                     print("UNIT FOUND myUnit:%s type:%s" % (myUnit, ntype))
                     return ntype
@@ -252,7 +247,6 @@ def getDataFromDeck(linesReadedNoComments, myName, typeValue="string"):
 
 def getMyDataFromDeck(linesReadedNoComments, myName):
     for i in range(len(linesReadedNoComments)):
-
         splitEquality = linesReadedNoComments[i].split("=")
         try:
             name = splitEquality[0].replace(" ", "")
@@ -281,7 +275,7 @@ def loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True):
         list of lines obateined form the deck without the comments
     """
 
-    infile = open(nameDck, "r", encoding='windows-1252')
+    infile = open(nameDck, "r", encoding="windows-1252")
 
     lines = infile.readlines()
 
@@ -304,12 +298,10 @@ def loadDeck(nameDck, eraseBeginComment=True, eliminateComments=True):
 
 def checkEquationsAndConstants(lines, nameDck):
     for i in range(len(lines)):
-
         splitBlank = lines[i].split()
 
         keyWord = splitBlank[0].upper()
         if keyWord == "EQUATIONS" or keyWord == "CONSTANTS":
-
             lineError = i + 1
             try:
                 numberOfValues = int(splitBlank[1])
@@ -428,17 +420,16 @@ def readEnergyBalanceVariablesFromDeck(lines):
 
     eBalance = []
     for i in range(len(lines)):
-
         if (
-                len(lines[i].split("qSysIn_")) > 1
-                or len(lines[i].split("qSysOut_")) > 1
-                or len(lines[i].split("elSysIn_")) > 1
-                or len(lines[i].split("elSysOut_")) > 1
+            len(lines[i].split("qSysIn_")) > 1
+            or len(lines[i].split("qSysOut_")) > 1
+            or len(lines[i].split("elSysIn_")) > 1
+            or len(lines[i].split("elSysOut_")) > 1
         ):
             myEqualSplit = lines[i].split("=")
 
             if (
-                    len(myEqualSplit) > 1
+                len(myEqualSplit) > 1
             ):  # Otherwise if we add one of this variables in a printer it will copy the whole printer line here.
                 varBalance = myEqualSplit[0]
                 eBalance.append(varBalance.replace(" ", ""))
@@ -590,7 +581,7 @@ def changeAssignPath(lines, key, rootPath):
                 lineChanged = False
                 for j in range(len(splitPath)):
                     if splitPath[j].lower() == key:
-                        name = os.path.join(*splitPath[j + 1:])
+                        name = os.path.join(*splitPath[j + 1 :])
                         if len(splitBlank) > 2:
                             lineChanged = 'ASSIGN "%s" %s \n' % (os.path.join(rootPath, name), splitBlank[2])
                         else:

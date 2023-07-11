@@ -154,7 +154,21 @@ logical_unit: INT | variable
 
 computed_var: PORT_PROPERTY "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ]")"
 
-computed_output_var: "@temp" "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ] ")"
+?computed_output_var: computed_output_temp_var | computed_output_energy_var
+
+computed_output_temp_var: "@temp" "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ] ")"
+
+computed_output_energy_var: "@energy" "(" ENERGY_DIRECTION "," ENERGY_QUALITY "," CATEGORY_OR_LOCAL ("," CATEGORY)* ")"
+
+ENERGY_DIRECTION: "in" | "out"
+
+ENERGY_QUALITY: "heat" | "el"
+
+CATEGORY: /[A-za-z0-9]+/
+
+CATEGORY_LOCAL: ":"
+
+CATEGORY_OR_LOCAL: CATEGORY | CATEGORY_LOCAL
 
 FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
 

@@ -29,7 +29,7 @@ def createPlot(
     comparePlotUserName,
     setPrintDataForGle,
     shallPlotUncertainties,
-    extensionFig
+    extensionFig,
 ):
     xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions = _separatePlotVariables(plotVariables)
 

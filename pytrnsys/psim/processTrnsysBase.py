@@ -15,7 +15,6 @@ import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 
 class ProcessTrnsysBase:
     def __init__(self, _path, _name):
-
         self.fileName = _name
         self.outputPath = _path + "\%s" % self.fileName
         self.executingPath = _path
@@ -37,7 +36,6 @@ class ProcessTrnsysBase:
         self.initialize()
 
     def initialize(self):
-
         self.nameClass = "ProcessTrnsysBase"
         self.yearReadedInMonthylFile = -1  # This read the last year of the simulation
         self.cleanModeLatex = True
@@ -45,13 +43,11 @@ class ProcessTrnsysBase:
         self.firstConsideredTime = None  # the first one readed in time step file
 
     def setCleanModeLatex(self, mode):
-
         self.cleanModeLatex = mode
 
     # year=-1 : reads the last year
     # year=1 : reads 1st year
     def setYearReadedInMonthylFile(self, year):
-
         self.yearReadedInMonthylFile = year
 
     # firstMonth considered, "January", "February", etc
@@ -59,15 +55,12 @@ class ProcessTrnsysBase:
         self.firstMonth = firstMonth
 
     def setFirstConsideredTime(self, time):
-
         self.firstConsideredTime = time
 
     def addLatexText(self):  # Each child class should define this
-
         pass
 
     def createLatex(self):
-
         self.doc.documentClass = "SPFShortReportIndex"
 
         self.doc.setTitle(self.titleOfLatex)
