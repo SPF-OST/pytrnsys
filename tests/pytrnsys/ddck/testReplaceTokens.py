@@ -130,7 +130,7 @@ No default values were provided for the computed variables at the following loca
         assert not _res.isError(result)
 
         value = _res.value(result)
-        print(value)
+
         expectedOutputDdckFilePath = type861DirPath / "expected_output.ddck"
         assert value == expectedOutputDdckFilePath.read_text(encoding="utf8")
 
@@ -158,7 +158,6 @@ EQUATIONS 4
         assert not _res.isError(result)
 
         actualOutput = _res.value(result)
-        print(actualOutput)
 
         expectedOutput = """\
 ******************************************************************************************

@@ -33,7 +33,7 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
 ) -> _res.Result[str]:
     treeResult = _parse.parseDdck(content)
     if _res.isError(treeResult):
-        error = _res.error(inputDdckFilePath)
+        error = _res.error(treeResult)
 
         if not inputDdckFilePath:
             return error

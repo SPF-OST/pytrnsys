@@ -11,7 +11,7 @@ _CHANGE_ASSIGN_STATEMENT_PATTERN = _re.compile(
 
 
 @_dc.dataclass
-class AssignStatement:  # pylint: disable=too-few-public-methods
+class AssignStatement:
     path: str
     unitVariableName: str
 
