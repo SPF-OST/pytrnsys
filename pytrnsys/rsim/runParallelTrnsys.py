@@ -6,15 +6,14 @@ import json
 import os
 import pathlib as _pl
 import shutil
-import typing as _tp
 from copy import deepcopy
 
-import numpy as num
 import pandas as pd
 
 import pytrnsys.rsim.executeTrnsys as exeTrnsys
+import pytrnsys.rsim.getConfigMixin as _gcm
 import pytrnsys.rsim.runParallel as runPar
-import pytrnsys.trnsys_util.buildTrnsysDeck as build
+import pytrnsys.trnsys_util.buildTrnsysDeck as _btd
 import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.trnsys_util.replaceAssignStatements as _ras
@@ -22,7 +21,7 @@ import pytrnsys.utils.log as log
 import pytrnsys.utils.result as _res
 
 
-class RunParallelTrnsys:
+class RunParallelTrnsys(_gcm.GetConfigMixin):
     """
     Main class that represents a simulation job of pytrnsys. The standardized way of initiating it is by providing a
     config-file, in which case the run defined in the config case is started automatically.
@@ -45,6 +44,8 @@ class RunParallelTrnsys:
     """
 
     def __init__(self, pathConfig, name="pytrnsysRun", configFile=None, runPath=None):
+        super().__init__()
+
         self.pathConfig = pathConfig
 
         self.ddckPlaceHolderValuesJsonPath = None
@@ -84,7 +85,7 @@ class RunParallelTrnsys:
             self.path = os.getcwd()
 
         self._assignStatements: list[_ras.AssignStatement] = []
-        self._ddckFilePathWithComponentNames: list[build.DdckFilePathWithComponentName] = []
+        self._ddckFilePathWithComponentNames: list[_btd.DdckFilePathWithComponentName] = []
 
     def setDeckName(self, _name):
         self.nameBase = _name
@@ -340,7 +341,7 @@ class RunParallelTrnsys:
 
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(
+        deck = _btd.BuildTrnsysDeck(
             self.path, self.nameBase, self._ddckFilePathWithComponentNames, self.ddckPlaceHolderValuesJsonPath
         )
         result = deck.readDeckList(
@@ -371,44 +372,6 @@ class RunParallelTrnsys:
         deck.analyseDck()
 
         return deck.nameDeck
-
-    def addParametricVariations(self, variations):
-        """
-        it fills a variableOutput with a list of all variations to run
-        format <class 'list'>: [['Ac', 'AcollAp', 1.5, 2.0, 1.5, 2.0], ['Vice', 'VIceS', 0.3, 0.3, 0.4, 0.4]]
-
-        Parameters
-        ----------
-        variations : list of list
-            list object containing the variations to be used.
-
-        Returns
-        -------
-
-        """
-
-        if self.inputs["combineAllCases"] == True:
-            labels = []
-            values = []
-            for i, row in enumerate(variations):
-                labels.append(row[:2])
-                values.append(row[2:])
-
-            value_permutations = num.array(num.meshgrid(*values), dtype=object).reshape(len(variations), -1)
-            result = num.concatenate((labels, value_permutations), axis=1)
-            self.variablesOutput = result.tolist()
-
-        else:
-            sizeOneVariation = len(variations[0]) - 2
-            for n in range(len(variations)):
-                sizeCase = len(variations[n]) - 2
-                if sizeCase != sizeOneVariation:
-                    raise ValueError(
-                        "for combineAllCases=False all variations must have same lenght :%d case n:%d has a lenght of :%d"
-                        % (sizeOneVariation, n + 1, sizeCase)
-                    )
-
-            self.variablesOutput = variations
 
     def runParallel(self, writeLogFile=True):
         if writeLogFile:
@@ -524,7 +487,7 @@ class RunParallelTrnsys:
             if mySource == source:
                 newDdckFilePath = ddckFilePath[0:-nCharacters] + end
                 self.dictDdckPaths[newDdckFilePath] = self.dictDdckPaths[ddckFilePath]
-                newDdckFilePathWithComponentName = build.DdckFilePathWithComponentName(
+                newDdckFilePathWithComponentName = _btd.DdckFilePathWithComponentName(
                     _pl.Path(newDdckFilePath), ddckFilePathWithComponentName.componentName
                 )
                 self._ddckFilePathWithComponentNames[i] = newDdckFilePathWithComponentName
@@ -533,165 +496,6 @@ class RunParallelTrnsys:
 
         if not found:
             self.logger.warning("change File was not able to change %s by %s" % (source, end))
-
-    def getConfig(self):
-        """
-        Reads the config file.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-
-        """
-
-        # The vector self.inputs used in python has been filled. Now other variables for Trnsys will be filled
-
-        self.variation = []  # parametric studies
-        self.parDeck = []  # fixed values changed in all simulations
-        self._ddckFilePathWithComponentNames = []
-        self.parameters = {}  # deck parameters fixed for all simulations
-        self._assignStatements = []
-        self.listFit = {}
-        self.listFitObs = []
-        self.listDdckPaths = set()
-        self.dictDdckPaths = {}
-        self.caseDict = {}
-        self.sourceFilesToChange = []
-        self.sinkFilesToChange = []
-        self.foldersForDDckVariation = []
-        self.replaceLines = []
-
-        for line in self.lines:
-            splitLine = line.split()
-            if splitLine[0] == "variation":
-                variation = []
-                for i in range(len(splitLine)):
-                    if i == 0:
-                        pass
-                    elif i <= 2:
-                        variation.append(splitLine[i])
-                    else:
-                        try:
-                            variation.append(float(splitLine[i]))
-                        except:
-                            variation.append(splitLine[i])
-
-                self.variation.append(variation)
-
-            elif splitLine[0] == "deck":
-                if splitLine[2] == "string":
-                    self.parameters[splitLine[1]] = splitLine[3]
-                else:
-                    if splitLine[2].isdigit():
-                        self.parameters[splitLine[1]] = float(splitLine[2])
-                    else:
-                        self.parameters[splitLine[1]] = splitLine[2]
-
-            elif splitLine[0] == "assign":
-                errorMessage = f"""\
-Invalid syntax: {line}. Usage:
-    assign <new-path> <unit-variable-name>
-"""
-                if len(splitLine) != 3:
-                    raise ValueError(errorMessage)
-
-                _, newPath, unitVariableName = splitLine
-
-                if unitVariableName.isdigit() or "\\" in unitVariableName:
-                    raise ValueError(errorMessage)
-
-                assignStatement = _ras.AssignStatement(newPath, unitVariableName)
-
-                self._assignStatements.append(assignStatement)
-
-            elif splitLine[0] == "replace":
-                splitString = line.split('$"')
-                oldString = splitString[1].split('"')[0]
-                newString = splitString[2].split('"')[0]
-
-                self.replaceLines.append((oldString, newString))
-
-            elif splitLine[0] == "changeDDckFile":
-                self.sourceFilesToChange.append(splitLine[1])
-                sinkFilesToChange = []
-                for i in range(len(splitLine)):
-                    if i < 2:
-                        pass
-                    else:
-                        sinkFilesToChange.append(splitLine[i])
-                self.sinkFilesToChange.append(sinkFilesToChange)
-
-            elif splitLine[0] == "addDDckFolder":
-                for i in range(len(splitLine)):
-                    if i > 0:
-                        self.foldersForDDckVariation.append(splitLine[i])
-            elif splitLine[0] == "fit":
-                self.listFit[splitLine[1]] = [splitLine[2], splitLine[3], splitLine[4]]
-            elif splitLine[0] == "case":
-                self.listFit[splitLine[1]] = splitLine[2:]
-            elif splitLine[0] == "fitobs":
-                self.listFitObs.append(splitLine[1])
-
-            elif splitLine[0] in self.inputs.keys():
-                nParts = len(splitLine)
-                if nParts < 2:
-                    self._raiseDdckReferenceErrorMessage(line, "<path-variable-name>", "<ddck-file-name>")
-
-                basePathVariableName = splitLine[0]
-                relativeDdckFilePath = _pl.Path(splitLine[1])
-
-                basePath = _pl.Path(self.inputs[basePathVariableName])
-                ddckFilePath = basePath / relativeDdckFilePath
-
-                if nParts == 2:
-                    componentName = ddckFilePath.parent.name
-                elif nParts == 4 and splitLine[2] == "as":
-                    componentName = splitLine[3]
-                else:
-                    self._raiseDdckReferenceErrorMessage(line, basePathVariableName, str(relativeDdckFilePath))
-
-                ddckFilePathWithComponentName = build.DdckFilePathWithComponentName(ddckFilePath, componentName)
-                self._ddckFilePathWithComponentNames.append(ddckFilePathWithComponentName)
-                self.listDdckPaths.add(str(basePath))
-                self.dictDdckPaths[str(ddckFilePath)] = str(basePath)
-            else:
-                pass
-
-        if len(self.variation) > 0:
-            self.addParametricVariations(self.variation)
-            self.variationsUsed = True
-        else:
-            self.variationsUsed = False
-
-        if len(self.sourceFilesToChange) > 0:
-            self.changeDDckFilesUsed = True
-        else:
-            self.changeDDckFilesUsed = False
-
-        if len(self.foldersForDDckVariation) > 0:
-            self.foldersForDDckVariationUsed = True
-        else:
-            self.foldersForDDckVariationUsed = False
-
-    @staticmethod
-    def _raiseDdckReferenceErrorMessage(
-        actualLine: str, pathVariableName: str, relativeDdckFilePathString: str
-    ) -> _tp.NoReturn:
-        errorMessage = f"""\
-Invalid syntax: {actualLine}.
-
-Correct possibilities are:
-
-    {pathVariableName} {relativeDdckFilePathString}
-
-when the component name should be deduced from the ddck file's containing directory's name or
-    {pathVariableName} {relativeDdckFilePathString} as <component-name>
-
-when you want to give the component name explicitly by <component-name>
-"""
-        raise ValueError(errorMessage)
 
     def copyConfigFile(self, configPath, configName):
         configFile = os.path.join(configPath, configName)

@@ -167,7 +167,7 @@ class BuildTrnsysDeck:
                 self.definitions[ddckFileName] = definedVariables
 
             self.replaceLines(replaceLineList)
-            self.linesChanged = deckUtils.changeAssignPath(self.linesChanged, "path$", str(ddckFilePath))
+            self.linesChanged = deckUtils.changeAssignPath(self.linesChanged, "path$", dictPaths[str(ddckFilePath)])
             addedLines = firstThreeLines + self.linesChanged
 
             caption = (
