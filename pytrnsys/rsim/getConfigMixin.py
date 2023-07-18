@@ -49,8 +49,8 @@ class GetConfigMixin:
                 labels.append(row[:2])
                 values.append(row[2:])
 
-            value_permutations = num.array(num.meshgrid(*values), dtype=object).reshape(len(variations), -1)
-            result = num.concatenate((labels, value_permutations), axis=1)
+            valuePermutations = num.array(num.meshgrid(*values), dtype=object).reshape(len(variations), -1)
+            result = num.concatenate((labels, valuePermutations), axis=1)
             self.variablesOutput = result.tolist()
 
         else:
@@ -87,13 +87,14 @@ class GetConfigMixin:
                 variation = []
                 for i in range(len(splitLine)):
                     if i == 0:
-                        pass
-                    elif i <= 2:
+                        continue
+
+                    if i <= 2:
                         variation.append(splitLine[i])
                     else:
                         try:
                             variation.append(float(splitLine[i]))
-                        except:
+                        except ValueError:
                             variation.append(splitLine[i])
 
                 self.variation.append(variation)
@@ -136,9 +137,10 @@ Invalid syntax: {line}. Usage:
                 sinkFilesToChange = []
                 for i in range(len(splitLine)):
                     if i < 2:
-                        pass
-                    else:
-                        sinkFilesToChange.append(splitLine[i])
+                        continue
+                    
+                    sinkFilesToChange.append(splitLine[i])
+
                 self.sinkFilesToChange.append(sinkFilesToChange)
 
             elif splitLine[0] == "addDDckFolder":
