@@ -138,7 +138,7 @@ Invalid syntax: {line}. Usage:
                 for i in range(len(splitLine)):
                     if i < 2:
                         continue
-                    
+
                     sinkFilesToChange.append(splitLine[i])
 
                 self.sinkFilesToChange.append(sinkFilesToChange)

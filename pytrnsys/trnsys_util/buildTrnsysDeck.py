@@ -138,12 +138,13 @@ class BuildTrnsysDeck:
             ddckFilePath = ddckFilePathWithComponentName.path
             ddckFileName = ddckFilePath.name
 
-            ddckFileDirPath = ddckFilePath.parent
-            if ddckFileDirPath.is_absolute():
-                absoluteDdckFileDirPath = ddckFileDirPath
+            if ddckFilePath.is_absolute():
+                absoluteDdckFilePath = ddckFilePath
             else:
-                absoluteDdckFileDirPath = _pl.Path(pathConfig) / ddckFileDirPath
-                dictPaths[str(ddckFilePath)] = str(absoluteDdckFileDirPath / ddckFilePath)
+                absoluteDdckFilePath = _pl.Path(pathConfig) / ddckFilePath
+                dictPaths[str(ddckFilePath)] = str(_pl.Path(pathConfig) / dictPaths[str(ddckFilePath)])
+
+            absoluteDdckFileDirPath = absoluteDdckFilePath.parent
 
             result = self.loadDeck(
                 str(absoluteDdckFileDirPath), ddckFileName, ddckFilePathWithComponentName.componentName
