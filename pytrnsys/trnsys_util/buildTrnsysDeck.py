@@ -318,7 +318,7 @@ class BuildTrnsysDeck:
         outfile = open(nameFile, "w")
         outfile.writelines(lines)
 
-    def addAutomaticEnergyBalancePrinters(self):
+    def addAutomaticEnergyBalancePrinters(self, timestepPrinter = False):
         """
         It reads and generates a onthly printer for energy system calculations in an automatic way
         It needs the data read by checkTrnsysDeck
@@ -332,6 +332,23 @@ class BuildTrnsysDeck:
         unitId = self.unitId + 2
         lines = deckUtils.addEnergyBalanceHourlyPrinter(unitId, eBalance)
         self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
+
+        unitId = self.unitId + 4
+        lines = deckUtils.addElectricityBalanceHourlyPrinter(unitId, eBalance)
+        self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
+
+
+        if timestepPrinter:
+            unitId = self.unitId + 3
+            lines = deckUtils.addEnergyBalanceTimestepPrinter(unitId, eBalance)
+            self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
+
+            unitId = self.unitId + 5
+            lines = deckUtils.addElectricityBalanceTimestepPrinter(unitId, eBalance)
+            self.deckText = self.deckText[:-4] + lines + self.deckText[-4:]
+
+
+        # self.writeDeck()  # Deck rewritten with added printer
 
     def replaceLines(self, replaceList):
         """

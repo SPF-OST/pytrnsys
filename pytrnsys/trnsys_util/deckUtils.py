@@ -552,6 +552,277 @@ def addEnergyBalanceHourlyPrinter(unit, eBalance):
     lines.append(line)
     line = "%s\n" % allvars
     lines.append(line)
+
+    # self.linesChanged=self.linesChanged+lines
+    return lines
+
+def addEnergyBalanceTimestepPrinter(unit, eBalance):
+    """
+    Adds a timestep printer in the deck using the energy balance variables.
+
+    based on addEnergyBalanceHourlyPrinter
+
+    1st version: JS, 12.07.2023
+
+    """
+
+    # elBalance = []
+    #
+    # for name in eBalance:
+    #     if name[0:9] == "elSysOut_" or name[0:10] == "elSysIn_Q_" or name[0:8] == "elSysIn_":
+    #         # outVar.append(self.monData[name])
+    #         elBalance.append(name)
+
+    # ImbalanceString = "elImb = "
+
+    # for el in elBalance:
+    #     if "elSysOut_" in el or "elSysIn_Q_" in el:
+    #         ImbalanceString += " - " + el
+    #
+    #     elif "elSysIn_" in el:
+    #         ImbalanceString += " + " + el
+    #
+    # if ImbalanceString == "elImb = ":
+    #     ImbalanceString += "0"
+
+    lines = []
+    line = "***************************************************************\n"
+    lines.append(line)
+    line = "**BEGIN Timestep Energy Balance printer automatically generated from DDck files\n"
+    lines.append(line)
+    line = "***************************************************************\n"
+    lines.append(line)
+    # line = "EQUATIONS 1\n";
+    # lines.append(line)
+    # line = ImbalanceString + '\n';
+    # lines.append(line)
+    line = "CONSTANTS 1\n"
+    lines.append(line)
+    line = "unitPrintEnBal_ts=%d\n" % unit
+    lines.append(line)
+    line = "ASSIGN temp\ENERGY_BALANCE_TIMESTEP.Plt unitPrintEnBal_ts\n"
+    lines.append(line)
+    line = "UNIT %d Type 25\n" % unit
+    lines.append(line)
+    line = "PARAMETERS 10\n"
+    lines.append(line)
+    line = "dtPrUser                  ! 1 Printing interval\n"
+    lines.append(line)
+    line = "tStrtUser            ! 2 Start time\n"
+    lines.append(line)
+    line = "tEndUser                ! 3 Stop time\n"
+    lines.append(line)
+    line = "unitPrintEnBal_ts     ! 4 Logical unit\n"
+    lines.append(line)
+    line = "0     ! 5 Units printing mode\n"
+    lines.append(line)
+    line = "0     ! 6 Relative or absolute start time\n"
+    lines.append(line)
+    line = "-1     ! 7 Overwrite or Append\n"
+    lines.append(line)
+    line = "-1     ! 8 Print header\n"
+    lines.append(line)
+    line = "0     ! 9 Delimiter\n"
+    lines.append(line)
+    line = "1     ! 10 Print labels\n"
+    lines.append(line)
+
+    # line = "unitPrintElBal_ts !1: Logical unit number\n"
+    # lines.append(line)
+    # line = "-1 !2: for monthly summaries\n"
+    # lines.append(line)
+    # line = "0  !3: 0:print at each timestep\n"
+    # lines.append(line)
+    # line = "1 !4 1: hourly integration\n"
+    # lines.append(line)
+    # line = "1  !5 number of outputs to avoid integration\n"
+    # lines.append(line)
+    # line = "1  !6 output number to avoid integration\n"
+    # lines.append(line)
+    line = "INPUTS %d\n" % (len(eBalance) + 1)
+    lines.append(line)
+    allvars = " ".join(eBalance) + " qImb"
+    line = "%s\n" % allvars
+    lines.append(line)
+    line = "*******************************\n"
+    lines.append(line)
+    line = "%s\n" % allvars
+    lines.append(line)
+
+    # self.linesChanged=self.linesChanged+lines
+    return lines
+
+
+
+def addElectricityBalanceHourlyPrinter(unit, eBalance):
+    """
+    Adds a hourly printer in the deck using the electricity balance variables.
+
+    based on addEnergyBalanceHourlyPrinter
+
+    1st version: JS, 21.06.2023
+
+    """
+
+    elBalance = []
+
+    for name in eBalance:
+        if name[0:9] == "elSysOut_" or name[0:10] == "elSysIn_Q_" or name[0:8] == "elSysIn_":
+            # outVar.append(self.monData[name])
+            elBalance.append(name)
+
+    ImbalanceString = "elImb = "
+
+    for el in elBalance:
+        if "elSysOut_" in el or "elSysIn_Q_" in el:
+            ImbalanceString += " - " + el
+
+        elif "elSysIn_" in el:
+            ImbalanceString += " + " + el
+
+    if ImbalanceString == "elImb = ":
+        ImbalanceString += "0"
+
+    lines = []
+    line = "***************************************************************\n"
+    lines.append(line)
+    line = "**BEGIN Hourly Electricity Balance printer automatically generated from DDck files\n"
+    lines.append(line)
+    line = "***************************************************************\n"
+    lines.append(line)
+    line = "EQUATIONS 1\n";
+    lines.append(line)
+    line = ImbalanceString + '\n';
+    lines.append(line)
+    line = "CONSTANTS 1\n"
+    lines.append(line)
+    line = "unitPrintElBal_h=%d\n" % unit
+    lines.append(line)
+    line = "ASSIGN temp\ELECTRICITY_BALANCE_HR.Prt unitPrintElBal_h\n"
+    lines.append(line)
+    line = "UNIT %d Type 46\n" % unit
+    lines.append(line)
+    line = "PARAMETERS 6\n"
+    lines.append(line)
+    line = "unitPrintElBal_h !1: Logical unit number\n"
+    lines.append(line)
+    line = "-1 !2: for monthly summaries\n"
+    lines.append(line)
+    line = "1  !3: 1:print at absolute times\n"
+    lines.append(line)
+    line = "1 !4 1: hourly integration\n"
+    lines.append(line)
+    line = "1  !5 number of outputs to avoid integration\n"
+    lines.append(line)
+    line = "1  !6 output number to avoid integration\n"
+    lines.append(line)
+    line = "INPUTS %d\n" % (len(elBalance) + 2)
+    lines.append(line)
+    allvars = "TIME " + " ".join(elBalance) + " elImb"
+    line = "%s\n" % allvars
+    lines.append(line)
+    line = "*******************************\n"
+    lines.append(line)
+    line = "%s\n" % allvars
+    lines.append(line)
+
+    # self.linesChanged=self.linesChanged+lines
+    return lines
+
+def addElectricityBalanceTimestepPrinter(unit, eBalance):
+    """
+    Adds a timestep printer in the deck using the electricity balance variables.
+
+    based on addEnergyBalanceHourlyPrinter
+
+    1st version: JS, 26.06.2023
+
+    """
+
+    elBalance = []
+
+    for name in eBalance:
+        if name[0:9] == "elSysOut_" or name[0:10] == "elSysIn_Q_" or name[0:8] == "elSysIn_":
+            # outVar.append(self.monData[name])
+            elBalance.append(name)
+
+    # ImbalanceString = "elImb = "
+
+    # for el in elBalance:
+    #     if "elSysOut_" in el or "elSysIn_Q_" in el:
+    #         ImbalanceString += " - " + el
+    #
+    #     elif "elSysIn_" in el:
+    #         ImbalanceString += " + " + el
+    #
+    # if ImbalanceString == "elImb = ":
+    #     ImbalanceString += "0"
+
+    lines = []
+    line = "***************************************************************\n"
+    lines.append(line)
+    line = "**BEGIN Timestep Electricity Balance printer automatically generated from DDck files\n"
+    lines.append(line)
+    line = "***************************************************************\n"
+    lines.append(line)
+    # line = "EQUATIONS 1\n";
+    # lines.append(line)
+    # line = ImbalanceString + '\n';
+    # lines.append(line)
+    line = "CONSTANTS 1\n"
+    lines.append(line)
+    line = "unitPrintElBal_ts=%d\n" % unit
+    lines.append(line)
+    line = "ASSIGN temp\ELECTRICITY_BALANCE_TIMESTEP.Plt unitPrintElBal_ts\n"
+    lines.append(line)
+    line = "UNIT %d Type 25\n" % unit
+    lines.append(line)
+    line = "PARAMETERS 10\n"
+    lines.append(line)
+    line = "dtPrUser                  ! 1 Printing interval\n"
+    lines.append(line)
+    line = "tStrtUser            ! 2 Start time\n"
+    lines.append(line)
+    line = "tEndUser                ! 3 Stop time\n"
+    lines.append(line)
+    line = "unitPrintElBal_ts     ! 4 Logical unit\n"
+    lines.append(line)
+    line = "0     ! 5 Units printing mode\n"
+    lines.append(line)
+    line = "0     ! 6 Relative or absolute start time\n"
+    lines.append(line)
+    line = "-1     ! 7 Overwrite or Append\n"
+    lines.append(line)
+    line = "-1     ! 8 Print header\n"
+    lines.append(line)
+    line = "0     ! 9 Delimiter\n"
+    lines.append(line)
+    line = "1     ! 10 Print labels\n"
+    lines.append(line)
+
+    # line = "unitPrintElBal_ts !1: Logical unit number\n"
+    # lines.append(line)
+    # line = "-1 !2: for monthly summaries\n"
+    # lines.append(line)
+    # line = "0  !3: 0:print at each timestep\n"
+    # lines.append(line)
+    # line = "1 !4 1: hourly integration\n"
+    # lines.append(line)
+    # line = "1  !5 number of outputs to avoid integration\n"
+    # lines.append(line)
+    # line = "1  !6 output number to avoid integration\n"
+    # lines.append(line)
+    line = "INPUTS %d\n" % (len(elBalance) + 1)
+    lines.append(line)
+    allvars = " ".join(elBalance) + " elImb"
+    line = "%s\n" % allvars
+    lines.append(line)
+    line = "*******************************\n"
+    lines.append(line)
+    line = "%s\n" % allvars
+    lines.append(line)
+
+    # self.linesChanged=self.linesChanged+lines
     return lines
 
 

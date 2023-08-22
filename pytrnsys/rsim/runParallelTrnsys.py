@@ -366,7 +366,11 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
             deck.saveUnitTypeFile()
 
         if self.inputs["addAutomaticEnergyBalance"] == True:
-            deck.addAutomaticEnergyBalancePrinters()
+            if self.inputs["addTimestepEnergyBalance"] == True:
+                deck.addAutomaticEnergyBalancePrinters(timestepPrinter = True)
+            else:
+                deck.addAutomaticEnergyBalancePrinters()
+
             deck.writeDeck()  # Deck rewritten with added printer
 
         deck.analyseDck()
