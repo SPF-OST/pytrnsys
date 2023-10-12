@@ -407,7 +407,9 @@ class DeckTrnsys:
         self, newAssignStatements: tp.Sequence[_ras.AssignStatement]
     ) -> None:
         originalDeckContent = "".join(self.linesDeck)
-        updatedDeckContent = _ras.replaceAssignStatementsBasedOnUnitVariables(originalDeckContent, newAssignStatements)
+        updatedDeckContent = _ras.replaceAssignStatementsBasedOnUnitVariables(
+            originalDeckContent, newAssignStatements, logger
+        )
 
         deckFilePath = pl.Path(self.nameDck)
         deckFilePath.write_text(updatedDeckContent)
