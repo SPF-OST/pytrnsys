@@ -3,18 +3,15 @@
 # Run from top-level directory
 
 import argparse as ap
-import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
-import typing as tp
-import sysconfig as _sysconfig
-import venv
-
 import sys
+import sysconfig as sc
 import time
+import typing as tp
 
-_SCRIPTS_DIR = pl.Path(_sysconfig.get_path("scripts"))
+_SCRIPTS_DIR = pl.Path(sc.get_path("scripts"))
 
 
 def main():
