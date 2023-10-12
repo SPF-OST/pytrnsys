@@ -22,7 +22,9 @@ class TestReplaceAssignStatements:
 
         loggerMock = _mock.NonCallableMock(spec_set=["warning"])
 
-        actualResult = _ra.replaceAssignStatementsBasedOnUnitVariables(inputContent, newAssignStatements, loggerMock)
+        actualResult = _ra.replaceAssignStatementsBasedOnUnitVariables(
+            inputContent, newAssignStatements, loggerMock  # /NOSONAR
+        )
 
         assert actualResult == expectedResult
 
