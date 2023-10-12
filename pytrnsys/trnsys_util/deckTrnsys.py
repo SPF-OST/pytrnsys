@@ -1,8 +1,8 @@
 # pylint: skip-file
 # type: ignore
+import io
 import logging
 import os
-import pathlib as pl
 import re
 import shutil
 import typing as tp
@@ -29,7 +29,7 @@ class DeckTrnsys:
 
         self.setPathAndNames(_path, _name)
 
-        self.linesDeck = ""
+        self.linesDeck = []
         self.cleanMode = False
         self.useAbsoluteTempPath = False  # actually False does not work since trnsys does not work with  ./temp/whatever. Corrected False works since temp/whatever works !!
 
@@ -163,7 +163,6 @@ class DeckTrnsys:
 
     def ignoreOnlinePlotter(self):
         jBegin = 0
-        jEnd = 0
         found = False
 
         plotterFound = 0
@@ -171,41 +170,27 @@ class DeckTrnsys:
         for i in range(len(self.linesDeck)):
             splitBlank = self.linesDeck[i].split()
 
-            #            if(jBegin>0 and i>jBegin+30):
-            #                raise ValueError("jBegin found and not finishd yet")
-
-            #            print "check line i:%d"%i
-
             if found == True:
                 try:
-                    #                  print splitBlank[0].replace(" ","").lower()
-
                     if splitBlank[0].replace(" ", "").lower() == "LABELS".lower():
                         nLabelString = splitBlank[1].replace(" ", "")
                         nLabel = int(nLabelString)
 
                         jEnd = i + nLabel
 
-                        #                      print "jBegin:%d jEnd:%d nLabel:%d"%(jBegin,jEnd,nLabel)
-
-                        #                      raise ValueError()
-
                         for j in range(jBegin, jEnd + 1, 1):
-                            #                          print "COMMENT (1) FROM j:%d"%(j)
                             self.linesDeck[j] = "**IGNORE ONLINE PLOTTER - 1" + self.linesDeck[j]
 
                         found = False
-                        i = jEnd  # it does nothing !!!
+                        i = jEnd
 
                 except:
-                    #                print "COMMENT (3) FROM i:%d"%(i)
                     self.linesDeck[i] = "**IGNORE ONLINE PLOTTER 3 - \n" + self.linesDeck[i]
 
             else:  # First it looks for the unit number corresponding to the TYPE and comments util it enters into the LABEL (try section above)
                 found = False
                 try:
                     unit = splitBlank[0].replace(" ", "")
-                    nUnit = splitBlank[1].replace(" ", "")
                     types = splitBlank[2].replace(" ", "")
                     ntype = splitBlank[3].replace(" ", "")
 
@@ -213,20 +198,12 @@ class DeckTrnsys:
                         jBegin = i
                         found = True
                         self.linesDeck[i] = "** IGNORE ONLINE PLOTTER - " + self.linesDeck[i]
-                        #                        print "FOUND CASE i:%d %s"%(i,ntype)
                         plotterFound = plotterFound + 1
-
-                #                    print "FOUND CASE j:%d TYPE:%s UNIT:%s "%(j,ntype,nUnit)
 
                 except:
                     pass
 
-        outfile = open(self.nameDck, "w")
-
-        outfile.writelines(self.linesDeck)
-        outfile.close()
-
-        return None
+        return
 
     def getVariables(self):
         self.eliminateComments = (
@@ -273,144 +250,81 @@ class DeckTrnsys:
         outfile.close()
 
     def changeParameter(self, _parameters):
-        lines = self.linesDeck
-
-        #         print "linesDeck"
-        #         print self.linesDeck
         logger.debug("Change Parameters deckTrnsys Class")
-        #         print _parameters
 
         if _parameters != None:
             self.parameters = _parameters
 
-            for i in range(len(lines)):
-                splitEquality = lines[i].split("=")
-                splitBlank = lines[i].split()
-
-                #                 print splitEquality
-                # print splitBlank
-
-                #                 Im IN ASSIGN building\T44A38sfh100.bui 56
-                #                 fileNameWithoutCommas:building\T44A38sfh100.bui
-                #                 ['building\\T44A38sfh100.bui']
+            for i in range(len(self.linesDeck)):
+                splitEquality = self.linesDeck[i].split("=")
+                splitBlank = self.linesDeck[i].split()
 
                 try:
                     if splitBlank[0] == "ASSIGN":
-                        #                         print "Im IN %s %s %s " % (splitBlank[0],splitBlank[1],splitBlank[2])
-
                         fileNameWithoutCommas = splitBlank[1].replace('"', "")
-
-                        #                         print "fileNameWithoutCommas:%s" % fileNameWithoutCommas
-
-                        # ==============================================================================
-                        #                              BUILDING DATA
-                        # ==============================================================================
-
-                        # buildingSplit = fileNameWithoutCommas.split("building\\")
-
-                        #                          if(len(buildingSplit)>1):
-                        #                              #Not used from the common folder becasue if some executable try to read the same file it fails.
-                        #                              try: #It changes the buildign anme if set in parameters
-                        #                                  myFileInNewPath = self.pathOutput +"\\building\\"+ self.parameters["buildingName"]
-                        #                                  self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
-                        #                              except: #change the path to the common Trnsys folder
-                        #                                  myFileInNewPath = self.pathOutput +"\\building\\"+ buildingSplit[1]
-                        #                                  self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
-                        #
-                        # #                                 try: #It changes the buildign anme if set in parameters
-                        # #                                     myFileInNewPath = self.myCommonTrnsysFolder +"\\building\\"+ self.parameters["buildingName"]
-                        # #                                     self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
-                        # #                                 except: #change the path to the common Trnsys folder
-                        # #                                     myFileInNewPath = self.myCommonTrnsysFolder +"\\building\\"+ buildingSplit[1]
-                        # #                                     self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath,splitBlank[2])
-                        #
-                        #                              print "Building changed :%s " % self.linesDeck[i]
-
-                        # ==============================================================================
-                        #                               COMPRESSOR
-                        # ==============================================================================
 
                         compressorDataSplit = fileNameWithoutCommas.split("Compressor\\")
 
                         if len(compressorDataSplit) > 1:
                             myFileInNewPath = self.HOMEPath + "Compressor\\" + "%s" % compressorDataSplit[1]
-                            lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
+                            self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
 
-                            print("Compressor data changed :%s " % lines[i])
-
-                        # ==============================================================================
-                        #                               TEMP FOLDER
-                        # ==============================================================================
+                            print("Compressor data changed :%s " % self.linesDeck[i])
 
                         nameSplited = fileNameWithoutCommas.split("temp\\")
 
-                        #                         print nameSplited
-
                         try:
-                            #                             print "split[0]:%f splt[1]:%s" % (fileNameWithoutCommas[0],fileNameWithoutCommas[1])
                             if self.useAbsoluteTempPath:
                                 myFileInNewPath = self.filesOutputPath + "\\temp\\" + nameSplited[1]
-                                lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
+                                self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
                             else:
                                 myFileInNewPath = "temp\\" + nameSplited[1]
-                                lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
-
-                        #                             print "lineChanged-0 : %s pathOut:%s nameSplied:%s" % (self.linesDeck[i],self.pathOutput,nameSplited[1])
+                                self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
 
                         except:
                             if nameSplited[0] == "Temp_zone.BAL" or nameSplited[0] == "Energy_zone.BAL":
                                 myFileInNewPath = self.filesOutputPath + "\\" + nameSplited[0]
-                                lines[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
-                #                                 print "lineChanged-1 : %s pathOut:%s nameSplited:%s" % (self.linesDeck[i],self.pathOutput,nameSplited[0])
+                                self.linesDeck[i] = "ASSIGN %s %s \n" % (myFileInNewPath, splitBlank[2])
 
                 except:
                     pass
 
                 try:
                     myName = splitEquality[0].replace(" ", "")
-                    value = splitEquality[1].replace(" ", "")
-
-                    #                     print splitEquality,myName
-
-                    #                     print self.parameters
-                    #                     print "myName:%s- oldValue:%s\n" % (myName,value)
-
-                    #                     print myName,value
 
                     for key in self.parameters.keys():
-                        # print ("IN TRY key:%s"%key)
-
-                        #                         myName = string.replace(name," ","")
-
-                        if key.lower() == myName.lower():  # avoid case sensitive
+                        if key.lower() == myName.lower():  # avoid case-sensitive
                             #
                             myNewLine = "%s=%s ! value changed from original by executeTrnsys.py\n" % (
                                 key,
                                 self.parameters[key],
                             )
                             logger.debug("NEW LINE %s" % myNewLine)
-                            #
-                            lines[i] = myNewLine
+
+                            self.linesDeck[i] = myNewLine
 
                 except:
-                    #                    print "Not an equality name:%s\n" % name
                     pass
 
             logger.debug("variation deck file at %s" % self.nameDck)
-
-            outfile = open(self.nameDck, "w", encoding="windows-1252")
-
-            outfile.writelines(lines)
-            outfile.close()
 
     def changeAssignStatementsBasedOnUnitVariables(
         self, newAssignStatements: tp.Sequence[_ras.AssignStatement]
     ) -> None:
         originalDeckContent = "".join(self.linesDeck)
-        updatedDeckContent = _ras.replaceAssignStatementsBasedOnUnitVariables(originalDeckContent, newAssignStatements)
+        updatedDeckContent = _ras.replaceAssignStatementsBasedOnUnitVariables(
+            originalDeckContent, newAssignStatements, logger
+        )
 
-        deckFilePath = pl.Path(self.nameDck)
-        deckFilePath.write_text(updatedDeckContent)
+        newLines = self._readlines(updatedDeckContent)
+        self.linesDeck = newLines
+
+    @staticmethod
+    def _readlines(string: str) -> tp.Sequence[str]:
+        """Like `io.IOBase.readlines` but for strings."""
+        stringIO = io.StringIO(string)
+        lines = stringIO.readlines()
+        return lines
 
     def getTypeFromUnit(self, myUnit):
         return deckUtils.getTypeFromUnit(myUnit, self.linesDeck)
