@@ -155,8 +155,11 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
             tests[i].loadDeck(check=self.inputs["checkDeck"])
 
             tests[i].changeParameter(self.parameters)
+
             if self.inputs["ignoreOnlinePlotter"] == True:
                 tests[i].ignoreOnlinePlotter()
+
+            tests[i].deckTrnsys.writeDeck()
 
             tests[i].setRemovePopUpWindow(self.inputs["removePopUpWindow"])
 
@@ -311,6 +314,8 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
 
             if self.inputs["ignoreOnlinePlotter"] == True:
                 tests[i].ignoreOnlinePlotter()
+
+            tests[i].deckTrnsys.writeDeck()
 
             tests[i].cleanAndCreateResultsTempFolder()
             tests[i].moveFileFromSource()

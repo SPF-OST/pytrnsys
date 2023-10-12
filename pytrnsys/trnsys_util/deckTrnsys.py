@@ -163,7 +163,6 @@ class DeckTrnsys:
 
     def ignoreOnlinePlotter(self):
         jBegin = 0
-        jEnd = 0
         found = False
 
         plotterFound = 0
@@ -171,41 +170,27 @@ class DeckTrnsys:
         for i in range(len(self.linesDeck)):
             splitBlank = self.linesDeck[i].split()
 
-            #            if(jBegin>0 and i>jBegin+30):
-            #                raise ValueError("jBegin found and not finishd yet")
-
-            #            print "check line i:%d"%i
-
             if found == True:
                 try:
-                    #                  print splitBlank[0].replace(" ","").lower()
-
                     if splitBlank[0].replace(" ", "").lower() == "LABELS".lower():
                         nLabelString = splitBlank[1].replace(" ", "")
                         nLabel = int(nLabelString)
 
                         jEnd = i + nLabel
 
-                        #                      print "jBegin:%d jEnd:%d nLabel:%d"%(jBegin,jEnd,nLabel)
-
-                        #                      raise ValueError()
-
                         for j in range(jBegin, jEnd + 1, 1):
-                            #                          print "COMMENT (1) FROM j:%d"%(j)
                             self.linesDeck[j] = "**IGNORE ONLINE PLOTTER - 1" + self.linesDeck[j]
 
                         found = False
-                        i = jEnd  # it does nothing !!!
+                        i = jEnd
 
                 except:
-                    #                print "COMMENT (3) FROM i:%d"%(i)
                     self.linesDeck[i] = "**IGNORE ONLINE PLOTTER 3 - \n" + self.linesDeck[i]
 
             else:  # First it looks for the unit number corresponding to the TYPE and comments util it enters into the LABEL (try section above)
                 found = False
                 try:
                     unit = splitBlank[0].replace(" ", "")
-                    nUnit = splitBlank[1].replace(" ", "")
                     types = splitBlank[2].replace(" ", "")
                     ntype = splitBlank[3].replace(" ", "")
 
@@ -213,20 +198,12 @@ class DeckTrnsys:
                         jBegin = i
                         found = True
                         self.linesDeck[i] = "** IGNORE ONLINE PLOTTER - " + self.linesDeck[i]
-                        #                        print "FOUND CASE i:%d %s"%(i,ntype)
                         plotterFound = plotterFound + 1
-
-                #                    print "FOUND CASE j:%d TYPE:%s UNIT:%s "%(j,ntype,nUnit)
 
                 except:
                     pass
 
-        outfile = open(self.nameDck, "w")
-
-        outfile.writelines(self.linesDeck)
-        outfile.close()
-
-        return None
+        return
 
     def getVariables(self):
         self.eliminateComments = (
