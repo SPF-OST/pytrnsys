@@ -32,4 +32,4 @@ class TestReplaceAssignStatements:
             "The following assign statements were not matched:\n\tassign ..\\ddck\\some\\path.txt NonExistingUnit"
         )
 
-        loggerMock.assert_called_once_with("%s", expectedLoggedWarning)
+        loggerMock.warning.assert_called_once_with("%s", expectedLoggedWarning)
