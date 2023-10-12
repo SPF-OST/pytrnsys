@@ -31,8 +31,6 @@ def main():
 
     _maybeCreateDiagrams(arguments)
 
-    _maybeCreateExecutable(arguments)
-
     _maybeRunPytest(arguments, testResultsDirPath)
 
 
@@ -158,36 +156,6 @@ def _maybeCreateDiagrams(arguments):
         diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
         cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys -d test-results pytrnsys"
         _printAndRun(cmd.split())
-
-
-def _maybeCreateExecutable(arguments):
-    if arguments.shallRunAll or arguments.shallCreateExecutable:
-        releaseDirPath = pl.Path("release").resolve(strict=True)
-
-        sh.rmtree(releaseDirPath / "build", ignore_errors=True)
-        sh.rmtree(releaseDirPath / "dist", ignore_errors=True)
-        sh.rmtree(releaseDirPath / "pyinstaller-venv", ignore_errors=True)
-
-        venvDirPath = releaseDirPath / "pyinstaller-venv"
-        venv.create(venvDirPath, with_pip=True)
-
-        commands = [
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install --upgrade pip",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install wheel",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install -r requirements\release.txt",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller.remove",
-            r"release\pyinstaller-venv\Scripts\python.exe dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
-        ]
-
-        for cmd in commands:
-            _printAndRun(cmd.split())
-
-        os.chdir("release")
-
-        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe pytrnsys-gui.spec"
-        _printAndRun(cmd.split())
-
-        os.chdir("..")
 
 
 def _maybeRunPytest(arguments, testResultsDirPath):
