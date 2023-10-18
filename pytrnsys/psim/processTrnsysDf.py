@@ -1004,19 +1004,7 @@ class ProcessTrnsysDf:
             self._computeMonthlyStatistics(newVariableName)
 
         for equation in self.inputs["calc"]:
-            namespace = {
-                **self.deckData,
-                **self.__dict__,
-                **self.yearlySums,
-                **self.yearlyMin,
-                **self.yearlyMax,
-                **self.yearlyAvg,
-                **self.cumSumEnd,
-            }
-            expression = equation.replace(" ", "")
-            exec(expression, globals(), namespace)
-            self.deckData = namespace
-            logger.debug(expression)
+            self._doCalc(equation)
 
         for equation in self.inputs["calcMonthly"]:
             newVariableName = self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.monDataDf)
@@ -1055,23 +1043,9 @@ class ProcessTrnsysDf:
             self._updateCumSumVariables(baseVariables, self.steDataDf)
 
         for equation in self.inputs["calcTest"]:
-            namespace = {
-                **self.deckData,
-                **self.__dict__,
-                **self.yearlySums,
-                **self.yearlyMin,
-                **self.yearlyMax,
-                **self.yearlyAvg,
-                **self.cumSumEnd,
-            }
-            expression = equation.replace(" ", "")
-            exec(expression, globals(), namespace)
-            self.deckData = namespace
-            logger.debug(expression)
+            self._doCalc(equation)
 
-        for equation in self.inputs[
-            "calcTimeStepTest"
-        ]:
+        for equation in self.inputs["calcTimeStepTest"]:
             self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.steDataDf)
             self._computeYearlyStatistics(self.steDataDf)
 
@@ -1083,6 +1057,21 @@ class ProcessTrnsysDf:
             newVariableName = self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.monDataDf)
             self._computeMonthlyStatistics(newVariableName)
 
+    def _doCalc(self, equation: str) -> None:
+        namespace = {
+            **self.deckData,
+            **self.__dict__,
+            **self.yearlySums,
+            **self.yearlyMin,
+            **self.yearlyMax,
+            **self.yearlyAvg,
+            **self.cumSumEnd,
+        }
+        expression = equation.replace(" ", "")
+        exec(expression, globals(), namespace)
+        self.deckData = namespace
+        logger.debug(expression)
+
     def _updateCumSumVariables(self, baseVariables: tp.Sequence[str], df: pd.DataFrame) -> None:
         for baseVariable in baseVariables:
             cumSumVariableName = "cumsum_" + baseVariable
@@ -1090,26 +1079,35 @@ class ProcessTrnsysDf:
             self.cumSumEnd[cumSumVariableName + "_End"] = df[cumSumVariableName][-1]
 
     def _evalAssignmentInDataFrameAndGetNewVariableName(self, equation: str, df: pd.DataFrame) -> str:
-        kwargs = {
-            "local_dict": {
-                **self.deckData,
-                **self.yearlySums,
-                **self.yearlyMin,
-                **self.yearlyMax,
-                **self.yearlyAvg,
-                **self.cumSumEnd,
-            }
-        }
-        scalars = kwargs["local_dict"].keys()
+        splitEquation = equation.split("=")
+        variableName = splitEquation[0].strip()
+
+        equation = self._prefixScalars(equation)
+
+        df.eval(equation, inplace=True, local_dict=self._getLocals())
+
+        return variableName
+
+    def _prefixScalars(self, equation: str) -> str:
         splitEquation = equation.split("=")
         parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
         parts = re.split(r"[*/+-]", parsedEquation.replace(r"(", "").replace(r")", ""))
-        for scalar in scalars:
+
+        scalarVariableNames = self._getLocals().keys()
+        for scalar in scalarVariableNames:
             if scalar in parts:
                 equation = equation.replace(scalar, "@" + scalar)
-        df.eval(equation, inplace=True, **kwargs)
-        variableName = splitEquation[0].strip()
-        return variableName
+        return equation
+
+    def _getLocals(self) -> tp.Mapping[str, float]:
+        return {
+            **self.deckData,
+            **self.yearlySums,
+            **self.yearlyMin,
+            **self.yearlyMax,
+            **self.yearlyAvg,
+            **self.cumSumEnd,
+        }
 
     def _computeYearlyStatistics(self, df: pd.DataFrame) -> None:
         self.yearlyMin = {value + "_Min": df[value].min() for value in df.columns}
@@ -1440,7 +1438,9 @@ class ProcessTrnsysDf:
             min_time = selectedDays[i]
             max_time = selectedDays[i] + pd.to_timedelta(23, unit="h")
 
-            df_DataSelected = df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
+            df_DataSelected = df_selectedDay[
+                (df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)
+            ]
             Test = pd.DataFrame(df_DataSelected.sum(), df_DataSelected.columns)
             Test2 = Test.T
             Test2["Date"] = min_time.date()
