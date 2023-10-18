@@ -98,13 +98,6 @@ def _parseArguments() -> ap.Namespace:
         action="store_true",
         dest="shallRunAll",
     )
-    parser.add_argument(
-        "-x",
-        "--executable",
-        help="Create executable using pyinstaller",
-        action="store_true",
-        dest="shallCreateExecutable",
-    )
     arguments = parser.parse_args()
     return arguments
 
