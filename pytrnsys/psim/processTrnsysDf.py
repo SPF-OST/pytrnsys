@@ -1115,7 +1115,7 @@ class ProcessTrnsysDf:
         self.yearlyAvg = {value + "_Avg": df[value].mean() for value in df.columns}
 
     def _computeMonthlyStatistics(self, variableName: str) -> None:
-        self.monDataDf["Cum_" + variableName : str] = self.monDataDf[variableName:str].cumsum()
+        self.monDataDf["Cum_" + variableName] = self.monDataDf[variableName].cumsum()
         self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
 
     def addPlotConfigEquation(self):
