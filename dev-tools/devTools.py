@@ -155,7 +155,6 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         and arguments.lintArguments is None
         and arguments.blackArguments is None
         and arguments.diagramsFormat is None
-        and not arguments.shallCreateExecutable
     )
     if arguments.shallRunAll or arguments.pytestMarkersExpression is not None or wasCalledWithoutArguments:
         markerExpressions = _getMarkerExpressions(arguments.pytestMarkersExpression)
