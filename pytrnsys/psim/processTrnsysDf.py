@@ -993,197 +993,130 @@ class ProcessTrnsysDf:
             elem1 = splitEquation[1].split(",")[0][5:]  # removing max(
             elem2 = splitEquation[1].split(",")[1][:-1]
 
-            value = splitEquation[0].strip()
+            newVariableName = splitEquation[0].strip()
 
-            self.monDataDf[value] = self.monDataDf[elem1]
+            self.monDataDf[newVariableName] = self.monDataDf[elem1]
             for i in range(len(self.monDataDf[elem1])):
-                self.monDataDf[value].values[i] = min(self.monDataDf[elem1].values[i], self.monDataDf[elem2].values[i])
+                self.monDataDf[newVariableName].values[i] = min(
+                    self.monDataDf[elem1].values[i], self.monDataDf[elem2].values[i]
+                )
 
-            self.monDataDf["Cum_" + value] = self.monDataDf[value].cumsum()
-            self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
+            self._computeMonthlyStatistics(newVariableName)
 
         for equation in self.inputs["calc"]:
-            namespace = {
-                **self.deckData,
-                **self.__dict__,
-                **self.yearlySums,
-                **self.yearlyMin,
-                **self.yearlyMax,
-                **self.yearlyAvg,
-                **self.cumSumEnd,
-            }
-            expression = equation.replace(" ", "")
-            exec(expression, globals(), namespace)
-            self.deckData = namespace
-            logger.debug(expression)
+            self._doCalc(equation)
 
         for equation in self.inputs["calcMonthly"]:
-            kwargs = {
-                "local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax, **self.yearlyAvg}
-            }
-            scalars = kwargs["local_dict"].keys()
-            splitEquation = equation.split("=")
-            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
-            parts = re.split(r"[*/+-]", parsedEquation.replace(r"(", "").replace(r")", ""))
-            for scalar in scalars:
-                if scalar in parts:
-                    equation = equation.replace(scalar, "@" + scalar)
-            self.monDataDf.eval(equation, inplace=True, **kwargs)
-            value = splitEquation[0].strip()
-            self.monDataDf["Cum_" + value] = self.monDataDf[value].cumsum()
-            self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
+            newVariableName = self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.monDataDf)
+            self._computeMonthlyStatistics(newVariableName)
 
         for equation in self.inputs["calcDaily"]:
-            kwargs = {"local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax}}
-            scalars = kwargs["local_dict"].keys()
-            splitEquation = equation.split("=")
-            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
-            parts = re.split(r"[*/+-]", parsedEquation.replace(r"(", "").replace(r")", ""))
-            for scalar in scalars:
-                if scalar in parts:
-                    equation = equation.replace(scalar, "@" + scalar)
-            self.dayDataDf.eval(equation, inplace=True, **kwargs)
-            self.yearlyMin = {value + "_Min": self.dayDataDf[value].min() for value in self.dayDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.dayDataDf[value].max() for value in self.dayDataDf.columns}
-            # self.cumSumEnd = {value + "_End": self.dayDataDf[value][-1] for value in self.dayDataDf.columns} #I guess not needed since we dont have cumsumDaily?
-            self.yearlyAvg = {value + "_Avg": self.dayDataDf[value].mean() for value in self.houDataDf.columns}
+            self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.dayDataDf)
+            self._computeYearlyStatistics(self.dayDataDf)
 
         for equation in self.inputs["calcHourly"]:
-            kwargs = {
-                "local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax, **self.yearlyAvg}
-            }
-            scalars = kwargs["local_dict"].keys()
-            splitEquation = equation.split("=")
-            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
-            parts = re.split(r"[*/+-]", parsedEquation.replace(r"(", "").replace(r")", ""))
-            for scalar in scalars:
-                if scalar in parts:
-                    equation = equation.replace(scalar, "@" + scalar)
-            self.houDataDf.eval(equation, inplace=True, **kwargs)
-            self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-            # self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
-            self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
+            self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.houDataDf)
+            self._computeYearlyStatistics(self.houDataDf)
 
         for equation in self.inputs["calcMonthlyFromHourly"]:
-            kwargs = {"local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax}}
-            scalars = kwargs["local_dict"].keys()
-            splitEquation = equation.split("=")
-            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
-            parts = re.split(r"[*/+-]", parsedEquation.replace(r"(", "").replace(r")", ""))
-            for scalar in scalars:
-                if scalar in parts:
-                    equation = equation.replace(scalar, "@" + scalar)
-            self.houDataDf.eval(equation, inplace=True, **kwargs)
-            calculatedVariableName = splitEquation[0].strip()
-            calculatedVariableDf = self.houDataDf[calculatedVariableName]
+            newVariableName = self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.houDataDf)
+
+            calculatedVariableDf = self.houDataDf[newVariableName]
             calculatedVariableMonth = num.array(calculatedVariableDf.index.month)
             calculatedVariable = calculatedVariableDf.to_numpy()
             calculatedVariablePerMonth = []
             for month in num.arange(1, 13, 1):
                 support = num.where(calculatedVariableMonth == month, 1, 0)
                 calculatedVariablePerMonth.append(num.dot(support, calculatedVariable))
-            self.monDataDf[calculatedVariableName] = calculatedVariablePerMonth
-            self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-            # self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
-            self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
+            self.monDataDf[newVariableName] = calculatedVariablePerMonth
 
-        for equation in self.inputs["calcCumSumHourly"]:
-            for value in equation:
-                for key in self.houDataDf.columns:
-                    if key == value:
-                        self.houDataDf["cumsum_" + value] = self.houDataDf[value].cumsum()
-                        myValue = "cumsum_" + value
-                        self.cumSumEnd = {myValue + "_End": self.houDataDf[myValue][-1]}
+            self._computeYearlyStatistics(self.houDataDf)
+
+        for baseVariables in self.inputs["calcCumSumHourly"]:
+            self._updateCumSumVariables(baseVariables, self.houDataDf)
 
         for equation in self.inputs["calcTimeStep"]:
-            kwargs = {"local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax}}
-            scalars = kwargs["local_dict"].keys()
-            splitEquation = equation.split("=")
-            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
-            parts = re.split(r"[*/+-]", parsedEquation.replace(r"(", "").replace(r")", ""))
-            for scalar in scalars:
-                if scalar in parts:
-                    equation = equation.replace(scalar, "@" + scalar)
-            self.steDataDf.eval(
-                equation, inplace=True, **kwargs
-            )  # by doing so we add also the key into the dictionary steDataDf
-            self.yearlyMin = {value + "_Min": self.steDataDf[value].min() for value in self.steDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.steDataDf[value].max() for value in self.steDataDf.columns}
-            # self.cumSumEnd = {value + "_End": self.steDataDf[value][-1] for value in self.steDataDf.columns}
+            self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.steDataDf)
+            self._computeYearlyStatistics(self.steDataDf)
 
-        for equation in self.inputs["calcCumSumTimeStep"]:
-            for value in equation:
-                for key in self.steDataDf.columns:
-                    if key == value:
-                        myValue = "cumsum_" + value
-                        self.steDataDf[myValue] = self.steDataDf[value].cumsum()
-                        # self.cumSumEnd = {myValue + "_End": self.steDataDf[myValue][-1]}
-                        self.cumSumEnd.update({myValue + "_End": round(self.steDataDf[myValue][-1], 2)})
+        for baseVariables in self.inputs["calcCumSumTimeStep"]:
+            self._updateCumSumVariables(baseVariables, self.steDataDf)
 
         for equation in self.inputs["calcTest"]:
-            namespace = {
-                **self.deckData,
-                **self.__dict__,
-                **self.yearlySums,
-                **self.yearlyMin,
-                **self.yearlyMax,
-                **self.yearlyAvg,
-                **self.cumSumEnd,
-            }
-            expression = equation.replace(" ", "")
-            exec(expression, globals(), namespace)
-            self.deckData = namespace
-            logger.debug(expression)
+            self._doCalc(equation)
 
-        for equation in self.inputs[
-            "calcTimeStepTest"
-        ]:  # dirty trick to be able to use it also after calcCumSumTimeStep DC
-            kwargs = {"local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax}}
-            scalars = kwargs["local_dict"].keys()
-            splitEquation = equation.split("=")
-            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
-            parts = re.split(r"[*/+-]", parsedEquation.replace(r"(", "").replace(r")", ""))
-            for scalar in scalars:
-                if scalar in parts:
-                    equation = equation.replace(scalar, "@" + scalar)
-            self.steDataDf.eval(equation, inplace=True, **kwargs)
-            self.yearlyMin = {value + "_Min": self.steDataDf[value].min() for value in self.steDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.steDataDf[value].max() for value in self.steDataDf.columns}
+        for equation in self.inputs["calcTimeStepTest"]:
+            self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.steDataDf)
+            self._computeYearlyStatistics(self.steDataDf)
 
         for equation in self.inputs["calcHourlyTest"]:
-            kwargs = {"local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax}}
-            scalars = kwargs["local_dict"].keys()
-            splitEquation = equation.split("=")
-            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
-            parts = re.split(r"[*/+-]", parsedEquation.replace(r"(", "").replace(r")", ""))
-            for scalar in scalars:
-                if scalar in parts:
-                    equation = equation.replace(scalar, "@" + scalar)
-            self.houDataDf.eval(equation, inplace=True, **kwargs)
-            value = splitEquation[0]
-            # self.yearlyMax = {value + '_Ma': self.houDataDf[value].max()}
-            self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-            # self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
-            self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
+            self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.houDataDf)
+            self._computeYearlyStatistics(self.houDataDf)
 
         for equation in self.inputs["calcMonthlyTest"]:
-            kwargs = {
-                "local_dict": {**self.deckData, **self.yearlySums, **self.yearlyMin, **self.yearlyMax, **self.yearlyAvg}
-            }
-            scalars = kwargs["local_dict"].keys()
-            splitEquation = equation.split("=")
-            parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
-            parts = re.split(r"[*/+-]", parsedEquation.replace(r"(", "").replace(r")", ""))
-            for scalar in scalars:
-                if scalar in parts:
-                    equation = equation.replace(scalar, "@" + scalar)
-            self.monDataDf.eval(equation, inplace=True, **kwargs)
-            value = splitEquation[0].strip()
-            self.monDataDf["Cum_" + value] = self.monDataDf[value].cumsum()
-            self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
+            newVariableName = self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.monDataDf)
+            self._computeMonthlyStatistics(newVariableName)
+
+    def _doCalc(self, equation: str) -> None:
+        namespace = {
+            **self.deckData,
+            **self.__dict__,
+            **self.yearlySums,
+            **self.yearlyMin,
+            **self.yearlyMax,
+            **self.yearlyAvg,
+            **self.cumSumEnd,
+        }
+        expression = equation.replace(" ", "")
+        exec(expression, globals(), namespace)
+        self.deckData = namespace
+        logger.debug(expression)
+
+    def _updateCumSumVariables(self, baseVariables: tp.Sequence[str], df: pd.DataFrame) -> None:
+        for baseVariable in baseVariables:
+            cumSumVariableName = "cumsum_" + baseVariable
+            df[cumSumVariableName] = df[baseVariable].cumsum()
+            self.cumSumEnd[cumSumVariableName + "_End"] = df[cumSumVariableName][-1]
+
+    def _evalAssignmentInDataFrameAndGetNewVariableName(self, equation: str, df: pd.DataFrame) -> str:
+        splitEquation = equation.split("=")
+        variableName = splitEquation[0].strip()
+
+        equation = self._prefixScalars(equation)
+
+        df.eval(equation, inplace=True, local_dict=self._getLocals())
+
+        return variableName
+
+    def _prefixScalars(self, equation: str) -> str:
+        splitEquation = equation.split("=")
+        parsedEquation = splitEquation[1].replace(" ", "").replace("^", "**")
+        parts = re.split(r"[*/+-]", parsedEquation.replace(r"(", "").replace(r")", ""))
+
+        scalarVariableNames = self._getLocals().keys()
+        for scalar in scalarVariableNames:
+            if scalar in parts:
+                equation = equation.replace(scalar, "@" + scalar)
+        return equation
+
+    def _getLocals(self) -> tp.Mapping[str, float]:
+        return {
+            **self.deckData,
+            **self.yearlySums,
+            **self.yearlyMin,
+            **self.yearlyMax,
+            **self.yearlyAvg,
+            **self.cumSumEnd,
+        }
+
+    def _computeYearlyStatistics(self, df: pd.DataFrame) -> None:
+        self.yearlyMin = {value + "_Min": df[value].min() for value in df.columns}
+        self.yearlyMax = {value + "_Max": df[value].max() for value in df.columns}
+        self.yearlyAvg = {value + "_Avg": df[value].mean() for value in df.columns}
+
+    def _computeMonthlyStatistics(self, variableName: str) -> None:
+        self.monDataDf["Cum_" + variableName : str] = self.monDataDf[variableName:str].cumsum()
+        self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
 
     def addPlotConfigEquation(self):
         for equation in self.inputs["calcMonthly"]:
@@ -1505,7 +1438,9 @@ class ProcessTrnsysDf:
             min_time = selectedDays[i]
             max_time = selectedDays[i] + pd.to_timedelta(23, unit="h")
 
-            df_DataSelected = df_selectedDay[(df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)]
+            df_DataSelected = df_selectedDay[
+                (df_selectedDay["Date"] <= max_time) & (df_selectedDay["Date"] >= min_time)
+            ]
             Test = pd.DataFrame(df_DataSelected.sum(), df_DataSelected.columns)
             Test2 = Test.T
             Test2["Date"] = min_time.date()
