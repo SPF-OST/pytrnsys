@@ -993,14 +993,15 @@ class ProcessTrnsysDf:
             elem1 = splitEquation[1].split(",")[0][5:]  # removing max(
             elem2 = splitEquation[1].split(",")[1][:-1]
 
-            value = splitEquation[0].strip()
+            newVariableName = splitEquation[0].strip()
 
-            self.monDataDf[value] = self.monDataDf[elem1]
+            self.monDataDf[newVariableName] = self.monDataDf[elem1]
             for i in range(len(self.monDataDf[elem1])):
-                self.monDataDf[value].values[i] = min(self.monDataDf[elem1].values[i], self.monDataDf[elem2].values[i])
+                self.monDataDf[newVariableName].values[i] = min(
+                    self.monDataDf[elem1].values[i], self.monDataDf[elem2].values[i]
+                )
 
-            self.monDataDf["Cum_" + value] = self.monDataDf[value].cumsum()
-            self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
+            self._computeMonthlyStatistics(newVariableName)
 
         for equation in self.inputs["calc"]:
             namespace = {
@@ -1018,71 +1019,40 @@ class ProcessTrnsysDf:
             logger.debug(expression)
 
         for equation in self.inputs["calcMonthly"]:
-            df = self.monDataDf
-            value = self._evalEquationInDataFrame(equation, df)
-            self.monDataDf["Cum_" + value] = self.monDataDf[value].cumsum()
-            self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
+            newVariableName = self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.monDataDf)
+            self._computeMonthlyStatistics(newVariableName)
 
         for equation in self.inputs["calcDaily"]:
-            df = self.dayDataDf
-            value = self._evalEquationInDataFrame(equation, df)
-
-            self.yearlyMin = {value + "_Min": self.dayDataDf[value].min() for value in self.dayDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.dayDataDf[value].max() for value in self.dayDataDf.columns}
-            # self.cumSumEnd = {value + "_End": self.dayDataDf[value][-1] for value in self.dayDataDf.columns} #I guess not needed since we dont have cumsumDaily?
-            self.yearlyAvg = {value + "_Avg": self.dayDataDf[value].mean() for value in self.houDataDf.columns}
+            self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.dayDataDf)
+            self._computeYearlyStatistics(self.dayDataDf)
 
         for equation in self.inputs["calcHourly"]:
-            df = self.houDataDf
-            value = self._evalEquationInDataFrame(equation, df)
-
-            self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-            # self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
-            self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
+            self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.houDataDf)
+            self._computeYearlyStatistics(self.houDataDf)
 
         for equation in self.inputs["calcMonthlyFromHourly"]:
-            df = self.houDataDf
-            value = self._evalEquationInDataFrame(equation, df)
+            newVariableName = self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.houDataDf)
 
-            calculatedVariableName = splitEquation[0].strip()
-            calculatedVariableDf = self.houDataDf[calculatedVariableName]
+            calculatedVariableDf = self.houDataDf[newVariableName]
             calculatedVariableMonth = num.array(calculatedVariableDf.index.month)
             calculatedVariable = calculatedVariableDf.to_numpy()
             calculatedVariablePerMonth = []
             for month in num.arange(1, 13, 1):
                 support = num.where(calculatedVariableMonth == month, 1, 0)
                 calculatedVariablePerMonth.append(num.dot(support, calculatedVariable))
-            self.monDataDf[calculatedVariableName] = calculatedVariablePerMonth
-            self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-            # self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
-            self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
+            self.monDataDf[newVariableName] = calculatedVariablePerMonth
 
-        for equation in self.inputs["calcCumSumHourly"]:
-            for value in equation:
-                for key in self.houDataDf.columns:
-                    if key == value:
-                        self.houDataDf["cumsum_" + value] = self.houDataDf[value].cumsum()
-                        myValue = "cumsum_" + value
-                        self.cumSumEnd = {myValue + "_End": self.houDataDf[myValue][-1]}
+            self._computeYearlyStatistics(self.houDataDf)
+
+        for baseVariables in self.inputs["calcCumSumHourly"]:
+            self._updateCumSumVariables(baseVariables, self.houDataDf)
 
         for equation in self.inputs["calcTimeStep"]:
-            df = self.steDataDf
-            value = self._evalEquationInDataFrame(equation, df)
+            self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.steDataDf)
+            self._computeYearlyStatistics(self.steDataDf)
 
-            self.yearlyMin = {value + "_Min": self.steDataDf[value].min() for value in self.steDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.steDataDf[value].max() for value in self.steDataDf.columns}
-            # self.cumSumEnd = {value + "_End": self.steDataDf[value][-1] for value in self.steDataDf.columns}
-
-        for equation in self.inputs["calcCumSumTimeStep"]:
-            for value in equation:
-                for key in self.steDataDf.columns:
-                    if key == value:
-                        myValue = "cumsum_" + value
-                        self.steDataDf[myValue] = self.steDataDf[value].cumsum()
-                        # self.cumSumEnd = {myValue + "_End": self.steDataDf[myValue][-1]}
-                        self.cumSumEnd.update({myValue + "_End": round(self.steDataDf[myValue][-1], 2)})
+        for baseVariables in self.inputs["calcCumSumTimeStep"]:
+            self._updateCumSumVariables(baseVariables, self.steDataDf)
 
         for equation in self.inputs["calcTest"]:
             namespace = {
@@ -1101,28 +1071,25 @@ class ProcessTrnsysDf:
 
         for equation in self.inputs[
             "calcTimeStepTest"
-        ]:  # dirty trick to be able to use it also after calcCumSumTimeStep DC
-            df = self.steDataDf
-            value = self._evalEquationInDataFrame(equation, df)
-            self.yearlyMin = {value + "_Min": self.steDataDf[value].min() for value in self.steDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.steDataDf[value].max() for value in self.steDataDf.columns}
+        ]:
+            self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.steDataDf)
+            self._computeYearlyStatistics(self.steDataDf)
 
         for equation in self.inputs["calcHourlyTest"]:
-            df = self.houDataDf
-            value = self._evalEquationInDataFrame(equation, df)
-            # self.yearlyMax = {value + '_Ma': self.houDataDf[value].max()}
-            self.yearlyMin = {value + "_Min": self.houDataDf[value].min() for value in self.houDataDf.columns}
-            self.yearlyMax = {value + "_Max": self.houDataDf[value].max() for value in self.houDataDf.columns}
-            # self.cumSumEnd = {value + "_End": self.houDataDf[value][-1] for value in self.houDataDf.columns}
-            self.yearlyAvg = {value + "_Avg": self.houDataDf[value].mean() for value in self.houDataDf.columns}
+            self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.houDataDf)
+            self._computeYearlyStatistics(self.houDataDf)
 
         for equation in self.inputs["calcMonthlyTest"]:
-            df = self.monDataDf
-            value = self._evalEquationInDataFrame(equation, df)
-            self.monDataDf["Cum_" + value] = self.monDataDf[value].cumsum()
-            self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
+            newVariableName = self._evalAssignmentInDataFrameAndGetNewVariableName(equation, self.monDataDf)
+            self._computeMonthlyStatistics(newVariableName)
 
-    def _evalEquationInDataFrame(self, equation, df):
+    def _updateCumSumVariables(self, baseVariables: tp.Sequence[str], df: pd.DataFrame) -> None:
+        for baseVariable in baseVariables:
+            cumSumVariableName = "cumsum_" + baseVariable
+            df[cumSumVariableName] = df[baseVariable].cumsum()
+            self.cumSumEnd[cumSumVariableName + "_End"] = df[cumSumVariableName][-1]
+
+    def _evalAssignmentInDataFrameAndGetNewVariableName(self, equation: str, df: pd.DataFrame) -> str:
         kwargs = {
             "local_dict": {
                 **self.deckData,
@@ -1141,8 +1108,17 @@ class ProcessTrnsysDf:
             if scalar in parts:
                 equation = equation.replace(scalar, "@" + scalar)
         df.eval(equation, inplace=True, **kwargs)
-        value = splitEquation[0].strip()
-        return value
+        variableName = splitEquation[0].strip()
+        return variableName
+
+    def _computeYearlyStatistics(self, df: pd.DataFrame) -> None:
+        self.yearlyMin = {value + "_Min": df[value].min() for value in df.columns}
+        self.yearlyMax = {value + "_Max": df[value].max() for value in df.columns}
+        self.yearlyAvg = {value + "_Avg": df[value].mean() for value in df.columns}
+
+    def _computeMonthlyStatistics(self, variableName: str) -> None:
+        self.monDataDf["Cum_" + variableName : str] = self.monDataDf[variableName:str].cumsum()
+        self.yearlySums = {value + "_Tot": self.monDataDf[value].sum() for value in self.monDataDf.columns}
 
     def addPlotConfigEquation(self):
         for equation in self.inputs["calcMonthly"]:
