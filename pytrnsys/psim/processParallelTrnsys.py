@@ -511,7 +511,7 @@ class ProcessParallelTrnsys:
         locationPath: str,
         fileName: str,
         individualFiles: _tp.Optional[_tp.Sequence[str]] = None,
-        yearReadInMonthlyFile: int = 1,
+        yearReadInMonthlyFile: int = -1,
     ) -> ProcessingCase:
         return ProcessingCase(
             self.logger, processTrnsyDf, locationPath, fileName, self.inputs, individualFiles, yearReadInMonthlyFile
