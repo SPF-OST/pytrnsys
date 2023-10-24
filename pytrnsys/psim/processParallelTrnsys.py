@@ -53,7 +53,7 @@ class ProcessingCase:
             self._runImpl()
         except Exception as e:
             self.logger.error("An exception occurred processing case %s: %s", self.fileName, e)
-            self.logger.error("Error trace: %s", _tb.format_exc())
+            self.logger.error("Error trace:\n%s", _tb.format_exc())
             return f"{e}: {self.fileName}"
 
         return f"Finished: {self.fileName}"
