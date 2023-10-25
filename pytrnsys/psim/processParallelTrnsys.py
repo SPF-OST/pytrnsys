@@ -39,7 +39,7 @@ import pytrnsys.utils.log as log
 
 
 @_dc.dataclass
-class ProcessingCase:
+class _ProcessingCase:
     logger: _log.Logger
     processTrnsysDf: processTrnsys.ProcessTrnsysDf
     locationPath: str
@@ -412,10 +412,7 @@ class ProcessParallelTrnsys:
 
             pool = mp.Pool(processes=maxNumberOfCPU)
 
-            def runProcessingCase(localProcessingCase: ProcessingCase) -> str:
-                return localProcessingCase.run()
-
-            results = pool.map(runProcessingCase, processingCases)
+            results = pool.map(_ProcessingCase.run, processingCases)
 
             pool.close()
             pool.join()
@@ -489,7 +486,7 @@ class ProcessParallelTrnsys:
         processTrnsysDf: processTrnsys.ProcessTrnsysDf,
         pathFolder: str,
         name: str,
-        processingCases: list[ProcessingCase],
+        processingCases: list[_ProcessingCase],
     ) -> None:
         yearReadInMonthlyFileBase = self.inputs["yearReadedInMonthlyFile"]
         if yearReadInMonthlyFileBase == -1:
@@ -512,8 +509,8 @@ class ProcessParallelTrnsys:
         fileName: str,
         individualFiles: _tp.Optional[_tp.Sequence[str]] = None,
         yearReadInMonthlyFile: int = -1,
-    ) -> ProcessingCase:
-        return ProcessingCase(
+    ) -> _ProcessingCase:
+        return _ProcessingCase(
             self.logger, processTrnsyDf, locationPath, fileName, self.inputs, individualFiles, yearReadInMonthlyFile
         )
 
