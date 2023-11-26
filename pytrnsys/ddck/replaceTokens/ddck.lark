@@ -6,7 +6,7 @@ ddck: block+
 
 ?simulation_control: version | simulation | tolerances | limits
     | nan_check | overwrite_check | time_report | dfq | eqsolver | solver |
-    | assign | end | equations | constants
+    | assign | end | equations | constants | accelerate
 
 simulation: "SIMULATION"i tstart tend delta_t
 
@@ -55,6 +55,8 @@ list: "LIST"i
 version: "VERSION"i version_number
 
 version_number: positive_int_or_explicit_var
+
+accelerate: "ACCELERATE"i positive_int_or_explicit_var (positive_int_or_explicit_var "," positive_int_or_explicit_var)+
 
 unit: header [parameters] [inputs [labels]]
 
