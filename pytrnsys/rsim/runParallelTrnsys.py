@@ -1,7 +1,6 @@
 # pylint: skip-file
 # type: ignore
 
-import imp
 import json
 import os
 import pathlib as _pl
@@ -402,10 +401,9 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
         logfile.write("# Run created by " + username + "\n")
         logfile.write("# Ddck repositories used:\n")
         try:
-            imp.find_module("git")
-            found = True
             import git
-        except ImportError:
+            found = True
+        except ModuleNotFoundError:
             found = False
 
         for path in self.listDdckPaths:
