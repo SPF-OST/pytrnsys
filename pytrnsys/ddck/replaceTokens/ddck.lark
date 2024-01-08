@@ -148,11 +148,11 @@ private_var: ":" NAME
 
 shared_var: NAME
 
-assign: "ASSIGN" (file_path | "\"" file_path "\"") [logical_unit]
+assign: "ASSIGN"i (file_path | "\"" file_path "\"") logical_unit
 
 file_path: FILE_PATH
 
-logical_unit: INT | variable
+logical_unit: INT | explicit_var
 
 computed_var: PORT_PROPERTY "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ]")"
 
