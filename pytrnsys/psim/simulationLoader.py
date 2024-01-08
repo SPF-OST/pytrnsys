@@ -133,11 +133,11 @@ class SimulationLoader:
 
         if fileType == _ResultsFileType.MONTHLY and self._monthlyUsed == True:
             if footerPresent:
-                file = pd.read_csv(pathFile, header=1, delimiter="\t", nrows=nRows - 26, mangle_dupe_cols=True).rename(
+                file = pd.read_csv(pathFile, header=1, delimiter="\t", nrows=nRows - 26).rename(
                     columns=lambda x: x.strip()
                 )
             else:
-                file = pd.read_csv(pathFile, header=1, delimiter="\t", nrows=nRows - 1, mangle_dupe_cols=True).rename(
+                file = pd.read_csv(pathFile, header=1, delimiter="\t", nrows=nRows - 1).rename(
                     columns=lambda x: x.strip()
                 )
             file = file[file.columns[:-1]]
