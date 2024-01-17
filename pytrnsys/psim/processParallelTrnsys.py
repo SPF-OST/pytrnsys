@@ -1,34 +1,32 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/python
-
-import copy
+import dataclasses as _dc
 import glob
 import json
-import logging
+import logging as _log
 import multiprocessing as mp
 import os
+import pathlib as _pl
 import re
 import sys
-import pathlib as _pl
-import pkg_resources
+import traceback as _tb
+import typing as _tp
 
 import matplotlib.pyplot as plt
 import numpy as num
 import pandas as pd
 import seaborn as _seb
-import dataclasses_jsonschema as _dcj
 
+import pytrnsys.cost_calculation as _cc
+import pytrnsys.plot.comparison as _pc
 import pytrnsys.plot.plotMatplotlib as plot
+import pytrnsys.psim.conditions as _conds
 import pytrnsys.psim.debugProcess as debugProcess
 import pytrnsys.psim.processTrnsysDf as processTrnsys
 import pytrnsys.report.latexReport as latex
 import pytrnsys.rsim.runParallel as run
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
-import pytrnsys.cost_calculation as _cc
-import pytrnsys.plot.comparison as _pc
-import pytrnsys.psim.conditions as _conds
 import pytrnsys.utils.uncertainFloat as _uf
 
 try:
@@ -39,76 +37,65 @@ except ImportError:
 import pytrnsys.utils.log as log
 
 
-def processDataGeneral(casesInputs, withIndividualFiles=False):
-    """
-    processes all the specified cases
+@_dc.dataclass
+class _ProcessingCase:
+    logger: _log.Logger
+    processTrnsysDf: processTrnsys.ProcessTrnsysDf
+    locationPath: str
+    fileName: str
+    inputs: _tp.Mapping[str, _tp.Any]
+    individualFiles: _tp.Optional[_tp.Sequence[str]]
+    yearReadInMonthlyFile: int
 
-    Parameters
-    ----------
-    casesInputs: list of str
-        list of strings with all cases to run
+    def run(self) -> str:
+        try:
+            self._runImpl()
+        except Exception as e:
+            self.logger.error("An exception occurred processing case %s: %s", self.fileName, e)
+            self.logger.error("Error trace:\n%s", _tb.format_exc())
+            return f"{e}: {self.fileName}"
 
-    Returns
-    -------
+        return f"Finished: {self.fileName}"
 
-    """
-    if withIndividualFiles:
-        (baseClass, locationPath, fileName, inputs, individualFiles) = casesInputs
-    else:
-        (baseClass, locationPath, fileName, inputs) = casesInputs
+    def _runImpl(self) -> None:
+        self.processTrnsysDf.setInputs(self.inputs)
+        if self.individualFiles is not None:
+            self.processTrnsysDf.setIndividualFiles(self.individualFiles)
+        if "latexNames" in self.inputs:
+            self.processTrnsysDf.setLatexNamesFile(self.inputs["latexNames"])
+        else:
+            self.processTrnsysDf.setLatexNamesFile(None)
+        if "matplotlibStyle" in self.inputs:
+            self.processTrnsysDf.setMatplotlibStyle(self.inputs["matplotlibStyle"])
+        if "setFontsize" in self.inputs:
+            self.processTrnsysDf.setFontsize(self.inputs["setFontsize"])
+        self.processTrnsysDf.setBuildingArea(self.inputs["buildingArea"])
+        self.processTrnsysDf.setTrnsysDllPath(self.inputs["dllTrnsysPath"])
+        self.processTrnsysDf.setPrintDataForGle(self.inputs["setPrintDataForGle"])
+        self.processTrnsysDf.yearReadedInMonthylFile = self.yearReadInMonthlyFile
+        self.processTrnsysDf.cleanModeLatex = self.inputs["cleanModeLatex"]
+        if self.inputs["isTrnsys"]:
+            self.processTrnsysDf.loadAndProcessTrnsys()
+        else:
+            self.processTrnsysDf.loadAndProcessGeneric()
+        # rename files if multiple years are available:
+        if self.yearReadInMonthlyFile != -1 and self.inputs["typeOfProcess"] != "json":
+            renameFile = os.path.join(self.locationPath, self.fileName, self.fileName)
 
-    baseClass.setInputs(inputs)
-    if inputs["typeOfProcess"] == "individual":
-        baseClass.setIndividualFiles(individualFiles)
-    if "latexNames" in inputs.keys():
-        baseClass.setLatexNamesFile(inputs["latexNames"])
-    else:
-        baseClass.setLatexNamesFile(None)
+            fileEndingsDefault = ["-results.json", "-report.pdf", "-plots.html"]
 
-    if "matplotlibStyle" in inputs:
-        baseClass.setMatplotlibStyle(inputs["matplotlibStyle"])
-
-    if "setFontsize" in inputs:
-        baseClass.setFontsize(inputs["setFontsize"])
-
-    baseClass.setBuildingArea(inputs["buildingArea"])
-    baseClass.setTrnsysDllPath(inputs["dllTrnsysPath"])
-
-    baseClass.setPrintDataForGle(inputs["setPrintDataForGle"])
-
-    baseClass.yearReadedInMonthylFile = inputs["yearReadedInMonthlyFile"]
-
-    baseClass.cleanModeLatex = inputs["cleanModeLatex"]
-
-    doProcess = True
-
-    if inputs["isTrnsys"]:
-        baseClass.loadAndProcessTrnsys()
-    else:
-        baseClass.loadAndProcessGeneric()
-
-    # rename files if multiple years are available:
-    if inputs["yearReadedInMonthlyFile"] != -1 and inputs["typeOfProcess"] != "json":
-        renameFile = os.path.join(locationPath, fileName, fileName)
-
-        fileEndingsDefault = ["-results.json", "-report.pdf", "-plots.html"]
-
-        for ending in fileEndingsDefault:
-            newEnding = "-Year%i" % inputs["yearReadedInMonthlyFile"] + ending
-            try:
-                if os.path.isfile(renameFile + newEnding):
-                    os.remove(renameFile + newEnding)
-                os.rename(renameFile + ending, renameFile + newEnding)
-                os.remove(renameFile + ending)
-            except:
-                print(
-                    "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)"
-                    % (renameFile + newEnding)
-                )
-
-    del baseClass
-
-    return " Finished: " + fileName
+            for ending in fileEndingsDefault:
+                newEnding = "-Year%i" % self.yearReadInMonthlyFile + ending
+                try:
+                    if os.path.isfile(renameFile + newEnding):
+                        os.remove(renameFile + newEnding)
+                    os.rename(renameFile + ending, renameFile + newEnding)
+                    os.remove(renameFile + ending)
+                except OSError:
+                    print(
+                        "File %s already exists, and thus was not saved again, needs to be improved (either not processed, or actually replaced)"
+                        % (renameFile + newEnding)
+                    )
 
 
 class ProcessParallelTrnsys:
@@ -123,14 +110,12 @@ class ProcessParallelTrnsys:
     """
 
     def __init__(self):
-
         self.defaultInputs()
         self.filteredfolder = [".gle"]
 
         self.logger = log.getOrCreateCustomLogger("root", self.inputs["outputLevel"])
 
     def defaultInputs(self, pathBase=None):
-
         self.inputs = {}
         self.inputs["plotStyle"] = "line"
         self.inputs["isTrnsys"] = True
@@ -182,7 +167,7 @@ class ProcessParallelTrnsys:
         self.configPath = path
         tool = readConfig.ReadConfigTrnsys()
         tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated)
-        #self.inputs["pathBase"] = path
+        # self.inputs["pathBase"] = path
         self.logger.setLevel(self.inputs["outputLevel"])
         if "latexNames" in self.inputs.keys():
             if ":" not in self.inputs["latexNames"]:
@@ -190,8 +175,7 @@ class ProcessParallelTrnsys:
         if "fileToLoad" in self.inputs.keys():
             self.individualFile = True
 
-    def getBaseClass(self, classProcessing, pathFolder, fileName):
-
+    def _createProcessTrnsysDf(self, pathFolder: str, fileName: str) -> processTrnsys.ProcessTrnsysDf:
         return processTrnsys.ProcessTrnsysDf(pathFolder, fileName, individualFile=self.individualFile)
 
     def isStringNumber(self, sample):
@@ -216,7 +200,6 @@ class ProcessParallelTrnsys:
             return False
 
     def loadPlotJson(self, filePath):
-
         with open(filePath, "r") as file:
             plotParDict = json.load(file)
 
@@ -237,9 +220,8 @@ class ProcessParallelTrnsys:
         return pyplotKwargs
 
     def process(self):
-        casesInputs = []
+        processingCases = []
         fileName = []
-        classList = []
 
         self.filesReturn = None
 
@@ -247,7 +229,6 @@ class ProcessParallelTrnsys:
             os.remove(os.path.join(self.inputs["pathBase"], "Summary.dat"))
 
         if (self.inputs["typeOfProcess"] == "completeFolder") or (self.inputs["typeOfProcess"] == "json"):
-
             pathFolder = self.inputs["pathBase"]
 
             if self.inputs["typeOfProcess"] == "completeFolder":
@@ -292,10 +273,11 @@ class ProcessParallelTrnsys:
                             newPath = os.path.join(pathFolder, os.path.join(*list(_pl.Path(relPath).parts[:-1])))
                         else:
                             newPath = pathFolder
-                        baseClass = self.getBaseClass(self.inputs["classProcessing"], newPath, name)
+                        processTrnsysDf = self._createProcessTrnsysDf(newPath, name)
 
                         self.logger.info("%s will be processed" % name)
-                        casesInputs.append((baseClass, pathFolder, name, self.inputs))
+                        processingCase = self._createProcessingCase(processTrnsysDf, pathFolder, name)
+                        processingCases.append(processingCase)
 
         elif self.inputs["typeOfProcess"] == "individual":
             self.individualFiles = []
@@ -307,27 +289,29 @@ class ProcessParallelTrnsys:
                 self.individualFiles += [fileDict]
 
             for fileDict in self.individualFiles:
-                baseClass = self.getBaseClass(self.inputs["classProcessing"], fileDict["path"], fileDict["name"])
+                processTrnsysDf = self._createProcessTrnsysDf(fileDict["path"], fileDict["name"])
                 self.logger.info("%s will be processed" % fileDict["name"])
-                casesInputs.append((baseClass, fileDict["path"], fileDict["name"], self.inputs, self.individualFiles))
+                processingCase = self._createProcessingCase(
+                    processTrnsysDf, fileDict["path"], fileDict["name"], self.individualFiles
+                )
+                processingCases.append(processingCase)
 
         elif self.inputs["typeOfProcess"] == "casesDefined":
             name = self.inputs["fileName"]
             pathFolder = self.inputs["pathBase"]
-            baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)  # DC This was missing
-            casesInputs.append((baseClass, pathFolder, name, self.inputs))  # DC This was missing
+            processTrnsysDf = self._createProcessTrnsysDf(pathFolder, name)
+            processingCase = self._createProcessingCase(processTrnsysDf, pathFolder, name)
+            processingCases.append(processingCase)
 
             self.filesReturn = []
             self.filesReturn.append(os.path.join(pathFolder, name, name) + ".dck")
 
         elif self.inputs["typeOfProcess"] == "citiesFolder":
-
             for city in self.inputs["cities"]:
                 pathFolder = os.path.join(self.inputs["pathBase"], city)
                 fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
 
                 for name in fileName:
-
                     folderUsed = True
                     for i in range(len(self.filteredfolder)):
                         if name == self.filteredfolder[i]:
@@ -345,24 +329,15 @@ class ProcessParallelTrnsys:
                             self.logger.info("%s already processed" % name)
 
                         else:
-                            baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)
+                            processTrnsysDf = self._createProcessTrnsysDf(pathFolder, name)
 
                             self.logger.info("%s will be processed" % name)
 
                             if ("hourly" in name or "hourlyOld" in name) and not "Mean" in name:
-                                inputs = []
-                                if self.inputs["yearReadedInMonthlyFile"] == -1:
-                                    for i in range(self.inputs["numberOfYearsInHourlyFile"]):
-                                        inputs.append(copy.deepcopy(self.inputs))
-                                        inputs[i]["yearReadedInMonthlyFile"] = i
-                                        casesInputs.append((baseClass, pathFolder, name, inputs[i]))
-                                else:
-                                    for i in range(self.inputs["numberOfYearsInHourlyFile"]):
-                                        inputs.append(copy.deepcopy(self.inputs))
-                                        inputs[i]["yearReadedInMonthlyFile"] = self.inputs["yearReadedInMonthlyFile"] + i
-                                        casesInputs.append((baseClass, pathFolder, name, inputs[i]))
+                                self._addCasesForYears(processTrnsysDf, pathFolder, name, processingCases)
                             else:
-                                casesInputs.append((baseClass, pathFolder, name, self.inputs))
+                                processingCase = self._createProcessingCase(processTrnsysDf, pathFolder, name)
+                                processingCases.append(processingCase)
 
         elif self.inputs["typeOfProcess"] == "config":
             """
@@ -387,10 +362,8 @@ class ProcessParallelTrnsys:
                 fileName = [name for name in os.listdir(pathFolder) if os.path.isdir(pathFolder + "\\" + name)]
 
                 for name in fileName:
-
                     for type in self.inputs["fileTypes"][0]:
                         if type in name:
-
                             folderUsed = True
                             for i in range(len(self.filteredfolder)):
                                 if name == self.filteredfolder[i]:
@@ -408,73 +381,55 @@ class ProcessParallelTrnsys:
                                     self.logger.info("file :%s already processed" % name)
 
                                 else:
-                                    baseClass = self.getBaseClass(self.inputs["classProcessing"], pathFolder, name)
+                                    processTrnsysDf = self._createProcessTrnsysDf(pathFolder, name)
 
                                     self.logger.info("%s will be processed" % name)
 
                                     if ("hourly" in name or "hourlyOld" in name) and not "Mean" in name:
                                         if self.inputs["forceHourlyYear"]:
-                                            casesInputs.append((baseClass, pathFolder, name, self.inputs))
+                                            processingCase = self._createProcessingCase(
+                                                processTrnsysDf, pathFolder, name
+                                            )
+                                            processingCases.append(processingCase)
                                         else:
-                                            inputs = []
-                                            if self.inputs["yearReadedInMonthlyFile"] == -1:
-                                                for i in range(self.inputs["numberOfYearsInHourlyFile"]):
-                                                    inputs.append(copy.deepcopy(self.inputs))
-                                                    inputs[i]["yearReadedInMonthlyFile"] = i
-                                                    casesInputs.append((baseClass, pathFolder, name, inputs[i]))
-                                            else:
-                                                for i in range(self.inputs["numberOfYearsInHourlyFile"]):
-                                                    inputs.append(copy.deepcopy(self.inputs))
-                                                    inputs[i]["yearReadedInMonthlyFile"] = (
-                                                        self.inputs["yearReadedInMonthlyFile"] + i
-                                                    )
-                                                    casesInputs.append((baseClass, pathFolder, name, inputs[i]))
-                                    elif "hourlyMean" in name and type == "hourlyMean":
-                                        casesInputs.append((baseClass, pathFolder, name, self.inputs))
+                                            self._addCasesForYears(processTrnsysDf, pathFolder, name, processingCases)
                                     elif "hourlyMean" in name and type != "hourlyMean":
                                         pass
                                     else:
-                                        casesInputs.append((baseClass, pathFolder, name, self.inputs))
-                        else:
-                            pass
-
-            # sort to process 10 year files first and all 10 years:
-
+                                        processingCase = self._createProcessingCase(processTrnsysDf, pathFolder, name)
+                                        processingCases.append(processingCase)
         else:
             raise ValueError("Not Implemented yet")
 
         typeOfProcess = self.inputs["typeOfProcess"]
-        if self.inputs["processParallel"] == True:
-
+        if self.inputs["processParallel"]:
             debug = debugProcess.DebugProcess(pathFolder, "FileProcessed.dat", fileName)
             debug.start()
 
             # maximum number of processes at once:
             maxNumberOfCPU = min(run.getNumberOfCPU() - self.inputs["reduceCpu"], len(fileName))
 
-            pool = mp.Pool(processes=maxNumberOfCPU) #Dc bak to previous. Not sure why it was changed
+            pool = mp.Pool(processes=maxNumberOfCPU)
 
-            results = pool.map(processDataGeneral, casesInputs)
+            results = pool.map(_ProcessingCase.run, processingCases)
 
             pool.close()
+            pool.join()
 
             debug.addLines(results)
             debug.finish()
         else:
-            for i in range(len(casesInputs)):
-                if typeOfProcess == "individual":
-                    processDataGeneral(casesInputs[i], True)
-                else:
-                    processDataGeneral(casesInputs[i])
+            for processingCase in processingCases:
+                processingCase.run()
 
         if self.inputs["calculateCost"] and "cost" in self.inputs:
             fileNameList = [self.inputs["fileName"]] if typeOfProcess == "casesDefined" else None
 
             self.calcCost(fileNameList)
 
-        if "pathInfoToJson" in self.inputs.keys(): #first add
+        if "pathInfoToJson" in self.inputs.keys():  # first add
             self.transferPathInfoToJson()
-            
+
         if "acrossSetsCalc" in self.inputs.keys():
             self.logger.info("Calculating across sets")
             self.calculationsAcrossSets()
@@ -508,8 +463,6 @@ class ProcessParallelTrnsys:
         if "scatterPlot" in self.inputs.keys():
             self.scatterPlot()
 
-      
-
         if "jsonCalc" in self.inputs.keys():
             self.calculateInJson()
 
@@ -526,6 +479,39 @@ class ProcessParallelTrnsys:
             self.printBoxPlotGLEData()
 
         return self.filesReturn  # Dc maybe not the best way
+
+    def _addCasesForYears(
+        self,
+        processTrnsysDf: processTrnsys.ProcessTrnsysDf,
+        pathFolder: str,
+        name: str,
+        processingCases: list[_ProcessingCase],
+    ) -> None:
+        yearReadInMonthlyFileBase = self.inputs["yearReadedInMonthlyFile"]
+        if yearReadInMonthlyFileBase == -1:
+            yearReadInMonthlyFileBase = 0
+
+        for i in range(self.inputs["numberOfYearsInHourlyFile"]):
+            yearReadInMonthlyFile = yearReadInMonthlyFileBase + i
+            processingCase = self._createProcessingCase(
+                processTrnsysDf,
+                pathFolder,
+                name,
+                yearReadInMonthlyFile=yearReadInMonthlyFile,
+            )
+            processingCases.append(processingCase)
+
+    def _createProcessingCase(
+        self,
+        processTrnsyDf: processTrnsys.ProcessTrnsysDf,
+        locationPath: str,
+        fileName: str,
+        individualFiles: _tp.Optional[_tp.Sequence[str]] = None,
+        yearReadInMonthlyFile: int = -1,
+    ) -> _ProcessingCase:
+        return _ProcessingCase(
+            self.logger, processTrnsyDf, locationPath, fileName, self.inputs, individualFiles, yearReadInMonthlyFile
+        )
 
     def calculationsAcrossSets(self):
         pathFolder = self.inputs["pathBase"]
@@ -574,7 +560,6 @@ class ProcessParallelTrnsys:
                     conditionList.append(conditionDict[conditionEntry] == resultsDict[conditionEntry])
 
                 if all(conditionList):
-
                     if "[" not in xAxisVariable:
                         xAxis = resultsDict[xAxisVariable]
                     else:
@@ -712,7 +697,6 @@ class ProcessParallelTrnsys:
                     conditionList.append(conditionDict[conditionEntry] == resultsDict[conditionEntry])
 
                 if all(conditionList):
-
                     conditionNeverMet = False
 
                     if resultsDict[seriesVariable] not in seriesColors.keys():
@@ -747,7 +731,9 @@ class ProcessParallelTrnsys:
                     pass
 
             if conditionNeverMet:
-                self.logger.warning('The following conditions from "comparePlotConditional" were never met all at once:')
+                self.logger.warning(
+                    'The following conditions from "comparePlotConditional" were never met all at once:'
+                )
                 for entry in conditionDict:
                     self.logger.warning("%s = %s" % (entry, str(conditionDict[entry])))
                 self.logger.warning("The respective plot cannot be generated")
@@ -798,7 +784,6 @@ class ProcessParallelTrnsys:
                 labelBarPlot = []
                 keyBarPlot = []
                 for key in plotXDict[chunk].keys():
-
                     index = num.argsort(plotXDict[chunk][key])
                     myX = num.array(plotXDict[chunk][key])[index]
                     myY = num.array(plotYDict[chunk][key])[index]
@@ -849,7 +834,6 @@ class ProcessParallelTrnsys:
             if 0:
                 for X, Y in zip(myX, myY):
                     for chunk, style in zip(plotXDict.keys(), styles):
-
                         for key in plotXDict[chunk].keys():  # the varables that appear in the legend
                             index = num.argsort(plotXDict[chunk][key])
                             myX = num.array(plotXDict[chunk][key])[index]
@@ -862,7 +846,6 @@ class ProcessParallelTrnsys:
             else:
                 for i in range(mySize):
                     for chunk, style in zip(plotXDict.keys(), styles):
-
                         for key in plotXDict[chunk].keys():  # the varables that appear in the legend
                             index = num.argsort(plotXDict[chunk][key])
                             myX = num.array(plotXDict[chunk][key])[index]
@@ -1056,7 +1039,6 @@ class ProcessParallelTrnsys:
             conditionsFulfilled = conditions.doResultsSatisfyConditions(resultsDict)
 
             if conditionsFulfilled:
-
                 conditionNeverMet = False
 
                 if resultsDict[seriesVariable] not in seriesColors.keys():
@@ -1238,7 +1220,6 @@ class ProcessParallelTrnsys:
                     conditionList.append(conditionDict[conditionEntry] == resultsDict[conditionEntry])
 
                 if all(conditionList):
-
                     # if equationVariable not in seriesColors.keys():
                     #    seriesColors[equationVariable] = colors[colorsCounter]
                     #    colorsCounter += 1
@@ -1367,7 +1348,6 @@ class ProcessParallelTrnsys:
 
             for i in range(mySize):
                 for chunk, style in zip(plotXDict.keys(), styles):
-
                     index = num.argsort(plotXDict[chunk][globalXAxisVariable])
                     myX = num.array(plotXDict[chunk][globalXAxisVariable])[index]
                     for key in equationDict.keys():  # the varables that appear in the legend
@@ -1528,7 +1508,11 @@ class ProcessParallelTrnsys:
                 )
             else:
                 ax1.plot(
-                    xDict[entry], yDict[entry], "d", color=colors[colorsCounter], label=self.doc.getNiceLatexNames(entry)
+                    xDict[entry],
+                    yDict[entry],
+                    "d",
+                    color=colors[colorsCounter],
+                    label=self.doc.getNiceLatexNames(entry),
                 )
             colorsCounter += 1
             colorsCounter = colorsCounter % len(colors)
@@ -1536,7 +1520,9 @@ class ProcessParallelTrnsys:
             ax1.legend(loc="best")
         ax1.set_xlabel(self.doc.getNiceLatexNames(xVariable))
         if differencePlot:
-            ax1.set_ylabel(self.doc.getNiceLatexNames(yVariables[0]) + " / " + self.doc.getNiceLatexNames(yVariables[1]))
+            ax1.set_ylabel(
+                self.doc.getNiceLatexNames(yVariables[0]) + " / " + self.doc.getNiceLatexNames(yVariables[1])
+            )
         else:
             ax1.set_ylabel(self.doc.getNiceLatexNames(yVariables[0]))
 
@@ -1749,7 +1735,6 @@ class ProcessParallelTrnsys:
         fig.savefig(os.path.join(pathFolder, name + ".png"), dpi=500)
 
     def changeFile(self, source, end):
-
         # todo: this function is currently not working
 
         found = False
@@ -1768,22 +1753,3 @@ class ProcessParallelTrnsys:
         shallWriteReport = self.inputs["costPdf"]
         processType = _cc.OTHER if not fileNamesToRead else _cc.CasesDefined(fileNamesToRead)
         _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, shallWriteReport, processType)
-
-
-def process():
-    pathBase = ""
-    template = pkg_resources.resource_filename("pytrnsys_examples", "solar_dhw/process_solar_dhw.config")
-    if len(sys.argv) > 1:
-        pathBase, configFile = os.path.split(sys.argv[1])
-    else:
-        pathBase, configFile = os.path.split(template)
-
-    if ":" not in pathBase:
-        pathBase = os.path.join(os.getcwd(), pathBase)
-    tool = ProcessParallelTrnsys()
-    tool.readConfig(pathBase, configFile)
-    tool.process()
-
-
-if __name__ == "__main__":
-    process()

@@ -126,6 +126,18 @@ def _createAxisValues(variableName, means, errors):
 class ManyChunks:
     chunks: _tp.Sequence["Chunk"]
 
+    def __post_init__(self) -> None:
+        if not self.chunks:
+            raise ValueError("Must be given at least one chunk.")
+
+        chunkLengths = {len(c.allSeries) for c in self.chunks}
+        if len(chunkLengths) != 1:
+            raise ValueError("All chunks must have the number of series.")
+
+    @property
+    def chunkLength(self) -> int:
+        return len(self.chunks[0].allSeries)
+
 
 @_dc.dataclass()
 class ManySeries:
@@ -184,8 +196,7 @@ class Series:
 
         if not self.chunk:
             return [
-                f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.groupingValue.value})"
-                for sign in signs
+                f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.groupingValue.value})" for sign in signs
             ]
 
         return [

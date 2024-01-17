@@ -45,7 +45,6 @@ class PlotMatplotlib:
         self.extensionPlot = extension
 
     def setDefaultColors(self):
-
         myColorsIn = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
         self.myColorsIn = myColorsIn + myColorsIn + myColorsIn + myColorsIn
@@ -89,7 +88,6 @@ class PlotMatplotlib:
     #        self.myColorsOut = ['b','m','#FF9933','g','c','#CCFF33','#CCFFFF''r']
 
     def setPath(self, _path):
-
         self.path = _path
         self.gle = gle.PlotGle(_path)
 
@@ -210,7 +208,6 @@ class PlotMatplotlib:
             plt.close()
 
             if printData == True:
-
                 lines = ""
                 line = "!nMonth %s\n" % (myLabel)
                 lines = lines + line
@@ -331,7 +328,6 @@ class PlotMatplotlib:
             plt.close()
 
             if printData == True:
-
                 lines = ""
                 line = "!nMonth %s\n" % (myLabel)
                 lines = lines + line
@@ -371,7 +367,6 @@ class PlotMatplotlib:
         showMonths=False,
         ylim=False,
     ):
-
         move = 0.5
         if showMonths == False:
             N = 13
@@ -525,7 +520,6 @@ class PlotMatplotlib:
         variables = inVar.copy()
 
         if useYear == True:
-
             nMonth = 13
             var13 = []
             monthSequence.append(yearTag)
@@ -556,7 +550,6 @@ class PlotMatplotlib:
             showMonths = 12
         width = 0.5 / (len(inVar))  # the width of the bars
         for i, values in enumerate(inVar):
-
             bar = plot.bar(ind - 0.25 + i * width + width / 2, [var13[i][j] for j in showMonths], width)
             bars.append(bar)
 
@@ -606,7 +599,6 @@ class PlotMatplotlib:
         return namePdf
 
     def _plot_as_emf(self, figure, **kwargs):
-
         try:
             inkscape_path = kwargs.get("inkscape", "C://Program Files//Inkscape//inkscape.exe")
             filepath = kwargs.get("filename", None)
@@ -693,7 +685,6 @@ class PlotMatplotlib:
                 outVar[i] = utils.reorganizeMonthlyFile(outVar[i], startMonth)
 
         if useYear == True:
-
             nMonth = 13
             inVar13 = []
             outVar13 = []
@@ -778,7 +769,11 @@ class PlotMatplotlib:
                 else:
                     bar.append(
                         plot.bar(
-                            ind - move * width, -outVar13[i][showMonths], width, color=self.myColorsOut[i], bottom=addVar
+                            ind - move * width,
+                            -outVar13[i][showMonths],
+                            width,
+                            color=self.myColorsOut[i],
+                            bottom=addVar,
                         )
                     )
                     addVar = addVar - outVar13[i][showMonths]
@@ -832,7 +827,6 @@ class PlotMatplotlib:
             fig.savefig(nameWithPath)
 
             if plotEmf:
-
                 nameEmf = "%s.emf" % nameFile
                 nameEmfWithPath = "%s\%s" % (self.path, nameEmf)
 
@@ -841,7 +835,6 @@ class PlotMatplotlib:
             plt.close()
 
             if printData == True:
-
                 lines = ""
                 line = "!nMonth\t"
                 lines = lines + line
@@ -860,14 +853,12 @@ class PlotMatplotlib:
 
                     sumVar = 0.0
                     for i in range(len(inVar13)):
-
                         sumVar = sumVar + inVar13[i][j]
                         line = "%.2f\t" % sumVar
                         lines = lines + line
 
                     sumVar = 0
                     for i in range(len(outVar13)):
-
                         sumVar = sumVar - outVar13[i][j]
                         line = "%.2f\t" % sumVar
                         lines = lines + line
@@ -954,13 +945,11 @@ class PlotMatplotlib:
         for var in outVar:
             variables.append(-var)
         if useYear == True:
-
             nMonth = 13
             variables13 = []
             monthSequence.append(yearTag)
 
             for i in range(len(variables)):
-
                 variables13.append(utils.addYearlyValue(variables[i], yearlyFactor=yearlyFactor))
 
             if showMonths == False:
@@ -1026,7 +1015,9 @@ class PlotMatplotlib:
                             )
                         )
                     except:
-                        bar.append(plot.bar(ind - move * width, variables13[i][showMonths], width, bottom=data_stack[i]))
+                        bar.append(
+                            plot.bar(ind - move * width, variables13[i][showMonths], width, bottom=data_stack[i])
+                        )
 
             if printImb:
                 if style == "relative":
@@ -1092,7 +1083,6 @@ class PlotMatplotlib:
                 printData = False
 
             if printData == True:
-
                 lines = ""
                 line = "!nMonth\t"
                 lines = lines + line
@@ -1263,7 +1253,9 @@ class PlotMatplotlib:
                         )
                     )
                 else:
-                    bar.append(plot.bar(ind - move * width, data[-1][showDays], width, color="k", bottom=data_stack[-1]))
+                    bar.append(
+                        plot.bar(ind - move * width, data[-1][showDays], width, color="k", bottom=data_stack[-1])
+                    )
 
             if style == "relative":
                 myLabel = myLabel + " [%]"
@@ -1313,7 +1305,6 @@ class PlotMatplotlib:
                 printData = False
 
             if printData == True:
-
                 lines = ""
                 line = "!nMonth\t"
                 lines = lines + line
@@ -1332,7 +1323,6 @@ class PlotMatplotlib:
                     sumVar = 0.0
                     sumVarNeg = 0.0
                     for i in range(len(variables)):
-
                         sumVarNeg += variables[i][j]
                         line = "%.2f\t" % sumVarNeg
 
@@ -1351,7 +1341,7 @@ class PlotMatplotlib:
 
         return namePdf
 
-    def plotHeatingLimitFit(self, dailyTemperature, heatingPower, fileName, timeStep, title="", yLabel="",doPlot=True):
+    def plotHeatingLimitFit(self, dailyTemperature, heatingPower, fileName, timeStep, title="", yLabel="", doPlot=True):
         """
         Generate a plot of heating power values in dependence of average daily temperature. If timeStep == 'daily' a
         linear fit over these data will be done to obtain values for H and HG (heating limit). Only heating power values
@@ -1394,7 +1384,6 @@ class PlotMatplotlib:
             fitHeatingPower = heatingPower[heatingPower > fitHeatingPowerLowerLimit]
 
             if timeStep == "hourly":
-
                 temperatureHourFromDay = []
                 days = heatingPower.index.dayofyear
                 for day in days:
@@ -1424,7 +1413,6 @@ class PlotMatplotlib:
                 return namePdf
 
             elif timeStep == "daily":
-
                 plot.plot(dailyTemperature, heatingPower, "bo", Markersize=3)
                 timeStepTitle = "Tageswerte"
 
@@ -1503,7 +1491,6 @@ class PlotMatplotlib:
         return d
 
     def plotDaily(self, var, myLabel, nameFile, plotJpg=False):
-
         N = 365
         width = 0.1  # the width of the bars
         ind = num.arange(N)  # the x locations for the groups
@@ -1533,7 +1520,6 @@ class PlotMatplotlib:
         plt.savefig(nameWithPath)
 
         if plotJpg:
-
             nameJpg = "%s.jpg" % myLabel
             nameJpgWithPath = "%s\%s" % (self.path, nameJpg)
 
@@ -1557,7 +1543,6 @@ class PlotMatplotlib:
         xlim=False,
         ylim=False,
     ):
-
         try:
             size = len(xVar)
         except:
@@ -1590,14 +1575,12 @@ class PlotMatplotlib:
             namePdf = None
 
         else:
-
             namePdf = "%s.%s" % (nameFile, self.extensionPlot)
             nameWithPath = "%s\%s" % (self.path, namePdf)
 
             plt.savefig(nameWithPath)
 
             if plotJpg:
-
                 nameJpg = "%s.jpg" % nameFile
                 nameJpgWithPath = "%s\%s" % (self.path, nameJpg)
 
@@ -1653,7 +1636,6 @@ class PlotMatplotlib:
         xlim=False,
         ylim=False,
     ):
-
         try:
             size = len(xVar)
         except:
@@ -1688,7 +1670,6 @@ class PlotMatplotlib:
             namePdf = None
 
         else:
-
             namePdf = "%s.%s" % (nameFile, self.extensionPlot)
             nameWithPath = "%s\%s" % (self.path, namePdf)
 
@@ -1741,7 +1722,6 @@ class PlotMatplotlib:
         return namePdf
 
     def plotDynamicOneVar(self, xVar, yVar, myLegend, nameFile, plotJpg=False):
-
         try:
             size = len(xVar)
         except:
@@ -1765,7 +1745,6 @@ class PlotMatplotlib:
             namePdf = None
 
         else:
-
             namePdf = "%s.%s" % (nameFile, self.extensionPlot)
             nameWithPath = "%s\%s" % (self.path, namePdf)
 
@@ -1774,7 +1753,6 @@ class PlotMatplotlib:
             plt.savefig(nameWithPath)
 
             if plotJpg:
-
                 nameJpg = "%s.jpg" % nameFile
                 nameJpgWithPath = "%s\%s" % (self.path, nameJpg)
 
@@ -1788,7 +1766,6 @@ class PlotMatplotlib:
         return namePdf
 
     def calcAndPrintQVersusT(self, fileName, tFlow, eFlow, legends, printEvery=1, normalized=False, cut=False):
-
         nVar = len(legends)
 
         if nVar > 0:
@@ -1863,7 +1840,6 @@ class PlotMatplotlib:
     # var[nvariables,nMonth] or var[nVariables], labels[nvariables]
 
     def plotPie(self, var, labels, myTitle, nameFile, printData=False, extension="pdf", sort=True, fontSize=10):
-
         fig = plt.figure()
 
         fig.add_subplot(111)
@@ -1960,7 +1936,6 @@ class PlotMatplotlib:
         plt.close()
 
         if printData == True:
-
             lines = ""
 
             for label in labelsSorted:
@@ -1998,7 +1973,6 @@ class PlotMatplotlib:
         printData=False,
         useTwoColumns=False,
     ):
-
         try:
             if len(inVar[0]) > 2:
                 monthlyDataUsed = True
@@ -2129,7 +2103,6 @@ class PlotMatplotlib:
         plt.close()
 
         if printData == True:
-
             lines = ""
             line = "!nMonth\t"
             lines = lines + line
@@ -2149,14 +2122,12 @@ class PlotMatplotlib:
 
                     sumVar = 0.0
                     for i in range(len(inVarYear)):
-
                         sumVar = sumVar + inVarYear[i][j]
                         line = "%f\t" % sumVar
                         lines = lines + line
 
                     sumVar = 0
                     for i in range(len(outVarYear)):
-
                         sumVar = sumVar - outVarYear[i][j]
                         line = "%f\t" % sumVar
                         lines = lines + line
@@ -2173,7 +2144,6 @@ class PlotMatplotlib:
                 linesEmpty = linesEmpty + lineEmpty
                 sumVar = 0.0
                 for i in range(len(inVarYear)):
-
                     sumVar = sumVar + inVarYear[i][j]
                     line = "%f\t" % sumVar
                     linesOne = linesOne + line
@@ -2183,7 +2153,6 @@ class PlotMatplotlib:
                 j = 1
                 sumVar = 0
                 for i in range(len(outVarYear)):
-
                     sumVar = sumVar - outVarYear[i][j]
                     line = "%f\t" % sumVar
                     linesOne = linesOne + line
@@ -2214,7 +2183,6 @@ class PlotMatplotlib:
     def plotTemperatureFrequency(
         self, path, nameFile, name, temperature, printData=False, extension="pdf", sort=True, fontSize=10
     ):
-
         fig, ax = plt.subplots(1, 1)
 
         ax.set_title(name)

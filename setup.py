@@ -48,7 +48,7 @@ _st.setup(
     include_package_data=True,
     install_requires=["numpy", "scipy", "pandas", "matplotlib", "seaborn", "bokeh", "dataclasses-jsonschema", "lark"],
     package_data={
-        "pytrnsys": ["py.typed", "./plot/stylesheets/*.*", "./report/latex_doc/*.*", "ddck/ddck.lark"],
+        "pytrnsys": ["py.typed", "./plot/stylesheets/*.*", "./report/latex_doc/*.*", "ddck/replaceTokens/ddck.lark"],
     },
     data_files=_getDataFilePairs(),
     classifiers=[
@@ -56,13 +56,6 @@ _st.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: Microsoft :: Windows",
     ],
-    entry_points="""
-    [console_scripts]
-    pytrnsys-dll = pytrnsys.utils.copyDllFiles:dllCopy
-    pytrnsys-run = pytrnsys.rsim.runParallelTrnsys:run
-    pytrnsys-process = pytrnsys.psim.processParallelTrnsys:process
-    pytrnsys-load = pytrnsys.utils.loadExamplesAndDdcks:load
-    """,
     setup_requires=["setuptools-git-versioning"],
-    python_requires=">=3.9",
+    python_requires=">=3.12",
 )

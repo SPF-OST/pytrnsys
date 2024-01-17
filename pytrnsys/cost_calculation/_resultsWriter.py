@@ -44,7 +44,6 @@ class ResultsWriter:
 
     @staticmethod
     def readCostJson(path):
-
         with open(path) as json_file:
             dictCost = json.load(json_file)
 
@@ -64,18 +63,14 @@ class ResultsWriter:
         plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
         plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-    def _addCostsToResultsJson(
-        self, output: _output.Output, resultsJsonFilePath: _pl.Path
-    ):
+    def _addCostsToResultsJson(self, output: _output.Output, resultsJsonFilePath: _pl.Path):
         serializedResults = resultsJsonFilePath.read_text()
         results = json.loads(serializedResults)
 
         costsDict = self._createCostsDict(output)
         resultsWithCosts = results | costsDict
 
-        serializedResultsWithCosts = json.dumps(
-            resultsWithCosts, indent=2, sort_keys=True
-        )
+        serializedResultsWithCosts = json.dumps(resultsWithCosts, indent=2, sort_keys=True)
         resultsJsonFilePath.write_text(serializedResultsWithCosts)
 
     @staticmethod
@@ -86,14 +81,11 @@ class ResultsWriter:
         costsDict = {
             "investment": totalCost.to_dict(),
             "energyCost": output.heatGenerationCost.to_dict(),
-            "investmentPerMWh": totalCostPerMwh.to_dict()
+            "investmentPerMWh": totalCostPerMwh.to_dict(),
         }
 
         collectorComponents = [
-            c
-            for g in output.componentGroups.groups
-            for c in g.components.factors
-            if c.name == "Collector"
+            c for g in output.componentGroups.groups for c in g.components.factors if c.name == "Collector"
         ]
 
         if len(collectorComponents) > 1:
@@ -108,12 +100,7 @@ class ResultsWriter:
                 "investmentPerM2": totalCostPerM2.to_dict(),
             }
 
-        hpComponents = [
-            c
-            for g in output.componentGroups.groups
-            for c in g.components.factors
-            if c.name == "Heat pump"
-        ]
+        hpComponents = [c for g in output.componentGroups.groups for c in g.components.factors if c.name == "Heat pump"]
 
         if len(hpComponents) > 1:
             raise RuntimeError("More than one `Heat pump' component found.")
@@ -132,12 +119,8 @@ class ResultsWriter:
 
     # plots
 
-    def _doPlots(
-        self, componentGroups: _output.ComponentGroups, resultsJsonFilePath: _pl.Path
-    ) -> None:
-        groupNamesWithCost = [
-            (g.name, g.components.cost.mean) for g in componentGroups.groups
-        ]
+    def _doPlots(self, componentGroups: _output.ComponentGroups, resultsJsonFilePath: _pl.Path) -> None:
+        groupNamesWithCost = [(g.name, g.components.cost.mean) for g in componentGroups.groups]
 
         groupNames, groupCosts = zip(*groupNamesWithCost)
         simulationName = self._getSimulationName(resultsJsonFilePath)
@@ -283,16 +266,10 @@ class ResultsWriter:
         return stem[: -len(suffix)]
 
     def _getIsLatexCleanMode(self, parameters):
-        return (
-            parameters.cleanModeLatex
-            if self.cleanModeLatex is None
-            else self.cleanModeLatex
-        )
+        return parameters.cleanModeLatex if self.cleanModeLatex is None else self.cleanModeLatex
 
     @staticmethod
-    def _addTableEconomicAssumptions(
-        parameters: _input.Parameters, output: _output.Output, doc: latex.LatexReport
-    ):
+    def _addTableEconomicAssumptions(parameters: _input.Parameters, output: _output.Output, doc: latex.LatexReport):
         caption = "Assumptions for calculation of heat generation costs"
         names = ["", "", "", ""]
         units = None
@@ -308,9 +285,7 @@ class ResultsWriter:
         lines += line + "\n"
         line = rf"Electricity & Fix costs: {parameters.costElecFix:2.0f}  Fr. per year \\"
         lines += line + "\n"
-        line = (
-            rf" & Variable costs:  {parameters.costElecKWh:2.2f} $Fr.$ $per$ $kWh$ \\"
-        )
+        line = rf" & Variable costs:  {parameters.costElecKWh:2.2f} $Fr.$ $per$ $kWh$ \\"
         lines += line + "\n"
         line = rf"Increase of electricity costs & {parameters.increaseElecCost * 100:2.1f} \% per year \\"
         lines += line + "\n"
@@ -318,9 +293,6 @@ class ResultsWriter:
         lines += line + "\n"
         line = rf"Energy demand per year & {output.heatingDemandInKWh:2.0f} kWh \\"
         lines += line + "\n"
-
-
-
 
         label = "definitionTable"
 

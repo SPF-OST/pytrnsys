@@ -17,7 +17,6 @@ import pytrnsys.pdata.processFiles as spfUtils
 
 class loadBase:
     def __init__(self, _name):
-
         self.verbose = True
 
         # internal data
@@ -51,7 +50,6 @@ class loadBase:
         self.readLabels = _labels
 
     def loadFile(self, skypChar, replaceChar):
-
         if self.verbose:
             print("Reading the file: %s " % self.fileNameWithExtension)
 
@@ -76,7 +74,6 @@ class loadBase:
 
             else:
                 if len(linesWithSign) > 0:
-
                     linesWithSign = [float(list_item) for list_item in linesWithSign]
                     #                    The previous line does the same as is doing the next but faster
                     #                    for i in range(len(linesWithSign)):

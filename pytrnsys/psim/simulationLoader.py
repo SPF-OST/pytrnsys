@@ -64,7 +64,6 @@ class SimulationLoader:
         footerPresent=True,
         individualFiles=False,
     ):
-
         self.logger = logging.getLogger("root")
 
         self._path = path
@@ -133,13 +132,12 @@ class SimulationLoader:
         self.myShortMonths = None
 
         if fileType == _ResultsFileType.MONTHLY and self._monthlyUsed == True:
-
             if footerPresent:
-                file = pd.read_csv(pathFile, header=1, delimiter="\t", nrows=nRows - 26, mangle_dupe_cols=True).rename(
+                file = pd.read_csv(pathFile, header=1, delimiter="\t", nrows=nRows - 26).rename(
                     columns=lambda x: x.strip()
                 )
             else:
-                file = pd.read_csv(pathFile, header=1, delimiter="\t", nrows=nRows - 1, mangle_dupe_cols=True).rename(
+                file = pd.read_csv(pathFile, header=1, delimiter="\t", nrows=nRows - 1).rename(
                     columns=lambda x: x.strip()
                 )
             file = file[file.columns[:-1]]
@@ -205,9 +203,7 @@ class SimulationLoader:
                     file = file[-8758:]  # this is here because of the trnsys bug in type 99
 
             else:
-                firstHourNumber = (
-                    datetime(2018, firstMonthN, 1) - datetime(2018, 1, 1)
-                ).days * 24 + self._year * 8760
+                firstHourNumber = (datetime(2018, firstMonthN, 1) - datetime(2018, 1, 1)).days * 24 + self._year * 8760
                 try:
                     file = file.loc[firstHourNumber : firstHourNumber + 8760]
 
@@ -272,7 +268,6 @@ class SimulationLoader:
         return i + 1
 
     def loadHourlyFile(self, file):
-
         file = pd.read_csv(pathFile, header=1, delimiter=";", nrows=nRows - 1).rename(columns=lambda x: x.strip())
         file.set_index("Time", inplace=True, drop=False)
         period = datetime(2018, 1, 1) + pd.to_timedelta(file["Time"], unit="h")

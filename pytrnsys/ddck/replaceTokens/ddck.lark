@@ -6,7 +6,7 @@ ddck: block+
 
 ?simulation_control: version | simulation | tolerances | limits
     | nan_check | overwrite_check | time_report | dfq | eqsolver | solver |
-    | assign | end | equations | constants
+    | assign | end | equations | constants | accelerate
 
 simulation: "SIMULATION"i tstart tend delta_t
 
@@ -55,6 +55,8 @@ list: "LIST"i
 version: "VERSION"i version_number
 
 version_number: positive_int_or_explicit_var
+
+accelerate: "ACCELERATE"i positive_int_or_explicit_var (positive_int_or_explicit_var "," positive_int_or_explicit_var)+
 
 unit: header [parameters] [inputs [labels]]
 
@@ -146,15 +148,29 @@ private_var: ":" NAME
 
 shared_var: NAME
 
-assign: "ASSIGN" (file_path | "\"" file_path "\"") [logical_unit]
+assign: "ASSIGN"i (file_path | "\"" file_path "\"") logical_unit
 
 file_path: FILE_PATH
 
-logical_unit: INT | variable
+logical_unit: INT | explicit_var
 
 computed_var: PORT_PROPERTY "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ]")"
 
-computed_output_var: "@temp" "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ] ")"
+?computed_output_var: computed_output_temp_var | computed_output_energy_var
+
+computed_output_temp_var: "@temp" "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ] ")"
+
+computed_output_energy_var: "@energy" "(" ENERGY_DIRECTION "," ENERGY_QUALITY "," CATEGORY_OR_LOCAL ("," CATEGORY)* ")"
+
+ENERGY_DIRECTION: "in" | "out"
+
+ENERGY_QUALITY: "heat" | "el"
+
+CATEGORY: /[A-za-z0-9]+/
+
+CATEGORY_LOCAL: ":"
+
+CATEGORY_OR_LOCAL: CATEGORY | CATEGORY_LOCAL
 
 FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
 

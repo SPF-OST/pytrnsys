@@ -2,12 +2,12 @@ import pkgutil as _pu
 
 import lark as _lark
 
-import pytrnsys.ddck as _ddck
+import pytrnsys.ddck.replaceTokens as _rt
 import pytrnsys.utils.result as _res
 
 
 def _createParser() -> _lark.Lark:
-    data = _pu.get_data(_ddck.__name__, "ddck.lark")
+    data = _pu.get_data(_rt.__name__, "ddck.lark")
     assert data, "Could not find ddck Lark grammar file."
     grammar = data.decode()
     parser = _lark.Lark(grammar, parser="earley", propagate_positions=True)

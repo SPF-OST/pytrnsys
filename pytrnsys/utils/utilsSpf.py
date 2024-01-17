@@ -19,7 +19,6 @@ import time
 
 
 def filterPath(path):
-
     #    print "filterPath :%s"%path
     pathChanged = path.replace("\\", "/")
     #    print "filterPath changed :%s"%pathChanged
@@ -41,7 +40,6 @@ def isInteger(n):
 
 
 def getNameCity(nCity):
-
     if nCity == 7:
         return "Zurich"
     elif nCity == 6:
@@ -51,7 +49,6 @@ def getNameCity(nCity):
 
 
 def isWhole(x):
-
     if x % 1 == 0:
         return True
     else:
@@ -59,7 +56,6 @@ def isWhole(x):
 
 
 def addYearlyValue(array, yearlyFactor=1.0):
-
     if len(array) == 13:
         print(
             "addYearlyValue found an array of 13 lenght. So I assume that it was already added and I return the same value"
@@ -86,7 +82,6 @@ def addYearlyValue(array, yearlyFactor=1.0):
 
 
 def getNameFromUserName():
-
     userName = getpass.getuser()
 
     if userName == "dcarbone":
@@ -102,7 +97,6 @@ def getNameFromUserName():
 
 
 def getEmailFromUserName():
-
     userName = getpass.getuser()
 
     if userName == "dcarbone":
@@ -118,7 +112,6 @@ def getEmailFromUserName():
 
 
 def isMonthName(_month):
-
     if _month == "January":
         return True
     elif _month == "February":
@@ -148,7 +141,6 @@ def isMonthName(_month):
 
 
 def getMonthNameIndex(_month):
-
     if _month == "January":
         return 0
     elif _month == "February":
@@ -231,7 +223,6 @@ def getMonthKey(i, language="en"):
 
 
 def getShortMonthyNameArray(monthVec):
-
     monthShort = []
 
     for i in range(len(monthVec)):
@@ -241,7 +232,6 @@ def getShortMonthyNameArray(monthVec):
 
 
 def getShortMonthNames(month):
-
     _month = month.replace(" ", "")
 
     if _month == "January":
@@ -274,7 +264,6 @@ def getShortMonthNames(month):
 
 # startMonth [1-12]
 def reorganizeMonthlyFile(var, startMonth):
-
     varNew = num.zeros(num.size(var))  # it could be 13 for yearly value !!
 
     if startMonth > 12:
@@ -283,7 +272,6 @@ def reorganizeMonthlyFile(var, startMonth):
     j = startMonth - 1
 
     for i in range(12):
-
         if j == 12:
             j = 0
 
@@ -299,7 +287,6 @@ def reorganizeMonthlyFile(var, startMonth):
 
 
 def getMonthNameSequence(startMonth, language="en"):
-
     monthSeq = []
 
     j = startMonth  # 1-12
@@ -366,7 +353,6 @@ def getMonthLongName(i, language="en"):
 
 
 def getNumberOfAccumulatedDays(month, day):
-
     numberOfAccumulatedDays = 0
 
     for i in range(1, 13, 1):
@@ -384,7 +370,6 @@ def getNumberOfAccumulatedDays(month, day):
 
 # month 1-12, day 1-31, hour=0
 def getNumberOfAccumulatedHours(month, day, _hour):
-
     numberOfAccumulatedDays = getNumberOfAccumulatedDays(month, day - 1)
 
     hour = _hour + numberOfAccumulatedDays * 24
@@ -395,7 +380,6 @@ def getNumberOfAccumulatedHours(month, day, _hour):
 
 
 def getNumberOfDaysOfMonth(i):
-
     if i == 1:
         return 31
     elif i == 2:
@@ -425,7 +409,6 @@ def getNumberOfDaysOfMonth(i):
 
 
 def getHourBeginAndEndForMonth(monthBegin, monthEnd):
-
     firstHour = getNumberOfAccumulatedHours(monthBegin, 1, 0)
     lastHour = getNumberOfAccumulatedHours(monthEnd + 1, 1, 0)
 
@@ -436,7 +419,6 @@ def getHourBeginAndEndForMonth(monthBegin, monthEnd):
 
 
 def getIsLeapYear(_year):
-
     for n in range(20):
         if _year == (1980 + 4 * n):
             return True
@@ -445,7 +427,6 @@ def getIsLeapYear(_year):
 
 
 def getDayIndexByHourOfYear(_hour):
-
     year = 0
 
     for myYear in range(30, 0, -1):
@@ -465,13 +446,11 @@ def getDayIndexByHourOfYear(_hour):
 
 
 def getNumberOfHoursPerMonth(_month):
-
     return getNumberOfDaysOfMonth(_month) * 24.0
 
 
 # from 1 to 12
 def getMonthIndexByHourOfYear(_hour):
-
     year = 0
 
     for myYear in range(30, 0, -1):
@@ -527,7 +506,6 @@ def getMonthIndexByHourOfYear(_hour):
 
 
 def calculateDaylyValuesFromHourly(varHourly):
-
     varDay = num.zeros(365)
 
     for i in range(len(varHourly)):
@@ -555,7 +533,6 @@ def calculateDaylyValuesFromHourly(varHourly):
 
 
 def calculateMonthlyValues(varHourly):
-
     varMonth = num.zeros(12)
 
     try:
@@ -573,7 +550,6 @@ def calculateMonthlyValues(varHourly):
 
 
 def calculateMonthlyAverages(varHourly):
-
     varMonth = num.zeros(12)
 
     try:
@@ -600,13 +576,11 @@ the values are stored in varMonth as varMonth[0]=sum of Jan, etc..
 
 
 def calculateMonthlyAveragesFromUserDefinedTimeStep(varUserDefined, timeStepInSeconds, firstHourInYear=0):
-
     varMonth = num.zeros(12)
 
     month0 = 0
     count = 1
     for i in range(len(varUserDefined)):
-
         hour = i * timeStepInSeconds / 3600.0 + firstHourInYear
 
         (m, nix, nix) = getMonthIndexByHourOfYear(hour)
@@ -646,11 +620,9 @@ the values are stored in varMonth as varMonth[0]=sum of Jan, etc..
 
 
 def calculateMonthlyValuesFromUserDefinedTimeStep(varUserDefined, timeStepInSeconds, firstHourInYear=0):
-
     varMonth = num.zeros(12)
 
     for i in range(len(varUserDefined)):
-
         hour = i * timeStepInSeconds / 3600.0 + firstHourInYear
 
         (month, day, year) = getMonthIndexByHourOfYear(hour)
@@ -671,7 +643,6 @@ the vector that correspond to the month desired is returned
 
 
 def getMonthlySliceFromUserDefinedTimeStep(varUserDefined, timeStepInSeconds, monthDesired, firstHourInYear=0):
-
     indexBegin = None
     indexEnd = None
     monthFound = False
@@ -681,7 +652,6 @@ def getMonthlySliceFromUserDefinedTimeStep(varUserDefined, timeStepInSeconds, mo
         raise ValueError("month:%d out of range[1-12]" % monthDesired)
 
     for i in range(len(varUserDefined)):
-
         hour = i * timeStepInSeconds / 3600 + firstHourInYear
 
         (month, nix, nix) = getMonthIndexByHourOfYear(hour)
@@ -719,7 +689,6 @@ def getMonthlySliceFromUserDefinedTimeStep(varUserDefined, timeStepInSeconds, mo
 
 
 def calculateMonthlyValuesFromUserDefinedTimeStep2(varUserDefined, timeStepInSeconds, firstHourInYear=0):
-
     jan = []
     feb = []
     mar = []
@@ -760,7 +729,6 @@ def calculateMonthlyValuesFromUserDefinedTimeStep2(varUserDefined, timeStepInSec
     decIt = 0
 
     for i in range(len(varUserDefined)):
-
         hour = i * timeStepInSeconds / 3600 + firstHourInYear
 
         (month, nix, nix) = getMonthIndexByHourOfYear(hour)
@@ -944,7 +912,6 @@ the values are stored in varMonth as varMonth[0]=sum of Jan, etc..
 def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(
     varUserDefined, timeStepInSeconds, firstHourInYear=0, avoidZeros=False
 ):
-
     jan = []
     feb = []
     mar = []
@@ -1093,7 +1060,6 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(
         pass
 
     try:
-
         varMonth[3] = sum(apr)
         maxMonth[3] = max(apr)
         minMonth[3] = min(apr)
@@ -1187,14 +1153,12 @@ def calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(
 
 
 def calculateMonthlyAvgFromUserDefinedTimeStep(varUserDefined, timeStepInSeconds):
-
     var, maxV, minV, avV = calculateMonthlyValuesMinMaxAvgFromUserDefinedTimeStep(varUserDefined, timeStepInSeconds)
 
     return avV
 
 
 def getTLog(tIn, tOut, tStorage):
-
     dtIn = abs(tIn - tStorage)
     dtOut = abs(tOut - tStorage)
 
@@ -1208,7 +1172,6 @@ def getTLog(tIn, tOut, tStorage):
 
 
 def getSecondOrder(a, b, c):
-
     sqTerm = b * b - (4.0 * a * c)
 
     if sqTerm < 0.0:
@@ -1226,7 +1189,6 @@ def getSecondOrder(a, b, c):
 
 # print var(nVars,13) vector. Position 13 is for year value
 def printMonthlyData(path, nameFile, var, legends):
-
     lines = ""
     line = "!nMonth\t"
     lines = lines + line
@@ -1243,7 +1205,6 @@ def printMonthlyData(path, nameFile, var, legends):
 
         sumVar = 0.0
         for i in range(len(var)):
-
             sumVar = sumVar + var[i][j]
             line = "%f\t" % sumVar
             lines = lines + line
@@ -1259,7 +1220,6 @@ def printMonthlyData(path, nameFile, var, legends):
 
 # This sums up the power, so it is assumed that units are W*s, or kW*h
 def calcQvsT(tFlow, eFlow, nameFile=None):
-
     numberOfTimesteps = len(tFlow)
 
     sortedIndexTempFlow = num.argsort(tFlow)
@@ -1295,7 +1255,6 @@ def calcQvsT(tFlow, eFlow, nameFile=None):
 
 
 def sortVsT(tFlow, var, nameFile=None):
-
     numberOfTimesteps = len(tFlow)
 
     sortedIndexTempFlow = num.argsort(tFlow)
@@ -1347,7 +1306,6 @@ def calcAndPrintQVersusT(
     printEvery=1,
     qTesFromColUsed=False,
 ):
-
     numberOfTimesteps = len(tShFl)
 
     tShFlSort, cumulativeEShFl = calcQvsT(tShFl, eSh)
@@ -1430,7 +1388,6 @@ def calcAndPrintQVersusT_new(
     printEvery=1,
     qTesFromColUsed=False,
 ):
-
     numberOfTimesteps = len(tShFl)
 
     print("sum tShFl:%f tShRt:%f" % (sum(tShFl), sum(tShRt)))
@@ -1499,7 +1456,6 @@ def calcAndPrintQVersusT_new(
 
 
 def createGleQvsT(outputPath, fileName):
-
     lines = ""
 
     line = "size 14 8\n"
@@ -1575,7 +1531,6 @@ def createGleQvsT(outputPath, fileName):
 
 
 def createGleQvsT_new(outputPath, fileName):
-
     lines = ""
 
     line = "size 14 8\n"

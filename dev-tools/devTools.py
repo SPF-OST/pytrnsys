@@ -3,18 +3,15 @@
 # Run from top-level directory
 
 import argparse as ap
-import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
-import typing as tp
-import sysconfig as _sysconfig
-import venv
-
 import sys
+import sysconfig as sc
 import time
+import typing as tp
 
-_SCRIPTS_DIR = pl.Path(_sysconfig.get_path("scripts"))
+_SCRIPTS_DIR = pl.Path(sc.get_path("scripts"))
 
 
 def main():
@@ -30,8 +27,6 @@ def main():
     _maybeRunBlack(arguments)
 
     _maybeCreateDiagrams(arguments)
-
-    _maybeCreateExecutable(arguments)
 
     _maybeRunPytest(arguments, testResultsDirPath)
 
@@ -103,13 +98,6 @@ def _parseArguments() -> ap.Namespace:
         action="store_true",
         dest="shallRunAll",
     )
-    parser.add_argument(
-        "-x",
-        "--executable",
-        help="Create executable using pyinstaller",
-        action="store_true",
-        dest="shallCreateExecutable",
-    )
     arguments = parser.parse_args()
     return arguments
 
@@ -160,36 +148,6 @@ def _maybeCreateDiagrams(arguments):
         _printAndRun(cmd.split())
 
 
-def _maybeCreateExecutable(arguments):
-    if arguments.shallRunAll or arguments.shallCreateExecutable:
-        releaseDirPath = pl.Path("release").resolve(strict=True)
-
-        sh.rmtree(releaseDirPath / "build", ignore_errors=True)
-        sh.rmtree(releaseDirPath / "dist", ignore_errors=True)
-        sh.rmtree(releaseDirPath / "pyinstaller-venv", ignore_errors=True)
-
-        venvDirPath = releaseDirPath / "pyinstaller-venv"
-        venv.create(venvDirPath, with_pip=True)
-
-        commands = [
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install --upgrade pip",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install wheel",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install -r requirements\release.txt",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller.remove",
-            r"release\pyinstaller-venv\Scripts\python.exe dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
-        ]
-
-        for cmd in commands:
-            _printAndRun(cmd.split())
-
-        os.chdir("release")
-
-        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe pytrnsys-gui.spec"
-        _printAndRun(cmd.split())
-
-        os.chdir("..")
-
-
 def _maybeRunPytest(arguments, testResultsDirPath):
     wasCalledWithoutArguments = (
         not arguments.shallPerformStaticChecks
@@ -197,7 +155,6 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         and arguments.lintArguments is None
         and arguments.blackArguments is None
         and arguments.diagramsFormat is None
-        and not arguments.shallCreateExecutable
     )
     if arguments.shallRunAll or arguments.pytestMarkersExpression is not None or wasCalledWithoutArguments:
         markerExpressions = _getMarkerExpressions(arguments.pytestMarkersExpression)
@@ -206,7 +163,7 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         cmd = [
             _SCRIPTS_DIR / "pytest",
             "-v",
-            "--cov=trnsysGUI",
+            "--cov=pytrnsys",
             f"--cov-report=html:{testResultsDirPath / 'coverage-html'}",
             f"--cov-report=lcov:{testResultsDirPath / 'coverage.lcov'}",
             "--cov-report=term",

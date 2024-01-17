@@ -4,6 +4,7 @@
 __all__ = ["createPlot"]
 
 import json as _json
+import logging as _log
 import os as _os
 import pathlib as _pl
 import typing as _tp
@@ -12,9 +13,8 @@ import matplotlib.pyplot as _plt
 
 import pytrnsys.psim.conditions as _conds
 import pytrnsys.report.latexReport as _latex
-
-from . import _gle
 from . import _common
+from . import _gle
 
 
 def createPlot(
@@ -29,11 +29,11 @@ def createPlot(
     comparePlotUserName,
     setPrintDataForGle,
     shallPlotUncertainties,
-    extensionFig
+    extensionFig,
 ):
     xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions = _separatePlotVariables(plotVariables)
 
-    resultFilePaths = _getResultsFilePaths(pathFolder, typeOfProcess)
+    resultFilePaths = _getResultsFilePaths(pathFolder, typeOfProcess, logger)
     if not resultFilePaths:
         logger.error("No results.json-files found.")
         logger.error('Unable to generate "comparePlot %s %s %s"', xAxisVariable, yAxisVariable, seriesVariable)
@@ -58,18 +58,11 @@ def createPlot(
     if isinstance(manySeriesOrChunks, _common.ManyChunks) and len(manySeriesOrChunks.chunks) > len(styles):
         raise AssertionError("Too many chunks")
 
-    allSeries = (
-        manySeriesOrChunks.allSeries
-        if isinstance(manySeriesOrChunks, _common.ManySeries)
-        else [s for c in manySeriesOrChunks.chunks for s in c.allSeries]
-    )
-    seriesColors = _getSeriesColors(allSeries)
-
     doc = _createLatexDoc(configPath, latexNames)
 
     fig, ax = _plt.subplots(constrained_layout=True)
 
-    chunkLabels, dummyLines = _plotValues(ax, manySeriesOrChunks, shallPlotUncertainties, seriesColors, styles, doc)
+    chunkLabels, dummyLines = _plotValues(ax, manySeriesOrChunks, shallPlotUncertainties, styles, doc)
 
     _setLegendsAndLabels(
         fig, ax, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, chunkLabels, dummyLines, doc
@@ -79,6 +72,12 @@ def createPlot(
 
     if conditionsTitle:
         ax.set_title(conditionsTitle)
+
+    allSeries = (
+        manySeriesOrChunks.allSeries
+        if isinstance(manySeriesOrChunks, _common.ManySeries)
+        else [s for c in manySeriesOrChunks.chunks for s in c.allSeries]
+    )
 
     _savePlotAndData(
         fig,
@@ -121,7 +120,7 @@ def _separatePlotVariables(plotVariables):
     return xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions
 
 
-def _getResultsFilePaths(pathFolder, typeOfProcess) -> _tp.Sequence[_pl.Path]:
+def _getResultsFilePaths(pathFolder: str, typeOfProcess: str, logger: _log.Logger) -> _tp.Sequence[_pl.Path]:
     pathFolder = _pl.Path(pathFolder)
 
     if not pathFolder.is_dir():
@@ -130,17 +129,29 @@ def _getResultsFilePaths(pathFolder, typeOfProcess) -> _tp.Sequence[_pl.Path]:
     if typeOfProcess == "json":
         return list(pathFolder.rglob("*-results.json"))
 
-    resultFilePaths = [d / f"{d.name}-results.json" for d in pathFolder.iterdir() if d.is_dir()]
+    return _getExistingResultsFilePaths(pathFolder, logger)
 
-    return resultFilePaths
+
+def _getExistingResultsFilePaths(pathFolder: _pl.Path, logger: _log.Logger) -> _tp.Sequence[_pl.Path]:
+    resultFilePaths = sorted(d / f"{d.name}-results.json" for d in pathFolder.iterdir() if d.is_dir())
+    existingResultsFilePaths = [p for p in resultFilePaths if p.is_file()]
+    missingResultsFilePaths = sorted(set(resultFilePaths) - set(existingResultsFilePaths))
+
+    if missingResultsFilePaths:
+        formattedMissingresultsFilePaths = "\n\t".join(str(p) for p in missingResultsFilePaths)
+        logger.warning(
+            "The following expected result files could not be found:\n\t%s", formattedMissingresultsFilePaths
+        )
+
+    return existingResultsFilePaths
 
 
 def _loadValues(
-    resultFilePaths, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions, shallPlotUncertainties
+    resultsFilePaths, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions, shallPlotUncertainties
 ) -> _tp.Union[_common.ManySeries, _common.ManyChunks, None]:
     values = {}
-    for resultFilePath in resultFilePaths:
-        results = _loadResults(resultFilePath)
+    for resultsFilePath in resultsFilePaths:
+        results = _loadResults(resultsFilePath)
 
         conditionsFulfilled = conditions.doResultsSatisfyConditions(results)
         if not conditionsFulfilled:
@@ -168,8 +179,8 @@ def _loadValues(
     return manySeriesOrChunks
 
 
-def _loadResults(resultFilePath) -> _tp.Dict[str, _tp.Any]:
-    serializedResults = resultFilePath.read_text()
+def _loadResults(resultsFilePath) -> _tp.Dict[str, _tp.Any]:
+    serializedResults = resultsFilePath.read_text()
     resultsDict = _json.loads(serializedResults)
     return resultsDict
 
@@ -197,19 +208,23 @@ def _plotValues(
     ax: _plt.Axes,
     manySeriesOrChunks: _tp.Union[_common.ManySeries, _common.ManyChunks],
     shallPlotUncertainties,
-    seriesColors,
     styles,
     doc,
 ):
     if isinstance(manySeriesOrChunks, _common.ManySeries):
-        styles = styles[0]
+        allSeries = manySeriesOrChunks.allSeries
+        style = styles[0]
+
+        colors = _getSeriesColors(len(allSeries))
 
         seriesLabels = set()
-        for series in manySeriesOrChunks.allSeries:
-            _plotSeries(ax, series, styles, seriesColors, seriesLabels, doc, shallPlotUncertainties)
+        for series, color in zip(allSeries, colors):
+            _plotSeries(ax, series, style, color, seriesLabels, doc, shallPlotUncertainties)
 
         return [], []
-    else:
+    elif isinstance(manySeriesOrChunks, _common.ManyChunks):
+        colors = _getSeriesColors(manySeriesOrChunks.chunkLength)
+
         dummyLines = []
         chunkLabels = []
         seriesLabels = set()
@@ -220,13 +235,17 @@ def _plotValues(
             if chunkLabel:
                 chunkLabels.append(chunkLabel)
 
-            for series in chunk.allSeries:
-                _plotSeries(ax, series, style, seriesColors, seriesLabels, doc, shallPlotUncertainties)
+            allSeries = chunk.allSeries
+            for series, color in zip(allSeries, colors):
+                _plotSeries(ax, series, style, color, seriesLabels, doc, shallPlotUncertainties)
 
         return chunkLabels, dummyLines
 
+    else:
+        raise AssertionError("Can't get here.")
 
-def _plotSeries(ax, series, style, seriesColors, seriesLabels, doc, shallPlotUncertainties):
+
+def _plotSeries(ax, series, style, color, seriesLabels, doc, shallPlotUncertainties):
     seriesVariableValue = series.groupingValue.value if series.groupingValue else None
 
     label = _getSeriesLabelOrNone(seriesVariableValue, seriesLabels, doc)
@@ -241,11 +260,11 @@ def _plotSeries(ax, series, style, seriesColors, seriesLabels, doc, shallPlotUnc
             ordinate.errors,
             abscissa.errors,
             style,
-            color=seriesColors[series],
-            label=label,
+            color,
+            label,
         )
     else:
-        ax.plot(abscissa.means, ordinate.means, style, color=seriesColors[series], label=label)
+        ax.plot(abscissa.means, ordinate.means, style, color=color, label=label)
 
 
 def _createLatexDoc(configPath, latexNames):
@@ -261,9 +280,12 @@ def _createLatexDoc(configPath, latexNames):
     return doc
 
 
-def _getSeriesColors(allSeries):
+def _getSeriesColors(numberOfSeries: int) -> _tp.Sequence[_tp.Any]:
     colors = _plt.rcParams["axes.prop_cycle"].by_key()["color"]
-    seriesColors = {s: colors[i % len(colors)] for i, s in enumerate(allSeries)}
+    nColors = len(colors)
+
+    seriesColors = [colors[i % nColors] for i in range(numberOfSeries)]
+
     return seriesColors
 
 

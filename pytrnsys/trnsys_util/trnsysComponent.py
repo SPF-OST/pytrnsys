@@ -8,7 +8,6 @@ import pytrnsys.trnsys_util.deckUtils as deckUtils
 
 class TrnsysComponent:
     def __init__(self, _path, _name, extension="ddck", eliminateComments=True):
-
         self.extension = extension
 
         self._name = _name
@@ -110,7 +109,6 @@ class TrnsysComponent:
         return definedVariables, requiredVariables
 
     def ignoreOnlinePlotter(self):
-
         jBegin = 0
         jEnd = 0
         found = False
@@ -118,7 +116,6 @@ class TrnsysComponent:
         plotterFound = 0
 
         for i in range(len(self.linesDeck)):
-
             splitBlank = self.linesDeck[i].split()
 
             #            if(jBegin>0 and i>jBegin+30):
@@ -128,11 +125,9 @@ class TrnsysComponent:
 
             if found == True:
                 try:
-
                     #                  print splitBlank[0].replace(" ","").lower()
 
                     if splitBlank[0].replace(" ", "").lower() == "LABELS".lower():
-
                         nLabelString = splitBlank[1].replace(" ", "")
                         nLabel = int(nLabelString)
 

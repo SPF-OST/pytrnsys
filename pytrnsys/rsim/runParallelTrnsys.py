@@ -1,42 +1,26 @@
 # pylint: skip-file
 # type: ignore
 
-# !/usr/bin/python
-"""
-Author : Dani Carbonell
-Date   : 30.09.2016
-ToDo
-"""
-
-import imp
 import json
 import os
+import pathlib as _pl
 import shutil
 from copy import deepcopy
 
-import numpy as num
 import pandas as pd
-import pkg_resources
-import sys
 
 import pytrnsys.rsim.executeTrnsys as exeTrnsys
+import pytrnsys.rsim.getConfigMixin as _gcm
 import pytrnsys.rsim.runParallel as runPar
-import pytrnsys.trnsys_util.buildTrnsysDeck as build
+import pytrnsys.trnsys_util.buildTrnsysDeck as _btd
 import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
+import pytrnsys.trnsys_util.replaceAssignStatements as _ras
 import pytrnsys.utils.log as log
 import pytrnsys.utils.result as _res
 
-try:
-    import pytrnsys_examples
-except ImportError:
-    pass
 
-
-# from sets import Set
-
-
-class RunParallelTrnsys:
+class RunParallelTrnsys(_gcm.GetConfigMixin):
     """
     Main class that represents a simulation job of pytrnsys. The standardized way of initiating it is by providing a
     config-file, in which case the run defined in the config case is started automatically.
@@ -59,6 +43,7 @@ class RunParallelTrnsys:
     """
 
     def __init__(self, pathConfig, name="pytrnsysRun", configFile=None, runPath=None):
+        super().__init__()
 
         self.pathConfig = pathConfig
 
@@ -98,7 +83,8 @@ class RunParallelTrnsys:
             self.nameBase = name
             self.path = os.getcwd()
 
-        pass
+        self._assignStatements: list[_ras.AssignStatement] = []
+        self._ddckFilePathWithComponentNames: list[_btd.DdckFilePathWithComponentName] = []
 
     def setDeckName(self, _name):
         self.nameBase = _name
@@ -107,7 +93,6 @@ class RunParallelTrnsys:
         self.path = path
 
     def defaultInputs(self):
-
         self.inputs = {}
         self.inputs["ignoreOnlinePlotter"] = False
         self.inputs["removePopUpWindow"] = False
@@ -135,7 +120,6 @@ class RunParallelTrnsys:
         self.variablesOutput = []
 
     def readFromFolder(self, pathRun):
-
         fileNames = [name for name in os.listdir(pathRun) if os.path.isdir(pathRun + "\\" + name)]
 
         returnNames = []
@@ -148,7 +132,6 @@ class RunParallelTrnsys:
         return returnNames
 
     def readCasesToRun(self, pathRun, nameFileWithCasesToRun):
-
         fileToRunWithPath = os.path.join(pathRun, nameFileWithCasesToRun)
         file = open(fileToRunWithPath, "r")
         lines = file.readlines()
@@ -163,18 +146,19 @@ class RunParallelTrnsys:
         return cases
 
     def runFromNames(self, path, fileNames):
-
         tests = []
         self.cmds = []
         for i in range(len(fileNames)):
-
             tests.append(exeTrnsys.ExecuteTrnsys(path, fileNames[i]))
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
             tests[i].loadDeck(check=self.inputs["checkDeck"])
 
             tests[i].changeParameter(self.parameters)
+
             if self.inputs["ignoreOnlinePlotter"] == True:
                 tests[i].ignoreOnlinePlotter()
+
+            tests[i].deckTrnsys.writeDeck()
 
             tests[i].setRemovePopUpWindow(self.inputs["removePopUpWindow"])
 
@@ -252,7 +236,6 @@ class RunParallelTrnsys:
                 self.createDecksFromVariant()
 
     def createDecksFromVariant(self, fitParameters={}):
-
         variations = self.variablesOutput
         parameters = self.parameters
         parameters.update(fitParameters)
@@ -298,7 +281,6 @@ class RunParallelTrnsys:
         variablePath = self.path
 
         for i in range(len(fileName)):
-
             self.logger.debug("name to run :%s" % fileName[i])
 
             # if useLocationStructure:
@@ -327,8 +309,12 @@ class RunParallelTrnsys:
 
             tests[i].changeParameter(localCopyPar)
 
+            tests[i].changeAssignStatementsBasedOnUnitVariables(self._assignStatements)
+
             if self.inputs["ignoreOnlinePlotter"] == True:
                 tests[i].ignoreOnlinePlotter()
+
+            tests[i].deckTrnsys.writeDeck()
 
             tests[i].cleanAndCreateResultsTempFolder()
             tests[i].moveFileFromSource()
@@ -359,7 +345,9 @@ class RunParallelTrnsys:
 
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self.ddckPlaceHolderValuesJsonPath)
+        deck = _btd.BuildTrnsysDeck(
+            self.path, self.nameBase, self._ddckFilePathWithComponentNames, self.ddckPlaceHolderValuesJsonPath
+        )
         result = deck.readDeckList(
             self.pathConfig,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
@@ -389,44 +377,6 @@ class RunParallelTrnsys:
 
         return deck.nameDeck
 
-    def addParametricVariations(self, variations):
-        """
-        it fills a variableOutput with a list of all variations to run
-        format <class 'list'>: [['Ac', 'AcollAp', 1.5, 2.0, 1.5, 2.0], ['Vice', 'VIceS', 0.3, 0.3, 0.4, 0.4]]
-
-        Parameters
-        ----------
-        variations : list of list
-            list object containing the variations to be used.
-
-        Returns
-        -------
-
-        """
-
-        if self.inputs["combineAllCases"] == True:
-            labels = []
-            values = []
-            for i, row in enumerate(variations):
-                labels.append(row[:2])
-                values.append(row[2:])
-
-            value_permutations = num.array(num.meshgrid(*values), dtype=object).reshape(len(variations), -1)
-            result = num.concatenate((labels, value_permutations), axis=1)
-            self.variablesOutput = result.tolist()
-
-        else:
-            sizeOneVariation = len(variations[0]) - 2
-            for n in range(len(variations)):
-                sizeCase = len(variations[n]) - 2
-                if sizeCase != sizeOneVariation:
-                    raise ValueError(
-                        "for combineAllCases=False all variations must have same lenght :%d case n:%d has a lenght of :%d"
-                        % (sizeOneVariation, n + 1, sizeCase)
-                    )
-
-            self.variablesOutput = variations
-
     def runParallel(self, writeLogFile=True):
         if writeLogFile:
             self.writeRunLogFile()
@@ -451,10 +401,9 @@ class RunParallelTrnsys:
         logfile.write("# Run created by " + username + "\n")
         logfile.write("# Ddck repositories used:\n")
         try:
-            imp.find_module("git")
-            found = True
             import git
-        except ImportError:
+            found = True
+        except ModuleNotFoundError:
             found = False
 
         for path in self.listDdckPaths:
@@ -474,7 +423,6 @@ class RunParallelTrnsys:
         logfile.close()
 
     def readConfig(self, path, name, parseFileCreated=False):
-
         """
         It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
         It also loads the readed lines into self.lines
@@ -533,129 +481,26 @@ class RunParallelTrnsys:
         found = False
         nCharacters = len(source)
 
-        for i in range(len(self.listDdck)):
-            mySource = self.listDdck[i][
-                       -nCharacters:
-                       ]  # I read only the last characters with the same size as the end file
+        for i in range(len(self._ddckFilePathWithComponentNames)):
+            ddckFilePathWithComponentName = self._ddckFilePathWithComponentNames[i]
+
+            ddckFilePath = str(ddckFilePathWithComponentName.path)
+
+            mySource = ddckFilePath[-nCharacters:]  # I read only the last characters with the same size as the end file
             if mySource == source:
-                newDDck = self.listDdck[i][0:-nCharacters] + end
-                self.dictDdckPaths[newDDck] = self.dictDdckPaths[self.listDdck[i]]
-                self.listDdck[i] = newDDck
+                newDdckFilePath = ddckFilePath[0:-nCharacters] + end
+                self.dictDdckPaths[newDdckFilePath] = self.dictDdckPaths[ddckFilePath]
+                newDdckFilePathWithComponentName = _btd.DdckFilePathWithComponentName(
+                    _pl.Path(newDdckFilePath), ddckFilePathWithComponentName.componentName
+                )
+                self._ddckFilePathWithComponentNames[i] = newDdckFilePathWithComponentName
 
                 found = True
 
-        if found == False:
+        if not found:
             self.logger.warning("change File was not able to change %s by %s" % (source, end))
 
-    def getConfig(self):
-        """
-        Reads the config file.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-
-        """
-
-        # The vector self.inputs used in python has been filled. Now other variables for Trnsys will be filled
-
-        self.variation = []  # parametric studies
-        self.parDeck = []  # fixed values changed in all simulations
-        self.listDdck = []
-        self.parameters = {}  # deck parameters fixed for all simulations
-        self.listFit = {}
-        self.listFitObs = []
-        self.listDdckPaths = set()
-        self.dictDdckPaths = {}
-        self.caseDict = {}
-        self.sourceFilesToChange = []
-        self.sinkFilesToChange = []
-        self.foldersForDDckVariation = []
-        self.replaceLines = []
-
-        for line in self.lines:
-
-            splitLine = line.split()
-            if splitLine[0] == "variation":
-                variation = []
-                for i in range(len(splitLine)):
-                    if i == 0:
-                        pass
-                    elif i <= 2:
-                        variation.append(splitLine[i])
-                    else:
-                        try:
-                            variation.append(float(splitLine[i]))
-                        except:
-                            variation.append(splitLine[i])
-
-                self.variation.append(variation)
-
-            elif splitLine[0] == "deck":
-                if splitLine[2] == "string":
-                    self.parameters[splitLine[1]] = splitLine[3]
-                else:
-                    if splitLine[2].isdigit():
-                        self.parameters[splitLine[1]] = float(splitLine[2])
-                    else:
-                        self.parameters[splitLine[1]] = splitLine[2]
-
-            elif splitLine[0] == "replace":
-                splitString = line.split('$"')
-                oldString = splitString[1].split('"')[0]
-                newString = splitString[2].split('"')[0]
-
-                self.replaceLines.append((oldString, newString))
-
-            elif splitLine[0] == "changeDDckFile":
-                self.sourceFilesToChange.append(splitLine[1])
-                sinkFilesToChange = []
-                for i in range(len(splitLine)):
-                    if i < 2:
-                        pass
-                    else:
-                        sinkFilesToChange.append(splitLine[i])
-                self.sinkFilesToChange.append(sinkFilesToChange)
-
-            elif splitLine[0] == "addDDckFolder":
-                for i in range(len(splitLine)):
-                    if i > 0:
-                        self.foldersForDDckVariation.append(splitLine[i])
-            elif splitLine[0] == "fit":
-                self.listFit[splitLine[1]] = [splitLine[2], splitLine[3], splitLine[4]]
-            elif splitLine[0] == "case":
-                self.listFit[splitLine[1]] = splitLine[2:]
-            elif splitLine[0] == "fitobs":
-                self.listFitObs.append(splitLine[1])
-
-            elif splitLine[0] in self.inputs.keys():
-                fullPath = os.path.join(self.inputs[splitLine[0]], splitLine[1])
-                self.listDdck.append(fullPath)
-                self.listDdckPaths.add(self.inputs[splitLine[0]])
-                self.dictDdckPaths[fullPath] = self.inputs[splitLine[0]]
-            else:
-                pass
-
-        if len(self.variation) > 0:
-            self.addParametricVariations(self.variation)
-            self.variationsUsed = True
-        else:
-            self.variationsUsed = False
-
-        if len(self.sourceFilesToChange) > 0:
-            self.changeDDckFilesUsed = True
-        else:
-            self.changeDDckFilesUsed = False
-
-        if len(self.foldersForDDckVariation) > 0:
-            self.foldersForDDckVariationUsed = True
-        else:
-            self.foldersForDDckVariationUsed = False
-
     def copyConfigFile(self, configPath, configName):
-
         configFile = os.path.join(configPath, configName)
         dstPath = os.path.join(configPath, self.inputs["addResultsFolder"], configName)
         shutil.copyfile(configFile, dstPath)
@@ -700,28 +545,13 @@ class RunParallelTrnsys:
             for i in range(2, len(self.variablesOutput[j]), 1):
                 if self.variablesOutput[j][1] == "sizeHpUsed":
                     self.variablesOutput[j][i] = (
-                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadHPsize, 3))
+                        str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadHPsize, 3))
                     )
                 elif self.variablesOutput[j][1] == "AreaPvRoof":
                     self.variablesOutput[j][i] = (
-                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadElDemand, 3))
+                        str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadElDemand, 3))
                     )
                 else:
                     self.variablesOutput[j][i] = (
-                            str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadDemand, 3))
+                        str(round(self.unscaledVariables[j][i], 3)) + "*" + str(round(loadDemand, 3))
                     )
-
-
-def run():
-    if len(sys.argv) > 1:
-        pathBase, configFile = os.path.split(sys.argv[1])
-    else:
-        configFileFullPath = pkg_resources.resource_filename("pytrnsys_examples", "solar_dhw/run_solar_dhw.config")
-        pathBase, configFile = os.path.split(configFileFullPath)
-    if ":" not in pathBase:
-        pathBase = os.path.join(os.getcwd(), pathBase)
-    RunParallelTrnsys(pathBase, configFile=configFile)
-
-
-if __name__ == "__main__":
-    run()

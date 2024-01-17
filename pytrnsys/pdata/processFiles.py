@@ -18,10 +18,8 @@ logger = logging.getLogger("root")
 
 
 def purgueLines(lines, skypChar, replaceChar, skypedLines=0, removeBlankLines=False, removeBlankSpaces=False):
-
     flines = []
     for n in range(len(lines)):
-
         skypedLine = False
 
         if removeBlankLines:
@@ -48,7 +46,6 @@ def purgueLines(lines, skypChar, replaceChar, skypedLines=0, removeBlankLines=Fa
         #            raise ValueError("purgueLines from a null line")
 
         if lineExist:
-
             if n < skypedLines:
                 skypedLine = True
 
@@ -61,7 +58,6 @@ def purgueLines(lines, skypChar, replaceChar, skypedLines=0, removeBlankLines=Fa
                 fline = "%s\n" % line
 
                 if replaceChar != None:
-
                     for r in replaceChar:
                         #                    print "replaceChar:%s"%replace
                         # Replacing the replceChar for nothing to convert 2,500.0 for 2500.0 for example
@@ -72,9 +68,7 @@ def purgueLines(lines, skypChar, replaceChar, skypedLines=0, removeBlankLines=Fa
 
 
 def purgueComments(lines, commentsChar):
-
     if commentsChar != None:
-
         flines = []
         for n in range(len(lines)):
             line = lines[n][:-1]

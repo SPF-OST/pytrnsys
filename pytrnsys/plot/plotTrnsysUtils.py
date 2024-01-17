@@ -45,7 +45,6 @@ class PlotTrnsysUtils:
     #        w: white
 
     def clean(self):
-
         self.x = []
         self.y = []
         self.nameX = []
@@ -99,7 +98,6 @@ class PlotTrnsysUtils:
         self.y[self.i - 1] = y
 
     def plot(self, name=None):
-
         myLegend = []
 
         for i in range(len(self.x)):

@@ -88,7 +88,6 @@ def getWToKJh():
 
 class UnitConverter:
     def __init__(self):
-
         unit = ""
 
     # PRESSURE

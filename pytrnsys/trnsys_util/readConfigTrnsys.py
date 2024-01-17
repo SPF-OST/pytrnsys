@@ -48,7 +48,6 @@ class ReadConfigTrnsys:
         return v.lower() in ("yes", "true", "t", "1")
 
     def readFile(self, path, name, inputs, parseFileCreated=True, controlDataType=True):
-
         skypChar = "#"
         configFile = os.path.join(path, name)
 
@@ -69,7 +68,6 @@ class ReadConfigTrnsys:
         addPathBase = True
 
         for i, line in enumerate(lines):
-
             if line[-1:] == "\n":
                 line = line[0:-1]
                 lines[i] = line
@@ -81,13 +79,13 @@ class ReadConfigTrnsys:
             elif splitLine[0] == "int":
                 inputs[splitLine[1]] = int(splitLine[2])
             elif splitLine[0] == "string":
-                if 'string pathToConnectionInfo ' in line:
+                if "string pathToConnectionInfo " in line:
                     addPathToConnectionInfo = False
-                if 'string PROJECT$ ' in line:
+                if "string PROJECT$ " in line:
                     addProjects = False
-                if 'string projectPath ' in line:
+                if "string projectPath " in line:
                     addProjectPath = False
-                if 'string pathBase ' in line:
+                if "string pathBase " in line:
                     addPathBase = False
 
                 if len(splitLine) != 3:
@@ -168,8 +166,9 @@ class ReadConfigTrnsys:
                 else:
                     pass
 
-        lines, inputs = self._addMissingDefaultPaths(addPathBase, addPathToConnectionInfo, addProjectPath, addProjects,
-                                                     inputs, lines, name, path)
+        lines, inputs = self._addMissingDefaultPaths(
+            addPathBase, addPathToConnectionInfo, addProjectPath, addProjects, inputs, lines, name, path
+        )
 
         return lines
 
@@ -214,20 +213,21 @@ class ReadConfigTrnsys:
         return inputs
 
     @staticmethod
-    def _addMissingDefaultPaths(addPathBase, addPathToConnectionInfo, addProjectPath, addProjects, inputs, lines,
-                                name, path):
+    def _addMissingDefaultPaths(
+        addPathBase, addPathToConnectionInfo, addProjectPath, addProjects, inputs, lines, name, path
+    ):
         if "run.config" in name:
             if addPathToConnectionInfo:
                 info = os.path.join(path, "DdckPlaceHolderValues.json")
                 inputs["pathToConnectionInfo"] = info
-                lines.append('string pathToConnectionInfo ' + info)
+                lines.append("string pathToConnectionInfo " + info)
             if addProjects:
                 info = os.path.join(path, "ddck")
                 inputs["PROJECT$"] = info
-                lines.append('string PROJECT$ ' + info)
+                lines.append("string PROJECT$ " + info)
             if addProjectPath:
                 inputs["projectPath"] = path
-                lines.append('string projectPath ' + str(path))
+                lines.append("string projectPath " + str(path))
 
         elif "process.config" in name and addPathBase:
             inputs["pathBase"] = path

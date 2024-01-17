@@ -1,10 +1,9 @@
 # pylint: skip-file
 # type: ignore
 
+
 def getNPV(rate: float, analysisPeriod: float) -> float:
-    npv = ((1.0 + rate) ** analysisPeriod - 1.0) / (
-        rate * (1.0 + rate) ** analysisPeriod
-    )
+    npv = ((1.0 + rate) ** analysisPeriod - 1.0) / (rate * (1.0 + rate) ** analysisPeriod)
     return npv
 
 
@@ -17,9 +16,5 @@ def getNPVIncreaseCost(
     analysisPeriod: float,
     increaseCost: float,
 ) -> float:
-    npv = (
-        1
-        / (rate - increaseCost)
-        * (1.0 - ((1.0 + increaseCost) / (1.0 + rate)) ** analysisPeriod)
-    )
+    npv = 1 / (rate - increaseCost) * (1.0 - ((1.0 + increaseCost) / (1.0 + rate)) ** analysisPeriod)
     return npv

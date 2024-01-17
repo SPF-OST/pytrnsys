@@ -21,7 +21,6 @@ import pytrnsys.report.latexReport as latex
 
 class processHourly:
     def __init__(self, _path, _name):
-
         self.path = _path
         self.name = _name
 
@@ -46,12 +45,10 @@ class processHourly:
         self.addLatexTables = ""
 
     def setFileNameToRead(self, name):
-
         self.name = name
         self.fileNameRead = self.path + "\\" + self.name
 
     def loadHourly(self):
-
         self.loadFile = load.loadBaseNumpy(self.fileNameRead)
 
         self.loadFile.loadFile(skypChar="#", skypedLines=0, splitArgument="\t")
@@ -60,15 +57,12 @@ class processHourly:
         self.loadFile.get(name)
 
     def calculateMonthly(self, varHourly):
-
         return utils.calculateMonthlyValues(varHourly)
 
     def calculateDaily(self, varHourly):
-
         return utils.calculateDaylyValuesFromHourly(varHourly)
 
     def plotHourly(self, var, myLabel, nameFile, plotJpg=False):
-
         N = 8760
         hours = num.arange(N)
 
@@ -109,7 +103,6 @@ class processHourly:
         return namePdf
 
     def plotMonthly(self, var, myLabel, nameFile, yearlyFactor, plotEmf=False):
-
         N = 13
         width = 0.35  # the width of the bars
         ind = num.arange(N)  # the x locations for the groups
@@ -145,7 +138,6 @@ class processHourly:
         plt.savefig(nameWithPath)
 
         if plotEmf:
-
             nameEmf = "%s.jpg" % nameFile
             nameEmfWithPath = "%s\%s" % (self.path, nameEmf)
 
@@ -159,9 +151,7 @@ class processHourly:
     def plotMonthlyBalance(
         self, inVar, outVar, legends, myLabel, nameFile, unit, yearlyFactor=0, useYear=False, plotEmf=False
     ):
-
         if useYear == True:
-
             nMonth = 13
             inVar13 = []
             outVar13 = []
@@ -250,7 +240,6 @@ class processHourly:
         plt.savefig(nameWithPath)
 
         if plotEmf:
-
             nameEmf = "%s.jpg" % nameFile
             nameEmfWithPath = "%s\%s" % (self.path, nameEmf)
 
@@ -264,7 +253,6 @@ class processHourly:
 
     # Assumed that all units are equal
     def addLatexMonthlyData(self, caption, legends, myUnit, inVar, outVar, imb):
-
         nMonth = 12
         sizeBox = None
         # inVar(nVar,nMonth)
@@ -279,7 +267,6 @@ class processHourly:
         lines = ""
 
         for i in range(nMonth):
-
             line = "%s\t" % utils.getMonthKey(i + 1)
             lines = lines + line
 
@@ -320,7 +307,6 @@ class processHourly:
         self.doc.lines = ""
 
     def plotDaily(self, var, myLabel, nameFile, plotJpg=False):
-
         N = 365
         width = 0.1  # the width of the bars
         ind = num.arange(N)  # the x locations for the groups
@@ -348,7 +334,6 @@ class processHourly:
         plt.savefig(nameWithPath)
 
         if plotJpg:
-
             nameJpg = "%s.jpg" % myLabel
             nameJpgWithPath = "%s\%s" % (self.path, nameJpg)
 

@@ -32,7 +32,6 @@ logger = logging.getLogger("root")
 
 class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
     def __init__(self, _path, _name, language="en"):
-
         monthlyData.ProcessMonthlyDataBase.__init__(self, _path, _name, language=language)
         #
         #        self.fileName = _name.split('.')[0]
@@ -117,31 +116,26 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.buildingArea = area
 
     def setTrnsysDllPath(self, path):
-
         self.trnsysDllPath = path
 
     def setBuildingArea(self, area):
         self.buildingArea = area
 
     def getNameCity(self, nCity):
-
         utils.getNameCity(nCity)
 
     def setTrnsysVersion(self, version):
         self.trnsysVersion = version
 
     def setPrintDataForGle(self, printData):
-
         self.printDataForGle = printData
 
     def loadAndProcess(self):
-
         self.loadFiles()
         self.process()
         self.doLatexPdf()
 
     def setLoaderParameters(self):
-
         self.monthlyUsed = True
         self.hourlyUsed = True
         self.timeStepUsed = True
@@ -150,7 +144,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.loadMode = "complete"
 
     def loadFiles(self):
-
         self.setLoaderParameters()
         self.loader = SimulationLoader(
             self.outputPath + "//temp",
@@ -169,21 +162,17 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         logger.info("loadFiles completed using SimulationLoader")
 
     def process(self):
-
         pass
 
     def doLatexPdf(self, documentClass="SPFShortReportIndex"):
-
         self.createLatex(documentClass=documentClass)
 
         self.executeLatexFile()
 
     def addLatexContent(self):
-
         raise ValueError("process needs to be defined in each particuar child class")
 
     def createLatex(self, documentClass="SPFShortReportIndex"):
-
         self.doc.documentClass = documentClass
 
         self.doc.setTitle(self.titleOfLatex)
@@ -196,7 +185,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.doc.addEndDocumentAndCreateTexFile()
 
     def calculateDemands(self):
-
         self.qDemandVector = []
         self.elDemandVector = []
         self.qDemandDf = pd.DataFrame()
@@ -205,15 +193,12 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         # self.elDemandDf = pd.DataFrame()
 
         for name in self.monDataDf.columns:
-
             if len(name) > 9 and name[0:9] == "elSysOut_":
-
                 if name[-6:] == "Demand":
                     self.elDemandVector.append(self.monDataDf[name])
                     self.legendEl.append(self.getNiceLatexNames(name))
 
             elif len(name) > 8 and name[0:8] == "qSysOut_":
-
                 if name[-6:] == "Demand":
                     self.qDemandVector.append(self.monDataDf[name].values)
                     self.qDemandDf = self.qDemandDf + self.monDataDf[name]
@@ -225,7 +210,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             self.qDemand = self.qDemand + self.qDemandVector[i]
 
     def addDemands(self):
-
         legend = ["Month"] + self.legendQ + ["Total"]
 
         caption = "Heat Demand"
@@ -240,7 +224,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         )
 
     def calculateSPFSystem(self):
-
         self.SpfShpDis = num.zeros(13)
 
         for i in range(len(self.qDemand)):
@@ -253,7 +236,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.SpfShpDis[12] = self.yearSpfShpDis
 
     def addSPFSystem(self, printData=False):
-
         var = []
 
         qD = self.qDemand
@@ -284,7 +266,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.doc.addPlot(namePdf, caption, nameFile, 12)
 
     def addHeatBalance(self, printData=False):
-
         inVar = []
         outVar = []
         legendsIn = []
@@ -292,7 +273,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
 
         # for name in self.monData.keys():
         for name in self.monDataDf.columns:
-
             found = False
 
             try:
@@ -360,7 +340,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.doc.addPlot(namePdf, caption, nameFile, 12)
 
     def calculateElConsumption(self, printData=False):
-
         inVar = []
         outVar = []
         legends = []
@@ -368,7 +347,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.elHeatSysMatrix = []  # matrix with all vectors included in the el consumption. For table printing and plot
 
         for name in self.monDataDf.columns:
-
             found = False
 
             try:
@@ -383,7 +361,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.elHeatSysTotal = sum(self.elHeatSysMatrix)
 
     def addElConsumption(self, printData=False):
-
         nameFile = "elHeatSysMonthly"
 
         niceLegend = legends
@@ -416,7 +393,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.doc.addPlot(namePdf, caption, nameFile, 12)
 
     def getListOfNiceLatexNames(self, legends):
-
         legendOut = []
         for name in legends:
             legendOut.append(self.getNiceLatexNames(name))
@@ -424,7 +400,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         return legendOut
 
     def getNiceLatexNames(self, name):
-
         name = name.lower()
         if name == "qSysOut_DhwDemand".lower():  # DHW demand
             niceName = "$Q_{DHW}$"
@@ -497,7 +472,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         return niceName
 
     def loadDll(self):
-
         self.log = LogTrnsys.LogTrnsys(self.outputPath, self.fileName)
         self.log.loadLog()
         self.log.getMyDataFromLog()
@@ -508,7 +482,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.nItProblems = self.log.numberOfFailedIt
 
     def getVersionsDll(self):
-
         if 0:
             raise ValueError("Deprecated. File created in simulaiton folder. To be improved")
             #
@@ -533,9 +506,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
                     self.buildingModel = "ISO"
 
     def getDllVersionFromType(self, typeNumber):
-
         if self.trnsysDllPath == False:
-
             if self.trnsysVersion == "standard":
                 trnsysExe = os.getenv("TRNSYS_EXE")
 
@@ -571,14 +542,12 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         return dllVersion
 
     def getTagLabel(self, label):
-
         return "#=======================================\n#%s :%s\n#=======================================\n" % (
             self.nameClass,
             label,
         )
 
     def setPathReadTrnsysFile(self, _path):
-
         self.readTrnsysFiles.setPath(_path)
 
     #############################################
@@ -586,7 +555,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
     #############################################
 
     def loadSolar(self, _name):
-
         self.readTrnsysFiles.readMonthlyFiles(_name, firstMonth=self.firstMonth, myYear=self.yearReadedInMonthylFile)
 
         self.numberOfMonthsSimulated = self.readTrnsysFiles.numberOfMonthsSimulated
@@ -608,7 +576,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             logger.warning("Serial system and qSolartoTes must be readed from Storage data")
 
     def loadWeatherData(self, _name):
-
         self.readTrnsysFiles.readMonthlyFiles(_name, firstMonth=self.firstMonth, myYear=self.yearReadedInMonthylFile)
         self.numberOfMonthsSimulated = self.readTrnsysFiles.numberOfMonthsSimulated
 
@@ -622,7 +589,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             self.iTColkWPerM2 = self.qIrradTilt
 
     def loadStorage(self, _name):
-
         self.readTrnsysFiles.readMonthlyFiles(_name, firstMonth=self.firstMonth, myYear=self.yearReadedInMonthylFile)
         self.numberOfMonthsSimulated = self.readTrnsysFiles.numberOfMonthsSimulated
 
@@ -637,7 +603,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.qTesFromHp = self.qTesShFromHp + self.qTesDhwFromHp
 
         if abs(sum(self.qTesFromHp) - (sum(self.qTesDhwFromHp) + sum(self.qTesShFromHp)) > 1):
-
             logger.warning(
                 "Something goes wrong QTesFromHp:%f QTesFromHPDhwSh:%f "
                 % (sum(self.qTesFromHp), sum(self.qTesDhwFromHp) + sum(self.qTesShFromHp))
@@ -655,7 +620,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.qOutFromTesFound = True
 
     def loadBuilding(self, _name):
-
         self.readTrnsysFiles.readMonthlyFiles(_name, myYear=self.yearReadedInMonthylFile, firstMonth=self.firstMonth)
         # self.numberOfMonthsSimulated = self.readTrnsysFiles.numberOfMonthsSimulated
 
@@ -705,7 +669,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.existUserCircuitSH = True
 
     def readBuildingHourlyDataType56(self, _name):
-
         self.readTrnsysFiles.readHourlyBuildingFile(_name)
         self.buildingDataLoaded = True
 
@@ -771,7 +734,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             )
 
     def loadDHW(self, _name):
-
         self.existUserCircuitDHW = True
 
         self.readTrnsysFiles.readMonthlyFiles(_name, firstMonth=self.firstMonth, myYear=self.yearReadedInMonthylFile)
@@ -783,7 +745,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.pElDhwPenalty = self.readTrnsysFiles.get("PpenDHW_kW", ifNotFoundEqualToZero=True)
 
     def loadElectric(self, _name):
-
         self.readTrnsysFiles.readMonthlyFiles(_name, firstMonth=self.firstMonth, myYear=self.yearReadedInMonthylFile)
         self.numberOfMonthsSimulated = self.readTrnsysFiles.numberOfMonthsSimulated
 
@@ -837,7 +798,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             self.pElController[i] = self.pElControllerSolar[i] + self.pElControllerHp[i]
 
     def loadWorkingHoursFromMonthy(self, _name):
-
         self.readTrnsysFiles.readMonthlyFiles(_name, firstMonth=self.firstMonth, myYear=self.yearReadedInMonthylFile)
 
         # self.onOffPumpCol   = self.readTrnsysFiles.get("BoCnoOn",ifNotFoundEqualToZero=True)    JS: depracated BoCnoOn
@@ -854,7 +814,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             self.onOffPumpHp[i] = self.onOffPumpHpDhw[i] + self.onOffPumpHpSh[i]
 
     def loadWorkingHours(self, _name):
-
         self.readTrnsysFiles.readUserDefinedFiles(_name)
 
         self.onOffPumpColUserDefined = self.readTrnsysFiles.get("BoCnoOn")
@@ -879,7 +838,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             self.onOffPumpHp[i] = self.onOffPumpHpDhw[i] + self.onOffPumpHpSh[i]
 
     def loadHP(self, _name):
-
         self.readTrnsysFiles.readMonthlyFiles(_name, firstMonth=self.firstMonth, myYear=self.yearReadedInMonthylFile)
         self.numberOfMonthsSimulated = self.readTrnsysFiles.numberOfMonthsSimulated
 
@@ -921,7 +879,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         self.qLossHp = num.zeros(12)
 
         for i in range(self.numberOfMonthsSimulated):
-
             self.qLossHp[i] = self.lossDefrostingHp[i] + self.lossCyclingHp[i] + self.lossThermalHp[i]
             self.qCondHP[i] = self.qCondHP[i] + self.qDesuperHeaterHP[i]
             # imbSH = self.qHpInShMode[i]-self.qHpToSh[i]-self.qTesShFromHp[i]
@@ -929,7 +886,6 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
             # print "HP SH(mode):%f DHW(mode):%f TO-SH:%f TO-DHWTES:%f TO-SHTES:%f imbSH:%f imbDHW:%f"%(self.qHpInShMode[i],self.qHpInDhwMode[i],self.qHpToSh[i],self.qTesDhwFromHp[i],self.qTesShFromHp[i],imbSH,imbDHW)
 
     def calculateDemand(self):
-
         self.qUseFound = True
         self.qDemandFound = True
 
