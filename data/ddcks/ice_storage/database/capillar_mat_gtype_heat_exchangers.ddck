@@ -14,7 +14,7 @@
 EQUATIONS 4
 nUsedPipes   =  INT(Tankwidth/xBetweenPipes) ! 48 (before 96 but was wrong) S-type, 64 G-type
 nUTube    =  2 !DC-21  we have a u-tubw with double lengh compared to nUtube=1 but half Hx. This increase mass flow per tube and reduces risks of too low mass flow
-nRealHx      =  INT(Lstore/yBetweenHx/nUTube)
+nRealHx      =  INT(TankLenght/yBetweenHx/nUTube)
 xBetweenPipes = 0.03
 
 CONSTANTS 17

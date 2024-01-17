@@ -12,7 +12,7 @@
 ** City Name = Adelboden, CH     
 CONSTANTS 7    
 Lat = 43.15     ! Latitude, °
-TambD = -8     ! ambient design temperature of heating system, °C
+TambD = -2     ! ambient design temperature of heating system, °C
 TambAvg = 16.26    ! average outdoor temperature, °C
 dTambAmpl = 9.3     ! amplitude of outside temperature, K
 tTambShift = 488     ! Offset of outside air temperature minimum , h

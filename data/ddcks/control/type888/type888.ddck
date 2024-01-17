@@ -164,30 +164,30 @@ Tamb24 = [4,1]      ! 24h average of Tamb, �C
 CONSTANTS 1
 addPrinterType888 = 1  ! -1: removing , 1 : add
 
-UNIT 89 TYPE 65     ! Online Plotter Control (Element Hp)
-PARAMETERS 12     
-10    ! 1 Nb. of left-axis variables
-10    ! 2 Nb. of right-axis variables
--10   ! 3 Left axis minimum
-70    ! 4 Left axis maximum
-0     ! 5 Right axis minimum
-2   ! 6 Right axis maximum
-nPlotsPerSim ! 7 Number of plots per simulation
-12    ! 8 X-axis gridpoints
-addPrinterType888     ! 9 Shut off Online w/o removing
--1    ! 10 Logical unit for output file
-0     ! 11 Output file units
-0     ! 12 Output file delimiter
-INPUTS 20     
-TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn HpIsBlock BlockHp  Nix Nix
-HpForDHWIsNeeded HpForSHIsNeeded BoHS auxStoreDHWIsOn auxStoreSHIsOn  tScSet TSetSh TRdSet Nix Nix
-**
-TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn HpIsBlock BlockHp  Nix Nix
-HpForDHWIsNeeded HpForSHIsNeeded BoHs auxStoreDHWIsOn auxStoreSHIsOn tScSet TSetSh TRdSet Nix Nix
-LABELS  3     
-Temperatures     
-Boolean     
-Control    
+**UNIT 89 TYPE 65     ! Online Plotter Control (Element Hp)
+**PARAMETERS 12     
+**10    ! 1 Nb. of left-axis variables
+**10    ! 2 Nb. of right-axis variables
+**-10   ! 3 Left axis minimum
+**70    ! 4 Left axis maximum
+**0     ! 5 Right axis minimum
+**2   ! 6 Right axis maximum
+**nPlotsPerSim ! 7 Number of plots per simulation
+**12    ! 8 X-axis gridpoints
+**addPrinterType888     ! 9 Shut off Online w/o removing
+**-1    ! 10 Logical unit for output file
+**0     ! 11 Output file units
+**0     ! 12 Output file delimiter
+**INPUTS 20     
+**TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn HpIsBlock Nix  Nix Nix
+**HpForDHWIsNeeded HpForSHIsNeeded BoHS auxStoreDHWIsOn auxStoreSHIsOn  tScSet TSetSh TRdSet Nix Nix
+****
+**TTesDhwAuxOn TTesDhwAuxOff TwwStAuxON TwwStauxOff TsensorTesSh THpCondIn HpIsBlock Nix  Nix Nix
+**HpForDHWIsNeeded HpForSHIsNeeded BoHs auxStoreDHWIsOn auxStoreSHIsOn tScSet TSetSh TRdSet Nix Nix
+**LABELS  3     
+**Temperatures     
+**Boolean     
+**Control    
 
 *******************************
 **END Control-Cooling-888.ddck

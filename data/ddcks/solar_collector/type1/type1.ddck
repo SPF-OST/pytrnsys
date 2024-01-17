@@ -5,7 +5,8 @@
 *****************************************
 ** Contact person : Dani Carbonell    
 ** Creation date  : 10.01.2010
-** Last changes   : 20.05.2022
+** Last changes   : 16.02.23
+**                  DC - automatic fluid properties by @cp(in, cpBri)
 *****************************************
 
 ***************************************************************************
@@ -16,9 +17,11 @@
 ***********************************
 ** inputs from hydraulic solver
 ***********************************
-EQUATIONS 2
+EQUATIONS 3
 TCollIn = @temp(In, TPiColIn)
 MfrColl = ABS(@mfr(In, MfrPiColIn))
+cpCollector = @cp(In,cpBri)
+
 
 ***********************************
 ** outputs to hydraulic solver
@@ -77,7 +80,7 @@ UNIT 28 TYPE 1
 PARAMETERS 11
 nSeries       		! number in series
 AcollAp       		! collector area
-cpBri          		! fluid specific heat kj(kgK
+cpCollector    		! fluid specific heat kj(kgK
 efficiencyMode		! efficiency mode
 testedMfr      		! tested flow rate kg/(hm2)
 Eta0          		! intercept efficiency 

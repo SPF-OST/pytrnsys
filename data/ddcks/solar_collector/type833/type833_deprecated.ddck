@@ -17,15 +17,14 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 2     
-TCollIn = @temp(In, TPiColIn)			! oC
+TCollIn = @temp(In, TPiColIn)			! �C
 MfrColl = ABS(@mfr(In, MfrPiColIn))		! MfrColl_B		! because its the other way around  
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
-EQUATIONS 2
-TCollOut = [74,1]
-@temp(Out) = TCollOut		! Temperature of collector loop - collector to pipe
+EQUATIONS 1
+@temp(Out, TCollOut) = [74,1]		! Temperature of collector loop - collector to pipe
 
 ***********************************
 ** outputs to other ddck
@@ -35,9 +34,8 @@ TCollOut = [74,1]
 ** outputs to energy balance in kWh and ABSOLUTE value
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
-EQUATIONS 2
-@Qbalance(qSysIn_Collector) = PColl_kW  
-elSysOut_PuSolar = PelPuC_kW
+EQUATIONS 1
+qSysIn_Collector = PColl_kW  
 
 *************************************************************************************************
 ** Dependencies with other types
@@ -54,9 +52,9 @@ AcollAp = NumberOfColl*ColAperArea		! Total Collector aperture area [m2]
 **COLLECTOR DATA
 ***************************
 CONSTANTS 3
-C_tilt = slopeSurfUser_1		! Collector tilt angle / slope	[�]
-C_azim = aziSurfUser_1    		! Collector azimuth  (0:s, 90:w, 270: e)	[�]
-NumberOfColl = 10    			! Number of total collectors
+C_tilt = slopeSurfUser_1		! Collector tilt angle / slope [�]
+C_azim = aziSurfUser_1			! Collector azimuth  (0:s, 90:w, 270: e) [�]
+NumberOfColl = 10				! Number of total collectors
 
 ***************************************
 ** Weather Data calculation
@@ -64,9 +62,9 @@ NumberOfColl = 10    			! Number of total collectors
 EQUATIONS 4
 **surface-8
 IT_Coll_kJhm2 = IT_SurfUser_1		! Incident total radiation on collector plane, kJ/hm2 
-IB_Coll_kJhm2 = IB_SurfUser_1  		! incident beam radiation on collector plane, kJ/hm2
-ID_Coll_kJhm2 = ID_SurfUser_1  		! diffuse and ground reflected irradiance on collector tilt
-AI_Coll = AI_SurfUser_1  			! incident angle on collector plane, �
+IB_Coll_kJhm2 = IB_SurfUser_1		! incident beam radiation on collector plane, kJ/hm2
+ID_Coll_kJhm2 = ID_SurfUser_1		! diffuse and ground reflected irradiance on collector tilt
+AI_Coll = AI_SurfUser_1				! incident angle on collector plane, �
 
 EQUATIONS 5
 IT_Coll_kW = IT_Coll_kJhm2/3600		! Incident total radiation on collector plane, kW/m2
@@ -83,18 +81,18 @@ TskyCalc = (1+COS(C_tilt))*0.5*tSky + (1-COS(C_tilt))*0.5*tAmb
 vwindCalc = vWind * 0.5     
 
 EQUATIONS 5
-LI_Pyrg = ((tSky+273.15)**4)*5.67*(10**-8)*3.6     				! kJ/(m2h)
+LI_Pyrg = ((tSky+273.15)**4)*5.67*(10**-8)*3.6					! kJ/(m2h)
 BoCollBelowDp = LT(0.5*(TCollOutRc+TCollInRc),tAmbDewPoint)		! LT(TCollOutUc,TambDewPoint)		! Boolean: if TCollOut is below dew point we assume condensation
 BoCondWindIrr = LT(IT_Coll_Wm2,300)*LT(vWind,2)     			! condensation is only allowed if irradiation and wind speed are not too high
 parRatio = MAX(MIN((parRatioRc+dtSim/tSelLoss*(BoCollBelowDp*BoCondWindIrr-NOT(BoCondWindIrr)-EQL(MfrColl,0)*NOT(BoCollBelowDp))),1),0)  
-**parRatio = MAX(MIN(NOT(BoCollBelowDp*),1),0)					!BoCondWindIrr falla !!!
+**parRatio = MAX(MIN(NOT(BoCollBelowDp*),1),0)					! BoCondWindIrr falla !!!
 **parRatio = MAX(MIN((parRatioRc+dtSim/tSelLoss*(BoCollBelowDp-EQL(MfrColl,0)*NOT(BoCollBelowDp))),1),0)  
 **parRatio = 1   
 rf = (1+cos(C_tilt))/2
 
 CONSTANTS 5     
 MfrCPriSpec = 75		!60		! Coll. Prim. loop spec. mass flow [kg/hm2]
-dtColOn = 7     		! Upper dead band coll. pump ON
+dtColOn = 7				! Upper dead band coll. pump ON
 dtColOff = 3     		! Lower dead band coll. pump OFF
 tMaxCol = 110     		! Upper collector temp. limit for pump running
 LPiCollPri = 15     	! length of collector loop pipe
@@ -114,8 +112,8 @@ BoCst = GT(TCollOutRc,tMaxCol)*NOT(BoCstRc) + GT(TCollOutRc,TCstOff)*BoCstRc		! 
      
 UNIT 70 TYPE 2		! Collector Controller
 PARAMETERS 2     
-5     	! 1 No. of oscillations
-300		! 2 High limit cut-out
+5     	! 1: No. of oscillations
+300		! 2: High limit cut-out
 INPUTS 6     
 TcollOut     	! Upper input temperature Th
 TTesSolar     	! Lower input temperature Tl

@@ -335,6 +335,12 @@ class ProcessTrnsysDf:
 
         return os.path.join(self.outputPath + pathRelative)
 
+    def readDeckData(self):
+
+        self.deck = deckTrnsys.DeckTrnsys(self.outputPath, self.fileName)
+        self.deck.loadDeck()
+        self.deckData = self.deck.getAllDataFromDeck()
+
     def loadFiles(self, doConfigCalculation=True):
 
         self.setLoaderParameters()
