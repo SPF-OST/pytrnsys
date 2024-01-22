@@ -16,7 +16,6 @@ import typing as _tp
 import matplotlib.pyplot as plt
 import numpy as num
 import pandas as pd
-import pkg_resources
 import seaborn as _seb
 
 import pytrnsys.cost_calculation as _cc
@@ -535,7 +534,7 @@ class ProcessParallelTrnsys:
                 elif "=" in plotVariable:
                     equationVariable, equationExpression = plotVariable.split("=")
                     equationDict[equationVariable] = equationExpression
-                    for variable in re.split("\W", equationExpression):
+                    for variable in re.split(r"\W", equationExpression):
                         if variable != "" and not (self.isStringNumber(variable)):
                             calcVariableDict[variable] = ""
 
@@ -1193,7 +1192,7 @@ class ProcessParallelTrnsys:
                 elif "=" in plotVariable:
                     equationVariable, equationExpression = plotVariable.split("=")
                     equationDict[equationVariable] = equationExpression
-                    for variable in re.split("\W", equationExpression):
+                    for variable in re.split(r"\W", equationExpression):
                         if variable != "" and not (self.isStringNumber(variable)):
                             calcVariableDict[variable] = ""
 
@@ -1590,7 +1589,7 @@ class ProcessParallelTrnsys:
                     self.logger.error("Invalid equation statement in `jsonCalc`")
                     return -1
                 else:
-                    for variable in re.split("\W", equation):
+                    for variable in re.split(r"\W", equation):
                         if variable != "" and variable != "round" and not (self.isStringNumber(variable)):
                             equation = equation.replace(variable, 'resultsDict["%s"]' % variable)
                     exec(equation)
@@ -1754,22 +1753,3 @@ class ProcessParallelTrnsys:
         shallWriteReport = self.inputs["costPdf"]
         processType = _cc.OTHER if not fileNamesToRead else _cc.CasesDefined(fileNamesToRead)
         _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, shallWriteReport, processType)
-
-
-def process():
-    pathBase = ""
-    template = pkg_resources.resource_filename("pytrnsys_examples", "solar_dhw/process_solar_dhw.config")
-    if len(sys.argv) > 1:
-        pathBase, configFile = os.path.split(sys.argv[1])
-    else:
-        pathBase, configFile = os.path.split(template)
-
-    if ":" not in pathBase:
-        pathBase = os.path.join(os.getcwd(), pathBase)
-    tool = ProcessParallelTrnsys()
-    tool.readConfig(pathBase, configFile)
-    tool.process()
-
-
-if __name__ == "__main__":
-    process()
