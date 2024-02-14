@@ -16,7 +16,7 @@ import pytrnsys.trnsys_util.readTrnsysFiles as readTrnsysFiles
 class ProcessTrnsysBase:
     def __init__(self, _path, _name):
         self.fileName = _name
-        self.outputPath = _path + "\%s" % self.fileName
+        self.outputPath = _path + r"\%s" % self.fileName
         self.executingPath = _path
         self.titleOfLatex = "$%s$" % self.fileName
         self.folderName = self.fileName

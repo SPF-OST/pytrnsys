@@ -14,7 +14,7 @@ import pytrnsys.utils.utilsSpf as utils
 class ProcessMonthlyDataBase:
     def __init__(self, path, name, language="en"):
         self.fileName = name
-        self.outputPath = path + "\%s" % self.fileName
+        self.outputPath = path + r"\%s" % self.fileName
         self.executingPath = path
 
         # Internal data
@@ -34,7 +34,7 @@ class ProcessMonthlyDataBase:
 
     def initializeData(self):
         self.numberOfMonthSimulated = 0
-        self.perCent = "\%"
+        self.perCent = "%"
         self.useFixedControl = False
         self.plotJpg = False
         self.plotExtension = "png"
@@ -468,7 +468,7 @@ class ProcessMonthlyDataBase:
             )
 
         self.nameMonthlyEnergyPlotPdf = "energyMonthly.pdf"
-        self.nameMonthlyEnergyPlotPdfWithPath = "%s\%s" % (self.outputPath, self.nameMonthlyEnergyPlotPdf)
+        self.nameMonthlyEnergyPlotPdfWithPath = r"%s\%s" % (self.outputPath, self.nameMonthlyEnergyPlotPdf)
 
         plt.xlim([-0.5, 12.5])
 
@@ -476,7 +476,7 @@ class ProcessMonthlyDataBase:
 
         if self.plotJpg:
             nameJpg = "energyMonthly.jpg"
-            nameJpgWithPath = "%s\%s" % (self.outputPath, nameJpg)
+            nameJpgWithPath = r"%s\%s" % (self.outputPath, nameJpg)
 
             plt.savefig(nameJpgWithPath)
 
@@ -519,7 +519,7 @@ class ProcessMonthlyDataBase:
         plot.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0, fontsize=8)
 
         self.nameMonthlyEnergyPlotPdf = "energyMonthly.pdf"
-        self.nameMonthlyEnergyPlotPdfWithPath = "%s\%s" % (self.outputPath, self.nameMonthlyEnergyPlotPdf)
+        self.nameMonthlyEnergyPlotPdfWithPath = r"%s\%s" % (self.outputPath, self.nameMonthlyEnergyPlotPdf)
 
         plt.xlim([-0.5, 12.5])
 
@@ -527,7 +527,7 @@ class ProcessMonthlyDataBase:
 
         if self.plotJpg:
             nameJpg = "energyMonthly.jpg"
-            nameJpgWithPath = "%s\%s" % (self.outputPath, nameJpg)
+            nameJpgWithPath = r"%s\%s" % (self.outputPath, nameJpg)
 
             plt.savefig(nameJpgWithPath)
 
@@ -584,7 +584,7 @@ class ProcessMonthlyDataBase:
         )
 
         self.nameMonthlyColEnergyPlotPdf = "colEnergyMonthly.pdf"
-        self.nameMonthlyColEnergyPlotPdfWithPath = "%s\%s" % (self.outputPath, self.nameMonthlyColEnergyPlotPdf)
+        self.nameMonthlyColEnergyPlotPdfWithPath = r"%s\%s" % (self.outputPath, self.nameMonthlyColEnergyPlotPdf)
 
         plt.xlim([-0.5, 12.5])
 
@@ -754,7 +754,7 @@ class ProcessMonthlyDataBase:
             )
             lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         line = "& %.1f & %.1f & %.1f & %.1f (%.1f%s)\\\\ \n" % (
@@ -793,7 +793,7 @@ class ProcessMonthlyDataBase:
 
         line = "\\hline\n"
         lines = lines + line
-        symbol = "\%"
+        symbol = r"\%"
         line = "& %.1f & %.1f & %.1f & %.1f (%.1f%s)\\\\ \n" % (
             sum(self.qUseDhw),
             sum(self.qDemandDhw),
@@ -986,7 +986,7 @@ class ProcessMonthlyDataBase:
 
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         if self.existSolarLoop:
@@ -1132,7 +1132,7 @@ class ProcessMonthlyDataBase:
         )
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
 
@@ -1254,7 +1254,7 @@ class ProcessMonthlyDataBase:
         lines = lines + line
         line = "\\hline\n"
         lines = lines + line
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\textbf{$COP_t$}& \\textbf{%.2f} %s \\\\ \n" % (self.yearCOPtSolar, symbol)
         lines = lines + line
         #        line="\\textbf{$COP_e$}& \\textbf{%.2f} %s \\\\ \n" % (self.yearCOPeSolar,symbol); lines = lines + line
@@ -1367,7 +1367,7 @@ class ProcessMonthlyDataBase:
         lines = lines + line
         line = "\\hline\n"
         lines = lines + line
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\textbf{$COP_t$}& \\textbf{%.2f} %s \\\\ \n" % (self.yearCOPtSolar, symbol)
         lines = lines + line
         line = "\\textbf{$f_{s}$}& \\textbf{%.2f} %s \\\\ \n" % (self.yearFSolar, symbol)
@@ -1473,7 +1473,7 @@ class ProcessMonthlyDataBase:
 
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         line = "\\textbf{$Imb$}& \\textbf{%.2f} %s\\\\ \n" % (100.0 * Imb / (sum(self.qDHW) + 1e-30), symbol)
@@ -1533,7 +1533,7 @@ class ProcessMonthlyDataBase:
 
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         line = "\\textbf{$Imb$}& \\textbf{%.2f} %s\\\\ \n" % (100.0 * Imb / (sum(self.qSH) + 1e-30), symbol)
@@ -1660,7 +1660,7 @@ class ProcessMonthlyDataBase:
 
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         line = "\\textbf{$SPF_{hps}$}& \\textbf{%.2f}  \\\\ \n" % (self.yearSPFhps)
@@ -1715,7 +1715,7 @@ class ProcessMonthlyDataBase:
 
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         line = "\\textbf{$Imb$}& \\textbf{%.2f} %s\\\\ \n" % (100.0 * Imb / (sum(self.qDemandSh) + 1e-30), symbol)
@@ -1854,7 +1854,7 @@ class ProcessMonthlyDataBase:
 
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         line = "\\textbf{$Imb$}& \\textbf{%.2f} %s\\\\ \n" % (100.0 * Imb / (sum(self.qDemandSh) + 1e-30), symbol)
@@ -1967,7 +1967,7 @@ class ProcessMonthlyDataBase:
         )
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         line = "\\textbf{$SPF^{dis}_{hps}$}& \\textbf{%.2f}  \\\\ \n" % (self.yearSPFhpsWithDis)
@@ -2020,7 +2020,7 @@ class ProcessMonthlyDataBase:
         )
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         line = "\\textbf{$Imb$}& \\textbf{%.2f} %s\\\\ \n" % (100.0 * Imb / (sum(self.qUse) + 1e-30), symbol)
@@ -2065,7 +2065,7 @@ class ProcessMonthlyDataBase:
 
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         line = "\\textbf{$Imb$}& \\textbf{%.2f} %s\\\\ \n" % (100.0 * Imb / (sum(self.qUse) + 1e-30), symbol)
@@ -2111,7 +2111,7 @@ class ProcessMonthlyDataBase:
 
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
         line = "\\textbf{$Imb$}& \\textbf{%.2f} %s\\\\ \n" % (100.0 * Imb / (sum(self.qUse) + 1e-30), symbol)
@@ -2232,7 +2232,7 @@ class ProcessMonthlyDataBase:
         )
         lines = lines + line
 
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline\n"
         lines = lines + line
 
@@ -2334,7 +2334,7 @@ class ProcessMonthlyDataBase:
 
     def createFileTinQEvap(self):
         myGlobalName = "%s-TinEvap.dat" % self.fileName
-        myGlobalNameWithPath = "%s\%s" % (self.outputPath, myGlobalName)
+        myGlobalNameWithPath = r"%s\%s" % (self.outputPath, myGlobalName)
 
         outfile = open(myGlobalNameWithPath, "w")
 
@@ -2359,7 +2359,7 @@ class ProcessMonthlyDataBase:
 
     def createFileWithResults(self):
         myGlobalName = "%s-results.dat" % self.fileName
-        myGlobalNameWithPath = "%s\%s" % (self.outputPath, myGlobalName)
+        myGlobalNameWithPath = r"%s\%s" % (self.outputPath, myGlobalName)
 
         outfile = open(myGlobalNameWithPath, "w")
 

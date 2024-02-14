@@ -21,17 +21,15 @@ class LogTrnsys:
     def __init__(self, _path, _name):
         self.fileName = _name  # _name.split('.')[0]
         self.path = _path
-        # self.nameLog = self.path + "\%s.lst" % _name
-        self.nameLog = self.path + "\%s.log" % _name
+        self.nameLog = self.path + r"\%s.log" % _name
 
         # self.printItProblemsFile = True
 
-        self.pathOutput = self.path + "\%s" % self.fileName
+        self.pathOutput = self.path + r"\%s" % self.fileName
         self.linesChanged = ""
         self.titleOfLatex = "%s" % self.fileName
 
-        # self.nameDckPathOutput = self.pathOutput + "\%s.lst" % _name
-        self.nameDckPathOutput = self.pathOutput + "\%s.log" % _name
+        self.nameDckPathOutput = self.pathOutput + r"\%s.log" % _name
 
         self.cleanMode = False
 
@@ -140,7 +138,7 @@ class LogTrnsys:
                 split = self.lines[i].split(sentence)
 
                 try:
-                    self.numberOfFailedIt = split[1].replace("%", "\%")
+                    self.numberOfFailedIt = split[1].replace("%", r"\%")
                     logger.debug(self.numberOfFailedIt)
 
                 except:

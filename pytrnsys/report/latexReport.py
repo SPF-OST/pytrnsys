@@ -138,11 +138,11 @@ class LatexReport:
     ):
         'function to execute latex file, the function can use either "pdflatex" or "texify" to create pdf.'
 
-        logFile = "%s\%s.log" % (self.outputPath, self.fileName)
+        logFile = r"%s\%s.log" % (self.outputPath, self.fileName)
         logFileEnd = logFile
 
         if moveToTrnsysLogFile == True:
-            logFileEnd = "%s\%s.TRNSYS.log" % (self.outputPath, self.fileName)
+            logFileEnd = r"%s\%s.TRNSYS.log" % (self.outputPath, self.fileName)
 
             try:
                 shutil.copy(logFile, logFileEnd)
@@ -157,7 +157,6 @@ class LatexReport:
         else:
             latexExe = '"%s"' % pathLatexExe
 
-        #        fileNameTexWithPath = '"%s\\%s"'%(self.outputPath,self.fileNameTex)
         if LatexPackage == "texify":
             cmd = [
                 latexExe,
@@ -188,21 +187,21 @@ class LatexReport:
 
         if moveToTrnsysLogFile == True and removeAuxFiles:
             os.remove(logFileEnd)
-        name = "%s\%s.log" % (self.outputPath, self.fileName)
+        name = r"%s\%s.log" % (self.outputPath, self.fileName)
 
         try:
             os.remove(name)
         except:
             logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
 
-        name = "%s\%s.aux" % (self.outputPath, self.fileName)
+        name = r"%s\%s.aux" % (self.outputPath, self.fileName)
         try:
             os.remove(name)
         except:
             logger.warning(name + " could not be removed, maybe there was a problem with the Latex File...")
 
         if LatexPackage == "texify":
-            name = "%s\%s.synctex.gz" % (self.outputPath, self.fileName)
+            name = r"%s\%s.synctex.gz" % (self.outputPath, self.fileName)
             try:
                 os.remove(name)
             except:

@@ -444,7 +444,7 @@ if __name__ == "__main__":
 
     path = "D:\MyCalculations\Trnsys\IceStorage\PilotPlantKinderGarten"
 
-    myFile = "%s\%s" % (path, name)
+    myFile = r"%s\%s" % (path, name)
 
     pilot = loadBaseNumpy(myFile)
 
@@ -456,6 +456,6 @@ if __name__ == "__main__":
 
     print("END OF LOADBASENUMPY")
 
-    myFileOut = "%s\%s-End.dat" % (path, name.split(".")[0])
+    myFileOut = r"%s\%s-End.dat" % (path, name.split(".")[0])
 
     pilot.writeFile(myFileOut, verbose=True)
