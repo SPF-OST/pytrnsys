@@ -77,7 +77,7 @@ class DeckTrnsys:
         shutil.copy(self.nameDck, nameDeckBck)
 
     def loadDeck(self, useDeckName=False, eraseBeginComment=True, eliminateComments=True, useDeckOutputPath=False):
-        """
+        r"""
         It reads the deck  removing files starting with \*\*\*.
 
         Return

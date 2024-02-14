@@ -113,7 +113,7 @@ class LatexReport:
 
     def setTitle(self, _name):
         if "_" in _name:
-            newName = _name.replace("_", "\_")
+            newName = _name.replace("_", r"\_")
         else:
             newName = _name
         self.title = newName
@@ -244,7 +244,7 @@ class LatexReport:
         self.lines = self.lines + line
         line = "\\reportSubName{%s} \n" % self.subTitle
         self.lines = self.lines + line
-        line = "\\reportDate{\\today \hspace{0.1cm} at: \\currenttime \hspace{0.1cm} h} \n"
+        line = "\\reportDate{\\today \\hspace{0.1cm} at: \\currenttime \\hspace{0.1cm} h} \n"
         self.lines = self.lines + line
         #        line="\\reportDate{\\currenttime \hspace{0.1cm} h} \n" ; self.lines = self.lines + line
         line = "\\author{%s}\n" % self.nameAuthor

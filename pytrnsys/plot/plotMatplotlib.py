@@ -1394,7 +1394,7 @@ class PlotMatplotlib:
                     plot.set_title(title + " [" + timeStepTitle + "]")
 
                 plot.set_ylabel(yLabel)
-                plot.set_xlabel("Tagesdurchschnittstemperatur [$^\circ$C]")
+                plot.set_xlabel(r"Tagesdurchschnittstemperatur [$^\circ$C]")
 
                 plt.gcf().subplots_adjust(bottom=0.15)
 
@@ -1445,7 +1445,7 @@ class PlotMatplotlib:
                 )
 
                 plot.set_ylabel(yLabel)
-                plot.set_xlabel("Tagesdurchschnittstemperatur [$^\circ$C]")
+                plot.set_xlabel(r"Tagesdurchschnittstemperatur [$^\circ$C]")
 
                 textBox = "\n".join(
                     (
