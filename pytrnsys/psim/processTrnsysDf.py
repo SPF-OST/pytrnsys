@@ -927,7 +927,7 @@ class ProcessTrnsysDf:
 
                 namePdf = self.plot.plotMonthlyDf(
                     self.SPFShpWeighted,
-                    "$\widetilde{SPF_{SHP}}$",
+                    r"$\widetilde{SPF_{SHP}}$",
                     nameFile,
                     yearlyFactor,
                     self.myShortMonths,
@@ -977,7 +977,7 @@ class ProcessTrnsysDf:
 
         namePdf = self.plot.plotMonthlyDf(
             epfToPlot,
-            "electrical performance factor $\eta_{El}$ $[-]$",
+            r"electrical performance factor $\eta_{El}$ $[-]$",
             nameFile,
             yearlyFactor,
             self.myShortMonths,

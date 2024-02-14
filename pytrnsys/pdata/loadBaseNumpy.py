@@ -22,13 +22,8 @@ import re
 
 class loadBaseNumpy:
     def __init__(self, _name):
-        # internal data
-
         self.fileNameWithExtension = _name
-        self.fileName = re.search("(.+?)(\.[^.]*$|$)", _name).group(1)
-
-        #        self.rootPath=os.getcwd()
-        #        print self.rootPath
+        self.fileName = re.search(r"(.+?)(\.[^.]*$|$)", _name).group(1)
 
         self.numberOfDataPoints = 0
         self.numberOfVariables = 0
@@ -440,9 +435,8 @@ class loadBaseNumpy:
 
 if __name__ == "__main__":
     name = "ValidationIceStorage-TRNSYSInputSmall.dat"
-    #
 
-    path = "D:\MyCalculations\Trnsys\IceStorage\PilotPlantKinderGarten"
+    path = r"D:\MyCalculations\Trnsys\IceStorage\PilotPlantKinderGarten"
 
     myFile = r"%s\%s" % (path, name)
 
@@ -452,7 +446,6 @@ if __name__ == "__main__":
 
     print(pilot.get("TPcmExp1"))
 
-    #    print pilot.getTranspose("TPcmExp1")
 
     print("END OF LOADBASENUMPY")
 
