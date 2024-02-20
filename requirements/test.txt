@@ -8,6 +8,3 @@
 -r test-3rd-party.txt
 file:.#egg=pytrnsys
     # via -r requirements\test.in
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools

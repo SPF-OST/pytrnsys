@@ -8,6 +8,3 @@
 -r release-3rd-party.txt
 file:.#egg=pytrnsys
     # via -r requirements\release.in
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools

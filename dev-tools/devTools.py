@@ -13,6 +13,12 @@ import typing as tp
 
 _SCRIPTS_DIR = pl.Path(sc.get_path("scripts"))
 
+_SOURCE_DIRS = ["pytrnsys", "tests", "dev-tools"]
+
+_EXCLUDED_PATH_PATTERNS = [
+    "^tests/(.+/)?data/.*",
+]
+
 
 def main():
     arguments = _parseArguments()
@@ -119,33 +125,56 @@ def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: 
 
 
 def _maybeRunMypy(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'mypy'} --show-error-codes pytrnsys tests dev-tools"
-        additionalArgs = arguments.mypyArguments or ""
-        _printAndRun([*cmd.split(), *additionalArgs.split()])
+    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None):
+        return
+
+    excludeArguments = [a for p in _EXCLUDED_PATH_PATTERNS for a in ["--exclude", p]]
+
+    cmd = [
+        _SCRIPTS_DIR / "mypy",
+        "--show-error-codes",
+        # Don't include python scripts which are copied into test
+        # data directories (from, e.g., `examples`) during tests
+        *excludeArguments,
+    ]
+
+    additionalArgs = arguments.mypyArguments or ""
+
+    args = [*cmd, *additionalArgs, *_SOURCE_DIRS]
+
+    _printAndRun(args)
 
 
 def _maybeRunPylint(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'pylint'} pytrnsys tests dev-tools"
-        additionalArgs = arguments.lintArguments or ""
+    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None):
+        return
 
-        _printAndRun([*cmd.split(), *additionalArgs.split()])
+    cmd = f"{_SCRIPTS_DIR / 'pylint'}  --recursive=yes"
+    ignorePaths = ",".join(_EXCLUDED_PATH_PATTERNS)
+    additionalArgs = arguments.lintArguments or ""
+
+    allArgs = [*cmd.split(), "--ignore-paths", ignorePaths, *additionalArgs.split(), *_SOURCE_DIRS]
+
+    _printAndRun(allArgs)
 
 
 def _maybeRunBlack(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.blackArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 pytrnsys tests dev-tools"
-        additionalArgs = "--check" if arguments.blackArguments is None else arguments.blackArguments
+    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.blackArguments is not None):
+        return
 
-        _printAndRun([*cmd.split(), *additionalArgs.split()])
+    cmd = f"{_SCRIPTS_DIR / 'black'} -l 120"
+    additionalArgs = "--check" if arguments.blackArguments is None else arguments.blackArguments
+
+    _printAndRun([*cmd.split(), *additionalArgs.split(), *_SOURCE_DIRS])
 
 
 def _maybeCreateDiagrams(arguments):
-    if arguments.shallRunAll or arguments.diagramsFormat:
-        diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
-        cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys -d test-results pytrnsys"
-        _printAndRun(cmd.split())
+    if not (arguments.shallRunAll or arguments.diagramsFormat):
+        return
+
+    diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
+    cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys -d test-results pytrnsys"
+    _printAndRun(cmd.split())
 
 
 def _maybeRunPytest(arguments, testResultsDirPath):
