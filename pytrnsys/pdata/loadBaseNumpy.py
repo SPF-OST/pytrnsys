@@ -11,19 +11,19 @@ Author : Dani Carbonell
 Date   : 14.12.2012
 """
 
-import string, os
-import pytrnsys.pdata.processFiles as spfUtils
-import numpy as np
-import time
 import datetime
 import gc
-import re
+import time
+
+import numpy as np
+
+import pytrnsys.pdata.processFiles as spfUtils
 
 
 class loadBaseNumpy:
     def __init__(self, _name):
         self.fileNameWithExtension = _name
-        self.fileName = re.search(r"(.+?)(\.[^.]*$|$)", _name).group(1)
+        self.fileName = _name.rsplit(".", maxsplit=1)[0]
 
         self.numberOfDataPoints = 0
         self.numberOfVariables = 0
