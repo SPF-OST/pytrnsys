@@ -102,9 +102,6 @@ def runParallel(
     cpu = 1
 
     for cmd in cmds:
-        #        newCmds.append("%s start /affinity %s "%(cmdExe,getCpuHexadecimal(cpu)) + cmd)
-        #        newCmds.append("start /affinity %s "%(getCpuHexadecimal(cpu)) + cmd)
-
         newTask = "start /wait /affinity %s " % (getExclusiveAffinityMask(cpu)) + cmd
 
         newCmds.append(newTask)
@@ -288,7 +285,7 @@ def runParallel(
                                     logger.error("Unable to generate BACKUP of " + masterFile)
                                 origDf = pd.read_csv(masterFile, sep=";", index_col=0)
 
-                                masterDf = origDf.append(newDf)
+                                masterDf = pd.concat([origDf, newDf])
                                 masterDf = masterDf[~masterDf.index.duplicated(keep="last")]
                             else:
                                 masterDf = newDf
@@ -310,60 +307,7 @@ def runParallel(
                             activeP[cP[core]["cpu"] - 1] = 1
 
                     else:
-                        # print ('p')%p
-                        #                    print 'processes', processes
                         fail()
-
-        #
-        #        for
-        #             processes.append(Popen(newTask,stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=True))
-        #            newTask = "start /wait /affinity %s "%(getCpuHexadecimal(cpu)) + openCmds.pop(0)
-        #
-        #            currentCmds.append(newTask)
-
-        #############
-
-        #        while newCmds and len(processes) < maxNumberOfCPU:
-
-        # use the first value of the vector and erase it from cmds
-        #            newTask = newCmds.pop(0)
-
-        #            print "RunParallel task:%s of nParallelProcesses:%d" % (task,len(processes))
-
-        #            newTask = "start /wait /affinity %s "%(getCpuHexadecimal(cpu)) + task
-
-        #            cpu =cpu+1
-
-        #            processes.append(Popen(newTask,stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=True))
-
-        #        print "PROCESSES"
-        #        print processes
-
-        #        for p in processes:
-        #
-        ##            o,e = p.communicate()
-        ##            print o
-        ##            print "for p in process %d"%p.poll()
-        #
-        ##                print "%s returnCode=NONETYPE"%p
-        #            if done(p):
-        #
-        #                if success(p):
-        #                    if(outputFile!=False):
-        ##                        lines = "Finished simulated case %d\n"%(k,p.stdout.read(),p.stderr.read())
-        #                        lines = "Finished simulated case %d\n"%(k+1)
-        #                        outfileRun=open(outputFile,'a')
-        #                        outfileRun.writelines(lines)
-        #                        outfileRun.close()
-        #                        k=k+1
-        #                    processes.remove(p)
-        #
-        #
-        #                else:
-        #                    print 'p', p
-        #                    print 'processes', processes
-        #                    fail()
-        #
 
         if all(process == 0 for process in activeP) and not openCmds:
             #        if not processes and not newCmds:
