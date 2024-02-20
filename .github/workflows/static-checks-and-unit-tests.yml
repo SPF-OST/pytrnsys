@@ -7,47 +7,6 @@ on:
     branches: [ master ]
 
 jobs:
-  test-linux:
-
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.12]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Update APT cache
-      run: sudo apt-get update
-    - name: Install dependencies to do with report generation and comparison
-      run: sudo apt-get install texlive-latex-extra imagemagick poppler-utils
-    - name: Install graphviz for class and package diagrams
-      run: sudo apt-get install graphviz
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install wheel
-        pip install -r requirements/test.txt
-    - name: Static type checking with mypy
-      run: python dev-tools/devTools.py --type
-    - name: Lint with pylint
-      run: python dev-tools/devTools.py --lint --keep-results
-    - name: Generate class and package diagrams
-      run: |
-        python dev-tools/devTools.py --diagram --keep-results
-    - name: Test with pytest
-      run: python dev-tools/devTools.py --unit "not manual and not windows and not tool" --keep-results
-    - name: Upload test results and coverage reports
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-results-and-coverage-report-linux
-        path: test-results
-      # Use always() to always run this step to publish test results when there are test failures
-      if: ${{ always() }}
-
   test-windows:
 
     runs-on:
