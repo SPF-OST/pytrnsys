@@ -109,7 +109,7 @@ class ReadTrnsysFiles:
 
         self.userDefinedFileIsReaded = True
 
-        nameUserDefinedFile = "%s\%s" % (self.path, _nameFile)
+        nameUserDefinedFile = r"%s\%s" % (self.path, _nameFile)
 
         self.load = load.loadBaseNumpy(nameUserDefinedFile)
         self.load.loadFileYear(year, splitArgument=None, verbose=True)
@@ -174,7 +174,7 @@ class ReadTrnsysFiles:
 
         self.hourlyFileIsReaded = True
 
-        nameUserDefinedFile = "%s\%s" % (self.pathWithoutTemp, _nameFile)
+        nameUserDefinedFile = r"%s\%s" % (self.pathWithoutTemp, _nameFile)
 
         infile = open(nameUserDefinedFile, "r")
 
@@ -268,7 +268,6 @@ class ReadTrnsysFiles:
 
         self.monthlyFileIsReaded = True
 
-        # nameMonthlyFile = "%s\%s" % (self.path,_nameFile)
         nameMonthlyFile = os.path.join(self.path, _nameFile)
 
         infile = open(nameMonthlyFile, "r")

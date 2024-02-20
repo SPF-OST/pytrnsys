@@ -118,7 +118,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
         fig, ax = plt.subplots(figsize=(8, 8))
         ax1 = plt.subplot()
         ax1.plot(spfSorted, imbSorted)
-        ax1.set(ylabel="$Q_{imb}$ [\%]", xlabel="$SPF_{SHP+}$")
+        ax1.set(ylabel=r"$Q_{imb}$ [\%]", xlabel="$SPF_{SHP+}$")
         ax1.grid()
 
         extension = "pdf"
@@ -136,7 +136,7 @@ class checkSimulationDataClass(results.ResultsProcessedFile):
         fig, ax = plt.subplots(figsize=(8, 8))
         ax1 = plt.subplot()
         ax1.plot(imbSorted, itSorted)
-        ax1.set(xlabel="$Q_{imb}$ [\%]", ylabel="$It_{prob}$")
+        ax1.set(xlabel=r"$Q_{imb}$ [\%]", ylabel="$It_{prob}$")
         ax1.grid()
 
         extension = "pdf"

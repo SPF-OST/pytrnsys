@@ -33,9 +33,6 @@ logger = logging.getLogger("root")
 class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
     def __init__(self, _path, _name, language="en"):
         monthlyData.ProcessMonthlyDataBase.__init__(self, _path, _name, language=language)
-        #
-        #        self.fileName = _name.split('.')[0]
-        #        self.outputPath = _path + "\%s" % self.fileName
 
         self.cleanModeLatex = False
 
@@ -326,7 +323,7 @@ class ProcessTrnsys(monthlyData.ProcessMonthlyDataBase):
         imb = sum(var[len(var) - 1])
 
         addLines = ""
-        symbol = "\%"
+        symbol = r"\%"
         line = "\\hline \\\\ \n"
         addLines = addLines + line
         line = "$Q_D$ & %.2f & MWh \\\\ \n" % (totalDemand / 1000.0)

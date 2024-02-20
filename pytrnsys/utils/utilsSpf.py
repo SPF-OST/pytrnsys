@@ -1212,7 +1212,7 @@ def printMonthlyData(path, nameFile, var, legends):
         line = "\n"
         lines = lines + line
 
-    nameWithPath = "%s\%s.dat" % (path, nameFile)
+    nameWithPath = r"%s\%s.dat" % (path, nameFile)
     outfile = open(nameWithPath, "w")
     outfile.writelines(lines)
     outfile.close()

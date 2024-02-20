@@ -5,75 +5,88 @@
 #
 #    pip-compile-multi
 #
-attrs==20.3.0
-    # via jsonschema
-bokeh==2.3.0
+attrs==23.1.0
+    # via
+    #   jsonschema
+    #   referencing
+bokeh==3.3.2
     # via -r requirements\release-3rd-party.in
-cycler==0.10.0
+contourpy==1.2.0
+    # via
+    #   bokeh
+    #   matplotlib
+cycler==0.12.1
     # via matplotlib
-dataclasses-jsonschema==2.14.1
+dataclasses-jsonschema==2.16.0
     # via -r requirements\release-3rd-party.in
-jinja2==2.11.3
+fonttools==4.46.0
+    # via matplotlib
+jinja2==3.1.2
     # via bokeh
-jsonschema==3.2.0
+jsonschema==4.20.0
     # via dataclasses-jsonschema
-kiwisolver==1.3.1
+jsonschema-specifications==2023.11.2
+    # via jsonschema
+kiwisolver==1.4.5
     # via matplotlib
-lark==1.0.0
+lark==1.1.8
     # via -r requirements\release-3rd-party.in
-markupsafe==1.1.1
+markupsafe==2.1.3
     # via jinja2
-matplotlib==3.3.4
+matplotlib==3.8.2
     # via
     #   -r requirements\release-3rd-party.in
     #   seaborn
-numpy==1.20.1
+numpy==1.26.2
     # via
     #   -r requirements\release-3rd-party.in
     #   bokeh
+    #   contourpy
     #   matplotlib
     #   pandas
     #   scipy
     #   seaborn
-packaging==23.1
-    # via bokeh
-pandas==1.2.2
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   seaborn
-pillow==9.3.0
+packaging==23.2
     # via
     #   bokeh
     #   matplotlib
-pyparsing==2.4.7
-    # via matplotlib
-pyrsistent==0.17.3
-    # via jsonschema
-python-dateutil==2.8.1
+pandas==2.1.4
+    # via
+    #   -r requirements\release-3rd-party.in
+    #   bokeh
+    #   seaborn
+pillow==10.1.0
     # via
     #   bokeh
+    #   matplotlib
+pyparsing==3.1.1
+    # via matplotlib
+python-dateutil==2.8.2
+    # via
     #   dataclasses-jsonschema
     #   matplotlib
     #   pandas
-pytz==2021.1
+pytz==2023.3.post1
     # via pandas
-pyyaml==5.4.1
+pyyaml==6.0.1
     # via bokeh
-scipy==1.6.1
+referencing==0.32.0
     # via
-    #   -r requirements\release-3rd-party.in
-    #   seaborn
-seaborn==0.11.1
-    # via -r requirements\release-3rd-party.in
-six==1.15.0
-    # via
-    #   cycler
     #   jsonschema
-    #   python-dateutil
-tornado==6.1
+    #   jsonschema-specifications
+rpds-py==0.13.2
+    # via
+    #   jsonschema
+    #   referencing
+scipy==1.11.4
+    # via -r requirements\release-3rd-party.in
+seaborn==0.13.0
+    # via -r requirements\release-3rd-party.in
+six==1.16.0
+    # via python-dateutil
+tornado==6.4
     # via bokeh
-typing-extensions==4.5.0
+tzdata==2023.3
+    # via pandas
+xyzservices==2023.10.1
     # via bokeh
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools

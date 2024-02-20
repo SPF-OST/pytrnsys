@@ -89,13 +89,13 @@ class processHourly:
         axes.set_ylabel(myLabel, fontsize=self.sizeAxis)
 
         namePdf = "%s.pdf" % nameFile
-        nameWithPath = "%s\%s" % (self.path, namePdf)
+        nameWithPath = r"%s\%s" % (self.path, namePdf)
 
         plt.savefig(nameWithPath)
 
         if plotJpg:
             name = "%s.jpg" % nameFile
-            nameWithPath = "%s\%s" % (self.path, name)
+            nameWithPath = r"%s\%s" % (self.path, name)
             plt.savefig(nameWithPath)
 
         plt.close()
@@ -131,7 +131,7 @@ class processHourly:
         )
 
         namePdf = "%s.pdf" % nameFile
-        nameWithPath = "%s\%s" % (self.path, namePdf)
+        nameWithPath = r"%s\%s" % (self.path, namePdf)
 
         plt.xlim([-0.5, 12.5])
 
@@ -139,7 +139,7 @@ class processHourly:
 
         if plotEmf:
             nameEmf = "%s.jpg" % nameFile
-            nameEmfWithPath = "%s\%s" % (self.path, nameEmf)
+            nameEmfWithPath = r"%s\%s" % (self.path, nameEmf)
 
             plt.savefig(nameEmfWithPath)
 
@@ -230,7 +230,7 @@ class processHourly:
         plot.legend(allbar, legends, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0, fontsize=self.sizeLegend)
 
         namePdf = "%s.pdf" % nameFile
-        nameWithPath = "%s\%s" % (self.path, namePdf)
+        nameWithPath = r"%s\%s" % (self.path, namePdf)
 
         if useYear == True:
             plt.xlim([-0.5, 13.5])
@@ -241,7 +241,7 @@ class processHourly:
 
         if plotEmf:
             nameEmf = "%s.jpg" % nameFile
-            nameEmfWithPath = "%s\%s" % (self.path, nameEmf)
+            nameEmfWithPath = r"%s\%s" % (self.path, nameEmf)
 
             plt.savefig(nameEmfWithPath)
 
@@ -327,7 +327,7 @@ class processHourly:
         #        plot.set_xticklabels(('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep','Oct', 'Nov', 'Dec','Year/10'),fontsize=20)
 
         namePdf = "%s.pdf" % nameFile
-        nameWithPath = "%s\%s" % (self.path, namePdf)
+        nameWithPath = r"%s\%s" % (self.path, namePdf)
 
         plt.xlim([-0.5, 365])
 
@@ -335,7 +335,7 @@ class processHourly:
 
         if plotJpg:
             nameJpg = "%s.jpg" % myLabel
-            nameJpgWithPath = "%s\%s" % (self.path, nameJpg)
+            nameJpgWithPath = r"%s\%s" % (self.path, nameJpg)
 
             plt.savefig(nameJpgWithPath)
 

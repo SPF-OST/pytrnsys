@@ -50,25 +50,24 @@ class DeckTrnsys:
     def setPathAndNames(self, _path, _name):
         self.fileName = _name  # _name.split('.')[0]
         self.path = _path
-        self.nameDck = self.path + "\%s.%s" % (_name, self.extensionDeck)
-        self.pathOutput = self.path + "\%s" % self.fileName
+        self.nameDck = self.path + r"\%s.%s" % (_name, self.extensionDeck)
+        self.pathOutput = self.path + r"\%s" % self.fileName
         self.titleOfLatex = "%s" % self.fileName
         self.useRelativePath = False
 
         if self.useRelativePath == False:
             self.filesOutputPath = self.pathOutput
 
-        self.nameDckPathOutput = self.pathOutput + "\%s.%s" % (_name, self.extensionDeck)
+        self.nameDckPathOutput = self.pathOutput + r"\%s.%s" % (_name, self.extensionDeck)
 
     def setEliminateComments(self, comment):
         self.eliminateComments = comment
 
     def changeNameOfDeck(self, newName):
-        self.nameDck = self.path + "\%s.%s" % (newName, self.extensionDeck)
-        self.pathOutput = self.path + "\%s" % newName
+        self.nameDck = self.path + r"\%s.%s" % (newName, self.extensionDeck)
+        self.pathOutput = self.path + r"\%s" % newName
         self.titleOfLatex = "%s" % newName
         self.tempFolderEnd = "%s\\temp" % self.pathOutput
-        # self.nameDckPathOutput = self.pathOutput + "\%s.%s" % (newName,self.extensionDeck)
 
         if self.useRelativePath == False:
             self.filesOutputPath = self.pathOutput
@@ -78,7 +77,7 @@ class DeckTrnsys:
         shutil.copy(self.nameDck, nameDeckBck)
 
     def loadDeck(self, useDeckName=False, eraseBeginComment=True, eliminateComments=True, useDeckOutputPath=False):
-        """
+        r"""
         It reads the deck  removing files starting with \*\*\*.
 
         Return

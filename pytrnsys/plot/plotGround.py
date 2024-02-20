@@ -40,7 +40,7 @@ class PlotGround:
             len(self.xPoints), len(self.yPoints)
         )
 
-        nameWithPath = "%s\%s" % (self.outputPath, name)
+        nameWithPath = r"%s\%s" % (self.outputPath, name)
 
         logger.debug(nameWithPath)
 
@@ -111,7 +111,7 @@ class PlotGround:
         outfile.close()
 
     def loadGroundField(self):
-        nameGroundWithPath = "%s\%s" % (self.outputPath, self.nameWithExtension)
+        nameGroundWithPath = r"%s\%s" % (self.outputPath, self.nameWithExtension)
 
         logger.debug(nameGroundWithPath)
 
@@ -281,7 +281,7 @@ class PlotGround:
 
         fig.savefig(self.nameGroundWithPath1)
         if plotEmf:
-            nameEmfWithPath = "%s\%s" % (self.outputPath, nameFile)
+            nameEmfWithPath = r"%s\%s" % (self.outputPath, nameFile)
 
             self._plot_as_emf(fig, filename=nameEmfWithPath)
 

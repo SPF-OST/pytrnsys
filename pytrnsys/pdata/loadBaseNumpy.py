@@ -11,24 +11,19 @@ Author : Dani Carbonell
 Date   : 14.12.2012
 """
 
-import string, os
-import pytrnsys.pdata.processFiles as spfUtils
-import numpy as np
-import time
 import datetime
 import gc
-import re
+import time
+
+import numpy as np
+
+import pytrnsys.pdata.processFiles as spfUtils
 
 
 class loadBaseNumpy:
     def __init__(self, _name):
-        # internal data
-
         self.fileNameWithExtension = _name
-        self.fileName = re.search("(.+?)(\.[^.]*$|$)", _name).group(1)
-
-        #        self.rootPath=os.getcwd()
-        #        print self.rootPath
+        self.fileName = _name.rsplit(".", maxsplit=1)[0]
 
         self.numberOfDataPoints = 0
         self.numberOfVariables = 0
@@ -440,11 +435,10 @@ class loadBaseNumpy:
 
 if __name__ == "__main__":
     name = "ValidationIceStorage-TRNSYSInputSmall.dat"
-    #
 
-    path = "D:\MyCalculations\Trnsys\IceStorage\PilotPlantKinderGarten"
+    path = r"D:\MyCalculations\Trnsys\IceStorage\PilotPlantKinderGarten"
 
-    myFile = "%s\%s" % (path, name)
+    myFile = r"%s\%s" % (path, name)
 
     pilot = loadBaseNumpy(myFile)
 
@@ -452,10 +446,9 @@ if __name__ == "__main__":
 
     print(pilot.get("TPcmExp1"))
 
-    #    print pilot.getTranspose("TPcmExp1")
 
     print("END OF LOADBASENUMPY")
 
-    myFileOut = "%s\%s-End.dat" % (path, name.split(".")[0])
+    myFileOut = r"%s\%s-End.dat" % (path, name.split(".")[0])
 
     pilot.writeFile(myFileOut, verbose=True)

@@ -44,7 +44,7 @@ class BuildTrnsysDeck:
         ddckPlaceHolderValuesJsonPath,
     ):
         self.pathDeck = pathDeck
-        self.nameDeck = self.pathDeck + "\%s.dck" % nameDeck
+        self.nameDeck = self.pathDeck + r"\%s.dck" % nameDeck
 
         self._ddckPlaceHolderValuesJsonPath = (
             _pl.Path(ddckPlaceHolderValuesJsonPath) if ddckPlaceHolderValuesJsonPath else None
