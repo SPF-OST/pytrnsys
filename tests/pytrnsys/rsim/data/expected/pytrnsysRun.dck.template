@@ -35,6 +35,10 @@ NAN_CHECK nan_check_bool  ! Nan DEBUG statement
 OVERWRITE_CHECK debug_statement     ! Overwrite DEBUG statement
 EQSOLVER solver_equation           ! EQUATION SOLVER statement
 TIME_REPORT time_report
+CONSTANTS 3
+mfrSolverAbsTol = 1e-8
+mfrSolverRelTol = 1e-8
+mfrTolSwitchThreshold = 1e2
 CONSTANTS 3    
 tStrtUser = START     ! START start time of user defined printer
 tEndUser  = STOP      ! END time of user defined printer
