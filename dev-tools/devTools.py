@@ -162,7 +162,7 @@ def _maybeRunBlack(arguments):
     if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.blackArguments is not None):
         return
 
-    cmd = f"{_SCRIPTS_DIR / 'black'} -l 120"
+    cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 -t py311"
     additionalArgs = "--check" if arguments.blackArguments is None else arguments.blackArguments
 
     _printAndRun([*cmd.split(), *additionalArgs.split(), *_SOURCE_DIRS])
