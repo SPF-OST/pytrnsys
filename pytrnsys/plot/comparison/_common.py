@@ -20,7 +20,12 @@ from pytrnsys.utils import uncertainFloat as _uf
 
 
 def createManySeriesOrManyChunksFromValues(
-    abscissaVariable, ordinateVariable, seriesVariable, chunkVariable, values, shallPrintUncertainties
+    abscissaVariable: str,
+    ordinateVariable: str,
+    seriesVariable: str,
+    chunkVariable: str,
+    values: _tp.Mapping[float | None, _tp.Mapping[float | None, float]],
+    shallPrintUncertainties,
 ) -> _tp.Union["ManySeries", "ManyChunks", None]:
     if not values:
         return None
@@ -43,7 +48,9 @@ def createManySeriesOrManyChunksFromValues(
 
     if not chunkVariable:
         allSeries = []
-        for seriesValue, valuesForSeries in values[None].items():
+
+        sortedSeriesValuesAndValues = _getSortedByGroupingValue(values[None].items())
+        for seriesValue, valuesForSeries in sortedSeriesValuesAndValues:
             i = len(allSeries) + 1
             seriesGroupingValue = GroupingValue(seriesVariable, seriesValue)
             abscissaValues, ordinateValues = _createAbscissaAndOrdinateAxisValues(
@@ -57,9 +64,11 @@ def createManySeriesOrManyChunksFromValues(
         return ManySeries(allSeries)
 
     chunks = []
-    for chunkValue, chunkGroupingValue in values.items():
+    sortedChunkValuesAndValues = _getSortedByGroupingValue(values.items())
+    for chunkValue, valuesForChunk in sortedChunkValuesAndValues:
         allSeriesForChunk = []
-        for seriesValue, valuesForSeries in chunkGroupingValue.items():
+        sortedSeriesValuesAndValues = _getSortedByGroupingValue(valuesForChunk.items())
+        for seriesValue, valuesForSeries in sortedSeriesValuesAndValues:
             i = sum(len(c.allSeries) for c in chunks) + 1
             seriesGroupingValue = GroupingValue(seriesVariable, seriesValue)
 
@@ -70,8 +79,8 @@ def createManySeriesOrManyChunksFromValues(
             series = Series(i, seriesGroupingValue, abscissaValues, ordinateValues, shallPrintUncertainties)
             allSeriesForChunk.append(series)
 
-        chunkGroupingValue = GroupingValue(chunkVariable, chunkValue)
-        chunk = Chunk(chunkGroupingValue, allSeriesForChunk)
+        valuesForChunk = GroupingValue(chunkVariable, chunkValue)
+        chunk = Chunk(valuesForChunk, allSeriesForChunk)
         chunks.append(chunk)
 
         for series in allSeriesForChunk:
@@ -122,6 +131,20 @@ def _createAxisValues(variableName, means, errors):
     return xAxisValues
 
 
+_T: _tp.TypeVar = _tp.TypeVar("_T")
+
+
+def _getSortedByGroupingValue(
+    groupingValueAndValues: _tp.Iterable[_tp.Tuple[float | None, _T]]
+) -> _tp.Sequence[_tp.Tuple[float | None, _T]]:
+    sortedGroupingValueAndValues = sorted(groupingValueAndValues, key=_getFirstItem)
+    return sortedGroupingValueAndValues
+
+
+def _getFirstItem(pair: _tp.Tuple[float | None, float]) -> float:
+    return pair[0]
+
+
 @_dc.dataclass()
 class ManyChunks:
     chunks: _tp.Sequence["Chunk"]
@@ -130,13 +153,9 @@ class ManyChunks:
         if not self.chunks:
             raise ValueError("Must be given at least one chunk.")
 
-        chunkLengths = {len(c.allSeries) for c in self.chunks}
-        if len(chunkLengths) != 1:
-            raise ValueError("All chunks must have the number of series.")
-
     @property
     def chunkLength(self) -> int:
-        return len(self.chunks[0].allSeries)
+        return max(len(c.allSeries) for c in self.chunks)
 
 
 @_dc.dataclass()

@@ -213,13 +213,13 @@ def _plotValues(
 ):
     if isinstance(manySeriesOrChunks, _common.ManySeries):
         allSeries = manySeriesOrChunks.allSeries
-        style = styles[0]
+        chunkStyle = styles[0]
 
         colors = _getSeriesColors(len(allSeries))
 
         seriesLabels = set()
-        for series, color in zip(allSeries, colors):
-            _plotSeries(ax, series, style, color, seriesLabels, doc, shallPlotUncertainties)
+        for series, seriesColor in zip(allSeries, colors):
+            _plotSeries(ax, series, chunkStyle, seriesColor, seriesLabels, doc, shallPlotUncertainties)
 
         return [], []
     elif isinstance(manySeriesOrChunks, _common.ManyChunks):
@@ -228,16 +228,16 @@ def _plotValues(
         dummyLines = []
         chunkLabels = []
         seriesLabels = set()
-        for chunk, style in zip(manySeriesOrChunks.chunks, styles):
-            dummyLines.append(ax.plot([], [], style, c="black"))
+        for chunk, chunkStyle in zip(manySeriesOrChunks.chunks, styles):
+            dummyLines.append(ax.plot([], [], chunkStyle, c="black"))
             chunkLabel = _getChunkLabel(chunk.groupingValue.value)
 
             if chunkLabel:
                 chunkLabels.append(chunkLabel)
 
             allSeries = chunk.allSeries
-            for series, color in zip(allSeries, colors):
-                _plotSeries(ax, series, style, color, seriesLabels, doc, shallPlotUncertainties)
+            for series, seriesColor in zip(allSeries, colors):
+                _plotSeries(ax, series, chunkStyle, seriesColor, seriesLabels, doc, shallPlotUncertainties)
 
         return chunkLabels, dummyLines
 
