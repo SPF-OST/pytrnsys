@@ -129,9 +129,9 @@ class ProcessParallelTrnsys:
         self.inputs["firstMonth"] = "January"  # 0=January 1=February 7=August
         self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder"  # "casesDefined"
-        self.inputs[
-            "forceProcess"
-        ] = True  # even if results file exist it proceess the results, otherwise it checks if it exists
+        self.inputs["forceProcess"] = (
+            True  # even if results file exist it proceess the results, otherwise it checks if it exists
+        )
         if pathBase:
             self.inputs["pathBase"] = pathBase
         else:
