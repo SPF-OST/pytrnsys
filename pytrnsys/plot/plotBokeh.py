@@ -110,7 +110,7 @@ class PlotBokeh:
                 plotsDict[key]["fig"] = figure(
                     width=self.plotWidth,
                     x_range=plotsDict[keysList[0]]["fig"].x_range,
-                    plot_height=self.plotHeight,
+                    height=self.plotHeight,
                     x_axis_type="datetime",
                     tools=TOOLS,
                 )
