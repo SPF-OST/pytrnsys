@@ -33,6 +33,8 @@ def createPlot(
 ):
     xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions = _separatePlotVariables(plotVariables)
 
+    assert seriesVariable != "" and chunkVariable != ""
+
     resultFilePaths = _getResultsFilePaths(pathFolder, typeOfProcess, logger)
     if not resultFilePaths:
         logger.error("No results.json-files found.")
@@ -103,8 +105,8 @@ def _separatePlotVariables(plotVariables):
     xAxisVariable = plotVariables[0]
     yAxisVariable = plotVariables[1]
 
-    seriesVariable = ""
-    chunkVariable = ""
+    seriesVariable = None
+    chunkVariable = None
 
     serializedConditions = plotVariables[2:]
     if len(plotVariables) >= 3 and not _conds.mayBeSerializedCondition(plotVariables[2]):
@@ -147,9 +149,16 @@ def _getExistingResultsFilePaths(pathFolder: _pl.Path, logger: _log.Logger) -> _
 
 
 def _loadValues(
-    resultsFilePaths, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions, shallPlotUncertainties
+    resultsFilePaths: _tp.Sequence[_pl.Path],
+    xAxisVariable: str,
+    yAxisVariable: str,
+    seriesVariable: str | None,
+    chunkVariable: str | None,
+    conditions: _conds.Conditions,
+    shallPlotUncertainties: bool,
 ) -> _tp.Union[_common.ManySeries, _common.ManyChunks, None]:
-    values = {}
+    values = {} if seriesVariable else []
+
     for resultsFilePath in resultsFilePaths:
         results = _loadResults(resultsFilePath)
 
@@ -160,15 +169,7 @@ def _loadValues(
         xAxis = _getValue(results, xAxisVariable)
         yAxis = _getValue(results, yAxisVariable)
 
-        chunkVariableValue = results[chunkVariable] if chunkVariable else None
-        if chunkVariableValue not in values:
-            values[chunkVariableValue] = {}
-        chunk = values[chunkVariableValue]
-
-        seriesVariableValue = results[seriesVariable] if seriesVariable else None
-        if seriesVariableValue not in chunk:
-            chunk[seriesVariableValue] = []
-        seriesValues = chunk[seriesVariableValue]
+        seriesValues = _getSeriesValues(values, seriesVariable, chunkVariable, results)
 
         seriesValues.append((xAxis, yAxis))
 
@@ -177,6 +178,51 @@ def _loadValues(
     )
 
     return manySeriesOrChunks
+
+
+_WritableValues = (
+    list[tuple[float, float]]
+    | dict[float, list[tuple[float, float]]]
+    | dict[float, dict[float, list[tuple[float, float]]]]
+)
+
+
+def _getSeriesValues(
+    values: _WritableValues,
+    seriesVariable: str | None,
+    chunkVariable: str | None,
+    results: _tp.Mapping[str, float | dict],
+) -> _WritableValues:
+    if not seriesVariable:
+        return values
+
+    seriesVariableValue = results[seriesVariable]
+    if not isinstance(seriesVariableValue, float):
+        raise ValueError("The series variable cannot include uncertainties.")
+
+    if not chunkVariable:
+        if seriesVariableValue not in values:
+            values[seriesVariableValue] = []
+
+        seriesValues = values[seriesVariableValue]
+
+        return seriesValues
+
+    chunkVariableValue = results[chunkVariable]
+    if not isinstance(chunkVariableValue, float):
+        raise ValueError("The chunk variable cannot include uncertainties.")
+
+    if chunkVariableValue not in values:
+        values[chunkVariableValue] = {}
+
+    chunkValues = values[chunkVariableValue]
+
+    if seriesVariableValue not in chunkValues:
+        chunkValues[seriesVariableValue] = []
+
+    seriesValues = values[chunkVariableValue][seriesVariableValue]
+
+    return seriesValues
 
 
 def _loadResults(resultsFilePath) -> _tp.Dict[str, _tp.Any]:
