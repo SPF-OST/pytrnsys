@@ -30,6 +30,7 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         data: _dcj.JsonDict,
         validate=True,
         validate_enums: bool = True,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _S:
         if cls._doesRequireVersion() and "__version__" not in data:
             raise SerializationError("No '__version__' field found.")
@@ -54,8 +55,9 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         omit_none: bool = True,
         validate: bool = False,
         validate_enums: bool = True,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
+        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
 
         assert (
             "__version__" not in data
@@ -124,6 +126,7 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
         data: _dcj.JsonDict,
         validate=True,
         validate_enums: bool = True,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _T:
         if validate:
             try:

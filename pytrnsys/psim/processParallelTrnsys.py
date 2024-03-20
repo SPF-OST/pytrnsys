@@ -129,9 +129,9 @@ class ProcessParallelTrnsys:
         self.inputs["firstMonth"] = "January"  # 0=January 1=February 7=August
         self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder"  # "casesDefined"
-        self.inputs[
-            "forceProcess"
-        ] = True  # even if results file exist it proceess the results, otherwise it checks if it exists
+        self.inputs["forceProcess"] = (
+            True  # even if results file exist it proceess the results, otherwise it checks if it exists
+        )
         if pathBase:
             self.inputs["pathBase"] = pathBase
         else:
@@ -534,7 +534,7 @@ class ProcessParallelTrnsys:
                 elif "=" in plotVariable:
                     equationVariable, equationExpression = plotVariable.split("=")
                     equationDict[equationVariable] = equationExpression
-                    for variable in re.split("\W", equationExpression):
+                    for variable in re.split(r"\W", equationExpression):
                         if variable != "" and not (self.isStringNumber(variable)):
                             calcVariableDict[variable] = ""
 
@@ -1192,7 +1192,7 @@ class ProcessParallelTrnsys:
                 elif "=" in plotVariable:
                     equationVariable, equationExpression = plotVariable.split("=")
                     equationDict[equationVariable] = equationExpression
-                    for variable in re.split("\W", equationExpression):
+                    for variable in re.split(r"\W", equationExpression):
                         if variable != "" and not (self.isStringNumber(variable)):
                             calcVariableDict[variable] = ""
 
@@ -1589,7 +1589,7 @@ class ProcessParallelTrnsys:
                     self.logger.error("Invalid equation statement in `jsonCalc`")
                     return -1
                 else:
-                    for variable in re.split("\W", equation):
+                    for variable in re.split(r"\W", equation):
                         if variable != "" and variable != "round" and not (self.isStringNumber(variable)):
                             equation = equation.replace(variable, 'resultsDict["%s"]' % variable)
                     exec(equation)

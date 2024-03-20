@@ -13,21 +13,13 @@ Author : Jeremias Schmidli
 Date   : 2019/12/10
 ToDo : get class to work, automatically load and plot hourly files based on names of variables
 """
-import numpy as np
-import pandas as pd
-from bokeh.plotting import figure, output_file, show, save
-from bokeh.layouts import gridplot
-from bokeh.models import HoverTool, BoxSelectTool, DatetimeTickFormatter
-
-# select a palette
-# from bokeh.palettes import Category10_10 as palette
-from bokeh.palettes import Dark2_8 as palette
-
 import itertools
-
 import os
 
-import datetime as dt
+from bokeh.layouts import gridplot
+from bokeh.models import HoverTool, DatetimeTickFormatter
+from bokeh.palettes import Dark2_8 as palette
+from bokeh.plotting import figure, output_file, show, save
 
 
 class PlotBokeh:
@@ -97,6 +89,7 @@ class PlotBokeh:
         else:
             output_file(os.path.join(path, fileName + "-plots.html"))
 
+        # TOOLS = ['box_select,box_zoom,reset,xpan,xwheel_zoom','hover','save']
         TOOLS = ["box_zoom", "reset", "pan", "wheel_zoom", "hover", "save"]
 
         # create a color iterator

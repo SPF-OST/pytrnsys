@@ -933,7 +933,7 @@ class ProcessTrnsysDf:
 
                 namePdf = self.plot.plotMonthlyDf(
                     self.SPFShpWeighted,
-                    "$\widetilde{SPF_{SHP}}$",
+                    r"$\widetilde{SPF_{SHP}}$",
                     nameFile,
                     yearlyFactor,
                     self.myShortMonths,
@@ -983,7 +983,7 @@ class ProcessTrnsysDf:
 
         namePdf = self.plot.plotMonthlyDf(
             epfToPlot,
-            "electrical performance factor $\eta_{El}$ $[-]$",
+            r"electrical performance factor $\eta_{El}$ $[-]$",
             nameFile,
             yearlyFactor,
             self.myShortMonths,
@@ -1309,7 +1309,7 @@ class ProcessTrnsysDf:
             imb = sum(var[len(var) - 1])
 
             addLines = ""
-            symbol = "\%"
+            symbol = r"\%"
             line = "\\hline \\\\ \n"
             addLines = addLines + line
             line = "$El_D$ & %.2f & MWh \\\\ \n" % (totalDemand / 1000.0)
@@ -1382,7 +1382,7 @@ class ProcessTrnsysDf:
             imb = sum(var[len(var) - 1])
 
             addLines = ""
-            symbol = "\%"
+            symbol = r"\%"
             line = "\\hline \\\\ \n"
             addLines = addLines + line
             line = "$Q_D$ & %.2f & MWh \\\\ \n" % (totalDemand / 1000.0)
@@ -1510,7 +1510,7 @@ class ProcessTrnsysDf:
             imb = sum(var[len(var) - 1])
 
             addLines = ""
-            symbol = "\%"
+            symbol = r"\%"
             line = "\\hline \\\\ \n"
             addLines = addLines + line
             line = "$Q_D$ & %.2f & MWh \\\\ \n" % (totalDemand / 1000.0)
@@ -1660,7 +1660,7 @@ class ProcessTrnsysDf:
             imb = sum(var[len(var) - 1])
 
             addLines = ""
-            symbol = "\%"
+            symbol = r"\%"
             line = "\\hline \\\\ \n"
             addLines = addLines + line
             line = "$Q_D$ & %.2f & MWh \\\\ \n" % (totalDemand / 1000.0)
@@ -1989,7 +1989,7 @@ class ProcessTrnsysDf:
         caption = "General data"
         names = ["", "", "", ""]
         units = None
-        symbol = "\%"
+        symbol = r"\%"
 
         lines = ""
         jointDicts = {

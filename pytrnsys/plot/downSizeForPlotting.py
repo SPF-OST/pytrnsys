@@ -23,7 +23,7 @@ class DownSizeForPlotting:
     def __init__(self, _path, _name):
         self.name = _name.split(".")[0]
         self.path = _path
-        self.fileNameWithPath = "%s\\%s" % (_path, _name)
+        self.fileNameWithPath = r"%s\%s" % (_path, _name)
 
         self.load = load.loadBaseNumpy(self.fileNameWithPath)
 

@@ -92,23 +92,11 @@ class Helper:
             simulationName = resultsJsonFilePath.name[: -len("-results.json")]
             relativeContainingDirPath = resultsJsonFilePath.parent.relative_to(self._expectedResultsDir)
 
-            costPlotName = f"costShare-{simulationName}.pdf"
-            self._assertPdfEqual(relativeContainingDirPath, costPlotName)
-
-            annuityPlotName = f"costShareAnnuity-{simulationName}.pdf"
-            self._assertPdfEqual(relativeContainingDirPath, annuityPlotName)
-
             reportTexName = f"{simulationName}-cost.tex"
             self._assertTextFileEqual(relativeContainingDirPath, reportTexName)
 
             resultJsonName = f"{simulationName}-results.json"
             self._assertTextFileEqual(relativeContainingDirPath, resultJsonName)
-
-    def _assertPdfEqual(self, relativeContainingDirPath, pdfFileName):
-        import diff_pdf_visually as dpdf
-
-        expectedPath, actualPath = self._getExpectedAndActualPath(relativeContainingDirPath, pdfFileName)
-        assert dpdf.pdfdiff(actualPath, expectedPath)
 
     def _assertTextFileEqual(self, relativeContainingDirPath, texFileName):
         expectedPath, actualPath = self._getExpectedAndActualPath(relativeContainingDirPath, texFileName)

@@ -76,9 +76,7 @@ class CreateTrnsysDeck:
                             self.city,
                         )
                         self.deckOutputs.append(nameDeck)
-                        nameDeckCreated = "%s\%s.dck" % (self.path, nameDeck)
-
-                        #                    print "DECK GENERATED :%s " % nameDeckCreated
+                        nameDeckCreated = r"%s\%s.dck" % (self.path, nameDeck)
 
                         if os.path.isfile(nameDeckCreated):
                             if self.createNewOne:
@@ -137,9 +135,7 @@ class CreateTrnsysDeck:
                     #                    print nameDeck
 
                     self.deckOutputs.append(nameDeck)
-                    nameDeckCreated = "%s\%s.dck" % (self.path, nameDeck)
-
-                    # print "DECK GENERATED :%s " % nameDeckCreated
+                    nameDeckCreated = r"%s\%s.dck" % (self.path, nameDeck)
 
                     if os.path.isfile(nameDeckCreated):
                         if self.createNewOne:
@@ -250,7 +246,7 @@ class CreateTrnsysDeck:
                         continue
 
                 self.deckOutputs.append(nameDeck)
-                nameDeckCreated = "%s\%s.dck" % (self.path, nameDeck)
+                nameDeckCreated = r"%s\%s.dck" % (self.path, nameDeck)
 
                 if os.path.isfile(nameDeckCreated):
                     if self.createNewOne:

@@ -402,6 +402,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
         logfile.write("# Ddck repositories used:\n")
         try:
             import git
+
             found = True
         except ModuleNotFoundError:
             found = False

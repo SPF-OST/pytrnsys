@@ -301,7 +301,7 @@ class ResultsWriter:
     def _addTableCosts(self, output: _output.Output, doc):
         lines = _ct.createLines(output, self._SHALL_USE_kCHF_FOR_TOTAL_COSTS)
 
-        caption = r"System and Heat generation costs (all values incl. 8$\%$ VAT) "
+        caption = rf"System and Heat generation costs (all values incl. 8$\%$ VAT) "
         names = ["Group", "Component", "Costs", "Size", "LifeTime", "Total Costs"]
         units = self._getUnitsForAnnuityPlot()
         label = "CostsTable"

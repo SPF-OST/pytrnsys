@@ -18,10 +18,10 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 4
-T1SlryTk = @temp(leftSideInput, TPiSlrySide1In)
-Mfr1SlryTk_kg_h = ABS(@mfr(leftSideInput, MfrPiIceToHpIn))		
-T2SlryTk = @temp(rightSideInput, TPiHxSolarIceIn)
-Mfr2SlryTk_kg_h = ABS(@mfr(rightSideInput, MfrPiHxSolarIceIn)) 			
+T1SlryTk = @temp(LeftIn, TPiSlrySide1In)
+Mfr1SlryTk_kg_h = ABS(@mfr(LeftIn, MfrPiIceToHpIn))		
+T2SlryTk = @temp(RightIn, TPiHxSolarIceIn)
+Mfr2SlryTk_kg_h = ABS(@mfr(RightIn, MfrPiHxSolarIceIn)) 			
 
 ***********************************
 ** outputs to hydraulic solver
