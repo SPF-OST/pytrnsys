@@ -25,7 +25,7 @@ class PlotGle:
 
         self.useMarkers = True
 
-        self.colorGLE = [
+        self.colorListGLE = [
             "#d62728",
             "#1f77b4",
             "#2ca02c",
@@ -68,6 +68,10 @@ class PlotGle:
         # "#17becf" #cyan
 
         self.sizeLine = 0.02
+
+    def colorGLE(self, nr):
+        useNr = nr % len(self.colorListGLE)
+        return self.colorListGLE[useNr]
 
     def setUseMarkers(self, use):
         self.useMarkers = use
