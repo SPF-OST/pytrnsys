@@ -9,7 +9,7 @@ import pytrnsys.plot.plotGle as _pgle
     (28, "#d62728"),
     (500, "firebrick")
 ])
-def test_colorRestarting(iColor, expectedColor):
+def test_colorRestarting(iColor: int, expectedColor: str):
     plotter = _pgle.PlotGle(".")
     color = plotter.colorGLE(iColor)
     assert color == expectedColor

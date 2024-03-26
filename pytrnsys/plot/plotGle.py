@@ -69,7 +69,7 @@ class PlotGle:
 
         self.sizeLine = 0.02
 
-    def colorGLE(self, nr):
+    def colorGLE(self, nr: int):
         useNr = nr % len(self.colorListGLE)
         return self.colorListGLE[useNr]
 
@@ -171,13 +171,13 @@ class PlotGle:
                 if self.useMarkers == True:
                     line = (
                         '\td%d marker myMarker1$ msize markerSize line lstyle myStyle1 lwidth lSize color %s key "%s"\n'
-                        % (i + 1, self.colorGLE[i], legendLine)
+                        % (i + 1, self.colorGLE(i), legendLine)
                     )
                     lines = lines + line
                 else:
                     line = '\td%d line lstyle myStyle1 lwidth lSize color %s key "%s"\n' % (
                         i + 1,
-                        self.colorGLE[i],
+                        self.colorGLE(i),
                         legendLine,
                     )
                     lines = lines + line
@@ -185,14 +185,14 @@ class PlotGle:
                 if self.useMarkers == True:
                     line = (
                         '\td%d marker myMarker%d$ msize markerSize line lstyle myStyle%d lwidth lSize color %s key "%s"\n'
-                        % (i + 1, i + 1, i + 1, self.colorGLE[i], legendLine)
+                        % (i + 1, i + 1, i + 1, self.colorGLE(i), legendLine)
                     )
                     lines = lines + line
                 else:
                     line = '\td%d line lstyle myStyle%d lwidth lSize color %s key "%s"\n' % (
                         i + 1,
                         i + 1,
-                        self.colorGLE[i],
+                        self.colorGLE(i),
                         legendLine,
                     )
                     lines = lines + line
@@ -246,13 +246,13 @@ class PlotGle:
             if self.useMarkers == True:
                 line = (
                     '\td%d marker myMarker1$ msize markerSize line lstyle myStyle1 lwidth lSize color %s errdown d%d errup d%d errWidth myErrorWidth key "%s"\n'
-                    % (i + 1, self.colorGLE[i], i + 100, i + 102, legendLine)
+                    % (i + 1, self.colorGLE(i), i + 100, i + 102, legendLine)
                 )
                 lines = lines + line
             else:
                 line = (
                     '\td%d line lstyle myStyle1 lwidth lSize color %s errdown d%d errup d%d errWidth myErrorWidth key "%s"\n'
-                    % (i + 1, self.colorGLE[i], i + 100, i + 102, legendLine)
+                    % (i + 1, self.colorGLE(i), i + 100, i + 102, legendLine)
                 )
                 lines = lines + line
 
@@ -301,7 +301,7 @@ class PlotGle:
             col2 = col2 + 1
 
         for i in range(len(legends), 0, -1):
-            line = "\tbar d%d fill %s\n" % (i, self.colorGLE[i])
+            line = "\tbar d%d fill %s\n" % (i, self.colorGLE(i))
             lines = lines + line
 
         for i in range(len(legends)):
@@ -489,7 +489,7 @@ class PlotGle:
                 line = 'd%d lstyle 1 line lwidth %f color %s key "%s"  \n' % (
                     i + 1,
                     self.sizeLine,
-                    self.colorGLE[i],
+                    self.colorGLE(i),
                     legends[i],
                 )
                 lines = lines + line
@@ -497,7 +497,7 @@ class PlotGle:
                 line = 'd%d lstyle 1 line lwidth %f color %s key "$%s$"  \n' % (
                     i + 1,
                     self.sizeLine,
-                    self.colorGLE[i],
+                    self.colorGLE(i),
                     legends[i],
                 )
                 lines = lines + line
