@@ -1,6 +1,6 @@
 import pytest as _pt
 
-import pytrnsys.plot.plotGle as _pgle
+import pytrnsys.plot.plotGle as _pgle  # type: ignore[attr-defined]
 
 
 @_pt.mark.parametrize("iColor, expectedColor", [
