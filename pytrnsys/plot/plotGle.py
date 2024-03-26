@@ -367,14 +367,14 @@ class PlotGle:
         lines = lines + line
 
         for i in range(sizeIn - 1, -1, -1):
-            line = "\tbar d%d fill %s !%s\n" % (i + 1, self.colorGLE[i % 17], legends[i])
+            line = "\tbar d%d fill %s !%s\n" % (i + 1, self.colorGLE(i % 17), legends[i])
             lines = lines + line
 
         line = "!negative values\n"
         lines = lines + line
 
         for i in range(len(legends) - 1, sizeIn - 1, -1):
-            line = "\tbar d%d fill %s ! %s\n" % (i + 1, self.colorGLE[i % 17], legends[i])
+            line = "\tbar d%d fill %s ! %s\n" % (i + 1, self.colorGLE(i % 17), legends[i])
             lines = lines + line
 
         for i in range(len(legends)):

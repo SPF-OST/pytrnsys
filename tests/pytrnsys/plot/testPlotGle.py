@@ -1,6 +1,6 @@
 import pytest as _pt
 
-import pytrnsys.plot.plotGle as _pgle  # type: ignore[attr-defined]
+import pytrnsys.plot.plotGle as _pgle
 
 
 @_pt.mark.parametrize("iColor, expectedColor", [
@@ -10,6 +10,6 @@ import pytrnsys.plot.plotGle as _pgle  # type: ignore[attr-defined]
     (500, "firebrick")
 ])
 def testColorRestarting(iColor: int, expectedColor: str):
-    plotter = _pgle.PlotGle(".")
+    plotter = _pgle.PlotGle(".")  # type: ignore[attr-defined]
     color = plotter.colorGLE(iColor)
     assert color == expectedColor
