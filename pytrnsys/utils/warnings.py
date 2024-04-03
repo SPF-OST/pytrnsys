@@ -13,10 +13,6 @@ class ValueWithWarnings(_tp.Generic[_ValueType_co]):
     def hasWarnings(self) -> bool:
         return bool(self.warnings)
 
-    def withWarning(self, warning: str) -> "ValueWithWarnings[_ValueType_co]":
-        combinedWarnings = [warning, *self.warnings]
-        return ValueWithWarnings(self.value, combinedWarnings)
-
     def withValue(self, newValue: _NewValueType_contra) -> "ValueWithWarnings[_NewValueType_contra]":
         return ValueWithWarnings(newValue, self.warnings)
 
