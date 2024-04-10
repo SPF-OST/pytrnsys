@@ -193,8 +193,9 @@ def runParallel(
                     with open(trackingFile, "w") as file:
                         json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
 
+                cmd = cP[core]["cmd"]
                 logger.info("Command: " + cmd)
-                cP[core]["process"] = Popen(cP[core]["cmd"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+                cP[core]["process"] = Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
                 activeP[cP[core]["cpu"] - 1] = 1
 
