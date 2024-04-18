@@ -1951,29 +1951,26 @@ class ProcessTrnsysDf:
 
     def addCustomNBar(self):
         if "monthlyBars" in self.inputs.keys():
-            for i in range(len(self.inputs["monthlyBars"])):
-                nameFile = self.inputs["monthlyBars"][i][0]
+            for fileNameAndVariableNames in self.inputs["monthlyBars"]:
+                fileName, *variableNames = fileNameAndVariableNames
 
                 legend = []
                 inVar = []
-                for variable in self.inputs["monthlyBars"][i]:
-                    if variable != nameFile:
-                        if variable[0] != "-":
-                            legend.append(self.getNiceLatexNames(variable))
-                            inVar.append(self.monDataDf[variable].values)
-                        else:
-                            legend.append(self.getNiceLatexNames(variable[1:]))
-                            inVar.append(-self.monDataDf[variable[1:]].values)
+                for variableName in variableNames:
+                    sign = -1 if variableName[0] == "-" else 1
+                    values = sign * self.monDataDf[variableName].values
+                    legend.append(self.getNiceLatexNames(variableName))
+                    inVar.append(values)
 
                 titlePlot = "Balance"
                 namePdf = self.plot.plotMonthlyNBar(
-                    inVar, legend, "", nameFile, 10, self.myShortMonths, plotEmf=self.inputs["plotEmf"]
+                    inVar, legend, "", fileName, 10, self.myShortMonths, plotEmf=self.inputs["plotEmf"]
                 )
                 caption = titlePlot
                 tableNames = ["Month"] + legend + ["Total"]
                 var = inVar
                 var.append(sum(inVar))
-                self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, nameFile, self.myShortMonths, sizeBox=15)
+                self.doc.addTableMonthlyDf(var, tableNames, "kWh", caption, fileName, self.myShortMonths, sizeBox=15)
 
                 self.addPlotToLaTeX = {namePdf: caption}
 
