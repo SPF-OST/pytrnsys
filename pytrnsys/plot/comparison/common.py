@@ -263,8 +263,9 @@ class AxisValues:
     def _ensureAlLengthsEqualOrValueError(self):
         shapes = {self.mins.shape, self.means.shape, self.maxs.shape}
 
-        if len(shapes) != 1:
+        if len(shapes) != 1:  # /NOSONAR
             raise ValueError("`mins`, `means` and `maxs` must all be same length.")
+
         shape = list(shapes)[0]
 
         if len(shape) != 1:
