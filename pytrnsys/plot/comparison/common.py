@@ -185,7 +185,7 @@ class Series:  # pylint: disable=too-many-instance-attributes
 
     shallPrintUncertainties: bool
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.abscissa.length != self.ordinate.length:
             raise ValueError("`abscissaValues` and `ordinateValues` must be the same length.")
         self.length = self.abscissa.length
@@ -271,12 +271,16 @@ class AxisValues:
         if len(shape) != 1:
             raise ValueError("`mins`, `means` and `maxs` must all be same one-dimensional arrays.")
 
-    def __eq__(self, other: "AxisValues") -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, AxisValues):
+            return False
+
         return _isClose(self.mins, other.mins) and _isClose(self.means, other.means) and _isClose(self.maxs, other.maxs)
 
 
 def _isClose(x: _np.ndarray, y: _np.ndarray) -> bool:
-    return _np.isclose(x, y, rtol=VALUES_RELATIVE_TOLERANCE).all()
+    isClose = _np.isclose(x, y, rtol=VALUES_RELATIVE_TOLERANCE).all()
+    return bool(isClose)
 
 
 def createManySeriesOrManyChunksFromResults(
@@ -286,8 +290,8 @@ def createManySeriesOrManyChunksFromResults(
     seriesVariable: str | None,
     chunkVariable: str | None,
     shallPlotUncertainties: bool,
-):
-    values = {} if seriesVariable else []
+) -> ManySeries | ManyChunks | None:
+    values: _WritableValues = {} if seriesVariable else []
     for results in allResults:
         xAxis = _getValue(results, abscissaVariable)
         yAxis = _getValue(results, ordinateVariable)
@@ -311,6 +315,11 @@ _WritableValues = (
 )
 
 
+# There's duplicated information in this function's arguments: whether the series or chunk variable arguments
+# are given determines the structure of `results`. Because we check for the existence of the "variable" arguments
+# - which I believe is more readable - than do "if"s based on the structure of `results`, `mypy` has a hard time
+# following what's going on. Therefore - maybe as a temporary solution? - don't type check this particular function.
+@_tp.no_type_check
 def _getSeriesValues(
     values: _WritableValues,
     seriesVariable: str | None,

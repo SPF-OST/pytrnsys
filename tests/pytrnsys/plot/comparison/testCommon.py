@@ -2,7 +2,6 @@ import dataclasses as _dc
 import typing as _tp
 
 import numpy as _np
-import numpy as np
 import pytest as _pt
 
 import pytrnsys.plot.comparison.common as _common
@@ -84,18 +83,18 @@ def generateFromValuesTestCases() -> _tp.Iterable[FromValuesTestCase]:
         ),
         {
             "MFH": {
-                "ASHP": {
+                "ASHP": [
                     (20, 2.1),
                     (30, 2.2),
                     (40, 2.4),
-                }
+                ]
             },
             "SFH": {
-                "GSHP": {
+                "GSHP": [
                     (20, 3.1),
                     (32, 3.4),
                     (40, 3.5),
-                }
+                ]
             },
         },
     )

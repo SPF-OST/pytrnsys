@@ -9,7 +9,7 @@ import numpy as _np
 import pytest as _pt
 
 import pytrnsys.plot.comparison._gle as _gle
-import pytrnsys.plot.comparison._common as _com
+import pytrnsys.plot.comparison.common as _com
 
 
 @_dc.dataclass
