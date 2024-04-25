@@ -9,16 +9,20 @@ __all__ = [
 ]
 
 import dataclasses as _dc
+import enum as _enum
 import typing as _tp
 
 import numpy as _np
 
 from pytrnsys.utils import uncertainFloat as _uf
 
+VALUES_RELATIVE_TOLERANCE = 1e-9
+GROUPING_VARIABLE_VALUES_ROUND_TO_DIGITS = 2
+
 Values = (
     _tp.Sequence[tuple[float, float]]
-    | _tp.Mapping[float, _tp.Sequence[tuple[float, float]]]
-    | _tp.Mapping[float, _tp.Mapping[float, _tp.Sequence[tuple[float, float]]]]
+    | _tp.Mapping[str, _tp.Sequence[tuple[float, float]]]
+    | _tp.Mapping[str, _tp.Mapping[str, _tp.Sequence[tuple[float, float]]]]
 )
 
 
@@ -28,7 +32,7 @@ def createManySeriesOrManyChunksFromValues(  # pylint: disable=too-many-locals
     seriesVariable: str | None,
     chunkVariable: str | None,
     values: Values,
-    shallPrintUncertainties,
+    shallPlotUncertainties,
 ) -> _tp.Union["ManySeries", "ManyChunks", None]:
     if not values:
         return None
@@ -45,7 +49,7 @@ def createManySeriesOrManyChunksFromValues(  # pylint: disable=too-many-locals
             groupingValue=None,
             abscissa=abscissaValues,
             ordinate=ordinateValues,
-            shallPrintUncertainties=shallPrintUncertainties,
+            shallPrintUncertainties=shallPlotUncertainties,
         )
         return ManySeries([series])
 
@@ -53,43 +57,37 @@ def createManySeriesOrManyChunksFromValues(  # pylint: disable=too-many-locals
 
     if not chunkVariable:
         allSeries = list[Series]()
-        sortedSeriesValuesAndValues = _getSortedByGroupingValue(values.items())
-        for seriesValue, valuesForSeries in sortedSeriesValuesAndValues:
-            assert seriesValue is not None
-
+        sortedSeriesLabelsAndValues = _getSortedByLabel(values.items())
+        for seriesLabel, valuesForSeries in sortedSeriesLabelsAndValues:
             i = len(allSeries) + 1
-            seriesGroupingValue = GroupingValue(seriesVariable, seriesValue)
+            seriesGroupingValue = GroupingValue(seriesVariable, seriesLabel)
             abscissaValues, ordinateValues = _createAbscissaAndOrdinateAxisValues(
                 abscissaVariable, ordinateVariable, valuesForSeries
             )
 
-            series = Series(i, seriesGroupingValue, abscissaValues, ordinateValues, shallPrintUncertainties)
+            series = Series(i, seriesGroupingValue, abscissaValues, ordinateValues, shallPlotUncertainties)
 
             allSeries.append(series)
 
         return ManySeries(allSeries)
 
     chunks = list[Chunk]()
-    sortedChunkValuesAndValues = _getSortedByGroupingValue(values.items())
-    for chunkValue, valuesForChunk in sortedChunkValuesAndValues:
-        assert chunkValue
-
+    sortedChunkLabelsAndValues = _getSortedByLabel(values.items())
+    for chunkLabel, valuesForChunk in sortedChunkLabelsAndValues:
         allSeriesForChunk = []
-        sortedSeriesValuesAndValues = _getSortedByGroupingValue(valuesForChunk.items())
-        for seriesValue, valuesForSeries in sortedSeriesValuesAndValues:
-            assert seriesValue
-
+        sortedSeriesLabelsAndValues = _getSortedByLabel(valuesForChunk.items())
+        for seriesLabel, valuesForSeries in sortedSeriesLabelsAndValues:
             i = sum(len(c.allSeries) for c in chunks) + 1
-            seriesGroupingValue = GroupingValue(seriesVariable, seriesValue)
+            seriesGroupingValue = GroupingValue(seriesVariable, seriesLabel)
 
             abscissaValues, ordinateValues = _createAbscissaAndOrdinateAxisValues(
                 abscissaVariable, ordinateVariable, valuesForSeries
             )
 
-            series = Series(i, seriesGroupingValue, abscissaValues, ordinateValues, shallPrintUncertainties)
+            series = Series(i, seriesGroupingValue, abscissaValues, ordinateValues, shallPlotUncertainties)
             allSeriesForChunk.append(series)
 
-        chunkGroupingValue = GroupingValue(chunkVariable, chunkValue)
+        chunkGroupingValue = GroupingValue(chunkVariable, chunkLabel)
         chunk = Chunk(chunkGroupingValue, allSeriesForChunk)
         chunks.append(chunk)
 
@@ -144,12 +142,12 @@ def _createAxisValues(variableName, means, errors):
 _T = _tp.TypeVar("_T")
 
 
-def _getSortedByGroupingValue(groupingValueAndValues: _tp.Iterable[tuple[float, _T]]) -> _tp.Sequence[tuple[float, _T]]:
-    sortedGroupingValueAndValues = sorted(groupingValueAndValues, key=_getFirstItem)
-    return sortedGroupingValueAndValues
+def _getSortedByLabel(groupingLabelAndValues: _tp.Iterable[tuple[str, _T]]) -> _tp.Sequence[tuple[str, _T]]:
+    sortedGroupingLabelAndValues = sorted(groupingLabelAndValues, key=_getFirstItem)
+    return sortedGroupingLabelAndValues
 
 
-def _getFirstItem(pair: tuple[float, _T]) -> float:
+def _getFirstItem(pair: tuple[str, _T]) -> str:
     return pair[0]
 
 
@@ -177,7 +175,7 @@ class Chunk:
     allSeries: _tp.Sequence["Series"]
 
 
-@_dc.dataclass(eq=False)
+@_dc.dataclass()
 class Series:  # pylint: disable=too-many-instance-attributes
     index: _tp.Optional[int]
     groupingValue: _tp.Optional["GroupingValue"]
@@ -187,7 +185,7 @@ class Series:  # pylint: disable=too-many-instance-attributes
 
     shallPrintUncertainties: bool
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.abscissa.length != self.ordinate.length:
             raise ValueError("`abscissaValues` and `ordinateValues` must be the same length.")
         self.length = self.abscissa.length
@@ -223,12 +221,12 @@ class Series:  # pylint: disable=too-many-instance-attributes
 
         if not self.chunk:
             return [
-                f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.groupingValue.value})" for sign in signs
+                f"{self.ordinate.name}{sign}({self._indexedAbscissaName},{self.groupingValue.label})" for sign in signs
             ]
 
         return [
             f"{self.ordinate.name}{sign}({self._indexedAbscissaName},"
-            f"{self.groupingValue.value},{self.chunk.groupingValue.value})"
+            f"{self.groupingValue.label},{self.chunk.groupingValue.label})"
             for sign in signs
         ]
 
@@ -243,7 +241,7 @@ class Series:  # pylint: disable=too-many-instance-attributes
 @_dc.dataclass()
 class GroupingValue:
     name: str
-    value: float
+    label: str
 
 
 @_dc.dataclass()
@@ -265,9 +263,129 @@ class AxisValues:
     def _ensureAlLengthsEqualOrValueError(self):
         shapes = {self.mins.shape, self.means.shape, self.maxs.shape}
 
-        if len(shapes) != 1:
+        if len(shapes) != 1:  # /NOSONAR
             raise ValueError("`mins`, `means` and `maxs` must all be same length.")
+
         shape = list(shapes)[0]
 
         if len(shape) != 1:
             raise ValueError("`mins`, `means` and `maxs` must all be same one-dimensional arrays.")
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, AxisValues):
+            return False
+
+        return _isClose(self.mins, other.mins) and _isClose(self.means, other.means) and _isClose(self.maxs, other.maxs)
+
+
+def _isClose(x: _np.ndarray, y: _np.ndarray) -> bool:
+    isClose = _np.isclose(x, y, rtol=VALUES_RELATIVE_TOLERANCE).all()
+    return bool(isClose)
+
+
+def createManySeriesOrManyChunksFromResults(
+    allResults: _tp.Sequence[_tp.Mapping[str, _tp.Any]],
+    abscissaVariable: str,
+    ordinateVariable: str,
+    seriesVariable: str | None,
+    chunkVariable: str | None,
+    shallPlotUncertainties: bool,
+) -> ManySeries | ManyChunks | None:
+    values: _WritableValues = {} if seriesVariable else []
+    for results in allResults:
+        xAxis = _getValue(results, abscissaVariable)
+        yAxis = _getValue(results, ordinateVariable)
+
+        seriesValues = _getSeriesValues(values, seriesVariable, chunkVariable, results)
+
+        seriesValues.append((xAxis, yAxis))
+
+    manySeriesOrChunks = createManySeriesOrManyChunksFromValues(
+        abscissaVariable, ordinateVariable, seriesVariable, chunkVariable, values, shallPlotUncertainties
+    )
+
+    return manySeriesOrChunks
+
+
+_SeriesValues = list[tuple[float, float]]
+_WritableValues = (
+    _SeriesValues  # one series
+    | dict[str, _SeriesValues]  # many series
+    | dict[str, dict[str, _SeriesValues]]  # many chunks of series
+)
+
+
+# There's duplicated information in this function's arguments: whether the series or chunk variable arguments
+# are given determines the structure of `results`. Because we check for the existence of the "variable" arguments
+# - which I believe is more readable - than do "if"s based on the structure of `results`, `mypy` has a hard time
+# following what's going on. Therefore - maybe as a temporary solution? - don't type check this particular function.
+@_tp.no_type_check
+def _getSeriesValues(
+    values: _WritableValues,
+    seriesVariable: str | None,
+    chunkVariable: str | None,
+    results: _tp.Mapping[str, _tp.Any],
+) -> _SeriesValues:
+    if not seriesVariable:
+        seriesValues = values
+        return seriesValues
+
+    seriesLabel = _getLabel(seriesVariable, results, _VariableType.SERIES)
+
+    if not chunkVariable:
+        if seriesLabel not in values:
+            values[seriesLabel] = []
+
+        seriesValues = values[seriesLabel]
+
+        return seriesValues
+
+    chunkLabel = _getLabel(chunkVariable, results, _VariableType.CHUNK)
+
+    assert isinstance(values, dict)
+
+    if chunkLabel not in values:
+        values[chunkLabel] = {}
+
+    chunkValues = values[chunkLabel]
+
+    if seriesLabel not in chunkValues:
+        chunkValues[seriesLabel] = []
+
+    seriesValues = values[chunkLabel][seriesLabel]
+
+    return seriesValues
+
+
+class _VariableType(_enum.Enum):
+    SERIES = "series"
+    CHUNK = "chunk"
+
+
+def _getLabel(
+    variableName: str,
+    results: _tp.Mapping[str, str | float | dict],
+    variableType: _VariableType,
+) -> str:
+    variableValue = results[variableName]
+    if not isinstance(variableValue, (float, str)):
+        raise ValueError(f"The {variableType.name} variable must have a scalar value.")
+
+    if isinstance(variableValue, str):
+        label = variableValue
+        return label
+
+    formatSpecifier = f".{GROUPING_VARIABLE_VALUES_ROUND_TO_DIGITS}f"
+    label = format(variableValue, formatSpecifier)
+
+    return label
+
+
+def _getValue(resultsDict, variable):
+    if "[" not in variable:
+        yAxis = resultsDict[variable]
+    else:
+        name, index = str(variable).split("[")
+        index = int(index.replace("]", ""))
+        yAxis = resultsDict[name][index]
+    return yAxis

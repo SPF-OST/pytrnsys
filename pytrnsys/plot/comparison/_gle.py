@@ -3,13 +3,12 @@
 
 __all__ = ["writeFiles"]
 
+import dataclasses as _dc
 import pathlib as _pl
 import typing as _tp
-import dataclasses as _dc
 
+import pytrnsys.plot.comparison.common as _common
 import pytrnsys.plot.plotGle as _pgle
-
-from . import _common
 
 
 def writeFiles(
