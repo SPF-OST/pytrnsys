@@ -15,9 +15,6 @@ import datetime
 logger = logging.getLogger("root")
 import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
 
-# from __future__ import print_function
-
-
 def getNumberOfCPU():
     """Returns the number of CPUs in the system"""
     num = 1
@@ -38,10 +35,6 @@ def getNumberOfCPU():
             pass
 
     return num
-
-
-def getExclusiveAffinityMask(cpu):
-    return 2 ** (cpu - 1)
 
 
 def runParallel(
@@ -102,7 +95,7 @@ def runParallel(
     cpu = 1
 
     for cmd in cmds:
-        newTask = "start /wait /affinity %s " % (getExclusiveAffinityMask(cpu)) + cmd
+        newTask = cmd
 
         newCmds.append(newTask)
 
@@ -132,7 +125,7 @@ def runParallel(
     for core in cP.keys():
         # print cP[core]
 
-        cP[core]["cmd"] = "start /wait /affinity %s " % (getExclusiveAffinityMask(cP[core]["cpu"])) + openCmds.pop(0)
+        cP[core]["cmd"] = openCmds.pop(0)
         cP[core]["case"] = caseNr
         caseNr += 1
 
@@ -300,9 +293,7 @@ def runParallel(
                         # assign new command if there are open commands:
 
                         if openCmds:
-                            cP[core]["cmd"] = "start /wait /affinity %s " % (
-                                getExclusiveAffinityMask(cP[core]["cpu"])
-                            ) + openCmds.pop(0)
+                            cP[core]["cmd"] = openCmds.pop(0)
                             cP[core]["case"] = caseNr
                             caseNr += 1
                             activeP[cP[core]["cpu"] - 1] = 1
