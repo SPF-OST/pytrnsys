@@ -18,8 +18,6 @@ class TestCostCalculation:
         ["costSolarIce_HpSplit_typeOfProcess_json.json", "results_json_files"],
     ]
 
-    @pytest.mark.ci
-    @pytest.mark.linux
     @pytest.mark.parametrize(["costConfigFileName", "resultsDirName"], CONFIG_FILE_RESULTS_DIR_PAIRS)
     def test(
         self,
