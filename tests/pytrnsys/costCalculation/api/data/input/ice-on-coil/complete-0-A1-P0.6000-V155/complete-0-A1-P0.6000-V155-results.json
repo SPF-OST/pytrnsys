@@ -37,27 +37,7 @@
   "Vol_TesUsed": 0,
   "averagePowerGW2500flh": 0.0025341094279789336,
   "cumsum_QmismatchSourceDemand_End": 1123234.0804224391,
-  "energyCost": {
-    "mean": 0.13858959194257162,
-    "toLowerBound": 0.0,
-    "toUpperBound": 0.0
-  },
   "fullLoadHoursAt6MW": 1055.8789283245558,
-  "investment": {
-    "mean": 10890694.017128462,
-    "toLowerBound": 0.0,
-    "toUpperBound": 0.0
-  },
-  "investmentPerM2": {
-    "mean": 1460.170657140582,
-    "toLowerBound": 0.0,
-    "toUpperBound": 0.0
-  },
-  "investmentPerMWh": {
-    "mean": 1460.170657140582,
-    "toLowerBound": 0.0,
-    "toUpperBound": 0.0
-  },
   "nCycleLat": 1.3568573627725347,
   "nCycleSen": 2.596000171610745,
   "nCycleTotal": 1.8789383820564518,

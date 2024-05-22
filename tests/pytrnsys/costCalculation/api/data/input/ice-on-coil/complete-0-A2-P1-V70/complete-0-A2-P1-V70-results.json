@@ -29,26 +29,6 @@
   "VIceS": 9887.03993860846,
   "Vol_TesUsed": 0,
   "averagePowerGW2500flh": 0.005382183408144739,
-  "energyCost": {
-    "mean": 0.11380318045067216,
-    "toLowerBound": 0.0,
-    "toUpperBound": 0.0
-  },
   "fullLoadHoursAt6MW": 2242.576420060308,
-  "investment": {
-    "mean": 15901833.942306297,
-    "toLowerBound": 0.0,
-    "toUpperBound": 0.0
-  },
-  "investmentPerM2": {
-    "mean": 639.611891053756,
-    "toLowerBound": 0.0,
-    "toUpperBound": 0.0
-  },
-  "investmentPerMWh": {
-    "mean": 1279.223782107512,
-    "toLowerBound": 0.0,
-    "toUpperBound": 0.0
-  },
   "spf": 4.602344198619091
 }
