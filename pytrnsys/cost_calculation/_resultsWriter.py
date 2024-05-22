@@ -94,11 +94,12 @@ class ResultsWriter:
         if collectorComponents:
             collectorComponent = collectorComponents[0]
             size = collectorComponent.value
-            totalCostPerM2 = totalCost / size.value
-            costsDict = {
-                **costsDict,
-                "investmentPerM2": totalCostPerM2.to_dict(),
-            }
+            if(size.value > 0.):
+                totalCostPerM2 = totalCost / size.value
+                costsDict = {
+                    **costsDict,
+                    "investmentPerM2": totalCostPerM2.to_dict(),
+                }
 
         hpComponents = [c for g in output.componentGroups.groups for c in g.components.factors if c.name == "Heat pump"]
 
