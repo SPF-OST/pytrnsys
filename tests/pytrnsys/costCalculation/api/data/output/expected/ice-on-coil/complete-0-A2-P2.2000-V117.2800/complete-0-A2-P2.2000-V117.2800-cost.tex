@@ -1,0 +1,92 @@
+\documentclass[english]{SPFShortReport}
+\usepackage{subfigure}
+\usepackage{longtable}
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage{adjustbox}
+\usepackage{gensymb}
+\usepackage{booktabs}
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\reportName{complete-0-A2-P2.2000-V117.2800}
+\reportSubName{Energy generation costs} 
+\reportDate{\today \hspace{0.1cm} at: \currenttime \hspace{0.1cm} h} 
+\author{<not-set>}
+\address{<not-set>}
+\begin{document}
+\begin{table}[!ht]
+\centering
+\caption{Assumptions for calculation of heat generation costs}
+\begin{adjustbox}{max width =\textwidth}
+\begin{tabular}{l | c c c } 
+\hline
+\hline
+$$ &$$ &$$ &$$ \\ 
+\hline
+Rate & 1.0 \% per annum\\
+Analysis period & 30 years\\
+Maintenance & 1.0 \% of Investment costs per year \\
+\hline \\
+Electricity & Fix costs:  0  Fr. per year \\
+ & Variable costs:  0.20 $Fr.$ $per$ $kWh$ \\
+Increase of electricity costs & 0.0 \% per year \\
+Electricity costs year 1 & 1185758 Fr. in year 1 \\
+Energy demand per year & 27347861 kWh \\
+\hline
+\hline
+\end{tabular}
+\end{adjustbox}
+\label{definitionTable}
+\end{table}
+\begin{table}[!ht]
+\centering
+\caption{System and Heat generation costs (all values incl. 8$\%$ VAT) }
+\begin{adjustbox}{max width =\textwidth}
+\begin{tabular}{l | c c c c c } 
+\hline
+\hline
+Group &Component &Costs &Size &LifeTime &Total Costs \\ 
+ & &[CHF] & &Years &[CHF]\\ 
+\hline
+\\
+\hline \\
+\textbf{Col} & Collector & 0+400/m$^2$ & 54695.72 m$^2$ & 30 & 21878289.1 (83.8\%) \\
+\hline \\
+\hline \\
+\textbf{IceSlurryStorage} & pit storage casing & 0+100/m$^3$ & 36443.06 m$^3$ & 20 & 3644306.4 (14.0\%) \\
+ & Crystallizer & 0+100/kW & 6000.00 kW & 20 & 600000.0 (2.3\%) \\
+&\cline{1-5}
+ & \textbf{Total IceSlurryStorage} & & & & 4244306.4 (16.2\%) \\
+\hline \\
+ & \textbf{Total Investment Cost} & & & & \textbf{26122595.53} (100\%) \\ 
+\hline \\ 
+\hline \\ 
+Annuity & Annuity (yearly costs over lifetime)  &&& & 2529925 /a  \\
+ & Share of Investment & &&& 1082942 /a (43\%) \\
+ & Share of Electricity & 0+0.20/kWh & 5928788 kWh &  & 1185758 /a (47\%)\\
+ & Share of Maintenance & &&& 261226 /a (10\%)\\ 
+ & Share of Yearly cost & 0+0.00/kWh & 5928788 kWh & &  0 /a ( 0\%)\\
+ & Share of Residual Value &&& &  0 /a ( 0\%)\\
+Present Value  & Present Value of all costs  & &&& 63465922.47 CHF \\
+\hline \\ 
+ Energy Generation Costs & Using annuity: &&& 9.25 & Rp./kWh \\
+\hline
+\hline
+\end{tabular}
+\end{adjustbox}
+\label{CostsTable}
+\end{table}
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{costShare-complete-0-A2-P2.2000-V117.2800.pdf}
+\caption{System cost}
+\label{systemCost}
+\end{center}
+\end{figure}
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{costShareAnnuity-complete-0-A2-P2.2000-V117.2800.pdf}
+\caption{System cost annuity share}
+\label{systemCostannuity}
+\end{center}
+\end{figure}
+\end{document}
