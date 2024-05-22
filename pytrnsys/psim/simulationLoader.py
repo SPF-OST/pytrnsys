@@ -127,7 +127,7 @@ class SimulationLoader:
         else:
             pathFile = os.path.join(self._path, file)
         fileType = self._fileSniffer(pathFile)
-        nRows = self._fileLen(pathFile)
+        nRows = self._getNumberOfLines(pathFile)
 
         self.myShortMonths = None
 
@@ -261,20 +261,11 @@ class SimulationLoader:
                 if "TIME" in f.readline():
                     return _ResultsFileType.TIMESTEP
 
-    def _fileLen(self, fname):
-        with open(fname) as f:
-            for i, l in enumerate(f):
-                pass
-        return i + 1
-
-    def loadHourlyFile(self, file):
-        file = pd.read_csv(pathFile, header=1, delimiter=";", nrows=nRows - 1).rename(columns=lambda x: x.strip())
-        file.set_index("Time", inplace=True, drop=False)
-        period = datetime(2018, 1, 1) + pd.to_timedelta(file["Time"], unit="h")
-        file["Time"] = period
-        file.set_index("Time", inplace=True)
-        cols_to_use = [item for item in file.columns[:-1] if item not in set(self.houDataDf.columns)]
-        self.houDataDf = pd.merge(self.houDataDf, file[cols_to_use], left_index=True, right_index=True, how="outer")
+    @staticmethod
+    def _getNumberOfLines(filePath: str) -> int:
+        with open(filePath) as f:
+            nLines = sum(1 for _ in f)
+            return nLines
 
 
 class _ResultsFileType(Enum):

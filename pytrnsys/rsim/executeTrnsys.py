@@ -203,10 +203,14 @@ class ExecuteTrnsys:
             else:
                 cmd = self.trnsysExePath + " " + useDeckName + ext
         else:
-            if useDeckName == False:
-                cmd = self.trnsysExePath + " " + self.nameDckPathOutput + " /N"
+            if inputDict["keepOnlinePlotter"]:
+                ext = ''
             else:
-                cmd = self.trnsysExePath + " " + useDeckName + " /N"
+                ext = ' /N'
+            if useDeckName == False:
+                cmd = self.trnsysExePath + " " + self.nameDckPathOutput + ext
+            else:
+                cmd = self.trnsysExePath + " " + useDeckName + ext
 
         #        myCmd ='"%s"'%cmd #for blank spaces in paths
 

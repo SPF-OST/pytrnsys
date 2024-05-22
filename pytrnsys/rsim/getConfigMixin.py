@@ -59,7 +59,7 @@ class GetConfigMixin:
                 sizeCase = len(variations[n]) - 2
                 if sizeCase != sizeOneVariation:
                     raise ValueError(
-                        "for combineAllCases=False all variations must have same lenght :%d case n:%d has a lenght of :%d"
+                        "for combineAllCases=False all variations must have same length :%d case n:%d has a length of :%d"
                         % (sizeOneVariation, n + 1, sizeCase)
                     )
 

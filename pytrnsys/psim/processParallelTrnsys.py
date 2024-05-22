@@ -18,7 +18,7 @@ import numpy as num
 import pandas as pd
 import seaborn as _seb
 
-import pytrnsys.cost_calculation as _cc
+import pytrnsys.costCalculation as _cc
 import pytrnsys.plot.comparison as _pc
 import pytrnsys.plot.plotMatplotlib as plot
 import pytrnsys.psim.conditions as _conds
@@ -129,9 +129,9 @@ class ProcessParallelTrnsys:
         self.inputs["firstMonth"] = "January"  # 0=January 1=February 7=August
         self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder"  # "casesDefined"
-        self.inputs["forceProcess"] = (
-            True  # even if results file exist it proceess the results, otherwise it checks if it exists
-        )
+        self.inputs[
+            "forceProcess"
+        ] = True  # even if results file exist it proceess the results, otherwise it checks if it exists
         if pathBase:
             self.inputs["pathBase"] = pathBase
         else:

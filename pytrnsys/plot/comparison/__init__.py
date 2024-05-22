@@ -11,9 +11,9 @@ import typing as _tp
 
 import matplotlib.pyplot as _plt
 
+import pytrnsys.plot.comparison.common as _common
 import pytrnsys.psim.conditions as _conds
 import pytrnsys.report.latexReport as _latex
-from . import _common
 from . import _gle
 
 
@@ -32,6 +32,8 @@ def createPlot(
     extensionFig,
 ):
     xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions = _separatePlotVariables(plotVariables)
+
+    assert seriesVariable != "" and chunkVariable != ""
 
     resultFilePaths = _getResultsFilePaths(pathFolder, typeOfProcess, logger)
     if not resultFilePaths:
@@ -58,11 +60,11 @@ def createPlot(
     if isinstance(manySeriesOrChunks, _common.ManyChunks) and len(manySeriesOrChunks.chunks) > len(styles):
         raise AssertionError("Too many chunks")
 
-    doc = _createLatexDoc(configPath, latexNames)
-
     fig, ax = _plt.subplots(constrained_layout=True)
 
-    chunkLabels, dummyLines = _plotValues(ax, manySeriesOrChunks, shallPlotUncertainties, styles, doc)
+    chunkLabels, dummyLines = _plotValues(ax, manySeriesOrChunks, shallPlotUncertainties, styles)
+
+    doc = _createLatexDoc(configPath, latexNames)
 
     _setLegendsAndLabels(
         fig, ax, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, chunkLabels, dummyLines, doc
@@ -103,8 +105,8 @@ def _separatePlotVariables(plotVariables):
     xAxisVariable = plotVariables[0]
     yAxisVariable = plotVariables[1]
 
-    seriesVariable = ""
-    chunkVariable = ""
+    seriesVariable = None
+    chunkVariable = None
 
     serializedConditions = plotVariables[2:]
     if len(plotVariables) >= 3 and not _conds.mayBeSerializedCondition(plotVariables[2]):
@@ -138,61 +140,43 @@ def _getExistingResultsFilePaths(pathFolder: _pl.Path, logger: _log.Logger) -> _
     missingResultsFilePaths = sorted(set(resultFilePaths) - set(existingResultsFilePaths))
 
     if missingResultsFilePaths:
-        formattedMissingresultsFilePaths = "\n\t".join(str(p) for p in missingResultsFilePaths)
+        formattedMissingResultsFilePaths = "\n\t".join(str(p) for p in missingResultsFilePaths)
         logger.warning(
-            "The following expected result files could not be found:\n\t%s", formattedMissingresultsFilePaths
+            "The following expected result files could not be found:\n\t%s", formattedMissingResultsFilePaths
         )
 
     return existingResultsFilePaths
 
 
 def _loadValues(
-    resultsFilePaths, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions, shallPlotUncertainties
+    resultsFilePaths: _tp.Sequence[_pl.Path],
+    xAxisVariable: str,
+    yAxisVariable: str,
+    seriesVariable: str | None,
+    chunkVariable: str | None,
+    conditions: _conds.Conditions,
+    shallPlotUncertainties: bool,
 ) -> _tp.Union[_common.ManySeries, _common.ManyChunks, None]:
-    values = {}
-    for resultsFilePath in resultsFilePaths:
-        results = _loadResults(resultsFilePath)
+    allResults = [
+        results
+        for p in resultsFilePaths
+        if (results := _loadResults(p)) and conditions.doResultsSatisfyConditions(results)
+    ]
 
-        conditionsFulfilled = conditions.doResultsSatisfyConditions(results)
-        if not conditionsFulfilled:
-            continue
-
-        xAxis = _getValue(results, xAxisVariable)
-        yAxis = _getValue(results, yAxisVariable)
-
-        chunkVariableValue = results[chunkVariable] if chunkVariable else None
-        if chunkVariableValue not in values:
-            values[chunkVariableValue] = {}
-        chunk = values[chunkVariableValue]
-
-        seriesVariableValue = results[seriesVariable] if seriesVariable else None
-        if seriesVariableValue not in chunk:
-            chunk[seriesVariableValue] = []
-        seriesValues = chunk[seriesVariableValue]
-
-        seriesValues.append((xAxis, yAxis))
-
-    manySeriesOrChunks = _common.createManySeriesOrManyChunksFromValues(
-        xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, values, shallPlotUncertainties
+    return _common.createManySeriesOrManyChunksFromResults(
+        allResults,
+        xAxisVariable,
+        yAxisVariable,
+        seriesVariable,
+        chunkVariable,
+        shallPlotUncertainties,
     )
 
-    return manySeriesOrChunks
 
-
-def _loadResults(resultsFilePath) -> _tp.Dict[str, _tp.Any]:
+def _loadResults(resultsFilePath) -> _tp.Mapping[str, _tp.Any]:
     serializedResults = resultsFilePath.read_text()
     resultsDict = _json.loads(serializedResults)
     return resultsDict
-
-
-def _getValue(resultsDict, variable):
-    if "[" not in variable:
-        yAxis = resultsDict[variable]
-    else:
-        name, index = str(variable).split("[")
-        index = int(index.replace("]", ""))
-        yAxis = resultsDict[name][index]
-    return yAxis
 
 
 def _configurePypltStyle(stylesheet):
@@ -209,7 +193,6 @@ def _plotValues(
     manySeriesOrChunks: _tp.Union[_common.ManySeries, _common.ManyChunks],
     shallPlotUncertainties,
     styles,
-    doc,
 ):
     if isinstance(manySeriesOrChunks, _common.ManySeries):
         allSeries = manySeriesOrChunks.allSeries
@@ -217,9 +200,8 @@ def _plotValues(
 
         colors = _getSeriesColors(len(allSeries))
 
-        seriesLabels = set()
         for series, seriesColor in zip(allSeries, colors):
-            _plotSeries(ax, series, chunkStyle, seriesColor, seriesLabels, doc, shallPlotUncertainties)
+            _plotSeries(ax, series, chunkStyle, seriesColor, shallPlotUncertainties)
 
         return [], []
     elif isinstance(manySeriesOrChunks, _common.ManyChunks):
@@ -227,17 +209,16 @@ def _plotValues(
 
         dummyLines = []
         chunkLabels = []
-        seriesLabels = set()
         for chunk, chunkStyle in zip(manySeriesOrChunks.chunks, styles):
             dummyLines.append(ax.plot([], [], chunkStyle, c="black"))
-            chunkLabel = _getChunkLabel(chunk.groupingValue.value)
+            chunkLabel = chunk.groupingValue.label
 
             if chunkLabel:
                 chunkLabels.append(chunkLabel)
 
             allSeries = chunk.allSeries
             for series, seriesColor in zip(allSeries, colors):
-                _plotSeries(ax, series, chunkStyle, seriesColor, seriesLabels, doc, shallPlotUncertainties)
+                _plotSeries(ax, series, chunkStyle, seriesColor, shallPlotUncertainties)
 
         return chunkLabels, dummyLines
 
@@ -245,10 +226,8 @@ def _plotValues(
         raise AssertionError("Can't get here.")
 
 
-def _plotSeries(ax, series, style, color, seriesLabels, doc, shallPlotUncertainties):
-    seriesVariableValue = series.groupingValue.value if series.groupingValue else None
-
-    label = _getSeriesLabelOrNone(seriesVariableValue, seriesLabels, doc)
+def _plotSeries(ax, series, style, color, shallPlotUncertainties):
+    label = series.groupingValue.label if series.groupingValue else None
 
     abscissa = series.abscissa
     ordinate = series.ordinate
@@ -267,7 +246,7 @@ def _plotSeries(ax, series, style, color, seriesLabels, doc, shallPlotUncertaint
         ax.plot(abscissa.means, ordinate.means, style, color=color, label=label)
 
 
-def _createLatexDoc(configPath, latexNames):
+def _createLatexDoc(configPath, latexNames) -> _latex.LatexReport:
     doc = _latex.LatexReport("", "")
     if latexNames:
         if ":" in latexNames:
@@ -287,36 +266,6 @@ def _getSeriesColors(numberOfSeries: int) -> _tp.Sequence[_tp.Any]:
     seriesColors = [colors[i % nColors] for i in range(numberOfSeries)]
 
     return seriesColors
-
-
-def _getChunkLabel(chunkVariableValue):
-    if chunkVariableValue is None:
-        return None
-
-    if isinstance(chunkVariableValue, str):
-        return chunkVariableValue
-
-    roundedValue = round(float(chunkVariableValue), 2)
-    return "{:.2f}".format(roundedValue)
-
-
-def _getSeriesLabelOrNone(seriesVariableValue, labelSet, doc):
-    if seriesVariableValue is None:
-        return None
-
-    labelValue = seriesVariableValue if isinstance(seriesVariableValue, str) else round(float(seriesVariableValue), 2)
-
-    if labelValue in labelSet:
-        return None
-
-    labelSet.add(labelValue)
-
-    if not isinstance(labelValue, str):
-        label = "{0:.1f}".format(labelValue)
-    else:
-        label = doc.getNiceLatexNames(labelValue)
-
-    return label
 
 
 def _setLegendsAndLabels(

@@ -12,26 +12,40 @@ jobs:
     runs-on:
       - self-hosted
       - spf-windows-gh-runners
+
     steps:
     - uses: actions/checkout@v2
+    
     - name: Remove old venv
       run: |
         if (Test-Path -LiteralPath venv) {
           Remove-Item -LiteralPath venv -Recurse
         }
+    
     - name: Create virtual environment
       run: py -3.12 -m venv venv
+    
     - name: Install dependencies
       run: |
         venv\Scripts\python -m pip install --upgrade pip
         venv\Scripts\python -m pip install wheel
         venv\Scripts\python -m pip install -r requirements/test.txt
+    
     - name: Static type checking with mypy
       run: venv\Scripts\python dev-tools\devTools.py --type
+    
     - name: Lint with pylint
       run: venv\Scripts\python dev-tools\devTools.py --lint --keep-results
+    
     - name: Test with pytest
       run: venv\Scripts\python dev-tools\devTools.py --unit "not manual and not linux and not tool" --keep-results
+
+    - name: Post coverage report to Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: test-results/coverage.lcov
+    
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
@@ -39,6 +53,7 @@ jobs:
         path: test-results
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+    
     - name: Trigger build of `pytrnsys-gui` executable
       uses: peter-evans/repository-dispatch@v2
       with:

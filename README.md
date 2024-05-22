@@ -1,6 +1,8 @@
 
 # pytrnsys: The python TRNSYS tool kit
  
+[![Coverage Status](https://coveralls.io/repos/github/SPF-OST/pytrnsys/badge.svg?branch=master)](https://coveralls.io/github/SPF-OST/pytrnsys?branch=master)
+
 The pytrnsys package provides a complete framework to run and process, plot and report 
 TRNSYS simulations. It is designed to give researchers a fast,
 fully automatized and easily reproducible way to execute and share TRNSYS simulations by the use of a single short
@@ -26,7 +28,7 @@ to develop the code, you will need git. Then you should follow the "Installation
 
 ##### Required
 
-1. [Python 3.9](https://www.python.org/downloads/)
+1. [Python 3.12](https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe)
 
 #### Getting started
 
@@ -34,27 +36,27 @@ to develop the code, you will need git. Then you should follow the "Installation
    into the search box and hitting enter). The following commands should be entered
    into the command prompt just opened.
 
-1. Navigate to the directory which should contain the `pytrnsys` directory:
+2. Navigate to the directory which should contain the `pytrnsys` directory:
     ```commandline
     cd [your-directory]
     ```
    Replace `[your-directory]` (including the brackets []) with your directory of choice: if your
 directory is called `foo` then `pytrnsys` will be installed to `foo\pytrnsys`.
    
-1. Create a virtual environment:
+3. Create a virtual environment:
     ```commandline
-    py -3.9 -m venv pytrnsys
+    py -3.12 -m venv pytrnsys
     ```
-1. Activate it:
+4. Activate it:
     ```commandline
     pytrnsys\Scripts\activate
     ```
-1. Install the `wheel` package:
+5. Install the `wheel` package:
     ```commandline
     pip install wheel
     ```
          
-1. Install `pytrnsys` and its requirements:
+6. Install `pytrnsys` and its requirements:
     ```commandline
     pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys/v0.6.4-reqs/requirements/releases/v0.6.4/requirements.txt
     ```
@@ -76,8 +78,8 @@ to the respective folder of your TRNSYS installation::
 
 ##### Required
 
-1. [Python 3.9](https://www.python.org/downloads/)
-1. A local clone of the following GIT repository:
+1. [Python 3.12](https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe)
+2. A local clone of the following GIT repository:
     `https://github.com/SPF-OST/pytrnsys.git`
 
 ##### Recommended
@@ -90,16 +92,16 @@ specified are for a Windows environment. They are very similar for Linux.
 
 1. Create a virtual environment:
     ```commandline
-    py -3.9 -m venv venv
+    py -3.12 -m venv venv
     ```
-1. Activate it:
+2. Activate it:
     ```commandline
     venv\Scripts\activate
     ```
-1. Install the requirements:
+3. Install the requirements:
     ```commandline
     pip install wheel
-    pip install -r requirements\dev\requirements.txt
+    pip install -r requirements\dev.txt
     ```
    
 Several original types are delivered with pytrnsys. For those you'll manually need to copy the dll-files from:
@@ -123,11 +125,8 @@ This code was not initially developed with the intention to be shared with other
 but after realizing that it could help the community to have a better workflow with TRNSYS, we decided to share it.
 
 #### Current developers: 
-- Daniel Carbonell
-- Martin Neugebauer
 - Damian Birchler
-- Jeremias Schmidli
-- Maike Schubert
+- Alex Hobé
 
 All current developers are based at the Institute for Solar Technology (SPF) at the Eastern Switzerland University of 
 Applied Sciences (OST) in Rapperswil.
@@ -136,7 +135,7 @@ Applied Sciences (OST) in Rapperswil.
  
 A first version of this package was created in 2013 and since then it has evolved considerably. 
 We would like to thank the Swiss Federal Office Of Energy (SFOE) 
-who supported many projects related to simulations of renewable energy systems where this code has been developed. 
+who supported many projects related to simulations of renewable energy systems within which this code has been developed. 
 We would also like to thank the European Union’s Horizon 2020 research and innovation programme
 for the funding received in TRI-HP under the Grant Agreement No. 81488. 
-This project allowed to decicate efforts in sharing the code with the consortium and to make the code usable for the others.  
+The grant allowed us to invest in, among other thing, making the code more usable for users outside SPF.  
