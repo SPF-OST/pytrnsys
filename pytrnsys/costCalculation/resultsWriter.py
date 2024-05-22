@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 __all__ = ["ResultsWriter"]
 
@@ -201,7 +200,7 @@ class ResultsWriter:
             colors.append(myColors[i])
             explode.append(0.0)  # (0.05)
 
-        patches, texts, autotexts = plt.pie(
+        patches, texts, autotexts = plt.pie(  # type: ignore[misc]
             fracs,
             labels=legends,
             explode=explode,
@@ -235,7 +234,7 @@ class ResultsWriter:
     ):
         simulationName = self._getSimulationName(resultsJsonFilePath)
 
-        doc = latex.LatexReport(str(resultsJsonFilePath.parent), simulationName)
+        doc = latex.LatexReport(str(resultsJsonFilePath.parent), simulationName)  # type: ignore[attr-defined]
         doc.resetTexName(simulationName + "-cost")
 
         doc.setSubTitle("Energy generation costs")
@@ -269,7 +268,11 @@ class ResultsWriter:
         return parameters.cleanModeLatex if self.cleanModeLatex is None else self.cleanModeLatex
 
     @staticmethod
-    def _addTableEconomicAssumptions(parameters: _input.Parameters, output: _output.Output, doc: latex.LatexReport):
+    def _addTableEconomicAssumptions(
+        parameters: _input.Parameters,
+        output: _output.Output,
+        doc: latex.LatexReport,  # type: ignore[name-defined]
+    ) -> None:
         caption = "Assumptions for calculation of heat generation costs"
         names = ["", "", "", ""]
         units = None

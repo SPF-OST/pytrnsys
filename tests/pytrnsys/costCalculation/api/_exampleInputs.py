@@ -1,11 +1,11 @@
-from pytrnsys.costCalculation.models.common import LinearCoefficients
-from pytrnsys.costCalculation.models.input import Component
-from pytrnsys.costCalculation.models.input import ComponentGroup
-from pytrnsys.costCalculation.models.input import Input
-from pytrnsys.costCalculation.models.input import Parameters
-from pytrnsys.costCalculation.models.input import Variable
-from pytrnsys.costCalculation.models.input import YearlyCost
-from pytrnsys.utils.uncertainFloat import UncertainFloat
+from pytrnsys.costCalculation.models.common import LinearCoefficients  # type: ignore[attr-defined]
+from pytrnsys.costCalculation.models.input import Component  # type: ignore[attr-defined]
+from pytrnsys.costCalculation.models.input import ComponentGroup  # type: ignore[attr-defined]
+from pytrnsys.costCalculation.models.input import Input  # type: ignore[attr-defined]
+from pytrnsys.costCalculation.models.input import Parameters  # type: ignore[attr-defined]
+from pytrnsys.costCalculation.models.input import Variable  # type: ignore[attr-defined]
+from pytrnsys.costCalculation.models.input import YearlyCost  # type: ignore[attr-defined]
+from pytrnsys.utils.uncertainFloat import UncertainFloat  # type: ignore[attr-defined]
 
 _BASE_COMPONENT_GROUPS = [
     ComponentGroup(

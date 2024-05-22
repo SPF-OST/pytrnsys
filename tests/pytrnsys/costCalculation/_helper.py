@@ -45,9 +45,8 @@ class Helper:
     def _assertFileStructureEqual(self):
         dircmp = filecmp.dircmp(self.actualResultsDir, self._expectedResultsDir)
 
-        if True:
-            assert not dircmp.left_only
-            assert not dircmp.right_only
+        assert not dircmp.left_only
+        assert not dircmp.right_only
 
     def _assertOutputFilesEqual(self):
         for resultsJsonFilePath in self._expectedResultsDir.rglob("*-results.json"):

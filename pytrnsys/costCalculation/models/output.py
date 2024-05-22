@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 __all__ = ["Output", "ComponentGroups", "ComponentGroup", "CostFactors", "CostFactor"]
 
@@ -97,19 +96,19 @@ class ComponentGroups:
 
     @property
     def cost(self) -> _uf.UncertainFloat:
-        return sum(g.components.cost for g in self.groups)
+        return _sum(g.components.cost for g in self.groups)
 
     @property
     def annuity(self) -> _uf.UncertainFloat:
-        return sum(g.components.annuity for g in self.groups)
+        return _sum(g.components.annuity for g in self.groups)
 
     @property
     def maintenanceCost(self) -> _uf.UncertainFloat:
-        return sum(g.components.maintenanceCost for g in self.groups)
+        return _sum(g.components.maintenanceCost for g in self.groups)
 
     @property
     def npvMaintenanceCost(self) -> _uf.UncertainFloat:
-        return sum(g.components.npvMaintenanceCost for g in self.groups)
+        return _sum(g.components.npvMaintenanceCost for g in self.groups)
 
 
 @_dc.dataclass(frozen=True)
@@ -163,23 +162,23 @@ class CostFactors:
 
     @property
     def cost(self) -> _uf.UncertainFloat:
-        return sum(f.cost for f in self.factors)
+        return _sum(f.cost for f in self.factors)
 
     @property
     def npvCost(self) -> _uf.UncertainFloat:
-        return sum(f.npvCost for f in self.factors)
+        return _sum(f.npvCost for f in self.factors)
 
     @property
     def annuity(self) -> _uf.UncertainFloat:
-        return sum(f.annuity for f in self.factors)
+        return _sum(f.annuity for f in self.factors)
 
     @property
     def maintenanceCost(self) -> _uf.UncertainFloat:
-        return sum(f.maintenanceCost for f in self.factors)
+        return _sum(f.maintenanceCost for f in self.factors)
 
     @property
     def npvMaintenanceCost(self) -> _uf.UncertainFloat:
-        return sum(f.npvMaintenanceCost for f in self.factors)
+        return _sum(f.npvMaintenanceCost for f in self.factors)
 
 
 def _createCostFactor(inputFactor: _input.CostFactor, values, rate, lifetime, period, maintenanceRate):
@@ -300,3 +299,7 @@ class ResidualCost:
         annuityFactor = _ef.getAnnuity(self.rate, self.analysisPeriod)
         annuity = annuityFactor * self.npvResidualValue
         return annuity
+
+
+def _sum(iterable: _tp.Iterable[_uf.UncertainFloat]) -> _uf.UncertainFloat:
+    return sum(iterable, start=_uf.UncertainFloat.zero())

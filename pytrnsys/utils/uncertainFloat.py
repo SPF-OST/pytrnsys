@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 __all__ = ["FloatLike", "UncertainFloat"]
 
@@ -32,7 +31,7 @@ class UncertainFloat(_dcj.JsonSchemaMixin):
         return self.mean + self.toUpperBound
 
     @staticmethod
-    def create(other: FloatLike):
+    def create(other: FloatLike) -> "UncertainFloat":
         if isinstance(other, UncertainFloat):
             return other
 

@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 __all__ = ["LinearCoefficients"]
 

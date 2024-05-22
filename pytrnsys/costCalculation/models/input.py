@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 import dataclasses as _dc
 import dataclasses_jsonschema as _dcj

@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 
 def getNPV(rate: float, analysisPeriod: float) -> float:

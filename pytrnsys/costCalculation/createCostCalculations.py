@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 import collections.abc as _cabc
 import dataclasses as _dc
