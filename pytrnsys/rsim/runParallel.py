@@ -15,6 +15,7 @@ import datetime
 logger = logging.getLogger("root")
 import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
 
+
 def getNumberOfCPU():
     """Returns the number of CPUs in the system"""
     num = 1

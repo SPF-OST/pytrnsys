@@ -1,0 +1,156 @@
+{
+  "_comments": {
+    "Version": 1.0,
+    "Author": "Daniel Carbonell",
+    "Date": "17.03.2021",
+    "General Remarks": "This cost.json config file is to be used for cost calculations of systems with uncertainties'",
+    "IMPORTANT": "Tes data from TRI-HP report. Collector data from R:\\Projekte\\BFE_SolTherm2050\\CostData\\SimulatedCases_WithCost_v6 (01.09.20)"
+  },
+  "componentGroups": [
+    {
+      "name": "TES",
+      "components": [
+         {
+          "name": "Pit Storage",
+          "coeffs": {
+            "offset": {
+              "mean": 0
+            },
+            "slope": {
+              "mean": 65
+            }
+          },
+          "variable": {
+            "name": "Vol_TesUsed",
+            "unit": "m$^3$"
+          },
+          "lifetimeInYears": 30
+        }
+      ]
+    },
+    {
+      "name": "Col",
+      "components": [
+        {
+          "name": "Collector",
+          "coeffs": {
+            "offset": {
+              "mean": 0
+            },
+            "slope": {
+              "mean": 400
+            }
+          },
+          "variable": {
+            "name": "AcollAp",
+            "unit": "m$^2$"
+          },
+          "lifetimeInYears": 30
+        }
+      ]
+    },
+    {
+      "name": "Air Source",
+      "components": [
+        {
+          "name": "Air Heat Exchanger",
+          "coeffs": {
+            "offset": {
+              "mean": 0
+            },
+            "slope": {
+              "mean": 100
+            }
+          },
+          "variable": {
+            "name": "AirHxSize",
+            "unit": "kW"
+          },
+          "lifetimeInYears": 30
+        }
+      ]
+    },
+    {
+      "name": "IceStorage",
+      "components": [
+        {
+          "name": "concrete casing and digging",
+          "coeffs": {
+            "offset": {
+              "mean": 21967
+            },
+            "slope": {
+              "mean": 248.3
+            }
+          },
+          "variable": {
+            "name": "VIceS",
+            "unit": "m$^3$"
+          },
+          "lifetimeInYears": 20
+        },
+        {
+          "name": "heat exchanger",
+          "coeffs": {
+            "offset": {
+              "mean": 0
+            },
+            "slope": {
+              "mean": 352
+            }
+          },
+          "variable": {
+            "name": "VIceS",
+            "unit": "m$^3$"
+          },
+          "lifetimeInYears": 20
+        }
+      ]
+    }
+  ],
+	"yearlyCosts": [
+    {
+      "name": "Yearly cost",
+      "coeffs": {
+        "offset": {
+          "mean": 0
+        },
+        "slope": {
+          "mean": 0.0
+        }
+      },
+      "variable": {
+        "name": "E_yearly_used",
+        "unit": "kWh"
+      }
+    }
+  ],
+ "parameters": {
+    "analysisPeriod": 30,
+    "lifetimeResVal": 30,
+    "cleanModeLatex": true,
+    "qDemandVariable": {
+      "name": "Q_heat_used",
+      "unit": "kWh"
+    },
+    "elFromGridVariable": {
+      "name": "E_yearly_used",
+      "unit": "kWh"
+    },
+    "costElecFix": {
+      "mean": 0
+    },
+    "costElecKWh": {
+      "mean": 0.2
+    },
+    "maintenanceRate": {
+      "mean": 0.01
+    },
+    "costResidual": {
+      "mean": 0
+    },
+    "increaseElecCost": 0,
+    "rate": 0.01
+  }
+}
+
