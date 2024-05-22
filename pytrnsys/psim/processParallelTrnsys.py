@@ -18,7 +18,7 @@ import numpy as num
 import pandas as pd
 import seaborn as _seb
 
-import pytrnsys.cost_calculation as _cc
+import pytrnsys.costCalculation as _cc
 import pytrnsys.plot.comparison as _pc
 import pytrnsys.plot.plotMatplotlib as plot
 import pytrnsys.psim.conditions as _conds

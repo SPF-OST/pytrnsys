@@ -1,0 +1,55 @@
+{
+  "AcollAp": 14917.015300739507,
+  "AirHxSize": 0,
+  "CollAM2PerMWh": 2.0,
+  "CollP_Avg": 989.8719225218823,
+  "CollTIn_Min": -7.497572145617633,
+  "CrysPowerkW": 6000,
+  "EMax_MWh": 349.08123109031146,
+  "EStore_MWh": 414.8387268230014,
+  "E_yearly_used": 1631620.0466293017,
+  "IceM3PerMWh": 0.6,
+  "IceM3PerMWh80": 0.633,
+  "IceM3PerMWhLatent": 0.51,
+  "IceM3PerMWhUsed": 0.51,
+  "MMaxNorm_t_per_GWh": 505.2261178089317,
+  "MStoreNorm_t_per_GWh": 600.3971018864723,
+  "Name": "0",
+  "QIceSMWhperGWh": 53.0,
+  "QPsTotadditional": -9.541492349630246,
+  "QPs_Max": 0.005646675125694,
+  "QPs_Tot": 7.458507650369754,
+  "Q_heat_used": 7458507.650369754,
+  "Qcond_Tot": 7.5085157194774474,
+  "QelHPs_Tot": 1.6425597911297034,
+  "Qsources_Max": 0.01281816492890278,
+  "Qsources_Tot": 8.671278041291679,
+  "VIceLat": 3779.5715795832775,
+  "VIceRatio_Max": 84.14866031522979,
+  "VIceS": 4491.5410006821285,
+  "Vol_TesUsed": 0,
+  "averagePowerGW2500flh": 0.0034685112165166714,
+  "cumsum_QmismatchSourceDemand_End": -1212770.390921923,
+  "energyCost": {
+    "mean": 0.09195208044141713,
+    "toLowerBound": 0.0,
+    "toUpperBound": 0.0
+  },
+  "fullLoadHoursAt6MW": 1445.2130068819463,
+  "investment": {
+    "mean": 7015960.220364016,
+    "toLowerBound": 0.0,
+    "toUpperBound": 0.0
+  },
+  "investmentPerM2": {
+    "mean": 470.3327092529161,
+    "toLowerBound": 0.0,
+    "toUpperBound": 0.0
+  },
+  "investmentPerMWh": {
+    "mean": 940.6654185058322,
+    "toLowerBound": 0.0,
+    "toUpperBound": 0.0
+  },
+  "spf": 4.57122824997032
+}
