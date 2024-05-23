@@ -96,7 +96,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
         self.inputs = {}
         self.inputs["ignoreOnlinePlotter"] = False
         self.inputs["removePopUpWindow"] = False
-        self.inputs["keepOnlinePlotter"] = False
+        self.inputs["autoCloseOnlinePlotter"] = True
         self.inputs["checkDeck"] = True
         self.inputs["reduceCpu"] = 0
         self.inputs["combineAllCases"] = True
