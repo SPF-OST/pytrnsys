@@ -3,6 +3,7 @@ import dataclasses as _dc
 import logging as _log
 import pathlib as _pl
 import typing as _tp
+import filecmp as _fcomp
 
 import pytest as _pt
 
@@ -19,36 +20,59 @@ class TestCase:
     plotVariablesAndConditions: _cabc.Sequence[str]
     resultsDirName: str
     shallPlotUncertainties: bool
+    expectedFileName: str
 
     @property
     def actualResultsDirPath(self) -> _pl.Path:
-        return DATA_DIR_PATH / "input" / self.resultsDirName
+        return self._caseDirPath / "input"
+
+    @property
+    def expectedActualCreatedImageFilePath(self) -> _pl.Path:
+        return self.actualResultsDirPath / self.expectedFileName
+
+    @property
+    def expectedCreatedImageFilePath(self) -> _pl.Path:
+        return self._caseDirPath / "expected" / self.expectedFileName
+
+    @property
+    def _caseDirPath(self):
+        return DATA_DIR_PATH / "cases" / self.resultsDirName
+
+    def assertThatCreateImageIsBinaryEqualToExpected(self) -> None:
+        assert _fcomp.cmp(self.expectedActualCreatedImageFilePath, self.expectedCreatedImageFilePath, shallow=False)
 
 
 def generateResultsTestCases() -> _tp.Iterable[TestCase]:
     yield TestCase(
-        "slurry-cost-uncertain-y", ["QPs_Tot", "energyCost", "CollAM2PerMWh"], "slurry", shallPlotUncertainties=True
+        "slurry-cost-uncertain-y",
+        ["QPs_Tot", "energyCost", "CollAM2PerMWh"],
+        "slurry",
+        True,
+        "QPs_Tot_energyCost_CollAM2PerMWh.png",
     )
 
     yield TestCase(
         "slurry-cost-uncertain-xy",
         ["energyCost", "investmentPerMWh", "CollAM2PerMWh"],
         "slurry",
-        shallPlotUncertainties=True,
+        True,
+        "energyCost_investmentPerMWh_CollAM2PerMWh.png",
     )
 
     yield TestCase(
         "slurry-cost-uncertain-xy-chunk-filter",
         ["energyCost", "investmentPerMWh", "CollAM2PerMWh", "CrysPowerkW", "spf>4.5"],
         "slurry",
-        shallPlotUncertainties=True,
+        True,
+        "energyCost_investmentPerMWh_CollAM2PerMWh_CrysPowerkW_spf_g_4.5.png",
     )
 
     yield TestCase(
         "slurry-cost-uncertain-xy-chunk-filter",
         ["energyCost", "investmentPerMWh", "CollAM2PerMWh", "CrysPowerkW", "spf<=4.5"],
         "slurry",
-        shallPlotUncertainties=True,
+        True,
+        "energyCost_investmentPerMWh_CollAM2PerMWh_CrysPowerkW_spf_l_=4.5.png",
     )
 
 
@@ -61,3 +85,5 @@ class TestComparison:
             LOGGER,
             shallPlotUncertainties=testCase.shallPlotUncertainties,
         )
+
+        testCase.assertThatCreateImageIsBinaryEqualToExpected()
