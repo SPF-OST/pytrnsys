@@ -192,6 +192,8 @@ class ManyChunks:
 
         groupingValueName = list(groupingValueNames)[0]
 
+        assert groupingValueName
+
         return groupingValueName
 
     @property
@@ -201,6 +203,8 @@ class ManyChunks:
             raise ValueError("All series grouping value names must be the same.")
 
         seriesGroupingValueName = list(seriesGroupingValueNames)[0]
+
+        assert seriesGroupingValueName
 
         return seriesGroupingValueName
 
@@ -239,12 +243,20 @@ class ManySeries:
         return abscissaName
 
     @property
-    def groupingValueName(self) -> str:
-        groupingValueNames = {s.groupingValue.name for s in self.allSeries}
+    def groupingValueName(self) -> str | None:
+        if len(self.allSeries) == 1:
+            singleSeries = self.allSeries[0]
+            groupingValueName = singleSeries.groupingValue.name if singleSeries.groupingValue else None
+            return groupingValueName
+
+        groupingValueNames = {s.groupingValue.name if s.groupingValue else None for s in self.allSeries}
         if len(groupingValueNames) != 1:
             raise ValueError("All grouping value names must be the same.")
 
         groupingValueName = list(groupingValueNames)[0]
+
+        if not groupingValueName:
+            raise ValueError("Cannot have an empty grouping value if there's more than one series.")
 
         return groupingValueName
 

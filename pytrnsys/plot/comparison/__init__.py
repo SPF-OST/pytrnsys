@@ -1,8 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
-__all__ = ["createPlot"]
-
 import collections.abc as _cabc
 import json as _json
 import logging as _log
@@ -18,7 +13,7 @@ import pytrnsys.report.latexReport as _latex
 from . import _gle
 
 
-def createPlot(
+def createPlot(  # pylint: disable=too-many-arguments,too-many-locals
     plotVariablesAndConditions: _cabc.Sequence[str],
     resultsDirPath: str,
     logger: _log.Logger,
@@ -30,8 +25,8 @@ def createPlot(
     stylesheetNameOrPath: str | None = None,
     plotStyle: _tp.Literal["dot"] | None = None,
     comparePlotUserName: str | None = None,
-    shallPrintDataForGle: bool = None,
-    shallPlotUncertainties: bool = None,
+    shallPrintDataForGle: bool = False,
+    shallPlotUncertainties: bool = False,
 ):
     xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions = _separatePlotVariables(
         plotVariablesAndConditions
@@ -71,7 +66,7 @@ def createPlot(
     )
 
 
-def createAndSavePlotAndData(
+def createAndSavePlotAndData(  # pylint: disable=too-many-arguments,too-many-locals
     manySeriesOrChunks: _common.ManySeries | _common.ManyChunks,
     resultsFolderPath: str,
     extensionFig,
@@ -145,7 +140,7 @@ def createAndSavePlotAndData(
 def _separatePlotVariables(plotVariables):
     if len(plotVariables) < 2:
         raise ValueError(
-            "You did not specify variable names and labels " "for the x and the y Axis in a compare Plot line"
+            "You did not specify variable names and labels for the x and the y Axis in a `comparePlot` line"
         )
     xAxisVariable = plotVariables[0]
     yAxisVariable = plotVariables[1]
@@ -168,9 +163,9 @@ def _separatePlotVariables(plotVariables):
 
 
 def _getResultsFilePaths(
-    pathFolder: str, typeOfProcess: _tp.Literal["json"] | None, logger: _log.Logger
+    pathFolderAsString: str, typeOfProcess: _tp.Literal["json"] | None, logger: _log.Logger
 ) -> _tp.Sequence[_pl.Path]:
-    pathFolder = _pl.Path(pathFolder)
+    pathFolder = _pl.Path(pathFolderAsString)
 
     if not pathFolder.is_dir():
         raise ValueError("`pathFolder` needs to point to a directory.")
@@ -250,7 +245,8 @@ def _plotValues(
             _plotSeries(ax, series, chunkStyle, seriesColor)
 
         return [], []
-    elif isinstance(manySeriesOrChunks, _common.ManyChunks):
+
+    if isinstance(manySeriesOrChunks, _common.ManyChunks):
         colors = _getSeriesColors(manySeriesOrChunks.chunkLength)
 
         dummyLines = []
@@ -268,8 +264,7 @@ def _plotValues(
 
         return chunkLabels, dummyLines
 
-    else:
-        raise AssertionError("Can't get here.")
+    raise AssertionError("Can't get here.")
 
 
 def _plotSeries(ax, series, style, color):
@@ -279,7 +274,7 @@ def _plotSeries(ax, series, style, color):
     ordinate = series.ordinate
 
     if series.shallPrintUncertainties:
-        _ = ax.errorbar(
+        ax.errorbar(
             x=abscissa.means,
             y=ordinate.means,
             yerr=ordinate.errors,
@@ -288,13 +283,12 @@ def _plotSeries(ax, series, style, color):
             ecolor=color,
             label=label,
         )
-        pass
     else:
         ax.plot(abscissa.means, ordinate.means, style, color=color, label=label)
 
 
-def _createLatexDoc(configPath, latexNames) -> _latex.LatexReport:
-    doc = _latex.LatexReport("", "")
+def _createLatexDoc(configPath, latexNames) -> _latex.LatexReport:  # type: ignore[name-defined]
+    doc = _latex.LatexReport("", "")  # type: ignore[attr-defined]
     if latexNames:
         if ":" in latexNames:
             latexNameFullPath = latexNames
@@ -317,7 +311,7 @@ def _getSeriesColors(numberOfSeries: int) -> _tp.Sequence[_tp.Any]:
 
 def _setLegendsAndLabels(
     fig, ax, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, chunkLabels, dummyLines, doc
-):
+):  # pylint: disable=too-many-arguments
     if chunkVariable:
         legend = fig.legend(
             [dummy_line[0] for dummy_line in dummyLines],
@@ -349,7 +343,7 @@ def _savePlotAndData(
     shallPrintDataForGle,
     shallPlotUncertainties,
     extensionFig,
-):
+):  # pylint: disable=too-many-arguments
     fileName = _getFileName(
         xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileNamePart, comparePlotUserName
     )

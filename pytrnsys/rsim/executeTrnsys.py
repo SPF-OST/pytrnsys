@@ -204,9 +204,9 @@ class ExecuteTrnsys:
                 cmd = self.trnsysExePath + " " + useDeckName + ext
         else:
             if inputDict["autoCloseOnlinePlotter"]:
-                ext = ' /N'
+                ext = " /N"
             else:
-                ext = ''
+                ext = ""
             if useDeckName == False:
                 cmd = self.trnsysExePath + " " + self.nameDckPathOutput + ext
             else:
