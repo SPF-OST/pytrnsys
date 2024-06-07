@@ -9,7 +9,6 @@ import multiprocessing as mp
 import os
 import pathlib as _pl
 import re
-import sys
 import traceback as _tb
 import typing as _tp
 
@@ -129,9 +128,9 @@ class ProcessParallelTrnsys:
         self.inputs["firstMonth"] = "January"  # 0=January 1=February 7=August
         self.inputs["reduceCpu"] = 2
         self.inputs["typeOfProcess"] = "completeFolder"  # "casesDefined"
-        self.inputs[
-            "forceProcess"
-        ] = True  # even if results file exist it proceess the results, otherwise it checks if it exists
+        self.inputs["forceProcess"] = (
+            True  # even if results file exist it proceess the results, otherwise it checks if it exists
+        )
         if pathBase:
             self.inputs["pathBase"] = pathBase
         else:
@@ -636,16 +635,16 @@ class ProcessParallelTrnsys:
             _pc.createPlot(
                 plotVariables,
                 pathFolder,
-                typeOfProcess,
                 logger,
-                latexNames,
-                configPath,
-                stylesheet,
-                plotStyle,
-                comparePlotUserName,
-                setPrintDataForGle,
-                shallPlotUncertainties,
-                extensionFig,
+                imageFileExtension=extensionFig,
+                typeOfProcess=typeOfProcess,
+                relativeLatexNamesFilePath=latexNames,
+                configPath=configPath,
+                stylesheetNameOrPath=stylesheet,
+                plotStyle=plotStyle,
+                comparePlotUserName=comparePlotUserName,
+                shallPrintDataForGle=setPrintDataForGle,
+                shallPlotUncertainties=shallPlotUncertainties,
             )
 
     def plotBarplotConditional(self):

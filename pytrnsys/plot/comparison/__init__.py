@@ -3,6 +3,7 @@
 
 __all__ = ["createPlot"]
 
+import collections.abc as _cabc
 import json as _json
 import logging as _log
 import os as _os
@@ -18,24 +19,27 @@ from . import _gle
 
 
 def createPlot(
-    plotVariables,
-    pathFolder,
-    typeOfProcess,
-    logger,
-    latexNames,
-    configPath,
-    stylesheet,
-    plotStyle,
-    comparePlotUserName,
-    setPrintDataForGle,
-    shallPlotUncertainties,
-    extensionFig,
+    plotVariablesAndConditions: _cabc.Sequence[str],
+    resultsDirPath: str,
+    logger: _log.Logger,
+    *,
+    imageFileExtension: str = ".png",
+    typeOfProcess: _tp.Literal["json"] | None = None,
+    relativeLatexNamesFilePath: str | None = None,
+    configPath: str | None = None,
+    stylesheetNameOrPath: str | None = None,
+    plotStyle: _tp.Literal["dot"] | None = None,
+    comparePlotUserName: str | None = None,
+    shallPrintDataForGle: bool = None,
+    shallPlotUncertainties: bool = None,
 ):
-    xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions = _separatePlotVariables(plotVariables)
+    xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions = _separatePlotVariables(
+        plotVariablesAndConditions
+    )
 
     assert seriesVariable != "" and chunkVariable != ""
 
-    resultFilePaths = _getResultsFilePaths(pathFolder, typeOfProcess, logger)
+    resultFilePaths = _getResultsFilePaths(resultsDirPath, typeOfProcess, logger)
     if not resultFilePaths:
         logger.error("No results.json-files found.")
         logger.error('Unable to generate "comparePlot %s %s %s"', xAxisVariable, yAxisVariable, seriesVariable)
@@ -51,8 +55,34 @@ def createPlot(
         logger.warning("The respective plot cannot be generated.")
         return
 
-    _configurePypltStyle(stylesheet)
+    _configurePypltStyle(stylesheetNameOrPath)
 
+    createAndSavePlotAndData(
+        manySeriesOrChunks,
+        resultsDirPath,
+        imageFileExtension,
+        conditions,
+        relativeLatexNamesFilePath,
+        configPath,
+        plotStyle,
+        comparePlotUserName,
+        shallPrintDataForGle,
+        shallPlotUncertainties,
+    )
+
+
+def createAndSavePlotAndData(
+    manySeriesOrChunks: _common.ManySeries | _common.ManyChunks,
+    resultsFolderPath: str,
+    extensionFig,
+    conditions: _conds.Conditions = _conds.ALL,
+    latexNamesFilePath: str | None = None,
+    configFileDirPath: str | None = None,
+    plotStyle: _tp.Literal["dot"] | None = None,
+    comparePlotUserName: str | None = None,
+    shallPrintDataForGle: bool = False,
+    shallPlotUncertainties: bool = False,
+):
     styles = ["x-", "x--", "x-.", "x:", "o-", "o--", "o-.", "o:"]
     if plotStyle == "dot":
         styles = ["x", "o", "+", "d", "s", "v", "^", "h"]
@@ -62,36 +92,51 @@ def createPlot(
 
     fig, ax = _plt.subplots(constrained_layout=True)
 
-    chunkLabels, dummyLines = _plotValues(ax, manySeriesOrChunks, shallPlotUncertainties, styles)
+    chunkLabels, dummyLines = _plotValues(ax, manySeriesOrChunks, styles)
 
-    doc = _createLatexDoc(configPath, latexNames)
+    doc = _createLatexDoc(configFileDirPath, latexNamesFilePath)
 
+    seriesGroupingValueName = (
+        manySeriesOrChunks.seriesGroupingValueName
+        if isinstance(manySeriesOrChunks, _common.ManyChunks)
+        else manySeriesOrChunks.groupingValueName
+    )
+    chunkGroupingValueName = (
+        manySeriesOrChunks.groupingValueName if isinstance(manySeriesOrChunks, _common.ManyChunks) else None
+    )
     _setLegendsAndLabels(
-        fig, ax, xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, chunkLabels, dummyLines, doc
+        fig,
+        ax,
+        manySeriesOrChunks.abscissaName,
+        manySeriesOrChunks.ordinateName,
+        seriesGroupingValueName,
+        chunkGroupingValueName,
+        chunkLabels,
+        dummyLines,
+        doc,
     )
 
     conditionsFileNamePart, conditionsTitle = _getConditionsFileNameAndTitle(conditions)
-
     if conditionsTitle:
         ax.set_title(conditionsTitle)
 
     allSeries = (
         manySeriesOrChunks.allSeries
         if isinstance(manySeriesOrChunks, _common.ManySeries)
-        else [s for c in manySeriesOrChunks.chunks for s in c.allSeries]
+        else [s for c in manySeriesOrChunks.chunks for s in c.manySeries.allSeries]
     )
 
     _savePlotAndData(
         fig,
-        xAxisVariable,
-        yAxisVariable,
-        seriesVariable,
-        chunkVariable,
-        pathFolder,
+        manySeriesOrChunks.abscissaName,
+        manySeriesOrChunks.ordinateName,
+        seriesGroupingValueName,
+        chunkGroupingValueName,
+        resultsFolderPath,
         comparePlotUserName,
         conditionsFileNamePart,
         allSeries,
-        setPrintDataForGle,
+        shallPrintDataForGle,
         shallPlotUncertainties,
         extensionFig,
     )
@@ -122,7 +167,9 @@ def _separatePlotVariables(plotVariables):
     return xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditions
 
 
-def _getResultsFilePaths(pathFolder: str, typeOfProcess: str, logger: _log.Logger) -> _tp.Sequence[_pl.Path]:
+def _getResultsFilePaths(
+    pathFolder: str, typeOfProcess: _tp.Literal["json"] | None, logger: _log.Logger
+) -> _tp.Sequence[_pl.Path]:
     pathFolder = _pl.Path(pathFolder)
 
     if not pathFolder.is_dir():
@@ -191,9 +238,8 @@ def _configurePypltStyle(stylesheet):
 def _plotValues(
     ax: _plt.Axes,
     manySeriesOrChunks: _tp.Union[_common.ManySeries, _common.ManyChunks],
-    shallPlotUncertainties,
-    styles,
-):
+    styles: _cabc.Sequence[str],
+) -> tuple[_cabc.Sequence[str], _cabc.Sequence[_tp.Any]]:
     if isinstance(manySeriesOrChunks, _common.ManySeries):
         allSeries = manySeriesOrChunks.allSeries
         chunkStyle = styles[0]
@@ -201,7 +247,7 @@ def _plotValues(
         colors = _getSeriesColors(len(allSeries))
 
         for series, seriesColor in zip(allSeries, colors):
-            _plotSeries(ax, series, chunkStyle, seriesColor, shallPlotUncertainties)
+            _plotSeries(ax, series, chunkStyle, seriesColor)
 
         return [], []
     elif isinstance(manySeriesOrChunks, _common.ManyChunks):
@@ -216,9 +262,9 @@ def _plotValues(
             if chunkLabel:
                 chunkLabels.append(chunkLabel)
 
-            allSeries = chunk.allSeries
+            allSeries = chunk.manySeries.allSeries
             for series, seriesColor in zip(allSeries, colors):
-                _plotSeries(ax, series, chunkStyle, seriesColor, shallPlotUncertainties)
+                _plotSeries(ax, series, chunkStyle, seriesColor)
 
         return chunkLabels, dummyLines
 
@@ -226,22 +272,23 @@ def _plotValues(
         raise AssertionError("Can't get here.")
 
 
-def _plotSeries(ax, series, style, color, shallPlotUncertainties):
+def _plotSeries(ax, series, style, color):
     label = series.groupingValue.label if series.groupingValue else None
 
     abscissa = series.abscissa
     ordinate = series.ordinate
 
-    if shallPlotUncertainties:
-        ax.errorbar(
-            abscissa.means,
-            ordinate.means,
-            ordinate.errors,
-            abscissa.errors,
-            style,
-            color,
-            label,
+    if series.shallPrintUncertainties:
+        _ = ax.errorbar(
+            x=abscissa.means,
+            y=ordinate.means,
+            yerr=ordinate.errors,
+            xerr=abscissa.errors,
+            fmt=style,
+            ecolor=color,
+            label=label,
         )
+        pass
     else:
         ax.plot(abscissa.means, ordinate.means, style, color=color, label=label)
 
@@ -299,7 +346,7 @@ def _savePlotAndData(
     comparePlotUserName,
     conditionsFileNamePart,
     allSeries,
-    setPrintDataForGle,
+    shallPrintDataForGle,
     shallPlotUncertainties,
     extensionFig,
 ):
@@ -310,7 +357,7 @@ def _savePlotAndData(
     fig.savefig(_os.path.join(pathFolder, fileName + extensionFig), bbox_inches="tight")
     _plt.close()
 
-    if setPrintDataForGle:
+    if shallPrintDataForGle:
         _gle.writeFiles(
             pathFolder,
             fileName,

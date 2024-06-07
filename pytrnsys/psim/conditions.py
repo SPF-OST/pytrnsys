@@ -187,6 +187,9 @@ class Conditions:
         return True
 
 
+ALL = Conditions([])
+
+
 def createConditions(serializedConditions: _tp.Sequence[str]) -> Conditions:
     conditions = [_createCondition(sc) for sc in serializedConditions]
 
