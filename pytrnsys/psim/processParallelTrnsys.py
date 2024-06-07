@@ -9,7 +9,6 @@ import multiprocessing as mp
 import os
 import pathlib as _pl
 import re
-import sys
 import traceback as _tb
 import typing as _tp
 
@@ -636,16 +635,16 @@ class ProcessParallelTrnsys:
             _pc.createPlot(
                 plotVariables,
                 pathFolder,
-                typeOfProcess,
                 logger,
-                latexNames,
-                configPath,
-                stylesheet,
-                plotStyle,
-                comparePlotUserName,
-                setPrintDataForGle,
-                shallPlotUncertainties,
-                extensionFig,
+                imageFileExtension=extensionFig,
+                typeOfProcess=typeOfProcess,
+                relativeLatexNamesFilePath=latexNames,
+                configPath=configPath,
+                stylesheetNameOrPath=stylesheet,
+                plotStyle=plotStyle,
+                comparePlotUserName=comparePlotUserName,
+                shallPrintDataForGle=setPrintDataForGle,
+                shallPlotUncertainties=shallPlotUncertainties,
             )
 
     def plotBarplotConditional(self):

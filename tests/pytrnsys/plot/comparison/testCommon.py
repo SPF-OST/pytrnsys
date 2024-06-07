@@ -1,10 +1,13 @@
 import dataclasses as _dc
 import typing as _tp
+import pathlib as _pl
 
 import numpy as _np
 import pytest as _pt
 
 import pytrnsys.plot.comparison.common as _common
+
+import pytrnsys.plot.comparison as _cplot
 
 
 @_dc.dataclass
@@ -14,6 +17,7 @@ class TestCaseBase:
     ordinateVariable: str
     seriesVariable: str | None
     chunkVariable: str | None
+    shallPlotUncertainties: bool
     expectedManySeriesOrManyChunks: _common.ManySeries | _common.ManyChunks | None
 
     def __post_init__(self):
@@ -33,51 +37,56 @@ def generateFromValuesTestCases() -> _tp.Iterable[FromValuesTestCase]:
         "SPF",
         "house type",
         "HP",
+        False,
         _common.ManyChunks(
             chunks=[
                 _common.Chunk(
                     groupingValue=_common.GroupingValue(name="HP", label="MFH"),
-                    allSeries=[
-                        _common.Series(
-                            index=1,
-                            groupingValue=_common.GroupingValue(name="house " "type", label="ASHP"),
-                            abscissa=_common.AxisValues(
-                                name="VShM3",
-                                mins=_np.array([20, 30, 40]),
-                                means=_np.array([20, 30, 40]),
-                                maxs=_np.array([20, 30, 40]),
-                            ),
-                            ordinate=_common.AxisValues(
-                                name="SPF",
-                                mins=_np.array([2.1, 2.2, 2.4]),
-                                means=_np.array([2.1, 2.2, 2.4]),
-                                maxs=_np.array([2.1, 2.2, 2.4]),
-                            ),
-                            shallPrintUncertainties=False,
-                        )
-                    ],
+                    manySeries=_common.ManySeries(
+                        [
+                            _common.Series(
+                                index=1,
+                                groupingValue=_common.GroupingValue(name="house " "type", label="ASHP"),
+                                abscissa=_common.AxisValues(
+                                    name="VShM3",
+                                    mins=_np.array([20, 30, 40]),
+                                    means=_np.array([20, 30, 40]),
+                                    maxs=_np.array([20, 30, 40]),
+                                ),
+                                ordinate=_common.AxisValues(
+                                    name="SPF",
+                                    mins=_np.array([2.1, 2.2, 2.4]),
+                                    means=_np.array([2.1, 2.2, 2.4]),
+                                    maxs=_np.array([2.1, 2.2, 2.4]),
+                                ),
+                                shallPrintUncertainties=False,
+                            )
+                        ]
+                    ),
                 ),
                 _common.Chunk(
                     groupingValue=_common.GroupingValue(name="HP", label="SFH"),
-                    allSeries=[
-                        _common.Series(
-                            index=2,
-                            groupingValue=_common.GroupingValue(name="house " "type", label="GSHP"),
-                            abscissa=_common.AxisValues(
-                                name="VShM3",
-                                mins=_np.array([20, 32, 40]),
-                                means=_np.array([20, 32, 40]),
-                                maxs=_np.array([20, 32, 40]),
-                            ),
-                            ordinate=_common.AxisValues(
-                                name="SPF",
-                                mins=_np.array([3.1, 3.4, 3.5]),
-                                means=_np.array([3.1, 3.4, 3.5]),
-                                maxs=_np.array([3.1, 3.4, 3.5]),
-                            ),
-                            shallPrintUncertainties=False,
-                        )
-                    ],
+                    manySeries=_common.ManySeries(
+                        [
+                            _common.Series(
+                                index=2,
+                                groupingValue=_common.GroupingValue(name="house " "type", label="GSHP"),
+                                abscissa=_common.AxisValues(
+                                    name="VShM3",
+                                    mins=_np.array([20, 32, 40]),
+                                    means=_np.array([20, 32, 40]),
+                                    maxs=_np.array([20, 32, 40]),
+                                ),
+                                ordinate=_common.AxisValues(
+                                    name="SPF",
+                                    mins=_np.array([3.1, 3.4, 3.5]),
+                                    means=_np.array([3.1, 3.4, 3.5]),
+                                    maxs=_np.array([3.1, 3.4, 3.5]),
+                                ),
+                                shallPrintUncertainties=False,
+                            )
+                        ]
+                    ),
                 ),
             ]
         ),
@@ -112,6 +121,7 @@ def generateFromResultsTestCases() -> _tp.Iterable[FromResultsTestCase]:
         "fSolar",
         "DhwVM3PerM2",
         None,
+        False,
         _common.ManySeries(
             allSeries=[
                 _common.Series(
@@ -220,7 +230,7 @@ class TestCommon:
             testCase.seriesVariable,
             testCase.chunkVariable,
             testCase.values,
-            shallPlotUncertainties=False,
+            testCase.shallPlotUncertainties,
         )
 
         assert actualManySeriesOrManyChunks == testCase.expectedManySeriesOrManyChunks
@@ -233,7 +243,7 @@ class TestCommon:
             testCase.ordinateVariable,
             testCase.seriesVariable,
             testCase.chunkVariable,
-            shallPlotUncertainties=False,
+            testCase.shallPlotUncertainties,
         )
 
         assert actualManySeriesOrManyChunks == testCase.expectedManySeriesOrManyChunks
