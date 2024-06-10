@@ -94,7 +94,7 @@ class _IntervalConditionFactory:
         if match:
             return cls._createBoundedInterval(match, serializedCondition)
 
-        raise ValueError(f"Couldn't not parse condition {serializedCondition}")
+        raise ValueError(f"Couldn't not parse condition {serializedCondition}.")
 
     @classmethod
     def _createUnboundedInterval(cls, match: _tp.Match, serializedCondition: str) -> "_IntervalCondition":
@@ -134,12 +134,12 @@ class _IntervalConditionFactory:
         return _IntervalCondition(variableName, lowerBound, upperBound, serializedCondition)
 
     @classmethod
-    def _createBoundForBounded(cls, lower: str, op1: str, serializedCondition: str) -> _Bound:
-        lowerAsFloat = cls._convertToFloatOrThrow(lower, serializedCondition)
+    def _createBoundForBounded(cls, bound: str, op: str, serializedCondition: str) -> _Bound:
+        boundAsFloat = cls._convertToFloatOrThrow(bound, serializedCondition)
 
-        isInclusive = op1 == "<="
+        isInclusive = op == "<="
 
-        return _Bound(lowerAsFloat, isInclusive)
+        return _Bound(boundAsFloat, isInclusive)
 
     @classmethod
     def _convertToFloatOrThrow(cls, bound: str, serializedCondition: str) -> float:
