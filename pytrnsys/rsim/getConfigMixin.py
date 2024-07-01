@@ -188,7 +188,7 @@ Invalid syntax: {line}. Usage:
         if "defaultVisibility" in self.inputs:
             value: str = self.inputs["defaultVisibility"]
             if value not in ("local", "global"):
-                ValueError(f'Default visibility must be "local" or "global", but was {value}.')
+                raise ValueError(f'Default visibility must be "local" or "global", but was {value}.')
 
             valueUpperCase = value.upper()
 
