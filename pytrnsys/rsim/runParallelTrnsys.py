@@ -47,8 +47,6 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
 
         self.pathConfig = pathConfig
 
-        self.ddckPlaceHolderValuesJsonPath = None
-
         self.defaultInputs()
         self.cmds = []
         if runPath == None:
@@ -346,7 +344,11 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
         deck = _btd.BuildTrnsysDeck(
-            self.path, self.nameBase, self._ddckFilePathWithComponentNames, self.ddckPlaceHolderValuesJsonPath
+            self.path,
+            self.nameBase,
+            self._ddckFilePathWithComponentNames,
+            self._defaultVisibility,
+            self._ddckPlaceHolderValuesJsonPath,
         )
         result = deck.readDeckList(
             self.pathConfig,
@@ -431,17 +433,12 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
         tool = readConfig.ReadConfigTrnsys()
 
         self.lines = tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated, controlDataType=False)
-        try:
-            self.logger = logging.getLogger("root")
-        except:
-            self.logger = log.getOrCreateCustomLogger("root", self.inputs["outputLevel"])
+
+        self.logger = log.getOrCreateCustomLogger("root", self.inputs["outputLevel"])
+
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
-        if "pathToConnectionInfo" in self.inputs:
-            self.ddckPlaceHolderValuesJsonPath = self.inputs["pathToConnectionInfo"]
-        if self.inputs["addResultsFolder"] == False:
-            pass
-        else:
+        if self.inputs["addResultsFolder"]:
             self.path = os.path.join(self.path, self.inputs["addResultsFolder"])
 
             if not os.path.isdir(self.path):

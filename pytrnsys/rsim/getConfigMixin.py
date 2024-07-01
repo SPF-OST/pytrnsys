@@ -6,6 +6,7 @@ import typing as _tp
 
 import numpy as num
 
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 import pytrnsys.trnsys_util.buildTrnsysDeck as _build
 import pytrnsys.trnsys_util.replaceAssignStatements as _ras
 
@@ -15,6 +16,8 @@ class GetConfigMixin:
         self.variation = []  # parametric studies
         self.parDeck = []  # fixed values changed in all simulations
         self._ddckFilePathWithComponentNames = []
+        self._defaultVisibility = _dv.DefaultVisibility.LOCAL
+        self._ddckPlaceHolderValuesJsonPath = None
         self.parameters = {}  # deck parameters fixed for all simulations
         self._assignStatements = []
         self.listFit = {}
@@ -69,6 +72,8 @@ class GetConfigMixin:
         self.variation = []  # parametric studies
         self.parDeck = []  # fixed values changed in all simulations
         self._ddckFilePathWithComponentNames = []
+        self._defaultVisibility = _dv.DefaultVisibility.LOCAL
+        self._ddckPlaceHolderValuesJsonPath = None
         self.parameters = {}  # deck parameters fixed for all simulations
         self._assignStatements = []
         self.listFit = {}
@@ -176,8 +181,18 @@ Invalid syntax: {line}. Usage:
                 self._ddckFilePathWithComponentNames.append(ddckFilePathWithComponentName)
                 self.listDdckPaths.add(str(basePath))
                 self.dictDdckPaths[str(ddckFilePath)] = str(basePath)
-            else:
-                pass
+
+        if "pathToConnectionInfo" in self.inputs:
+            self._ddckPlaceHolderValuesJsonPath = self.inputs["pathToConnectionInfo"]
+
+        if "defaultVisibility" in self.inputs:
+            value: str = self.inputs["defaultVisibility"]
+            if value not in ("local", "global"):
+                ValueError(f'Default visibility must be "local" or "global", but was {value}.')
+
+            valueUpperCase = value.upper()
+
+            self._defaultVisibility = _dv.DefaultVisibility[valueUpperCase]
 
         if len(self.variation) > 0:
             self.addParametricVariations(self.variation)

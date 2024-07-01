@@ -23,6 +23,7 @@ import pytrnsys.trnsys_util.deckTrnsys as deck
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
 import pytrnsys.utils.result as _res
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -41,10 +42,13 @@ class BuildTrnsysDeck:
         pathDeck,
         nameDeck,
         ddckFilePathsWithComponentName: _tp.Sequence[DdckFilePathWithComponentName],
+        defaultVisibility: _dv.DefaultVisibility,
         ddckPlaceHolderValuesJsonPath,
     ):
         self.pathDeck = pathDeck
         self.nameDeck = self.pathDeck + r"\%s.dck" % nameDeck
+
+        self._defaultVisibility = defaultVisibility
 
         self._ddckPlaceHolderValuesJsonPath = (
             _pl.Path(ddckPlaceHolderValuesJsonPath) if ddckPlaceHolderValuesJsonPath else None
@@ -90,7 +94,7 @@ class BuildTrnsysDeck:
 
     def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path, componentName: str) -> _res.Result[str]:
         if not self._ddckPlaceHolderValuesJsonPath:
-            return _rtwph.replaceTokensWithDefaults(ddckFilePath, componentName)
+            return _rtwph.replaceTokensWithDefaults(ddckFilePath, componentName, self._defaultVisibility)
 
         if not self._ddckPlaceHolderValuesJsonPath.is_file():
             return _res.Error(
@@ -105,7 +109,7 @@ class BuildTrnsysDeck:
             )
 
         computedNamesByPort = placeholderValues.get(componentName, dict())
-        result = _rtph.replaceTokens(ddckFilePath, componentName, computedNamesByPort)
+        result = _rtph.replaceTokens(ddckFilePath, componentName, computedNamesByPort, self._defaultVisibility)
 
         if _res.isError(result):
             return _res.error(result)
