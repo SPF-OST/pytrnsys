@@ -9,6 +9,7 @@ bool runParallel False
 
 ############# AUTOMATIC WORK BOOL##############################
 
+string defaultVisibility "global"
 bool doAutoUnitNumbering True
 bool generateUnitTypesUsed True
 bool addAutomaticEnergyBalance True

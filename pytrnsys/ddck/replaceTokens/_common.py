@@ -1,4 +1,5 @@
 import abc as _abc
+import collections.abc as _cabc
 import dataclasses as _dc
 import enum as _enum
 import typing as _tp
@@ -7,6 +8,11 @@ import lark as _lark
 from lark import visitors as _lvis
 
 from . import _tokens
+from .defaultVisibility import DefaultVisibility
+
+
+class ReplaceTokensError(ValueError):
+    pass
 
 
 @_dc.dataclass
@@ -17,8 +23,21 @@ class ComputedVariable(_tokens.Token):  # pylint: disable=too-few-public-methods
 
 
 @_dc.dataclass
-class _PrivateVariable(_tokens.Token):
+class VariableBase(_tokens.Token):
     name: str
+
+
+_T = _tp.TypeVar("_T", bound=VariableBase)
+
+
+@_dc.dataclass
+class LocalVariable(VariableBase):
+    pass
+
+
+@_dc.dataclass
+class GlobalVariable(VariableBase):
+    pass
 
 
 class _EnergyDirection(_enum.Enum):
@@ -38,11 +57,11 @@ _TERMINAL_TO_ENERGY_QUALITY = {"heat": _EnergyQuality.HEAT, "el": _EnergyQuality
 
 
 @_dc.dataclass
-class _ComputedEnergyVariable(_tokens.Token):
+class ComputedEnergyVariable(_tokens.Token):
     direction: _EnergyDirection
     quality: _EnergyQuality
     category: str
-    subCategories: _tp.Sequence[str]
+    subCategories: _cabc.Sequence[str]
 
     def __post_init__(self):
         if any(":" in sc for sc in self.subCategories):
@@ -65,10 +84,12 @@ def createComputedVariable(tree: _lark.Tree, portProperty: str) -> ComputedVaria
 
 
 class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
-    def __init__(self) -> None:
-        self.privateVariables: list[_PrivateVariable] = []
+    def __init__(self, defaultVisibility: DefaultVisibility) -> None:
+        self._defaultVisibility = defaultVisibility
+        self.localVariables: list[LocalVariable] = []
+        self.globalVariables: list[GlobalVariable] = []
         self.computedHydraulicVariables: list[ComputedVariable] = []
-        self.computedEnergyVariables: list[_ComputedEnergyVariable] = []
+        self.computedEnergyVariables: list[ComputedEnergyVariable] = []
 
     def computed_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         propertyName = getChildTokenValue("PORT_PROPERTY", tree)
@@ -81,7 +102,7 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
         categoryOrLocal = getChildTokenValue("CATEGORY_OR_LOCAL", tree)
         categories = _getChildTokenValues("CATEGORY", tree)
 
-        computedEnergyVariable = _ComputedEnergyVariable(
+        computedEnergyVariable = ComputedEnergyVariable(
             tree.meta.line,
             tree.meta.column,
             tree.meta.start_pos,
@@ -94,12 +115,44 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
         self.computedEnergyVariables.append(computedEnergyVariable)
 
-    def private_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
+    def local_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
+        if self._defaultVisibility != DefaultVisibility.GLOBAL:
+            raise ReplaceTokensError(
+                'Explicitly local variables are only allowed if the default visibility is "global".'
+            )
+
+        self._addLocalVariable(tree)
+
+    def default_visibility_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
+        match self._defaultVisibility:
+            case DefaultVisibility.LOCAL:
+                self._addLocalVariable(tree)
+            case DefaultVisibility.GLOBAL:
+                self._addGlobalVariable(tree)
+            case _:
+                _tp.assert_never(self._defaultVisibility)
+
+    def global_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
+        if self._defaultVisibility != DefaultVisibility.LOCAL:
+            raise ReplaceTokensError(
+                'Explicitly global variables are only allowed if the default visibility is "local".'
+            )
+
+        self._addGlobalVariable(tree)
+
+    def _addLocalVariable(self, tree: _lark.Tree) -> None:
+        localVariable = self._createVariable(LocalVariable, tree)
+        self.localVariables.append(localVariable)
+
+    def _addGlobalVariable(self, tree: _lark.Tree) -> None:
+        globalVariable = self._createVariable(GlobalVariable, tree)
+        self.globalVariables.append(globalVariable)
+
+    @staticmethod
+    def _createVariable(clazz: _tp.Type[_T], tree: _lark.Tree) -> _T:
         name = getChildTokenValue("NAME", tree)
-        privateVariable = _PrivateVariable(
-            tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos, name
-        )
-        self.privateVariables.append(privateVariable)
+        variable = clazz(tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos, name)
+        return variable
 
 
 def getChildTokenValue(tokenType: str, tree: _lark.Tree) -> str:
@@ -123,22 +176,27 @@ def getChildTokenValueOrNone(tokenType: str, tree: _lark.Tree) -> _tp.Optional[s
     return values[0]
 
 
-def _getChildTokenValues(tokenType: str, tree: _lark.Tree) -> _tp.Sequence[str]:
+def _getChildTokenValues(tokenType: str, tree: _lark.Tree) -> _cabc.Sequence[str]:
     return [c.value for c in tree.children if isinstance(c, _lark.Token) and c.type == tokenType]
 
 
-def getPrivateNames(privateVariables: _tp.Sequence[_PrivateVariable], componentName: str) -> _tp.Sequence[str]:
-    privateNames = [f"{componentName}{v.name}" for v in privateVariables]
-    return privateNames
+def getLocalNames(localVariables: _cabc.Sequence[LocalVariable], componentName: str) -> _cabc.Sequence[str]:
+    localNames = [f"{componentName}{v.name}" for v in localVariables]
+    return localNames
+
+
+def getGlobalNames(globalVariables: _cabc.Sequence[GlobalVariable]) -> _cabc.Sequence[str]:
+    globalNames = [v.name for v in globalVariables]
+    return globalNames
 
 
 def getComputedEnergyNames(
-    computedEnergyVariables: _tp.Sequence[_ComputedEnergyVariable], componentName: str
-) -> _tp.Sequence[str]:
+    computedEnergyVariables: _cabc.Sequence[ComputedEnergyVariable], componentName: str
+) -> _cabc.Sequence[str]:
     return [_getComputedEnergyName(v, componentName) for v in computedEnergyVariables]
 
 
-def _getComputedEnergyName(computedEnergyVariable: _ComputedEnergyVariable, componentName: str) -> str:
+def _getComputedEnergyName(computedEnergyVariable: ComputedEnergyVariable, componentName: str) -> str:
     quality = computedEnergyVariable.quality.value
 
     direction = computedEnergyVariable.direction.value
