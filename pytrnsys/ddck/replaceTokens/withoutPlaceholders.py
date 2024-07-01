@@ -122,7 +122,7 @@ def replaceTokensWithDefaults(
 
     result = replaceTokensWithDefaultsInString(inputDdckContent, componentName, defaultVisibility)
     if _res.isError(result):
-        error = _res.error(result).withContext(f"Error processing file `{inputDdckFilePath}`")
+        error = _res.error(result).withContext(f"Error processing file `{inputDdckFilePath.name}`")
         return error
 
     return _res.value(result)
@@ -146,7 +146,7 @@ def replaceTokensWithDefaultsInString(
     replacementsResult = _getReplacements(visitor, componentName)
     if _res.isError(replacementsResult):
         moreSpecificError = _res.error(replacementsResult).withContext(
-            f"An error occurred while substituting the defaults for the placeholders"
+            "Could not substitute the defaults for the placeholders"
         )
         return moreSpecificError
     replacements = _res.value(replacementsResult)

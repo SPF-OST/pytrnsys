@@ -90,7 +90,8 @@ class TestReplaceTokens:
         error = _res.error(result)
         print(error.message)
         expectedErrorMessage = """\
-An error occurred while substituting the defaults for the placeholders in file type977_v1_input_missing_default.ddck:
+Error processing file `type977_v1_input_missing_default.ddck`:
+Could not substitute the defaults for the placeholders:
 No default values were provided for the computed variables at the following locations (line number:column number):
 \t26:14
 \t27:13

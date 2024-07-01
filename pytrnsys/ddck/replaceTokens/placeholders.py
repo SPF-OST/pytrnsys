@@ -42,10 +42,8 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
 ) -> _res.Result[str]:
     treeResult = _parse.parseDdck(content)
     if _res.isError(treeResult):
-        error = _res.error(treeResult)
-
         if not inputDdckFilePath:
-            return error
+            return _res.error(treeResult)
 
         moreSpecificError = _res.error(treeResult).withContext(
             f"An error was found in ddck file {inputDdckFilePath.name}"
@@ -70,9 +68,9 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
         else:
             contextMessage = "Error replacing placeholders"
 
-        error = _res.error(computedHydraulicNamesResult).withContext(contextMessage)
+        errorWithContext = _res.error(computedHydraulicNamesResult).withContext(contextMessage)
 
-        return error
+        return errorWithContext
     computedHydraulicNames = _res.value(computedHydraulicNamesResult)
 
     computedEnergyNames = _common.getComputedEnergyNames(visitor.computedEnergyVariables, componentName)
