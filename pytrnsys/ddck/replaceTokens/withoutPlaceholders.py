@@ -140,8 +140,9 @@ def replaceTokensWithDefaultsInString(
     visitor = _WithoutPlaceholdersJSONCollectTokensVisitor(defaultVisibility)
     try:
         visitor.visit(tree)
-    except _common.ReplaceTokensError as error:
-        return _res.Error(str(error))
+    except _common.ReplaceTokenError as error:
+        errorMessage = error.getErrorMessage(inputDdckContent)
+        return _res.Error(errorMessage)
 
     replacementsResult = _getReplacements(visitor, componentName)
     if _res.isError(replacementsResult):

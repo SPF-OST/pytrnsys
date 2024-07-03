@@ -11,8 +11,45 @@ from . import _tokens
 from .defaultVisibility import DefaultVisibility
 
 
-class ReplaceTokensError(ValueError):
-    pass
+@_dc.dataclass
+class ReplaceTokenError(Exception):
+    meta: _lark.tree.Meta
+    errorMessage: str
+
+    def getErrorMessage(self, originalInput: str, nBeginContextLines: int = 5, nEndContextLines=5) -> str:
+        context = self._getContext(originalInput, nBeginContextLines, nEndContextLines)
+
+        message = f"""\
+{self.errorMessage}:
+
+At line {self.meta.line} column {self.meta.column}:
+
+{context}
+"""
+        return message
+
+    def _getContext(self, originalInput: str, nBeginContextLines: int = 5, nEndContextLines=5) -> str:
+        originalInputLines = originalInput.splitlines()
+
+        startLineNumber = max(self.meta.line - nBeginContextLines, 1)
+        endLineNumber = min(self.meta.end_line + nEndContextLines, len(originalInputLines))
+
+        leadingContextLines = originalInputLines[startLineNumber : self.meta.line - 1]
+        offendingLine = originalInputLines[self.meta.line - 1]
+        laggingContextLines = originalInputLines[self.meta.line : endLineNumber]
+
+        indicatorLine = self._createIndicatorLine(self.meta.column, self.meta.end_column)
+
+        contextLines = [*leadingContextLines, offendingLine, indicatorLine, *laggingContextLines]
+        context = "\n".join(contextLines)
+
+        return context
+
+    @staticmethod
+    def _createIndicatorLine(indicatorsStartColumn: int, indicatorsEndColumn: int) -> str:
+        nIndicators = indicatorsEndColumn - indicatorsStartColumn
+        indicatorLine = f"{' ' * (indicatorsStartColumn - 1)}{'^' * nIndicators}"
+        return indicatorLine
 
 
 @_dc.dataclass
@@ -117,8 +154,8 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
     def local_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         if self._defaultVisibility != DefaultVisibility.GLOBAL:
-            raise ReplaceTokensError(
-                'Explicitly local variables are only allowed if the default visibility is "global".'
+            raise ReplaceTokenError(
+                tree.meta, 'Explicitly local variables are only allowed if the default visibility is "global"'
             )
 
         self._addLocalVariable(tree)
@@ -134,8 +171,8 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
     def global_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         if self._defaultVisibility != DefaultVisibility.LOCAL:
-            raise ReplaceTokensError(
-                'Explicitly global variables are only allowed if the default visibility is "local".'
+            raise ReplaceTokenError(
+                tree.meta, 'Explicitly global variables are only allowed if the default visibility is "local"'
             )
 
         self._addGlobalVariable(tree)

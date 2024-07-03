@@ -55,8 +55,9 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
     visitor = _WithPlaceholdersJSONCollectTokensVisitor(defaultVisibility)
     try:
         visitor.visit(tree)
-    except _common.ReplaceTokensError as error:
-        return _res.Error(str(error))
+    except _common.ReplaceTokenError as error:
+        errorMessage = error.getErrorMessage(content)
+        return _res.Error(errorMessage)
 
     localNames = _common.getLocalNames(visitor.localVariables, componentName)
     globalNames = _common.getGlobalNames(visitor.globalVariables)
