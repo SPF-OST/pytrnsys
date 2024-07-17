@@ -54,4 +54,4 @@ class TestUseApi:
 
             config = _cc.createConfig(costCalcJsonPath)
 
-            _pp.pprint(config, indent=4)
+            _pp.pprint(config)

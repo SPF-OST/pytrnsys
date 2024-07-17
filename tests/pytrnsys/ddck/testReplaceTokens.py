@@ -5,6 +5,7 @@ import typing as _tp
 
 import pytest as _pt
 
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 import pytrnsys.ddck.replaceTokens.placeholders as _rtph
 import pytrnsys.ddck.replaceTokens.withoutPlaceholders as _rtwph
 import pytrnsys.utils.result as _res
@@ -74,18 +75,23 @@ class TestReplaceTokens:
     def testReplaceTokensWithDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input.ddck"
         expectedDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_expected.ddck"
-        actualDdckContent = _rtwph.replaceTokensWithDefaults(inputDdckFilePath, componentName="IGNORED")
+        componentName = "IGNORED"
+        actualDdckContent = _rtwph.replaceTokensWithDefaults(
+            inputDdckFilePath, componentName, _dv.DefaultVisibility.GLOBAL
+        )
         assert actualDdckContent == expectedDdckFilePath.read_text()
 
     @staticmethod
     def testReplaceTokensWithDefaultsMissingInputVariableDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input_missing_default.ddck"
-        result = _rtwph.replaceTokensWithDefaults(inputDdckFilePath, componentName="IGNORED")
+        componentName = "IGNORED"
+        result = _rtwph.replaceTokensWithDefaults(inputDdckFilePath, componentName, _dv.DefaultVisibility.GLOBAL)
         assert _res.isError(result)
         error = _res.error(result)
         print(error.message)
         expectedErrorMessage = """\
-An error occurred while substituting the defaults for the placeholders in file type977_v1_input_missing_default.ddck:
+Error processing file `type977_v1_input_missing_default.ddck`:
+Could not substitute the defaults for the placeholders:
 No default values were provided for the computed variables at the following locations (line number:column number):
 \t26:14
 \t27:13
@@ -101,7 +107,7 @@ No default values were provided for the computed variables at the following loca
 
         names = ddckPlaceHolderValues.get(ddckFile.componentName) or {}
 
-        result = _rtph.replaceTokens(ddckFile.input, ddckFile.componentName, names)
+        result = _rtph.replaceTokens(ddckFile.input, ddckFile.componentName, names, _dv.DefaultVisibility.GLOBAL)
         _res.throwIfError(result)
         actualDdckContent = _res.value(result)
 
@@ -122,9 +128,7 @@ No default values were provided for the computed variables at the following loca
         }
 
         result = _rtph.replaceTokens(
-            inputDdckFilePath,
-            componentName,
-            computedNamesByPort,
+            inputDdckFilePath, componentName, computedNamesByPort, _dv.DefaultVisibility.GLOBAL
         )
 
         assert not _res.isError(result)
@@ -149,10 +153,9 @@ EQUATIONS 4
 *********************************
 """
 
+        computedNamesByPort = {}
         result = _rtph.replaceTokensInString(
-            inputContent,
-            componentName,
-            computedNamesByPort={},
+            inputContent, componentName, computedNamesByPort, _dv.DefaultVisibility.GLOBAL
         )
 
         assert not _res.isError(result)
@@ -180,9 +183,7 @@ qSysOut_QSnk60TessAcum = QSnk60dQ
         computedNamesByPort = {"In": {"@temp": "TFoo", "@Mfr": "MBar"}, "Out": {"@temp": "TGhx"}}
 
         result = _rtph.replaceTokens(
-            inputDdckFilePath,
-            componentName,
-            computedNamesByPort,
+            inputDdckFilePath, componentName, computedNamesByPort, _dv.DefaultVisibility.GLOBAL
         )
 
         assert _res.isError(result)

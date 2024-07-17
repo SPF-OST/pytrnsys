@@ -5,9 +5,11 @@ import typing as _tp
 import lark as _lark
 from lark import visitors as _lvis
 
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 from pytrnsys.utils import result as _res
-
-from . import _parse, _tokens, _common
+from . import _common
+from . import _parse
+from . import _tokens
 
 
 @_dc.dataclass
@@ -33,8 +35,8 @@ class _OutputVariableAssignment(_tokens.Token):
 
 
 class _WithoutPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorBase):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, defaultVisibility: _dv.DefaultVisibility) -> None:
+        super().__init__(defaultVisibility)
 
         self.outputVariableAssignmentsToRemove: list[_OutputVariableAssignment] = []
         self.equationsCountersToAdjust: list[_EquationsCounter] = []
@@ -113,28 +115,46 @@ class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(_lvis.Visitor_Recurs
         self.outputVariableWithoutDefaultAssignments.append(outputVariableAssignment)
 
 
-def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path, componentName: str) -> _res.Result[str]:
+def replaceTokensWithDefaults(
+    inputDdckFilePath: _pl.Path, componentName: str, defaultVisibility: _dv.DefaultVisibility
+) -> _res.Result[str]:
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
+    result = replaceTokensWithDefaultsInString(inputDdckContent, componentName, defaultVisibility)
+    if _res.isError(result):
+        error = _res.error(result).withContext(f"Error processing file `{inputDdckFilePath.name}`")
+        return error
+
+    return _res.value(result)
+
+
+def replaceTokensWithDefaultsInString(
+    inputDdckContent: str, componentName: str, defaultVisibility: _dv.DefaultVisibility
+) -> _res.Result[str]:
     result = _parse.parseDdck(inputDdckContent)
     if _res.isError(result):
-        moreSpecificError = _res.error(result).withContext(f"An error was found in ddck file {inputDdckFilePath}")
+        moreSpecificError = _res.error(result)
         return moreSpecificError
     tree = _res.value(result)
 
-    visitor = _WithoutPlaceholdersJSONCollectTokensVisitor()
-    visitor.visit(tree)
+    visitor = _WithoutPlaceholdersJSONCollectTokensVisitor(defaultVisibility)
+    try:
+        visitor.visit(tree)
+    except _common.ReplaceTokenError as error:
+        errorMessage = error.getErrorMessage(inputDdckContent)
+        return _res.Error(errorMessage)
 
-    replacementsResult = _getDefaultReplacements(visitor, componentName)
+    replacementsResult = _getReplacements(visitor, componentName)
     if _res.isError(replacementsResult):
         moreSpecificError = _res.error(replacementsResult).withContext(
-            f"An error occurred while substituting the defaults for the placeholders in file {inputDdckFilePath.name}"
+            "Could not substitute the defaults for the placeholders"
         )
         return moreSpecificError
     replacements = _res.value(replacementsResult)
 
     tokens = [
-        *visitor.privateVariables,
+        *visitor.localVariables,
+        *visitor.globalVariables,
         *visitor.computedHydraulicVariables,
         *visitor.computedEnergyVariables,
         *visitor.outputVariableAssignmentsToRemove,
@@ -147,10 +167,11 @@ def replaceTokensWithDefaults(inputDdckFilePath: _pl.Path, componentName: str) -
     return outputDdckContent
 
 
-def _getDefaultReplacements(
+def _getReplacements(
     visitor: _WithoutPlaceholdersJSONCollectTokensVisitor, componentName: str
 ) -> _res.Result[_tp.Sequence[str]]:
-    privateNames = _common.getPrivateNames(visitor.privateVariables, componentName)
+    localNames = _common.getLocalNames(visitor.localVariables, componentName)
+    globalNames = _common.getGlobalNames(visitor.globalVariables)
 
     computedVariablesWithoutDefaultName = [v for v in visitor.computedHydraulicVariables if not v.defaultVariableName]
     if any(computedVariablesWithoutDefaultName):
@@ -181,7 +202,8 @@ def _getDefaultReplacements(
     ]
 
     replacements = [
-        *privateNames,
+        *localNames,
+        *globalNames,
         *defaultNamesForComputedVariables,
         *computedEnergyNames,
         *emptyReplacementTextsForOutputVariableAssignments,

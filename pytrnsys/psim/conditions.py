@@ -1,7 +1,4 @@
-# pylint: skip-file
-# type: ignore
-
-__all__ = ["createConditions", "Conditions", "ConditionBase", "VALUE", "mayBeSerializedCondition"]
+__all__ = ["createConditions", "Conditions", "ConditionBase", "Value", "mayBeSerializedCondition"]
 
 import typing as _tp
 import abc as _abc
@@ -9,7 +6,7 @@ import dataclasses as _dc
 import re as _re
 
 
-VALUE = _tp.Union[str, float, int]
+Value = _tp.Union[str, float, int]
 
 
 class ConditionBase(_abc.ABC):
@@ -21,7 +18,7 @@ class ConditionBase(_abc.ABC):
         return self.serializedCondition
 
     @_abc.abstractmethod
-    def doesValueFulfillCondition(self, value: VALUE) -> bool:
+    def doesValueFulfillCondition(self, value: Value) -> bool:
         pass
 
 
@@ -42,7 +39,12 @@ class _IntervalCondition(ConditionBase):
     def __repr__(self):
         return f"<IntervalCondition({self.variableName},{self.lowerBound},{self.upperBound})>"
 
-    def doesValueFulfillCondition(self, value: float) -> bool:
+    def doesValueFulfillCondition(self, value: Value) -> bool:
+        if isinstance(value, str):
+            raise ValueError(f"Value must be int or float for {self.__class__.__name__}.", value)
+
+        value = float(value)
+
         return self._isLowerBoundRespected(value) and self._isUpperBoundRespected(value)
 
     def _isLowerBoundRespected(self, value: float) -> bool:
@@ -65,14 +67,14 @@ class _IntervalCondition(ConditionBase):
 
 
 class _CaseCondition(ConditionBase):
-    def __init__(self, name: str, values: _tp.Sequence[VALUE], serializedCondition: str) -> None:
+    def __init__(self, name: str, values: _tp.Sequence[Value], serializedCondition: str) -> None:
         super().__init__(name, serializedCondition)
         self.values = values
 
     def __repr__(self):
         return f"<CaseCondition({self.variableName},{self.values})>"
 
-    def doesValueFulfillCondition(self, value: VALUE) -> bool:
+    def doesValueFulfillCondition(self, value: Value) -> bool:
         return any(v == value for v in self.values)
 
 
@@ -92,7 +94,7 @@ class _IntervalConditionFactory:
         if match:
             return cls._createBoundedInterval(match, serializedCondition)
 
-        raise ValueError(f"Couldn't not parse condition {serializedCondition}")
+        raise ValueError(f"Couldn't not parse condition {serializedCondition}.")
 
     @classmethod
     def _createUnboundedInterval(cls, match: _tp.Match, serializedCondition: str) -> "_IntervalCondition":
@@ -108,16 +110,17 @@ class _IntervalConditionFactory:
 
     @classmethod
     def _createBoundsForUnbounded(cls, bound: float, op: str) -> _tp.Tuple[_tp.Optional[_Bound], _tp.Optional[_Bound]]:
-        if op == "<":
-            return None, _Bound(bound, isInclusive=False)
-        elif op == "<=":
-            return None, _Bound(bound, isInclusive=True)
-        elif op == ">":
-            return _Bound(bound, isInclusive=False), None
-        elif op == ">=":
-            return _Bound(bound, isInclusive=True), None
-        else:
-            raise AssertionError(f"Unknown operator: {op}.")
+        match op:
+            case "<":
+                return None, _Bound(bound, isInclusive=False)
+            case "<=":
+                return None, _Bound(bound, isInclusive=True)
+            case ">":
+                return _Bound(bound, isInclusive=False), None
+            case ">=":
+                return _Bound(bound, isInclusive=True), None
+            case _:
+                raise AssertionError(f"Unknown operator: {op}.")
 
     @classmethod
     def _createBoundedInterval(cls, match: _tp.Match, serializedCondition: str) -> "_IntervalCondition":
@@ -131,20 +134,19 @@ class _IntervalConditionFactory:
         return _IntervalCondition(variableName, lowerBound, upperBound, serializedCondition)
 
     @classmethod
-    def _createBoundForBounded(cls, lower: str, op1: str, serializedCondition: str) -> _Bound:
-        lower = cls._convertToFloatOrThrow(lower, serializedCondition)
+    def _createBoundForBounded(cls, bound: str, op: str, serializedCondition: str) -> _Bound:
+        boundAsFloat = cls._convertToFloatOrThrow(bound, serializedCondition)
 
-        isInclusive = op1 == "<="
+        isInclusive = op == "<="
 
-        return _Bound(lower, isInclusive)
+        return _Bound(boundAsFloat, isInclusive)
 
     @classmethod
     def _convertToFloatOrThrow(cls, bound: str, serializedCondition: str) -> float:
         try:
-            bound = float(bound)
-        except ValueError:
-            raise ValueError(f"Bound must be convertible to float in {serializedCondition}.")
-        return bound
+            return float(bound)
+        except ValueError as error:
+            raise ValueError(f"Bound must be convertible to float in {serializedCondition}.") from error
 
 
 class _CaseConditionFactory:
@@ -185,6 +187,9 @@ class Conditions:
                 return False
 
         return True
+
+
+ALL = Conditions([])
 
 
 def createConditions(serializedConditions: _tp.Sequence[str]) -> Conditions:

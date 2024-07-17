@@ -139,14 +139,17 @@ output_number: INT
 ?variable: computed_var
     | explicit_var
 
-explicit_var: shared_var
-    | private_var
+explicit_var: default_visibility_var
+    | local_var
+    | global_var
 
 unreferencable_var: UNREFERENCABLE_NAME
 
-private_var: ":" NAME
+local_var: ":" NAME
 
-shared_var: NAME
+global_var: "$" NAME
+
+default_visibility_var: NAME
 
 assign: "ASSIGN"i (file_path | "\"" file_path "\"") logical_unit
 

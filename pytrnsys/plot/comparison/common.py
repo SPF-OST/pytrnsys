@@ -77,7 +77,7 @@ def createManySeriesOrManyChunksFromValues(  # pylint: disable=too-many-locals
         allSeriesForChunk = []
         sortedSeriesLabelsAndValues = _getSortedByLabel(valuesForChunk.items())
         for seriesLabel, valuesForSeries in sortedSeriesLabelsAndValues:
-            i = sum(len(c.allSeries) for c in chunks) + 1
+            i = sum(len(c.manySeries.allSeries) for c in chunks) + 1
             seriesGroupingValue = GroupingValue(seriesVariable, seriesLabel)
 
             abscissaValues, ordinateValues = _createAbscissaAndOrdinateAxisValues(
@@ -88,7 +88,8 @@ def createManySeriesOrManyChunksFromValues(  # pylint: disable=too-many-locals
             allSeriesForChunk.append(series)
 
         chunkGroupingValue = GroupingValue(chunkVariable, chunkLabel)
-        chunk = Chunk(chunkGroupingValue, allSeriesForChunk)
+        manySeries = ManySeries(allSeriesForChunk)
+        chunk = Chunk(chunkGroupingValue, manySeries)
         chunks.append(chunk)
 
         for series in allSeriesForChunk:
@@ -159,20 +160,111 @@ class ManyChunks:
         if not self.chunks:
             raise ValueError("Must be given at least one chunk.")
 
+        _ = self.abscissaName
+        _ = self.ordinateName
+        _ = self.groupingValueName
+
+    @property
+    def ordinateName(self) -> str:
+        ordinateNames = {c.manySeries.ordinateName for c in self.chunks}
+        if len(ordinateNames) != 1:
+            raise ValueError("Ordinate names must all be the same.")
+
+        ordinateName = list(ordinateNames)[0]
+
+        return ordinateName
+
+    @property
+    def abscissaName(self) -> str:
+        abscissaNames = {c.manySeries.abscissaName for c in self.chunks}
+        if len(abscissaNames) != 1:
+            raise ValueError("Abscissa names must all be the same.")
+
+        abscissaName = list(abscissaNames)[0]
+
+        return abscissaName
+
+    @property
+    def groupingValueName(self) -> str:
+        groupingValueNames = {c.groupingValue.name for c in self.chunks}
+        if len(groupingValueNames) != 1:
+            raise ValueError("All grouping value names must be the same.")
+
+        groupingValueName = list(groupingValueNames)[0]
+
+        assert groupingValueName
+
+        return groupingValueName
+
+    @property
+    def seriesGroupingValueName(self) -> str:
+        seriesGroupingValueNames = {c.manySeries.groupingValueName for c in self.chunks}
+        if len(seriesGroupingValueNames) != 1:
+            raise ValueError("All series grouping value names must be the same.")
+
+        seriesGroupingValueName = list(seriesGroupingValueNames)[0]
+
+        assert seriesGroupingValueName
+
+        return seriesGroupingValueName
+
     @property
     def chunkLength(self) -> int:
-        return max(len(c.allSeries) for c in self.chunks)
+        return max(len(c.manySeries.allSeries) for c in self.chunks)
 
 
 @_dc.dataclass()
 class ManySeries:
     allSeries: _tp.Sequence["Series"]
 
+    def __post_init__(self) -> None:
+        _ = self.abscissaName
+        _ = self.ordinateName
+        _ = self.groupingValueName
+
+    @property
+    def ordinateName(self) -> str:
+        ordinateNames = {s.ordinate.name for s in self.allSeries}
+        if len(ordinateNames) != 1:
+            raise ValueError("Ordinate names must all be the same.")
+
+        ordinateName = list(ordinateNames)[0]
+
+        return ordinateName
+
+    @property
+    def abscissaName(self) -> str:
+        abscissaNames = {s.abscissa.name for s in self.allSeries}
+        if len(abscissaNames) != 1:
+            raise ValueError("Abscissa names must all be the same.")
+
+        abscissaName = list(abscissaNames)[0]
+
+        return abscissaName
+
+    @property
+    def groupingValueName(self) -> str | None:
+        if len(self.allSeries) == 1:
+            singleSeries = self.allSeries[0]
+            groupingValueName = singleSeries.groupingValue.name if singleSeries.groupingValue else None
+            return groupingValueName
+
+        groupingValueNames = {s.groupingValue.name if s.groupingValue else None for s in self.allSeries}
+        if len(groupingValueNames) != 1:
+            raise ValueError("All grouping value names must be the same.")
+
+        groupingValueName = list(groupingValueNames)[0]
+
+        if not groupingValueName:
+            raise ValueError("Cannot have an empty grouping value if there's more than one series.")
+
+        return groupingValueName
+
 
 @_dc.dataclass()
 class Chunk:
     groupingValue: "GroupingValue"
-    allSeries: _tp.Sequence["Series"]
+    manySeries: ManySeries
 
 
 @_dc.dataclass()
@@ -368,7 +460,7 @@ def _getLabel(
     variableType: _VariableType,
 ) -> str:
     variableValue = results[variableName]
-    if not isinstance(variableValue, (float, str)):
+    if not isinstance(variableValue, (int, float, str)):
         raise ValueError(f"The {variableType.name} variable must have a scalar value.")
 
     if isinstance(variableValue, str):

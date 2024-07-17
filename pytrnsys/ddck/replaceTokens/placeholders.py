@@ -3,9 +3,12 @@ import typing as _tp
 
 import lark as _lark
 
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 from pytrnsys.utils import result as _res
 
-from . import _parse, _tokens, _common
+from . import _common
+from . import _parse
+from . import _tokens
 
 
 class _WithPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorBase):
@@ -15,28 +18,32 @@ class _WithPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorBase
 
 
 def replaceTokens(
-    inputDdckFilePath: _pl.Path, componentName: str, computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]]
+    inputDdckFilePath: _pl.Path,
+    componentName: str,
+    computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]],
+    defaultVisibility: _dv.DefaultVisibility,
 ) -> _res.Result[str]:
     if not inputDdckFilePath.is_file():
         return _res.Error(f"Could not replace placeholders in file {inputDdckFilePath}: the file does not exist.")
 
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
-    return replaceTokensInString(inputDdckContent, componentName, computedNamesByPort, inputDdckFilePath)
+    return replaceTokensInString(
+        inputDdckContent, componentName, computedNamesByPort, defaultVisibility, inputDdckFilePath
+    )
 
 
 def replaceTokensInString(  # pylint: disable=too-many-locals
     content: str,
     componentName: str,
     computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]],
+    defaultVisibility: _dv.DefaultVisibility,
     inputDdckFilePath: _tp.Optional[_pl.Path] = None,
 ) -> _res.Result[str]:
     treeResult = _parse.parseDdck(content)
     if _res.isError(treeResult):
-        error = _res.error(treeResult)
-
         if not inputDdckFilePath:
-            return error
+            return _res.error(treeResult)
 
         moreSpecificError = _res.error(treeResult).withContext(
             f"An error was found in ddck file {inputDdckFilePath.name}"
@@ -45,10 +52,15 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
         return moreSpecificError
     tree = _res.value(treeResult)
 
-    visitor = _WithPlaceholdersJSONCollectTokensVisitor()
-    visitor.visit(tree)
+    visitor = _WithPlaceholdersJSONCollectTokensVisitor(defaultVisibility)
+    try:
+        visitor.visit(tree)
+    except _common.ReplaceTokenError as error:
+        errorMessage = error.getErrorMessage(content)
+        return _res.Error(errorMessage)
 
-    privateNames = _common.getPrivateNames(visitor.privateVariables, componentName)
+    localNames = _common.getLocalNames(visitor.localVariables, componentName)
+    globalNames = _common.getGlobalNames(visitor.globalVariables)
 
     computedHydraulicNamesResult = _getComputedHydraulicNames(visitor.computedHydraulicVariables, computedNamesByPort)
     if _res.isError(computedHydraulicNamesResult):
@@ -57,15 +69,20 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
         else:
             contextMessage = "Error replacing placeholders"
 
-        error = _res.error(computedHydraulicNamesResult).withContext(contextMessage)
+        errorWithContext = _res.error(computedHydraulicNamesResult).withContext(contextMessage)
 
-        return error
+        return errorWithContext
     computedHydraulicNames = _res.value(computedHydraulicNamesResult)
 
     computedEnergyNames = _common.getComputedEnergyNames(visitor.computedEnergyVariables, componentName)
 
-    tokens = [*visitor.privateVariables, *visitor.computedHydraulicVariables, *visitor.computedEnergyVariables]
-    replacements = [*privateNames, *computedHydraulicNames, *computedEnergyNames]
+    tokens = [
+        *visitor.localVariables,
+        *visitor.globalVariables,
+        *visitor.computedHydraulicVariables,
+        *visitor.computedEnergyVariables,
+    ]
+    replacements = [*localNames, *globalNames, *computedHydraulicNames, *computedEnergyNames]
 
     outputDdckContent = _tokens.replaceTokensWithReplacements(content, tokens, replacements)
 
