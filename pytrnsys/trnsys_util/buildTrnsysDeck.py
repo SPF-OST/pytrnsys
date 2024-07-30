@@ -34,6 +34,7 @@ logger.propagate = False
 class DdckFilePathWithComponentName:
     path: _pl.Path
     componentName: str
+    defaultVisibility: _dv.DefaultVisibility | None
 
 
 class BuildTrnsysDeck:
@@ -48,7 +49,7 @@ class BuildTrnsysDeck:
         self.pathDeck = pathDeck
         self.nameDeck = self.pathDeck + r"\%s.dck" % nameDeck
 
-        self._defaultVisibility = defaultVisibility
+        self._configDefaultVisibility = defaultVisibility
 
         self._ddckPlaceHolderValuesJsonPath = (
             _pl.Path(ddckPlaceHolderValuesJsonPath) if ddckPlaceHolderValuesJsonPath else None
@@ -70,10 +71,12 @@ class BuildTrnsysDeck:
         self.existingDckUnchecked = True
         self.dckAlreadyExists = True
 
-    def loadDeck(self, path: str, name: str, componentName: str) -> _res.Result[_tp.Tuple[str, str, str]]:
+    def loadDeck(
+        self, path: str, name: str, componentName: str, defaultVisibility: _dv.DefaultVisibility | None
+    ) -> _res.Result[_tp.Tuple[str, str, str]]:
         ddckFilePath = _pl.Path(path) / f"{name}.{self.extOneSheetDeck}"
 
-        result = self._replacePlaceholdersAndGetContent(ddckFilePath, componentName)
+        result = self._replacePlaceholdersAndGetContent(ddckFilePath, componentName, defaultVisibility)
         if _res.isError(result):
             return _res.error(result)
         ddckContent = _res.value(result)
@@ -92,9 +95,13 @@ class BuildTrnsysDeck:
 
         return lines[0:3]  # only returns the caption with the info of the file
 
-    def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path, componentName: str) -> _res.Result[str]:
+    def _replacePlaceholdersAndGetContent(
+        self, ddckFilePath: _pl.Path, componentName: str, defaultVisibility: _dv.DefaultVisibility | None
+    ) -> _res.Result[str]:
+        perFileDefaultVisibility = defaultVisibility if defaultVisibility else self._configDefaultVisibility
+
         if not self._ddckPlaceHolderValuesJsonPath:
-            return _rtwph.replaceTokensWithDefaults(ddckFilePath, componentName, self._defaultVisibility)
+            return _rtwph.replaceTokensWithDefaults(ddckFilePath, componentName, perFileDefaultVisibility)
 
         if not self._ddckPlaceHolderValuesJsonPath.is_file():
             return _res.Error(
@@ -105,11 +112,12 @@ class BuildTrnsysDeck:
             placeholderValues = _json.loads(self._ddckPlaceHolderValuesJsonPath.read_text())
         except _json.JSONDecodeError as exception:
             return _res.Error(
-                f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} is not a valid JSON file: {exception}"
+                f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} is not a valid JSON file: "
+                f"{exception}"
             )
 
         computedNamesByPort = placeholderValues.get(componentName, dict())
-        result = _rtph.replaceTokens(ddckFilePath, componentName, computedNamesByPort, self._defaultVisibility)
+        result = _rtph.replaceTokens(ddckFilePath, componentName, computedNamesByPort, perFileDefaultVisibility)
 
         if _res.isError(result):
             return _res.error(result)
@@ -151,7 +159,10 @@ class BuildTrnsysDeck:
             absoluteDdckFileDirPath = absoluteDdckFilePath.parent
 
             result = self.loadDeck(
-                str(absoluteDdckFileDirPath), ddckFileName, ddckFilePathWithComponentName.componentName
+                str(absoluteDdckFileDirPath),
+                ddckFileName,
+                ddckFilePathWithComponentName.componentName,
+                ddckFilePathWithComponentName.defaultVisibility,
             )
 
             if _res.isError(result):

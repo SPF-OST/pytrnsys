@@ -172,12 +172,19 @@ Invalid syntax: {line}. Usage:
 
                 if nParts == 2:
                     componentName = ddckFilePath.parent.name
+                    defaultVisibility = None
+                elif nParts == 3 and splitLine[2] == "global":
+                    componentName = ddckFilePath.parent.name
+                    defaultVisibility = _dv.DefaultVisibility.GLOBAL
                 elif nParts == 4 and splitLine[2] == "as":
                     componentName = splitLine[3]
+                    defaultVisibility = None
                 else:
                     self._raiseDdckReferenceErrorMessage(line, basePathVariableName, str(relativeDdckFilePath))
 
-                ddckFilePathWithComponentName = _build.DdckFilePathWithComponentName(ddckFilePath, componentName)
+                ddckFilePathWithComponentName = _build.DdckFilePathWithComponentName(
+                    ddckFilePath, componentName, defaultVisibility
+                )
                 self._ddckFilePathWithComponentNames.append(ddckFilePathWithComponentName)
                 self.listDdckPaths.add(str(basePath))
                 self.dictDdckPaths[str(ddckFilePath)] = str(basePath)
@@ -222,6 +229,12 @@ Correct possibilities are:
     {pathVariableName} {relativeDdckFilePathString}
 
 when the component name should be deduced from the ddck file's containing directory's name or
+
+    {pathVariableName} {relativeDdckFilePathString} global
+
+if - in addition to the above - the variables within the ddck should be treated as globally
+visible, irrespective of the default visibility set in the config file, or
+
     {pathVariableName} {relativeDdckFilePathString} as <component-name>
 
 when you want to give the component name explicitly by <component-name>

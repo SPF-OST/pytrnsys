@@ -26,7 +26,7 @@ class ErrorException(Exception):
     message: str
 
 
-def isError(result: Result[_T]) -> bool:
+def isError(result: Result[_T]) -> _tp.TypeGuard[Error]:
     if isinstance(result, Error):
         return True
 
