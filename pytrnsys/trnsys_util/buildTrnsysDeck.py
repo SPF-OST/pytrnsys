@@ -16,7 +16,9 @@ import tkinter as tk
 import typing as _tp
 from tkinter import messagebox as tkMessageBox
 
+import pytrnsys.utils.warnings as _warn
 import pytrnsys.ddck.replaceTokens.placeholders as _rtph
+import pytrnsys.ddck.perFileDefaultVisibilityPlausibilityCheck as _dvpc
 import pytrnsys.ddck.replaceTokens.withoutPlaceholders as _rtwph
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deck
@@ -31,7 +33,7 @@ logger.propagate = False
 
 
 @_dc.dataclass
-class DdckFilePathWithComponentName:
+class IncludedDdckFile:
     path: _pl.Path
     componentName: str
     defaultVisibility: _dv.DefaultVisibility | None
@@ -42,7 +44,7 @@ class BuildTrnsysDeck:
         self,
         pathDeck,
         nameDeck,
-        ddckFilePathsWithComponentName: _tp.Sequence[DdckFilePathWithComponentName],
+        includedDdckFiles: _tp.Sequence[IncludedDdckFile],
         defaultVisibility: _dv.DefaultVisibility,
         ddckPlaceHolderValuesJsonPath,
     ):
@@ -56,7 +58,7 @@ class BuildTrnsysDeck:
         )
 
         self.oneSheetList = []
-        self._ddckFilePathsWithComponentName = ddckFilePathsWithComponentName
+        self._includedDdckFiles = includedDdckFiles
         self.deckText = []
 
         self.overwriteForcedByUser = False
@@ -73,8 +75,13 @@ class BuildTrnsysDeck:
 
     def loadDeck(
         self, path: str, name: str, componentName: str, defaultVisibility: _dv.DefaultVisibility | None
-    ) -> _res.Result[_tp.Tuple[str, str, str]]:
+    ) -> _res.Result[_warn.ValueWithWarnings[Tuple[str, str, str]]]:
         ddckFilePath = _pl.Path(path) / f"{name}.{self.extOneSheetDeck}"
+
+        visibilityCheckResult = _dvpc.checkDefaultVisibility(ddckFilePath, defaultVisibility)
+        if _res.isError(visibilityCheckResult):
+            return visibilityCheckResult
+        warnings = _res.value(visibilityCheckResult)
 
         result = self._replacePlaceholdersAndGetContent(ddckFilePath, componentName, defaultVisibility)
         if _res.isError(result):
@@ -93,7 +100,9 @@ class BuildTrnsysDeck:
         if self.eliminateComments:
             self.linesChanged = spfUtils.purgueComments(self.linesChanged, ["!"])
 
-        return lines[0:3]  # only returns the caption with the info of the file
+        header = lines[0], lines[1], lines[2]
+
+        return warnings.withValue(header)
 
     def _replacePlaceholdersAndGetContent(
         self, ddckFilePath: _pl.Path, componentName: str, defaultVisibility: _dv.DefaultVisibility | None
@@ -126,7 +135,7 @@ class BuildTrnsysDeck:
 
     def readDeckList(
         self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
-    ) -> _res.Result[None]:
+    ) -> _res.Result[_warn.ValueWithWarnings[None]]:
         """
 
         Parameters
@@ -146,8 +155,9 @@ class BuildTrnsysDeck:
 
         self.dependencies = {}
         self.definitions = {}
-        for ddckFilePathWithComponentName in self._ddckFilePathsWithComponentName:
-            ddckFilePath = ddckFilePathWithComponentName.path
+        warnings = []
+        for includedDdckFile in self._includedDdckFiles:
+            ddckFilePath = includedDdckFile.path
             ddckFileName = ddckFilePath.name
 
             if ddckFilePath.is_absolute():
@@ -161,14 +171,16 @@ class BuildTrnsysDeck:
             result = self.loadDeck(
                 str(absoluteDdckFileDirPath),
                 ddckFileName,
-                ddckFilePathWithComponentName.componentName,
-                ddckFilePathWithComponentName.defaultVisibility,
+                includedDdckFile.componentName,
+                includedDdckFile.defaultVisibility,
             )
 
             if _res.isError(result):
                 return _res.error(result)
 
-            firstThreeLines = _res.value(result)
+            firstThreeLinesWithWarnings = _res.value(result)
+            warnings.extend(firstThreeLinesWithWarnings.warnings)
+            firstThreeLines = firstThreeLinesWithWarnings.value
 
             ddck = trnsysComponent.TrnsysComponent(absoluteDdckFileDirPath, ddckFileName)
             definedVariables, requiredVariables = ddck.getVariables()
@@ -208,6 +220,8 @@ class BuildTrnsysDeck:
         # stop propagting to root logger
         self.logger.propagate = False
         self.logger.debug("Replacemenet of Units done")
+
+        return _warn.ValueWithWarnings(None, warnings)
 
     def createDependencyGraph(self):
         e = Graph("ER", filename="er.gv", node_attr={"color": "lightblue2", "style": "filled"})

@@ -5,10 +5,9 @@ import lark as _lark
 
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 from pytrnsys.utils import result as _res
-
 from . import _common
-from . import _parse
 from . import _tokens
+from .._parse import parse as _parse
 
 
 class _WithPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorBase):

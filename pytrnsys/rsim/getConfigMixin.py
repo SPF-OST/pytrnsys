@@ -15,7 +15,7 @@ class GetConfigMixin:
     def __init__(self):
         self.variation = []  # parametric studies
         self.parDeck = []  # fixed values changed in all simulations
-        self._ddckFilePathWithComponentNames = []
+        self._includedDdckFiles = []
         self._defaultVisibility = _dv.DefaultVisibility.LOCAL
         self._ddckPlaceHolderValuesJsonPath = None
         self.parameters = {}  # deck parameters fixed for all simulations
@@ -71,7 +71,7 @@ class GetConfigMixin:
     def getConfig(self):
         self.variation = []  # parametric studies
         self.parDeck = []  # fixed values changed in all simulations
-        self._ddckFilePathWithComponentNames = []
+        self._includedDdckFiles = []
         self._defaultVisibility = _dv.DefaultVisibility.LOCAL
         self._ddckPlaceHolderValuesJsonPath = None
         self.parameters = {}  # deck parameters fixed for all simulations
@@ -182,10 +182,10 @@ Invalid syntax: {line}. Usage:
                 else:
                     self._raiseDdckReferenceErrorMessage(line, basePathVariableName, str(relativeDdckFilePath))
 
-                ddckFilePathWithComponentName = _build.DdckFilePathWithComponentName(
+                includedDdckFile = _build.IncludedDdckFile(
                     ddckFilePath, componentName, defaultVisibility
                 )
-                self._ddckFilePathWithComponentNames.append(ddckFilePathWithComponentName)
+                self._includedDdckFiles.append(includedDdckFile)
                 self.listDdckPaths.add(str(basePath))
                 self.dictDdckPaths[str(ddckFilePath)] = str(basePath)
 
