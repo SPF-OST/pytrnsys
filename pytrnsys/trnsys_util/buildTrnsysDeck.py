@@ -75,7 +75,7 @@ class BuildTrnsysDeck:
 
     def loadDeck(
         self, path: str, name: str, componentName: str, defaultVisibility: _dv.DefaultVisibility | None
-    ) -> _res.Result[_warn.ValueWithWarnings[Tuple[str, str, str]]]:
+    ) -> _res.Result[_warn.ValueWithWarnings[tuple[str, str, str]]]:
         ddckFilePath = _pl.Path(path) / f"{name}.{self.extOneSheetDeck}"
 
         visibilityCheckResult = _dvpc.checkDefaultVisibility(ddckFilePath, defaultVisibility)
