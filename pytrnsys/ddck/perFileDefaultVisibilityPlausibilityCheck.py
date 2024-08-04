@@ -15,16 +15,17 @@ class _CollectUsedTypesVisitor(_lv.Visitor_Recursive):
     def __init__(self) -> None:
         self.typeNumbers = list[int]()
 
-    def header(self, tree: _lark.Tree):
-        typeNumberString = _vh.getChildTokenValue("type_number", tree)
+    def type_number(self, tree: _lark.Tree):
+        typeNumberString = _vh.getChildTokenValue("POSITIVE_INT", tree)
         typeNumber = int(typeNumberString)
         self.typeNumbers.append(typeNumber)
 
     @staticmethod
-    def collectTypeNumbers(globalTree: _lark.Tree) -> _cabc.Sequence[int]:
+    def collectUniqueTypeNumbers(globalTree: _lark.Tree) -> _cabc.Set[int]:
         visitor = _CollectUsedTypesVisitor()
         visitor.visit(globalTree)
-        return visitor.typeNumbers
+        uniqueTypeNumbers = {*visitor.typeNumbers}
+        return uniqueTypeNumbers
 
 
 _TYPE_NUMBERS_WHICH_CAN_ONLY_BE_USED_GLOBALLY = [*range(1924, 1930 + 1), 935, 9351, 9352]
@@ -46,18 +47,20 @@ def checkDefaultVisibility(
         return result.withContext(f"Parsing the file `{ddckFilePath}`")
     tree = result
 
-    usedTypeNumbers = _CollectUsedTypesVisitor.collectTypeNumbers(tree)
+    usedTypeNumbers = _CollectUsedTypesVisitor.collectUniqueTypeNumbers(tree)
 
-    offendingUsedTypeNumbers = [n in _TYPE_NUMBERS_WHICH_CAN_ONLY_BE_USED_GLOBALLY for n in usedTypeNumbers]
+    offendingUsedTypeNumbers = [n for n in usedTypeNumbers if n in _TYPE_NUMBERS_WHICH_CAN_ONLY_BE_USED_GLOBALLY]
 
     if not offendingUsedTypeNumbers:
         return _warn.ValueWithWarnings.create(None)
 
-    formattedOffendingUsedTypeNumbers = "\n".join(f"\t {n}" for n in offendingUsedTypeNumbers)
+    sortedOffendingUsedTypeNumbers = sorted(offendingUsedTypeNumbers)
+    formattedOffendingUsedTypeNumbers = "\n".join(f"\t {n}" for n in sortedOffendingUsedTypeNumbers)
 
     warning = rf"""\
 The following TRNSYS types were found to be used in the ddck file `{ddckFilePath}`:
 {formattedOffendingUsedTypeNumbers}
+
 Usually, these types are used in ddck files which should be included *globally* in your
 config file like so, e.g.:
 
