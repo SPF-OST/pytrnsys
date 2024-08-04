@@ -182,9 +182,7 @@ Invalid syntax: {line}. Usage:
                 else:
                     self._raiseDdckReferenceErrorMessage(line, basePathVariableName, str(relativeDdckFilePath))
 
-                includedDdckFile = _build.IncludedDdckFile(
-                    ddckFilePath, componentName, defaultVisibility
-                )
+                includedDdckFile = _build.IncludedDdckFile(ddckFilePath, componentName, defaultVisibility)
                 self._includedDdckFiles.append(includedDdckFile)
                 self.listDdckPaths.add(str(basePath))
                 self.dictDdckPaths[str(ddckFilePath)] = str(basePath)

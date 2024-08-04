@@ -16,16 +16,16 @@ import tkinter as tk
 import typing as _tp
 from tkinter import messagebox as tkMessageBox
 
-import pytrnsys.utils.warnings as _warn
-import pytrnsys.ddck.replaceTokens.placeholders as _rtph
 import pytrnsys.ddck.perFileDefaultVisibilityPlausibilityCheck as _dvpc
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
+import pytrnsys.ddck.replaceTokens.placeholders as _rtph
 import pytrnsys.ddck.replaceTokens.withoutPlaceholders as _rtwph
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deck
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
 import pytrnsys.utils.result as _res
-import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
+import pytrnsys.utils.warnings as _warn
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -34,7 +34,7 @@ logger.propagate = False
 
 @_dc.dataclass
 class IncludedDdckFile:
-    path: _pl.Path
+    pathWithoutSuffix: _pl.Path
     componentName: str
     defaultVisibility: _dv.DefaultVisibility | None
 
@@ -74,8 +74,10 @@ class BuildTrnsysDeck:
         self.dckAlreadyExists = True
 
     def loadDeck(
-        self, path: str, name: str, componentName: str, defaultVisibility: _dv.DefaultVisibility | None
+        self, path: str, name: str, componentName: str, perFileDefaultVisibility: _dv.DefaultVisibility | None
     ) -> _res.Result[_warn.ValueWithWarnings[tuple[str, str, str]]]:
+        defaultVisibility = perFileDefaultVisibility or self._configDefaultVisibility
+
         ddckFilePath = _pl.Path(path) / f"{name}.{self.extOneSheetDeck}"
 
         visibilityCheckResult = _dvpc.checkDefaultVisibility(ddckFilePath, defaultVisibility)
@@ -105,12 +107,10 @@ class BuildTrnsysDeck:
         return warnings.withValue(header)
 
     def _replacePlaceholdersAndGetContent(
-        self, ddckFilePath: _pl.Path, componentName: str, defaultVisibility: _dv.DefaultVisibility | None
+        self, ddckFilePath: _pl.Path, componentName: str, defaultVisibility: _dv.DefaultVisibility
     ) -> _res.Result[str]:
-        perFileDefaultVisibility = defaultVisibility if defaultVisibility else self._configDefaultVisibility
-
         if not self._ddckPlaceHolderValuesJsonPath:
-            return _rtwph.replaceTokensWithDefaults(ddckFilePath, componentName, perFileDefaultVisibility)
+            return _rtwph.replaceTokensWithDefaults(ddckFilePath, componentName, defaultVisibility)
 
         if not self._ddckPlaceHolderValuesJsonPath.is_file():
             return _res.Error(
@@ -126,7 +126,7 @@ class BuildTrnsysDeck:
             )
 
         computedNamesByPort = placeholderValues.get(componentName, dict())
-        result = _rtph.replaceTokens(ddckFilePath, componentName, computedNamesByPort, perFileDefaultVisibility)
+        result = _rtph.replaceTokens(ddckFilePath, componentName, computedNamesByPort, defaultVisibility)
 
         if _res.isError(result):
             return _res.error(result)
@@ -157,7 +157,7 @@ class BuildTrnsysDeck:
         self.definitions = {}
         warnings = []
         for includedDdckFile in self._includedDdckFiles:
-            ddckFilePath = includedDdckFile.path
+            ddckFilePath = includedDdckFile.pathWithoutSuffix
             ddckFileName = ddckFilePath.name
 
             if ddckFilePath.is_absolute():
@@ -196,7 +196,7 @@ class BuildTrnsysDeck:
 
             self.replaceLines(replaceLineList)
             self.linesChanged = deckUtils.changeAssignPath(self.linesChanged, "path$", dictPaths[str(ddckFilePath)])
-            addedLines = firstThreeLines + self.linesChanged
+            addedLines = [*firstThreeLines, *self.linesChanged]
 
             caption = (
                 "**********************************************************************\n** %s.ddck from %s \n**********************************************************************\n"
@@ -222,27 +222,6 @@ class BuildTrnsysDeck:
         self.logger.debug("Replacemenet of Units done")
 
         return _warn.ValueWithWarnings(None, warnings)
-
-    def createDependencyGraph(self):
-        e = Graph("ER", filename="er.gv", node_attr={"color": "lightblue2", "style": "filled"})
-        e.attr("node", shape="box")
-        variables_global = ["cpwat", "rhowat", "nix", "tamb", "dtsim", "cpbri", "rhobri", "pi", "stop", "start", "zero"]
-        for key, value in self.dependencies.items():
-            e.node(key)
-
-        for key, value in self.dependencies.items():
-            for keyDef, valueDef in self.definitions.items():
-                edgelLabel = ""
-                for dependency in value:
-                    if dependency in valueDef and dependency not in variables_global:
-                        edgelLabel += dependency + "\n"
-                if edgelLabel != "":
-                    e.edge(key, keyDef, label=edgelLabel, style="bold")
-
-        e.attr(label=r"\n\nEntity Relation Diagram\ndrawn by NEATO")
-        e.attr(fontsize="1")
-
-        e.render("er.gv", view=False)
 
     def writeDeck(self, addedLines=None):
         """

@@ -83,7 +83,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
             self.path = os.getcwd()
 
         self._assignStatements: list[_ras.AssignStatement] = []
-        self._ddckFilePathWithComponentNames: list[_btd.IncludedDdckFile] = []
+        self._includedDdckFiles: list[_btd.IncludedDdckFile] = []
 
     def setDeckName(self, _name):
         self.nameBase = _name
@@ -353,7 +353,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
         deck = _btd.BuildTrnsysDeck(
             self.path,
             self.nameBase,
-            self._ddckFilePathWithComponentNames,
+            self._includedDdckFiles,
             self._defaultVisibility,
             self._ddckPlaceHolderValuesJsonPath,
         )
@@ -487,19 +487,19 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
         found = False
         nCharacters = len(source)
 
-        for i in range(len(self._ddckFilePathWithComponentNames)):
-            ddckFilePathWithComponentName = self._ddckFilePathWithComponentNames[i]
+        for i in range(len(self._includedDdckFiles)):
+            oldIncludedDdckFile = self._includedDdckFiles[i]
 
-            ddckFilePath = str(ddckFilePathWithComponentName.path)
+            ddckFilePath = str(oldIncludedDdckFile.pathWithoutSuffix)
 
             mySource = ddckFilePath[-nCharacters:]  # I read only the last characters with the same size as the end file
             if mySource == source:
                 newDdckFilePath = ddckFilePath[0:-nCharacters] + end
                 self.dictDdckPaths[newDdckFilePath] = self.dictDdckPaths[ddckFilePath]
-                newDdckFilePathWithComponentName = _btd.IncludedDdckFile(
-                    _pl.Path(newDdckFilePath), ddckFilePathWithComponentName.componentName
+                newIncludedDdckFile = _btd.IncludedDdckFile(
+                    _pl.Path(newDdckFilePath), oldIncludedDdckFile.componentName, oldIncludedDdckFile.defaultVisibility
                 )
-                self._ddckFilePathWithComponentNames[i] = newDdckFilePathWithComponentName
+                self._includedDdckFiles[i] = newIncludedDdckFile
 
                 found = True
 

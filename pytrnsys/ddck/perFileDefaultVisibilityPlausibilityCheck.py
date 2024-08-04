@@ -15,7 +15,7 @@ class _CollectUsedTypesVisitor(_lv.Visitor_Recursive):
     def __init__(self) -> None:
         self.typeNumbers = list[int]()
 
-    def type_number(self, tree: _lark.Tree):
+    def type_number(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         typeNumberString = _vh.getChildTokenValue("POSITIVE_INT", tree)
         typeNumber = int(typeNumberString)
         self.typeNumbers.append(typeNumber)
@@ -45,7 +45,7 @@ def checkDefaultVisibility(
     result = _parse.parseDdck(ddckFileContent)
     if _res.isError(result):
         return result.withContext(f"Parsing the file `{ddckFilePath}`")
-    tree = result
+    tree = _res.value(result)
 
     usedTypeNumbers = _CollectUsedTypesVisitor.collectUniqueTypeNumbers(tree)
 
