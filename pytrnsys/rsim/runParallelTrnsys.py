@@ -18,6 +18,7 @@ import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.trnsys_util.replaceAssignStatements as _ras
 import pytrnsys.utils.log as log
 import pytrnsys.utils.result as _res
+import pytrnsys.utils.warnings as _warn
 
 
 class RunParallelTrnsys(_gcm.GetConfigMixin):
@@ -82,7 +83,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
             self.path = os.getcwd()
 
         self._assignStatements: list[_ras.AssignStatement] = []
-        self._ddckFilePathWithComponentNames: list[_btd.DdckFilePathWithComponentName] = []
+        self._includedDdckFiles: list[_btd.IncludedDdckFile] = []
 
     def setDeckName(self, _name):
         self.nameBase = _name
@@ -219,9 +220,12 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
                             self.logger.error(error.message)
                             return error
 
+                        warnings = _res.value(result)
+                        warnings.log(self.logger)
+
                         self.createDecksFromVariant()
 
-                        if self.foldersForDDckVariationUsed == True:
+                        if self.foldersForDDckVariationUsed:
                             self.path = originalPath  # recall the original path, otherwise the next folder will be cerated inside the first
             else:
                 result = self.buildTrnsysDeck()
@@ -230,6 +234,9 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
                     error = _res.error(result)
                     self.logger.error(error.message)
                     return error
+
+                warnings = _res.value(result)
+                warnings.log(self.logger)
 
                 self.createDecksFromVariant()
 
@@ -332,7 +339,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
 
         shutil.move(root_src_dir, root_target_dir)
 
-    def buildTrnsysDeck(self) -> _res.Result[str]:
+    def buildTrnsysDeck(self) -> _res.Result[_warn.ValueWithWarnings[str]]:
         """
         It builds a TRNSYS Deck from a listDdck with pathDdck using the BuildingTrnsysDeck Class.
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
@@ -346,7 +353,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
         deck = _btd.BuildTrnsysDeck(
             self.path,
             self.nameBase,
-            self._ddckFilePathWithComponentNames,
+            self._includedDdckFiles,
             self._defaultVisibility,
             self._ddckPlaceHolderValuesJsonPath,
         )
@@ -359,6 +366,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
 
         if _res.isError(result):
             return _res.error(result)
+        warnings = _res.value(result)
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
         deck.writeDeck(addedLines=deckExplanation)
@@ -377,7 +385,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
 
         deck.analyseDck()
 
-        return deck.nameDeck
+        return warnings.withValue(deck.nameDeck)
 
     def runParallel(self, writeLogFile=True):
         if writeLogFile:
@@ -479,19 +487,19 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
         found = False
         nCharacters = len(source)
 
-        for i in range(len(self._ddckFilePathWithComponentNames)):
-            ddckFilePathWithComponentName = self._ddckFilePathWithComponentNames[i]
+        for i in range(len(self._includedDdckFiles)):
+            oldIncludedDdckFile = self._includedDdckFiles[i]
 
-            ddckFilePath = str(ddckFilePathWithComponentName.path)
+            ddckFilePath = str(oldIncludedDdckFile.pathWithoutSuffix)
 
             mySource = ddckFilePath[-nCharacters:]  # I read only the last characters with the same size as the end file
             if mySource == source:
                 newDdckFilePath = ddckFilePath[0:-nCharacters] + end
                 self.dictDdckPaths[newDdckFilePath] = self.dictDdckPaths[ddckFilePath]
-                newDdckFilePathWithComponentName = _btd.DdckFilePathWithComponentName(
-                    _pl.Path(newDdckFilePath), ddckFilePathWithComponentName.componentName
+                newIncludedDdckFile = _btd.IncludedDdckFile(
+                    _pl.Path(newDdckFilePath), oldIncludedDdckFile.componentName, oldIncludedDdckFile.defaultVisibility
                 )
-                self._ddckFilePathWithComponentNames[i] = newDdckFilePathWithComponentName
+                self._includedDdckFiles[i] = newIncludedDdckFile
 
                 found = True
 

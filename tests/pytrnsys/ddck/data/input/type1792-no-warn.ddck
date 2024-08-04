@@ -1,0 +1,336 @@
+**************************************
+**BEGIN type1792.ddck 
+**************************************
+    
+*****************************************
+** Contact person : Dani Carbonell   
+** Creation date  : 30.09.2016
+** Last changes   : 30.04.20 MB
+*****************************************
+
+***************************************************************************
+** Description: 
+** Building demands using the ISO model from the standard model.
+** The heat is delivered by a radiant floor model.
+** Parameters were fitted to fit the IDA-ICE results
+** Reference article is $$$
+** TODO: 
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS 1
+TRdFl = TPiRadIn    
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+EQUATIONS 1
+TRdRt = [42,1]  ! return temperature from space heat distribution system, °C
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+EQUATIONS 3
+qSysOut_BuiDemand 	= PheatBui_kW ! Total heat (without cooling) Heat to Building from Radiator: W --> kW
+qSysIn_BuiDemand  	= PcoolBui_kW !   
+elSysOut_PuShDemand	= PelPuSh_kW  ! To be moved and generated automatically to hydraulic GUI export JS: uncommented, because if it's calculated it should be included here...
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+EQUATIONS 6
+myTrdSet = TrdSet
+myCoolingOn = CoolingOn
+myAreaBui = AreaBui
+myTroomRc = TroomRc
+myTroomSetCool = TroomSetCool
+myTroomSet = TroomSet
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS 2     
+T_Set_d       = MAX(TRdRt,myTrdSet)      ! TrdSet output from TYPE 888. Temperature set point for tempering valve used in hydraulic. 
+PheatBui    = [42,3]*3.6      ! Heat to Building from Radiator: W -> kJ/h
+EQUATIONS 1
+MfrBuiRd  = MfrBuiHeatRd + MfrBuiCoolRd
+
+
+CONSTANTS 4    
+MfrBuiRdNom = 200*nParallelPipe !20*nParallelPipe !PheatRadNom/(CPWAT*(TBuiFlNom-TBuiRtNom))     ! Nominal mass flow of heat distribution system [kg/h] !JS: Divide by factor of 4 to have more realistic values
+PheatRadNom = MfrBuiRdNom*CPWAT*(TBuiFlNom-TBuiRtNom)
+pGainRad = 0.6     
+iGainRad = 0.05     
+
+
+*******************************************************
+** PID controller for mass flow in space heating loop *
+*******************************************************
+
+UNIT 41 TYPE 320     ! PID Controller for Radiator mass flow (Idea: instead of thermostatic valves a PID controler is taken to reduce mass flow if the room temperature gets too high)
+PARAMETERS 7     
+3     ! 1 Temperature width of PID band
+pGainRad     ! 2 Proportional gain PID band
+iGainRad     ! 3 Integral gain PID band
+0     ! 4 Differential gain PID band
+0.5     ! 5 Proportional gain P-band
+0     ! 6 Saturation mode
+0     ! 7 Minimum value controller action in saturation mode
+INPUTS 3     
+myTroomSet        !  Set temperature
+myTroomRc         !  Building: 1- (air temperature of zone)  TAIR   1 ->Feedback room temperature
+0,0          !  Control inversion option 1: increasing, 2: decreasing action
+*** INITIAL INPUT VALUES     
+22 18 2      
+     
+EQUATIONS 3    
+PIDRadBuiMin = 0.15  !  0.05    !0.01 
+PIDBuiOut =  [41,1]
+PIDRadBui = MIN(GT(PIDBuiOut,PIDRadBuiMin)*PIDBuiOut,1) ![41,1]*BoHS     
+**MfrBuiRd  = NOT(BoAuxWWOn)*MfrBuiRdNom*PIDRadBui*BoHS*LE(myTroomRc,myTroomSet+1)  ! DC : added LT(Troom,tRoomSet+1) to avoid heating in spring/summer when tRoom =25 °C     
+** MfrBuiRd  = NOT(BoAuxWWOn)*MfrBuiRdNom*PIDRadBui*BoHS+MfrBuiRdNom*CoolingOn  ! DC : added LT(Troom,tRoomSet+1) to avoid heating in spring/summer when tRoom =25 °C
+ 
+UNIT 44 TYPE 320     ! PID Controller for Cooling Radiator mass flow 
+PARAMETERS 7     
+3     ! 1 Temperature width of PID band
+pGainRad     ! 2 Proportional gain PID band
+iGainRad     ! 3 Integral gain PID band
+0     ! 4 Differential gain PID band
+0.5     ! 5 Proportional gain P-band
+0     ! 6 Saturation mode
+0     ! 7 Minimum value controller action in saturation mode
+INPUTS 3     
+myTroomSetCool        !  Set temperature
+myTroomRc         !  Building: 1- (air temperature of zone)  TAIR   1 ->Feedback room temperature
+0,0          !  Control inversion option 1: increasing, 2: decreasing action
+*** INITIAL INPUT VALUES     
+24 22 1      
+     
+EQUATIONS 4    
+PIDRadCoolBuiMin = 0.15  !  0.05    !0.01   
+PIDRaCooldBui = MIN(MAX([44,1],PIDRadCoolBuiMin),1) ! DC, JEREMIAS you had [41,1]
+MfrBuiCoolRd  = MfrBuiRdNom*myCoolingOn  ! JS: cooling no longer uses PID, but instead a deadband
+MfrBuiHeatRd  = MfrBuiRdNom*NOT(myCoolingOn)*PIDRadBui
+
+
+*******************************************************
+** Definition of radiant floor *
+*******************************************************
+
+CONSTANTS 17
+AFloor     =  myAreaBui ! m2 !JS it is 120, was added on config level
+dxBetweenTubes = 0.144
+LFloorPipe = 200 ! 50 m/pipe
+LFloorPipeTotal = 7*AFloor!6.95*AFloor !
+dFloorPipe      = 0.015 
+nParallelPipe   = LFloorPipeTotal/LFloorPipe+1 ! usually distance 10-15 cm
+indexPipeLayer  = 2 !from bottom !!!! IT SHOULD BE CHANGED !!!!!
+pipeFloorWallThick   = 0.002 ! 2 mm thickness
+lambdaFloorPipe  = 0.4 ! W/mK multi layer tube (pastic PE-RT +  aluminium (oxygen tight) + PE-HD)
+alphaMode    = 0 ! calculated internally -1 alpha for all Cv, 1 using tin, 0 fixed
+accelerator  = 0
+nCvFloorPipe = 100
+TiniFloor    = 30
+epsilonWood  = 0.9 
+nMatType1792 = 4 !LAYERS FROM TOP TO BOTTOM : (1) wood, (2) beton, (3) pipe, (4) insulation
+nParType1792 = 15+nMatType1792*5
+bocoDown = 0 ! U and T below the floor
+
+CONSTANTS 18
+thickInsFloor  = 0.042 !
+lambdaInsFloor = 0.037
+cpInsFloor     = 2.1 ! kJ/kgK
+rhoInsFloor    = 280
+nCvInsFloor    = 1
+thickBetonPipe = dFloorPipe
+nCvBetonPipe = 1
+thickBeton  = 0.04 -  thickBetonPipe
+lambdaBeton = 2
+cpBeton     = 0.950 ! kJ/kgK
+rhoBeton    = 250 
+nCvBeton    = 1 
+thickWood   = 0.01
+lambdaWood  = 0.1
+cpWood      = 2.3
+rhoWood     = 600
+nCvWood     = 1
+epsilonDown = 0
+EQUATIONS 6		!TRY WITH RC to see if It problems are solved
+TfloorUp    = myTroomRc
+TBelowFloor = myTroomRc     !To avoid bot losses we use U=0 (adiabatic) since losses has been already included in the building model
+TviewUp     = myTroomRc
+TviewDown = 0
+UBelowFloor = 0.0 ! adiabatic
+UconvUp = -1
+
+UNIT 42 TYPE 1792     ! Radiant floor
+PARAMETERS nParType1792     
+AFloor   	![m^2]        total area of floor
+dxBetweenTubes       ![m]    total length of heating pipe 
+dFloorPipe       ![m]     diameter of heating pipe
+nParallelPipe    ![-]     number of parallel pipes
+indexPipeLayer   ![-]     index pipe layer from the bottom
+pipeFloorWallThick   ![m]     thickness of pipe wall
+lambdaFloorPipe  ![W/m/K] heat conductivity pipe wall
+alphaMode        ![-]     Mode of forced heat transfer coefficient computation
+accelerator		 ! calculation acceleration		
+CPWAT            ![kJ/K/kg]           specific heat of fluid
+nCvFloorPipe     ![-]                    number of control volumes (cells) in fluid model
+TiniFloor        ![°C]                   initial floor temperature
+epsilonWood      ![-]                    emissivity of layer at the interface to the room
+epsilonDown     ![-]                    number of different materials
+nMatType1792
+******
+thickWood 
+lambdaWood
+cpWood    		    
+rhoWood           
+nCvWood   
+******
+thickBeton     ![m]                    thickness of material
+lambdaBeton    ![W/m/K]                heat conduction coefficient of material
+cpBeton        ![kJ/K/kg] -> [J/K/kg]  specific heat of material
+rhoBeton       ![kg/m^3]
+nCvBeton       ![-]                    number of control volumes for this material
+*****
+thickBetonPipe    ![m]                    thickness of material
+lambdaBeton    ![W/m/K]                heat conduction coefficient of material
+cpBeton        ![kJ/K/kg] -> [J/K/kg]  specific heat of material
+rhoBeton       ![kg/m^3]
+nCvBetonPipe   ![-]                    number of control volumes for this material
+**********
+thickInsFloor    ![m]                    thickness of material
+lambdaInsFloor   ![W/m/K]                heat conduction coefficient of material
+cpInsFLoor       ![kJ/K/kg] -> [J/K/kg]  specific heat of material
+rhoInsFloor      ![kg/m^3]
+nCvInsFloor      ![-]                    number of control volumes for this material
+******
+INPUTS 8
+TRdFl     ! supply Temperature
+MfrBuiRd  ! mass flow rate    [kg/h
+TfloorUp   ! room air temperature  Top    [°C]
+TBelowFloor  ! ground temperature at 1 m depth    [°C] 
+TviewUp    ! room field temperature    [°C]
+TviewDown	! lower room field temperature
+UconvUp		! upper room U value (if set to negtive value-->internal calculation)
+UBelowFloor   ! room field temperature below if bocoDown=1, if bocoDown=0 UA between floor and ground (TfloorBot)   [°C]
+
+*** INITIAL INPUT VALUES     
+35 MfrBuiRdNom 21 21 21 21 -1 0
+
+EQUATIONS 19
+mFlowPerRadFloorTube = [42,2] 
+PRdIn_kW    = [42,4]/1000 ! heat injected by fluid to floor W -> kW
+**PheatBui_kW = MAX([42,3]/1000,0)      ! Heat to Building from Radiator: W --> kW
+PtotBui_kW = [42,3]/1000      ! Heat to Building from Radiator: W --> kW
+PheatBui_kW = PRdIn_kW*GT(PRdIn_kW,0)  ! total heat (without cooling)  Heat to Building from Radiator: W --> kW
+PcoolBui_kW = -PRdIn_kW*LE(PRdIn_kW,0)  ! total cooling     
+** PcoolBui_kW = MIN([42,3]/1000,0)      ! Heat to Building from Radiator: W --> kW
+QAcumRadiator = -[42,5]/1000     !Total Accumulated Heat in Radiator, such that in+acum=out
+RadFloorLoss_kW  =  [42,6]/1000
+TWood = [42,7]
+PheatBuiRad_kW  = [42,9]/1000  ! total useful
+PheatBuiConv_kW = [42,10]/1000 ! total useful
+PheatBuiRadBot_kW  = [42,11]/1000  !loss
+PheatBuiConvBot_kW = [42,12]/1000 !loss
+PheatBuiBot_KW = PheatBuiRadBot_kW+PheatBuiConvBot_kW ! we assume losses below are inputs to lower flat. 
+MfrSh = MfrBuiRd     
+BoPumpShOn = GT(MfrSh,0.0001)     ! actual pressure-drop of space heat distribution in Pascal, Pa
+ImbRad=PRdIn_KW+QAcumRadiator-PtotBui_kW     
+RadInImb = PRdIn_kW-CPWat*MfrBuiRd*(TRdFl-TRDRt)/3600        
+ratioRad = GT(PtotBui_kW,0.)*(PheatBuiRad_kW/(0.00001+PheatBuiConv_kW))
+TfloorLayerBot = [42,13]	
+ 
+EQUATIONS 2
+PheatBuiRad  = [42,9]*3.6    !W -> kJ/h
+PheatBuiConv = [42,10]*3.6   !W -> kJ/h
+     
+** Attention! No mass flow dependency of the efficiency here due to thermostatic valves!     
+EQUATIONS 7     ! Electric pump power for space heat distribution
+MfrShNom = MfrBuiRdNom     ! nominal mass flow rate, kg/h
+dpShNom_bar = 0.25     ! pressure-drop of loop at nominal mass flow, bar     
+frMfrSh= MfrSh/MfrShNom     ! Flow rate fraction of nominal flow rate    
+dpSh_bar = (frMfrSh)^2*dpShNom_bar     ! pressure drop at actual mass flow rate, bar
+PflowSh_W = ((MfrShNom/3600)/RhoWat)*dpShNom_bar*100000     ! required power to drive the flow, W
+etaPuSh = 0.3-0.00*(1-frMfrSh)     ! pump efficiency equation dependent on fractional mass flow rate of nominal mass flow rate
+PelPuSh_kW = GT(MfrSh,1)*0.015     ! required pump electric power, kW
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!MONTHLY PRINTER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+CONSTANTS 1
+unitPrinterHeat=123
+
+ASSIGN    temp\HEATING_DISTR_MO.Prt     unitPrinterHeat
+
+UNIT 123 Type 46 ! Printegrator Monthly Values for System
+PARAMETERS 6    
+unitPrinterHeat ! 1: Logical unit number, -
+-1             ! 2: Logical unit for monthly summaries, -
+1              ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1             ! 4: Printing & integrating interval, h. -1 for monthly integration
+1              ! 5: Number of inputs to avoid integration, -
+1              ! 6: Output number to avoid integration
+INPUTS 5
+Time  PheatBui_kW  PRdIn_kW  PcoolBui_kW QAcumRadiator
+***************
+Time  PheatBui_kW  PRdIn_kW  PcoolBui_kW QAcumRadiatorc
+
+*******************************
+** hourly printer
+*******************************
+CONSTANTS 1
+unitPrinterHeatHr = 517
+
+ASSIGN temp\HEATING_DISTR_HR.hr      unitPrinterHeatHr  
+UNIT 517 Type 46     ! Printegrator hourly Values for System
+PARAMETERS 6    
+unitPrinterHeatHr   ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1 ! 6: Output number to avoid integration
+
+INPUTS 7
+Time TRdFl TrdRt ImbRad 
+MfrBuiRd PRdIn_KW  PheatBui_kW
+***
+Time TRdFl TrdRt ImbRad 
+MfrBuiRd PRdIn_KW  PheatBui_kW
+	
+	
+UNIT 59 TYPE 65     ! Online Plotter Building (element OpB)
+PARAMETERS 12     
+4     ! 1 Nb. of left-axis variables
+7     ! 2 Nb. of right-axis variables
+-5     ! 3 Left axis minimum
+60     ! 4 Left axis maximum
+-10     ! 5 Right axis minimum
+50     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+0     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 11     
+Tamb  myTroomRc  TRdFl TrdRt  
+BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW   ImbRad
+*******
+Tamb  myTroomRc  TRdFl TrdRt  
+BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW  ImbRad
+****
+LABELS  3     
+Temperatures     
+Power     
+RadFloor

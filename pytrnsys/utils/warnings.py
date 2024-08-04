@@ -1,4 +1,5 @@
 import dataclasses as _dc
+import logging as _log
 import typing as _tp
 
 _ValueType_co = _tp.TypeVar("_ValueType_co", covariant=True)
@@ -19,6 +20,14 @@ class ValueWithWarnings(_tp.Generic[_ValueType_co]):
     def toWarningMessage(self, seperator: str = "\n") -> str:
         warningMessage = seperator.join(self.warnings)
         return warningMessage
+
+    def log(self, logger: _log.Logger) -> None:
+        if not self.hasWarnings():
+            return
+
+        message = self.toWarningMessage()
+
+        logger.warning(message)
 
     @staticmethod
     def create(

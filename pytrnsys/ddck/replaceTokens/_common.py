@@ -9,6 +9,7 @@ from lark import visitors as _lvis
 
 from . import _tokens
 from .defaultVisibility import DefaultVisibility
+from .. import _visitorHelpers as _vh
 
 
 @_dc.dataclass
@@ -106,8 +107,8 @@ class ComputedEnergyVariable(_tokens.Token):
 
 
 def createComputedVariable(tree: _lark.Tree, portProperty: str) -> ComputedVariable:
-    portName = getChildTokenValue("PORT_NAME", tree)
-    defaultVariableName = getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", tree)
+    portName = _vh.getChildTokenValue("PORT_NAME", tree)
+    defaultVariableName = _vh.getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", tree)
     computedVariable = ComputedVariable(
         tree.meta.line,
         tree.meta.column,
@@ -129,15 +130,15 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
         self.computedEnergyVariables: list[ComputedEnergyVariable] = []
 
     def computed_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
-        propertyName = getChildTokenValue("PORT_PROPERTY", tree)
+        propertyName = _vh.getChildTokenValue("PORT_PROPERTY", tree)
         computedVariable = createComputedVariable(tree, propertyName)
         self.computedHydraulicVariables.append(computedVariable)
 
     def computed_output_energy_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
-        direction = getChildTokenValue("ENERGY_DIRECTION", tree)
-        quality = getChildTokenValue("ENERGY_QUALITY", tree)
-        categoryOrLocal = getChildTokenValue("CATEGORY_OR_LOCAL", tree)
-        categories = _getChildTokenValues("CATEGORY", tree)
+        direction = _vh.getChildTokenValue("ENERGY_DIRECTION", tree)
+        quality = _vh.getChildTokenValue("ENERGY_QUALITY", tree)
+        categoryOrLocal = _vh.getChildTokenValue("CATEGORY_OR_LOCAL", tree)
+        categories = _vh.getChildTokenValues("CATEGORY", tree)
 
         computedEnergyVariable = ComputedEnergyVariable(
             tree.meta.line,
@@ -187,34 +188,9 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
     @staticmethod
     def _createVariable(clazz: _tp.Type[_T], tree: _lark.Tree) -> _T:
-        name = getChildTokenValue("NAME", tree)
+        name = _vh.getChildTokenValue("NAME", tree)
         variable = clazz(tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos, name)
         return variable
-
-
-def getChildTokenValue(tokenType: str, tree: _lark.Tree) -> str:
-    tokenValueOrNone = getChildTokenValueOrNone(tokenType, tree)
-    if not tokenValueOrNone:
-        raise ValueError(f"`{tree.data}` doesn't contain a direct child token of type `{tokenType}`.")
-
-    return tokenValueOrNone
-
-
-def getChildTokenValueOrNone(tokenType: str, tree: _lark.Tree) -> _tp.Optional[str]:
-    values = _getChildTokenValues(tokenType, tree)
-
-    nValues = len(values)
-    if nValues == 0:
-        return None
-
-    if nValues > 1:
-        raise ValueError(f"More than one token of type {tokenType} found.")
-
-    return values[0]
-
-
-def _getChildTokenValues(tokenType: str, tree: _lark.Tree) -> _cabc.Sequence[str]:
-    return [c.value for c in tree.children if isinstance(c, _lark.Token) and c.type == tokenType]
 
 
 def getLocalNames(localVariables: _cabc.Sequence[LocalVariable], componentName: str) -> _cabc.Sequence[str]:
@@ -241,16 +217,9 @@ def _getComputedEnergyName(computedEnergyVariable: ComputedEnergyVariable, compo
     variableCategory = computedEnergyVariable.category
     category = componentName if variableCategory == ":" else variableCategory
 
-    capitalizedSubcategories = [_capitalizeFirstLetter(c) for c in computedEnergyVariable.subCategories]
+    capitalizedSubcategories = [c.capitalize() for c in computedEnergyVariable.subCategories]
     jointSubcategories = "".join(c for c in capitalizedSubcategories)
 
     computedName = f"{quality}Sys{direction}_{category}{jointSubcategories}"
 
     return computedName
-
-
-def _capitalizeFirstLetter(string: str) -> str:
-    if not string:
-        return ""
-
-    return f"{string[0].upper()}{string[1:]}"
