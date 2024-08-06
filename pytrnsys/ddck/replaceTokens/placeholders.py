@@ -27,9 +27,15 @@ def replaceTokens(
 
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
-    return replaceTokensInString(
-        inputDdckContent, componentName, computedNamesByPort, defaultVisibility, inputDdckFilePath
-    )
+    result = replaceTokensInString(inputDdckContent, componentName, computedNamesByPort, defaultVisibility)
+
+    if _res.isError(result):
+        error = _res.error(result)
+        errorWithContext = error.withContext(f"Could not replace placeholders in ddck file `{inputDdckFilePath}`")
+        return errorWithContext
+
+    content = _res.value(result)
+    return content
 
 
 def replaceTokensInString(  # pylint: disable=too-many-locals
@@ -37,18 +43,10 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
     componentName: str,
     computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]],
     defaultVisibility: _dv.DefaultVisibility,
-    inputDdckFilePath: _tp.Optional[_pl.Path] = None,
 ) -> _res.Result[str]:
     treeResult = _parse.parseDdck(content)
     if _res.isError(treeResult):
-        if not inputDdckFilePath:
-            return _res.error(treeResult)
-
-        moreSpecificError = _res.error(treeResult).withContext(
-            f"An error was found in ddck file {inputDdckFilePath.name}"
-        )
-
-        return moreSpecificError
+        return _res.error(treeResult)
     tree = _res.value(treeResult)
 
     visitor = _WithPlaceholdersJSONCollectTokensVisitor(defaultVisibility)
@@ -63,14 +61,7 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
 
     computedHydraulicNamesResult = _getComputedHydraulicNames(visitor.computedHydraulicVariables, computedNamesByPort)
     if _res.isError(computedHydraulicNamesResult):
-        if inputDdckFilePath:
-            contextMessage = f"Error replacing placeholders in file {inputDdckFilePath.name}"
-        else:
-            contextMessage = "Error replacing placeholders"
-
-        errorWithContext = _res.error(computedHydraulicNamesResult).withContext(contextMessage)
-
-        return errorWithContext
+        return _res.error(computedHydraulicNamesResult)
     computedHydraulicNames = _res.value(computedHydraulicNamesResult)
 
     computedEnergyNames = _common.getComputedEnergyNames(visitor.computedEnergyVariables, componentName)

@@ -38,7 +38,7 @@ def checkDefaultVisibility(
         return _warn.ValueWithWarnings.create(None)
 
     try:
-        ddckFileContent = ddckFilePath.read_text("UTF8")
+        ddckFileContent = ddckFilePath.read_text("windows-1252")
     except OSError as error:
         return _res.Error(f"An error occurred opening the file `{ddckFilePath}`: {error}")
 
@@ -57,17 +57,16 @@ def checkDefaultVisibility(
     sortedOffendingUsedTypeNumbers = sorted(offendingUsedTypeNumbers)
     formattedOffendingUsedTypeNumbers = "\n".join(f"\t {n}" for n in sortedOffendingUsedTypeNumbers)
 
-    warning = rf"""\
+    warning = f"""\
 The following TRNSYS types were found to be used in the ddck file `{ddckFilePath}`:
 {formattedOffendingUsedTypeNumbers}
 
 Usually, these types are used in ddck files which should be included *globally* in your
 config file like so, e.g.:
 
-    PROJECT$ path\to\{ddckFilePath.stem} global
+    PROJECT$ path\\to\\{ddckFilePath.stem} global
 
-The simulation will try to proceed anyway, but if you run into errors consider importing
-this file globally.
+If you run into errors consider importing this file globally.
 """
 
     return _warn.ValueWithWarnings.create(None, warning)
