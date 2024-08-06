@@ -60,7 +60,9 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorB
         numberOfOutputAssignmentsWithoutDefaults = len(assignments)
 
         if nEquations == numberOfOutputAssignmentsWithoutDefaults:
-            equationsBlockToRemove = _Equations(tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos)
+            equationsBlockToRemove = _Equations(
+                tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos
+            )
             self.equationsBlocksToRemove.append(equationsBlockToRemove)
             return
 
@@ -181,7 +183,9 @@ def _getReplacements(
             f"{formattedLocations}\n"
         )
         return _res.Error(errorMessage)
-    defaultNamesForComputedVariables = [_tp.cast(str, v.defaultVariableName) for v in visitor.computedHydraulicVariables]
+    defaultNamesForComputedVariables = [
+        _tp.cast(str, v.defaultVariableName) for v in visitor.computedHydraulicVariables
+    ]
 
     computedEnergyNames = _common.getComputedEnergyNames(visitor.computedEnergyVariables, componentName)
 

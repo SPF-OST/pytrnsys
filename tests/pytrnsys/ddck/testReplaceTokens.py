@@ -189,7 +189,7 @@ qSysOut_QSnk60TessAcum = QSnk60dQ
         assert _res.isError(result)
         error = _res.error(result)
         print(error.message)
-        expectedErrorMessage = """\
-Error replacing placeholders in file type951_non_existent_port.ddck:
+        expectedErrorMessage = f"""\
+Could not replace placeholders in ddck file `{inputDdckFilePath}`:
 Unknown port `HotIn`."""
         assert error.message == expectedErrorMessage
