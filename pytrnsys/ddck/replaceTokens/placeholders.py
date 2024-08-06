@@ -54,9 +54,10 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
     visitor = _WithPlaceholdersJSONCollectTokensVisitor(defaultVisibility)
     try:
         visitor.visit(tree)
-    except _common.ReplaceTokenError as error:
-        errorMessage = error.getErrorMessage(content)
-        return _res.Error(errorMessage)
+    except _common.ReplaceTokenError as replaceTokenError:
+        errorMessage = replaceTokenError.getErrorMessage(content)
+        error = _res.Error(errorMessage).withContext(f"Processing ddck file `{inputDdckFilePath}`")
+        return error
 
     localNames = _common.getLocalNames(visitor.localVariables, componentName)
     globalNames = _common.getGlobalNames(visitor.globalVariables)
