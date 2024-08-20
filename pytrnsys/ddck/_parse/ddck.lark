@@ -44,13 +44,21 @@ relax_factor_max: number_or_explicit_var
 
 end: "END"i
 
-?listing_control: width | list
+?listing_control: width | list | nolist
 
 width: "WIDTH"i positive_int_or_explicit_var -> width
 
 list: "LIST"i
 
-?component_control: unit
+nolist: "NOLIST"i
+
+?component_control: unit | trace | etrace
+
+trace: "TRACE"i ton toff
+etrace: "ETRACE"i ton toff
+
+ton: number_or_explicit_var
+toff: number_or_explicit_var
 
 version: "VERSION"i version_number
 
