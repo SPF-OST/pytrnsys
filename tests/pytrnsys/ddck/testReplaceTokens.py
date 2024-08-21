@@ -82,6 +82,27 @@ class TestReplaceTokens:
         assert actualDdckContent == expectedDdckFilePath.read_text()
 
     @staticmethod
+    def testReplaceTokensIncorrectUsageOfTrace():
+        """ This test does not check the full error message, because the order of the options is flaky. """
+
+        inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input_TRACE_incorrect.ddck"
+        componentName = "IGNORED"
+        # with _pt.raises(AssertionError):
+
+        error = _rtwph.replaceTokensWithDefaults(
+                inputDdckFilePath, componentName, _dv.DefaultVisibility.GLOBAL
+            )
+        assert """\
+Error processing file `type977_v1_input_TRACE_incorrect.ddck`:
+No terminal matches 'T' in the current parser context, at line 4 col 1
+
+TRACE 15 25
+^
+""" in error.message
+
+    # TODO: add trace used correctly
+
+    @staticmethod
     def testReplaceTokensWithDefaultsMissingInputVariableDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input_missing_default.ddck"
         componentName = "IGNORED"

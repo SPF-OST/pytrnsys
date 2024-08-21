@@ -44,7 +44,7 @@ relax_factor_max: number_or_explicit_var
 
 end: "END"i
 
-?listing_control: width | list | nolist
+?listing_control: width | list | nolist  | etrace
 
 width: "WIDTH"i positive_int_or_explicit_var -> width
 
@@ -52,13 +52,12 @@ list: "LIST"i
 
 nolist: "NOLIST"i
 
-?component_control: unit | trace | etrace
-
-trace: "TRACE"i ton toff
 etrace: "ETRACE"i ton toff
 
 ton: number_or_explicit_var
 toff: number_or_explicit_var
+
+?component_control: unit
 
 version: "VERSION"i version_number
 
@@ -66,7 +65,7 @@ version_number: positive_int_or_explicit_var
 
 accelerate: "ACCELERATE"i positive_int_or_explicit_var (positive_int_or_explicit_var "," positive_int_or_explicit_var)+
 
-unit: header [parameters] [inputs [labels]]
+unit: header [parameters] [inputs [labels]] [trace]
 
 header: "UNIT"i unit_number "TYPE"i type_number [header_comment]
 
@@ -104,6 +103,8 @@ equations: "EQUATIONS"i number_of_equations equation+
 number_of_equations: POSITIVE_INT
 
 equation: assignment_target "=" sum
+
+trace: "TRACE"i ton toff
 
 ?assignment_target: explicit_var | computed_output_var | unreferencable_var
 
