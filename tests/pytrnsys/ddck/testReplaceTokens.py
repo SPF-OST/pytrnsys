@@ -100,8 +100,6 @@ TRACE 15 25
 ^
 """ in error.message
 
-    # TODO: add trace used correctly
-
     @staticmethod
     def testReplaceTokensWithDefaultsMissingInputVariableDefaults():
         inputDdckFilePath = _REPLACE_WITH_DEFAULTS_DATA_DIR / "type977_v1_input_missing_default.ddck"
