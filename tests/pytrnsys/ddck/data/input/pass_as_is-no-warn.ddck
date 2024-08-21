@@ -1,0 +1,33 @@
+*******************************
+**BEGIN pass_as_is.ddck
+*******************************
+LIST
+
+UNIT 501 TYPE 931
+!PiFCUIn
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+7
+2
+20
+INPUTS 4
+5
+4
+15
+2
+***Initial values
+20 0.0 20 20
+TRACE 12 50
+
+NOLIST
+
+ETRACE 75 500
+
+CONSTANTS 1
+var1 = 2
+
+*******************************
+**END pass_as_is.ddck
+*******************************

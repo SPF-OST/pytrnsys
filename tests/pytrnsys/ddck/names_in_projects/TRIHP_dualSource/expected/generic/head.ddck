@@ -87,14 +87,15 @@ NPlotsPerSim = 18
 **************************************
 
 CONSTANTS 7 
-CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 °C Tyfocor LS
-RHOBRI = 1016.0  ! density Glycol [kg/m³]; Value for an average pipe temperature with 55 °C Tyfocor L
-CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 °C
-RHOWAT = 998.0   ! density of Water  [kg/m³] at20 °C
+CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 Â°C Tyfocor LS
+RHOBRI = 1016.0  ! density Glycol [kg/mÂ³]; Value for an average pipe temperature with 55 Â°C Tyfocor L
+CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 Â°C
+RHOWAT = 998.0   ! density of Water  [kg/mÂ³] at20 Â°C
 LAMWAT = 0.58    ! heat conductivity W/(mK) 
 CPWAT_SI = CPWAT*1000 ! J/(kgK)    
 CPBRI_SI = CPBRI*1000 ! J/(kgK)    
 
+ETRACE 12 50
 *******************************
 **END Head.dck
 *******************************
