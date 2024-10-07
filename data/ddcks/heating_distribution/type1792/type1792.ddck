@@ -54,7 +54,7 @@ myTroomSet = TroomSet
 ** outputs to other ddck
 ***********************************
 EQUATIONS 2     
-T_Set_d = MAX(TRdRt,myTrdSet)		! TrdSet output from TYPE 888. Temperature set point for tempering valve used in hydraulic. 
+T_Set_d = MAX(@temp(Out, TRdRt),myTrdSet)		! TrdSet output from TYPE 888. Temperature set point for tempering valve used in hydraulic. 
 PheatBui = [42,3]*3.6				! Heat to Building from Radiator: W -> kJ/h
 EQUATIONS 1
 MfrBuiRd = MfrBuiHeatRd + MfrBuiCoolRd
@@ -236,7 +236,7 @@ PheatBuiBot_KW = PheatBuiRadBot_kW+PheatBuiConvBot_kW		! we assume losses below 
 MfrSh = MfrBuiRd     
 BoPumpShOn = GT(MfrSh,0.0001)								! actual pressure-drop of space heat distribution in Pascal, Pa
 ImbRad=PRdIn_KW+QAcumRadiator-PtotBui_kW     
-RadInImb = PRdIn_kW-CPWat*MfrBuiRd*(TRdFl-TRDRt)/3600        
+RadInImb = PRdIn_kW-CPWat*MfrBuiRd*(TRdFl-@temp(Out, TRdRt))/3600        
 ratioRad = GT(PtotBui_kW,0.)*(PheatBuiRad_kW/(0.00001+PheatBuiConv_kW))
 TfloorLayerBot = [42,13]	
  
@@ -282,10 +282,10 @@ unitPrinterHeatHr		! 1: Logical unit number, -
 1						! 6: Output number to avoid integration
 
 INPUTS 7
-Time TRdFl TrdRt ImbRad 
+Time TRdFl @temp(Out, TRdRt) ImbRad 
 MfrBuiRd PRdIn_KW  PheatBui_kW
 ***
-Time TRdFl TrdRt ImbRad 
+Time TRdFl @temp(Out, TRdRt) ImbRad 
 MfrBuiRd PRdIn_KW  PheatBui_kW
 	
 **UNIT 59 TYPE 65		! Online Plotter Building (element OpB)
@@ -303,10 +303,10 @@ MfrBuiRd PRdIn_KW  PheatBui_kW
 **0					! 11: Output file units
 **0					! 12: Output file delimiter
 **INPUTS 11     
-**Tamb  myTroomRc  TRdFl TrdRt  
+**Tamb  myTroomRc  TRdFl @temp(Out, TRdRt)  
 **BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW   ImbRad
 *********
-**Tamb  myTroomRc  TRdFl TrdRt  
+**Tamb  myTroomRc  TRdFl @temp(Out, TRdRt)  
 **BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW  ImbRad
 ******
 **LABELS  3     

@@ -18,10 +18,10 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 4
-TSourceDHWHXIn = @temp(Side1In, TPiHxDhwIn)
-MfrSourceDHWHXIn = ABS(@mfr(Side1In, MfrPiHxDhwIn))
-TLoadDHWHXIn = @temp(Side2In, TPiHxDhwSecIn)
-MfrLoadDHWHXIn = ABS(@mfr(Side2In, MfrPiHxDhwSecIn))
+TSourceDHWHXIn = @temp(In1, TPiHxDhwIn)
+MfrSourceDHWHXIn = ABS(@mfr(In1, MfrPiHxDhwIn))
+TLoadDHWHXIn = @temp(In2, TPiHxDhwSecIn)
+MfrLoadDHWHXIn = ABS(@mfr(In2, MfrPiHxDhwSecIn))
 
 *************************************************************************************************
 ** Dependencies with other types
@@ -35,8 +35,8 @@ TDhwSetPoint = Tdhwset
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 2
-@temp(Side1Out, TsourceDHWHXOut) = TsourceDHWHXOutT		!TSourceDHWHXIn-HTR_HXDHWHX/(MfrSourceDHWHXIn*cpWat+0.0000000000000000001)
-@temp(Side2Out, TLoadDHWHXOut) = [501,7]				!Load side outlet temperature	C
+@temp(Out1, TsourceDHWHXOut) = TsourceDHWHXOutT		!TSourceDHWHXIn-HTR_HXDHWHX/(MfrSourceDHWHXIn*cpWat+0.0000000000000000001)
+@temp(Out2, TLoadDHWHXOut) = [501,7]				!Load side outlet temperature	C
 
 ***********************************
 ** outputs to other ddck

@@ -87,7 +87,7 @@ dMfrHpCondDec = -dMfrHpCondInc
 dtSetHp = 5
 
 EQUATIONS 1
-dTProPID= HpIsOn*(THpCondOut-THpCondIn)+NOT(HpIsOn)*5
+dTProPID= HpIsOn*(@temp(Out, THpCondOut)-THpCondIn)+NOT(HpIsOn)*5
 
 *************************************
 ** CONTROL OF ASHP MASSFLOW
@@ -236,7 +236,7 @@ PelPuAuxBri_kW = GT(MfrEvapIn,0.1)*PelPuAuxBrine_kW							! GT(MfrcondIn,0.1)*Pe
 	 
 EQUATIONS 2
 dtEvap = ThpEvapIn-THpEvapOut
-dtCond = THpCondOut-THpCondIn
+dtCond = @temp(Out, THpCondOut)-THpCondIn
 
 *************************************
 ** Monthly printer
@@ -299,10 +299,10 @@ nPlotsPerSim		! 7: Number of plots per simulation
 0					! 11: Output file units
 0					! 12: Output file delimiter
 INPUTS 20     
-ThpEvapIn THpEvapOut THpCondIn THpCondOut myHpIsOn HpIsBlock Nix Nix  Nix Nix
+ThpEvapIn THpEvapOut THpCondIn @temp(Out, THpCondOut) myHpIsOn HpIsBlock Nix Nix  Nix Nix
 MfrEvapIn MfrCondIn PauxEvap_kW PauxCond_kW   frCond dtEvap dtCond PAuxLossStart_kW Nix Nix
 **
-ThpEvapIn THpEvapOut THpCondIn THpCondOut myHpIsOn HpIsBlock Nix Nix  Nix Nix
+ThpEvapIn THpEvapOut THpCondIn @temp(Out, THpCondOut) myHpIsOn HpIsBlock Nix Nix  Nix Nix
 MfrEvapIn MfrCondIn PauxEvap_kW PauxCond_kW   frCond dtEvap dtCond PAuxLossStart_kW Nix Nix
 LABELS  3     
 Temperatures     

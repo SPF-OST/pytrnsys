@@ -14,3 +14,10 @@ venv312
 /build/
 /dist/
 /pytrnsys.egg-info/
+/pytrnsys/.idea/.gitignore
+/pytrnsys/.idea/inspectionProfiles/profiles_settings.xml
+/pytrnsys/.idea/misc.xml
+/pytrnsys/.idea/modules.xml
+/pytrnsys/.idea/pytrnsys.iml
+/pytrnsys/.idea/vcs.xml
+/venv_pytrnsys/
