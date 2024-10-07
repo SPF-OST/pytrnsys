@@ -5,11 +5,12 @@ import typing as _tp
 import lark as _lark
 from lark import visitors as _lvis
 
+import pytrnsys.ddck._visitorHelpers as _vh
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 from pytrnsys.utils import result as _res
 from . import _common
-from . import _parse
 from . import _tokens
+from .._parse import parse as _parse
 
 
 @_dc.dataclass
@@ -53,7 +54,7 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorB
             return
 
         nEquationsTree = _getSubtree("number_of_equations", tree)
-        nEquationsAsString = _common.getChildTokenValue("POSITIVE_INT", nEquationsTree)
+        nEquationsAsString = _vh.getChildTokenValue("POSITIVE_INT", nEquationsTree)
         nEquations = int(nEquationsAsString)
 
         numberOfOutputAssignmentsWithoutDefaults = len(assignments)
@@ -101,13 +102,13 @@ class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(_lvis.Visitor_Recurs
         if assignmentTarget.data != "computed_output_temp_var":
             return
 
-        defaultVariableName = _common.getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", assignmentTarget)
+        defaultVariableName = _vh.getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", assignmentTarget)
         if defaultVariableName:
             computedVariable = _common.createComputedVariable(assignmentTarget, "@temp")
             self.outputVariablesWithDefault.append(computedVariable)
             return
 
-        portName = _common.getChildTokenValue("PORT_NAME", assignmentTarget)
+        portName = _vh.getChildTokenValue("PORT_NAME", assignmentTarget)
         outputVariableAssignment = _OutputVariableAssignment(
             tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos, portName
         )
@@ -140,8 +141,8 @@ def replaceTokensWithDefaultsInString(
     visitor = _WithoutPlaceholdersJSONCollectTokensVisitor(defaultVisibility)
     try:
         visitor.visit(tree)
-    except _common.ReplaceTokenError as error:
-        errorMessage = error.getErrorMessage(inputDdckContent)
+    except _common.ReplaceTokenError as replaceTokenError:
+        errorMessage = replaceTokenError.getErrorMessage(inputDdckContent)
         return _res.Error(errorMessage)
 
     replacementsResult = _getReplacements(visitor, componentName)

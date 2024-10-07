@@ -16,6 +16,8 @@ import tkinter as tk
 import typing as _tp
 from tkinter import messagebox as tkMessageBox
 
+import pytrnsys.ddck.perFileDefaultVisibilityPlausibilityCheck as _dvpc
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 import pytrnsys.ddck.replaceTokens.placeholders as _rtph
 import pytrnsys.ddck.replaceTokens.withoutPlaceholders as _rtwph
 import pytrnsys.pdata.processFiles as spfUtils
@@ -23,7 +25,7 @@ import pytrnsys.trnsys_util.deckTrnsys as deck
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
 import pytrnsys.utils.result as _res
-import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
+import pytrnsys.utils.warnings as _warn
 
 logger = logging.getLogger("root")
 # stop propagting to root logger
@@ -31,9 +33,10 @@ logger.propagate = False
 
 
 @_dc.dataclass
-class DdckFilePathWithComponentName:
-    path: _pl.Path
+class IncludedDdckFile:
+    pathWithoutSuffix: _pl.Path
     componentName: str
+    defaultVisibility: _dv.DefaultVisibility | None
 
 
 class BuildTrnsysDeck:
@@ -41,21 +44,21 @@ class BuildTrnsysDeck:
         self,
         pathDeck,
         nameDeck,
-        ddckFilePathsWithComponentName: _tp.Sequence[DdckFilePathWithComponentName],
+        includedDdckFiles: _tp.Sequence[IncludedDdckFile],
         defaultVisibility: _dv.DefaultVisibility,
         ddckPlaceHolderValuesJsonPath,
     ):
         self.pathDeck = pathDeck
         self.nameDeck = self.pathDeck + r"\%s.dck" % nameDeck
 
-        self._defaultVisibility = defaultVisibility
+        self._configDefaultVisibility = defaultVisibility
 
         self._ddckPlaceHolderValuesJsonPath = (
             _pl.Path(ddckPlaceHolderValuesJsonPath) if ddckPlaceHolderValuesJsonPath else None
         )
 
         self.oneSheetList = []
-        self._ddckFilePathsWithComponentName = ddckFilePathsWithComponentName
+        self._includedDdckFiles = includedDdckFiles
         self.deckText = []
 
         self.overwriteForcedByUser = False
@@ -70,10 +73,19 @@ class BuildTrnsysDeck:
         self.existingDckUnchecked = True
         self.dckAlreadyExists = True
 
-    def loadDeck(self, path: str, name: str, componentName: str) -> _res.Result[_tp.Tuple[str, str, str]]:
+    def loadDeck(
+        self, path: str, name: str, componentName: str, perFileDefaultVisibility: _dv.DefaultVisibility | None
+    ) -> _res.Result[_warn.ValueWithWarnings[tuple[str, str, str]]]:
+        defaultVisibility = perFileDefaultVisibility or self._configDefaultVisibility
+
         ddckFilePath = _pl.Path(path) / f"{name}.{self.extOneSheetDeck}"
 
-        result = self._replacePlaceholdersAndGetContent(ddckFilePath, componentName)
+        visibilityCheckResult = _dvpc.checkDefaultVisibility(ddckFilePath, defaultVisibility)
+        if _res.isError(visibilityCheckResult):
+            return visibilityCheckResult
+        warnings = _res.value(visibilityCheckResult)
+
+        result = self._replacePlaceholdersAndGetContent(ddckFilePath, componentName, defaultVisibility)
         if _res.isError(result):
             return _res.error(result)
         ddckContent = _res.value(result)
@@ -90,11 +102,15 @@ class BuildTrnsysDeck:
         if self.eliminateComments:
             self.linesChanged = spfUtils.purgueComments(self.linesChanged, ["!"])
 
-        return lines[0:3]  # only returns the caption with the info of the file
+        header = lines[0], lines[1], lines[2]
 
-    def _replacePlaceholdersAndGetContent(self, ddckFilePath: _pl.Path, componentName: str) -> _res.Result[str]:
+        return warnings.withValue(header)
+
+    def _replacePlaceholdersAndGetContent(
+        self, ddckFilePath: _pl.Path, componentName: str, defaultVisibility: _dv.DefaultVisibility
+    ) -> _res.Result[str]:
         if not self._ddckPlaceHolderValuesJsonPath:
-            return _rtwph.replaceTokensWithDefaults(ddckFilePath, componentName, self._defaultVisibility)
+            return _rtwph.replaceTokensWithDefaults(ddckFilePath, componentName, defaultVisibility)
 
         if not self._ddckPlaceHolderValuesJsonPath.is_file():
             return _res.Error(
@@ -105,11 +121,12 @@ class BuildTrnsysDeck:
             placeholderValues = _json.loads(self._ddckPlaceHolderValuesJsonPath.read_text())
         except _json.JSONDecodeError as exception:
             return _res.Error(
-                f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} is not a valid JSON file: {exception}"
+                f"The ddck placeholder values file at {self._ddckPlaceHolderValuesJsonPath} is not a valid JSON file: "
+                f"{exception}"
             )
 
         computedNamesByPort = placeholderValues.get(componentName, dict())
-        result = _rtph.replaceTokens(ddckFilePath, componentName, computedNamesByPort, self._defaultVisibility)
+        result = _rtph.replaceTokens(ddckFilePath, componentName, computedNamesByPort, defaultVisibility)
 
         if _res.isError(result):
             return _res.error(result)
@@ -118,7 +135,7 @@ class BuildTrnsysDeck:
 
     def readDeckList(
         self, pathConfig, doAutoUnitNumbering=False, dictPaths=False, replaceLineList=[]
-    ) -> _res.Result[None]:
+    ) -> _res.Result[_warn.ValueWithWarnings[None]]:
         """
 
         Parameters
@@ -138,8 +155,9 @@ class BuildTrnsysDeck:
 
         self.dependencies = {}
         self.definitions = {}
-        for ddckFilePathWithComponentName in self._ddckFilePathsWithComponentName:
-            ddckFilePath = ddckFilePathWithComponentName.path
+        warnings = []
+        for includedDdckFile in self._includedDdckFiles:
+            ddckFilePath = includedDdckFile.pathWithoutSuffix
             ddckFileName = ddckFilePath.name
 
             if ddckFilePath.is_absolute():
@@ -151,13 +169,18 @@ class BuildTrnsysDeck:
             absoluteDdckFileDirPath = absoluteDdckFilePath.parent
 
             result = self.loadDeck(
-                str(absoluteDdckFileDirPath), ddckFileName, ddckFilePathWithComponentName.componentName
+                str(absoluteDdckFileDirPath),
+                ddckFileName,
+                includedDdckFile.componentName,
+                includedDdckFile.defaultVisibility,
             )
 
             if _res.isError(result):
                 return _res.error(result)
 
-            firstThreeLines = _res.value(result)
+            firstThreeLinesWithWarnings = _res.value(result)
+            warnings.extend(firstThreeLinesWithWarnings.warnings)
+            firstThreeLines = firstThreeLinesWithWarnings.value
 
             ddck = trnsysComponent.TrnsysComponent(absoluteDdckFileDirPath, ddckFileName)
             definedVariables, requiredVariables = ddck.getVariables()
@@ -173,7 +196,7 @@ class BuildTrnsysDeck:
 
             self.replaceLines(replaceLineList)
             self.linesChanged = deckUtils.changeAssignPath(self.linesChanged, "path$", dictPaths[str(ddckFilePath)])
-            addedLines = firstThreeLines + self.linesChanged
+            addedLines = [*firstThreeLines, *self.linesChanged]
 
             caption = (
                 "**********************************************************************\n** %s.ddck from %s \n**********************************************************************\n"
@@ -198,26 +221,7 @@ class BuildTrnsysDeck:
         self.logger.propagate = False
         self.logger.debug("Replacemenet of Units done")
 
-    def createDependencyGraph(self):
-        e = Graph("ER", filename="er.gv", node_attr={"color": "lightblue2", "style": "filled"})
-        e.attr("node", shape="box")
-        variables_global = ["cpwat", "rhowat", "nix", "tamb", "dtsim", "cpbri", "rhobri", "pi", "stop", "start", "zero"]
-        for key, value in self.dependencies.items():
-            e.node(key)
-
-        for key, value in self.dependencies.items():
-            for keyDef, valueDef in self.definitions.items():
-                edgelLabel = ""
-                for dependency in value:
-                    if dependency in valueDef and dependency not in variables_global:
-                        edgelLabel += dependency + "\n"
-                if edgelLabel != "":
-                    e.edge(key, keyDef, label=edgelLabel, style="bold")
-
-        e.attr(label=r"\n\nEntity Relation Diagram\ndrawn by NEATO")
-        e.attr(fontsize="1")
-
-        e.render("er.gv", view=False)
+        return _warn.ValueWithWarnings(None, warnings)
 
     def writeDeck(self, addedLines=None):
         """

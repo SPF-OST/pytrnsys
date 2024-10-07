@@ -193,7 +193,8 @@ tAmbHp			! 39: t_room, deg C
 frCond			! 40: factor for condenser heat
 frCOP			! 41: factor for COP
 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0.5 21 1 1
-    
+TRACE 15 750
+
 ***********************************
 ** OUTPUTS of type 982
 ***********************************
