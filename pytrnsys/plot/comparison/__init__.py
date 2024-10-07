@@ -347,6 +347,8 @@ def _savePlotAndData(
     fileName = _getFileName(
         xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileNamePart, comparePlotUserName
     )
+    if(shallPlotUncertainties):
+        fileName=fileName+"_uncertain"
 
     fig.savefig(_os.path.join(pathFolder, fileName + extensionFig), bbox_inches="tight")
     _plt.close()

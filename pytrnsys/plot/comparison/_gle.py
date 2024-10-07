@@ -26,6 +26,8 @@ def writeFiles(
         allSeries,
         shallPlotUncertainties,
     )
+    # if(shallPlotUncertainties):
+    #     outputFileStem = outputFileStem + "_uncertain"
 
     _writeScriptFile(outputFolder, outputFileStem, allSeries, shallPlotUncertainties)
 
