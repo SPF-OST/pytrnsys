@@ -1,7 +1,7 @@
+import collections.abc as _cabc
 import dataclasses as _dc
 import json as _json
 import pathlib as _pl
-import typing as _tp
 
 import pytest as _pt
 
@@ -26,7 +26,7 @@ class _Paths:  # pylint: disable=too-few-public-methods
 
 
 @_dc.dataclass
-class _DdckFile:  # pylint: disable=too-few-public-methods
+class _ProjectDdckFile:  # pylint: disable=too-few-public-methods
     projectDirPath: _pl.Path
     ddckPlaceHoldervaluesFilePath: _pl.Path
     componentName: str
@@ -41,7 +41,16 @@ class _DdckFile:  # pylint: disable=too-few-public-methods
         return relativeInputPath.as_posix()
 
 
-def getProjectsDdckFiles() -> _tp.Iterable[_DdckFile]:
+@_dc.dataclass
+class _TestCase:
+    name: str
+    componentName: str
+    computedNamesByPort: _cabc.Mapping[str, _cabc.Mapping[str, str]]
+    expectedError: _res.Error | None = None
+    defaultVisibility: _dv.DefaultVisibility = _dv.DefaultVisibility.GLOBAL
+
+
+def getProjectsDdckFiles() -> _cabc.Iterable[_ProjectDdckFile]:
     for projectDirPath in _REPLACE_WITH_NAMES_IN_PROJECTS_DATA_DIR.iterdir():
         assert projectDirPath.is_dir()
 
@@ -57,7 +66,7 @@ def getProjectsDdckFiles() -> _tp.Iterable[_DdckFile]:
 
             componentName = inputDdckFilePath.parent.name
 
-            yield _DdckFile(
+            yield _ProjectDdckFile(
                 projectDirPath,
                 paths.ddckPlaceHolderValuesFilePath,
                 componentName,
@@ -67,7 +76,45 @@ def getProjectsDdckFiles() -> _tp.Iterable[_DdckFile]:
             )
 
 
+def getDdckFiles() -> _cabc.Iterable[_TestCase]:
+    yield _TestCase(
+        "type861",
+        "IceStore",
+        {
+            "In": {"@temp": "TIn", "@mfr": "MIn", "@cp": "CPWAT", "@rho": "RHOWAT"},
+            "Out": {"@temp": "TOut", "@revtemp": "TOutRev"},
+        },
+    )
+
+    testCaseName = "type951_non_existent_port"
+    inputDdckFilePath = _REPLACE_WITH_NAMES_DATA_DIR / testCaseName / "input.ddck"
+    yield _TestCase(
+        testCaseName,
+        "Ghx",
+        {"In": {"@temp": "TFoo", "@Mfr": "MBar"}, "Out": {"@temp": "TGhx"}},
+        _res.Error(
+            f"""\
+Could not replace placeholders in ddck file `{inputDdckFilePath}`:
+Unknown port `HotIn`."""
+        ),
+    )
+
+    yield _TestCase(
+        "const_eff_hx_dhw_contr_local",
+        "HxDhw",
+        {
+            "Side1In": {"@temp": "TSide1In", "@mfr": "MSide1In", "@cp": "CPWAT", "@rho": "RHOWAT"},
+            "Side1Out": {"@temp": "TSide1Out", "@revtemp": "TSide1OutRev"},
+            "Side2In": {"@temp": "TSide2In", "@mfr": "MSide2In", "@cp": "CPBRI", "@rho": "RHOBRI"},
+            "Side2Out": {"@temp": "TSide2Out", "@revtemp": "TSide2OutRev"},
+        },
+        defaultVisibility=_dv.DefaultVisibility.LOCAL,
+    )
+
+
 _REPLACE_WITH_NAME_PROJECTS_TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjectsDdckFiles()]
+
+_REPLACE_WITH_NAME_TEST_CASES = [_pt.param(p, id=p.name) for p in getDdckFiles()]
 
 
 class TestReplaceTokens:
@@ -119,43 +166,49 @@ No default values were provided for the computed variables at the following loca
         assert error.message == expectedErrorMessage
 
     @staticmethod
-    @_pt.mark.parametrize("ddckFile", _REPLACE_WITH_NAME_PROJECTS_TEST_CASES)
-    def testReplaceTokensInProject(ddckFile: _DdckFile):
-        serializedDdckPlaceHolderValues = ddckFile.ddckPlaceHoldervaluesFilePath.read_text(encoding="utf8")
+    @_pt.mark.parametrize("projectDdckFile", _REPLACE_WITH_NAME_PROJECTS_TEST_CASES)
+    def testReplaceTokensInProject(projectDdckFile: _ProjectDdckFile):
+        serializedDdckPlaceHolderValues = projectDdckFile.ddckPlaceHoldervaluesFilePath.read_text(encoding="utf8")
         ddckPlaceHolderValues = _json.loads(serializedDdckPlaceHolderValues)
 
-        names = ddckPlaceHolderValues.get(ddckFile.componentName) or {}
+        names = ddckPlaceHolderValues.get(projectDdckFile.componentName) or {}
 
-        result = _rtph.replaceTokens(ddckFile.input, ddckFile.componentName, names, _dv.DefaultVisibility.GLOBAL)
+        result = _rtph.replaceTokens(
+            projectDdckFile.input, projectDdckFile.componentName, names, _dv.DefaultVisibility.GLOBAL
+        )
         _res.throwIfError(result)
         actualDdckContent = _res.value(result)
 
-        ddckFile.actual.parent.mkdir(parents=True, exist_ok=True)
-        ddckFile.actual.write_text(actualDdckContent)
+        projectDdckFile.actual.parent.mkdir(parents=True, exist_ok=True)
+        projectDdckFile.actual.write_text(actualDdckContent)
 
-        assert ddckFile.actual.read_text() == ddckFile.expected.read_text(encoding="windows-1252")
+        assert projectDdckFile.actual.read_text() == projectDdckFile.expected.read_text(encoding="windows-1252")
 
     @staticmethod
-    def testReplaceComputedVariables():
-        type861DirPath = _REPLACE_WITH_NAMES_DATA_DIR / "type861"
-        inputDdckFilePath = type861DirPath / "input.ddck"
-
-        componentName = "IceStore"
-        computedNamesByPort = {
-            "In": {"@temp": "TIn", "@mfr": "MIn", "@cp": "CPWAT", "@rho": "RHOWAT"},
-            "Out": {"@temp": "TOut", "@revtemp": "TOutRev"},
-        }
+    @_pt.mark.parametrize("testCase", _REPLACE_WITH_NAME_TEST_CASES)
+    def testReplaceTokens(testCase: _TestCase):
+        testCaseDirPath = _REPLACE_WITH_NAMES_DATA_DIR / testCase.name
+        inputDdckFilePath = testCaseDirPath / "input.ddck"
 
         result = _rtph.replaceTokens(
-            inputDdckFilePath, componentName, computedNamesByPort, _dv.DefaultVisibility.GLOBAL
+            inputDdckFilePath, testCase.componentName, testCase.computedNamesByPort, testCase.defaultVisibility
         )
+
+        if testCase.expectedError:
+            assert _res.isError(result)
+            actualError = _res.error(result)
+            assert actualError == testCase.expectedError
+            return
 
         assert not _res.isError(result)
 
-        value = _res.value(result)
+        actualContent = _res.value(result)
 
-        expectedOutputDdckFilePath = type861DirPath / "expected_output.ddck"
-        assert value == expectedOutputDdckFilePath.read_text(encoding="utf8")
+        expectedOutputDdckFilePath = testCaseDirPath / "expected_output.ddck"
+        (_pl.Path(r"C:\Users\damian.birchler\Downloads") / f"{testCase.name}_output.ddck").write_text(actualContent)
+        expectedContent = expectedOutputDdckFilePath.read_text(encoding="utf8")
+
+        assert actualContent == expectedContent
 
     @staticmethod
     def testReplaceEnergyVariables():
@@ -194,21 +247,3 @@ qSysOut_QSnk60TessAcum = QSnk60dQ
 """
 
         assert actualOutput == expectedOutput
-
-    @staticmethod
-    def testReplaceTokensNonexistentPort() -> None:
-        inputDdckFilePath = _REPLACE_WITH_NAMES_DATA_DIR / "type951_non_existent_port.ddck"
-        componentName = "Ghx"
-        computedNamesByPort = {"In": {"@temp": "TFoo", "@Mfr": "MBar"}, "Out": {"@temp": "TGhx"}}
-
-        result = _rtph.replaceTokens(
-            inputDdckFilePath, componentName, computedNamesByPort, _dv.DefaultVisibility.GLOBAL
-        )
-
-        assert _res.isError(result)
-        error = _res.error(result)
-        print(error.message)
-        expectedErrorMessage = f"""\
-Could not replace placeholders in ddck file `{inputDdckFilePath}`:
-Unknown port `HotIn`."""
-        assert error.message == expectedErrorMessage

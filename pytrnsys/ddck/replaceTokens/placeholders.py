@@ -1,3 +1,4 @@
+import collections.abc as _cabc
 import pathlib as _pl
 import typing as _tp
 
@@ -19,7 +20,7 @@ class _WithPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorBase
 def replaceTokens(
     inputDdckFilePath: _pl.Path,
     componentName: str,
-    computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]],
+    computedNamesByPort: _cabc.Mapping[str, _cabc.Mapping[str, str]],
     defaultVisibility: _dv.DefaultVisibility,
 ) -> _res.Result[str]:
     if not inputDdckFilePath.is_file():
@@ -41,7 +42,7 @@ def replaceTokens(
 def replaceTokensInString(  # pylint: disable=too-many-locals
     content: str,
     componentName: str,
-    computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]],
+    computedNamesByPort: _cabc.Mapping[str, _cabc.Mapping[str, str]],
     defaultVisibility: _dv.DefaultVisibility,
 ) -> _res.Result[str]:
     treeResult = _parse.parseDdck(content)
@@ -80,7 +81,8 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
 
 
 def _getComputedHydraulicNames(
-    computedVariables: _tp.Sequence[_common.ComputedVariable], computedNamesByPort: _tp.Dict[str, _tp.Dict[str, str]]
+    computedVariables: _tp.Sequence[_common.ComputedVariable],
+    computedNamesByPort: _cabc.Mapping[str, _cabc.Mapping[str, str]],
 ) -> _res.Result[_tp.Sequence[str]]:
     computedNames = []
     for computedVariable in computedVariables:
