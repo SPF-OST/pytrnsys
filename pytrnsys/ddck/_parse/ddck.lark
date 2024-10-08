@@ -196,7 +196,7 @@ NAME: /(?!(constants|equations|unit|parameters|inputs|labels|trace|assign)\s)[a-
 
 LABEL: /(?!(constants|equations|unit|parameters|inputs|labels|trace|assign)\s)[^,\s]+/i
 
-UNREFERENCABLE_NAME: LETTER (LETTER|DIGIT|"_"|"-")*
+UNREFERENCABLE_NAME: /(?!(constants|equations|unit|parameters|inputs|labels|trace|assign)\s)[a-z]([a-z]|[0-9]|_|-)*/i
 
 POSITIVE_INT: POSITIVE_DIGIT DIGIT*
 
