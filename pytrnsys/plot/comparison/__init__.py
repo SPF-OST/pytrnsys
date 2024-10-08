@@ -345,10 +345,14 @@ def _savePlotAndData(
     extensionFig,
 ):  # pylint: disable=too-many-arguments
     fileName = _getFileName(
-        xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileNamePart, comparePlotUserName
+        xAxisVariable,
+        yAxisVariable,
+        seriesVariable,
+        chunkVariable,
+        conditionsFileNamePart,
+        comparePlotUserName,
+        shallPlotUncertainties,
     )
-    if(shallPlotUncertainties):
-        fileName=fileName+"_uncertain"
 
     fig.savefig(_os.path.join(pathFolder, fileName + extensionFig), bbox_inches="tight")
     _plt.close()
@@ -362,14 +366,25 @@ def _savePlotAndData(
         )
 
 
-def _getFileName(xAxisVariable, yAxisVariable, seriesVariable, chunkVariable, conditionsFileName, comparePlotUserName):
+def _getFileName(
+    xAxisVariable,
+    yAxisVariable,
+    seriesVariable,
+    chunkVariable,
+    conditionsFileNamePart,
+    comparePlotUserName,
+    shallPlotUncertainties,
+):
+    shallPlotUncertaintiesPart = "uncertain" if shallPlotUncertainties else None
+
     possibleParts = [
         xAxisVariable,
         yAxisVariable,
         seriesVariable,
         chunkVariable,
-        conditionsFileName,
+        conditionsFileNamePart,
         comparePlotUserName,
+        shallPlotUncertaintiesPart,
     ]
 
     parts = [part for part in possibleParts if part]

@@ -93,7 +93,7 @@ class ResultsWriter:
         if collectorComponents:
             collectorComponent = collectorComponents[0]
             size = collectorComponent.value
-            if(size.value > 0.):
+            if size.value > 0.0:
                 totalCostPerM2 = totalCost / size.value
                 costsDict = {
                     **costsDict,

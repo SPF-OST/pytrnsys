@@ -93,7 +93,7 @@ def runParallel(
 
     #    cmdExe = os.getenv("COMSPEC")
 
-    cpu = 1 #DC - if you want to decide to which core to start increase this number
+    cpu = 1  # DC - if you want to decide to which core to start increase this number
 
     for cmd in cmds:
         newTask = cmd

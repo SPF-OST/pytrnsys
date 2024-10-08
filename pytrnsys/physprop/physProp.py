@@ -180,8 +180,6 @@ class PhysProp:
                 else:
                     return Props("L", "T", T + 0.1 + 273.15, "P", self.pressure, self.name) * 1000.0
 
-
-
     def getEnthalpy(self, T):
         if self.useConstantProperties:
             if self.constantEnthalpyIsSet == False:
