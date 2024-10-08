@@ -38,7 +38,7 @@ class TestCase:
     def _caseDirPath(self):
         return DATA_DIR_PATH / "cases" / self.resultsDirName
 
-    def assertThatCreatedImageIsBinaryEqualToExpected(self) -> None:
+    def assertThatCreateImageIsBinaryEqualToExpected(self) -> None:
         assert _fcomp.cmp(self.expectedActualCreatedImageFilePath, self.expectedCreatedImageFilePath, shallow=False)
 
 
@@ -48,7 +48,7 @@ def generateResultsTestCases() -> _tp.Iterable[TestCase]:
         ["QPs_Tot", "energyCost", "CollAM2PerMWh"],
         "slurry",
         True,
-        "QPs_Tot_energyCost_CollAM2PerMWh_uncertain.png",
+        "QPs_Tot_energyCost_CollAM2PerMWh.png",
     )
 
     yield TestCase(
@@ -56,7 +56,7 @@ def generateResultsTestCases() -> _tp.Iterable[TestCase]:
         ["energyCost", "investmentPerMWh", "CollAM2PerMWh"],
         "slurry",
         True,
-        "energyCost_investmentPerMWh_CollAM2PerMWh_uncertain.png",
+        "energyCost_investmentPerMWh_CollAM2PerMWh.png",
     )
 
     yield TestCase(
@@ -64,7 +64,7 @@ def generateResultsTestCases() -> _tp.Iterable[TestCase]:
         ["energyCost", "investmentPerMWh", "CollAM2PerMWh", "CrysPowerkW", "spf>4.5"],
         "slurry",
         True,
-        "energyCost_investmentPerMWh_CollAM2PerMWh_CrysPowerkW_spf_g_4.5_uncertain.png",
+        "energyCost_investmentPerMWh_CollAM2PerMWh_CrysPowerkW_spf_g_4.5.png",
     )
 
     yield TestCase(
@@ -72,7 +72,7 @@ def generateResultsTestCases() -> _tp.Iterable[TestCase]:
         ["energyCost", "investmentPerMWh", "CollAM2PerMWh", "CrysPowerkW", "spf<=4.5"],
         "slurry",
         True,
-        "energyCost_investmentPerMWh_CollAM2PerMWh_CrysPowerkW_spf_l_=4.5_uncertain.png",
+        "energyCost_investmentPerMWh_CollAM2PerMWh_CrysPowerkW_spf_l_=4.5.png",
     )
 
 
@@ -86,4 +86,4 @@ class TestComparison:
             shallPlotUncertainties=testCase.shallPlotUncertainties,
         )
 
-        testCase.assertThatCreatedImageIsBinaryEqualToExpected()
+        testCase.assertThatCreateImageIsBinaryEqualToExpected()
