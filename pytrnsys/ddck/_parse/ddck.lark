@@ -77,14 +77,14 @@ type_number: POSITIVE_INT
 
 parameters: "PARAMETERS"i ("0" | number_of_parameters parameter+)
 
-number_of_parameters: POSITIVE_INT | NAME
+number_of_parameters: positive_int_or_explicit_var
 
 parameter: variable
     | SIGNED_NUMBER -> literal
 
 inputs: "INPUTS"i number_of_inputs input+
 
-number_of_inputs: POSITIVE_INT
+number_of_inputs: positive_int_or_explicit_var
 
 input: variable
     | SIGNED_NUMBER -> literal
@@ -192,9 +192,9 @@ PORT_PROPERTY: "@" ("temp" | "revtemp" | "mfr" | "cp" | "rho")
 
 DEFAULT_VARIABLE_NAME: NAME
 
-NAME: LETTER (LETTER|DIGIT|"_")*
+NAME: /(?!(constants|equations|unit|parameters|inputs|labels|assign)\s)[a-z]([a-z]|[0-9]|_)*/i
 
-LABEL: /[^,\s]+/
+LABEL: /(?!(constants|equations|unit|parameters|inputs|labels|assign)\s)[^,\s]+/i
 
 UNREFERENCABLE_NAME: LETTER (LETTER|DIGIT|"_"|"-")*
 
