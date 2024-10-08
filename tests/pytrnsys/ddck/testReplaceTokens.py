@@ -26,7 +26,7 @@ class _Paths:  # pylint: disable=too-few-public-methods
 
 
 @_dc.dataclass
-class _ProjectDdckFile:  # pylint: disable=too-few-public-methods
+class _ProjectTestCase:  # pylint: disable=too-few-public-methods
     projectDirPath: _pl.Path
     ddckPlaceHoldervaluesFilePath: _pl.Path
     componentName: str
@@ -50,7 +50,7 @@ class _TestCase:
     defaultVisibility: _dv.DefaultVisibility = _dv.DefaultVisibility.GLOBAL
 
 
-def getProjectsDdckFiles() -> _cabc.Iterable[_ProjectDdckFile]:
+def getProjectTestCases() -> _cabc.Iterable[_ProjectTestCase]:
     for projectDirPath in _REPLACE_WITH_NAMES_IN_PROJECTS_DATA_DIR.iterdir():
         assert projectDirPath.is_dir()
 
@@ -66,7 +66,7 @@ def getProjectsDdckFiles() -> _cabc.Iterable[_ProjectDdckFile]:
 
             componentName = inputDdckFilePath.parent.name
 
-            yield _ProjectDdckFile(
+            yield _ProjectTestCase(
                 projectDirPath,
                 paths.ddckPlaceHolderValuesFilePath,
                 componentName,
@@ -76,7 +76,7 @@ def getProjectsDdckFiles() -> _cabc.Iterable[_ProjectDdckFile]:
             )
 
 
-def getDdckFiles() -> _cabc.Iterable[_TestCase]:
+def getTestCases() -> _cabc.Iterable[_TestCase]:
     yield _TestCase(
         "type861",
         "IceStore",
@@ -112,9 +112,9 @@ Unknown port `HotIn`."""
     )
 
 
-_REPLACE_WITH_NAME_PROJECTS_TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjectsDdckFiles()]
+_REPLACE_WITH_NAME_PROJECTS_TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjectTestCases()]
 
-_REPLACE_WITH_NAME_TEST_CASES = [_pt.param(p, id=p.name) for p in getDdckFiles()]
+_REPLACE_WITH_NAME_TEST_CASES = [_pt.param(p, id=p.name) for p in getTestCases()]
 
 
 class TestReplaceTokens:
@@ -166,23 +166,23 @@ No default values were provided for the computed variables at the following loca
         assert error.message == expectedErrorMessage
 
     @staticmethod
-    @_pt.mark.parametrize("projectDdckFile", _REPLACE_WITH_NAME_PROJECTS_TEST_CASES)
-    def testReplaceTokensInProject(projectDdckFile: _ProjectDdckFile):
-        serializedDdckPlaceHolderValues = projectDdckFile.ddckPlaceHoldervaluesFilePath.read_text(encoding="utf8")
+    @_pt.mark.parametrize("projectTestCase", _REPLACE_WITH_NAME_PROJECTS_TEST_CASES)
+    def testReplaceTokensInProject(projectTestCase: _ProjectTestCase):
+        serializedDdckPlaceHolderValues = projectTestCase.ddckPlaceHoldervaluesFilePath.read_text(encoding="utf8")
         ddckPlaceHolderValues = _json.loads(serializedDdckPlaceHolderValues)
 
-        names = ddckPlaceHolderValues.get(projectDdckFile.componentName) or {}
+        names = ddckPlaceHolderValues.get(projectTestCase.componentName) or {}
 
         result = _rtph.replaceTokens(
-            projectDdckFile.input, projectDdckFile.componentName, names, _dv.DefaultVisibility.GLOBAL
+            projectTestCase.input, projectTestCase.componentName, names, _dv.DefaultVisibility.GLOBAL
         )
         _res.throwIfError(result)
         actualDdckContent = _res.value(result)
 
-        projectDdckFile.actual.parent.mkdir(parents=True, exist_ok=True)
-        projectDdckFile.actual.write_text(actualDdckContent)
+        projectTestCase.actual.parent.mkdir(parents=True, exist_ok=True)
+        projectTestCase.actual.write_text(actualDdckContent)
 
-        assert projectDdckFile.actual.read_text() == projectDdckFile.expected.read_text(encoding="windows-1252")
+        assert projectTestCase.actual.read_text() == projectTestCase.expected.read_text(encoding="windows-1252")
 
     @staticmethod
     @_pt.mark.parametrize("testCase", _REPLACE_WITH_NAME_TEST_CASES)
@@ -205,7 +205,6 @@ No default values were provided for the computed variables at the following loca
         actualContent = _res.value(result)
 
         expectedOutputDdckFilePath = testCaseDirPath / "expected_output.ddck"
-        (_pl.Path(r"C:\Users\damian.birchler\Downloads") / f"{testCase.name}_output.ddck").write_text(actualContent)
         expectedContent = expectedOutputDdckFilePath.read_text(encoding="utf8")
 
         assert actualContent == expectedContent
