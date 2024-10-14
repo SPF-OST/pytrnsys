@@ -222,12 +222,12 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
         self._addReplacement(token, replacement)
 
     def _addLocalVariable(self, tree: _lark.Tree) -> None:
-        localVariable = self._createVariable(LocalVariable, tree)
+        localVariable = self._createVariable(tree)
         replacement = f"{self.componentName}{localVariable.name}"
         self._addReplacement(localVariable, replacement)
 
     def _addGlobalVariable(self, tree: _lark.Tree) -> None:
-        globalVariable = self._createVariable(GlobalVariable, tree)
+        globalVariable = self._createVariable(tree)
         replacement = globalVariable.name
         self._addReplacement(globalVariable, replacement)
 
@@ -249,7 +249,7 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
             raise ReplaceTokenError(
                 declaredNumberOfSubtree.meta,
                 f"The declared number of {what} ({declaredNumberOf}) doesn't "
-                f"match the actual number of {what} ({actualNumberOf}).",
+                f"match the actual number of {what} ({actualNumberOf})",
             )
 
     @staticmethod
