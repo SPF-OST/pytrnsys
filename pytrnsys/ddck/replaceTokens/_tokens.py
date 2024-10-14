@@ -1,6 +1,9 @@
+import collections.abc as _cabc
 import dataclasses as _dc
 import functools as _ft
 import typing as _tp
+
+import lark as _lark
 
 
 @_dc.dataclass
@@ -9,6 +12,15 @@ class Token:
     startColumn: int
     startIndex: int
     endIndex: int
+
+    @staticmethod
+    def fromTree(tree: _lark.Tree) -> "Token":
+        return Token(
+            tree.meta.line,
+            tree.meta.column,
+            tree.meta.start_pos,
+            tree.meta.end_pos,
+        )
 
     def shift(self, offset: int) -> "Token":
         shiftedStartIndex = offset + self.startIndex
@@ -29,37 +41,24 @@ class Token:
             raise ValueError("Start and end index must be > 0.")
 
 
-def replaceTokensWithReplacements(
-    inputDdckContent: str, tokens: _tp.Sequence[Token], replacements: _tp.Sequence[str]
-) -> str:
-    sortedTokens, sortedReplacements = _getSortedTokensAndReplacements(tokens, replacements)
-    sortedTokensWithoutCovers, sortedReplacementsWithoutCovers = _removeCoveredTokens(sortedTokens, sortedReplacements)
-    outputDdckContent = _replaceSortedNonOverlappingTokens(
-        inputDdckContent, sortedTokensWithoutCovers, sortedReplacementsWithoutCovers
-    )
+TokensAndReplacement = _cabc.Sequence[_tp.Tuple[Token, str]]
+
+
+def replaceTokensWithReplacements(inputDdckContent: str, tokensAndReplacement: TokensAndReplacement) -> str:
+    sortedTokensAndReplacement = _getSortedTokensAndReplacement(tokensAndReplacement)
+    sortedNonOverlappingTokensAndReplacement = _removeCoveredTokens(sortedTokensAndReplacement)
+    outputDdckContent = _replaceSortedNonOverlappingTokens(inputDdckContent, sortedNonOverlappingTokensAndReplacement)
     return outputDdckContent
 
 
-def _getSortedTokensAndReplacements(
-    tokens: _tp.Sequence[Token], replacements: _tp.Sequence[str]
-) -> _tp.Tuple[_tp.Sequence[Token], _tp.Sequence[str]]:
-    if not len(tokens) == len(replacements):
-        raise ValueError("`tokens` and `replacements` must be of the same length.")
-
-    if len(tokens) == len(replacements) == 0:
-        return [], []
-
-    if len(tokens) == len(replacements) == 1:
-        return tokens, replacements
-
-    tokenAndReplacements = zip(tokens, replacements)
+def _getSortedTokensAndReplacement(tokensAndReplacement: TokensAndReplacement) -> TokensAndReplacement:
+    if len(tokensAndReplacement) <= 1:
+        return tokensAndReplacement
 
     key = _ft.cmp_to_key(_compareTokensEarliestAndLongestFirst)
-    sortedTokenAndReplacements = list(sorted(tokenAndReplacements, key=key))
+    sortedTokensAndReplacement = list(sorted(tokensAndReplacement, key=key))
 
-    sortedTokens, sortedReplacements = zip(*sortedTokenAndReplacements)
-
-    return sortedTokens, sortedReplacements
+    return sortedTokensAndReplacement
 
 
 def _compareTokensEarliestAndLongestFirst(
@@ -80,19 +79,17 @@ def _compareTokensEarliestAndLongestFirst(
     return -1 if token1.endIndex > token2.endIndex else 1
 
 
-def _removeCoveredTokens(
-    sortedTokens: _tp.Sequence[Token], sortedReplacements: _tp.Sequence[str]
-) -> _tp.Tuple[_tp.Sequence[Token], _tp.Sequence[str]]:
-    if len(sortedTokens) == len(sortedReplacements) <= 1:
-        return sortedTokens, sortedReplacements
+def _removeCoveredTokens(sortedTokensAndReplacement: TokensAndReplacement) -> TokensAndReplacement:
+    if len(sortedTokensAndReplacement) <= 1:
+        return sortedTokensAndReplacement
 
-    tokensWithoutOverlap = [sortedTokens[0]]
-    replacementsWithoutOverlap = [sortedReplacements[0]]
-    for token, replacement in zip(sortedTokens[1:], sortedReplacements[1:]):
-        lastTokenWithoutOverlap = tokensWithoutOverlap[-1]
+    tokensAndReplacementWithoutOverlap = [sortedTokensAndReplacement[0]]
+    for tokenAndReplacement in sortedTokensAndReplacement[1:]:
+        token = tokenAndReplacement[0]
+
+        lastTokenWithoutOverlap, _ = tokensAndReplacementWithoutOverlap[-1]
         if lastTokenWithoutOverlap.endIndex < token.startIndex:
-            tokensWithoutOverlap.append(token)
-            replacementsWithoutOverlap.append(replacement)
+            tokensAndReplacementWithoutOverlap.append(tokenAndReplacement)
             continue
 
         if lastTokenWithoutOverlap.endIndex >= token.endIndex:
@@ -100,14 +97,14 @@ def _removeCoveredTokens(
 
         raise ValueError("Tokens must either not overlap or fully cover each other.")
 
-    return tokensWithoutOverlap, replacementsWithoutOverlap
+    return tokensAndReplacementWithoutOverlap
 
 
-def _replaceSortedNonOverlappingTokens(
-    content: str, tokens: _tp.Sequence[Token], replacements: _tp.Sequence[str]
-) -> str:
-    if len(tokens) != len(replacements):
-        raise ValueError("`tokens` and `replacements` must be of the same length.")
+def _replaceSortedNonOverlappingTokens(content: str, tokensAndReplacements: TokensAndReplacement) -> str:
+    if len(tokensAndReplacements) <= 1:
+        return content
+
+    tokens, replacements = zip(*tokensAndReplacements)
 
     if len(tokens) > 1:
         previousAndCurrentTokens = list(zip(tokens[:-1], tokens[1:]))
