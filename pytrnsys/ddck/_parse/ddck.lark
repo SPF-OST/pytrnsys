@@ -75,30 +75,43 @@ unit_number: POSITIVE_INT
 
 type_number: POSITIVE_INT
 
-parameters: "PARAMETERS"i ("0" | number_of_parameters parameter+)
+parameters: PARAMETERS ("0" | ((HASH| number_of_parameters) parameter+))
+
+HASH: "#"
+
+PARAMETERS: "parameters"i
 
 number_of_parameters: positive_int_or_explicit_var
 
-parameter: variable
-    | SIGNED_NUMBER -> literal
+parameter: variable | SIGNED_NUMBER
 
-inputs: "INPUTS"i number_of_inputs input+
+inputs: INPUTS (HASH| number_of_inputs) input+
+
+INPUTS: "inputs"i
 
 number_of_inputs: positive_int_or_explicit_var
 
 input: variable
-    | SIGNED_NUMBER -> literal
-    | ("0" "," "0" | "CONST") -> const
+    | SIGNED_NUMBER 
+    | ("0" "," "0" | "CONST")
 
-labels: "LABELS"i number_of_labels (LABEL [","])* LABEL
+labels: LABELS (HASH| number_of_labels) (label [","])* label
+
+LABELS: "labels"i
+
+label: LABEL
 
 number_of_labels: POSITIVE_INT
 
-constants: "CONSTANTS"i number_of_constants equation+
+constants: CONSTANTS (HASH| number_of_constants) equation+
+
+CONSTANTS: "constants"i
 
 number_of_constants: POSITIVE_INT
 
-equations: "EQUATIONS"i number_of_equations equation+
+equations: EQUATIONS (HASH| number_of_equations) equation+
+
+EQUATIONS: "equations"i
 
 number_of_equations: POSITIVE_INT
 

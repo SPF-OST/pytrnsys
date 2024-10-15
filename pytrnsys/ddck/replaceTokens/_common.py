@@ -61,21 +61,8 @@ class ComputedVariable(_tokens.Token):  # pylint: disable=too-few-public-methods
 
 
 @_dc.dataclass
-class VariableBase(_tokens.Token):
+class Variable(_tokens.Token):
     name: str
-
-
-_T = _tp.TypeVar("_T", bound=VariableBase)
-
-
-@_dc.dataclass
-class LocalVariable(VariableBase):
-    pass
-
-
-@_dc.dataclass
-class GlobalVariable(VariableBase):
-    pass
 
 
 class _EnergyDirection(_enum.Enum):
@@ -107,8 +94,8 @@ class ComputedEnergyVariable(_tokens.Token):
 
 
 def createComputedVariable(tree: _lark.Tree, portProperty: str) -> ComputedVariable:
-    portName = _vh.getChildTokenValue("PORT_NAME", tree)
-    defaultVariableName = _vh.getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", tree)
+    portName = _vh.getChildTokenValue("PORT_NAME", tree, str)
+    defaultVariableName = _vh.getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", tree, str)
     computedVariable = ComputedVariable(
         tree.meta.line,
         tree.meta.column,
@@ -122,22 +109,39 @@ def createComputedVariable(tree: _lark.Tree, portProperty: str) -> ComputedVaria
 
 
 class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
-    def __init__(self, defaultVisibility: DefaultVisibility) -> None:
+    def __init__(self, componentName: str, defaultVisibility: DefaultVisibility) -> None:
+        self.componentName = componentName
         self._defaultVisibility = defaultVisibility
-        self.localVariables: list[LocalVariable] = []
-        self.globalVariables: list[GlobalVariable] = []
         self.computedHydraulicVariables: list[ComputedVariable] = []
-        self.computedEnergyVariables: list[ComputedEnergyVariable] = []
+        self.tokensAndReplacement: list[tuple[_tokens.Token, str]] = []
+
+    def parameters(self, tree: _lark.Tree) -> None:
+        if not tree.children:
+            return
+
+        self._checkOrAddDeclaredNumberOf("parameters", "parameter", "number_of_parameters", tree)
+
+    def inputs(self, tree: _lark.Tree) -> None:
+        self._checkOrAddDeclaredNumberOf("inputs", "input", "number_of_inputs", tree, multiplicity=2)
+
+    def labels(self, tree: _lark.Tree) -> None:
+        self._checkOrAddDeclaredNumberOf("labels", "label", "number_of_labels", tree)
+
+    def equations(self, tree: _lark.Tree) -> None:
+        self._checkOrAddDeclaredNumberOf("equations", "equation", "number_of_equations", tree)
+
+    def constants(self, tree: _lark.Tree) -> None:
+        self._checkOrAddDeclaredNumberOf("constants", "equation", "number_of_constants", tree)
 
     def computed_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
-        propertyName = _vh.getChildTokenValue("PORT_PROPERTY", tree)
+        propertyName = _vh.getChildTokenValue("PORT_PROPERTY", tree, str)
         computedVariable = createComputedVariable(tree, propertyName)
         self.computedHydraulicVariables.append(computedVariable)
 
     def computed_output_energy_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
-        direction = _vh.getChildTokenValue("ENERGY_DIRECTION", tree)
-        quality = _vh.getChildTokenValue("ENERGY_QUALITY", tree)
-        categoryOrLocal = _vh.getChildTokenValue("CATEGORY_OR_LOCAL", tree)
+        direction = _vh.getChildTokenValue("ENERGY_DIRECTION", tree, str)
+        quality = _vh.getChildTokenValue("ENERGY_QUALITY", tree, str)
+        categoryOrLocal = _vh.getChildTokenValue("CATEGORY_OR_LOCAL", tree, str)
         categories = _vh.getChildTokenValues("CATEGORY", tree)
 
         computedEnergyVariable = ComputedEnergyVariable(
@@ -151,7 +155,9 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
             categories,
         )
 
-        self.computedEnergyVariables.append(computedEnergyVariable)
+        replacement = _getComputedEnergyName(computedEnergyVariable, self.componentName)
+
+        self._addReplacement(computedEnergyVariable, replacement)
 
     def local_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         if self._defaultVisibility != DefaultVisibility.GLOBAL:
@@ -178,35 +184,88 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
         self._addGlobalVariable(tree)
 
+    def _checkOrAddDeclaredNumberOf(
+        self,
+        what: _tp.Literal["constants", "equations", "parameters", "inputs", "labels"],
+        childrenSubtreeName: str,
+        declaredNumberOfSubtreeName: str,
+        tree: _lark.Tree,
+        multiplicity: int = 1,
+    ) -> None:
+        childrenSubtrees = _vh.getSubtrees(childrenSubtreeName, tree)
+
+        if not childrenSubtrees:
+            # The case "EQUATIONS 0", e.g., is handled by the parser, i.e.
+            #
+            #   EQUATIONS 0
+            #   foo = bar
+            #
+            # is already detected by the parser, so we don't have to deal
+            # with that here.
+            return
+
+        nChildrenSubtree = len(childrenSubtrees)
+        if nChildrenSubtree % multiplicity != 0:
+            raise ReplaceTokenError(
+                tree.meta,
+                f"Number of arguments to {what} must be a multiple of {multiplicity} but was {nChildrenSubtree}",
+            )
+
+        actualNumberOf = int(nChildrenSubtree / multiplicity)
+
+        declaredNumberOfSubtree = _vh.getSubtreeOrNone(declaredNumberOfSubtreeName, tree)
+        if declaredNumberOfSubtree:
+            self._checkDeclaredNumberOf(what, declaredNumberOfSubtree, actualNumberOf)
+            return
+
+        hashToken = _vh.getChildToken("HASH", tree)
+
+        self._addDeclaredNumberOf(actualNumberOf, hashToken)
+
+    def _addDeclaredNumberOf(self, actualNumberOf: int, hashToken: _lark.Token) -> None:
+        replacement = str(actualNumberOf)
+        token = _tokens.Token.fromMetaOrToken(hashToken)
+
+        self._addReplacement(token, replacement)
+
     def _addLocalVariable(self, tree: _lark.Tree) -> None:
-        localVariable = self._createVariable(LocalVariable, tree)
-        self.localVariables.append(localVariable)
+        localVariable = self._createVariable(tree)
+        replacement = f"{self.componentName}{localVariable.name}"
+        self._addReplacement(localVariable, replacement)
 
     def _addGlobalVariable(self, tree: _lark.Tree) -> None:
-        globalVariable = self._createVariable(GlobalVariable, tree)
-        self.globalVariables.append(globalVariable)
+        globalVariable = self._createVariable(tree)
+        replacement = globalVariable.name
+        self._addReplacement(globalVariable, replacement)
+
+    def _addReplacement(self, token: _tokens.Token, replacement: str) -> None:
+        tokenAndReplacement = (token, replacement)
+        self.tokensAndReplacement.append(tokenAndReplacement)
 
     @staticmethod
-    def _createVariable(clazz: _tp.Type[_T], tree: _lark.Tree) -> _T:
-        name = _vh.getChildTokenValue("NAME", tree)
-        variable = clazz(tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos, name)
+    def _checkDeclaredNumberOf(
+        what: str,
+        declaredNumberOfSubtree: _lark.Tree,
+        actualNumberOf: int,
+    ) -> None:
+        declaredNumberOf = _vh.getChildTokenValueOrNone("POSITIVE_INT", declaredNumberOfSubtree, int)
+        if declaredNumberOf is None:
+            # If the declared number is a variable, we cannot find out whether the value of that variable
+            # matches the actual number of arguments, hence we just return (i.e. pretend it does).
+            return
+
+        if actualNumberOf != declaredNumberOf:
+            raise ReplaceTokenError(
+                declaredNumberOfSubtree.meta,
+                f"The declared number of {what} ({declaredNumberOf}) doesn't "
+                f"match the actual number of {what} ({actualNumberOf})",
+            )
+
+    @staticmethod
+    def _createVariable(tree: _lark.Tree) -> Variable:
+        name = _vh.getChildTokenValue("NAME", tree, str)
+        variable = Variable(tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos, name)
         return variable
-
-
-def getLocalNames(localVariables: _cabc.Sequence[LocalVariable], componentName: str) -> _cabc.Sequence[str]:
-    localNames = [f"{componentName}{v.name}" for v in localVariables]
-    return localNames
-
-
-def getGlobalNames(globalVariables: _cabc.Sequence[GlobalVariable]) -> _cabc.Sequence[str]:
-    globalNames = [v.name for v in globalVariables]
-    return globalNames
-
-
-def getComputedEnergyNames(
-    computedEnergyVariables: _cabc.Sequence[ComputedEnergyVariable], componentName: str
-) -> _cabc.Sequence[str]:
-    return [_getComputedEnergyName(v, componentName) for v in computedEnergyVariables]
 
 
 def _getComputedEnergyName(computedEnergyVariable: ComputedEnergyVariable, componentName: str) -> str:

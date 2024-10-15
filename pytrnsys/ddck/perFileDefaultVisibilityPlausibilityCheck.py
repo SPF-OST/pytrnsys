@@ -16,8 +16,7 @@ class _CollectUsedTypesVisitor(_lv.Visitor_Recursive):
         self.typeNumbers = list[int]()
 
     def type_number(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
-        typeNumberString = _vh.getChildTokenValue("POSITIVE_INT", tree)
-        typeNumber = int(typeNumberString)
+        typeNumber = _vh.getChildTokenValue("POSITIVE_INT", tree, int)
         self.typeNumbers.append(typeNumber)
 
     @staticmethod

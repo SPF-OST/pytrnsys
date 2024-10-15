@@ -50,32 +50,23 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
         return _res.error(treeResult)
     tree = _res.value(treeResult)
 
-    visitor = _WithPlaceholdersJSONCollectTokensVisitor(defaultVisibility)
+    visitor = _WithPlaceholdersJSONCollectTokensVisitor(componentName, defaultVisibility)
     try:
         visitor.visit(tree)
     except _common.ReplaceTokenError as error:
         errorMessage = error.getErrorMessage(content)
         return _res.Error(errorMessage)
 
-    localNames = _common.getLocalNames(visitor.localVariables, componentName)
-    globalNames = _common.getGlobalNames(visitor.globalVariables)
-
     computedHydraulicNamesResult = _getComputedHydraulicNames(visitor.computedHydraulicVariables, computedNamesByPort)
     if _res.isError(computedHydraulicNamesResult):
         return _res.error(computedHydraulicNamesResult)
     computedHydraulicNames = _res.value(computedHydraulicNamesResult)
 
-    computedEnergyNames = _common.getComputedEnergyNames(visitor.computedEnergyVariables, componentName)
+    computedHydraulicTokensAndReplacement = zip(visitor.computedHydraulicVariables, computedHydraulicNames)
 
-    tokens = [
-        *visitor.localVariables,
-        *visitor.globalVariables,
-        *visitor.computedHydraulicVariables,
-        *visitor.computedEnergyVariables,
-    ]
-    replacements = [*localNames, *globalNames, *computedHydraulicNames, *computedEnergyNames]
+    tokensAndReplacements = [*computedHydraulicTokensAndReplacement, *visitor.tokensAndReplacement]
 
-    outputDdckContent = _tokens.replaceTokensWithReplacements(content, tokens, replacements)
+    outputDdckContent = _tokens.replaceTokensWithReplacements(content, tokensAndReplacements)
 
     return outputDdckContent
 

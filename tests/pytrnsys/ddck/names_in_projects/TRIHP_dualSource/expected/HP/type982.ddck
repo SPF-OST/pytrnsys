@@ -17,7 +17,7 @@
 ***********************************
 ** inputs from hydraulic solver
 ***********************************
-EQUATIONS 6
+EQUATIONS 8
 THpEvapIn = TPiGhxToHP				! Temperature of the evaporator inlet, deg C    
 MfrEvapIn = ABS(MHPEvap_A) 		! Mass flow rate into evaporator, kg/h     
 CpHpEvapIn = Lloop5Cp

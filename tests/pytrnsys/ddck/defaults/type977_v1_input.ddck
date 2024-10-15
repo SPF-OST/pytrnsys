@@ -20,7 +20,7 @@
 ** inputs from hydraulic solver
 ***********************************
 
-EQUATIONS 4
+EQUATIONS 6
 ThpEvapIn = @temp(EvapIn, TPiHpEvapIn)   !@connector   
 MfrEvapIn = ABS(@mfr(EvapIn, MfrPuHpEvap))
 CphpEvapIn = @cp(EvapIn, CPWAT)
