@@ -43,29 +43,16 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorB
 
         adjustedActualNumberOfEquations = actualNumberOfEquations - nComputedOutputVariablesWithoutDefaults
 
-        token, replacement = self._createDeclaredNumberOfEquationsTokenAndReplacement(
-            declaredNumberOfEquationsTree, adjustedActualNumberOfEquations, tree
-        )
+        replacement = str(adjustedActualNumberOfEquations)
 
-        self._addReplacement(token, replacement)
-
-    @staticmethod
-    def _createDeclaredNumberOfEquationsTokenAndReplacement(
-        declaredNumberOfEquationsTree: _lark.Tree | None, adjustedActualNumberOfEquations: int, tree: _lark.Tree
-    ) -> _tp.Tuple[_tokens.Token, str]:
         if declaredNumberOfEquationsTree:
-            return _tokens.Token.fromTree(declaredNumberOfEquationsTree), str(adjustedActualNumberOfEquations)
+            token = _tokens.Token.fromTree(declaredNumberOfEquationsTree)
+            self._addReplacement(token, replacement)
+            return
 
-        whatLength = len("equations")
-
-        startPos = tree.meta.start_pos + whatLength
-        endPos = startPos
-        startColumn = tree.meta.column + whatLength
-
-        token = _tokens.Token(tree.meta.line, startColumn, tree.meta.start_pos, endPos)
-        replacement = f" {adjustedActualNumberOfEquations}"
-
-        return token, replacement
+        hashToken = _vh.getChildToken("HASH", tree)
+        token = _tokens.Token.fromMetaOrToken(hashToken)
+        self._addReplacement(token, replacement)
 
 
 class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(_lvis.Visitor_Recursive):

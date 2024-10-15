@@ -42,16 +42,12 @@ def getSubtreesNonEmpty(treeData: str, tree: _lark.Tree) -> _cabc.Sequence[_lark
 _T = _tp.TypeVar("_T")
 
 
-def toString(x: str) -> str:
-    return x
-
-
 def getChildTokenValue(tokenType: str, tree: _lark.Tree, conversionFunction: _cabc.Callable[[str], _T]) -> _T:
-    tokenValueOrNone = getChildTokenValueOrNone(tokenType, tree, conversionFunction)
+    token = getChildTokenValueOrNone(tokenType, tree, conversionFunction)
 
-    if not tokenValueOrNone:
+    if not token:
         raise ValueError(f"`{tree.data}` doesn't contain a direct child token of type `{tokenType}`.")
-    tokenValue = tokenValueOrNone
+    tokenValue = token
 
     return tokenValue
 
@@ -59,21 +55,44 @@ def getChildTokenValue(tokenType: str, tree: _lark.Tree, conversionFunction: _ca
 def getChildTokenValueOrNone(
     tokenType: str, tree: _lark.Tree, conversionFunction: _tp.Callable[[str], _T]
 ) -> _T | None:
-    values = getChildTokenValues(tokenType, tree)
+    tokenOrNone = getChildTokenOrNone(tokenType, tree)
 
-    nValues = len(values)
-    if nValues == 0:
+    if not tokenOrNone:
         return None
 
-    if nValues > 1:
-        raise ValueError(f"More than one token of type {tokenType} found.")
-
-    value = values[0]
-
-    convertedValue = conversionFunction(value)
+    convertedValue = conversionFunction(tokenOrNone.value)
 
     return convertedValue
 
 
 def getChildTokenValues(tokenType: str, tree: _lark.Tree) -> _cabc.Sequence[str]:
-    return [c.value for c in tree.children if isinstance(c, _lark.Token) and c.type == tokenType]
+    return [t.value for t in getChildTokens(tokenType, tree)]
+
+
+def getChildToken(tokenType: str, tree: _lark.Tree) -> _lark.Token:
+    tokenOrNone = getChildTokenOrNone(tokenType, tree)
+
+    if not tokenOrNone:
+        raise ValueError(f"Multiple tokens of type `{tokenType}` found for `{tree.data}`.")
+    token = tokenOrNone
+
+    return token
+
+
+def getChildTokenOrNone(tokenType: str, tree: _lark.Tree) -> _lark.Token | None:
+    tokens = getChildTokens(tokenType, tree)
+
+    nTokens = len(tokens)
+    if nTokens == 0:
+        return None
+
+    if nTokens > 1:
+        raise ValueError(f"More than one token of type `{tokenType}` found.")
+
+    token = tokens[0]
+
+    return token
+
+
+def getChildTokens(tokenType: str, tree: _lark.Tree) -> _cabc.Sequence[_lark.Token]:
+    return [c for c in tree.children if isinstance(c, _lark.Token) and c.type == tokenType]

@@ -15,11 +15,23 @@ class Token:
 
     @staticmethod
     def fromTree(tree: _lark.Tree) -> "Token":
+        return Token.fromMetaOrToken(tree.meta)
+
+    @staticmethod
+    def fromMetaOrToken(metaOrToken: _lark.tree.Meta | _lark.Token) -> "Token":
+        if (
+            metaOrToken.line is None
+            or metaOrToken.column is None
+            or metaOrToken.start_pos is None
+            or metaOrToken.end_pos is None
+        ):
+            raise ValueError("All meta attributes of token must be non-None.")
+
         return Token(
-            tree.meta.line,
-            tree.meta.column,
-            tree.meta.start_pos,
-            tree.meta.end_pos,
+            metaOrToken.line,
+            metaOrToken.column,
+            metaOrToken.start_pos,
+            metaOrToken.end_pos,
         )
 
     def shift(self, offset: int) -> "Token":

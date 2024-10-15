@@ -122,7 +122,7 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
         self._checkOrAddDeclaredNumberOf("parameters", "parameter", "number_of_parameters", tree)
 
     def inputs(self, tree: _lark.Tree) -> None:
-        self._checkOrAddDeclaredNumberOf("inputs", "input", "number_of_inputs", tree)
+        self._checkOrAddDeclaredNumberOf("inputs", "input", "number_of_inputs", tree, multiplicity=2)
 
     def labels(self, tree: _lark.Tree) -> None:
         self._checkOrAddDeclaredNumberOf("labels", "label", "number_of_labels", tree)
@@ -190,35 +190,42 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
         childrenSubtreeName: str,
         declaredNumberOfSubtreeName: str,
         tree: _lark.Tree,
+        multiplicity: int = 1,
     ) -> None:
-        declaredNumberOfSubtree = _vh.getSubtreeOrNone(declaredNumberOfSubtreeName, tree)
         childrenSubtrees = _vh.getSubtrees(childrenSubtreeName, tree)
 
         if not childrenSubtrees:
             # The case "EQUATIONS 0", e.g., is handled by the parser, i.e.
             #
-            #   Parameters 0
+            #   EQUATIONS 0
             #   foo = bar
             #
             # is already detected by the parser, so we don't have to deal
             # with that here.
             return
 
-        actualNumberOf = len(childrenSubtrees)
+        nChildrenSubtree = len(childrenSubtrees)
+        if nChildrenSubtree % multiplicity != 0:
+            raise ReplaceTokenError(
+                tree.meta,
+                f"Number of arguments to {what} must be a multiple of {multiplicity} but was {nChildrenSubtree}",
+            )
 
+        actualNumberOf = int(nChildrenSubtree / multiplicity)
+
+        declaredNumberOfSubtree = _vh.getSubtreeOrNone(declaredNumberOfSubtreeName, tree)
         if declaredNumberOfSubtree:
             self._checkDeclaredNumberOf(what, declaredNumberOfSubtree, actualNumberOf)
             return
 
-        self._addDeclaredNumberOf(what, actualNumberOf, tree.meta)
+        hashToken = _vh.getChildToken("HASH", tree)
 
-    def _addDeclaredNumberOf(self, what: str, actualNumberOf: int, meta: _lark.tree.Meta) -> None:
-        whatLength = len(what)
-        startPos = meta.start_pos + whatLength
-        endPos = startPos
-        replacement = f" {actualNumberOf}"
-        startColumn = meta.column + whatLength
-        token = _tokens.Token(meta.line, startColumn, startPos, endPos)
+        self._addDeclaredNumberOf(actualNumberOf, hashToken)
+
+    def _addDeclaredNumberOf(self, actualNumberOf: int, hashToken: _lark.Token) -> None:
+        replacement = str(actualNumberOf)
+        token = _tokens.Token.fromMetaOrToken(hashToken)
+
         self._addReplacement(token, replacement)
 
     def _addLocalVariable(self, tree: _lark.Tree) -> None:
@@ -243,6 +250,8 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
     ) -> None:
         declaredNumberOf = _vh.getChildTokenValueOrNone("POSITIVE_INT", declaredNumberOfSubtree, int)
         if declaredNumberOf is None:
+            # If the declared number is a variable, we cannot find out whether the value of that variable
+            # matches the actual number of arguments, hence we just return (i.e. pretend it does).
             return
 
         if actualNumberOf != declaredNumberOf:
