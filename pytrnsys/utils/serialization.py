@@ -5,10 +5,10 @@ __all__ = [
 ]
 
 import abc as _abc
+import json as _json
 import logging as _log
 import typing as _tp
 import uuid as _uuid
-import json as _json
 
 import dataclasses_jsonschema as _dcj
 
@@ -76,14 +76,17 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
     ) -> _dcj.JsonDict:
         schema = super().json_schema(embeddable, schema_type, validate_enums, **kwargs)
 
-        schemaWithVersion = cls._getSchemaWithVersion(schema, embeddable)
+        schema = schema[cls.__name__] if embeddable else schema
 
-        return schemaWithVersion
+        schema = schema.copy()
+        schema["additionalProperties"] = False
+
+        schemaWithVersion = cls._getSchemaWithVersion(schema)
+
+        return {**schema, cls.__name__: schemaWithVersion} if embeddable else schemaWithVersion
 
     @classmethod
-    def _getSchemaWithVersion(cls, fullSchema, embeddable):
-        schema = fullSchema[cls.__name__] if embeddable else fullSchema
-
+    def _getSchemaWithVersion(cls, schema):
         properties = schema.get("properties", {})
         properties = {**properties, "__version__": {"const": str(cls.getVersion())}}
 
@@ -93,7 +96,7 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
 
         schema = {**schema, "properties": properties, "required": required}
 
-        return {**fullSchema, cls.__name__: schema} if embeddable else schema
+        return schema
 
     @classmethod
     @_abc.abstractmethod
@@ -220,7 +223,7 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
 
         allDefinitions = definitions | fullSupersededSchema
 
-        keys = {"type", "properties", "required", "description"}
+        keys = {"type", "properties", "required", "description", "additionalProperties"}
         schema = {k: v for k, v in fullSchema.items() if k in keys}
         remainingSchema = {k: v for k, v in fullSchema.items() if k not in keys}
 
