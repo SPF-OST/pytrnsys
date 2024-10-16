@@ -229,7 +229,7 @@ class TestSerialization:
 
     def testNested(self):
         json = _json.dumps(self.SERIALIZED_T0)
-        
+
         actualSchema = _json.dumps(Team.json_schema(), indent=4)
         print(actualSchema)
         expectedSchema = """\
@@ -351,9 +351,9 @@ class TestSerialization:
     },
     "additionalProperties": false
 }"""
-        
+
         assert actualSchema == expectedSchema
-        
+
         team = Team.from_json(json)
 
         expectedMembers = [Person.from_dict(d) for d in [self.SERIALIZED_P0, self.SERIALIZED_P1, self.SERIALIZED_P]]
