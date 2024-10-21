@@ -166,11 +166,11 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         raise NotImplementedError()
 
     @classmethod
-    def _doesRequireVersion(cls) -> bool:
+    def additionalProperties(cls) -> bool:
         return False
 
     @classmethod
-    def additionalProperties(cls) -> bool:
+    def _doesRequireVersion(cls) -> bool:
         return False
 
 
