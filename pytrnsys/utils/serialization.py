@@ -23,6 +23,33 @@ class SerializationError(ValueError):
     pass
 
 
+class ValidationError(SerializationError):
+    def __init__(self, data: str, schema: str, *args: _tp.Any) -> None:
+        self.data = data
+        self.schema = schema
+        super().__init__(*args)
+
+    @staticmethod
+    def create(data: _dcj.JsonDict, schema: _dcj.JsonDict, *args: _tp.Any) -> "ValidationError":
+        serializedData = _json.dumps(data, indent=4)
+        serializedSchema = _json.dumps(schema, indent=4)
+        return ValidationError(serializedData, serializedSchema, *args)
+
+    def __str__(self) -> str:
+        return f"""\
+<{type(self).__name__}
+
+data =
+    
+{self.data}
+    
+schema = 
+    
+{self.schema}
+
+>"""
+
+
 class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
     @classmethod
     def from_dict(
@@ -46,7 +73,7 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         try:
             deserializedObject = super().from_dict(data, validate, validate_enums, schema_type)
         except _dcj.ValidationError as error:
-            raise SerializationError("Validation failed.") from error
+            cls._raiseValidationErrorFrom(error, data, validate_enums, schema_type)
 
         return _tp.cast(_S, deserializedObject)
 
@@ -64,7 +91,22 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         ), "Serialized object dictionary from dataclasses-json already contained '__version__' key!"
 
         data["__version__"] = str(self.getVersion())
+
         return data
+
+    @classmethod
+    def _raiseValidationErrorFrom(
+        cls,
+        error: _dcj.ValidationError,
+        data: _dcj.JsonDict,
+        validate_enums: bool,  # pylint: disable=invalid-name
+        schema_type: _dcj.SchemaType,  # pylint: disable=invalid-name
+    ) -> _tp.NoReturn:
+        schema = cls.json_schema(embeddable=False, schema_type=schema_type, validate_enums=validate_enums)
+
+        validationError = ValidationError.create(data, schema, data)  # pylint: disable=arguments-out-of-order
+
+        raise validationError from error
 
     @classmethod
     def json_schema(
@@ -79,7 +121,7 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         schema = fullSchema[cls.__name__] if embeddable else fullSchema
 
         schema = cls._addVersionToSchema(schema)
-        schema = cls._addAdditionalPropertiesFalseToSchema(schema)
+        schema = cls._addAdditionalPropertiesToSchema(schema)
 
         return {**fullSchema, cls.__name__: schema} if embeddable else schema
 
@@ -92,13 +134,17 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         if cls._doesRequireVersion():
             required = [*required, "__version__"]
 
-        schema = {**schema, "properties": properties, "required": required, "additionalProperties": False}
+        schema = {
+            **schema,
+            "properties": properties,
+            "required": required,
+        }
 
         return schema
 
     @classmethod
-    def _addAdditionalPropertiesFalseToSchema(cls, schema):
-        return {**schema, "additionalProperties": False}
+    def _addAdditionalPropertiesToSchema(cls, schema):
+        return {**schema, "additionalProperties": cls.additionalProperties()}
 
     @classmethod
     @_abc.abstractmethod
@@ -123,6 +169,10 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
     def _doesRequireVersion(cls) -> bool:
         return False
 
+    @classmethod
+    def additionalProperties(cls) -> bool:
+        return False
+
 
 class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
     @classmethod
@@ -137,7 +187,7 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
             try:
                 cls._validate(data, validate_enums)
             except _dcj.ValidationError as error:
-                raise SerializationError from error
+                cls._raiseValidationErrorFrom(error, data, validate_enums, schema_type)
 
         try:
             return super().from_dict(data, validate=False, validate_enums=validate_enums, schema_type=schema_type)
