@@ -95,7 +95,7 @@ input: variable
     | SIGNED_NUMBER 
     | ("0" "," "0" | "CONST")
 
-labels: LABELS (HASH| number_of_labels) (label [","])* label
+labels: LABELS (HASH| number_of_labels) label+
 
 LABELS: "labels"i
 
@@ -207,7 +207,7 @@ DEFAULT_VARIABLE_NAME: NAME
 
 NAME: /(?!(constants|equations|unit|parameters|inputs|labels|trace|assign)\s)[a-z]([a-z]|[0-9]|_)*/i
 
-LABEL: /(?!(constants|equations|unit|parameters|inputs|labels|trace|assign)\s)[^,\s\*!]+/i
+LABEL: /(?!(constants|equations|unit|parameters|inputs|labels|trace|assign)\s)("[^"]+"|[^\s\*!]+)/i
 
 UNREFERENCABLE_NAME: /(?!(constants|equations|unit|parameters|inputs|labels|trace|assign)\s)[a-z]([a-z]|[0-9]|_|-)*/i
 
