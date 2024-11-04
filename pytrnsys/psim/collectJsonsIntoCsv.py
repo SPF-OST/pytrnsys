@@ -4,11 +4,11 @@ import typing as _tp
 
 import pandas as _pd
 
-_Value: _tp.TypeAlias = str | int | float | _pl.Path | None
-_Row: _tp.TypeAlias = dict[str, _Value]
+_Value = str | int | float | _pl.Path | None
+_Row = dict[str, _Value]
 
 _Column = list[_Value]
-_Table: _tp.TypeAlias = dict[str, _Column]
+_Table = dict[str, _Column]
 
 
 def collectJsonsIntoCsv(csvFilePath: _pl.Path, resultsDirPath: _pl.Path | None = None) -> None:
@@ -73,7 +73,6 @@ def _getFlattenedData(dirPath: _pl.Path, jsonFilePath: _pl.Path) -> _Row:
                 f'Ignoring file entry "{key}" of unsupported type `{type(value).__name__}` '
                 f"in file {relativeJsonFilePath}."
             )
-            continue
 
     return flattenedData
 
