@@ -10,3 +10,5 @@ pylint
 black
 
 diff-pdf-visually
+
+pandas-stubs

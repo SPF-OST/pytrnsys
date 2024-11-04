@@ -9,9 +9,7 @@ import pandas as pd
 def main():
     if len(sys.argv) != 3:
         scriptName = pl.Path(sys.argv[0]).name
-        print(
-            f"Usage: {scriptName} <path-to-directory-containing-json-files> <path-to-csv-file>"
-        )
+        print(f"Usage: {scriptName} <path-to-directory-containing-json-files> <path-to-csv-file>")
         sys.exit(-1)
 
     dirPath = pl.Path(sys.argv[1])
