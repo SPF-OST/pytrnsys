@@ -11,6 +11,7 @@ import pathlib as _pl
 import re
 import traceback as _tb
 import typing as _tp
+import collections.abc as _cabc
 
 import matplotlib.pyplot as plt
 import numpy as num
@@ -27,6 +28,7 @@ import pytrnsys.report.latexReport as latex
 import pytrnsys.rsim.runParallel as run
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.utils.uncertainFloat as _uf
+import pytrnsys.psim.collectJsonsIntoCsv as _collect
 
 try:
     import pytrnsys_examples
@@ -439,8 +441,8 @@ class ProcessParallelTrnsys:
             self.plotComparison(commands, shallPlotUncertainties=False)
 
         if "comparePlotUncertain" in self.inputs:
-            commands = self.inputs["comparePlotUncertain"]
             self.logger.info("Generating comparison plots with uncertainties.")
+            commands = self.inputs["comparePlotUncertain"]
             self.plotComparison(commands, shallPlotUncertainties=True)
 
         if "barPlotConditional" in self.inputs.keys():
@@ -476,6 +478,10 @@ class ProcessParallelTrnsys:
 
         if "printBoxPlotGLEData" in self.inputs.keys():
             self.printBoxPlotGLEData()
+
+        if "collectJsonsIntoCsv" in self.inputs.keys():
+            commands = self.inputs["collectJsonsIntoCsv"]
+            self.collectJsonsIntoCsv(commands)
 
         return self.filesReturn  # Dc maybe not the best way
 
@@ -1752,3 +1758,8 @@ class ProcessParallelTrnsys:
         shallWriteReport = self.inputs["costPdf"]
         processType = _cc.OTHER if not fileNamesToRead else _cc.CasesDefined(fileNamesToRead)
         _cc.calculateCostsAndWriteReports(configFilePath, resultsDirPath, shallWriteReport, processType)
+
+    def collectJsonsIntoCsv(self, resultCsvFilePathString: str) -> None:
+        resultCsvFilePath = _pl.Path(resultCsvFilePathString)
+        resultsDirPath = _pl.Path(self.inputs["pathBase"])
+        _collect.collectJsonsIntoCsv(resultCsvFilePath, resultsDirPath)
