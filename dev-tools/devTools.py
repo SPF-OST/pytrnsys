@@ -1,4 +1,4 @@
-#!/usr/bin/python3.9
+#!/usr/bin/python3.12
 
 # Run from top-level directory
 
