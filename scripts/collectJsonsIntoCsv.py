@@ -77,7 +77,6 @@ def _getFlattenedData(dirPath, jsonFilePath):
                 f'Ignoring file entry "{key}" of unsupported type `{type(value).__name__}` '
                 f"in file {relativeJsonFilePath}."
             )
-            continue
 
     return flattenedData
 
