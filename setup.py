@@ -56,13 +56,7 @@ _st.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: Microsoft :: Windows",
     ],
-    entry_points="""
-    [console_scripts]
-    pytrnsys-dll = pytrnsys.utils.copyDllFiles:dllCopy
-    pytrnsys-run = pytrnsys.rsim.runParallelTrnsys:run
-    pytrnsys-process = pytrnsys.psim.processParallelTrnsys:process
-    pytrnsys-load = pytrnsys.utils.loadExamplesAndDdcks:load
-    """,
+    scripts=["scripts/collectJsonsIntoCsv.py"],
     setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.9",
 )
