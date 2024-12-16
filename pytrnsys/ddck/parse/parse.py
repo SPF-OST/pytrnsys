@@ -2,9 +2,8 @@ import pkgutil as _pu
 
 import lark as _lark
 
+import pytrnsys.ddck.parse as _parse
 import pytrnsys.utils.result as _res
-
-from .. import _parse
 
 
 def _createParser() -> _lark.Lark:
