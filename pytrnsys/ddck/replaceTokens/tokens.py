@@ -22,7 +22,8 @@ class Token:
     @staticmethod
     def fromMetaOrToken(metaOrToken: _lark.tree.Meta | _lark.Token) -> "Token":
         if (
-            metaOrToken.line is None
+            # need to do this in one big expression for mypy to understand
+            metaOrToken.line is None  # pylint: disable=too-many-boolean-expressions
             or metaOrToken.end_line is None
             or metaOrToken.column is None
             or metaOrToken.end_column is None
@@ -35,7 +36,7 @@ class Token:
             metaOrToken.line,
             metaOrToken.end_line,
             metaOrToken.column,
-            metaOrToken.end_line,
+            metaOrToken.end_column,
             metaOrToken.start_pos,
             metaOrToken.end_pos,
         )
@@ -62,18 +63,10 @@ class Token:
 TokensAndReplacement = _cabc.Sequence[_tp.Tuple[Token, str]]
 
 
-def replaceTokensWithReplacements(
-    inputDdckContent: str, tokensAndReplacement: TokensAndReplacement
-) -> str:
-    sortedTokensAndReplacement = _getSortedTokensAndReplacement(
-        tokensAndReplacement
-    )
-    sortedNonOverlappingTokensAndReplacement = _removeCoveredTokens(
-        sortedTokensAndReplacement
-    )
-    outputDdckContent = _replaceSortedNonOverlappingTokens(
-        inputDdckContent, sortedNonOverlappingTokensAndReplacement
-    )
+def replaceTokensWithReplacements(inputDdckContent: str, tokensAndReplacement: TokensAndReplacement) -> str:
+    sortedTokensAndReplacement = _getSortedTokensAndReplacement(tokensAndReplacement)
+    sortedNonOverlappingTokensAndReplacement = _removeCoveredTokens(sortedTokensAndReplacement)
+    outputDdckContent = _replaceSortedNonOverlappingTokens(inputDdckContent, sortedNonOverlappingTokensAndReplacement)
     return outputDdckContent
 
 
@@ -126,16 +119,12 @@ def _removeCoveredTokens(
         if lastTokenWithoutOverlap.endIndex >= token.endIndex:
             continue
 
-        raise ValueError(
-            "Tokens must either not overlap or fully cover each other."
-        )
+        raise ValueError("Tokens must either not overlap or fully cover each other.")
 
     return tokensAndReplacementWithoutOverlap
 
 
-def _replaceSortedNonOverlappingTokens(
-    content: str, tokensAndReplacements: TokensAndReplacement
-) -> str:
+def _replaceSortedNonOverlappingTokens(content: str, tokensAndReplacements: TokensAndReplacement) -> str:
     if len(tokensAndReplacements) <= 1:
         return content
 
@@ -146,26 +135,18 @@ def _replaceSortedNonOverlappingTokens(
     if len(tokens) > 1:
         previousAndCurrentTokens = list(zip(tokens[:-1], tokens[1:]))
 
-        areTokensSorted = all(
-            p.startIndex < c.startIndex for p, c in previousAndCurrentTokens
-        )
+        areTokensSorted = all(p.startIndex < c.startIndex for p, c in previousAndCurrentTokens)
         if not areTokensSorted:
-            raise ValueError(
-                "`tokens` must be sorted by start index ascending."
-            )
+            raise ValueError("`tokens` must be sorted by start index ascending.")
 
-        doAnyTokensOverlap = any(
-            p.endIndex >= c.startIndex for p, c in previousAndCurrentTokens
-        )
+        doAnyTokensOverlap = any(p.endIndex >= c.startIndex for p, c in previousAndCurrentTokens)
         if doAnyTokensOverlap:
             raise ValueError("`tokens` must not overlap.")
 
     offset = 0
     resultContent = content
     for token, replacement in zip(tokens, replacements):
-        shiftedStartIndex, shiftedEndIndex = token.getShiftedStartAndEndIndex(
-            offset
-        )
+        shiftedStartIndex, shiftedEndIndex = token.getShiftedStartAndEndIndex(offset)
         resultContent = _replaceSubstring(
             resultContent,
             shiftedStartIndex,
@@ -177,7 +158,5 @@ def _replaceSortedNonOverlappingTokens(
     return resultContent
 
 
-def _replaceSubstring(
-    content: str, startIndex: int, endIndex: int, replacement: str
-) -> str:
+def _replaceSubstring(content: str, startIndex: int, endIndex: int, replacement: str) -> str:
     return content[:startIndex] + replacement + content[endIndex:]

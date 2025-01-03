@@ -76,9 +76,7 @@ ValByPass
 
 
 class TestOnlinePlotter:
-    @_pt.mark.parametrize(
-        "testCase", [_pt.param(tc, id=tc.id) for tc in getTestCases()]
-    )
+    @_pt.mark.parametrize("testCase", [_pt.param(tc, id=tc.id) for tc in getTestCases()])
     def test(self, testCase: TestCase) -> None:
         result = _parse.parseDdck(testCase.input)
         assert not _res.isError(result)
@@ -87,8 +85,6 @@ class TestOnlinePlotter:
         visitor = _op.LeftRightVariablesVisitor()
         visitor.visit(tree)
 
-        actualOutput = _tokens.replaceTokensWithReplacements(
-            testCase.input, visitor.tokensAndReplacement
-        )
+        actualOutput = _tokens.replaceTokensWithReplacements(testCase.input, visitor.tokensAndReplacement)
 
         assert actualOutput == testCase.expectedOutput

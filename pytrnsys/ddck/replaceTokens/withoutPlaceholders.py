@@ -14,23 +14,15 @@ import pytrnsys.utils.result as _res
 from . import _common
 
 
-class _WithoutPlaceholdersJSONCollectTokensVisitor(
-    _common.CollectTokensVisitorBase
-):
-    def __init__(
-        self, componentName: str, defaultVisibility: _dv.DefaultVisibility
-    ) -> None:
+class _WithoutPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorBase):
+    def __init__(self, componentName: str, defaultVisibility: _dv.DefaultVisibility) -> None:
         super().__init__(componentName, defaultVisibility)
 
     def equations(self, tree: _lark.Tree) -> None:
-        equationsVisitor = (
-            _WithoutPlaceholdersJSONCollectEquationsTokensVisitor()
-        )
+        equationsVisitor = _WithoutPlaceholdersJSONCollectEquationsTokensVisitor()
         equationsVisitor.visit(tree)
 
-        nComputedOutputVariablesWithoutDefaults = (
-            equationsVisitor.nComputedOutputVariablesWithoutDefaults
-        )
+        nComputedOutputVariablesWithoutDefaults = equationsVisitor.nComputedOutputVariablesWithoutDefaults
 
         if nComputedOutputVariablesWithoutDefaults == 0:
             super().equations(tree)
@@ -39,9 +31,7 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(
         equationSubtrees = _vh.getSubtreesNonEmpty("equation", tree)
         actualNumberOfEquations = len(equationSubtrees)
 
-        declaredNumberOfEquationsTree = _vh.getSubtreeOrNone(
-            "number_of_equations", tree
-        )
+        declaredNumberOfEquationsTree = _vh.getSubtreeOrNone("number_of_equations", tree)
         if declaredNumberOfEquationsTree:
             self._checkDeclaredNumberOf(
                 "equations",
@@ -51,16 +41,12 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(
 
         if nComputedOutputVariablesWithoutDefaults == actualNumberOfEquations:
             token = _tokens.Token.fromTree(tree)
-            self._addReplacement(
-                token, "! Empty EQUATIONS block removed by pytrnsys"
-            )
+            self._addReplacement(token, "! Empty EQUATIONS block removed by pytrnsys")
             return
 
         self.tokensAndReplacement.extend(equationsVisitor.tokensAndReplacement)
 
-        adjustedActualNumberOfEquations = (
-            actualNumberOfEquations - nComputedOutputVariablesWithoutDefaults
-        )
+        adjustedActualNumberOfEquations = actualNumberOfEquations - nComputedOutputVariablesWithoutDefaults
 
         replacement = str(adjustedActualNumberOfEquations)
 
@@ -74,9 +60,7 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(
         self._addReplacement(token, replacement)
 
 
-class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(
-    _lvis.Visitor_Recursive
-):
+class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(_lvis.Visitor_Recursive):
     def __init__(self) -> None:
         super().__init__()
         self.tokensAndReplacement: list[tuple[_tokens.Token, str]] = []
@@ -90,9 +74,7 @@ class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(
         if assignmentTarget.data != "computed_output_temp_var":
             return
 
-        computedVariable = _common.createComputedVariable(
-            assignmentTarget, "@temp"
-        )
+        computedVariable = _common.createComputedVariable(assignmentTarget, "@temp")
 
         tokenAndReplacement: _tp.Tuple[_tokens.Token, str]
 
@@ -105,9 +87,7 @@ class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(
         self.nComputedOutputVariablesWithoutDefaults += 1
 
         portName = _vh.getChildTokenValue("PORT_NAME", assignmentTarget, str)
-        replacement = (
-            f"! Assignment to temperature at `{portName}` removed by pytrnsys"
-        )
+        replacement = f"! Assignment to temperature at `{portName}` removed by pytrnsys"
 
         token = _tokens.Token.fromTree(tree)
 
@@ -121,17 +101,11 @@ def replaceTokensWithDefaults(
     componentName: str,
     defaultVisibility: _dv.DefaultVisibility,
 ) -> _res.Result[str]:
-    inputDdckContent = inputDdckFilePath.read_text(
-        encoding="windows-1252"
-    )  # pylint: disable=bad-option-value
+    inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
-    result = replaceTokensWithDefaultsInString(
-        inputDdckContent, componentName, defaultVisibility, inputDdckFilePath
-    )
+    result = replaceTokensWithDefaultsInString(inputDdckContent, componentName, defaultVisibility, inputDdckFilePath)
     if _res.isError(result):
-        error = _res.error(result).withContext(
-            f"Error processing file `{inputDdckFilePath.name}`"
-        )
+        error = _res.error(result).withContext(f"Error processing file `{inputDdckFilePath.name}`")
         return error
 
     return _res.value(result)
@@ -149,43 +123,29 @@ def replaceTokensWithDefaultsInString(
         return moreSpecificError
     tree = _res.value(result)
 
-    visitor = _WithoutPlaceholdersJSONCollectTokensVisitor(
-        componentName, defaultVisibility
-    )
+    visitor = _WithoutPlaceholdersJSONCollectTokensVisitor(componentName, defaultVisibility)
     try:
         visitor.visit(tree)
     except pytrnsys.ddck.replaceTokens.error.ReplaceTokenError as replaceTokenError:
-        errorMessage = replaceTokenError.getErrorMessage(
-            inputDdckContent, filePath
-        )
+        errorMessage = replaceTokenError.getErrorMessage(inputDdckContent, filePath)
         return _res.Error(errorMessage)
 
-    hydraulicVariableReplacementsResult = (
-        _getReplacementsForHydraulicVariables(
-            visitor.computedHydraulicVariables
-        )
-    )
+    hydraulicVariableReplacementsResult = _getReplacementsForHydraulicVariables(visitor.computedHydraulicVariables)
     if _res.isError(hydraulicVariableReplacementsResult):
-        moreSpecificError = _res.error(
-            hydraulicVariableReplacementsResult
-        ).withContext("Could not substitute the defaults for the placeholders")
+        moreSpecificError = _res.error(hydraulicVariableReplacementsResult).withContext(
+            "Could not substitute the defaults for the placeholders"
+        )
         return moreSpecificError
-    hydraulicVariableReplacements = _res.value(
-        hydraulicVariableReplacementsResult
-    )
+    hydraulicVariableReplacements = _res.value(hydraulicVariableReplacementsResult)
 
-    hydraulicVariableTokensAndReplacement = list(
-        zip(visitor.computedHydraulicVariables, hydraulicVariableReplacements)
-    )
+    hydraulicVariableTokensAndReplacement = list(zip(visitor.computedHydraulicVariables, hydraulicVariableReplacements))
 
     tokensAndReplacement = [
         *visitor.tokensAndReplacement,
         *hydraulicVariableTokensAndReplacement,
     ]
 
-    outputDdckContent = _tokens.replaceTokensWithReplacements(
-        inputDdckContent, tokensAndReplacement
-    )
+    outputDdckContent = _tokens.replaceTokensWithReplacements(inputDdckContent, tokensAndReplacement)
 
     return outputDdckContent
 
@@ -194,24 +154,16 @@ def _getReplacementsForHydraulicVariables(
     computedHydraulicVariables: _cabc.Sequence[_common.ComputedVariable],
 ) -> _res.Result[_tp.Sequence[str]]:
 
-    computedVariablesWithoutDefaultName = [
-        v for v in computedHydraulicVariables if not v.defaultVariableName
-    ]
+    computedVariablesWithoutDefaultName = [v for v in computedHydraulicVariables if not v.defaultVariableName]
     if any(computedVariablesWithoutDefaultName):
-        formattedLocations = "\n".join(
-            f"\t{v.startLine}:{v.startColumn}"
-            for v in computedVariablesWithoutDefaultName
-        )
+        formattedLocations = "\n".join(f"\t{v.startLine}:{v.startColumn}" for v in computedVariablesWithoutDefaultName)
         errorMessage = (
             "No default values were provided for the computed variables at the following locations "
             f"(line number:column number):\n"
             f"{formattedLocations}\n"
         )
         return _res.Error(errorMessage)
-    defaultNamesForComputedVariables = [
-        _tp.cast(str, v.defaultVariableName)
-        for v in computedHydraulicVariables
-    ]
+    defaultNamesForComputedVariables = [_tp.cast(str, v.defaultVariableName) for v in computedHydraulicVariables]
 
     replacements = [
         *defaultNamesForComputedVariables,

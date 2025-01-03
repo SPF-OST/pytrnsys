@@ -7,18 +7,13 @@ import lark as _lark
 import pytrnsys.ddck.parse.parse as _parse
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 import pytrnsys.ddck.replaceTokens.error
-import pytrnsys.ddck.replaceTokens.error
 import pytrnsys.ddck.replaceTokens.tokens as _tokens
 from pytrnsys.utils import result as _res
 from . import _common
 
 
-class _WithPlaceholdersJSONCollectTokensVisitor(
-    _common.CollectTokensVisitorBase
-):
-    def computed_output_temp_var(
-        self, tree: _lark.Tree
-    ) -> None:  # pylint: disable=invalid-name
+class _WithPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorBase):
+    def computed_output_temp_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         computedVariable = _common.createComputedVariable(tree, "@temp")
         self.computedHydraulicVariables.append(computedVariable)
 
@@ -30,13 +25,9 @@ def replaceTokens(
     defaultVisibility: _dv.DefaultVisibility,
 ) -> _res.Result[str]:
     if not inputDdckFilePath.is_file():
-        return _res.Error(
-            f"Could not replace placeholders in file {inputDdckFilePath}: the file does not exist."
-        )
+        return _res.Error(f"Could not replace placeholders in file {inputDdckFilePath}: the file does not exist.")
 
-    inputDdckContent = inputDdckFilePath.read_text(
-        encoding="windows-1252"
-    )  # pylint: disable=bad-option-value
+    inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
     result = replaceTokensInString(
         inputDdckContent,
@@ -48,9 +39,7 @@ def replaceTokens(
 
     if _res.isError(result):
         error = _res.error(result)
-        errorWithContext = error.withContext(
-            f"Could not replace placeholders in ddck file `{inputDdckFilePath}`"
-        )
+        errorWithContext = error.withContext(f"Could not replace placeholders in ddck file `{inputDdckFilePath}`")
         return errorWithContext
 
     content = _res.value(result)
@@ -69,34 +58,26 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
         return _res.error(treeResult)
     tree = _res.value(treeResult)
 
-    visitor = _WithPlaceholdersJSONCollectTokensVisitor(
-        componentName, defaultVisibility
-    )
+    visitor = _WithPlaceholdersJSONCollectTokensVisitor(componentName, defaultVisibility)
     try:
         visitor.visit(tree)
     except pytrnsys.ddck.replaceTokens.error.ReplaceTokenError as error:
         errorMessage = error.getErrorMessage(content, filePath)
         return _res.Error(errorMessage)
 
-    computedHydraulicNamesResult = _getComputedHydraulicNames(
-        visitor.computedHydraulicVariables, computedNamesByPort
-    )
+    computedHydraulicNamesResult = _getComputedHydraulicNames(visitor.computedHydraulicVariables, computedNamesByPort)
     if _res.isError(computedHydraulicNamesResult):
         return _res.error(computedHydraulicNamesResult)
     computedHydraulicNames = _res.value(computedHydraulicNamesResult)
 
-    computedHydraulicTokensAndReplacement = zip(
-        visitor.computedHydraulicVariables, computedHydraulicNames
-    )
+    computedHydraulicTokensAndReplacement = zip(visitor.computedHydraulicVariables, computedHydraulicNames)
 
     tokensAndReplacements = [
         *computedHydraulicTokensAndReplacement,
         *visitor.tokensAndReplacement,
     ]
 
-    outputDdckContent = _tokens.replaceTokensWithReplacements(
-        content, tokensAndReplacements
-    )
+    outputDdckContent = _tokens.replaceTokensWithReplacements(content, tokensAndReplacements)
 
     return outputDdckContent
 
@@ -107,9 +88,7 @@ def _getComputedHydraulicNames(
 ) -> _res.Result[_tp.Sequence[str]]:
     computedNames = []
     for computedVariable in computedVariables:
-        computedNamesForPort = computedNamesByPort.get(
-            computedVariable.portName
-        )
+        computedNamesForPort = computedNamesByPort.get(computedVariable.portName)
         if not computedNamesForPort:
             return _res.Error(f"Unknown port `{computedVariable.portName}`.")
 

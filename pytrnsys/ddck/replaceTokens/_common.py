@@ -14,9 +14,7 @@ from .. import _visitorHelpers as _vh
 
 
 @_dc.dataclass
-class ComputedVariable(
-    _tokens.Token
-):  # pylint: disable=too-few-public-methods
+class ComputedVariable(_tokens.Token):  # pylint: disable=too-few-public-methods
     portProperty: str
     portName: str
     defaultVariableName: _tp.Optional[str]
@@ -61,13 +59,9 @@ class ComputedEnergyVariable(_tokens.Token):
             raise ValueError("""Sub-categories mustn't contain ":".""")
 
 
-def createComputedVariable(
-    tree: _lark.Tree, portProperty: str
-) -> ComputedVariable:
+def createComputedVariable(tree: _lark.Tree, portProperty: str) -> ComputedVariable:
     portName = _vh.getChildTokenValue("PORT_NAME", tree, str)
-    defaultVariableName = _vh.getChildTokenValueOrNone(
-        "DEFAULT_VARIABLE_NAME", tree, str
-    )
+    defaultVariableName = _vh.getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", tree, str)
     computedVariable = ComputedVariable(
         tree.meta.line,
         tree.meta.end_line,
@@ -83,9 +77,7 @@ def createComputedVariable(
 
 
 class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
-    def __init__(
-        self, componentName: str, defaultVisibility: DefaultVisibility
-    ) -> None:
+    def __init__(self, componentName: str, defaultVisibility: DefaultVisibility) -> None:
         self.componentName = componentName
         self._defaultVisibility = defaultVisibility
         self.computedHydraulicVariables: list[ComputedVariable] = []
@@ -95,45 +87,29 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
         if not tree.children:
             return
 
-        self._checkOrAddDeclaredNumberOf(
-            "parameters", "parameter", "number_of_parameters", tree
-        )
+        self._checkOrAddDeclaredNumberOf("parameters", "parameter", "number_of_parameters", tree)
 
     def inputs(self, tree: _lark.Tree) -> None:
-        self._checkOrAddDeclaredNumberOf(
-            "inputs", "input", "number_of_inputs", tree, multiplicity=2
-        )
+        self._checkOrAddDeclaredNumberOf("inputs", "input", "number_of_inputs", tree, multiplicity=2)
 
     def labels(self, tree: _lark.Tree) -> None:
-        self._checkOrAddDeclaredNumberOf(
-            "labels", "label", "number_of_labels", tree
-        )
+        self._checkOrAddDeclaredNumberOf("labels", "label", "number_of_labels", tree)
 
     def equations(self, tree: _lark.Tree) -> None:
-        self._checkOrAddDeclaredNumberOf(
-            "equations", "equation", "number_of_equations", tree
-        )
+        self._checkOrAddDeclaredNumberOf("equations", "equation", "number_of_equations", tree)
 
     def constants(self, tree: _lark.Tree) -> None:
-        self._checkOrAddDeclaredNumberOf(
-            "constants", "equation", "number_of_constants", tree
-        )
+        self._checkOrAddDeclaredNumberOf("constants", "equation", "number_of_constants", tree)
 
-    def computed_var(
-        self, tree: _lark.Tree
-    ) -> None:  # pylint: disable=invalid-name
+    def computed_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         propertyName = _vh.getChildTokenValue("PORT_PROPERTY", tree, str)
         computedVariable = createComputedVariable(tree, propertyName)
         self.computedHydraulicVariables.append(computedVariable)
 
-    def computed_output_energy_var(
-        self, tree: _lark.Tree
-    ) -> None:  # pylint: disable=invalid-name
+    def computed_output_energy_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         direction = _vh.getChildTokenValue("ENERGY_DIRECTION", tree, str)
         quality = _vh.getChildTokenValue("ENERGY_QUALITY", tree, str)
-        categoryOrLocal = _vh.getChildTokenValue(
-            "CATEGORY_OR_LOCAL", tree, str
-        )
+        categoryOrLocal = _vh.getChildTokenValue("CATEGORY_OR_LOCAL", tree, str)
         categories = _vh.getChildTokenValues("CATEGORY", tree)
 
         computedEnergyVariable = ComputedEnergyVariable(
@@ -149,15 +125,11 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
             categories,
         )
 
-        replacement = _getComputedEnergyName(
-            computedEnergyVariable, self.componentName
-        )
+        replacement = _getComputedEnergyName(computedEnergyVariable, self.componentName)
 
         self._addReplacement(computedEnergyVariable, replacement)
 
-    def local_var(
-        self, tree: _lark.Tree
-    ) -> None:  # pylint: disable=invalid-name
+    def local_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         if self._defaultVisibility != DefaultVisibility.GLOBAL:
             raise _error.ReplaceTokenError.fromTree(
                 tree,
@@ -166,9 +138,7 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
         self._addLocalVariable(tree)
 
-    def default_visibility_var(
-        self, tree: _lark.Tree
-    ) -> None:  # pylint: disable=invalid-name
+    def default_visibility_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         match self._defaultVisibility:
             case DefaultVisibility.LOCAL:
                 self._addLocalVariable(tree)
@@ -177,9 +147,7 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
             case _:
                 _tp.assert_never(self._defaultVisibility)
 
-    def global_var(
-        self, tree: _lark.Tree
-    ) -> None:  # pylint: disable=invalid-name
+    def global_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         if self._defaultVisibility != DefaultVisibility.LOCAL:
             raise _error.ReplaceTokenError.fromTree(
                 tree,
@@ -190,9 +158,7 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
     def _checkOrAddDeclaredNumberOf(
         self,
-        what: _tp.Literal[
-            "constants", "equations", "parameters", "inputs", "labels"
-        ],
+        what: _tp.Literal["constants", "equations", "parameters", "inputs", "labels"],
         childrenSubtreeName: str,
         declaredNumberOfSubtreeName: str,
         tree: _lark.Tree,
@@ -200,14 +166,17 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
     ) -> None:
         childrenSubtrees = _vh.getSubtrees(childrenSubtreeName, tree)
 
-        # The case "EQUATIONS 0", e.g., is handled by the parser, i.e.
-        #
-        #   EQUATIONS 0
-        #   foo = bar
-        #
-        # is already detected by the parser, so we don't have to deal
-        # with that here.
-        assert childrenSubtrees
+        if not childrenSubtrees:
+            # Invalid cases like "EQUATIONS 0", e.g., are handled by the parser, i.e.
+            #
+            #   EQUATIONS 0
+            #   foo = bar
+            #
+            # is already rejected by the parser, so we don't have to deal
+            # with that here.
+            #
+            # For valid cases, like "PARAMETERS 0", we just don't do anything.
+            return
 
         nChildrenSubtree = len(childrenSubtrees)
         if nChildrenSubtree % multiplicity != 0:
@@ -218,22 +187,16 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
         actualNumberOf = int(nChildrenSubtree / multiplicity)
 
-        declaredNumberOfSubtree = _vh.getSubtreeOrNone(
-            declaredNumberOfSubtreeName, tree
-        )
+        declaredNumberOfSubtree = _vh.getSubtreeOrNone(declaredNumberOfSubtreeName, tree)
         if declaredNumberOfSubtree:
-            self._checkDeclaredNumberOf(
-                what, declaredNumberOfSubtree, actualNumberOf
-            )
+            self._checkDeclaredNumberOf(what, declaredNumberOfSubtree, actualNumberOf)
             return
 
         hashToken = _vh.getChildToken("HASH", tree)
 
         self._addDeclaredNumberOf(actualNumberOf, hashToken)
 
-    def _addDeclaredNumberOf(
-        self, actualNumberOf: int, hashToken: _lark.Token
-    ) -> None:
+    def _addDeclaredNumberOf(self, actualNumberOf: int, hashToken: _lark.Token) -> None:
         replacement = str(actualNumberOf)
         token = _tokens.Token.fromMetaOrToken(hashToken)
 
@@ -259,9 +222,7 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
         declaredNumberOfSubtree: _lark.Tree,
         actualNumberOf: int,
     ) -> None:
-        declaredNumberOf = _vh.getChildTokenValueOrNone(
-            "POSITIVE_INT", declaredNumberOfSubtree, int
-        )
+        declaredNumberOf = _vh.getChildTokenValueOrNone("POSITIVE_INT", declaredNumberOfSubtree, int)
         if declaredNumberOf is None:
             # If the declared number is a variable, we cannot find out whether the value of that variable
             # matches the actual number of arguments, hence we just return (i.e. pretend it does).
@@ -289,9 +250,7 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
         return variable
 
 
-def _getComputedEnergyName(
-    computedEnergyVariable: ComputedEnergyVariable, componentName: str
-) -> str:
+def _getComputedEnergyName(computedEnergyVariable: ComputedEnergyVariable, componentName: str) -> str:
     quality = computedEnergyVariable.quality.value
 
     direction = computedEnergyVariable.direction.value
@@ -299,9 +258,7 @@ def _getComputedEnergyName(
     variableCategory = computedEnergyVariable.category
     category = componentName if variableCategory == ":" else variableCategory
 
-    capitalizedSubcategories = [
-        c.capitalize() for c in computedEnergyVariable.subCategories
-    ]
+    capitalizedSubcategories = [c.capitalize() for c in computedEnergyVariable.subCategories]
     jointSubcategories = "".join(c for c in capitalizedSubcategories)
 
     computedName = f"{quality}Sys{direction}_{category}{jointSubcategories}"

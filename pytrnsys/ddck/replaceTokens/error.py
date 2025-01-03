@@ -12,15 +12,11 @@ class ReplaceTokenError(Exception):
     errorMessage: str
 
     @classmethod
-    def fromTree(
-        cls, tree: _lark.Tree, errorMessage: str
-    ) -> "ReplaceTokenError":
+    def fromTree(cls, tree: _lark.Tree, errorMessage: str) -> "ReplaceTokenError":
         return cls.fromMetaOrToken(tree.meta, errorMessage)
 
     @staticmethod
-    def fromMetaOrToken(
-        metaOrToken: _lark.tree.Meta | _lark.Token, errorMessage: str
-    ) -> "ReplaceTokenError":
+    def fromMetaOrToken(metaOrToken: _lark.tree.Meta | _lark.Token, errorMessage: str) -> "ReplaceTokenError":
         token = _tokens.Token.fromMetaOrToken(metaOrToken)
         return ReplaceTokenError(token, errorMessage)
 
@@ -31,9 +27,7 @@ class ReplaceTokenError(Exception):
         nBeginContextLines: int = 5,
         nEndContextLines=5,
     ) -> str:
-        context = self._getContext(
-            originalInput, nBeginContextLines, nEndContextLines
-        )
+        context = self._getContext(originalInput, nBeginContextLines, nEndContextLines)
 
         message = f"""\
 {self.errorMessage}:
@@ -53,21 +47,13 @@ At {filePath or "<string>"}:{self.token.startLine}:
         originalInputLines = originalInput.splitlines()
 
         startLineNumber = max(self.token.startLine - nBeginContextLines, 1)
-        endLineNumber = min(
-            self.token.endLine + nEndContextLines, len(originalInputLines)
-        )
+        endLineNumber = min(self.token.endLine + nEndContextLines, len(originalInputLines))
 
-        leadingContextLines = originalInputLines[
-            startLineNumber : self.token.startLine - 1
-        ]
+        leadingContextLines = originalInputLines[startLineNumber : self.token.startLine - 1]
         offendingLine = originalInputLines[self.token.startLine - 1]
-        laggingContextLines = originalInputLines[
-            self.token.startLine : endLineNumber
-        ]
+        laggingContextLines = originalInputLines[self.token.startLine : endLineNumber]
 
-        indicatorLine = self._createIndicatorLine(
-            self.token.startColumn, self.token.endColumn
-        )
+        indicatorLine = self._createIndicatorLine(self.token.startColumn, self.token.endColumn)
 
         contextLines = [
             *leadingContextLines,
@@ -80,11 +66,7 @@ At {filePath or "<string>"}:{self.token.startLine}:
         return context
 
     @staticmethod
-    def _createIndicatorLine(
-        indicatorsStartColumn: int, indicatorsEndColumn: int
-    ) -> str:
+    def _createIndicatorLine(indicatorsStartColumn: int, indicatorsEndColumn: int) -> str:
         nIndicators = indicatorsEndColumn - indicatorsStartColumn
-        indicatorLine = (
-            f"{' ' * (indicatorsStartColumn - 1)}{'^' * nIndicators}"
-        )
+        indicatorLine = f"{' ' * (indicatorsStartColumn - 1)}{'^' * nIndicators}"
         return indicatorLine
