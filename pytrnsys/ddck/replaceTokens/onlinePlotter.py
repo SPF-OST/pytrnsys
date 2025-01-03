@@ -43,7 +43,7 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
 
         parameters = _vh.getSubtrees("parameter", parametersSubtree)
         nParameters = len(parameters)
-        if not nParameters == self._N_PARAMETERS:
+        if nParameters != self._N_PARAMETERS:
             errorMessage = f"Online plotters (type {self._TYPE_NUMBER}) must have {self._N_PARAMETERS} parameters"
             raise _error.ReplaceTokenError.fromTree(parametersSubtree, errorMessage)
 
