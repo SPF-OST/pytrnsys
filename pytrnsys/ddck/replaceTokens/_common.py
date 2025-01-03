@@ -5,52 +5,12 @@ import enum as _enum
 import typing as _tp
 
 import lark as _lark
-from lark import visitors as _lvis
+import lark.visitors as _lvis
 
-from . import _tokens
+import pytrnsys.ddck.replaceTokens.error as _error
+import pytrnsys.ddck.replaceTokens.tokens as _tokens
 from .defaultVisibility import DefaultVisibility
 from .. import _visitorHelpers as _vh
-
-
-@_dc.dataclass
-class ReplaceTokenError(Exception):
-    meta: _lark.tree.Meta
-    errorMessage: str
-
-    def getErrorMessage(self, originalInput: str, nBeginContextLines: int = 5, nEndContextLines=5) -> str:
-        context = self._getContext(originalInput, nBeginContextLines, nEndContextLines)
-
-        message = f"""\
-{self.errorMessage}:
-
-At line {self.meta.line} column {self.meta.column}:
-
-{context}
-"""
-        return message
-
-    def _getContext(self, originalInput: str, nBeginContextLines: int = 5, nEndContextLines=5) -> str:
-        originalInputLines = originalInput.splitlines()
-
-        startLineNumber = max(self.meta.line - nBeginContextLines, 1)
-        endLineNumber = min(self.meta.end_line + nEndContextLines, len(originalInputLines))
-
-        leadingContextLines = originalInputLines[startLineNumber : self.meta.line - 1]
-        offendingLine = originalInputLines[self.meta.line - 1]
-        laggingContextLines = originalInputLines[self.meta.line : endLineNumber]
-
-        indicatorLine = self._createIndicatorLine(self.meta.column, self.meta.end_column)
-
-        contextLines = [*leadingContextLines, offendingLine, indicatorLine, *laggingContextLines]
-        context = "\n".join(contextLines)
-
-        return context
-
-    @staticmethod
-    def _createIndicatorLine(indicatorsStartColumn: int, indicatorsEndColumn: int) -> str:
-        nIndicators = indicatorsEndColumn - indicatorsStartColumn
-        indicatorLine = f"{' ' * (indicatorsStartColumn - 1)}{'^' * nIndicators}"
-        return indicatorLine
 
 
 @_dc.dataclass
@@ -70,7 +30,10 @@ class _EnergyDirection(_enum.Enum):
     OUT = "Out"
 
 
-_TERMINAL_TO_ENERGY_DIRECTION = {"in": _EnergyDirection.IN, "out": _EnergyDirection.OUT}
+_TERMINAL_TO_ENERGY_DIRECTION = {
+    "in": _EnergyDirection.IN,
+    "out": _EnergyDirection.OUT,
+}
 
 
 class _EnergyQuality(_enum.Enum):
@@ -78,7 +41,10 @@ class _EnergyQuality(_enum.Enum):
     ELECTRICITY = "el"
 
 
-_TERMINAL_TO_ENERGY_QUALITY = {"heat": _EnergyQuality.HEAT, "el": _EnergyQuality.ELECTRICITY}
+_TERMINAL_TO_ENERGY_QUALITY = {
+    "heat": _EnergyQuality.HEAT,
+    "el": _EnergyQuality.ELECTRICITY,
+}
 
 
 @_dc.dataclass
@@ -98,7 +64,9 @@ def createComputedVariable(tree: _lark.Tree, portProperty: str) -> ComputedVaria
     defaultVariableName = _vh.getChildTokenValueOrNone("DEFAULT_VARIABLE_NAME", tree, str)
     computedVariable = ComputedVariable(
         tree.meta.line,
+        tree.meta.end_line,
         tree.meta.column,
+        tree.meta.end_column,
         tree.meta.start_pos,
         tree.meta.end_pos,
         portProperty,
@@ -146,7 +114,9 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
         computedEnergyVariable = ComputedEnergyVariable(
             tree.meta.line,
+            tree.meta.end_line,
             tree.meta.column,
+            tree.meta.end_column,
             tree.meta.start_pos,
             tree.meta.end_pos,
             _TERMINAL_TO_ENERGY_DIRECTION[direction],
@@ -161,8 +131,9 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
     def local_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         if self._defaultVisibility != DefaultVisibility.GLOBAL:
-            raise ReplaceTokenError(
-                tree.meta, 'Explicitly local variables are only allowed if the default visibility is "global"'
+            raise _error.ReplaceTokenError.fromTree(
+                tree,
+                'Explicitly local variables are only allowed if the default visibility is "global"',
             )
 
         self._addLocalVariable(tree)
@@ -178,8 +149,9 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
 
     def global_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
         if self._defaultVisibility != DefaultVisibility.LOCAL:
-            raise ReplaceTokenError(
-                tree.meta, 'Explicitly global variables are only allowed if the default visibility is "local"'
+            raise _error.ReplaceTokenError.fromTree(
+                tree,
+                'Explicitly global variables are only allowed if the default visibility is "local"',
             )
 
         self._addGlobalVariable(tree)
@@ -195,19 +167,21 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
         childrenSubtrees = _vh.getSubtrees(childrenSubtreeName, tree)
 
         if not childrenSubtrees:
-            # The case "EQUATIONS 0", e.g., is handled by the parser, i.e.
+            # Invalid cases like "EQUATIONS 0", e.g., are handled by the parser, i.e.
             #
             #   EQUATIONS 0
             #   foo = bar
             #
-            # is already detected by the parser, so we don't have to deal
+            # is already rejected by the parser, so we don't have to deal
             # with that here.
+            #
+            # For valid cases, like "PARAMETERS 0", we just don't do anything.
             return
 
         nChildrenSubtree = len(childrenSubtrees)
         if nChildrenSubtree % multiplicity != 0:
-            raise ReplaceTokenError(
-                tree.meta,
+            raise _error.ReplaceTokenError.fromTree(
+                tree,
                 f"Number of arguments to {what} must be a multiple of {multiplicity} but was {nChildrenSubtree}",
             )
 
@@ -255,8 +229,8 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
             return
 
         if actualNumberOf != declaredNumberOf:
-            raise ReplaceTokenError(
-                declaredNumberOfSubtree.meta,
+            raise _error.ReplaceTokenError.fromTree(
+                declaredNumberOfSubtree,
                 f"The declared number of {what} ({declaredNumberOf}) doesn't "
                 f"match the actual number of {what} ({actualNumberOf})",
             )
@@ -264,7 +238,15 @@ class CollectTokensVisitorBase(_lvis.Visitor_Recursive, _abc.ABC):
     @staticmethod
     def _createVariable(tree: _lark.Tree) -> Variable:
         name = _vh.getChildTokenValue("NAME", tree, str)
-        variable = Variable(tree.meta.line, tree.meta.column, tree.meta.start_pos, tree.meta.end_pos, name)
+        variable = Variable(
+            tree.meta.line,
+            tree.meta.end_line,
+            tree.meta.column,
+            tree.meta.end_column,
+            tree.meta.start_pos,
+            tree.meta.end_pos,
+            name,
+        )
         return variable
 
 

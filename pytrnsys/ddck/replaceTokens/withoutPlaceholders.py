@@ -6,11 +6,12 @@ import lark as _lark
 from lark import visitors as _lvis
 
 import pytrnsys.ddck._visitorHelpers as _vh
+import pytrnsys.ddck.parse.parse as _parse
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
-from pytrnsys.utils import result as _res
+import pytrnsys.ddck.replaceTokens.error
+import pytrnsys.ddck.replaceTokens.tokens as _tokens
+import pytrnsys.utils.result as _res
 from . import _common
-from . import _tokens
-from .._parse import parse as _parse
 
 
 class _WithoutPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorBase):
@@ -32,7 +33,11 @@ class _WithoutPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorB
 
         declaredNumberOfEquationsTree = _vh.getSubtreeOrNone("number_of_equations", tree)
         if declaredNumberOfEquationsTree:
-            self._checkDeclaredNumberOf("equations", declaredNumberOfEquationsTree, actualNumberOfEquations)
+            self._checkDeclaredNumberOf(
+                "equations",
+                declaredNumberOfEquationsTree,
+                actualNumberOfEquations,
+            )
 
         if nComputedOutputVariablesWithoutDefaults == actualNumberOfEquations:
             token = _tokens.Token.fromTree(tree)
@@ -92,11 +97,13 @@ class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(_lvis.Visitor_Recurs
 
 
 def replaceTokensWithDefaults(
-    inputDdckFilePath: _pl.Path, componentName: str, defaultVisibility: _dv.DefaultVisibility
+    inputDdckFilePath: _pl.Path,
+    componentName: str,
+    defaultVisibility: _dv.DefaultVisibility,
 ) -> _res.Result[str]:
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
-    result = replaceTokensWithDefaultsInString(inputDdckContent, componentName, defaultVisibility)
+    result = replaceTokensWithDefaultsInString(inputDdckContent, componentName, defaultVisibility, inputDdckFilePath)
     if _res.isError(result):
         error = _res.error(result).withContext(f"Error processing file `{inputDdckFilePath.name}`")
         return error
@@ -105,7 +112,10 @@ def replaceTokensWithDefaults(
 
 
 def replaceTokensWithDefaultsInString(
-    inputDdckContent: str, componentName: str, defaultVisibility: _dv.DefaultVisibility
+    inputDdckContent: str,
+    componentName: str,
+    defaultVisibility: _dv.DefaultVisibility,
+    filePath: _pl.Path | None = None,
 ) -> _res.Result[str]:
     result = _parse.parseDdck(inputDdckContent)
     if _res.isError(result):
@@ -116,8 +126,8 @@ def replaceTokensWithDefaultsInString(
     visitor = _WithoutPlaceholdersJSONCollectTokensVisitor(componentName, defaultVisibility)
     try:
         visitor.visit(tree)
-    except _common.ReplaceTokenError as replaceTokenError:
-        errorMessage = replaceTokenError.getErrorMessage(inputDdckContent)
+    except pytrnsys.ddck.replaceTokens.error.ReplaceTokenError as replaceTokenError:
+        errorMessage = replaceTokenError.getErrorMessage(inputDdckContent, filePath)
         return _res.Error(errorMessage)
 
     hydraulicVariableReplacementsResult = _getReplacementsForHydraulicVariables(visitor.computedHydraulicVariables)
@@ -130,7 +140,10 @@ def replaceTokensWithDefaultsInString(
 
     hydraulicVariableTokensAndReplacement = list(zip(visitor.computedHydraulicVariables, hydraulicVariableReplacements))
 
-    tokensAndReplacement = [*visitor.tokensAndReplacement, *hydraulicVariableTokensAndReplacement]
+    tokensAndReplacement = [
+        *visitor.tokensAndReplacement,
+        *hydraulicVariableTokensAndReplacement,
+    ]
 
     outputDdckContent = _tokens.replaceTokensWithReplacements(inputDdckContent, tokensAndReplacement)
 
