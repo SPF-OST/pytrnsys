@@ -30,7 +30,7 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
 
         if typeNumber != self._TYPE_NUMBER and parameterHashesAndIndex:
             firstHashToken = parameterHashesAndIndex[0][0]
-            errorMessage = "Only online plotters (type {self._TYPE_NUMBER}) can have '#' as a parameter."
+            errorMessage = f"Only online plotters (type {self._TYPE_NUMBER}) can have '#' as a parameter"
             raise _error.ReplaceTokenError.fromMetaOrToken(
                 firstHashToken,
                 errorMessage,
@@ -44,7 +44,7 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
         parameters = _vh.getSubtrees("parameter", parametersSubtree)
         nParameters = len(parameters)
         if not nParameters == self._N_PARAMETERS:
-            errorMessage = f"Online plotters (type {self._TYPE_NUMBER}) must have " f"{self._N_PARAMETERS} parameters."
+            errorMessage = f"Online plotters (type {self._TYPE_NUMBER}) must have {self._N_PARAMETERS} parameters"
             raise _error.ReplaceTokenError.fromTree(parametersSubtree, errorMessage)
 
         inputsSubtree = _vh.getSubtree("inputs", tree)
@@ -122,29 +122,38 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
         verticalBars: _cabc.Sequence[_lark.Token],
     ) -> _tp.Tuple[int, int]:
         notTwoBarsErrorMessage = f"""\
-        If a bar ("|") is used in an online plotter's (type {self._TYPE_NUMBER}) input list
-        then it must be used in the input variables list as well as in the initial values
-        list like so:
+If a bar ("|") is used in an online plotter's (type {self._TYPE_NUMBER}) input list
+then it must be used in the input variables list as well as in the initial values
+list like so:
 
-            INPUTS #    
-            TSources TStore TNetReturn TMixed mixOn storeOn needStoreButTempTooLow bypassOff | MSources MFromStore MMixed
-            TSources TStore TNetReturn TMixed mixOn storeOn needStoreButTempTooLow bypassOff | MSources MFromStore MMixed
+    INPUTS #    
+    TSources TStore TNetReturn TMixed mixOn storeOn needStoreButTempTooLow bypassOff | MSources MFromStore MMixed
+    TSources TStore TNetReturn TMixed mixOn storeOn needStoreButTempTooLow bypassOff | MSources MFromStore MMixed
 
-        """
+It can only be used exactly once in each list and must be used in the same position.
+
+"""
         if len(verticalBars) != 2:
             raise _error.ReplaceTokenError.fromTree(inputsSubtree, notTwoBarsErrorMessage)
+
         # +1 for the bar
         inputVariables = inputsAndBars[: nActualInputs + 1]
         initialValues = inputsAndBars[nActualInputs + 1 :]
+
         splitInputVariables = _split(inputVariables, _isVerticalBar)
         splitInitialValues = _split(initialValues, _isVerticalBar)
+
         inputVariableLengths = [len(ivs) for ivs in splitInputVariables]
         initialValueLengths = [len(ivs) for ivs in splitInitialValues]
+
         assert len(inputVariableLengths) == 2 == len(initialValueLengths)
+
         if inputVariableLengths != initialValueLengths:
             raise _error.ReplaceTokenError.fromTree(inputsSubtree, notTwoBarsErrorMessage)
+
         nLeftVariables = inputVariableLengths[0]
         nRightVariables = inputVariableLengths[1]
+
         return nLeftVariables, nRightVariables
 
     def _getParameterHashTokens(
@@ -155,7 +164,7 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
         if parameterHashesAndIndex and len(parameterHashesAndIndex) != 2:
             errorMessage = (
                 f"An online plotter (type {self._TYPE_NUMBER}) "
-                f"must either have two '#' as parameters or none at all."
+                f"must either have two '#' as parameters or none at all"
             )
 
             raise _error.ReplaceTokenError.fromTree(parametersSubtree, errorMessage)
@@ -165,7 +174,7 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
         errorMessage = (
             f"A hash can only be used as parameter {self._N_LEFT_VARS_PARAM_INDEX} "
             f"or {self._N_RIGHT_VARS_PARAM_INDEX} of an online plotter (type "
-            f"{self._TYPE_NUMBER})."
+            f"{self._TYPE_NUMBER})"
         )
 
         if firstHashIndex != self._N_LEFT_VARS_PARAM_INDEX:
@@ -184,16 +193,18 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
         verticalBars: _cabc.Sequence[_lark.Token],
     ) -> None:
         if verticalBars:
-            errorMessage = f"""\
-        A bar ("|") can only be used in an online plotter's (type {self._TYPE_NUMBER})
-        input list if hashes ("#") are used for the parameters specifying the number of
-        left and right axis variables (parameter {self._N_LEFT_VARS_PARAM_INDEX} and
-        {self._N_RIGHT_VARS_PARAM_INDEX}), respectively."""
+            l = self._N_LEFT_VARS_PARAM_INDEX
+            r = self._N_RIGHT_VARS_PARAM_INDEX
+            errorMessage = (
+                f'A bar ("|") can only be used in an online plotter\'s (type {self._TYPE_NUMBER}) input\n'
+                f'list if hashes ("#") are used for the parameters specifying the number of left and right\n'
+                f"axis variables (parameter {l} and {r}, respectively)"
+            )
 
-            raise _error.ReplaceTokenError.fromTree(inputsSubtree, errorMessage)
+            raise _error.ReplaceTokenError.fromMetaOrToken(verticalBars[0], errorMessage)
 
-        nLeftInputs = _vh.getChildTokenValueOrNone("POSITIVE_INT", parameters[self._N_LEFT_VARS_PARAM_INDEX], int)
-        nRightInputs = _vh.getChildTokenValueOrNone("POSITIVE_INT", parameters[self._N_RIGHT_VARS_PARAM_INDEX], int)
+        nLeftInputs = self._getNVariablesParameterValue(parameters[self._N_LEFT_VARS_PARAM_INDEX - 1])
+        nRightInputs = self._getNVariablesParameterValue(parameters[self._N_RIGHT_VARS_PARAM_INDEX - 1])
 
         if nLeftInputs is None and nRightInputs is None:
             # both variables, nothing more to do
@@ -204,7 +215,7 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
             if nActualInputs == nExpectedInputs:
                 return
 
-            errorMessage = f"{nExpectedInputs} input(s) were expected but only {nActualInputs} were specified."
+            errorMessage = f"{nExpectedInputs} input(s) were expected but {nActualInputs} were specified"
             raise _error.ReplaceTokenError.fromTree(inputsSubtree, errorMessage)
 
         nMinInputs = nLeftInputs if nLeftInputs is not None else nRightInputs
@@ -213,11 +224,32 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
         if nActualInputs >= nMinInputs:
             return
 
-        errorMessage = f"At least {nMinInputs} input(s) were expected, but {nActualInputs} were given."
+        errorMessage = f"At least {nMinInputs} input(s) were expected, but {nActualInputs} were given"
         raise _error.ReplaceTokenError.fromTree(inputsSubtree, errorMessage)
 
     def _addTokenAndReplacement(self, verticalBar: _lark.Token, replacement: str) -> None:
         self._tokensAndReplacement.append((_tokens.Token.fromMetaOrToken(verticalBar), replacement))
+
+    def _getNVariablesParameterValue(self, nVariablesParameterSubtree: _lark.Tree) -> int | None:
+        token = _tokens.Token.fromMetaOrToken(nVariablesParameterSubtree.meta)
+        errorMessage = (
+            f"Parameters {self._N_LEFT_VARS_PARAM_INDEX} and {self._N_RIGHT_VARS_PARAM_INDEX} of "
+            f"an online plotter (type {self._TYPE_NUMBER})\n"
+            f"must be non-negative integers"
+        )
+
+        try:
+            value = _vh.getChildTokenValueOrNone("SIGNED_NUMBER", nVariablesParameterSubtree, int)
+        except ValueError as valueError:
+            raise _error.ReplaceTokenError(token, errorMessage) from valueError
+
+        if value is None:
+            return None
+
+        if value < 0:
+            raise _error.ReplaceTokenError(token, errorMessage)
+
+        return value
 
 
 def _getTypeNumber(tree: _lark.Tree) -> int:
@@ -226,8 +258,7 @@ def _getTypeNumber(tree: _lark.Tree) -> int:
     visitor.visit(tree)
 
     typeNumber = visitor.typeNumber
-    if not typeNumber:
-        raise ValueError("Tree doesn't have a type number.", tree)
+    assert typeNumber is not None
 
     return typeNumber
 

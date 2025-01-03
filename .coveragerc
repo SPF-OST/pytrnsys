@@ -1,0 +1,16 @@
+[report]
+exclude_also =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
+    assert 
+
+    @_abc\.abstractmethod
+
+    # leave out code that is only there for mypy checks.
+    if _tp\.TYPE_CHECKING:
+    
+    # Don't complain about lines which are guaranteed never to be hit
+    _tp\.assert_never\(

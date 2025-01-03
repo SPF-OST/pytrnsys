@@ -25,7 +25,7 @@ class ReplaceTokenError(Exception):
         originalInput: str,
         filePath: _pl.Path | None = None,
         nBeginContextLines: int = 5,
-        nEndContextLines=5,
+        nEndContextLines: int = 5,
     ) -> str:
         context = self._getContext(originalInput, nBeginContextLines, nEndContextLines)
 
@@ -41,8 +41,8 @@ At {filePath or "<string>"}:{self.token.startLine}:
     def _getContext(
         self,
         originalInput: str,
-        nBeginContextLines: int = 5,
-        nEndContextLines=5,
+        nBeginContextLines,
+        nEndContextLines,
     ) -> str:
         originalInputLines = originalInput.splitlines()
 
