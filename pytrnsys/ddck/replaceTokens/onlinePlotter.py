@@ -28,7 +28,9 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
         typeNumber = _getTypeNumber(tree)
         parameterHashesAndIndex = _getParameterHashesAndIndex(tree)
 
-        if typeNumber != self._TYPE_NUMBER and parameterHashesAndIndex:
+        isOnlinePlotter = typeNumber == self._TYPE_NUMBER
+        
+        if not isOnlinePlotter and parameterHashesAndIndex:
             firstHashToken = parameterHashesAndIndex[0][0]
             errorMessage = f"Only online plotters (type {self._TYPE_NUMBER}) can have '#' as a parameter"
             raise _error.ReplaceTokenError.fromMetaOrToken(
@@ -36,7 +38,7 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
                 errorMessage,
             )
 
-        if typeNumber != self._TYPE_NUMBER:
+        if isOnlinePlotter:
             return
 
         parametersSubtree = _vh.getSubtree("parameters", tree)
@@ -114,6 +116,37 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
 
         return (firstHash, nLeftVariables), (secondHash, nRightVariables)
 
+    def _getParameterHashTokens(
+        self,
+        parameterHashesAndIndex: _cabc.Sequence[_tp.Tuple[_lark.Token, int]],
+        parametersSubtree: _lark.Tree,
+    ) -> _tp.Tuple[_lark.Token, _lark.Token]:
+        assert parameterHashesAndIndex
+        
+        if len(parameterHashesAndIndex) != 2:
+            errorMessage = (
+                f"An online plotter (type {self._TYPE_NUMBER}) "
+                f"must either have two '#' as parameters or none at all"
+            )
+
+            raise _error.ReplaceTokenError.fromTree(parametersSubtree, errorMessage)
+
+        (firstHash, firstHashIndex), (secondHash, secondHashIndex) = parameterHashesAndIndex
+
+        errorMessage = (
+            f"A hash can only be used as parameter {self._N_LEFT_VARS_PARAM_INDEX} "
+            f"or {self._N_RIGHT_VARS_PARAM_INDEX} of an online plotter (type "
+            f"{self._TYPE_NUMBER})"
+        )
+
+        if firstHashIndex != self._N_LEFT_VARS_PARAM_INDEX:
+            raise _error.ReplaceTokenError.fromMetaOrToken(firstHash, errorMessage)
+
+        if secondHashIndex != self._N_RIGHT_VARS_PARAM_INDEX:
+            raise _error.ReplaceTokenError.fromMetaOrToken(secondHash, errorMessage)
+
+        return firstHash, secondHash
+
     def _getNLeftAndRightVariables(
         self,
         inputsSubtree: _lark.Tree,
@@ -155,35 +188,6 @@ It can only be used exactly once in each list and must be used in the same posit
         nRightVariables = inputVariableLengths[1]
 
         return nLeftVariables, nRightVariables
-
-    def _getParameterHashTokens(
-        self,
-        parameterHashesAndIndex: _cabc.Sequence[_tp.Tuple[_lark.Token, int]],
-        parametersSubtree: _lark.Tree,
-    ) -> _tp.Tuple[_lark.Token, _lark.Token]:
-        if parameterHashesAndIndex and len(parameterHashesAndIndex) != 2:
-            errorMessage = (
-                f"An online plotter (type {self._TYPE_NUMBER}) "
-                f"must either have two '#' as parameters or none at all"
-            )
-
-            raise _error.ReplaceTokenError.fromTree(parametersSubtree, errorMessage)
-
-        (firstHash, firstHashIndex), (secondHash, secondHashIndex) = parameterHashesAndIndex
-
-        errorMessage = (
-            f"A hash can only be used as parameter {self._N_LEFT_VARS_PARAM_INDEX} "
-            f"or {self._N_RIGHT_VARS_PARAM_INDEX} of an online plotter (type "
-            f"{self._TYPE_NUMBER})"
-        )
-
-        if firstHashIndex != self._N_LEFT_VARS_PARAM_INDEX:
-            raise _error.ReplaceTokenError.fromMetaOrToken(firstHash, errorMessage)
-
-        if secondHashIndex != self._N_RIGHT_VARS_PARAM_INDEX:
-            raise _error.ReplaceTokenError.fromMetaOrToken(secondHash, errorMessage)
-
-        return firstHash, secondHash
 
     def _handleNoHashesInParameters(
         self,
