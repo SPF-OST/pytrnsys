@@ -29,7 +29,7 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
         parameterHashesAndIndex = _getParameterHashesAndIndex(tree)
 
         isOnlinePlotter = typeNumber == self._TYPE_NUMBER
-        
+
         if not isOnlinePlotter and parameterHashesAndIndex:
             firstHashToken = parameterHashesAndIndex[0][0]
             errorMessage = f"Only online plotters (type {self._TYPE_NUMBER}) can have '#' as a parameter"
@@ -38,7 +38,7 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
                 errorMessage,
             )
 
-        if isOnlinePlotter:
+        if not isOnlinePlotter:
             return
 
         parametersSubtree = _vh.getSubtree("parameters", tree)
@@ -122,7 +122,7 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
         parametersSubtree: _lark.Tree,
     ) -> _tp.Tuple[_lark.Token, _lark.Token]:
         assert parameterHashesAndIndex
-        
+
         if len(parameterHashesAndIndex) != 2:
             errorMessage = (
                 f"An online plotter (type {self._TYPE_NUMBER}) "
