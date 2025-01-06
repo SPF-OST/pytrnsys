@@ -6,7 +6,8 @@ import lark as _lark
 
 import pytrnsys.ddck.parse.parse as _parse
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
-import pytrnsys.ddck.replaceTokens.error
+import pytrnsys.ddck.replaceTokens.error as _error
+import pytrnsys.ddck.replaceTokens.onlinePlotter as _op
 import pytrnsys.ddck.replaceTokens.tokens as _tokens
 from pytrnsys.utils import result as _res
 from . import _common
@@ -59,9 +60,14 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
     tree = _res.value(treeResult)
 
     visitor = _WithPlaceholdersJSONCollectTokensVisitor(componentName, defaultVisibility)
+    onlinePlotterVisitor = _op.LeftRightVariablesVisitor()
     try:
         visitor.visit(tree)
-    except pytrnsys.ddck.replaceTokens.error.ReplaceTokenError as error:
+
+        # online plotter visitor must come after general visitor as it relies on some things checked
+        # in latter
+        onlinePlotterVisitor.visit(tree)
+    except _error.ReplaceTokenError as error:
         errorMessage = error.getErrorMessage(content, filePath)
         return _res.Error(errorMessage)
 
@@ -75,6 +81,7 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
     tokensAndReplacements = [
         *computedHydraulicTokensAndReplacement,
         *visitor.tokensAndReplacement,
+        *onlinePlotterVisitor.tokensAndReplacement,
     ]
 
     outputDdckContent = _tokens.replaceTokensWithReplacements(content, tokensAndReplacements)

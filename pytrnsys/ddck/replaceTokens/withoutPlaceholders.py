@@ -8,7 +8,8 @@ from lark import visitors as _lvis
 import pytrnsys.ddck._visitorHelpers as _vh
 import pytrnsys.ddck.parse.parse as _parse
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
-import pytrnsys.ddck.replaceTokens.error
+import pytrnsys.ddck.replaceTokens.error as _error
+import pytrnsys.ddck.replaceTokens.onlinePlotter as _op
 import pytrnsys.ddck.replaceTokens.tokens as _tokens
 import pytrnsys.utils.result as _res
 from . import _common
@@ -117,18 +118,10 @@ def replaceTokensWithDefaultsInString(
     defaultVisibility: _dv.DefaultVisibility,
     filePath: _pl.Path | None = None,
 ) -> _res.Result[str]:
-    result = _parse.parseDdck(inputDdckContent)
-    if _res.isError(result):
-        moreSpecificError = _res.error(result)
-        return moreSpecificError
-    tree = _res.value(result)
-
-    visitor = _WithoutPlaceholdersJSONCollectTokensVisitor(componentName, defaultVisibility)
-    try:
-        visitor.visit(tree)
-    except pytrnsys.ddck.replaceTokens.error.ReplaceTokenError as replaceTokenError:
-        errorMessage = replaceTokenError.getErrorMessage(inputDdckContent, filePath)
-        return _res.Error(errorMessage)
+    visitorResults = _createVisitAndGetVisitors(inputDdckContent, componentName, defaultVisibility, filePath)
+    if _res.isError(visitorResults):
+        return visitorResults
+    visitor, onlinePlotterVisitor = _res.value(visitorResults)
 
     hydraulicVariableReplacementsResult = _getReplacementsForHydraulicVariables(visitor.computedHydraulicVariables)
     if _res.isError(hydraulicVariableReplacementsResult):
@@ -141,13 +134,41 @@ def replaceTokensWithDefaultsInString(
     hydraulicVariableTokensAndReplacement = list(zip(visitor.computedHydraulicVariables, hydraulicVariableReplacements))
 
     tokensAndReplacement = [
-        *visitor.tokensAndReplacement,
         *hydraulicVariableTokensAndReplacement,
+        *visitor.tokensAndReplacement,
+        *onlinePlotterVisitor.tokensAndReplacement,
     ]
 
     outputDdckContent = _tokens.replaceTokensWithReplacements(inputDdckContent, tokensAndReplacement)
 
     return outputDdckContent
+
+
+def _createVisitAndGetVisitors(
+    inputDdckContent: str,
+    componentName: str,
+    defaultVisibility: _dv.DefaultVisibility,
+    filePath: _pl.Path | None,
+) -> _res.Result[_tp.Tuple[_WithoutPlaceholdersJSONCollectTokensVisitor, _op.LeftRightVariablesVisitor,]]:
+    result = _parse.parseDdck(inputDdckContent)
+    if _res.isError(result):
+        moreSpecificError = _res.error(result)
+        return moreSpecificError
+    tree = _res.value(result)
+
+    visitor = _WithoutPlaceholdersJSONCollectTokensVisitor(componentName, defaultVisibility)
+    onlinePlotterVisitor = _op.LeftRightVariablesVisitor()
+    try:
+        visitor.visit(tree)
+
+        # online plotter visitor must come after general visitor as it relies on some things checked
+        # in latter
+        onlinePlotterVisitor.visit(tree)
+    except _error.ReplaceTokenError as replaceTokenError:
+        errorMessage = replaceTokenError.getErrorMessage(inputDdckContent, filePath)
+        return _res.Error(errorMessage)
+
+    return visitor, onlinePlotterVisitor
 
 
 def _getReplacementsForHydraulicVariables(
