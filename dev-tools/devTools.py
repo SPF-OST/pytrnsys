@@ -13,7 +13,7 @@ import typing as tp
 
 _SCRIPTS_DIR = pl.Path(sc.get_path("scripts"))
 
-_SOURCE_DIRS = ["pytrnsys", "scripts", "tests", "dev-tools"]
+_SOURCE_DIRS = ["pytrnsys", "tests", "dev-tools"]
 
 _EXCLUDED_PATH_PATTERNS = [
     "^tests/(.+/)?data/.*",
