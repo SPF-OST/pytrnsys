@@ -56,7 +56,6 @@ _st.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: Microsoft :: Windows",
     ],
-    scripts=["scripts/collectJsonsIntoCsv.py"],
     setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.9",
 )
