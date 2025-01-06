@@ -9,7 +9,9 @@ import lark as _lark
 @_dc.dataclass
 class Token:
     startLine: int
+    endLine: int
     startColumn: int
+    endColumn: int
     startIndex: int
     endIndex: int
 
@@ -20,8 +22,11 @@ class Token:
     @staticmethod
     def fromMetaOrToken(metaOrToken: _lark.tree.Meta | _lark.Token) -> "Token":
         if (
-            metaOrToken.line is None
+            # need to do this in one big expression for mypy to understand
+            metaOrToken.line is None  # pylint: disable=too-many-boolean-expressions
+            or metaOrToken.end_line is None
             or metaOrToken.column is None
+            or metaOrToken.end_column is None
             or metaOrToken.start_pos is None
             or metaOrToken.end_pos is None
         ):
@@ -29,15 +34,17 @@ class Token:
 
         return Token(
             metaOrToken.line,
+            metaOrToken.end_line,
             metaOrToken.column,
+            metaOrToken.end_column,
             metaOrToken.start_pos,
             metaOrToken.end_pos,
         )
 
-    def shift(self, offset: int) -> "Token":
+    def getShiftedStartAndEndIndex(self, offset: int) -> _tp.Tuple[int, int]:
         shiftedStartIndex = offset + self.startIndex
         shiftedEndIndex = offset + self.endIndex
-        return _dc.replace(self, startIndex=shiftedStartIndex, endIndex=shiftedEndIndex)
+        return shiftedStartIndex, shiftedEndIndex
 
     def lengthChange(self, replacementString) -> int:
         lengthBeforeReplacing = self.endIndex - self.startIndex
@@ -63,7 +70,9 @@ def replaceTokensWithReplacements(inputDdckContent: str, tokensAndReplacement: T
     return outputDdckContent
 
 
-def _getSortedTokensAndReplacement(tokensAndReplacement: TokensAndReplacement) -> TokensAndReplacement:
+def _getSortedTokensAndReplacement(
+    tokensAndReplacement: TokensAndReplacement,
+) -> TokensAndReplacement:
     if len(tokensAndReplacement) <= 1:
         return tokensAndReplacement
 
@@ -74,7 +83,8 @@ def _getSortedTokensAndReplacement(tokensAndReplacement: TokensAndReplacement) -
 
 
 def _compareTokensEarliestAndLongestFirst(
-    tokenAndReplacement1: _tp.Tuple[Token, str], tokenAndReplacement2: _tp.Tuple[Token, str]
+    tokenAndReplacement1: _tp.Tuple[Token, str],
+    tokenAndReplacement2: _tp.Tuple[Token, str],
 ) -> int:
     token1 = tokenAndReplacement1[0]
     token2 = tokenAndReplacement2[0]
@@ -91,7 +101,9 @@ def _compareTokensEarliestAndLongestFirst(
     return -1 if token1.endIndex > token2.endIndex else 1
 
 
-def _removeCoveredTokens(sortedTokensAndReplacement: TokensAndReplacement) -> TokensAndReplacement:
+def _removeCoveredTokens(
+    sortedTokensAndReplacement: TokensAndReplacement,
+) -> TokensAndReplacement:
     if len(sortedTokensAndReplacement) <= 1:
         return sortedTokensAndReplacement
 
@@ -116,6 +128,8 @@ def _replaceSortedNonOverlappingTokens(content: str, tokensAndReplacements: Toke
     if len(tokensAndReplacements) <= 1:
         return content
 
+    tokens: _cabc.Sequence[Token]
+    replacements: _cabc.Sequence[str]
     tokens, replacements = zip(*tokensAndReplacements)
 
     if len(tokens) > 1:
@@ -132,9 +146,11 @@ def _replaceSortedNonOverlappingTokens(content: str, tokensAndReplacements: Toke
     offset = 0
     resultContent = content
     for token, replacement in zip(tokens, replacements):
-        resultContent = _replaceToken(
+        shiftedStartIndex, shiftedEndIndex = token.getShiftedStartAndEndIndex(offset)
+        resultContent = _replaceSubstring(
             resultContent,
-            token.shift(offset),
+            shiftedStartIndex,
+            shiftedEndIndex,
             replacement,
         )
         offset += token.lengthChange(replacement)
@@ -142,5 +158,5 @@ def _replaceSortedNonOverlappingTokens(content: str, tokensAndReplacements: Toke
     return resultContent
 
 
-def _replaceToken(content: str, token: Token, replacement: str) -> str:
-    return content[: token.startIndex] + replacement + content[token.endIndex :]
+def _replaceSubstring(content: str, startIndex: int, endIndex: int, replacement: str) -> str:
+    return content[:startIndex] + replacement + content[endIndex:]

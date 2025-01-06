@@ -48,7 +48,7 @@ EQUATIONS 2
             """\
 Explicitly local variables are only allowed if the default visibility is "global":
 
-At line 2 column 1:
+At <string>:2:
 
 :A = 5 ! m^2
 ^^
@@ -106,7 +106,7 @@ C_azim = aziSurfUSer_1    ! @dependencyDdck Collector azimuth  (0:s, 90:w, 270: 
             """\
 Explicitly local variables are only allowed if the default visibility is "global":
 
-At line 35 column 1:
+At <string>:35:
 
 ** Dependencies with other ddck
 ***********************************
@@ -151,7 +151,7 @@ freezeDanger = LT($Tamb, 1)
             """\
 Explicitly global variables are only allowed if the default visibility is "local":
 
-At line 3 column 19:
+At <string>:3:
 
 A = 5 ! m^2
 freezeDanger = LT($Tamb, 1)

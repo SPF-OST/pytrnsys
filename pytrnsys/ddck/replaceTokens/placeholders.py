@@ -4,11 +4,13 @@ import typing as _tp
 
 import lark as _lark
 
+import pytrnsys.ddck.parse.parse as _parse
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
+import pytrnsys.ddck.replaceTokens.error as _error
+import pytrnsys.ddck.replaceTokens.onlinePlotter as _op
+import pytrnsys.ddck.replaceTokens.tokens as _tokens
 from pytrnsys.utils import result as _res
 from . import _common
-from . import _tokens
-from .._parse import parse as _parse
 
 
 class _WithPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorBase):
@@ -28,7 +30,13 @@ def replaceTokens(
 
     inputDdckContent = inputDdckFilePath.read_text(encoding="windows-1252")  # pylint: disable=bad-option-value
 
-    result = replaceTokensInString(inputDdckContent, componentName, computedNamesByPort, defaultVisibility)
+    result = replaceTokensInString(
+        inputDdckContent,
+        componentName,
+        computedNamesByPort,
+        defaultVisibility,
+        inputDdckFilePath,
+    )
 
     if _res.isError(result):
         error = _res.error(result)
@@ -44,6 +52,7 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
     componentName: str,
     computedNamesByPort: _cabc.Mapping[str, _cabc.Mapping[str, str]],
     defaultVisibility: _dv.DefaultVisibility,
+    filePath: _pl.Path | None = None,
 ) -> _res.Result[str]:
     treeResult = _parse.parseDdck(content)
     if _res.isError(treeResult):
@@ -51,10 +60,15 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
     tree = _res.value(treeResult)
 
     visitor = _WithPlaceholdersJSONCollectTokensVisitor(componentName, defaultVisibility)
+    onlinePlotterVisitor = _op.LeftRightVariablesVisitor()
     try:
         visitor.visit(tree)
-    except _common.ReplaceTokenError as error:
-        errorMessage = error.getErrorMessage(content)
+
+        # online plotter visitor must come after general visitor as it relies on some things checked
+        # in latter
+        onlinePlotterVisitor.visit(tree)
+    except _error.ReplaceTokenError as error:
+        errorMessage = error.getErrorMessage(content, filePath)
         return _res.Error(errorMessage)
 
     computedHydraulicNamesResult = _getComputedHydraulicNames(visitor.computedHydraulicVariables, computedNamesByPort)
@@ -64,7 +78,11 @@ def replaceTokensInString(  # pylint: disable=too-many-locals
 
     computedHydraulicTokensAndReplacement = zip(visitor.computedHydraulicVariables, computedHydraulicNames)
 
-    tokensAndReplacements = [*computedHydraulicTokensAndReplacement, *visitor.tokensAndReplacement]
+    tokensAndReplacements = [
+        *computedHydraulicTokensAndReplacement,
+        *visitor.tokensAndReplacement,
+        *onlinePlotterVisitor.tokensAndReplacement,
+    ]
 
     outputDdckContent = _tokens.replaceTokensWithReplacements(content, tokensAndReplacements)
 

@@ -10,9 +10,9 @@ import pytrnsys.ddck.replaceTokens.placeholders as _rtph
 import pytrnsys.ddck.replaceTokens.withoutPlaceholders as _rtwph
 import pytrnsys.utils.result as _res
 
-_REPLACE_WITH_DEFAULTS_DATA_DIR = _pl.Path(__file__).parent / "defaults"
-_REPLACE_WITH_NAMES_DATA_DIR = _pl.Path(__file__).parent / "names"
-_REPLACE_WITH_NAMES_IN_PROJECTS_DATA_DIR = _pl.Path(__file__).parent / "names_in_projects"
+_REPLACE_WITH_DEFAULTS_DATA_DIR = _pl.Path(__file__).parents[1] / "defaults"
+_REPLACE_WITH_NAMES_DATA_DIR = _pl.Path(__file__).parents[1] / "names"
+_REPLACE_WITH_NAMES_IN_PROJECTS_DATA_DIR = _pl.Path(__file__).parents[1] / "names_in_projects"
 
 
 class _Paths:  # pylint: disable=too-few-public-methods

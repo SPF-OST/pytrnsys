@@ -8,12 +8,12 @@ def getSubtree(treeData: str, tree: _lark.Tree) -> _lark.Tree:
     subtreeOrNone = getSubtreeOrNone(treeData, tree)
 
     if not subtreeOrNone:
-        raise ValueError(f"No subtree found for `{tree.data}`.")
+        raise ValueError(f"No subtree `{treeData}` found for `{tree.data}`.")
 
     return subtreeOrNone
 
 
-def getSubtrees(treeData: str, tree: _lark.Tree) -> _cabc.Sequence[_lark.Tree] | None:
+def getSubtrees(treeData: str, tree: _lark.Tree) -> _cabc.Sequence[_lark.Tree]:
     subtrees = [c for c in tree.children if isinstance(c, _lark.Tree) and c.data == treeData]
     return subtrees
 
