@@ -1,3 +1,5 @@
+# pylint: disable=too-many-lines
+
 import collections.abc as _cabc
 import dataclasses as _dc
 
@@ -911,6 +913,118 @@ $nPlotsPerSim		! 7: Number of plots per simulation
 0     				! 11: Output file units
 """
         ),
+    )
+
+    yield TestCase(
+        "bar-at-start",
+        """\
+***********************************
+** Online Plotter
+***********************************
+UNIT 103 TYPE 65		!Changed automatically
+PARAMETERS #     
+#    				! 1: Nb. of left-axis variables
+#   				! 2: Nb. of right-axis variables
+-1     				! 3: Left axis minimum
+200     			! 4: Left axis maximum
+-1   				! 5: Right axis minimum
+1e5 		        ! 6: Right axis maximum
+$nPlotsPerSim		! 7: Number of plots per simulation
+12     				! 8: X-axis gridpoints
+1     				! 9: Shut off Online w/o removing
+-1     				! 10: Logical unit for output file
+0     				! 11: Output file units
+0     				! 12: Output file delimiter
+INPUTS #    
+| TInRec THotPos TWarmPos DistToHot DistToWarm useHot $xValStrat
+| TInRec THotPos TWarmPos DistToHot DistToWarm useHot $xValStrat
+LABELS #     
+"temperatures [deg C] and status [1]"
+"mass flows [kg/h]"
+"stratifying valve"
+""",
+        """\
+***********************************
+** Online Plotter
+***********************************
+UNIT 103 TYPE 65		!Changed automatically
+PARAMETERS #     
+0    				! 1: Nb. of left-axis variables
+7   				! 2: Nb. of right-axis variables
+-1     				! 3: Left axis minimum
+200     			! 4: Left axis maximum
+-1   				! 5: Right axis minimum
+1e5 		        ! 6: Right axis maximum
+$nPlotsPerSim		! 7: Number of plots per simulation
+12     				! 8: X-axis gridpoints
+1     				! 9: Shut off Online w/o removing
+-1     				! 10: Logical unit for output file
+0     				! 11: Output file units
+0     				! 12: Output file delimiter
+INPUTS #    
+ TInRec THotPos TWarmPos DistToHot DistToWarm useHot $xValStrat
+ TInRec THotPos TWarmPos DistToHot DistToWarm useHot $xValStrat
+LABELS #     
+"temperatures [deg C] and status [1]"
+"mass flows [kg/h]"
+"stratifying valve"
+""",
+    )
+
+    yield TestCase(
+        "bar-at-end",
+        """\
+***********************************
+** Online Plotter
+***********************************
+UNIT 103 TYPE 65		!Changed automatically
+PARAMETERS #     
+#    				! 1: Nb. of left-axis variables
+#   				! 2: Nb. of right-axis variables
+-1     				! 3: Left axis minimum
+200     			! 4: Left axis maximum
+-1   				! 5: Right axis minimum
+1e5 		        ! 6: Right axis maximum
+$nPlotsPerSim		! 7: Number of plots per simulation
+12     				! 8: X-axis gridpoints
+1     				! 9: Shut off Online w/o removing
+-1     				! 10: Logical unit for output file
+0     				! 11: Output file units
+0     				! 12: Output file delimiter
+INPUTS #    
+TInRec THotPos TWarmPos DistToHot DistToWarm useHot $xValStrat |
+TInRec THotPos TWarmPos DistToHot DistToWarm useHot $xValStrat |
+LABELS #     
+"temperatures [deg C] and status [1]"
+"mass flows [kg/h]"
+"stratifying valve"
+""",
+        """\
+***********************************
+** Online Plotter
+***********************************
+UNIT 103 TYPE 65		!Changed automatically
+PARAMETERS #     
+7    				! 1: Nb. of left-axis variables
+0   				! 2: Nb. of right-axis variables
+-1     				! 3: Left axis minimum
+200     			! 4: Left axis maximum
+-1   				! 5: Right axis minimum
+1e5 		        ! 6: Right axis maximum
+$nPlotsPerSim		! 7: Number of plots per simulation
+12     				! 8: X-axis gridpoints
+1     				! 9: Shut off Online w/o removing
+-1     				! 10: Logical unit for output file
+0     				! 11: Output file units
+0     				! 12: Output file delimiter
+INPUTS #    
+TInRec THotPos TWarmPos DistToHot DistToWarm useHot $xValStrat 
+TInRec THotPos TWarmPos DistToHot DistToWarm useHot $xValStrat 
+LABELS #     
+"temperatures [deg C] and status [1]"
+"mass flows [kg/h]"
+"stratifying valve"
+""",
     )
 
 

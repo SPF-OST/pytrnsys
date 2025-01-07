@@ -85,7 +85,7 @@ number_of_parameters: positive_int_or_explicit_var
 
 parameter: variable | SIGNED_NUMBER | HASH
 
-inputs: INPUTS (HASH| number_of_inputs) input [[BAR] input]+
+inputs: INPUTS (HASH| number_of_inputs) [BAR] input (input | BAR)*
 
 BAR: "|"
 
