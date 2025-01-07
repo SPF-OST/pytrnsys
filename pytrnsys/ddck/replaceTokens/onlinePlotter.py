@@ -155,17 +155,15 @@ class LeftRightVariablesVisitor(_lvis.Visitor_Recursive):
         verticalBars: _cabc.Sequence[_lark.Token],
     ) -> _tp.Tuple[int, int]:
         notTwoBarsErrorMessage = f"""\
-If a bar ("|") is used in an online plotter's (type {self._TYPE_NUMBER}) input list
-then it must be used in the input variables list as well as in the initial values
+If hashes ("#") are used in an online plotter's (type {self._TYPE_NUMBER}) parameters list then
+exactly one bar ("|") each must be used in the input variables list and in the initial values
 list like so:
 
     INPUTS #    
     TSources TStore TNetReturn TMixed mixOn storeOn needStoreButTempTooLow bypassOff | MSources MFromStore MMixed
     TSources TStore TNetReturn TMixed mixOn storeOn needStoreButTempTooLow bypassOff | MSources MFromStore MMixed
 
-It can only be used exactly once in each list and must be used in the same position.
-
-"""
+The position of the bar in the input variables list must be the same as in the initial values list"""
         if len(verticalBars) != 2:
             raise _error.ReplaceTokenError.fromTree(inputsSubtree, notTwoBarsErrorMessage)
 
