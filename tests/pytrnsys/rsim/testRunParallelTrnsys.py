@@ -16,9 +16,7 @@ TEST_DIR_PATH = _pl.Path(__file__).parent
 def _getPytrnsysSourceDirPath() -> _pl.Path:
     pytrnsysModuleSourceFilePathAsString = _is.getsourcefile(_pt)
     assert pytrnsysModuleSourceFilePathAsString
-    pytrnsysModuleDirPath = _pl.Path(
-        pytrnsysModuleSourceFilePathAsString
-    ).parents[1]
+    pytrnsysModuleDirPath = _pl.Path(pytrnsysModuleSourceFilePathAsString).parents[1]
     return pytrnsysModuleDirPath
 
 
@@ -35,36 +33,22 @@ class TestCase:
         pathVariables: _cabc.Mapping[str, str | _pl.Path],
     ) -> None:
         self.name = name
-        self.relativeConfigTemplateFilePath = _pl.Path(
-            relativeConfigTemplateFilePath
-        )
+        self.relativeConfigTemplateFilePath = _pl.Path(relativeConfigTemplateFilePath)
         self.relativeDckFilePath = _pl.Path(relativeDckFilePath)
         self.pathVariables = {
-            n: (
-                pp
-                if (pp := _pl.Path(p)).is_absolute()
-                else self.inputDirPath / pp
-            )
-            for n, p in pathVariables.items()
+            n: (pp if (pp := _pl.Path(p)).is_absolute() else self.inputDirPath / pp) for n, p in pathVariables.items()
         }
 
-        if (
-            self.relativeConfigTemplateFilePath.is_absolute()
-            or self.relativeConfigTemplateFilePath.suffixes
-            != [
-                ".config",
-                ".template",
-            ]
-        ):
+        if self.relativeConfigTemplateFilePath.is_absolute() or self.relativeConfigTemplateFilePath.suffixes != [
+            ".config",
+            ".template",
+        ]:
             raise ValueError(
                 "Config template file path must be relative and have .config.template extension.",
                 relativeConfigTemplateFilePath,
             )
 
-        if (
-            self.relativeDckFilePath.is_absolute()
-            or self.relativeDckFilePath.suffix != ".dck"
-        ):
+        if self.relativeDckFilePath.is_absolute() or self.relativeDckFilePath.suffix != ".dck":
             raise ValueError(
                 "Dck template file path must be relative and have .dck.template extension.",
                 relativeDckFilePath,
@@ -103,53 +87,37 @@ def getTestCases() -> _cabc.Iterable[TestCase]:
 
 
 class TestRunParallelTrnsys:  # pylint: disable=too-few-public-methods
-    @_pytest.mark.parametrize(
-        "testCase", [_pytest.param(tc, id=tc.name) for tc in getTestCases()]
-    )
-    def testRunConfig(self, testCase: TestCase):
+    @_pytest.mark.parametrize("testCase", [_pytest.param(tc, id=tc.name) for tc in getTestCases()])
+    def testRunConfig(self, testCase: TestCase) -> None:
         configFilePath = self._createConfigFile(testCase)
 
-        pytrnsysFilesDirPath = (
-            testCase.inputDirPath
-            / testCase.relativeConfigTemplateFilePath.parent
-        )
+        pytrnsysFilesDirPath = testCase.inputDirPath / testCase.relativeConfigTemplateFilePath.parent
         with _cl.chdir(pytrnsysFilesDirPath):
             pytrnsysFilesDirAsString = str(pytrnsysFilesDirPath)
 
-            runParallelTrnsys = _rpt.RunParallelTrnsys(
+            runParallelTrnsys = _rpt.RunParallelTrnsys(  # type: ignore[attr-defined]
                 pathConfig=pytrnsysFilesDirAsString
             )
             runParallelTrnsys.path = pytrnsysFilesDirAsString
-            runParallelTrnsys.readConfig(
-                pytrnsysFilesDirAsString, configFilePath.name
-            )
+            runParallelTrnsys.readConfig(pytrnsysFilesDirAsString, configFilePath.name)
             runParallelTrnsys.getConfig()
             runParallelTrnsys.overwriteForcedByUser = False
 
             result = runParallelTrnsys.runConfig()
             _res.throwIfError(result)
 
-            actualDckFilePath = (
-                testCase.inputDirPath / testCase.relativeDckFilePath
-            )
+            actualDckFilePath = testCase.inputDirPath / testCase.relativeDckFilePath
             expectedDdckFileContent = self._getExpectedDckFileContent(testCase)
 
-            assert (
-                actualDckFilePath.read_text(encoding="windows-1252")
-                == expectedDdckFileContent
-            )
+            assert actualDckFilePath.read_text(encoding="windows-1252") == expectedDdckFileContent
 
     @classmethod
     def _createConfigFile(cls, testCase: TestCase) -> _pl.Path:
-        configFileTemplatePath = (
-            testCase.inputDirPath / testCase.relativeConfigTemplateFilePath
-        )
+        configFileTemplatePath = testCase.inputDirPath / testCase.relativeConfigTemplateFilePath
 
         configFilePath = configFileTemplatePath.with_suffix("")
 
-        cls._createFileFromTemplate(
-            configFileTemplatePath, testCase.pathVariables, configFilePath
-        )
+        cls._createFileFromTemplate(configFileTemplatePath, testCase.pathVariables, configFilePath)
 
         return configFilePath
 
@@ -164,9 +132,7 @@ class TestRunParallelTrnsys:  # pylint: disable=too-few-public-methods
         outputFilePath.write_text(content)
 
     @staticmethod
-    def _getContentFromTemplate(
-        templateFilePath: _pl.Path, pathVariables: _cabc.Mapping[str, _pl.Path]
-    ) -> str:
+    def _getContentFromTemplate(templateFilePath: _pl.Path, pathVariables: _cabc.Mapping[str, _pl.Path]) -> str:
         templateContent = templateFilePath.read_text()
         content = templateContent
         for variableName, path in pathVariables.items():
@@ -177,12 +143,8 @@ class TestRunParallelTrnsys:  # pylint: disable=too-few-public-methods
     def _getExpectedDckFileContent(cls, testCase: TestCase) -> str:
         dckTemplateFileName = f"{testCase.relativeDckFilePath.name}.template"
 
-        expectedDckFileTemplatePath = (
-            testCase.expectedDirPath / dckTemplateFileName
-        )
+        expectedDckFileTemplatePath = testCase.expectedDirPath / dckTemplateFileName
 
-        expectedContent = cls._getContentFromTemplate(
-            expectedDckFileTemplatePath, testCase.pathVariables
-        )
+        expectedContent = cls._getContentFromTemplate(expectedDckFileTemplatePath, testCase.pathVariables)
 
         return expectedContent
