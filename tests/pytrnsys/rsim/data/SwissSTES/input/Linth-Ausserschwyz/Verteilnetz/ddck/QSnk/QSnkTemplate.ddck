@@ -1,0 +1,70 @@
+*******************************
+**BEGIN QSnkTemplate.ddck
+*******************************
+! this template will be used as a generic sink ddck for all the cities in this simulation
+
+***********************************
+** inputs from hydraulic solver
+EQUATIONS 1
+:TIn = @temp(In)
+
+***********************************
+** outputs to hydraulic solver
+EQUATIONS 1
+@temp(Out) = :TOut
+
+***********************************
+** outputs to hydraulic control
+EQUATIONS 1
+:Mfr = (:POut*3600) / (CPWAT*(:TInRc-:TOut))		!kg/h
+
+***********************************
+** outputs to energy balance in kWh
+EQUATIONS 1
+@energy(out, heat, :) = :POut!Real
+
+
+******************************************************************************************
+** CONTROLLER
+** Controls Massflowrate in order to match a deltaT of about X Kelvin and calculates the
+** temperature provided to the cold pipe of the network.
+
+!:POutReal = :Mfr/3600 * CPWAT * (:TIn - :TOut)
+
+!UNIT 49 TYPE 993   !Changed automatically
+!PARAMETERS 1
+!2     ! 1: number of variables to be remembered
+!INPUTS 2
+!:TIn :POut
+!20 0
+!EQUATIONS 2   ! outputs of Input Value Recall
+!:TInRc = [49,1]       !Changed automatically
+!:POutRc = [49,2]  !Changed automatically
+
+!EQUATIONS 1
+!:TOut = :TInRc - :deltaT
+
+***************************************************************
+**BEGIN HP energy balance printer
+***************************************************************
+EQUATIONS 1
+:qImb = :POut
+CONSTANTS 1
+:unitPrint_EBal=270
+ASSIGN temp\EBal_QSnkAlt.prt :unitPrint_EBal
+UNIT 270 Type 46
+PARAMETERS 5
+:unitPrint_EBal !1: Logical unit number
+-1 !2: for monthly summaries
+1  !3: 1:print at absolute times
+-1 !4 -1: monthly integration
+0  !5 number of outputs to avoid integration
+!1  !6 output number to avoid integration
+INPUTS 3
+TIME :POut :qImb
+**
+TIME :POut :qImb
+
+*******************************
+**END QSnkAlt.ddck
+*******************************

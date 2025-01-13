@@ -1,0 +1,68 @@
+****************************************************************************************
+** Begin TesEASZ_dummy.ddck
+****************************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+EQUATIONS 3
+:TIn = TTee3_TesEASZ
+:Mfr = MTesEASZDpR99_1_A
+:TInRev = TPump2_TesEASZ
+CONSTANTS 2
+zAux1_Tes4=0.00
+qAux1_Tes4=0.00
+
+***********************************
+** outputs to hydraulic solver
+EQUATIONS 1
+TTesEASZDpR99_1 = :TOut
+
+***********************************
+** outputs to hydraulic control
+
+
+***********************************
+** outputs to energy balance in kW
+EQUATIONS 2
+@energy(in, heat, :) = -:PDiffRc
+@energy(out, heat, :, Loss) = :PLoss
+
+****************************************************************************************
+** simple energy balance storage
+
+CONSTANTS 6
+:V = 1450      ! m^3
+:U = 0.8e-3  ! kW/(m2.K)
+:h = 10
+:A = :V/:h
+:r = (:A/PI)^0.5
+:O = 2*PI*:r*:h + 2*:A  ! total surface
+
+CONSTANTS 3
+:TMin = 50
+:TIni = 100
+:QIni = RHOWAT * :V * CPWAT * (:TIni - :TMin)    !kJ
+
+EQUATIONS 5
+:PDiffRc = :MfrRc/3600 * CPWAT * :TDiff   !kW
+:PLoss = :U * :O * (:TIni - TambAvg)              !kW
+:QCur = :QIni - (:PDiffRc + :PLoss)*3600*dtSim                 !kJ
+:TOut = :TIni
+:TDiff = :TIni - :TInRevRc
+
+Unit 24 Type 993    ! recall type
+Parameters 1
+2   ! how many recall values
+Inputs 2
+:Mfr
+:TInRev
+10000 50
+
+EQUATIONS 2
+:MfrRc = [24,1]
+:TInRevRc = [24,2]
+
+
+****************************************************************************************
+** end TesEASZ_dummy.ddck
+****************************************************************************************

@@ -1,0 +1,10 @@
+************************************
+** begin weather_dummy.ddck
+
+EQUATIONS 3
+TambAvg     = 10    ! (°C)
+dTambAmpl   = 20    ! (°C)
+DDTcwOffset = 10    ! (-) Days of minimum surface temperature
+
+** end weather_dummy.ddck
+************************************

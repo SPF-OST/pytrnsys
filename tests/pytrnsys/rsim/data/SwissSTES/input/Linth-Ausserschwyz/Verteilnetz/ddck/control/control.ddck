@@ -1,0 +1,98 @@
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+EQUATIONS 30
+*** Massflowrates
+MfrQSrcEASZ = QSrcEASZMfr
+MfrQSrcKVA = QSrcKVAMfr
+MfrQSnkFre = QSnkFreMfr
+MfrQSnkAlt = QSnkAltMfr
+MfrQSnkLac = QSnkLacMfr
+MfrQSnkWil = QSnkWilMfr
+MfrQSnkWol = QSnkWolMfr
+MfrQSnkPfa = QSnkPfaMfr
+MfrQSnkGal = QSnkGalMfr
+MfrQSnkSie = QSnkSieMfr
+MfrQSnkSbl = QSnkSblMfr
+MfrQSnkBut = QSnkButMfr
+MfrQSnkRei = QSnkReiMfr
+MfrQSnkBil = QSnkBilMfr
+MfrQSnkNUr = QSnkNUrMfr
+MfrQSnkOUr = QSnkOUrMfr
+MfrQSnkWan = QSnkWanMfr
+MfrQSnkTug = QSnkTugMfr
+MfrQSnkNae = QSnkNaeMfr
+MfrQSnkMol = QSnkMolMfr
+MfrPTesSZOut    = GE(MfrDiff,0) * ABS(MfrCurrTesSZ  )!(QTesSZ*3600000) / (CPWAT * (0.1 + TesSZTDiff))     ! (kg/h)
+MfrPTesEASZOut  = GE(MfrDiff,0) * ABS(MfrCurrTesEASZ)!(QTesEASZ*3600000) / (CPWAT * (0.1 + TesEASZTDiff))   ! (kg/h)
+MfrPTesKVAOut   = GE(MfrDiff,0) * ABS(MfrCurrTesKVA )!(QTesKVA*3600000) / (CPWAT * (0.1 + TesKVATDiff))    ! (kg/h)
+MfrPTesLiOut    = GE(MfrDiff,0) * ABS(MfrCurrTesLi  )!(QTesLi*3600000) / (CPWAT * (0.1 + TesLiTDiff))     ! (kg/h)
+MfrPTesWGOut    = GE(MfrDiff,0) * ABS(MfrCurrTesWG  )!(QTesWG*3600000) / (CPWAT * (0.1 + TesWGTDiff))     ! (kg/h)
+MfrPTesSZIn     = LE(MfrDiff,0) * ABS(MfrCurrTesSZ  )!(QTesSZ*3600000) / (CPWAT * (0.1 + TesSZTDiff))     ! (kg/h)
+MfrPTesEASZIn   = LE(MfrDiff,0) * ABS(MfrCurrTesEASZ)!(QTesEASZ*3600000) / (CPWAT * (0.1 + TesEASZTDiff))   ! (kg/h)
+MfrPTesWGIn     = LE(MfrDiff,0) * ABS(MfrCurrTesKVA )!(QTesKVA*3600000) / (CPWAT * (0.1 + TesKVATDiff))    ! (kg/h)
+MfrPTesKVAIn    = LE(MfrDiff,0) * ABS(MfrCurrTesLi  )!(QTesLi*3600000) / (CPWAT * (0.1 + TesLiTDiff))     ! (kg/h)
+MfrPTesLiIn     = LE(MfrDiff,0) * ABS(MfrCurrTesWG  )!(QTesWG*3600000) / (CPWAT * (0.1 + TesWGTDiff))     ! (kg/h)
+
+EQUATIONS 6
+! maximum power of storage
+! for SZ, Li and WG the storage has connection on both sides which is why the max capacity is extended by the villages connected to the storage
+QMaxTesSZ   = 17.25 + QSnkWolPOutDef + QSnkWilPOutDef  ! (MW)
+QMaxTesEASZ = 30        ! (MW)
+QMaxTesKVA  = 16.5+13.5 ! (MW)
+QMaxTesLi   = 17.25 + QSnkMolPOutDef  ! (MW)
+QMaxTesWG   = 17.25 + QSnkTugPOutDef  ! (MW)
+
+QMaxTes = QMaxTesSZ + QMaxTesEASZ + QMaxTesKVA + QMaxTesLi + QMaxTesWG
+
+! displayed power of storage -> if current power is too high, the max power will be taken
+!QTesSZ   = MIN(QMaxTesSZ,ABS(QCurrTesSZ))        ! (MW)
+!QTesEASZ = MIN(QMaxTesEASZ,ABS(QCurrTesEASZ))    ! (MW)
+!QTesKVA  = MIN(QMaxTesKVA,ABS(QCurrTesKVA))      ! (MW)
+!QTesLi   = MIN(QMaxTesLi,ABS(QCurrTesLi))        ! (MW)
+!QTesWG   = MIN(QMaxTesWG,ABS(QCurrTesWG))        ! (MW)
+
+******************************************************
+** Control of the charging / discharging
+******************************************************
+EQUATIONS 8
+QSrcTot = QSrcEASZPOut + QSrcKVAPOut   ! (MW) parameters from the ddcks QSrcEASZ and QSrcKVA
+QDiff = QSnkTot - QSrcTot              ! (MW) parameter QSnkTotal from QSnkTotal
+MfrDiff = MfrSnkTot - MfrSrcTot
+
+MfrCurrTesSZ   = (QMaxTesSZ / QMaxTes) * MfrDiff !QDiff
+MfrCurrTesEASZ = (QMaxTesEASZ / QMaxTes) * MfrDiff !QDiff
+MfrCurrTesKVA  = (QMaxTesKVA / QMaxTes) * MfrDiff !QDiff
+MfrCurrTesLi   = (QMaxTesLi / QMaxTes) * MfrDiff !QDiff
+MfrCurrTesWG   = (QMaxTesWG / QMaxTes) * MfrDiff !QDiff
+
+EQUATIONS 3
+!QTesTot = QCurrTesSZ + QCurrTesEASZ + QCurrTesKVA + QCurrTesLi + QCurrTesWG
+MfrSnkTot = QSnkFreMfr + QSnkAltMfr + QSnkLacMfr + QSnkWilMfr + QSnkWolMfr + QSnkPfaMfr + QSnkGalMfr + QSnkSieMfr + QSnkSblMfr + QSnkButMfr + QSnkReiMfr + QSnkBilMfr + QSnkNUrMfr + QSnkOUrMfr + QSnkWanMfr + QSnkTugMfr + QSnkNaeMfr + QSnkMolMfr
+MfrSrcTot = QSrcEASZMfr + QSrcKVAMfr
+MfrTesTot = MfrCurrTesSZ + MfrCurrTesEASZ + MfrCurrTesKVA + MfrCurrTesLi + MfrCurrTesWG
+
+*************************************
+** Hourly printer
+*************************************
+CONSTANTS 1
+unitHourlyMfr = 252
+
+ASSIGN    temp\mfr_H.Prt    unitHourlyMfr
+
+UNIT 34 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim           ! 1 Printing interval
+START           ! 2 Start time
+STOP            ! 3 Stop time
+unitHourlyMfr   ! 4 Logical unit
+0               ! 5 Units printing mode
+0               ! 6 Relative or absolute start time
+-1              ! 7 Overwrite or Append
+-1              ! 8 Print header
+0               ! 9 Delimiter
+1               ! 10 Print labels
+INPUTS 6
+QSnkTot QSrcTot QDiff MfrSnkTot MfrSrcTot MfrDiff
+**
+QSnkTot QSrcTot QDiff MfrSnkTot MfrSrcTot MfrDiff

@@ -1,0 +1,24 @@
+*************************************
+** Hourly printer
+*************************************
+CONSTANTS 1
+unitHCtrlValues = 93
+
+ASSIGN    temp\CtrlValues_H.Prt    unitHCtrlValues
+
+UNIT 93 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim           ! 1 Printing interval
+START           ! 2 Start time
+STOP            ! 3 Stop time
+unitHCtrlValues ! 4 Logical unit
+0               ! 5 Units printing mode
+0               ! 6 Relative or absolute start time
+-1              ! 7 Overwrite or Append
+-1              ! 8 Print header
+0               ! 9 Delimiter
+1               ! 10 Print labels
+INPUTS 10
+MfrPTesSZOut MfrPTesSZIn MfrPTesEASZOut MfrPTesEASZIn MfrPTesKVAOut MfrPTesKVAIn MfrPTesLiOut MfrPTesLiIn MfrPTesWGOut MfrPTesWGIn      
+**
+MfrPTesSZOut MfrPTesSZIn MfrPTesEASZOut MfrPTesEASZIn MfrPTesKVAOut MfrPTesKVAIn MfrPTesLiOut MfrPTesLiIn MfrPTesWGOut MfrPTesWGIn      

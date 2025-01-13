@@ -1,0 +1,203 @@
+**************************************************************************
+** Important results ddck
+**************************************************************************
+
+EQUATIONS 23
+MfrWolWil  = MSCnrWol_DTeeWilCold
+MfrWilSZ   = MDTeeWil_DTeeSZCold
+MfrSZFre   = MDTeeSZ_DTeeFreCold
+MfrFrePfa  = MDTeeFre_DTeePfaCold
+MfrPfaAlt  = MDTeePfa_DTeeAltCold
+MfrAltLac  = MDTeeAlt_DTeeLacCold
+MfrLacEASZ = MDTeeLac_DTeeEASZCold
+MfrEASZGal = MDTeeEASZ_DTeeGalCold
+MfrGalSie  = MDTeeGal_DTeeSieCold
+MfrSieWT   = MDTeeSie_DTeeWTCold
+MfrWTWan   = MDTeeWT_DTeeWanCold
+MfrWanWG   = MDTeeWan_DTeeWGCold
+MfrWGTug   = MDTeeWG_SCnrTugCold
+MfrSieSbl  = MDTeeSie_DTeeSblCold
+MfrSblBut  = MDTeeSbl_DTeeButCold
+MfrButRei  = MDTeeBut_DTeeReiCold
+MfrReiBil  = MDTeeRei_DTeeBilCold
+MfrBilKVA  = MDTeeBil_DTeeKVACold
+MfrKVANUr  = MDTeeKVA_DTeeNUrCold
+MfrNUrOUr  = MDTeeNUr_DTeeOUrCold
+MfrOUrNae  = MDTeeOUr_DTeeNaeCold
+MfrNaeLI   = MDTeeNae_DTeeLiCold
+MfrLIMol   = MDTeeLi_SCnrMolCold
+
+
+EQUATIONS 23
+PWolWil  = 1/1000*((TSCnrWol_DTeeWilHot - TSCnrWol_DTeeWilCold ) * 1/3600*MfrWolWil ) * CPWAT     ! kW
+PWilSZ   = 1/1000*((TDTeeWil_DTeeSZHot - TDTeeWil_DTeeSZCold  ) * 1/3600*MfrWilSZ ) * CPWAT     ! kW
+PSZFre   = 1/1000*((TDTeeSZ_DTeeFreHot - TDTeeSZ_DTeeFreCold  ) * 1/3600*MfrSZFre ) * CPWAT     ! kW
+PFrePfa  = 1/1000*((TDTeeFre_DTeePfaHot - TDTeeFre_DTeePfaCold ) * 1/3600*MfrFrePfa ) * CPWAT     ! kW
+PPfaAlt  = 1/1000*((TDTeePfa_DTeeAltHot - MDTeePfa_DTeeAltCold ) * 1/3600*MfrPfaAlt ) * CPWAT     ! kW
+PAltLac  = 1/1000*((TDTeeAlt_DTeeLacHot - TDTeeAlt_DTeeLacCold ) * 1/3600*MfrAltLac ) * CPWAT     ! kW
+PLacEASZ = 1/1000*((TDTeeLac_DTeeEASZHot - TDTeeLac_DTeeEASZCold ) * 1/3600*MfrLacEASZ) * CPWAT     ! kW
+PEASZGal = 1/1000*((TDTeeEASZ_DTeeGalHot - TDTeeEASZ_DTeeGalCold ) * 1/3600*MfrEASZGal) * CPWAT     ! kW
+PGalSie  = 1/1000*((TDTeeGal_DTeeSieHot - TDTeeGal_DTeeSieCold ) * 1/3600*MfrGalSie ) * CPWAT     ! kW
+PSieWT   = 1/1000*((TDTeeSie_DTeeWTHot - TDTeeSie_DTeeWTCold ) * 1/3600*MfrSieWT ) * CPWAT     ! kW
+PWTWan   = 1/1000*((TDTeeWT_DTeeWanHot - TDTeeWT_DTeeWanCold ) * 1/3600*MfrWTWan ) * CPWAT     ! kW
+PWanWG   = 1/1000*((TDTeeWan_DTeeWGHot - TDTeeWan_DTeeWGCold ) * 1/3600*MfrWanWG ) * CPWAT     ! kW
+PWGTug   = 1/1000*((TDTeeWG_SCnrTugHot - TDTeeWG_SCnrTugCold ) * 1/3600*MfrWGTug ) * CPWAT     ! kW
+PSieSbl  = 1/1000*((TDTeeSie_DTeeSblHot - TDTeeSie_DTeeSblCold ) * 1/3600*MfrSieSbl ) * CPWAT     ! kW
+PSblBut  = 1/1000*((TDTeeSbl_DTeeButHot - TDTeeSbl_DTeeButCold ) * 1/3600*MfrSblBut ) * CPWAT     ! kW
+PButRei  = 1/1000*((TDTeeBut_DTeeReiHot - TDTeeBut_DTeeReiCold ) * 1/3600*MfrButRei ) * CPWAT     ! kW
+PReiBil  = 1/1000*((TDTeeRei_DTeeBilHot - TDTeeRei_DTeeBilCold ) * 1/3600*MfrReiBil ) * CPWAT     ! kW
+PBilKVA  = 1/1000*((TDTeeBil_DTeeKVAHot - TDTeeBil_DTeeKVACold ) * 1/3600*MfrBilKVA ) * CPWAT     ! kW
+PKVANUr  = 1/1000*((TDTeeKVA_DTeeNUrHot - TDTeeKVA_DTeeNUrCold ) * 1/3600*MfrKVANUr ) * CPWAT     ! kW
+PNUrOUr  = 1/1000*((TDTeeNUr_DTeeOUrHot - TDTeeNUr_DTeeOUrCold ) * 1/3600*MfrNUrOUr ) * CPWAT     ! kW
+POUrNae  = 1/1000*((TDTeeOUr_DTeeNaeHot - TDTeeOUr_DTeeNaeCold ) * 1/3600*MfrOUrNae ) * CPWAT     ! kW
+PNaeLI   = 1/1000*((TDTeeNae_DTeeLIHot - TDTeeNae_DTeeLICold ) * 1/3600*MfrNaeLI ) * CPWAT     ! kW
+PLIMol   = 1/1000*((TDTeeLI_SCnrMolHot - TDTeeLI_SCnrMolCold ) * 1/3600*MfrLIMol ) * CPWAT     ! kW
+
+
+*************************************
+** Hourly printer
+*************************************
+CONSTANTS 1
+unitHourlyP = 252
+
+ASSIGN    temp\P_H.Prt    unitHourlyP
+
+UNIT 34 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim           ! 1 Printing interval
+START           ! 2 Start time
+STOP            ! 3 Stop time
+unitHourlyP     ! 4 Logical unit
+0               ! 5 Units printing mode
+0               ! 6 Relative or absolute start time
+-1              ! 7 Overwrite or Append
+-1              ! 8 Print header
+0               ! 9 Delimiter
+1               ! 10 Print labels
+INPUTS 23
+PWolWil PWilSZ PSZFre PFrePfa PPfaAlt PAltLac PLacEASZ PEASZGal PGalSie PSieWT PWTWan PWanWG PWGTug PSieSbl PSblBut PButRei PReiBil PBilKVA PKVANUr PNUrOUr POUrNae PNaeLi PLiMol
+**
+PWolWil PWilSZ PSZFre PFrePfa PPfaAlt PAltLac PLacEASZ PEASZGal PGalSie PSieWT PWTWan PWanWG PWGTug PSieSbl PSblBut PButRei PReiBil PBilKVA PKVANUr PNUrOUr POUrNae PNaeLi PLiMol
+
+
+*************************************
+** Hourly plotter
+** Power
+*************************************
+UNIT 501 TYPE 65     ! Online Plotter HX
+PARAMETERS 12
+10     ! 1 Nb. of left-axis variables
+6     ! 2 Nb. of right-axis variables
+-50      ! 3 Left axis minimum
+50     ! 4 Left axis maximum -
+-50     ! 5 Right axis minimum
+50     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+10     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 16
+PWolWil PWilSZ PSZFre PFrePfa PPfaAlt PAltLac PLacEASZ PEASZGal PGalSie PSieWT PWTWan PWanWG PWGTug PSieSbl PSblBut PButRei 
+PWolWil PWilSZ PSZFre PFrePfa PPfaAlt PAltLac PLacEASZ PEASZGal PGalSie PSieWT PWTWan PWanWG PWGTug PSieSbl PSblBut PButRei 
+LABELS  3
+"power MW"
+"power MW"
+"power ASZ"
+
+UNIT 502 TYPE 65     ! Online Plotter HX
+PARAMETERS 12
+7     ! 1 Nb. of left-axis variables
+0     ! 2 Nb. of right-axis variables
+-50      ! 3 Left axis minimum
+50     ! 4 Left axis maximum -
+-50     ! 5 Right axis minimum
+50     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+10     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 7
+PReiBil PBilKVA PKVANUr PNUrOUr POUrNae PNaeLi PLiMol
+PReiBil PBilKVA PKVANUr PNUrOUr POUrNae PNaeLi PLiMol
+LABELS  3
+"power MW"
+"power MW"
+"power Linth"
+
+*************************************
+** Hourly plotter
+** Massflow
+*************************************
+UNIT 503 TYPE 65     ! Online Plotter HX
+PARAMETERS 12
+10     ! 1 Nb. of left-axis variables
+6     ! 2 Nb. of right-axis variables
+-1000000       ! 3 Left axis minimum
+1000000      ! 4 Left axis maximum -
+-1000000      ! 5 Right axis minimum
+1000000      ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+10     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 16
+MfrWolWil MfrWilSZ MfrSZFre MfrFrePfa MfrPfaAlt MfrAltLac MfrLacEASZ MfrEASZGal MfrGalSie MfrSieWT MfrWTWan MfrWanWG MfrWGTug MfrSieSbl MfrSblBut MfrButRei
+MfrWolWil MfrWilSZ MfrSZFre MfrFrePfa MfrPfaAlt MfrAltLac MfrLacEASZ MfrEASZGal MfrGalSie MfrSieWT MfrWTWan MfrWanWG MfrWGTug MfrSieSbl MfrSblBut MfrButRei
+LABELS  3
+"massflow kg/h"
+"massflow kg/h"
+"massflow ASZ"
+
+UNIT 504 TYPE 65     ! Online Plotter HX
+PARAMETERS 12
+7     ! 1 Nb. of left-axis variables
+0     ! 2 Nb. of right-axis variables
+-1000000      ! 3 Left axis minimum
+1000000      ! 4 Left axis maximum -
+-1000000      ! 5 Right axis minimum
+1000000      ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+10     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 7
+MfrReiBil MfrBilKVA MfrKVANUr MfrNUrOUr MfrOUrNae MfrNaeLi MfrLiMol
+MfrReiBil MfrBilKVA MfrKVANUr MfrNUrOUr MfrOUrNae MfrNaeLi MfrLiMol
+LABELS  3
+"massflow kg/h"
+"massflow kg/h"
+"massflow Linth"
+
+*************************************
+** Hourly plotter
+** Temperature to Sinks
+*************************************
+UNIT 505 TYPE 65     ! Online Plotter HX
+PARAMETERS 12
+10     ! 1 Nb. of left-axis variables
+8     ! 2 Nb. of right-axis variables
+60      ! 3 Left axis minimum
+120     ! 4 Left axis maximum -
+0     ! 5 Right axis minimum
+100     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+10     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 18
+QSnkWolTIn QSnkWilTIn QSnkFreTIn QSnkPfaTIn QSnkAltTIn QSnkLacTIn QSnkGalTIn QSnkWanTIn QSnkTugTIn QSnkSieTIn QSnkSblTIn QSnkButTIn QSnkReiTIn QSnkBilTIn QSnkNUrTIn QSnkOUrTIn QSnkNaeTIn QSnkMolTIn
+QSnkWolTIn QSnkWilTIn QSnkFreTIn QSnkPfaTIn QSnkAltTIn QSnkLacTIn QSnkGalTIn QSnkWanTIn QSnkTugTIn QSnkSieTIn QSnkSblTIn QSnkButTIn QSnkReiTIn QSnkBilTIn QSnkNUrTIn QSnkOUrTIn QSnkNaeTIn QSnkMolTIn
+LABELS  3
+"temperature °C"
+"temperature °C"
+"temperature"

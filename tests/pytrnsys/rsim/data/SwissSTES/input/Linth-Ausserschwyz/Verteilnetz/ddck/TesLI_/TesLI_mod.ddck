@@ -1,0 +1,186 @@
+*************************************
+**BEGIN TesLI.ddck
+*************************************
+
+*************************************
+** Plug-Flow Model exported from TRNSYS GUI
+*************************************
+
+*************************************
+** To be checked: 
+** check cp and rho values for the circuits 
+** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used 
+*************************************
+
+*************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+*************************************
+!EQUATIONS 3
+
+
+*************************************
+*** Inputs from hydraulic solver ****
+*************************************
+EQUATIONS 3
+:TIn = TSCnr19_TesLI
+:Mfr = MTesLIDpL99_1_A
+:TInRev = TPump2_TesLI
+
+*************************************
+**** Outputs to hydraulic solver ****
+*************************************
+EQUATIONS 1
+*** direct port outputs
+TTesLIDpL99_1= :TOut
+
+*************************************
+** recall values
+Unit 21 Type 993    ! recall type
+Parameters 1
+2   ! how many recall values
+Inputs 2
+:TIn
+:TInRev
+50 50
+EQUATIONS 3
+:TInRc = [21,1]
+:TInRevRc = [21,2]
+:TDiff = ABS((GE(:Mfr,0)*:TInRc + LT(:Mfr,0)*:TInRevRc) - :TOut)
+
+*************************************
+** type 158 cylindrical storage
+*************************************
+
+CONSTANTS 15
+:V	     = 30000	! (m^3) Tank volume	                   
+:H	     = 1.331	! (m) Tank height	                   
+:NumTN	 = 20	    ! (-) Number of tank nodes	       
+:TopLC	 = 2.88 	! (kJ/hr.m^2.K) Top loss coefficient	       
+:EdgeLC	 = 2.88 	! (kJ/hr.m^2.K) Edge loss coefficient	       
+:BotLC	 = 2.88 	! (kJ/hr.m^2.K) Bottom loss coefficient	       
+:cpFl	 = 4.192	! (kJ/kg.K) Fluid specific heat	           
+:rhoFl	 = 975	    ! (kg/m^3) Fluid density	               
+:kFl	 = 2.387	! (kJ/hr.m.K) Fluid thermal conductivity	   
+:HFIn1	 = 0.99	    ! (%) Height fraction of inlet 1	   
+:HFOut1	 = 0.01	    ! (%) Height fraction of outlet 1	   
+:HFIn2	 = 0.01	    ! (%) Height fraction of inlet 2	   
+:HFOut2	 = 0.99	    ! (%) Height fraction of outlet 2	   
+:NumTS	 = 0	    ! (-) Number of thermostats	       
+:NumAux	 = 0	    ! (-) Number of auxiliary heat inputs
+
+EQUATIONS 8
+:TIn1   = :TIn  ! (°C) inlet temperature for port 1
+:Mfr1   = GE(:Mfr,0)*:Mfr   ! (kg/h) inlet flow rate for port 1 
+:TIn2   = :TInRev  ! (°C) inlet temperature for port 2
+:Mfr2   = LT(:Mfr,0)*-:Mfr   ! (kg/h) inlet flow rate for port 2 
+:TopLT  = 20  ! (°C) top loss temperature
+:EdgeLT = 20  ! (°C) edge loss temperature
+:BotLT  = 20  ! (°C) bottom loss temperature
+
+:TIni   = 90
+
+Unit 29 TYPE 158
+PARAMETERS 15
+:V	   
+:H	   
+:NumTN
+:TopLC
+:EdgeLC
+:BotLC
+:cpFl
+:rhoFl
+:kFl
+:HFIn1
+:HFOut1
+:HFIn2
+:HFOut2
+:NumTS
+:NumAux
+INPUTS 7
+:TIn1  
+:Mfr1  
+:TIn2  
+:Mfr2  
+:TopLT 
+:EdgeLT
+:BotLT 
+** Initial Values
+20 0 20 0 20 20 20
+DERIVATIVES 20 !(initial tank temperature for node x)
+:TIni :TIni :TIni :TIni :TIni   :TIni :TIni :TIni :TIni :TIni
+:TIni :TIni :TIni :TIni :TIni   :TIni :TIni :TIni :TIni :TIni
+!:TIni :TIni :TIni :TIni :TIni   :TIni :TIni :TIni :TIni :TIni
+
+EQUATIONS 32
+:TOut1      = [29,1] ! (C)  Temperature at outlet 1	    
+:TOut2      = [29,3] ! (C)  Temperature at outlet 2	    
+:TAvg       = [29,5] ! (C)  Average tank temperature	
+:QDel1      = [29,6]/3600  ! (kW)  Energy delivered via port 1	
+:QDel2      = [29,7]/3600  ! (kW)  Energy delivered via port 2	
+:TopLoss    = [29,8]/3600  ! (kW)  Top losses	                
+:EdgeLoss   = [29,9]/3600  ! (kW)  Edge Losses	                
+:BotLoss    = [29,10]/3600 ! (kW)  Bottom losses	            
+:QStorRate  = [29,12]/3600 ! (kW)  Tank energy storage rate	
+:EnErr      = [29,13] ! (% (base 100))  Tank energy balance error	
+:TN1        = [29,14] ! (C)  Tank nodal temperature-1	
+:TN2        = [29,15] ! (C)  Tank nodal temperature-2	
+:TN3        = [29,16] ! (C)  Tank nodal temperature-3	
+:TN4        = [29,17] ! (C)  Tank nodal temperature-4	
+:TN5        = [29,18] ! (C)  Tank nodal temperature-5	
+:TN6        = [29,19] ! (C)  Tank nodal temperature-6	
+:TN7        = [29,20] ! (C)  Tank nodal temperature-7	
+:TN8        = [29,21] ! (C)  Tank nodal temperature-8	
+:TN9        = [29,22] ! (C)  Tank nodal temperature-9	
+:TN10       = [29,23] ! (C)  Tank nodal temperature-10	
+:TN11       = [29,24] ! (C)  Tank nodal temperature-11	
+:TN12       = [29,25] ! (C)  Tank nodal temperature-12	
+:TN13       = [29,26] ! (C)  Tank nodal temperature-13	
+:TN14       = [29,27] ! (C)  Tank nodal temperature-14	
+:TN15       = [29,28] ! (C)  Tank nodal temperature-15	
+:TN16       = [29,29] ! (C)  Tank nodal temperature-16	
+:TN17       = [29,30] ! (C)  Tank nodal temperature-17	
+:TN18       = [29,31] ! (C)  Tank nodal temperature-18	
+:TN19       = [29,32] ! (C)  Tank nodal temperature-19	
+:TN20       = [29,33] ! (C)  Tank nodal temperature-20
+!:TN21       = [29,34] ! (C)  Tank nodal temperature-21	
+!:TN22       = [29,35] ! (C)  Tank nodal temperature-22	
+!:TN23       = [29,36] ! (C)  Tank nodal temperature-23	
+!:TN24       = [29,37] ! (C)  Tank nodal temperature-24	
+!:TN25       = [29,38] ! (C)  Tank nodal temperature-25	
+!:TN26       = [29,39] ! (C)  Tank nodal temperature-26	
+!:TN27       = [29,40] ! (C)  Tank nodal temperature-27	
+!:TN28       = [29,41] ! (C)  Tank nodal temperature-28	
+!:TN29       = [29,42] ! (C)  Tank nodal temperature-29	
+!:TN30       = [29,43] ! (C)  Tank nodal temperature-30
+
+:TOut = GE(:Mfr,0)*:TOut1 + LT(:Mfr,0)*:TOut2
+:LossTot = :TopLoss + :EdgeLoss + :BotLoss
+
+*************************************
+********** Online Plotter ***********
+*************************************
+
+UNIT 501 TYPE 65     ! Online Plotter HX 
+PARAMETERS 12   
+4     ! 1 Nb. of left-axis variables 
+5     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum 
+1000     ! 4 Left axis maximum -
+0     ! 5 Right axis minimum 
+100     ! 6 Right axis maximum 
+nPlotsPerSim     ! 7 Number of plots per simulation 
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing 
+-1     ! 10 Logical unit for output file 
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 9
+:QDel1 :QDel2 :QStorRate :LossTot :TOut :TN1 :TN10 :TN20 :TN30 
+:QDel1 :QDel2 :QStorRate :LossTot :TOut :TN1 :TN10 :TN20 :TN30 
+LABELS  3         
+Energy  
+Temperature  
+TesLI
+
+
