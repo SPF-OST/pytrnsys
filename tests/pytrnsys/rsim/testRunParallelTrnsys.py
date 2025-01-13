@@ -103,7 +103,6 @@ def getTestCases() -> _cabc.Iterable[TestCase]:
 
 
 class TestRunParallelTrnsys:  # pylint: disable=too-few-public-methods
-    @_pytest.mark.windows
     @_pytest.mark.parametrize(
         "testCase", [_pytest.param(tc, id=tc.name) for tc in getTestCases()]
     )
