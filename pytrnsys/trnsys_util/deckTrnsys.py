@@ -289,7 +289,7 @@ class DeckTrnsys:
                     pass
 
                 try:
-                    myName = splitEquality[0].replace(" ", "")
+                    myName = re.sub(r"[ \t]+", "", splitEquality[0])
 
                     for key in self.parameters.keys():
                         if key.lower() == myName.lower():  # avoid case-sensitive
