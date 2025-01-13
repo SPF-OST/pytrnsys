@@ -1,0 +1,36 @@
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+EQUATIONS 30
+*** Massflowrates
+MfrQSrcEASZ = 500
+MfrQSrcKVA = 500
+MfrQSnkFre = 500
+MfrQSnkAlt = 500
+MfrQSnkLac = 500
+MfrQSnkWil = 500
+MfrQSnkWol = 500
+MfrQSnkPfa = 500
+MfrQSnkGal = 500
+MfrQSnkSie = 500
+MfrQSnkSbl = 500
+MfrQSnkBut = 500
+MfrQSnkRei = 500
+MfrQSnkBil = 500
+MfrQSnkNUr = 500
+MfrQSnkOUr = 500
+MfrQSnkWan = 500
+MfrQSnkTug = 500
+MfrQSnkNae = 500
+MfrQSnkMol = 500
+MfrPTesSZOut = 4000.0
+MfrPTesEASZOut = 0.0
+MfrPTesKVAOut = 0.0
+MfrPTesLiOut = 4000.0
+MfrPTesWGOut = 0.0
+MfrPTesSZIn = 0.0
+MfrPTesEASZIn = 0.0
+MfrPTesWGIn = 0.0
+MfrPTesKVAIn = 0.0
+MfrPTesLiIn = 0.0
+

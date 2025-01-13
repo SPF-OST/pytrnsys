@@ -1,0 +1,107 @@
+############# GENERIC##############################
+
+bool autoCloseOnlinePlotter False
+bool ignoreOnlinePlotter False
+int reduceCpu  4
+bool parseFileCreated True
+bool runCases True
+bool checkDeck True
+string outputLevel "INFO"
+string defaultVisibility "global"
+
+############# AUTOMATIC WORK BOOL##############################
+
+bool doAutoUnitNumbering True
+bool generateUnitTypesUsed True
+bool addAutomaticEnergyBalance True
+
+#############PATHS################################
+
+string PROJECT$ ".\ddck"
+string trnsysExePath "C:\Trnsys18\Exe\TRNExe.exe"
+string addResultsFolder ".\results"
+
+################SCALING#########################
+
+string scaling "False" #"toDemand"
+string projectPath "."
+string nameRef "Verteilnetz"
+string runType "runFromConfig"
+string pathToConnectionInfo "DdckPlaceHolderValues.json"
+
+#############PARAMETRIC VARIATIONS##################
+
+bool combineAllCases False
+#variation Ac AcollAp 2 3 4 6 8 10
+#variation VTes volPerM2Col 75 100
+
+#############FIXED CHANGED IN DDCK##################
+
+deck START 0    # 0 is midnight new year
+deck STOP  10 #
+deck NPlotsPerSim 1
+deck dtSim 1/6
+
+# Initial values for pipes
+deck dpTIniHot 90
+deck dpTIniCold 50
+deck spTIni 70
+
+# Storage values (specific volume and height per storage)
+deck TesEASZV 1450
+deck TesKVAV 500
+deck TesLIV 30000
+deck TesSZV 30000
+deck TesWGV 30000
+
+deck TesEASZH 10
+deck TesKVAH 10
+deck TesLIH 20
+deck TesSZH 20
+deck TesWGH 20
+
+#############USED DDCKs##################
+
+PROJECT$ generic\head
+PROJECT$ PlotPrint\ImpRes
+PROJECT$ PlotPrint\CtrlValues
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkAlt
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkBil
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkBut
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkFre
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkGal
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkLac
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkMol
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkNUr
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkNae
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkOUr
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkPfa
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkRei
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkSbl
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkSie
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkTug
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkWan
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkWil
+PROJECT$ QSnkGeneric\QSnkGeneric as QSnkWol
+
+PROJECT$ QSnk\QSnkTotal
+PROJECT$ QSrcEASZ\QSrcEASZ
+PROJECT$ QSrcKVA\QSrcKVA
+
+PROJECT$ TesGeneric\TesGeneric as TesEASZ
+PROJECT$ TesGeneric\TesGeneric as TesKVA
+PROJECT$ TesGeneric\TesGeneric as TesLI
+PROJECT$ TesGeneric\TesGeneric as TesSZ
+PROJECT$ TesGeneric\TesGeneric as TesWG
+
+#PROJECT$ TesEASZ\TesEASZ_mod as TesEASZ
+#PROJECT$ TesKVA\TesKVA_mod as TesKVA
+#PROJECT$ TesLI\TesLI_mod as TesLI
+#PROJECT$ TesSZ\TesSZ_mod as TesSZ
+#PROJECT$ TesWG\TesWG_mod as TesWG
+
+PROJECT$ control\control
+#PROJECT$ control\hydraulic_control
+PROJECT$ hydraulic\hydraulic_mod
+PROJECT$ weather\weather
+PROJECT$ generic\end

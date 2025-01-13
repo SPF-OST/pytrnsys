@@ -1,0 +1,136 @@
+******************************************************************************************
+** QSnkTotal.ddck
+******************************************************************************************
+** This ddck contains all the data for every city and will be distributed through a
+** template ddck to single ddck files for each city
+**
+** the values are from the excel file
+******************************************************************************************
+** DEFINED CAPACITY
+EQUATIONS 18
+!QSnkSndPOutMax = 7.781   ! (MW)
+!QSnkFeuPOutMax = 5.315   ! (MW)
+QSnkWolPOutMax = 11.493  ! (MW)
+QSnkWilPOutMax = 8.02    ! (MW)
+QSnkFrePOutMax = 7.353   ! (MW)
+QSnkPfaPOutMax = 15.021  ! (MW)
+QSnkAltPOutMax = 11.27   ! (MW)
+QSnkLacPOutMax = 21.31   ! (MW)
+QSnkGalPOutMax = 9.962   ! (MW)
+QSnkSiePOutMax = 11.917  ! (MW)
+QSnkWanPOutMax = 11.3    ! (MW)
+QSnkTugPOutMax = 7.8     ! (MW)
+QSnkSblPOutMax = 4.536   ! (MW)
+QSnkButPOutMax = 8.316   ! (MW)
+QSnkReiPOutMax = 10.613  ! (MW)
+QSnkBilPOutMax = 6.0     ! (MW)
+QSnkNUrPOutMax = 17.0    ! (MW)
+QSnkOUrPOutMax = 3.3     ! (MW)
+QSnkNaePOutMax = 13.3    ! (MW)
+QSnkMolPOutMax = 5.6     ! (MW)
+!QSnkWeePOutMax = 5.5     ! (MW)
+!QSnkNetPOutMax = 7.8     ! (MW)
+!QSnkSnsPOutMax = 4.9     ! (MW)
+
+** DEFINED ENERGY AMOUNT per year
+EQUATIONS 19
+FullCapHours = 2000  ! (h) full capacity hours - the 0.6 are for the GZF
+!QSnkSndQ = QSnkSndPOutMax * FullCapHours / 1000 ! (GWh)
+!QSnkFeuQ = QSnkFeuPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkWolQ = QSnkWolPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkWilQ = QSnkWilPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkFreQ = QSnkFrePOutMax * FullCapHours / 1000 ! (GWh)
+QSnkPfaQ = QSnkPfaPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkAltQ = QSnkAltPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkLacQ = QSnkLacPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkGalQ = QSnkGalPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkSieQ = QSnkSiePOutMax * FullCapHours / 1000 ! (GWh)
+QSnkWanQ = QSnkWanPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkTugQ = QSnkTugPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkSblQ = QSnkSblPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkButQ = QSnkButPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkReiQ = QSnkReiPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkBilQ = QSnkBilPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkNUrQ = QSnkNurPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkOUrQ = QSnkOurPOutMax * FullCapHours / 1000 ! (GWh)
+QSnkNaeQ = QSnkNaePOutMax * FullCapHours / 1000 ! (GWh)
+QSnkMolQ = QSnkMolPOutMax * FullCapHours / 1000 ! (GWh)
+!QSnkWeeQ = QSnkWeePOutMax * FullCapHours / 1000 ! (GWh)
+!QSnkNetQ = QSnkNetPOutMax * FullCapHours / 1000 ! (GWh)
+!QSnkSnsQ = QSnkSnsPOutMax * FullCapHours / 1000 ! (GWh)
+
+** READ IN DEMAND PROFILE (with 30% hot water and a heating degree limit at 18°C)
+EQUATIONS 1
+:unit_File = 199
+ASSIGN  "..\..\ddck\QSnk\DemandProfile.txt" :unit_File
+UNIT 199 TYPE 9      !Changed automatically
+Parameters 14
+5     ! 1 Mode
+1     ! 2 Header Lines to Skip
+2     ! 3 No. of values to read
+1     ! 4 Time interval of data
+-1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+-1 1 0 0
+:unit_File     ! 9 Logical unit for input file (used to be 18)
+-1     ! 10 Free format mode
+
+EQUATIONS 2
+:Time = [199,1]
+:ProfileWW30HZG18 = [199,2]     ! this profile is fitted for a total demand of 1 GWh for the whole year with a full hour capacity of 3333h -> it has to be multiplied with the correlated demand in GWh
+
+** DEFINED ENERGY AMOUNT per hour (or capacity per hour)
+EQUATIONS 19
+!QSnkSndPOutDef = QSnkSndQ * :ProfileWW30HZG18 ! (kWh/kW)
+!QSnkFeuPOutDef = QSnkFeuQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkWolPOutDef = QSnkWolQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkWilPOutDef = QSnkWilQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkFrePOutDef = QSnkFreQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkPfaPOutDef = QSnkPfaQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkAltPOutDef = QSnkAltQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkLacPOutDef = QSnkLacQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkGalPOutDef = QSnkGalQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkSiePOutDef = QSnkSieQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkWanPOutDef = QSnkWanQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkTugPOutDef = QSnkTugQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkSblPOutDef = QSnkSblQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkButPOutDef = QSnkButQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkReiPOutDef = QSnkReiQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkBilPOutDef = QSnkBilQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkNUrPOutDef = QSnkNurQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkOUrPOutDef = QSnkOurQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkNaePOutDef = QSnkNaeQ * :ProfileWW30HZG18 ! (kWh/kW)
+QSnkMolPOutDef = QSnkMolQ * :ProfileWW30HZG18 ! (kWh/kW)
+!QSnkWeePOutDef = QSnkWeeQ * :ProfileWW30HZG18 ! (kWh/kW)
+!QSnkNetPOutDef = QSnkNetQ * :ProfileWW30HZG18 ! (kWh/kW)
+!QSnkSnsPOutDef = QSnkSnsQ * :ProfileWW30HZG18 ! (kWh/kW)
+
+QSnkTot = QSnkWolPOutDef + QSnkWilPOutDef + QSnkFrePOutDef + QSnkPfaPOutDef + QSnkAltPOutDef + QSnkLacPOutDef + QSnkGalPOutDef + QSnkSiePOutDef + QSnkWanPOutDef + QSnkTugPOutDef + QSnkSblPOutDef + QSnkButPOutDef + QSnkReiPOutDef + QSnkBilPOutDef + QSnkNUrPOutDef + QSnkOUrPOutDef + QSnkNaePOutDef + QSnkMolPOutDef
+
+** DEFINED TEMPERATURE
+EQUATIONS 20    ! temperature management
+TOutEASZ = 45   ! (°C) T_RL of EASZ heat grid
+TOutKVA = 50    ! (°C) T_RL of KVA heat grid
+
+!QSnkSndTOut = TOutEASZ
+!QSnkFeuTOut = TOutEASZ
+QSnkWolTOutDef = TOutEASZ
+QSnkWilTOutDef = TOutEASZ
+QSnkFreTOutDef = TOutEASZ
+QSnkPfaTOutDef = TOutEASZ
+QSnkAltTOutDef = TOutEASZ
+QSnkLacTOutDef = TOutEASZ
+QSnkGalTOutDef = TOutEASZ
+QSnkSieTOutDef = TOutEASZ
+QSnkWanTOutDef = TOutEASZ
+QSnkTugTOutDef = TOutEASZ
+QSnkSblTOutDef = TOutEASZ
+QSnkButTOutDef = TOutEASZ
+QSnkReiTOutDef = TOutEASZ
+QSnkBilTOutDef = TOutKVA
+QSnkNUrTOutDef = TOutKVA
+QSnkOUrTOutDef = TOutKVA
+QSnkNaeTOutDef = TOutKVA
+QSnkMolTOutDef = TOutKVA
+!QSnkWeeTOut = TOutKVA
+!QSnkNetTOut = TOutKVA
+!QSnkSnsTOut = TOutKVA

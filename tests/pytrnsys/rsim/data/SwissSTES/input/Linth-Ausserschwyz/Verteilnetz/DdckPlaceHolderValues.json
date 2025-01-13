@@ -1,0 +1,302 @@
+{
+    "QSnkAlt": {
+        "In": {
+            "@cp": "Lloop5Cp",
+            "@mfr": "MQSnkAlt_A",
+            "@rho": "Lloop5Rho",
+            "@temp": "TSCnr4_QSnkAlt"
+        },
+        "Out": {
+            "@revtemp": "TSCnr4_QSnkAlt2",
+            "@temp": "TQSnkAlt"
+        }
+    },
+    "QSnkBil": {
+        "In": {
+            "@cp": "Lloop15Cp",
+            "@mfr": "MQSnkBil_A",
+            "@rho": "Lloop15Rho",
+            "@temp": "TSCnr14_QSnkBil"
+        },
+        "Out": {
+            "@revtemp": "TSCnr14_QSnkBil2",
+            "@temp": "TQSnkBil"
+        }
+    },
+    "QSnkBut": {
+        "In": {
+            "@cp": "Lloop13Cp",
+            "@mfr": "MQSnkBut_A",
+            "@rho": "Lloop13Rho",
+            "@temp": "TSCnr12_QSnkBut"
+        },
+        "Out": {
+            "@revtemp": "TSCnr12_QSnkBut2",
+            "@temp": "TQSnkBut"
+        }
+    },
+    "QSnkFre": {
+        "In": {
+            "@cp": "Lloop3Cp",
+            "@mfr": "MQSnkFre_A",
+            "@rho": "Lloop3Rho",
+            "@temp": "TSCnr22_QSnkFre"
+        },
+        "Out": {
+            "@revtemp": "TSCnr22_QSnkFre2",
+            "@temp": "TQSnkFre"
+        }
+    },
+    "QSnkGal": {
+        "In": {
+            "@cp": "Lloop8Cp",
+            "@mfr": "MQSnkGal_A",
+            "@rho": "Lloop8Rho",
+            "@temp": "TSCnr9_QSnkGal"
+        },
+        "Out": {
+            "@revtemp": "TSCnr9_QSnkGal2",
+            "@temp": "TQSnkGal"
+        }
+    },
+    "QSnkLac": {
+        "In": {
+            "@cp": "Lloop6Cp",
+            "@mfr": "MQSnkLac_A",
+            "@rho": "Lloop6Rho",
+            "@temp": "TSCnr7_QSnkLac"
+        },
+        "Out": {
+            "@revtemp": "TSCnr7_QSnkLac2",
+            "@temp": "TQSnkLac"
+        }
+    },
+    "QSnkMol": {
+        "In": {
+            "@cp": "Lloop21Cp",
+            "@mfr": "MQSnkMol_A",
+            "@rho": "Lloop21Rho",
+            "@temp": "TSCnr20_QSnkMol"
+        },
+        "Out": {
+            "@revtemp": "TSCnr20_QSnkMol2",
+            "@temp": "TQSnkMol"
+        }
+    },
+    "QSnkNUr": {
+        "In": {
+            "@cp": "Lloop17Cp",
+            "@mfr": "MQSnkNUr_A",
+            "@rho": "Lloop17Rho",
+            "@temp": "TSCnr16_QSnkNUr"
+        },
+        "Out": {
+            "@revtemp": "TSCnr16_QSnkNUr2",
+            "@temp": "TQSnkNUr"
+        }
+    },
+    "QSnkNae": {
+        "In": {
+            "@cp": "Lloop19Cp",
+            "@mfr": "MQSnkNae_A",
+            "@rho": "Lloop19Rho",
+            "@temp": "TSCnr18_QSnkNae"
+        },
+        "Out": {
+            "@revtemp": "TSCnr18_QSnkNae2",
+            "@temp": "TQSnkNae"
+        }
+    },
+    "QSnkOUr": {
+        "In": {
+            "@cp": "Lloop18Cp",
+            "@mfr": "MQSnkOUr_A",
+            "@rho": "Lloop18Rho",
+            "@temp": "TSCnr17_QSnkOUr"
+        },
+        "Out": {
+            "@revtemp": "TSCnr17_QSnkOUr2",
+            "@temp": "TQSnkOUr"
+        }
+    },
+    "QSnkPfa": {
+        "In": {
+            "@cp": "Lloop4Cp",
+            "@mfr": "MQSnkPfa_A",
+            "@rho": "Lloop4Rho",
+            "@temp": "TSCnr3_QSnkPfa"
+        },
+        "Out": {
+            "@revtemp": "TSCnr3_QSnkPfa2",
+            "@temp": "TQSnkPfa"
+        }
+    },
+    "QSnkRei": {
+        "In": {
+            "@cp": "Lloop14Cp",
+            "@mfr": "MQSnkRei_A",
+            "@rho": "Lloop14Rho",
+            "@temp": "TSCnr13_QSnkRei"
+        },
+        "Out": {
+            "@revtemp": "TSCnr13_QSnkRei2",
+            "@temp": "TQSnkRei"
+        }
+    },
+    "QSnkSbl": {
+        "In": {
+            "@cp": "Lloop11Cp",
+            "@mfr": "MQSnkSbl_A",
+            "@rho": "Lloop11Rho",
+            "@temp": "TSCnr11_QSnkSbl"
+        },
+        "Out": {
+            "@revtemp": "TSCnr11_QSnkSbl2",
+            "@temp": "TQSnkSbl"
+        }
+    },
+    "QSnkSie": {
+        "In": {
+            "@cp": "Lloop10Cp",
+            "@mfr": "MQSnkSie_A",
+            "@rho": "Lloop10Rho",
+            "@temp": "TSCnr10_QSnkSie"
+        },
+        "Out": {
+            "@revtemp": "TSCnr10_QSnkSie2",
+            "@temp": "TQSnkSie"
+        }
+    },
+    "QSnkTug": {
+        "In": {
+            "@cp": "Lloop12Cp",
+            "@mfr": "MQSnkTug_A",
+            "@rho": "Lloop12Rho",
+            "@temp": "TSCnr6_QSnkTug"
+        },
+        "Out": {
+            "@revtemp": "TSCnr6_QSnkTug2",
+            "@temp": "TQSnkTug"
+        }
+    },
+    "QSnkWan": {
+        "In": {
+            "@cp": "Lloop9Cp",
+            "@mfr": "MQSnkWan_A",
+            "@rho": "Lloop9Rho",
+            "@temp": "TSCnr5_QSnkWan"
+        },
+        "Out": {
+            "@revtemp": "TQSnkWan_SCnr5",
+            "@temp": "TQSnkWan"
+        }
+    },
+    "QSnkWil": {
+        "In": {
+            "@cp": "Lloop2Cp",
+            "@mfr": "MQSnkWil_A",
+            "@rho": "Lloop2Rho",
+            "@temp": "TSCnr2_QSnkWil"
+        },
+        "Out": {
+            "@revtemp": "TQSnkWil_SCnr2",
+            "@temp": "TQSnkWil"
+        }
+    },
+    "QSnkWol": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MQSnkWol_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TSCnr_Wol"
+        },
+        "Out": {
+            "@revtemp": "TWol_SCnr",
+            "@temp": "TQSnkWol"
+        }
+    },
+    "QSrcEASZ": {
+        "In": {
+            "@cp": "Lloop23Cp",
+            "@mfr": "MQSrcEASZ_A",
+            "@rho": "Lloop23Rho",
+            "@temp": "TQSrcEASZ_Tee4"
+        },
+        "Out": {
+            "@revtemp": "TTee3_QSrcEASZ",
+            "@temp": "TQSrcEASZ"
+        }
+    },
+    "QSrcKVA": {
+        "In": {
+            "@cp": "Lloop16Cp",
+            "@mfr": "MQSrcKVA_A",
+            "@rho": "Lloop16Rho",
+            "@temp": "TTee2_QSrcKVA"
+        },
+        "Out": {
+            "@revtemp": "TTee_QSrcKVA",
+            "@temp": "TQSrcKVA"
+        }
+    },
+    "TesEASZ": {
+        "In": {
+            "@cp": "Lloop23Cp",
+            "@mfr": "MTesEASZ_A",
+            "@rho": "Lloop23Rho",
+            "@temp": "TTesEASZ_Tee3"
+        },
+        "Out": {
+            "@revtemp": "TTesEASZ_TTesEASZ1",
+            "@temp": "TTesEASZ"
+        }
+    },
+    "TesKVA": {
+        "In": {
+            "@cp": "Lloop16Cp",
+            "@mfr": "MTesKVA_A",
+            "@rho": "Lloop16Rho",
+            "@temp": "TTesKVA_Tee"
+        },
+        "Out": {
+            "@revtemp": "TTesKVA_TTesKVA1",
+            "@temp": "TTesKVA"
+        }
+    },
+    "TesLI": {
+        "In": {
+            "@cp": "Lloop25Cp",
+            "@mfr": "MTesLI_A",
+            "@rho": "Lloop25Rho",
+            "@temp": "TTesLI_SCnrLI"
+        },
+        "Out": {
+            "@revtemp": "TTTesLi1_TesLI",
+            "@temp": "TTesLI"
+        }
+    },
+    "TesSZ": {
+        "In": {
+            "@cp": "Lloop24Cp",
+            "@mfr": "MTesSZ_A",
+            "@rho": "Lloop24Rho",
+            "@temp": "TTesSZ_SCnrSZ"
+        },
+        "Out": {
+            "@revtemp": "TTesSZ_TTesSZ1",
+            "@temp": "TTesSZ"
+        }
+    },
+    "TesWG": {
+        "In": {
+            "@cp": "Lloop7Cp",
+            "@mfr": "MTesWG_A",
+            "@rho": "Lloop7Rho",
+            "@temp": "TTesWG_SCnrWG"
+        },
+        "Out": {
+            "@revtemp": "TTesWG_TTesWG1",
+            "@temp": "TTesWG"
+        }
+    }
+}
