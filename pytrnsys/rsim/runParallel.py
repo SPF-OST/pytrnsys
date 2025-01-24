@@ -39,10 +39,14 @@ def getNumberOfCPU():
 
 
 def runParallel(
-    cmds, reduceCpu=0, outputFile=False, estimedCPUTime=0.33, delayTime=0.3, trackingFile=None, masterFile=None
+    cmds, reduceCpu=0, outputFile=False, estimedCPUTime=0.33, delayTime=10, trackingFile=None, masterFile=None
 ):
     """Exec commands in parallel in multiple process
     (as much as we have CPU)
+    
+    The delay time is used to prevent multiple instances of trnsys trying to access the files at the same time.
+    This is especially problematic with type 56, which not only reads several files.
+    It also creates multiple files at the start of the simulation.
     """
     logDict = {}
     if trackingFile != None:
