@@ -57,6 +57,10 @@ jobs:
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
     
-    - name: Trigger build of `pytrnsys-gui` executable
-      uses: SPF-OST/pytrnsys_gui/.github/workflows/run-tests.yml@9908444aced99d5c0eaf7ff730468eecfdec5197
-
+  run-gui-tests:
+    
+    needs: test-windows
+    runs-on:
+      - self-hosted
+      - spf-windows-gh-runners
+    uses: SPF-OST/pytrnsys_gui/.github/workflows/run-tests.yml
