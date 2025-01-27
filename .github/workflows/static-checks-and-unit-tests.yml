@@ -61,3 +61,5 @@ jobs:
     
     needs: test-windows
     uses: SPF-OST/pytrnsys_gui/.github/workflows/run-tests.yml@4eaa23dec8113a11f1d6989865a6c1a18dbdbb24
+    with:
+      reason: pytrnsys-changed
