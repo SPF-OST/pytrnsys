@@ -56,11 +56,18 @@ jobs:
         path: test-results
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+      
+    - name: Generate a token
+      id: generate-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ vars.APP_ID }}
+        private-key: ${{ secrets.APP_KEY }}
     
     - name: Trigger build of `pytrnsys-gui` executable
       uses: peter-evans/repository-dispatch@v2
       with:
         repository: SPF-OST/pytrnsys_gui
-        token: ${{ secrets.PYTRNSYS_GUI_REPO_ACCESS_TOKEN }}
+        token: ${{ steps.app-token.outputs.token }}
         event-type: run-tests-and-build-executable
         client-payload: '{"type": "run-tests-and-build-executable"}'
