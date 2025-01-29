@@ -57,9 +57,10 @@ jobs:
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
     
-  run-gui-tests:
-    
-    needs: test-windows
-    uses: SPF-OST/pytrnsys_gui/.github/workflows/run-tests.yml@master
-    with:
-      reason: pytrnsys-changed
+    - name: Trigger build of `pytrnsys-gui` executable
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        repository: SPF-OST/pytrnsys_gui
+        token: ${{ secrets.PYTRNSYS_GUI_REPO_ACCESS_TOKEN }}
+        event-type: run-tests-and-build-executable
+        client-payload: '{"type": "run-tests-and-build-executable"}'
