@@ -63,6 +63,7 @@ jobs:
       with:
         app-id: ${{ vars.APP_ID }}
         private-key: ${{ secrets.APP_KEY }}
+        repository: pytrnsys_gui
     
     - name: Trigger build of `pytrnsys-gui` executable
       uses: peter-evans/repository-dispatch@v2
