@@ -69,6 +69,6 @@ jobs:
       uses: peter-evans/repository-dispatch@v2
       with:
         repository: SPF-OST/pytrnsys_gui
-        token: ${{ steps.app-token.outputs.token }}
+        token: ${{ steps.generate-token.outputs.token }}
         event-type: run-tests-and-build-executable
         client-payload: '{"type": "run-tests-and-build-executable"}'
