@@ -65,7 +65,7 @@ version_number: positive_int_or_explicit_var
 
 accelerate: "ACCELERATE"i positive_int_or_explicit_var (positive_int_or_explicit_var "," positive_int_or_explicit_var)+
 
-unit: header [parameters] [inputs [labels]] [trace]
+unit: header [parameters] [inputs] [derivatives] [labels] [trace]
 
 header: "UNIT"i unit_number "TYPE"i type_number [header_comment]
 
@@ -96,6 +96,14 @@ number_of_inputs: positive_int_or_explicit_var
 input: variable
     | SIGNED_NUMBER 
     | ("0" "," "0" | "CONST")
+
+derivatives: DERIVATIVES number_of_derivatives derivative+
+
+DERIVATIVES: "derivatives"i
+
+number_of_derivatives: positive_int_or_explicit_var
+
+derivative: variable | SIGNED_NUMBER 
 
 labels: LABELS (HASH| number_of_labels) label+
 
