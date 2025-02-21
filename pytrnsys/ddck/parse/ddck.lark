@@ -207,11 +207,11 @@ PORT_PROPERTY: "@" ("temp" | "revtemp" | "mfr" | "cp" | "rho")
 
 DEFAULT_VARIABLE_NAME: NAME
 
-NAME: /(?!(constants|equations|unit|parameters|inputs|labels|trace|assign)\s)[a-z]([a-z]|[0-9]|_)*/i
+NAME: /(?!(constants|equations|unit|parameters|inputs|derivatives|labels|trace|assign)\s)[a-z]([a-z]|[0-9]|_)*/i
 
-LABEL: /(?!(constants|equations|unit|parameters|inputs|labels|trace|assign)\s)("[^"]+"|[^\s\*!]+)/i
+LABEL: /(?!(constants|equations|unit|parameters|inputs|derivatives|labels|trace|assign)\s)("[^"]+"|[^\s\*!]+)/i
 
-UNREFERENCABLE_NAME: /(?!(constants|equations|unit|parameters|inputs|labels|trace|assign)\s)[a-z]([a-z]|[0-9]|_|-)*/i
+UNREFERENCABLE_NAME: /(?!(constants|equations|unit|parameters|derivatives|inputs|labels|trace|assign)\s)[a-z]([a-z]|[0-9]|_|-)*/i
 
 POSITIVE_INT: POSITIVE_DIGIT DIGIT*
 
