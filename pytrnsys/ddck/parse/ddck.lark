@@ -143,6 +143,7 @@ trace: "TRACE"i ton toff
     | power ("^" | "**") atom -> to_power_of
 
 ?atom: NUMBER -> number
+    | "+" atom -> unary_plus
     | "-" atom -> negate
     | variable
     | output
