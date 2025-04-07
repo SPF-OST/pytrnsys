@@ -3,7 +3,9 @@
 
 import logging
 import os
+import pathlib as _pl
 import shutil
+import shutil as _su
 import typing as tp
 
 import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
@@ -110,7 +112,13 @@ class ExecuteTrnsys:
         nameDeckBck = "%s-bck" % self.nameDck
         shutil.copy(self.nameDck, nameDeckBck)
 
-    def loadDeck(self, useDeckName=False, check=False, eliminateComments=False, useDeckOutputPath=False):
+    def loadDeck(
+        self,
+        useDeckName=False,
+        check=False,
+        eliminateComments=False,
+        useDeckOutputPath=False,
+    ):
         if useDeckName == False:
             nameDck = self.fileName  # self.nameDckPathOutput
         else:
@@ -119,7 +127,9 @@ class ExecuteTrnsys:
         self.deckTrnsys = deckTrnsys.DeckTrnsys(self.path, nameDck)
 
         lines = self.deckTrnsys.loadDeck(
-            eraseBeginComment=False, eliminateComments=False, useDeckOutputPath=useDeckOutputPath
+            eraseBeginComment=False,
+            eliminateComments=False,
+            useDeckOutputPath=useDeckOutputPath,
         )
 
         if check == True:
@@ -257,3 +267,29 @@ class ExecuteTrnsys:
         nameOut = self.pathOutput + "\\%s.dck" % self.fileName
 
         shutil.copy(nameSource, nameOut)
+
+    def copyPathToVariationFolder(self, source: _pl.Path, target: _pl.Path) -> None:
+        if target.is_absolute():
+            raise ValueError("Target path must be relative.", target)
+
+        deckContainingDirPath = _pl.Path(self.path)
+
+        absoluteTargetPath = deckContainingDirPath / target
+        assert absoluteTargetPath.is_absolute()
+
+        self._deleteTargetIfExistsAndCopy(source, absoluteTargetPath)
+
+    @staticmethod
+    def _deleteTargetIfExistsAndCopy(sourcePath: _pl.Path, targetPath: _pl.Path) -> None:
+        if not sourcePath.exists():
+            raise ValueError("Source path doesn't exist.", sourcePath)
+        
+        if targetPath.is_dir():
+            _su.rmtree(targetPath)
+        elif targetPath.is_file():
+            targetPath.unlink()
+
+        if sourcePath.is_dir():
+            _su.copytree(sourcePath, targetPath)
+        else:
+            _su.copy(sourcePath, targetPath)

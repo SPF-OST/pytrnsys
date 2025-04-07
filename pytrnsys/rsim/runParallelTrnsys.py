@@ -82,9 +82,6 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
             self.nameBase = name
             self.path = os.getcwd()
 
-        self._assignStatements: list[_ras.AssignStatement] = []
-        self._includedDdckFiles: list[_btd.IncludedDdckFile] = []
-
     def setDeckName(self, _name):
         self.nameBase = _name
 
@@ -302,30 +299,34 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
             # If we assign like localCopyPar = parameters, then the parameters will change with localCopyPar !!
             # Otherwise we change the global parameter and some values of last variation will remain.
 
-            tests.append(exeTrnsys.ExecuteTrnsys(variablePath, fileName[i]))
+            test = exeTrnsys.ExecuteTrnsys(variablePath, fileName[i])
+            tests.append(test)
 
-            tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
+            test.setTrnsysExePath(self.inputs["trnsysExePath"])
 
-            tests[i].setRemovePopUpWindow(self.inputs["removePopUpWindow"])
+            test.setRemovePopUpWindow(self.inputs["removePopUpWindow"])
 
-            tests[i].moveFileFromSource()
+            test.moveFileFromSource()
 
-            tests[i].loadDeck(useDeckOutputPath=True)
+            test.loadDeck(useDeckOutputPath=True)
 
-            tests[i].changeParameter(localCopyPar)
+            test.changeParameter(localCopyPar)
 
-            tests[i].changeAssignStatementsBasedOnUnitVariables(self._assignStatements)
+            test.changeAssignStatementsBasedOnUnitVariables(self._assignStatements)
+            
+            for pathToCopy in self._allPathsToCopy:
+                test.copyPathToVariationFolder(pathToCopy.source, pathToCopy.target)
 
             if self.inputs["ignoreOnlinePlotter"] == True:
-                tests[i].ignoreOnlinePlotter()
+                test.ignoreOnlinePlotter()
 
-            tests[i].deckTrnsys.writeDeck()
+            test.deckTrnsys.writeDeck()
 
-            tests[i].cleanAndCreateResultsTempFolder()
-            tests[i].moveFileFromSource()
+            test.cleanAndCreateResultsTempFolder()
+            test.moveFileFromSource()
 
             if self.inputs["runCases"] == True:
-                self.cmds.append(tests[i].getExecuteTrnsys(self.inputs))
+                self.cmds.append(test.getExecuteTrnsys(self.inputs))
 
     def createLocationFolders(path, locations):
         for location in locations:
