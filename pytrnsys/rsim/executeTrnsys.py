@@ -3,7 +3,9 @@
 
 import logging
 import os
+import pathlib as _pl
 import shutil
+import shutil as _su
 import typing as tp
 
 import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
@@ -110,7 +112,13 @@ class ExecuteTrnsys:
         nameDeckBck = "%s-bck" % self.nameDck
         shutil.copy(self.nameDck, nameDeckBck)
 
-    def loadDeck(self, useDeckName=False, check=False, eliminateComments=False, useDeckOutputPath=False):
+    def loadDeck(
+        self,
+        useDeckName=False,
+        check=False,
+        eliminateComments=False,
+        useDeckOutputPath=False,
+    ):
         if useDeckName == False:
             nameDck = self.fileName  # self.nameDckPathOutput
         else:
@@ -119,7 +127,9 @@ class ExecuteTrnsys:
         self.deckTrnsys = deckTrnsys.DeckTrnsys(self.path, nameDck)
 
         lines = self.deckTrnsys.loadDeck(
-            eraseBeginComment=False, eliminateComments=False, useDeckOutputPath=useDeckOutputPath
+            eraseBeginComment=False,
+            eliminateComments=False,
+            useDeckOutputPath=useDeckOutputPath,
         )
 
         if check == True:
@@ -257,3 +267,52 @@ class ExecuteTrnsys:
         nameOut = self.pathOutput + "\\%s.dck" % self.fileName
 
         shutil.copy(nameSource, nameOut)
+
+    def clearOrCreateVariationDataFolder(self) -> None:
+        dataDirPath = self._getDataDirPath()
+
+        assert not dataDirPath.is_file()
+
+        if dataDirPath.is_dir():
+            _su.rmtree(dataDirPath)
+
+        dataDirPath.mkdir()
+
+    def copyPathToVariationDataFolder(self, sourcePath: _pl.Path, targetPath: _pl.Path) -> None:
+        if targetPath.is_absolute():
+            raise ValueError("Target path must be relative.", targetPath)
+
+        self._copySourceToTargetAtDataDirPath(sourcePath, targetPath)
+
+    def _copySourceToTargetAtDataDirPath(self, sourcePath: _pl.Path, targetPath: _pl.Path) -> None:
+        if not sourcePath.exists():
+            raise ValueError(
+                "copyPathsToVariationDataFolder: Source path doesn't exist.",
+                sourcePath,
+            )
+
+        dataDirPath = self._getDataDirPath()
+
+        absoluteTargetPath = (dataDirPath / targetPath).resolve()
+
+        assert dataDirPath.is_absolute()
+
+        if not absoluteTargetPath.is_relative_to(dataDirPath):
+            raise ValueError(
+                "copyPathsToVariationDataFolder: target path must not escape variation data directory.",
+                targetPath,
+            )
+
+        targetParentPath = absoluteTargetPath.parent
+        if not targetParentPath.exists():
+            targetParentPath.mkdir(parents=True)
+
+        if sourcePath.is_dir():
+            _su.copytree(sourcePath, absoluteTargetPath)
+        else:
+            _su.copy(sourcePath, absoluteTargetPath)
+
+    def _getDataDirPath(self):
+        deckContainingDirPath = _pl.Path(self.pathOutput)
+        dataDirPath = deckContainingDirPath / "data"
+        return dataDirPath
