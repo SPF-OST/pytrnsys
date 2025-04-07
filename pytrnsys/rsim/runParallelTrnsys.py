@@ -313,9 +313,6 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
             test.changeParameter(localCopyPar)
 
             test.changeAssignStatementsBasedOnUnitVariables(self._assignStatements)
-            
-            for pathToCopy in self._allPathsToCopy:
-                test.copyPathToVariationFolder(pathToCopy.source, pathToCopy.target)
 
             if self.inputs["ignoreOnlinePlotter"] == True:
                 test.ignoreOnlinePlotter()
@@ -324,6 +321,10 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
 
             test.cleanAndCreateResultsTempFolder()
             test.moveFileFromSource()
+
+            test.clearOrCreateVariationDataFolder()
+            for pathToCopy in self._allPathsToCopyToVariationDataFolder:
+                test.copyPathToVariationDataFolder(pathToCopy.source, pathToCopy.target)
 
             if self.inputs["runCases"] == True:
                 self.cmds.append(test.getExecuteTrnsys(self.inputs))

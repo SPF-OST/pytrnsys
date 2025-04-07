@@ -15,7 +15,7 @@ import pytrnsys.trnsys_util.replaceAssignStatements as _ras
 
 
 @_dc.dataclass
-class _PathToCopy:
+class _PathToCopyToVariationDataFolder:
     source: _pl.Path
     target: _pl.Path
 
@@ -29,7 +29,7 @@ class GetConfigMixin:
         self._ddckPlaceHolderValuesJsonPath = None
         self.parameters = {}  # deck parameters fixed for all simulations
         self._assignStatements = list[_ras.AssignStatement]()
-        self._allPathsToCopy = list[_PathToCopy]()
+        self._allPathsToCopyToVariationDataFolder = list[_PathToCopyToVariationDataFolder]()
         self.listFit = {}
         self.listFitObs = []
         self.listDdckPaths = set()
@@ -160,8 +160,6 @@ class GetConfigMixin:
                 self.listFit[splitLine[1]] = splitLine[2:]
             elif command == "fitobs":
                 self.listFitObs.append(splitLine[1])
-            elif command == "copyPathsToVariationFolder":
-                self._addCopyPathsCommand(line)
             elif command in self.inputs.keys():
                 self._includeDdckFile(line)
 
@@ -170,6 +168,9 @@ class GetConfigMixin:
 
         if "defaultVisibility" in self.inputs:
             self._setDefaultVisibility()
+
+        if "copyPathsToVariationDataFolder" in self.inputs:
+            self._addAllPathsToCopyToVariationDataFolder()
 
         if len(self.variation) > 0:
             self.addParametricVariations(self.variation)
@@ -269,34 +270,42 @@ when you want to give the component name explicitly by <component-name>
 """
         raise ValueError(errorMessage)
 
-    def _addCopyPathsCommand(self, line: str) -> None:
-        errorMessage = f"""\
-Invalid syntax: {line}. Usage:
+    def _addAllPathsToCopyToVariationDataFolder(self) -> None:
+        allSourceAndTargets = self.inputs.get("copyPathsToVariationDataFolder")
+        assert allSourceAndTargets
 
-copyTasksToVariationFolder ..\path\to\source1 path\to\dest1 [path\to\source2.txt path\to\long\dest2.txt ...]
+        for sourceAndTargets in allSourceAndTargets:
+            self._addPathsToCopyToVariationDataFolder(sourceAndTargets)
+
+    def _addPathsToCopyToVariationDataFolder(self, sourceAndTargets: _tp.Sequence[str]) -> None:
+        isOk = (
+            isinstance(sourceAndTargets, list)
+            and len(sourceAndTargets) % 2 == 0
+            and all(isinstance(p, str) for p in sourceAndTargets)
+        )
+        if not isOk:
+            formattedSourceAndTargets = " ".join(f'"{p}"' for p in sourceAndTargets)
+            errorMessage = f"""\
+Invalid syntax: stringArray copyPathsToVariationDataFolder {formattedSourceAndTargets}. Usage:
+
+stringArray copyPathsToVariationDataFolder ..\\path\\to\\source1 path\\to\\dest1 [path\\to\\source2.txt path\\to\\long\\dest2.txt ...]
 """
-        command, *sourceAndTargets = line.split()
-
-        assert command == "copyTasksToVariationFolder"
-
-        isEvenLength = len(sourceAndTargets) % 2 == 0
-        if not isEvenLength:
             raise ValueError(errorMessage)
 
         sourceAndTargetPaths = [_pl.Path(s) for s in sourceAndTargets]
 
-        pathsToCopy = [_PathToCopy(s, t) for s, t in _it.batched(sourceAndTargetPaths, 2)]
+        pathsToCopy = [_PathToCopyToVariationDataFolder(s, t) for s, t in _it.batched(sourceAndTargetPaths, 2)]
 
         absoluteTargetPaths = [c.target for c in pathsToCopy if c.target.is_absolute()]
         if absoluteTargetPaths:
             formattedAbsoluteTargetPaths = "\n".join(f"\t{t}" for t in absoluteTargetPaths)
             errorMessage = f"""\
-The following absolute target paths were found in a `copyTasksToVariationFolder` command:
+The following absolute target paths were found in a `copyPathsToVariationDataFolder` command:
 
 {formattedAbsoluteTargetPaths}
 
-Target paths to `copyTasksToVariationFolder` must be relative.
+Target paths to `copyPathsToVariationDataFolder` must be relative.
 """
             raise ValueError(errorMessage)
 
-        self._allPathsToCopy.extend(pathsToCopy)
+        self._allPathsToCopyToVariationDataFolder.extend(pathsToCopy)

@@ -268,28 +268,51 @@ class ExecuteTrnsys:
 
         shutil.copy(nameSource, nameOut)
 
-    def copyPathToVariationFolder(self, source: _pl.Path, target: _pl.Path) -> None:
-        if target.is_absolute():
-            raise ValueError("Target path must be relative.", target)
+    def clearOrCreateVariationDataFolder(self) -> None:
+        dataDirPath = self._getDataDirPath()
 
-        deckContainingDirPath = _pl.Path(self.path)
+        assert not dataDirPath.is_file()
 
-        absoluteTargetPath = deckContainingDirPath / target
-        assert absoluteTargetPath.is_absolute()
+        if dataDirPath.is_dir():
+            _su.rmtree(dataDirPath)
 
-        self._deleteTargetIfExistsAndCopy(source, absoluteTargetPath)
+        dataDirPath.mkdir()
 
-    @staticmethod
-    def _deleteTargetIfExistsAndCopy(sourcePath: _pl.Path, targetPath: _pl.Path) -> None:
+    def copyPathToVariationDataFolder(self, sourcePath: _pl.Path, targetPath: _pl.Path) -> None:
+        if targetPath.is_absolute():
+            raise ValueError("Target path must be relative.", targetPath)
+
+        self._copySourceToTargetAtDataDirPath(sourcePath, targetPath)
+
+    def _copySourceToTargetAtDataDirPath(self, sourcePath: _pl.Path, targetPath: _pl.Path) -> None:
         if not sourcePath.exists():
-            raise ValueError("Source path doesn't exist.", sourcePath)
-        
-        if targetPath.is_dir():
-            _su.rmtree(targetPath)
-        elif targetPath.is_file():
-            targetPath.unlink()
+            raise ValueError(
+                "copyPathsToVariationDataFolder: Source path doesn't exist.",
+                sourcePath,
+            )
+
+        dataDirPath = self._getDataDirPath()
+
+        absoluteTargetPath = (dataDirPath / targetPath).resolve()
+
+        assert dataDirPath.is_absolute()
+
+        if not absoluteTargetPath.is_relative_to(dataDirPath):
+            raise ValueError(
+                "copyPathsToVariationDataFolder: target path must not escape variation data directory.",
+                targetPath,
+            )
+
+        targetParentPath = absoluteTargetPath.parent
+        if not targetParentPath.exists():
+            targetParentPath.mkdir(parents=True)
 
         if sourcePath.is_dir():
-            _su.copytree(sourcePath, targetPath)
+            _su.copytree(sourcePath, absoluteTargetPath)
         else:
-            _su.copy(sourcePath, targetPath)
+            _su.copy(sourcePath, absoluteTargetPath)
+
+    def _getDataDirPath(self):
+        deckContainingDirPath = _pl.Path(self.pathOutput)
+        dataDirPath = deckContainingDirPath / "data"
+        return dataDirPath
