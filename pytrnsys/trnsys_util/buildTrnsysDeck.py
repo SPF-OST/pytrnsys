@@ -5,7 +5,6 @@
 This class uses a list of ddck files to built a complete TRNSYS deck file
 """
 
-import dataclasses as _dc
 import io as _io
 import json as _json
 import logging
@@ -23,6 +22,7 @@ import pytrnsys.ddck.replaceTokens.withoutPlaceholders as _rtwph
 import pytrnsys.pdata.processFiles as spfUtils
 import pytrnsys.trnsys_util.deckTrnsys as deck
 import pytrnsys.trnsys_util.deckUtils as deckUtils
+import pytrnsys.trnsys_util.includedDdckFile as _idf
 import pytrnsys.trnsys_util.trnsysComponent as trnsysComponent
 import pytrnsys.utils.result as _res
 import pytrnsys.utils.warnings as _warn
@@ -32,19 +32,12 @@ logger = logging.getLogger("root")
 logger.propagate = False
 
 
-@_dc.dataclass
-class IncludedDdckFile:
-    pathWithoutSuffix: _pl.Path
-    componentName: str
-    defaultVisibility: _dv.DefaultVisibility | None
-
-
 class BuildTrnsysDeck:
     def __init__(
         self,
         pathDeck,
         nameDeck,
-        includedDdckFiles: _tp.Sequence[IncludedDdckFile],
+        includedDdckFiles: _tp.Sequence[_idf.IncludedDdckFile],
         defaultVisibility: _dv.DefaultVisibility,
         ddckPlaceHolderValuesJsonPath,
     ):

@@ -14,8 +14,8 @@ import pytrnsys.rsim.getConfigMixin as _gcm
 import pytrnsys.rsim.runParallel as runPar
 import pytrnsys.trnsys_util.buildTrnsysDeck as _btd
 import pytrnsys.trnsys_util.createTrnsysDeck as createDeck
+import pytrnsys.trnsys_util.includedDdckFile as _idf
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
-import pytrnsys.trnsys_util.replaceAssignStatements as _ras
 import pytrnsys.utils.log as log
 import pytrnsys.utils.result as _res
 import pytrnsys.utils.warnings as _warn
@@ -498,7 +498,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
             if mySource == source:
                 newDdckFilePath = ddckFilePath[0:-nCharacters] + end
                 self.dictDdckPaths[newDdckFilePath] = self.dictDdckPaths[ddckFilePath]
-                newIncludedDdckFile = _btd.IncludedDdckFile(
+                newIncludedDdckFile = _idf.IncludedDdckFile(
                     _pl.Path(newDdckFilePath), oldIncludedDdckFile.componentName, oldIncludedDdckFile.defaultVisibility
                 )
                 self._includedDdckFiles[i] = newIncludedDdckFile
