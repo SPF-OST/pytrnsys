@@ -1,6 +1,4 @@
-# pylint: skip-file
-# type: ignore
-
+import collections.abc as _cabc
 import dataclasses as _dc
 import itertools as _it
 import pathlib as _pl
@@ -9,8 +7,7 @@ import typing as _tp
 import numpy as _np
 
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
-import pytrnsys.trnsys_util.buildTrnsysDeck as _btd
-import pytrnsys.trnsys_util.buildTrnsysDeck as _build
+import pytrnsys.trnsys_util.includedDdckFile as _idf
 import pytrnsys.trnsys_util.replaceAssignStatements as _ras
 
 
@@ -20,11 +17,13 @@ class _PathToCopyToVariationDataFolder:
     target: _pl.Path
 
 
-class GetConfigMixin:
+class GetConfigMixin:  # pylint: disable=too-many-instance-attributes
+    inputs: _cabc.Mapping[str, _tp.Any]
+
     def __init__(self):
         self.variation = []  # parametric studies
         self.parDeck = []  # fixed values changed in all simulations
-        self._includedDdckFiles = list[_btd.IncludedDdckFile]
+        self._includedDdckFiles = list[_idf.IncludedDdckFile]
         self._defaultVisibility = _dv.DefaultVisibility.LOCAL
         self._ddckPlaceHolderValuesJsonPath = None
         self.parameters = {}  # deck parameters fixed for all simulations
@@ -55,10 +54,10 @@ class GetConfigMixin:
 
         """
 
-        if self.inputs["combineAllCases"] == True:
+        if self.inputs["combineAllCases"] is True:
             labels = []
             values = []
-            for i, row in enumerate(variations):
+            for row in variations:
                 labels.append(row[:2])
                 values.append(row[2:])
 
@@ -67,18 +66,13 @@ class GetConfigMixin:
             self.variablesOutput = result.tolist()
 
         else:
-            sizeOneVariation = len(variations[0]) - 2
-            for n in range(len(variations)):
-                sizeCase = len(variations[n]) - 2
-                if sizeCase != sizeOneVariation:
-                    raise ValueError(
-                        "for combineAllCases=False all variations must have same length :%d case n:%d has a length of :%d"
-                        % (sizeOneVariation, n + 1, sizeCase)
-                    )
+            variationLengths = {len(v) for v in variations}
+            if len(variationLengths) > 1:
+                raise ValueError("For combineAllCases=False all variations must have same length.")
 
             self.variablesOutput = variations
 
-    def getConfig(self):
+    def getConfig(self):  # pylint: disable=too-many-branches,too-many-statements
         self.variation = []  # parametric studies
         self.parDeck = []  # fixed values changed in all simulations
         self._includedDdckFiles = []
@@ -100,19 +94,18 @@ class GetConfigMixin:
             splitLine = line.split()
 
             command = splitLine[0]
-            if command == "variation":
-                variation = []
-                for i in range(len(splitLine)):
-                    if i == 0:
-                        continue
 
-                    if i <= 2:
-                        variation.append(splitLine[i])
-                    else:
-                        try:
-                            variation.append(float(splitLine[i]))
-                        except ValueError:
-                            variation.append(splitLine[i])
+            if command == "variation":
+                variation = [
+                    splitLine[1],
+                    splitLine[2],
+                ]
+
+                for value in splitLine[3:]:
+                    try:
+                        variation.append(float(value))
+                    except ValueError:
+                        variation.append(value)
 
                 self.variation.append(variation)
 
@@ -126,7 +119,7 @@ class GetConfigMixin:
                         self.parameters[splitLine[1]] = splitLine[2]
 
             elif command == "assign":
-                self._addAssignStatement(line, splitLine)
+                self._addAssignStatement(line)
 
             elif command == "replace":
                 splitString = line.split('$"')
@@ -137,19 +130,11 @@ class GetConfigMixin:
 
             elif command == "changeDDckFile":
                 self.sourceFilesToChange.append(splitLine[1])
-                sinkFilesToChange = []
-                for i in range(len(splitLine)):
-                    if i < 2:
-                        continue
-
-                    sinkFilesToChange.append(splitLine[i])
-
+                sinkFilesToChange = splitLine[2:]
                 self.sinkFilesToChange.append(sinkFilesToChange)
 
             elif command == "addDDckFolder":
-                for i in range(len(splitLine)):
-                    if i > 0:
-                        self.foldersForDDckVariation.append(splitLine[i])
+                self.foldersForDDckVariation.extend(splitLine[1:])
             elif command == "fit":
                 self.listFit[splitLine[1]] = [
                     splitLine[2],
@@ -240,7 +225,7 @@ Invalid syntax: {line}. Usage:
         else:
             self._raiseDdckReferenceErrorMessage(line, basePathVariableName, str(relativeDdckFilePath))
 
-        includedDdckFile = _build.IncludedDdckFile(ddckFilePath, componentName, defaultVisibility)
+        includedDdckFile = _idf.IncludedDdckFile(ddckFilePath, componentName, defaultVisibility)
 
         self._includedDdckFiles.append(includedDdckFile)
         self.listDdckPaths.add(str(basePath))
