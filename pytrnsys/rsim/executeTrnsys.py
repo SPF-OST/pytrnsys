@@ -163,41 +163,7 @@ class ExecuteTrnsys:
         fileSource = os.path.join(self.path, name)
         fileEnd = os.path.join(self.pathOutput, name)
 
-        logger.debug("Path %s" % self.path)
-        logger.debug("PathOutput %s" % self.pathOutput)
-
-        if len(fileSource) >= 260:
-            raise ValueError(
-                "fileSource has a length of %d >= 260 exceeding Windows path length limit." % len(fileSource)
-            )
-        if len(fileEnd) >= 260:
-            raise ValueError("fileEnd has a length of %d >= 260 exceeding Windows path length limit." % len(fileEnd))
-
-        try:
-            shutil.move(fileSource, fileEnd)
-            logger.debug("move file %s to %s" % (name, fileEnd))
-        except:
-            logger.warning("FAIL to move the file %s to %s" % (name, fileEnd))
-
-    def copyFileFromSource(self, name):
-        fileSource = os.path.join(self.path, name)
-        fileEnd = os.path.join(self.pathOutput, name)
-
-        try:
-            shutil.copy(fileSource, fileEnd)
-            logger.debug("copy file %s to %s" % (name, fileEnd))
-        except:
-            logger.warning("FAIL to copy the file %s to %s" % (name, fileEnd))
-
-    def copyFolderFrom(self, sourcePath, name):
-        folderSource = os.path.join(sourcePath, name)
-        folderEnd = os.path.join(self.pathOutput, name)
-
-        try:
-            shutil.copytree(folderSource, folderEnd)
-            logger.debug("copy folder %s to %s" % (name, folderEnd))
-        except:
-            logger.warning("FAIL to copy the folder %s from %s to %s" % (name, folderSource, folderEnd))
+        shutil.move(fileSource, fileEnd)
 
     def setTrnsysVersion(self, version):
         self.trnsysVersion = version
