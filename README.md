@@ -45,7 +45,7 @@ directory is called `foo` then `pytrnsys` will be installed to `foo\pytrnsys`.
    
 3. Create a virtual environment:
     ```commandline
-    py -3.12 -m venv pytrnsys
+    py -3.12 -m venv venv
     ```
 4. Activate it:
     ```commandline
