@@ -72,3 +72,4 @@ jobs:
         token: ${{ steps.generate-token.outputs.token }}
         event-type: run-tests-and-build-executable
         client-payload: '{"type": "run-tests-and-build-executable"}'
+      if: ${{github.ref_name == 'master'}}
