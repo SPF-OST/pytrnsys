@@ -3,6 +3,7 @@
 wheel
 
 pip-compile-multi
+uv
 
 Sphinx
 sphinx_rtd_theme

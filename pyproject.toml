@@ -2,5 +2,26 @@
 requires = ["setuptools >= 64"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "pytrnsys"
+authors = [
+    { name = "Institute for Solar Technology (SPF), OST Rapperswil", email = "damian.birchler@ost.ch" },
+]
+description = "pytrnsys simulation framework"
+readme = "README.md"
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+]
+
+dynamic = ["dependencies", "version"]
+
+requires-python = ">=3.12"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements/release-3rd-party.in"]}
+
 [tool.uv]
 config-settings = { editable_mode = "compat" }

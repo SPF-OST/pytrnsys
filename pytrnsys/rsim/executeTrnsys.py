@@ -171,7 +171,7 @@ class ExecuteTrnsys:
         self.trnsysVersion = version
 
     def getExecuteTrnsys(self, inputDict, useDeckName=False) -> _cmd.Command:
-        dckFilePath = _pl.Path(useDeckName) if useDeckName else self.nameDckPathOutput
+        dckFilePath = _pl.Path(useDeckName) if useDeckName else _pl.Path(self.nameDckPathOutput)
 
         ignoreOnlinePlotter = inputDict["ignoreOnlinePlotter"]
         autoCloseOnlinePlotter = inputDict["autoCloseOnlinePlotter"]
