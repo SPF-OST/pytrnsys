@@ -41,7 +41,13 @@ def getNumberOfCPU():
 
 
 def runParallel(
-    commands: _cabc.Sequence[_cmd.Command], reduceCpu=0, outputFile=False, estimedCPUTime=0.33, delayTime=10, trackingFile=None, masterFile=None
+    commands: _cabc.Sequence[_cmd.Command],
+    reduceCpu=0,
+    outputFile=False,
+    estimedCPUTime=0.33,
+    delayTime=10,
+    trackingFile=None,
+    masterFile=None,
 ) -> None:
     """Exec commands in parallel in multiple process
     (as much as we have CPU)
@@ -164,7 +170,7 @@ def runParallel(
                         json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
 
                 logger.info("Command: %s", cmd)
-                 cP[core]["process"] = _sp.Popen(cmd.args, stdout=_sp.PIPE, stderr=_sp.PIPE, shell=True, cwd=cmd.cwd)
+                cP[core]["process"] = _sp.Popen(cmd.args, stdout=_sp.PIPE, stderr=_sp.PIPE, shell=True, cwd=cmd.cwd)
 
                 activeP[cP[core]["cpu"] - 1] = 1
 

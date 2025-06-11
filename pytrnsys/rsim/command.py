@@ -11,7 +11,7 @@ class Command:
 
     @property
     def args(self) -> _cabc.Sequence[str | _pl.Path]:
-        args = [self.trnsysExeFilePath, self.deckFilePath.name * self.trnsysFlags]
+        args: _cabc.Sequence[str | _pl.Path] = [self.trnsysExeFilePath, self.deckFilePath.name, *self.trnsysFlags]
 
         return args
 

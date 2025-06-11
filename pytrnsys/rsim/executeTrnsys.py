@@ -176,16 +176,18 @@ class ExecuteTrnsys:
         ignoreOnlinePlotter = inputDict["ignoreOnlinePlotter"]
         autoCloseOnlinePlotter = inputDict["autoCloseOnlinePlotter"]
 
-        trnsysFlag = self._getTrnsysFlag(ignoreOnlinePlotter, self.removePopUpWindow, autoCloseOnlinePlotter)
+        trnsysFlag = self._getTrnsysFlag(
+            ignoreOnlinePlotter=ignoreOnlinePlotter,
+            removePopupWindow=self.removePopUpWindow,
+            autoCloseOnlinePlotter=autoCloseOnlinePlotter,
+        )
 
         command = _cmd.Command(self.trnsysExePath, dckFilePath, [trnsysFlag])
 
         return command
 
     @classmethod
-    def _getTrnsysFlag(
-        cls, *, ignoreOnlinePlotter: bool, removePopupWindow: bool, autoCloseOnlinePlotter: bool
-    ) -> str:
+    def _getTrnsysFlag(cls, *, ignoreOnlinePlotter: bool, removePopupWindow: bool, autoCloseOnlinePlotter: bool) -> str:
         if ignoreOnlinePlotter and removePopupWindow:
             return "/H"
         if ignoreOnlinePlotter and not removePopupWindow:
