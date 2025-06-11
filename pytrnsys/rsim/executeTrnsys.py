@@ -1,6 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
+import dataclasses as _dc
 import logging
 import os
 import pathlib as _pl
@@ -8,6 +9,7 @@ import shutil
 import shutil as _su
 import typing as tp
 
+import pytrnsys.rsim.command as _cmd
 import pytrnsys.trnsys_util.deckTrnsys as deckTrnsys
 import pytrnsys.trnsys_util.deckUtils as deckUtils
 import pytrnsys.trnsys_util.replaceAssignStatements as _ras
@@ -168,44 +170,30 @@ class ExecuteTrnsys:
     def setTrnsysVersion(self, version):
         self.trnsysVersion = version
 
-    def getExecuteTrnsys(self, inputDict, useDeckName=False):
-        if inputDict["ignoreOnlinePlotter"] == True:
-            if self.removePopUpWindow == True:
-                ext = " /H"
-            else:
-                ext = " /N"
-            if useDeckName == False:
-                cmd = self.trnsysExePath + " " + self.nameDckPathOutput + ext
-            else:
-                cmd = self.trnsysExePath + " " + useDeckName + ext
-        else:
-            if inputDict["autoCloseOnlinePlotter"]:
-                ext = " /N"
-            else:
-                ext = ""
-            if useDeckName == False:
-                cmd = self.trnsysExePath + " " + self.nameDckPathOutput + ext
-            else:
-                cmd = self.trnsysExePath + " " + useDeckName + ext
+    def getExecuteTrnsys(self, inputDict, useDeckName=False) -> _cmd.Command:
+        dckFilePath = _pl.Path(useDeckName) if useDeckName else self.nameDckPathOutput
 
-        #        myCmd ='"%s"'%cmd #for blank spaces in paths
+        ignoreOnlinePlotter = inputDict["ignoreOnlinePlotter"]
+        autoCloseOnlinePlotter = inputDict["autoCloseOnlinePlotter"]
 
-        logger.debug("getExecuteTrnsys cmd:%s" % cmd)
+        trnsysFlags = self._getTrnsysFlags(ignoreOnlinePlotter, self.removePopUpWindow, autoCloseOnlinePlotter)
 
-        #        os.system(myCmd)
+        command = _cmd.Command(self.trnsysExePath, dckFilePath, trnsysFlags)
 
-        return cmd
+        return command
 
-    def executeTrnsys(self, useDeckName=False):
-        # use this '"%s"' to handle blank spaces in executable name like Program Files/
-        myCmd = '"%s"' % self.getExecuteTrnsys(useDeckName)
+    @classmethod
+    def _getTrnsysFlags(
+        cls, *, ignoreOnlinePlotter: bool, removePopupWindow: bool, autoCloseOnlinePlotter: bool
+    ) -> str:
+        if ignoreOnlinePlotter and removePopupWindow:
+            return "/H"
+        if ignoreOnlinePlotter and not removePopupWindow:
+            return "/N"
+        if not ignoreOnlinePlotter and autoCloseOnlinePlotter:
+            return "/N"
 
-        # print myCmd
-
-        os.system(myCmd)
-
-        if self.cleanMode:
-            self.cleanFilesForRunning()
+        return ""
 
     def cleanAndCreateResultsTempFolder(self):
         try:
