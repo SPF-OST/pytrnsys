@@ -13,10 +13,9 @@ class Command:
 
     @property
     def args(self) -> _cabc.Sequence[str | _pl.Path]:
-        shortTrnsysExeFilePath = _sp83.get_short_path_name(str(self.trnsysExeFilePath))
         shortDeckFilePath = _sp83.get_short_path_name(str(self.deckFilePath))
 
-        args: _cabc.Sequence[str | _pl.Path] = [shortTrnsysExeFilePath, shortDeckFilePath, *self.trnsysFlags]
+        args: _cabc.Sequence[str | _pl.Path] = [self.trnsysExeFilePath, shortDeckFilePath, *self.trnsysFlags]
 
         return args
 
