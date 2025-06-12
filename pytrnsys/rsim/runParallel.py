@@ -1,19 +1,21 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/python
-# Author : Dani Carbonell
-# Date   : 14.12.2012
-import sys, os, time, shutil
-import json
-import subprocess
-import pandas as pd
-from subprocess import Popen  # , list2cmdline
-import logging
 import datetime
+import json
+import logging
+import os
+import shutil
+import subprocess as _sp
+import sys
+import time
+import collections.abc as _cabc
+
+import pandas as _pd
 
 logger = logging.getLogger("root")
-import pytrnsys.trnsys_util.LogTrnsys as LogTrnsys
+import pytrnsys.trnsys_util.LogTrnsys as _logt
+import pytrnsys.rsim.command as _cmd
 
 
 def getNumberOfCPU():
@@ -39,11 +41,17 @@ def getNumberOfCPU():
 
 
 def runParallel(
-    cmds, reduceCpu=0, outputFile=False, estimedCPUTime=0.33, delayTime=10, trackingFile=None, masterFile=None
-):
+    commands: _cabc.Sequence[_cmd.Command],
+    reduceCpu=0,
+    outputFile=False,
+    estimedCPUTime=0.33,
+    delayTime=10,
+    trackingFile=None,
+    masterFile=None,
+) -> None:
     """Exec commands in parallel in multiple process
     (as much as we have CPU)
-    
+
     The delay time is used to prevent multiple instances of trnsys trying to access the files at the same time.
     This is especially problematic with type 56, which not only reads several files.
     It also creates multiple files at the start of the simulation.
@@ -53,29 +61,23 @@ def runParallel(
         with open(trackingFile, "w") as file:
             json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
 
-    maxNumberOfCPU = max(min(getNumberOfCPU() - reduceCpu, len(cmds)), 1)
-    newCmds = []
+    maxNumberOfCPU = max(min(getNumberOfCPU() - reduceCpu, len(commands)), 1)
 
-    #################### new code
-    #   initialize dictionary with processes for each core:
     cP = {}
 
     for i in range(maxNumberOfCPU):
-        cP["cpu" + str(i + 1)] = {"cpu": i + 1, "cmd": [], "process": [], "case": []}
-
-    #############################
+        cP["cpu" + str(i + 1)] = {"cpu": i + 1, "process": []}
 
     if outputFile != False:
-        #        k=0
         lines = ""
         line = "============PARALLEL PROCESSING STARTED==============\n"
         lines = lines + line
-        line = "Number of simulated cases =%d\n" % len(cmds)
+        line = "Number of simulated cases =%d\n" % len(commands)
         lines = lines + line
         line = "Number of CPU used =%d\n" % maxNumberOfCPU
         lines = lines + line
         line = "Estimated time =%f hours, assuming :%f hour per simulation\n" % (
-            len(cmds) * estimedCPUTime / (maxNumberOfCPU * 1.0),
+            len(commands) * estimedCPUTime / (maxNumberOfCPU * 1.0),
             estimedCPUTime,
         )
         lines = lines + line
@@ -83,8 +85,8 @@ def runParallel(
         lines = lines + line
 
         i = 1
-        for cmd in cmds:
-            case = cmd.split("\\")[-1]
+        for cmd in commands:
+            case = cmd.deckFilePath.name
             line = "Case %d to be simulated %s\n" % (i, case)
             lines = lines + line
             i = i + 1
@@ -95,46 +97,21 @@ def runParallel(
         outfileRun.writelines(lines)
         outfileRun.close()
 
-    #    cmdExe = os.getenv("COMSPEC")
+    if not commands:
+        return
 
-    cpu = 1  # DC - if you want to decide to which core to start increase this number
+    openCmds = list(commands)
 
-    for cmd in cmds:
-        newTask = cmd
-
-        newCmds.append(newTask)
-
-        if cpu < maxNumberOfCPU:
-            cpu = cpu + 1
-        else:
-            cpu = 1
-
-    if not newCmds:
-        return  # empty list
-
-    #####################
-    # alternative code:
-
-    # list of commands that have not yet been executed:
-    openCmds = cmds[:]
-
-    # list of commands that have already executed:
     finishedCmds = []
 
-    # count cases:
     caseNr = 1
 
-    # list to check when finished:
     activeP = [0] * maxNumberOfCPU
 
     for core in cP.keys():
-        # print cP[core]
-
         cP[core]["cmd"] = openCmds.pop(0)
         cP[core]["case"] = caseNr
         caseNr += 1
-
-    #########################
 
     def done(p):
         return p.poll() is not None
@@ -143,7 +120,7 @@ def runParallel(
         fullDckFilePath = p.args.split(" ")[-2]
         (logFilePath, dckFileName) = os.path.split(fullDckFilePath)
         logFileName = os.path.splitext(dckFileName)[0]
-        logInstance = LogTrnsys.LogTrnsys(logFilePath, logFileName)
+        logInstance = _logt.LogTrnsys(logFilePath, logFileName)
 
         if logInstance.logFatalErrors():
             logger.error("======================================")
@@ -182,8 +159,9 @@ def runParallel(
         for core in cP.keys():
             p = cP[core]["process"]
             # start processes:
-            if (not p) and cP[core]["cmd"]:
-                dckName = cP[core]["cmd"].split("\\")[-1].split(" ")[0]
+            cmd: _cmd.Command = cP[core].get("cmd")
+            if not p and cmd:
+                dckName = cmd.deckFilePath.name
                 if trackingFile != None:
                     with open(trackingFile, "r") as file:
                         logDict = json.load(file)
@@ -191,9 +169,8 @@ def runParallel(
                     with open(trackingFile, "w") as file:
                         json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
 
-                cmd = cP[core]["cmd"]
-                logger.info("Command: " + cmd)
-                cP[core]["process"] = Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+                logger.info("Command: %s", cmd)
+                cP[core]["process"] = _sp.Popen(cmd.args, stdout=_sp.PIPE, stderr=_sp.PIPE, shell=True, cwd=cmd.cwd)
 
                 activeP[cP[core]["cpu"] - 1] = 1
 
@@ -226,7 +203,7 @@ def runParallel(
                             fullDckFilePath = p.args.split(" ")[-2]
                             (logFilePath, dckFileName) = os.path.split(fullDckFilePath)
                             logFileName = os.path.splitext(dckFileName)[0]
-                            logInstance = LogTrnsys.LogTrnsys(logFilePath, logFileName)
+                            logInstance = _logt.LogTrnsys(logFilePath, logFileName)
 
                             if logInstance.logFatalErrors():
                                 logDict[dckName].append("fatal error")
@@ -247,28 +224,28 @@ def runParallel(
                         # empty process:
                         cP[core]["process"] = []
                         finishedCmds.append(cP[core]["cmd"])
-                        cP[core]["cmd"] = []
-                        cP[core]["case"] = []
+                        del cP[core]["cmd"]
+                        del cP[core]["case"]
 
                         activeP[cP[core]["cpu"] - 1] = 0
 
-                        logger.info("Runs completed: %s/%s" % (len(finishedCmds), len(cmds)))
+                        logger.info("Runs completed: %s/%s" % (len(finishedCmds), len(commands)))
 
-                        if len(finishedCmds) % len(cP) == 0 and len(finishedCmds) != len(cmds):
+                        if len(finishedCmds) % len(cP) == 0 and len(finishedCmds) != len(commands):
                             currentTime = time.time()
                             timeSoFarSec = currentTime - startTime
-                            totalTimePredictionSec = timeSoFarSec * len(cmds) / len(finishedCmds)
+                            totalTimePredictionSec = timeSoFarSec * len(commands) / len(finishedCmds)
                             endTimePrediction = datetime.datetime.fromtimestamp(
                                 startTime + totalTimePredictionSec
                             ).strftime("%H:%M on %d.%m.%Y")
                             logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
                             logger.info(
-                                "Predicted time of completion of all %s runs: %s" % (len(cmds), endTimePrediction)
+                                "Predicted time of completion of all %s runs: %s" % (len(commands), endTimePrediction)
                             )
                             logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-                        if masterFile != None and (len(finishedCmds) == len(cmds)):
-                            newDf = pd.DataFrame.from_dict(
+                        if masterFile != None and (len(finishedCmds) == len(commands)):
+                            newDf = _pd.DataFrame.from_dict(
                                 logDict,
                                 orient="index",
                                 columns=["started", "finished", "outcome", "hour start", "hour end"],
@@ -282,9 +259,9 @@ def runParallel(
                                     logger.info("Updated " + masterBackup)
                                 except:
                                     logger.error("Unable to generate BACKUP of " + masterFile)
-                                origDf = pd.read_csv(masterFile, sep=";", index_col=0)
+                                origDf = _pd.read_csv(masterFile, sep=";", index_col=0)
 
-                                masterDf = pd.concat([origDf, newDf])
+                                masterDf = _pd.concat([origDf, newDf])
                                 masterDf = masterDf[~masterDf.index.duplicated(keep="last")]
                             else:
                                 masterDf = newDf

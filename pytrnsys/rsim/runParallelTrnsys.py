@@ -49,7 +49,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
         self.pathConfig = pathConfig
 
         self.defaultInputs()
-        self.cmds = []
+        self.commands = []
         if runPath == None:
             self.path = os.getcwd()
         else:
@@ -143,7 +143,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
 
     def runFromNames(self, path, fileNames):
         tests = []
-        self.cmds = []
+        self.commands = []
         for i in range(len(fileNames)):
             tests.append(exeTrnsys.ExecuteTrnsys(path, fileNames[i]))
             tests[i].setTrnsysExePath(self.inputs["trnsysExePath"])
@@ -158,19 +158,11 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
 
             tests[i].setRemovePopUpWindow(self.inputs["removePopUpWindow"])
 
-            self.cmds.append(tests[i].getExecuteTrnsys(self.inputs, useDeckName=tests[i].nameDck))
+            self.commands.append(tests[i].getExecuteTrnsys(self.inputs, useDeckName=tests[i].nameDck))
 
         self.runParallel()
 
     def runConfig(self) -> _res.Result[None]:
-        """
-        Runs the cases defined in the config file
-
-        Returns
-        -------
-
-        """
-
         if self.inputs["runType"] == "runFromCases":
             cases = self.readCasesToRun(self.inputs["pathWithCasesToRun"], self.inputs["fileWithCasesToRun"])
             self.runFromNames(self.inputs["pathWithCasesToRun"], cases)
@@ -327,7 +319,7 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
                 test.copyPathToVariationDataFolder(pathToCopy.source, pathToCopy.target)
 
             if self.inputs["runCases"] == True:
-                self.cmds.append(test.getExecuteTrnsys(self.inputs))
+                self.commands.append(test.getExecuteTrnsys(self.inputs))
 
     def createLocationFolders(path, locations):
         for location in locations:
@@ -395,17 +387,19 @@ class RunParallelTrnsys(_gcm.GetConfigMixin):
 
         if "masterFile" in self.inputs:
             runPar.runParallel(
-                self.cmds,
+                self.commands,
                 reduceCpu=int(self.inputs["reduceCpu"]),
                 trackingFile=self.inputs["trackingFile"],
                 masterFile=self.inputs["masterFile"],
             )
         elif "trackingFile" in self.inputs:
             runPar.runParallel(
-                self.cmds, reduceCpu=int(self.inputs["reduceCpu"]), trackingFile=self.inputs["trackingFile"]
+                self.commands, reduceCpu=int(self.inputs["reduceCpu"]), trackingFile=self.inputs["trackingFile"]
             )
         else:
-            runPar.runParallel(self.cmds, reduceCpu=int(self.inputs["reduceCpu"]), outputFile=self.outputFileDebugRun)
+            runPar.runParallel(
+                self.commands, reduceCpu=int(self.inputs["reduceCpu"]), outputFile=self.outputFileDebugRun
+            )
 
     def writeRunLogFile(self):
         logfile = open(os.path.join(self.path, "runLogFile.config"), "w")
