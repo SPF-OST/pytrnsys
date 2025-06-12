@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools >= 64"]
+requires = ["setuptools >= 64", "setuptools-git-versioning"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -22,6 +22,9 @@ requires-python = ">=3.12"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements/release-3rd-party.in"]}
+
+[tool.setuptool.package-data]
+pytrnsys = ["py.typed", "./plot/stylesheets/*.*", "./report/latex_doc/*.*", "ddck/_parse/ddck.lark"]
 
 [tool.uv]
 config-settings = { editable_mode = "compat" }

@@ -36,10 +36,5 @@ _st.setup(
     version_config=True,
     packages=_st.find_packages(),
     url="https://pytrnsys.readthedocs.io",
-    include_package_data=True,
-    package_data={
-        "pytrnsys": ["py.typed", "./plot/stylesheets/*.*", "./report/latex_doc/*.*", "ddck/_parse/ddck.lark"],
-    },
     data_files=_getDataFilePairs(),
-    setup_requires=["setuptools-git-versioning"],
 )
