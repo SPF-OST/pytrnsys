@@ -24,7 +24,7 @@ requires-python = ">=3.12"
 dependencies = {file = ["requirements/release-3rd-party.in"]}
 
 [tool.setuptool.package-data]
-pytrnsys = ["py.typed", "./plot/stylesheets/*.*", "./report/latex_doc/*.*", "ddck/_parse/ddck.lark"]
+pytrnsys = ["py.typed", "./plot/stylesheets/*.*", "./report/latex_doc/*.*", "ddck/parse/ddck.lark"]
 
 [tool.uv]
 config-settings = { editable_mode = "compat" }
