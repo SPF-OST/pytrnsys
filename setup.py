@@ -34,7 +34,6 @@ def _getDataFilePairs():
 
 _st.setup(
     version_config=True,
-    packages=_st.find_packages(),
     url="https://pytrnsys.readthedocs.io",
     data_files=_getDataFilePairs(),
 )

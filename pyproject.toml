@@ -23,8 +23,14 @@ requires-python = ">=3.12"
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements/release-3rd-party.in"]}
 
-[tool.setuptool.package-data]
-pytrnsys = ["py.typed", "./plot/stylesheets/*.*", "./report/latex_doc/*.*", "ddck/parse/ddck.lark"]
+[tool.setuptools]
+packages = ["pytrnsys"]
+
+[tool.setuptools.package-data]
+pytrnsys = ["py.typed"]
+"pytrnsys.plot.stylesheets" = ["*"]
+"pytrnsys.report.latex_doc" = ["*"]
+"pytrnsys.ddck.parse" = ["ddck.lark"]
 
 [tool.uv]
 config-settings = { editable_mode = "compat" }
