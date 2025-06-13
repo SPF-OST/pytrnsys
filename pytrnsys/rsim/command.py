@@ -19,7 +19,7 @@ class Command:
         deckFilePathString = str(self.deckFilePath)
 
         pathLength = len(deckFilePathString)
-        if pathLength <= cls.MAX_DECK_FILE_PATH_LENGTH:
+        if pathLength <= self.MAX_DECK_FILE_PATH_LENGTH:
             return self.deckFilePath
 
         truncatedDeckFilePathString = _sp83.get_short_path_name(deckFilePathString)

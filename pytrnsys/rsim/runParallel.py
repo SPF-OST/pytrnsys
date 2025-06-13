@@ -1,5 +1,4 @@
-# pylint: skip-file
-# type: ignore
+# pylint: disable=unspecified-encoding
 
 import collections.abc as _cabc
 import dataclasses as _dc
@@ -11,12 +10,14 @@ import shutil
 import subprocess as _sp
 import sys
 import time
+import typing as _tp
 
 import pandas as _pd
 
-logger = logging.getLogger("root")
-import pytrnsys.trnsys_util.LogTrnsys as _logt
 import pytrnsys.rsim.command as _cmd
+import pytrnsys.trnsys_util.LogTrnsys as _logt
+
+logger = logging.getLogger("root")
 
 
 def getNumberOfCPU():
@@ -45,7 +46,7 @@ def getNumberOfCPU():
 class _SimulationCase:
     caseNumber: int
     command: _cmd.Command
-    process: _sp.Popen | None
+    process: _sp.Popen | None = None
 
 
 @_dc.dataclass
@@ -54,7 +55,7 @@ class _Cpu:
     assignedCase: _SimulationCase | None = None
 
 
-def runParallel(
+def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
     commands: _cabc.Sequence[_cmd.Command],
     reduceCpu=0,
     outputFile=False,
@@ -70,7 +71,7 @@ def runParallel(
     This is especially problematic with type 56, which not only reads several files.
     It also creates multiple files at the start of the simulation.
     """
-    logDict = {}
+    logDict = dict[str, list[_tp.Any]]()
     if trackingFile:
         with open(trackingFile, "w") as file:
             json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
@@ -83,13 +84,13 @@ def runParallel(
         lines = ""
         line = "============PARALLEL PROCESSING STARTED==============\n"
         lines = lines + line
-        line = "Number of simulated cases =%d\n" % len(commands)
+        line = f"Number of simulated cases ={len(commands):d}\n"
         lines = lines + line
-        line = "Number of CPU used =%d\n" % maxNumberOfCPU
+        line = f"Number of CPU used ={maxNumberOfCPU:d}\n"
         lines = lines + line
-        line = "Estimated time =%f hours, assuming :%f hour per simulation\n" % (
-            len(commands) * estimatedCPUTime / (maxNumberOfCPU * 1.0),
-            estimatedCPUTime,
+        line = (
+            f"Estimated time = {len(commands) * estimatedCPUTime / (maxNumberOfCPU * 1.0):f} hours, "
+            f"assuming :{estimatedCPUTime:f} hour per simulation\n"
         )
         lines = lines + line
         line = "============CASES TO BE SIMULATED====================\n"
@@ -98,41 +99,40 @@ def runParallel(
         i = 1
         for cmd in commands:
             case = cmd.deckFilePath.name
-            line = "Case %d to be simulated %s\n" % (i, case)
+            line = f"Case {i:d} to be simulated {case}\n"
             lines = lines + line
             i = i + 1
         line = "============ALREADY SIMULATED CASES====================\n"
         lines = lines + line
 
-        outfileRun = open(outputFile, "w")
-        outfileRun.writelines(lines)
-        outfileRun.close()
+        with open(outputFile, "w") as outfileRun:
+            outfileRun.writelines(lines)
 
     if not commands:
         return
 
     caseNumber = 1
-    for cpu, command in zip(commands, strict=False):
+    for cpu, command in zip(cpus, commands, strict=False):
         simulationCase = _SimulationCase(caseNumber, command)
         cpu.assignedCase = simulationCase
         caseNumber += 1
 
-    assignedCommands = {c.assignedCommand for c in cpus if c.assignedCommand}
+    assignedCommands = {c.assignedCase.command for c in cpus if c.assignedCase}
     commandsStillToBeRun = [c for c in commands if c not in assignedCommands]
 
     completedCommands = []
 
     startTime = time.time()
 
-    while True:
+    while True:  # pylint: disable=too-many-nested-blocks
         for cpu in cpus:
-            simulationCase = cpu.assignedCase
+            assignedCase = cpu.assignedCase
 
-            if not simulationCase:
+            if not assignedCase:
                 continue
 
-            command = simulationCase.command
-            process = simulationCase.process
+            command = assignedCase.command
+            process = assignedCase.process
 
             dckName = command.deckFilePath.name
 
@@ -146,7 +146,7 @@ def runParallel(
                         json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
 
                 logger.info("Command: %s", command)
-                simulationCase.process = _sp.Popen(
+                assignedCase.process = _sp.Popen(  # pylint: disable=consider-using-with
                     command.args, stdout=_sp.PIPE, stderr=_sp.PIPE, shell=True, cwd=command.cwd
                 )
 
@@ -155,20 +155,17 @@ def runParallel(
                 )  # we delay 5 seconds for each new running to avoid that they read the same source file.
 
             elif _isDone(process):
-                if not _hasSuccessfullyCompleted(simulationCase):
+                if not _hasSuccessfullyCompleted(assignedCase):
                     logger.warning("PARALLEL RUN HAS FAILED")
                     sys.exit(1)
 
                 if outputFile:
-                    #                        lines = "Finished simulated case %d\n"%(k,p.stdout.read(),p.stderr.read())
-
-                    lines = "Finished simulated case %d at %s\n" % (
-                        simulationCase.caseNumber,
-                        time.strftime("%H:%M:%S of day %d-%m-%y"),
+                    lines = (
+                        f"Finished simulated case {assignedCase.caseNumber:d} "
+                        f"at {time.strftime('%H:%M:%S of day %d-%m-%y')}\n"
                     )
-                    outfileRun = open(outputFile, "a")
-                    outfileRun.writelines(lines)
-                    outfileRun.close()
+                    with open(outputFile, "a") as outfileRun:
+                        outfileRun.writelines(lines)
 
                 if trackingFile:
                     with open(trackingFile, "r") as file:
@@ -196,7 +193,7 @@ def runParallel(
                 cpu.assignedCase = None
                 completedCommands.append(command)
 
-                logger.info("Runs completed: %s/%s" % (len(completedCommands), len(commands)))
+                logger.info("Runs completed: %s/%s", len(completedCommands), len(commands))
 
                 if len(completedCommands) % len(cpus) == 0 and len(completedCommands) != len(commands):
                     currentTime = time.time()
@@ -206,7 +203,7 @@ def runParallel(
                         "%H:%M on %d.%m.%Y"
                     )
                     logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                    logger.info("Predicted time of completion of all %s runs: %s" % (len(commands), endTimePrediction))
+                    logger.info("Predicted time of completion of all %s runs: %s", len(commands), endTimePrediction)
                     logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
                 if masterFile and (len(completedCommands) == len(commands)):
@@ -221,9 +218,9 @@ def runParallel(
                         masterBackup = masterOrig.split(".")[0] + "_BACKUP.csv"
                         try:
                             shutil.copyfile(masterFile, os.path.join(masterPath, masterBackup))
-                            logger.info("Updated " + masterBackup)
+                            logger.info("Updated %s", masterBackup)
                         except OSError:
-                            logger.error("Unable to generate BACKUP of " + masterFile)
+                            logger.error("Unable to generate BACKUP of %s", masterFile)
                         origDf = _pd.read_csv(masterFile, sep=";", index_col=0)
 
                         masterDf = _pd.concat([origDf, newDf])
@@ -233,9 +230,9 @@ def runParallel(
 
                     try:
                         masterDf.to_csv(masterFile, sep=";")
-                        logger.info("Updated " + masterFile)
+                        logger.info("Updated %s", masterFile)
                     except OSError:
-                        logger.error("Unable to write to " + masterFile)
+                        logger.error("Unable to write to %s", masterFile)
 
                 if commandsStillToBeRun:
                     nextCommand = commandsStillToBeRun.pop(0)
@@ -246,8 +243,8 @@ def runParallel(
         runningCases = [c.assignedCase for c in cpus if c.assignedCase]
         if not runningCases and not commandsStillToBeRun:
             break
-        else:
-            time.sleep(1)
+
+        time.sleep(1)
 
 
 def _hasSuccessfullyCompleted(simulationCase: _SimulationCase) -> bool:
@@ -262,17 +259,20 @@ def _hasSuccessfullyCompleted(simulationCase: _SimulationCase) -> bool:
         for line in errorList:
             logger.error(line.replace("\n", ""))
     else:
-        logger.info("Success: No fatal errors during execution of " + dckFileName)
-        logger.warning("Number of warnings during simulation: %s" % logTrnsys.checkWarnings())
+        logger.info("Success: No fatal errors during execution of %s", dckFileName)
+        logger.warning("Number of warnings during simulation: %s", logTrnsys.checkWarnings())
 
-    return simulationCase.returncode == 0
+    process = simulationCase.process
+    assert process
+
+    return process.returncode == 0
 
 
-def _getLogTrnsysAndDeckFileName(command: _cmd.Command) -> _tp.Tuple[_logt.LogTrnsys, str]:
+def _getLogTrnsysAndDeckFileName(command: _cmd.Command) -> _tp.Tuple[_logt.LogTrnsys, str]:  # type: ignore[name-defined]
     fullDckFilePath = command.truncatedDeckFilePath
     (logFilePath, dckFileName) = os.path.split(fullDckFilePath)
     logFileName = os.path.splitext(dckFileName)[0]
-    logInstance = _logt.LogTrnsys(logFilePath, logFileName)
+    logInstance = _logt.LogTrnsys(logFilePath, logFileName)  # type: ignore[attr-defined]
     return logInstance, dckFileName
 
 
