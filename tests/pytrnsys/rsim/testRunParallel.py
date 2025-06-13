@@ -22,7 +22,7 @@ class TestRunParallel:
         assert nCpusToUse >= 1
 
         trnsysExeFilePath = _th.getTrnExeFilePath()
-        flags = ("/N",)
+        flags = ["/N"]
         commands = [_cmd.Command(trnsysExeFilePath, p, flags) for p in dckFilePaths]
 
         outputFilePath = WORKING_DIR_PATH / "output.log"

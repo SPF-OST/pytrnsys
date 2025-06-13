@@ -117,7 +117,7 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
         cpu.assignedCase = simulationCase
         caseNumber += 1
 
-    assignedCommands = {c.assignedCase.command for c in cpus if c.assignedCase}
+    assignedCommands = [c.assignedCase.command for c in cpus if c.assignedCase]
     commandsStillToBeRun = [c for c in commands if c not in assignedCommands]
 
     completedCommands = []

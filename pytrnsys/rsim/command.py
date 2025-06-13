@@ -6,13 +6,13 @@ import typing as _tp
 import shortpath83 as _sp83
 
 
-@_dc.dataclass(frozen=True)
+@_dc.dataclass
 class Command:
     MAX_DECK_FILE_PATH_LENGTH: _tp.ClassVar[int] = 260
 
     trnsysExeFilePath: _pl.Path
     deckFilePath: _pl.Path
-    trnsysFlags: tuple[str]
+    trnsysFlags: _cabc.Sequence[str]
 
     @property
     def truncatedDeckFilePath(self) -> _pl.Path:

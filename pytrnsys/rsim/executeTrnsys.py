@@ -182,7 +182,7 @@ class ExecuteTrnsys:
             autoCloseOnlinePlotter=autoCloseOnlinePlotter,
         )
 
-        command = _cmd.Command(self.trnsysExePath, dckFilePath, (trnsysFlag,))
+        command = _cmd.Command(self.trnsysExePath, dckFilePath, [trnsysFlag])
 
         return command
 
