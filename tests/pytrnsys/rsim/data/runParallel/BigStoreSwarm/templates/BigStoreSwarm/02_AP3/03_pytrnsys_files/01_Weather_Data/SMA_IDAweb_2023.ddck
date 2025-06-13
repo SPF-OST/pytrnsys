@@ -1,0 +1,30 @@
+*******************************
+**BEGIN SMA_IDAweb_2023.ddck
+*******************************
+
+** Normal Building Simulation     
+** City Name = SMA 
+
+CONSTANTS 7     
+Lat = 47.38                    ! Latitude, �
+TambD = -7.80                  ! ambient design temperature of heating system - equal to minimum 4-day moving average value, �C
+TambAvg = 11.45                ! average outdoor temperature, �C
+dTambAmpl = 9.42651173971053   ! amplitude of outside temperature, K
+tTambShift = 552               ! Offset of outside air temperature minimum, h
+altid = 556                    ! elevation, meters above sealevel
+ddTcwOffset = 40               ! time shift of minimum cold water temperature, d (ACHTUNG: this value is wrong and need to be updated) 
+
+CONSTANTS 4
+formatWeatherData = 1          ! 1 = user format, 2 = Standard weather file in the TMY2 format
+unitWeatherData = 38
+unitWeatherData2 = 39
+unitWeatherData3 = 40
+
+ASSIGN PATH$\01_Weather_Data\SMA_IDAweb_2023.99 unitWeatherData
+ASSIGN PATH$\01_Weather_Data\SMA_IDAweb_2023.99 unitWeatherData2
+ASSIGN PATH$\01_Weather_Data\SMA_IDAweb_2023.99 unitWeatherData3
+
+
+*******************************
+**END SMA_IDAweb_2030.ddck
+*******************************

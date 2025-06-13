@@ -1,0 +1,54 @@
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+** EQUATIONS 1
+** elSysOut_Pu = ElPuTot                                                ! Electricity consumption pumps
+
+EQUATIONS 5
+*** Massflowrates
+MfrWtTp = -dhw_MfrDHWset                                             ! Output from dhw_MFH25.ddck
+MfrWtSp = dhw_MfrDHWset                                              ! Output from dhw_MFH25.ddck
+MfrPuFBH = MfrBuiRd                                                  ! Output from building.ddck
+xFracDevVal = NOT(HpForDHWIsNeeded)                                  ! Output from type888.ddck
+MfrPuAshp = hpIsOn*MfrPuHpPD                                         ! Output from type9771.ddck
+
+EQUATIONS 4
+PelSpecPu = 0.03                                                     ! [W/(kg/h)] Assumption: specific electricity consumption of a pump
+ElPuAshp = PelSpecPu * MfrPuAshp/1000                                ! [kW]
+ElPuFBH = PelSpecPu * MfrPuFBH/1000                                  ! [kW]
+ElPuTot = ElPuAshp + ElPuFBH 
+
+
+** EQUATIONS 1                                                          ! control of heat pump
+** hpIsOn = OR(HpForDHWIsNeeded,HpForSHIsNeeded)                        ! "HpForDHWIsNeeded" and "HpForSHIsNeeded" Outputs from Type 888 
+
+CONSTANTS 2
+T_set_MixValDHW=45
+T_set_MixValSH= tSet_MixSh                                          ! input from "ControlPvHp.ddck"
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TTesDHW_MixValDHW
+TTee_MixValDHW
+MMixValDHW_WtTp
+T_set_MixValDHW
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixValDHW
+EQUATIONS 1
+xFracMixValDHW =  1.-[441,5] 
+
+UNIT 442 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TTesSH_MixValSH
+TTee2_MixValSH
+MMixValSH_PuFBH
+T_set_MixValSH
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixValSH
+EQUATIONS 1
+xFracMixValSH =  1.-[442,5] 
+

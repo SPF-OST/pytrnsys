@@ -12,7 +12,7 @@ class Command:
 
     trnsysExeFilePath: _pl.Path
     deckFilePath: _pl.Path
-    trnsysFlags: _cabc.Sequence[str]
+    trnsysFlags: tuple[str]
 
     @property
     def truncatedDeckFilePath(self) -> _pl.Path:

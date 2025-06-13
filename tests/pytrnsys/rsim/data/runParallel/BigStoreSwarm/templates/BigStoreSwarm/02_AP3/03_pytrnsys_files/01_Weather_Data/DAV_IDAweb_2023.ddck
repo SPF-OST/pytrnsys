@@ -1,0 +1,36 @@
+*******************************
+**BEGIN DAV_IDAweb_2023.ddck
+*******************************
+
+** Normal Building Simulation     
+** City Name = DAV 
+
+CONSTANTS 6     
+Lat = 46.817      ! Latitude, �
+TambD = -11.29    ! ambient design temperature of heating system - equal to minimum 4-day moving average value, �C
+
+!============================================
+! Provided by Weather, CHECK THE OTHER VALUES
+TambAvg = 5.23    ! average outdoor temperature, �C
+dTambAmpl = 9.51  ! amplitude of outside temperature, K
+tTambShift = 574  ! Offset of outside air temperature minimum, h
+!============================================
+
+
+altid = 1594     ! elevation, meters above sealevel
+
+
+CONSTANTS 4
+formatWeatherData = 1! 1 = user format, 2 = Standard weather file in the TMY2 format
+unitWeatherData = 38
+unitWeatherData2 = 39
+unitWeatherData3 = 40
+
+ASSIGN PATH$\01_Weather_Data\DAV_IDAweb_2023.99 unitWeatherData
+ASSIGN PATH$\01_Weather_Data\DAV_IDAweb_2023.99 unitWeatherData2
+ASSIGN PATH$\01_Weather_Data\DAV_IDAweb_2023.99 unitWeatherData3
+
+
+*******************************
+**END SMA_IDAweb_2030.ddck
+*******************************
