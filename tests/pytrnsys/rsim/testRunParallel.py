@@ -9,6 +9,8 @@ import tests.helper as _th
 
 BIG_STORE_SWARM_DIR_PATH = _pl.Path(__file__).parent / "data" / "runParallel" / "BigStoreSwarm"
 
+WORKING_DIR_PATH = BIG_STORE_SWARM_DIR_PATH / "working-copy"
+
 
 class TestRunParallel:
     def testRunParallel(self) -> None:
@@ -22,7 +24,18 @@ class TestRunParallel:
         trnsysExeFilePath = _th.getTrnExeFilePath()
         flags = ("/N",)
         commands = [_cmd.Command(trnsysExeFilePath, p, flags) for p in dckFilePaths]
-        _rp.runParallel(commands, reduceCpu=nCpusNotUsed)
+
+        outputFilePath = WORKING_DIR_PATH / "output.log"
+        trackingFilePath = WORKING_DIR_PATH / "tracking.json"
+        masterFilePath = WORKING_DIR_PATH / "master.csv"
+
+        _rp.runParallel(
+            commands,
+            reduceCpu=nCpusNotUsed,
+            outputFile=str(outputFilePath),
+            trackingFile=str(trackingFilePath),
+            masterFile=str(masterFilePath),
+        )
 
     @staticmethod
     def _setupAndGetDckFilePaths() -> _cabc.Sequence[_pl.Path]:
@@ -31,15 +44,14 @@ class TestRunParallel:
 
         templateDirPath = BIG_STORE_SWARM_DIR_PATH / "templates"
 
-        workingCopyDirPath = BIG_STORE_SWARM_DIR_PATH / "working-copy"
-        resultsDirPath = workingCopyDirPath / relativeResultsDirPath
-        projectDirPath = workingCopyDirPath / relativeBigStoreSwarmDirPath
+        resultsDirPath = WORKING_DIR_PATH / relativeResultsDirPath
+        projectDirPath = WORKING_DIR_PATH / relativeBigStoreSwarmDirPath
 
-        if workingCopyDirPath.is_dir():
-            _su.rmtree(workingCopyDirPath)
+        if WORKING_DIR_PATH.is_dir():
+            _su.rmtree(WORKING_DIR_PATH)
             _time.sleep(1)
 
-        _su.copytree(templateDirPath, workingCopyDirPath)
+        _su.copytree(templateDirPath, WORKING_DIR_PATH)
 
         ciProjectDirPathString = r"C:\actions-runner-simulations\_work\BigStoreSwarm\BigStoreSwarm"
         projectDirPathString = str(projectDirPath)
