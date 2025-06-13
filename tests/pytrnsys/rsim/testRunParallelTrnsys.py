@@ -12,6 +12,8 @@ import pytrnsys.utils.result as _res
 
 TEST_DIR_PATH = _pl.Path(__file__).parent
 
+DATA_DIR_PATH = TEST_DIR_PATH / "data" / "runParallelTrnsys"
+
 
 def _getPytrnsysSourceDirPath() -> _pl.Path:
     pytrnsysModuleSourceFilePathAsString = _is.getsourcefile(_pt)
@@ -56,7 +58,7 @@ class TestCase:
 
     @property
     def inputDirPath(self) -> _pl.Path:
-        return TEST_DIR_PATH / "data" / self.name / "input"
+        return DATA_DIR_PATH / self.name / "input"
 
     @property
     def pytrnsysFilesDirPath(self) -> _pl.Path:
@@ -64,7 +66,7 @@ class TestCase:
 
     @property
     def expectedDirPath(self) -> _pl.Path:
-        return TEST_DIR_PATH / "data" / self.name / "expected"
+        return DATA_DIR_PATH / self.name / "expected"
 
 
 def getTestCases() -> _cabc.Iterable[TestCase]:

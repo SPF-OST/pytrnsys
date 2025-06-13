@@ -1,0 +1,44 @@
+** ZONE view factor matrix
+1   !Treppenhaus
+0
+
+2   !UG
+0
+
+3   !EG_Ost_Klein
+0
+
+4   !EG_West_Klein
+0
+
+5   !EG_Ost
+0
+
+6   !EG_West
+0
+
+7   !1OG_Ost_Klein
+0
+
+8   !1OG_West_Klein
+0
+
+9   !1OG_Ost
+0
+
+10   !1OG_West
+0
+
+11   !2OG_Ost_Klein
+0
+
+12   !2OG_West_Klein
+0
+
+13   !2OG_Ost
+0
+
+14   !2OG_West
+0
+
+** POINT source view factor vector (GAIN or COMFORT)
