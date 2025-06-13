@@ -6,7 +6,7 @@ import typing as _tp
 import shortpath83 as _sp83
 
 
-@_dc.dataclass
+@_dc.dataclass(frozen=True)
 class Command:
     MAX_DECK_FILE_PATH_LENGTH: _tp.ClassVar[int] = 260
 
