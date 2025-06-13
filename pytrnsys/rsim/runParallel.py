@@ -1,6 +1,8 @@
 # pylint: skip-file
 # type: ignore
 
+import collections.abc as _cabc
+import dataclasses as _dc
 import datetime
 import json
 import logging
@@ -9,7 +11,6 @@ import shutil
 import subprocess as _sp
 import sys
 import time
-import collections.abc as _cabc
 
 import pandas as _pd
 
@@ -40,11 +41,24 @@ def getNumberOfCPU():
     return num
 
 
+@_dc.dataclass
+class _SimulationCase:
+    caseNumber: int
+    command: _cmd.Command
+    process: _sp.Popen | None
+
+
+@_dc.dataclass
+class _Cpu:
+    id: int
+    assignedCase: _SimulationCase | None = None
+
+
 def runParallel(
     commands: _cabc.Sequence[_cmd.Command],
     reduceCpu=0,
     outputFile=False,
-    estimedCPUTime=0.33,
+    estimatedCPUTime=0.33,
     delayTime=10,
     trackingFile=None,
     masterFile=None,
@@ -57,18 +71,15 @@ def runParallel(
     It also creates multiple files at the start of the simulation.
     """
     logDict = {}
-    if trackingFile != None:
+    if trackingFile:
         with open(trackingFile, "w") as file:
             json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
 
     maxNumberOfCPU = max(min(getNumberOfCPU() - reduceCpu, len(commands)), 1)
 
-    cP = {}
+    cpus = [_Cpu(i + 1) for i in range(maxNumberOfCPU)]
 
-    for i in range(maxNumberOfCPU):
-        cP["cpu" + str(i + 1)] = {"cpu": i + 1, "process": []}
-
-    if outputFile != False:
+    if outputFile:
         lines = ""
         line = "============PARALLEL PROCESSING STARTED==============\n"
         lines = lines + line
@@ -77,8 +88,8 @@ def runParallel(
         line = "Number of CPU used =%d\n" % maxNumberOfCPU
         lines = lines + line
         line = "Estimated time =%f hours, assuming :%f hour per simulation\n" % (
-            len(commands) * estimedCPUTime / (maxNumberOfCPU * 1.0),
-            estimedCPUTime,
+            len(commands) * estimatedCPUTime / (maxNumberOfCPU * 1.0),
+            estimatedCPUTime,
         )
         lines = lines + line
         line = "============CASES TO BE SIMULATED====================\n"
@@ -100,220 +111,170 @@ def runParallel(
     if not commands:
         return
 
-    openCmds = list(commands)
+    caseNumber = 1
+    for cpu, command in zip(commands, strict=False):
+        simulationCase = _SimulationCase(caseNumber, command)
+        cpu.assignedCase = simulationCase
+        caseNumber += 1
 
-    finishedCmds = []
+    assignedCommands = {c.assignedCommand for c in cpus if c.assignedCommand}
+    commandsStillToBeRun = [c for c in commands if c not in assignedCommands]
 
-    caseNr = 1
+    completedCommands = []
 
-    activeP = [0] * maxNumberOfCPU
-
-    for core in cP.keys():
-        cP[core]["cmd"] = openCmds.pop(0)
-        cP[core]["case"] = caseNr
-        caseNr += 1
-
-    def done(p):
-        return p.poll() is not None
-
-    def success(p):
-        fullDckFilePath = p.args.split(" ")[-2]
-        (logFilePath, dckFileName) = os.path.split(fullDckFilePath)
-        logFileName = os.path.splitext(dckFileName)[0]
-        logInstance = _logt.LogTrnsys(logFilePath, logFileName)
-
-        if logInstance.logFatalErrors():
-            logger.error("======================================")
-            logger.error(dckFileName)
-            logger.error("======================================")
-            errorList = logInstance.logFatalErrors()
-            for line in errorList:
-                logger.error(line.replace("\n", ""))
-        else:
-            logger.info("Success: No fatal errors during execution of " + dckFileName)
-            logger.warning("Number of warnings during simulation: %s" % logInstance.checkWarnings())
-
-        return p.returncode == 0
-
-    def fail():
-        logger.warning("PARALLEL RUN HAS FAILED")
-        sys.exit(1)
-
-    processes = []
-
-    if len(processes) > maxNumberOfCPU:
-        logger.warning("You are triying tu run %d processes and only have %d CPU\n" % (len(processes), maxNumberOfCPU))
-
-    #    while True:
-
-    #        cpu = 1
-
-    ###############
-    # alternative code:
-    #        while openCmds:
-
-    running = True
     startTime = time.time()
 
-    while running:
-        for core in cP.keys():
-            p = cP[core]["process"]
-            # start processes:
-            cmd: _cmd.Command = cP[core].get("cmd")
-            if not p and cmd:
-                dckName = cmd.deckFilePath.name
-                if trackingFile != None:
+    while True:
+        for cpu in cpus:
+            simulationCase = cpu.assignedCase
+
+            if not simulationCase:
+                continue
+
+            command = simulationCase.command
+            process = simulationCase.process
+
+            dckName = command.deckFilePath.name
+
+            if not process:
+
+                if trackingFile:
                     with open(trackingFile, "r") as file:
                         logDict = json.load(file)
                     logDict[dckName] = [time.strftime("%Y-%m-%d_%H:%M:%S")]
                     with open(trackingFile, "w") as file:
                         json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
 
-                logger.info("Command: %s", cmd)
-                cP[core]["process"] = _sp.Popen(cmd.args, stdout=_sp.PIPE, stderr=_sp.PIPE, shell=True, cwd=cmd.cwd)
-
-                activeP[cP[core]["cpu"] - 1] = 1
+                logger.info("Command: %s", command)
+                simulationCase.process = _sp.Popen(
+                    command.args, stdout=_sp.PIPE, stderr=_sp.PIPE, shell=True, cwd=command.cwd
+                )
 
                 time.sleep(
                     delayTime
                 )  # we delay 5 seconds for each new running to avoid that they read the same source file.
 
-            # if process is finished, assign new command:
+            elif _isDone(process):
+                if not _hasSuccessfullyCompleted(simulationCase):
+                    logger.warning("PARALLEL RUN HAS FAILED")
+                    sys.exit(1)
 
-            if p:
-                if done(p):
-                    if success(p):
-                        if outputFile != False:
-                            #                        lines = "Finished simulated case %d\n"%(k,p.stdout.read(),p.stderr.read())
+                if outputFile:
+                    #                        lines = "Finished simulated case %d\n"%(k,p.stdout.read(),p.stderr.read())
 
-                            lines = "Finished simulated case %d at %s\n" % (
-                                cP[core]["case"],
-                                time.strftime("%H:%M:%S of day %d-%m-%y"),
-                            )
-                            outfileRun = open(outputFile, "a")
-                            outfileRun.writelines(lines)
-                            outfileRun.close()
+                    lines = "Finished simulated case %d at %s\n" % (
+                        simulationCase.caseNumber,
+                        time.strftime("%H:%M:%S of day %d-%m-%y"),
+                    )
+                    outfileRun = open(outputFile, "a")
+                    outfileRun.writelines(lines)
+                    outfileRun.close()
 
-                        if trackingFile != None:
-                            dckName = p.args.split("\\")[-1].split(" ")[0]
-                            with open(trackingFile, "r") as file:
-                                logDict = json.load(file)
-                            logDict[dckName].append(time.strftime("%Y-%m-%d_%H:%M:%S"))
+                if trackingFile:
+                    with open(trackingFile, "r") as file:
+                        logDict = json.load(file)
+                    logDict[dckName].append(time.strftime("%Y-%m-%d_%H:%M:%S"))
 
-                            fullDckFilePath = p.args.split(" ")[-2]
-                            (logFilePath, dckFileName) = os.path.split(fullDckFilePath)
-                            logFileName = os.path.splitext(dckFileName)[0]
-                            logInstance = _logt.LogTrnsys(logFilePath, logFileName)
+                    logTrnsys, _ = _getLogTrnsysAndDeckFileName(command)
 
-                            if logInstance.logFatalErrors():
-                                logDict[dckName].append("fatal error")
-                            else:
-                                logDict[dckName].append("success")
-
-                            simulationHours = logInstance.checkSimulatedHours()
-                            if len(simulationHours) == 2:
-                                logDict[dckName].append(simulationHours[0])
-                                logDict[dckName].append(simulationHours[1])
-                            elif len(simulationHours) == 1:
-                                logDict[dckName].append(simulationHours[0])
-                                logDict[dckName].append(None)
-
-                            with open(trackingFile, "w") as file:
-                                json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
-
-                        # empty process:
-                        cP[core]["process"] = []
-                        finishedCmds.append(cP[core]["cmd"])
-                        del cP[core]["cmd"]
-                        del cP[core]["case"]
-
-                        activeP[cP[core]["cpu"] - 1] = 0
-
-                        logger.info("Runs completed: %s/%s" % (len(finishedCmds), len(commands)))
-
-                        if len(finishedCmds) % len(cP) == 0 and len(finishedCmds) != len(commands):
-                            currentTime = time.time()
-                            timeSoFarSec = currentTime - startTime
-                            totalTimePredictionSec = timeSoFarSec * len(commands) / len(finishedCmds)
-                            endTimePrediction = datetime.datetime.fromtimestamp(
-                                startTime + totalTimePredictionSec
-                            ).strftime("%H:%M on %d.%m.%Y")
-                            logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                            logger.info(
-                                "Predicted time of completion of all %s runs: %s" % (len(commands), endTimePrediction)
-                            )
-                            logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-
-                        if masterFile != None and (len(finishedCmds) == len(commands)):
-                            newDf = _pd.DataFrame.from_dict(
-                                logDict,
-                                orient="index",
-                                columns=["started", "finished", "outcome", "hour start", "hour end"],
-                            )
-
-                            if os.path.isfile(masterFile):
-                                masterPath, masterOrig = os.path.split(masterFile)
-                                masterBackup = masterOrig.split(".")[0] + "_BACKUP.csv"
-                                try:
-                                    shutil.copyfile(masterFile, os.path.join(masterPath, masterBackup))
-                                    logger.info("Updated " + masterBackup)
-                                except:
-                                    logger.error("Unable to generate BACKUP of " + masterFile)
-                                origDf = _pd.read_csv(masterFile, sep=";", index_col=0)
-
-                                masterDf = _pd.concat([origDf, newDf])
-                                masterDf = masterDf[~masterDf.index.duplicated(keep="last")]
-                            else:
-                                masterDf = newDf
-
-                            try:
-                                masterDf.to_csv(masterFile, sep=";")
-                                logger.info("Updated " + masterFile)
-                            except:
-                                logger.error("Unable to write to " + masterFile)
-
-                        # assign new command if there are open commands:
-
-                        if openCmds:
-                            cP[core]["cmd"] = openCmds.pop(0)
-                            cP[core]["case"] = caseNr
-                            caseNr += 1
-                            activeP[cP[core]["cpu"] - 1] = 1
-
+                    if logTrnsys.logFatalErrors():
+                        logDict[dckName].append("fatal error")
                     else:
-                        fail()
+                        logDict[dckName].append("success")
 
-        if all(process == 0 for process in activeP) and not openCmds:
-            #        if not processes and not newCmds:
+                    simulationHours = logTrnsys.checkSimulatedHours()
+                    if len(simulationHours) == 2:
+                        logDict[dckName].append(simulationHours[0])
+                        logDict[dckName].append(simulationHours[1])
+                    elif len(simulationHours) == 1:
+                        logDict[dckName].append(simulationHours[0])
+                        logDict[dckName].append(None)
+
+                    with open(trackingFile, "w") as file:
+                        json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
+
+                cpu.assignedCase = None
+                completedCommands.append(command)
+
+                logger.info("Runs completed: %s/%s" % (len(completedCommands), len(commands)))
+
+                if len(completedCommands) % len(cpus) == 0 and len(completedCommands) != len(commands):
+                    currentTime = time.time()
+                    timeSoFarSec = currentTime - startTime
+                    totalTimePredictionSec = timeSoFarSec * len(commands) / len(completedCommands)
+                    endTimePrediction = datetime.datetime.fromtimestamp(startTime + totalTimePredictionSec).strftime(
+                        "%H:%M on %d.%m.%Y"
+                    )
+                    logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                    logger.info("Predicted time of completion of all %s runs: %s" % (len(commands), endTimePrediction))
+                    logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+                if masterFile and (len(completedCommands) == len(commands)):
+                    newDf = _pd.DataFrame.from_dict(
+                        logDict,
+                        orient="index",
+                        columns=["started", "finished", "outcome", "hour start", "hour end"],
+                    )
+
+                    if os.path.isfile(masterFile):
+                        masterPath, masterOrig = os.path.split(masterFile)
+                        masterBackup = masterOrig.split(".")[0] + "_BACKUP.csv"
+                        try:
+                            shutil.copyfile(masterFile, os.path.join(masterPath, masterBackup))
+                            logger.info("Updated " + masterBackup)
+                        except OSError:
+                            logger.error("Unable to generate BACKUP of " + masterFile)
+                        origDf = _pd.read_csv(masterFile, sep=";", index_col=0)
+
+                        masterDf = _pd.concat([origDf, newDf])
+                        masterDf = masterDf[~masterDf.index.duplicated(keep="last")]
+                    else:
+                        masterDf = newDf
+
+                    try:
+                        masterDf.to_csv(masterFile, sep=";")
+                        logger.info("Updated " + masterFile)
+                    except OSError:
+                        logger.error("Unable to write to " + masterFile)
+
+                if commandsStillToBeRun:
+                    nextCommand = commandsStillToBeRun.pop(0)
+                    simulationCase = _SimulationCase(caseNumber, nextCommand)
+                    cpu.assignedCase = simulationCase
+                    caseNumber += 1
+
+        runningCases = [c.assignedCase for c in cpus if c.assignedCase]
+        if not runningCases and not commandsStillToBeRun:
             break
         else:
-            time.sleep(0.05)
+            time.sleep(1)
 
 
-def sortCommandList(cmds, keyWord):
-    """
-    function to put all commands that contain a keyWord string on top of a command list, so they will be evaluated first.
+def _hasSuccessfullyCompleted(simulationCase: _SimulationCase) -> bool:
+    command = simulationCase.command
+    logTrnsys, dckFileName = _getLogTrnsysAndDeckFileName(command)
 
-    Parameters
-    ----------
-    cmds : list of strings
-        includes all commands to be evaluated
+    if logTrnsys.logFatalErrors():
+        logger.error("======================================")
+        logger.error(dckFileName)
+        logger.error("======================================")
+        errorList = logTrnsys.logFatalErrors()
+        for line in errorList:
+            logger.error(line.replace("\n", ""))
+    else:
+        logger.info("Success: No fatal errors during execution of " + dckFileName)
+        logger.warning("Number of warnings during simulation: %s" % logTrnsys.checkWarnings())
 
-    keyWord : string
-        acts as filter; commmands including this string will be evaluated first
+    return simulationCase.returncode == 0
 
-    Returns
-    -------
-    cmdsNew : list of strings
-        all commands to be evaluated in new order
-    """
 
-    cmdsNew = []
+def _getLogTrnsysAndDeckFileName(command: _cmd.Command) -> _tp.Tuple[_logt.LogTrnsys, str]:
+    fullDckFilePath = command.truncatedDeckFilePath
+    (logFilePath, dckFileName) = os.path.split(fullDckFilePath)
+    logFileName = os.path.splitext(dckFileName)[0]
+    logInstance = _logt.LogTrnsys(logFilePath, logFileName)
+    return logInstance, dckFileName
 
-    for line in cmds:
-        if keyWord in line:
-            cmdsNew.insert(0, line)
-        else:
-            cmdsNew.append(line)
 
-    return cmdsNew
+def _isDone(process: _sp.Popen) -> bool:
+    return process.poll() is not None
