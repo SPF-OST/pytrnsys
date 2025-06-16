@@ -7,9 +7,9 @@ import pytrnsys.rsim.command as _cmd
 import pytrnsys.rsim.runParallel as _rp
 import tests.helper as _th
 
-BIG_STORE_SWARM_DIR_PATH = _pl.Path(__file__).parent / "data" / "runParallel" / "BigStoreSwarm"
+ICEGRID_DIR_PATH = _pl.Path(__file__).parent / "data" / "runParallel" / "icegrid"
 
-WORKING_DIR_PATH = BIG_STORE_SWARM_DIR_PATH / "working-copy"
+WORKING_DIR_PATH = ICEGRID_DIR_PATH / "working-copy"
 
 
 class TestRunParallel:
@@ -39,13 +39,13 @@ class TestRunParallel:
 
     @staticmethod
     def _setupAndGetDckFilePaths() -> _cabc.Sequence[_pl.Path]:
-        relativeBigStoreSwarmDirPath = _pl.Path("BigStoreSwarm")
-        relativeResultsDirPath = relativeBigStoreSwarmDirPath / "02_AP3" / "03_pytrnsys_files" / "results"
+        relativeIcegridDirPath = _pl.Path("icegrid")
+        relativeResultsDirPath = relativeIcegridDirPath / "results"
 
-        templateDirPath = BIG_STORE_SWARM_DIR_PATH / "templates"
+        templateDirPath = ICEGRID_DIR_PATH / "templates"
 
         resultsDirPath = WORKING_DIR_PATH / relativeResultsDirPath
-        projectDirPath = WORKING_DIR_PATH / relativeBigStoreSwarmDirPath
+        projectDirPath = WORKING_DIR_PATH / relativeIcegridDirPath
 
         if WORKING_DIR_PATH.is_dir():
             _su.rmtree(WORKING_DIR_PATH)
@@ -53,7 +53,7 @@ class TestRunParallel:
 
         _su.copytree(templateDirPath, WORKING_DIR_PATH)
 
-        ciProjectDirPathString = r"C:\actions-runner-simulations\_work\BigStoreSwarm\BigStoreSwarm"
+        ciProjectDirPathString = r"C:\actions-runner-simulations\_work\icegrid\icegrid"
         projectDirPathString = str(projectDirPath)
 
         dckFilePaths = [p / f"{p.name}.dck" for p in resultsDirPath.iterdir()]

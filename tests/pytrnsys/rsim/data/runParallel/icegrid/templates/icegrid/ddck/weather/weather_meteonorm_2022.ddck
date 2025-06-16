@@ -1,0 +1,80 @@
+*************************************
+** BEGIN weather_sam.ddck
+*************************************
+
+
+CONSTANTS 1
+unitReadWeather = 23
+
+ASSIGN ..\ddck\weather\Meteonorm_2022-hour.csv unitReadWeather !From meteonorm TMY3
+
+UNIT 6 TYPE 15	 Type15-2
+PARAMETERS 9
+7		! 1 File Type
+unitReadWeather		! 2 Logical unit
+3		! 3 Tilted Surface Radiation Mode
+0.2		! 4 Ground reflectance - no snow
+0.7		! 5 Ground reflectance - snow cover
+1		! 6 Number of surfaces
+3		! 7 Tracking mode
+0.0		! 8 Slope of surface
+0		! 9 Azimuth of surface 
+
+EQUATIONS 10
+tAmb = [6,1] 		    ! Type15-2:Dry bulb temperature ->Left axis variable-1
+RHa_TMY2 = [6,7] 		! Type15-2:Percent relative humidity ->Left axis variable-2
+SolZen_TMY2 = [6,16] 	! Type15-2:Solar Zenith_Angle
+SolAzi_TMY2 = [6,17] 	! Type15-2:Solar AzimuthAngle
+IT_H = [6,18] 		    ! Type15-2:Total horizontal radiation ->Left axis variable-3
+Gbh_TMY2 = [6,19] 		! Type15-2:Horizontal beam radiation ->Left axis variable-4
+AoIh_TMY2 = [6,23] 		! Type15-2:Angle of incidence for horizontal ->Left axis variable-5
+Gtsurf_TMY2 = [6,24] 	! Type15-2:Total tilted surface radiation for surface ->Left axis variable-6
+Gbsurf_TMY2 = [6,25] 	! Type15-2:Beam radiation for surface ->Left axis variable-7
+AoIsurf_TMY2 = [6,29] 	! Type15-2:Angle of incidence for surface ->Left axis variable-8
+
+
+UNIT 3 TYPE 65	 Type65c
+PARAMETERS 12
+5		! 1 Nb. of left-axis variables
+5		! 2 Nb. of right-axis variables
+0.0		! 3 Left axis minimum
+3600		! 4 Left axis maximum
+0.0		! 5 Right axis minimum
+3600		! 6 Right axis maximum
+nPlotsPerSim		! 7 Number of plots per simulation
+12		! 8 X-axis gridpoints
+0		! 9 Shut off Online w/o removing
+-1		! 10 Logical Unit for output file
+0		! 11 Output file units
+0		! 12 Output file delimiter
+INPUTS 10
+tAmb
+RHa_TMY2
+SolZen_TMY2
+SolAzi_TMY2
+IT_H
+Gbh_TMY2
+AoIh_TMY2
+Gtsurf_TMY2
+Gbsurf_TMY2
+AoIsurf_TMY2
+*** INITIAL INPUT VALUES
+tAmb
+RHa_TMY2
+SolZen_TMY2
+SolAzi_TMY2
+IT_H
+Gbh_TMY2
+AoIh_TMY2
+Gtsurf_TMY2
+Gbsurf_TMY2
+AoIsurf_TMY2
+LABELS  3
+"-"
+"-"
+"Weather"
+
+
+*************************************
+** END weather_sam.ddck
+************************************* 
