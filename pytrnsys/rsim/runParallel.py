@@ -65,10 +65,6 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
 ) -> None:
     """Exec commands in parallel in multiple process
     (as much as we have CPU)
-
-    The delay time is used to prevent multiple instances of trnsys trying to access the files at the same time.
-    This is especially problematic with type 56, which not only reads several files.
-    It also creates multiple files at the start of the simulation.
     """
     logDict = dict[str, list[_tp.Any]]()
     if trackingFile:
