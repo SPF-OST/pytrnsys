@@ -60,7 +60,6 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
     reduceCpu=0,
     outputFile=False,
     estimatedCPUTime=0.33,
-    delayTime=10,
     trackingFile=None,
     masterFile=None,
 ) -> None:
