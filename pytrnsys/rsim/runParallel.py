@@ -147,12 +147,8 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
 
                 logger.info("Command: %s", command)
                 assignedCase.process = _sp.Popen(  # pylint: disable=consider-using-with
-                    command.args, stdout=_sp.PIPE, stderr=_sp.PIPE, shell=True, cwd=command.cwd
+                    command.args, stdout=_sp.PIPE, stderr=_sp.PIPE, cwd=command.cwd
                 )
-
-                time.sleep(
-                    delayTime
-                )  # we delay 5 seconds for each new running to avoid that they read the same source file.
 
             elif _isDone(process):
                 if not _hasSuccessfullyCompleted(assignedCase):

@@ -7,7 +7,17 @@ import pytrnsys.rsim.command as _cmd
 import pytrnsys.rsim.runParallel as _rp
 import tests.helper as _th
 
-ICEGRID_DIR_PATH = _pl.Path(__file__).parent / "data" / "runParallel" / "icegrid"
+ICEGRID_DIR_PATH = (
+    _pl.Path(__file__).parent
+    / "data"
+    / "runParallel"
+    / "icegrid"
+    / (
+        "folderNameWhichIs247CharactersLooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+        "oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+        "ooooooooooooooooooooooooong"
+    )
+)
 
 WORKING_DIR_PATH = ICEGRID_DIR_PATH / "working-copy"
 

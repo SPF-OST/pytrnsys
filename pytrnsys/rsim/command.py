@@ -14,11 +14,18 @@ class Command:
     deckFilePath: _pl.Path
     trnsysFlags: _cabc.Sequence[str]
 
+    def __post_init__(self) -> None:
+        if not self.deckFilePath.is_absolute():
+            raise ValueError("Deck file path must be absolute.", self.deckFilePath)
+
     @property
     def truncatedDeckFilePath(self) -> _pl.Path:
+        # For more details see here:
+        # https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry#enable-long-paths-in-windows-10-version-1607-and-later
+        drive = self.deckFilePath.drive
         deckFilePathString = str(self.deckFilePath)
+        pathLength = len(deckFilePathString) - len(drive)
 
-        pathLength = len(deckFilePathString)
         if pathLength < self.MAX_DECK_FILE_PATH_LENGTH:
             return self.deckFilePath
 
@@ -34,4 +41,4 @@ class Command:
 
     @property
     def cwd(self) -> _pl.Path:
-        return self.deckFilePath.parent
+        return self.truncatedDeckFilePath.parent
