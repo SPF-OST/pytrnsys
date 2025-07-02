@@ -248,9 +248,9 @@ def _renameTruncatedLogFilePath(command):
         _su.move(truncatedLogFilePath, fullLogFilePath)
 
 
-def _createLogTrnsys(command: _cmd.Command) -> _logt.LogTrnsys:
+def _createLogTrnsys(command: _cmd.Command) -> _logt.LogTrnsys:  # type: ignore[name-defined]
     containingDirPathAsString = str(command.logFilePath.parent)
-    logTrnsys = _logt.LogTrnsys(containingDirPathAsString, command.logFilePath.stem)
+    logTrnsys = _logt.LogTrnsys(containingDirPathAsString, command.logFilePath.stem)  # type: ignore[attr-defined]
     return logTrnsys
 
 
