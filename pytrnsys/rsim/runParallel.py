@@ -2,14 +2,14 @@
 
 import collections.abc as _cabc
 import dataclasses as _dc
-import datetime
-import json
-import logging
-import os
-import shutil
+import datetime as _dt
+import json as _json
+import logging as _log
+import os as _os
+import shutil as _su
 import subprocess as _sp
-import sys
-import time
+import sys as _sys
+import time as _time
 import typing as _tp
 
 import pandas as _pd
@@ -17,25 +17,25 @@ import pandas as _pd
 import pytrnsys.rsim.command as _cmd
 import pytrnsys.trnsys_util.LogTrnsys as _logt
 
-logger = logging.getLogger("root")
+logger = _log.getLogger("root")
 
 
 def getNumberOfCPU():
     """Returns the number of CPUs in the system"""
     num = 1
-    if sys.platform == "win32":
+    if _sys.platform == "win32":
         try:
-            num = int(os.environ["NUMBER_OF_PROCESSORS"])
+            num = int(_os.environ["NUMBER_OF_PROCESSORS"])
         except (ValueError, KeyError):
             pass
-    elif sys.platform == "darwin":
+    elif _sys.platform == "darwin":
         try:
-            num = int(os.popen("sysctl -n hw.ncpu").read())
+            num = int(_os.popen("sysctl -n hw.ncpu").read())
         except ValueError:
             pass
     else:
         try:
-            num = os.sysconf("SC_NPROCESSORS_ONLN")
+            num = _os.sysconf("SC_NPROCESSORS_ONLN")
         except (ValueError, OSError, AttributeError):
             pass
 
@@ -69,7 +69,7 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
     logDict = dict[str, list[_tp.Any]]()
     if trackingFile:
         with open(trackingFile, "w") as file:
-            json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
+            _json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
 
     maxNumberOfCPU = max(min(getNumberOfCPU() - reduceCpu, len(commands)), 1)
 
@@ -117,7 +117,7 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
 
     completedCommands = []
 
-    startTime = time.time()
+    startTime = _time.time()
 
     while True:  # pylint: disable=too-many-nested-blocks
         for cpu in cpus:
@@ -135,10 +135,10 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
 
                 if trackingFile:
                     with open(trackingFile, "r") as file:
-                        logDict = json.load(file)
-                    logDict[dckName] = [time.strftime("%Y-%m-%d_%H:%M:%S")]
+                        logDict = _json.load(file)
+                    logDict[dckName] = [_time.strftime("%Y-%m-%d_%H:%M:%S")]
                     with open(trackingFile, "w") as file:
-                        json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
+                        _json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
 
                 logger.info("Command: %s", command)
                 assignedCase.process = _sp.Popen(  # pylint: disable=consider-using-with
@@ -146,24 +146,26 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
                 )
 
             elif _isDone(process):
+                _renameTruncatedLogFilePath(command)
+
                 if not _hasSuccessfullyCompleted(assignedCase):
                     logger.warning("PARALLEL RUN HAS FAILED")
-                    sys.exit(1)
+                    _sys.exit(1)
 
                 if outputFile:
                     lines = (
                         f"Finished simulated case {assignedCase.caseNumber:d} "
-                        f"at {time.strftime('%H:%M:%S of day %d-%m-%y')}\n"
+                        f"at {_time.strftime('%H:%M:%S of day %d-%m-%y')}\n"
                     )
                     with open(outputFile, "a") as outfileRun:
                         outfileRun.writelines(lines)
 
                 if trackingFile:
                     with open(trackingFile, "r") as file:
-                        logDict = json.load(file)
-                    logDict[dckName].append(time.strftime("%Y-%m-%d_%H:%M:%S"))
+                        logDict = _json.load(file)
+                    logDict[dckName].append(_time.strftime("%Y-%m-%d_%H:%M:%S"))
 
-                    logTrnsys, _ = _getLogTrnsysAndDeckFileName(command)
+                    logTrnsys = _createLogTrnsys(command)
 
                     if logTrnsys.logFatalErrors():
                         logDict[dckName].append("fatal error")
@@ -179,7 +181,7 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
                         logDict[dckName].append(None)
 
                     with open(trackingFile, "w") as file:
-                        json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
+                        _json.dump(logDict, file, indent=2, separators=(",", ": "), sort_keys=True)
 
                 cpu.assignedCase = None
                 completedCommands.append(command)
@@ -187,10 +189,10 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
                 logger.info("Runs completed: %s/%s", len(completedCommands), len(commands))
 
                 if len(completedCommands) % len(cpus) == 0 and len(completedCommands) != len(commands):
-                    currentTime = time.time()
+                    currentTime = _time.time()
                     timeSoFarSec = currentTime - startTime
                     totalTimePredictionSec = timeSoFarSec * len(commands) / len(completedCommands)
-                    endTimePrediction = datetime.datetime.fromtimestamp(startTime + totalTimePredictionSec).strftime(
+                    endTimePrediction = _dt.datetime.fromtimestamp(startTime + totalTimePredictionSec).strftime(
                         "%H:%M on %d.%m.%Y"
                     )
                     logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -204,11 +206,11 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
                         columns=["started", "finished", "outcome", "hour start", "hour end"],
                     )
 
-                    if os.path.isfile(masterFile):
-                        masterPath, masterOrig = os.path.split(masterFile)
+                    if _os.path.isfile(masterFile):
+                        masterPath, masterOrig = _os.path.split(masterFile)
                         masterBackup = masterOrig.split(".")[0] + "_BACKUP.csv"
                         try:
-                            shutil.copyfile(masterFile, os.path.join(masterPath, masterBackup))
+                            _su.copyfile(masterFile, _os.path.join(masterPath, masterBackup))
                             logger.info("Updated %s", masterBackup)
                         except OSError:
                             logger.error("Unable to generate BACKUP of %s", masterFile)
@@ -235,13 +237,28 @@ def runParallel(  # pylint: disable=too-many-locals,too-many-branches,too-many-s
         if not runningCases and not commandsStillToBeRun:
             break
 
-        time.sleep(1)
+        _time.sleep(1)
+
+
+def _renameTruncatedLogFilePath(command):
+    truncatedLogFilePath = command.truncatedLogFilePath
+    fullLogFilePath = command.logFilePath
+    if not fullLogFilePath.exists():
+        assert truncatedLogFilePath.exists()
+        _su.move(truncatedLogFilePath, fullLogFilePath)
+
+
+def _createLogTrnsys(command: _cmd.Command) -> _logt.LogTrnsys:  # type: ignore[name-defined]
+    containingDirPathAsString = str(command.logFilePath.parent)
+    logTrnsys = _logt.LogTrnsys(containingDirPathAsString, command.logFilePath.stem)  # type: ignore[attr-defined]
+    return logTrnsys
 
 
 def _hasSuccessfullyCompleted(simulationCase: _SimulationCase) -> bool:
     command = simulationCase.command
-    logTrnsys, dckFileName = _getLogTrnsysAndDeckFileName(command)
+    dckFileName = command.deckFilePath.name
 
+    logTrnsys = _createLogTrnsys(command)
     if logTrnsys.logFatalErrors():
         logger.error("======================================")
         logger.error(dckFileName)
@@ -257,14 +274,6 @@ def _hasSuccessfullyCompleted(simulationCase: _SimulationCase) -> bool:
     assert process
 
     return process.returncode == 0
-
-
-def _getLogTrnsysAndDeckFileName(command: _cmd.Command) -> _tp.Tuple[_logt.LogTrnsys, str]:  # type: ignore[name-defined]
-    fullDckFilePath = command.truncatedDeckFilePath
-    (logFilePath, dckFileName) = os.path.split(fullDckFilePath)
-    logFileName = os.path.splitext(dckFileName)[0]
-    logInstance = _logt.LogTrnsys(logFilePath, logFileName)  # type: ignore[attr-defined]
-    return logInstance, dckFileName
 
 
 def _isDone(process: _sp.Popen) -> bool:

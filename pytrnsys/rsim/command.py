@@ -24,6 +24,10 @@ class Command:
             raise ValueError("Deck file path must be absolute.", self.deckFilePath)
 
     @property
+    def logFilePath(self) -> _pl.Path:
+        return self.deckFilePath.with_suffix(".log")
+
+    @property
     def truncatedDeckFilePath(self) -> _pl.Path:
         # For more details see here:
         # https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry#enable-long-paths-in-windows-10-version-1607-and-later
@@ -38,6 +42,10 @@ class Command:
         truncatedDeckFilePathString = _sp83.get_short_path_name(deckFilePathString)
         truncatedDeckFilePath = _pl.Path(truncatedDeckFilePathString)
         return truncatedDeckFilePath
+
+    @property
+    def truncatedLogFilePath(self) -> _pl.Path:
+        return self.truncatedDeckFilePath.with_suffix(".log")
 
     @property
     def args(self) -> _cabc.Sequence[str | _pl.Path]:
