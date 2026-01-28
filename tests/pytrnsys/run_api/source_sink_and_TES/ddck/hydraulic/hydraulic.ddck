@@ -1,0 +1,307 @@
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+
+*************************************
+** Outputs to energy balance in kWh
+
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+
+*************************************
+
+
+
+
+EQUATIONS 4
+*** Black box component temperatures
+TQSrcH=TQSrc
+THtStInH=THtStIn
+THtStOutH=THtStOut
+TQSnkH=TQSnk
+
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
+UNIT 450 TYPE 9352
+PARAMETERS 68
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
+16
+12 6 0 8       !1 : QSrc
+7 0 0 5        !2 : HtStIn
+8 0 0 5        !3 : HtStOut
+11 13 8 2      !4 : Tee
+16 6 7 2       !5 : Tee2
+1 5 0 0        !6 : QSrc_Tee2
+5 2 0 0        !7 : Tee2_HtSt
+3 4 0 0        !8 : HtSt_Tee
+11 12 0 8      !9 : Pump
+15 13 0 8      !10 : Pump2
+4 9 0 0        !11 : Tee_Pump
+9 1 0 0        !12 : Pump_QSrc
+10 4 0 0       !13 : Pump2_Tee
+16 15 0 8      !14 : QSnk
+14 10 0 0      !15 : QSnk_Pump2
+5 14 0 0       !16 : Tee2_QSnk
+INPUTS 16! for Type 9351
+MfrQSrc 0,0 0,0 0,0 0,0 0,0 0,0 0,0 MfrPump MfrPump2 
+0,0 0,0 0,0 MfrQSnk 0,0 0,0 
+*** Initial Inputs
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 
+
+EQUATIONS 32	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MQSrc_A=[450,1]
+MQSrc_B=[450,2]
+MHtStIn_A=[450,4]
+MHtStOut_A=[450,7]
+MTee_A=[450,10]
+MTee_B=[450,11]
+MTee_C=[450,12]
+MTee2_A=[450,13]
+MTee2_B=[450,14]
+MTee2_C=[450,15]
+MQSrc_Tee2_A=[450,16]
+MQSrc_Tee2_B=[450,17]
+MTee2_HtSt_A=[450,19]
+MTee2_HtSt_B=[450,20]
+MHtSt_Tee_A=[450,22]
+MHtSt_Tee_B=[450,23]
+MPump_A=[450,25]
+MPump_B=[450,26]
+MPump2_A=[450,28]
+MPump2_B=[450,29]
+MTee_Pump_A=[450,31]
+MTee_Pump_B=[450,32]
+MPump_QSrc_A=[450,34]
+MPump_QSrc_B=[450,35]
+MPump2_Tee_A=[450,37]
+MPump2_Tee_B=[450,38]
+MQSnk_A=[450,40]
+MQSnk_B=[450,41]
+MQSnk_Pump2_A=[450,43]
+MQSnk_Pump2_B=[450,44]
+MTee2_QSnk_A=[450,46]
+MTee2_QSnk_B=[450,47]
+
+
+** Fluids:
+EQUATIONS 4
+** brine
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+** water
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+
+** Hydraulic loops
+EQUATIONS 2
+** loop3
+Lloop3Rho = FwaterRho
+Lloop3Cp = FwaterCp
+
+
+! Tee
+UNIT 451 TYPE 929
+INPUTS 6
+MTee_A
+MTee_B
+MTee_C
+TTee_Pump
+TPump2_Tee
+THtSt_Tee
+***
+0
+0
+0
+20.0
+20.0
+20.0
+EQUATIONS 1
+TTee = [451,1]
+
+! Tee2
+UNIT 452 TYPE 929
+INPUTS 6
+MTee2_A
+MTee2_B
+MTee2_C
+TTee2_QSnk
+TQSrc_Tee2
+TTee2_HtSt
+***
+0
+0
+0
+20.0
+20.0
+20.0
+EQUATIONS 1
+TTee2 = [452,1]
+
+UNIT 453 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MQSrc_Tee2_A TQSrcH TTee2
+***
+0 spTIni spTIni
+EQUATIONS 2
+TQSrc_Tee2 = [453,1]
+MQSrc_Tee2 = MQSrc_Tee2_A
+
+UNIT 454 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MTee2_HtSt_A TTee2 THtStInH
+***
+0 spTIni spTIni
+EQUATIONS 2
+TTee2_HtSt = [454,1]
+MTee2_HtSt = MTee2_HtSt_A
+
+UNIT 455 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MHtSt_Tee_A THtStOutH TTee
+***
+0 spTIni spTIni
+EQUATIONS 2
+THtSt_Tee = [455,1]
+MHtSt_Tee = MHtSt_Tee_A
+
+UNIT 456 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump_A TTee_Pump TPump_QSrc
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPump = [456,1]
+MPump = MPump_A
+
+UNIT 457 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump2_A TQSnk_Pump2 TPump2_Tee
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPump2 = [457,1]
+MPump2 = MPump2_A
+
+UNIT 458 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MTee_Pump_A TTee TPump
+***
+0 spTIni spTIni
+EQUATIONS 2
+TTee_Pump = [458,1]
+MTee_Pump = MTee_Pump_A
+
+UNIT 459 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump_QSrc_A TPump TQSrcH
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPump_QSrc = [459,1]
+MPump_QSrc = MPump_QSrc_A
+
+UNIT 460 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump2_Tee_A TPump2 TTee
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPump2_Tee = [460,1]
+MPump2_Tee = MPump2_Tee_A
+
+UNIT 461 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MQSnk_Pump2_A TQSnkH TPump2
+***
+0 spTIni spTIni
+EQUATIONS 2
+TQSnk_Pump2 = [461,1]
+MQSnk_Pump2 = MQSnk_Pump2_A
+
+UNIT 462 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MTee2_QSnk_A TTee2 TQSnkH
+***
+0 spTIni spTIni
+EQUATIONS 2
+TTee2_QSnk = [462,1]
+MTee2_QSnk = MTee2_QSnk_A
+
+ASSIGN source_sink_and_TES_Mfr.prt 463
+
+UNIT 463 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+463! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 8
+MQSrc_Tee2 MTee2_HtSt MHtSt_Tee MTee_Pump MPump_QSrc MPump2_Tee MQSnk_Pump2 MTee2_QSnk
+
+***
+MQSrc_Tee2 MTee2_HtSt MHtSt_Tee MTee_Pump MPump_QSrc MPump2_Tee MQSnk_Pump2 MTee2_QSnk
+
+
+ASSIGN source_sink_and_TES_T.prt 464
+
+UNIT 464 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+464! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 8
+TQSrc_Tee2 TTee2_HtSt THtSt_Tee TTee_Pump TPump_QSrc TPump2_Tee TQSnk_Pump2 TTee2_QSnk
+
+***
+TQSrc_Tee2 TTee2_HtSt THtSt_Tee TTee_Pump TPump_QSrc TPump2_Tee TQSnk_Pump2 TTee2_QSnk
+
+

@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     runTool = runTrnsys.RunParallelTrnsys(pathBase, nameDeck)
 
-    runTool.readConfig(pathBase, "expected_files/run.config")
+    runTool.readConfig(pathBase, "run.config")
     runTool.getConfig()
     runTool.runConfig()
     runTool.runParallel()

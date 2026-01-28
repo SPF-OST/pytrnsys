@@ -1,4 +1,4 @@
-from pytrnsys.run_api.config_api import PytrnsysConfiguration, save_config_file
+from pytrnsys.run_api import PytrnsysConfiguration, save_config_file
 
 
 def dummies_only_config() -> PytrnsysConfiguration:
@@ -12,8 +12,8 @@ def dummies_only_config() -> PytrnsysConfiguration:
     config.variables.replace_variable_value("dtSim", 1)
 
     ddck_alias = "DDCK$"
-    config.paths.add_path_alias(ddck_alias, "../../simulations/source_sink_and_TES/ddck")
-    config.paths.path_to_connection_info = "../../simulations/source_sink_and_TES/DdckPlaceHolderValues.json"
+    config.paths.add_path_alias(ddck_alias, "../source_sink_and_TES/ddck")
+    config.paths.path_to_connection_info = "../source_sink_and_TES/DdckPlaceHolderValues.json"
     config.paths.results_folder = "results"
 
     config.ddcks.add_ddck(ddck_alias, "hydraulic/hydraulic", is_global=True, label="hydraulic")

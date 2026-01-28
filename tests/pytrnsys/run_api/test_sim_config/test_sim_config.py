@@ -1,7 +1,7 @@
 import pathlib as _pl
 import unittest as _ut
 
-from pytrnsys.run_api.config_api import PytrnsysConfiguration, save_config_file
+from pytrnsys.run_api import PytrnsysConfiguration, save_config_file
 
 # TODO: adjust to be used directly in pytrnsys.run_api
 

@@ -1,0 +1,38 @@
+{
+    "HtSt": {
+        "InIn": {
+            "@cp": "Lloop3Cp",
+            "@mfr": "MHtStIn_A",
+            "@rho": "Lloop3Rho",
+            "@temp": "TTee2_HtSt"
+        },
+        "OutOut": {
+            "@revtemp": "THtSt_Tee",
+            "@temp": "THtStOut"
+        }
+    },
+    "QSnk": {
+        "In": {
+            "@cp": "Lloop3Cp",
+            "@mfr": "MQSnk_A",
+            "@rho": "Lloop3Rho",
+            "@temp": "TTee2_QSnk"
+        },
+        "Out": {
+            "@revtemp": "TQSnk_Pump2",
+            "@temp": "TQSnk"
+        }
+    },
+    "QSrc": {
+        "In": {
+            "@cp": "Lloop3Cp",
+            "@mfr": "MQSrc_A",
+            "@rho": "Lloop3Rho",
+            "@temp": "TPump_QSrc"
+        },
+        "Out": {
+            "@revtemp": "TQSrc_Tee2",
+            "@temp": "TQSrc"
+        }
+    }
+}
