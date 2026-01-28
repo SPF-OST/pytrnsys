@@ -50,8 +50,7 @@ class TestDummies:
         expected_dck_file = EXPECTED_FILES_DIR / "run.dck"
 
         # Replace this when integrated with pytrnsys.
-        pytrnsys_version = _pl.Path("C:/pytrnsys_versions/pytrnsys-gui-master-gui_3d40b5b-pytrnsys_6dbe3fb-2025-09-18T10_35_54+00_00/pytrnsys.bat")
-        error = run_pytrnsys(pytrnsys_version, run_py_path)
+        error = run_pytrnsys(CONFIG_FILE_PATH)
 
         compare_txt_files(dck_file, expected_dck_file)
 

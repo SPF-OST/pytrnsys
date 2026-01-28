@@ -1,2 +1,4 @@
 run.config
 *.dat
+runLogFile.config
+UnitsType.info
