@@ -20,7 +20,7 @@ import numpy as _np
 
 # TODO: add documentation everywhere.  # pylint: disable=fixme
 
-
+@_dc.dataclass
 class PlotterControl:
     """
     Control flags for the online plotter.
@@ -36,14 +36,15 @@ class PlotterControl:
         Online plotters as well as the progress bar window are suppressed during the simulations, which corresponds to
         the TRNSYS hidden mode.
     """
-    ignore_online_plotter: bool = True
-    auto_close_online_plotter: bool = True
-    remove_pop_up_window: bool = False
+    ignore_online_plotter: bool = _dc.field(default=True)
+    auto_close_online_plotter: bool = _dc.field(default=True)
+    remove_pop_up_window: bool = _dc.field(default=False)
     # TODO: implement remove_pop_up_window  # pylint: disable=fixme
 
 
+@_dc.dataclass
 class Variables:
-    _variables_to_change: dict = {}
+    _variables_to_change: dict = _dc.field(default_factory=dict)
 
     def replace_variable_value(self, variable: str, value: float | str) -> None:
         """
@@ -61,12 +62,13 @@ class Variables:
         self._variables_to_change[variable] = value
 
 
+@_dc.dataclass
 class Ddcks:
     # TODO: provide set_global as an input?  # pylint: disable=fixme
-    _assign: dict = {}
-    _ddcks: dict = {}
-    head_ddck: str = "DDCK$ generic/head global"
-    end_ddck: str = "DDCK$ generic/end"
+    _assign: dict = _dc.field(default_factory=dict)
+    _ddcks: dict = _dc.field(default_factory=dict)
+    head_ddck: str = _dc.field(default="DDCK$ generic/head global")
+    end_ddck: str = _dc.field(default="DDCK$ generic/end")
 
     def add_assign(self, prt_file_path: str, unit_variable: str) -> None:
         # TODO: error handling / warnings  # pylint: disable=fixme
@@ -132,6 +134,7 @@ class Ddcks:
         self.add_ddck(folder_alias, ddck_path, component_name, is_global, label)
 
 
+@_dc.dataclass
 class Paths:
     """
     Settings for the required paths:
@@ -153,12 +156,15 @@ class Paths:
         The default alias for the ddck folder is "DDCK$"
 
     """
-    ddck_folder: str = "ddck"
-    path_to_connection_info: str = "./DdckPlaceHolderValues.json"
-    project_path: str = "."
-    trnsys_exe_path: str = "C:/Trnsys18/Exe/TRNExe.exe"
-    known_aliases: dict[str, str] = {"DDCK$": ddck_folder}
-    results_folder: None | str = None
+    ddck_folder: str = _dc.field(default="ddck")
+    path_to_connection_info: str = _dc.field(default="./DdckPlaceHolderValues.json")
+    project_path: str = _dc.field(default=".")
+    trnsys_exe_path: str = _dc.field(default="C:/Trnsys18/Exe/TRNExe.exe")
+    known_aliases: dict[str, str] = _dc.field(default_factory=dict)
+    results_folder: None | str = _dc.field(default=None)
+
+    def __post_init__(self):
+        self.known_aliases = {"DDCK$": self.ddck_folder}
 
     def add_path_alias(self, alias: str, path: str) -> None:
         # TODO: error handling for $ requirement.  # pylint: disable=fixme
@@ -167,6 +173,7 @@ class Paths:
         self.known_aliases[alias] = path
 
 
+@_dc.dataclass
 class Generic:
     """
     General settings to control pytrnsys behavior.
@@ -195,16 +202,16 @@ class Generic:
 
     """
 
-    def __init__(self) -> None:
-        self.leave_n_cpus_available: int = 4
-        self.parse_file_created: bool = False
-        self.run_cases: bool = True
-        self.check_dck: bool = True
-        self.output_level: _tp.Literal["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"] = "INFO"
-        self.base_name_for_dcks: None | str = None
-        self.run_mode: _tp.Literal["runFromConfig", "runFromCases", "runFromFolder"] = "runFromConfig"
+    leave_n_cpus_available: int = _dc.field(default=4)
+    parse_file_created: bool = _dc.field(default=False)
+    run_cases: bool = _dc.field(default=True)
+    check_dck: bool = _dc.field(default=True)
+    output_level: _tp.Literal["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"] = _dc.field(default="INFO")
+    base_name_for_dcks: None | str = _dc.field(default=None)
+    run_mode: _tp.Literal["runFromConfig", "runFromCases", "runFromFolder"] = _dc.field(default="runFromConfig")
 
 
+@_dc.dataclass
 class AutomaticWork:
     """
     Settings for automatic work.
@@ -220,23 +227,24 @@ class AutomaticWork:
         the energy balance variables.
 
     """
-    do_auto_unit_numbering: bool = True
-    generate_unit_types_used: bool = True
-    add_automatic_energy_balance: bool = True
+    do_auto_unit_numbering: bool = _dc.field(default=True)
+    generate_unit_types_used: bool = _dc.field(default=True)
+    add_automatic_energy_balance: bool = _dc.field(default=True)
 
 
+@_dc.dataclass
 class Scaling:
     """
     # TODO: add docstring
     """
 
-    def __init__(self) -> None:
-        self.scaling: _tp.Literal["False", "toDemand"] = "False"
-        self.scale_hp: None | str = None
-        self.scaling_variable: None | str = None
-        self.scaling_reference: None | str = None
+    scaling: _tp.Literal["False", "toDemand"] = _dc.field(default="False")
+    scale_hp: None | str = _dc.field(default=None)
+    scaling_variable: None | str = _dc.field(default=None)
+    scaling_reference: None | str = _dc.field(default=None)
 
 
+@_dc.dataclass
 class Tracking:
     """
     Paths and flags related to tracking parametric simulations.
@@ -261,10 +269,11 @@ class Tracking:
         the csv-file to be created.
         'master_file = ".../[name].csv"'
     """
-    tracking_file: str | None = None
-    master_file: str | None = None
+    tracking_file: str | None = _dc.field(default=None)
+    master_file: str | None = _dc.field(default=None)
 
 
+@_dc.dataclass
 class ParametricVariations:
     # TODO: investigate random variations  # pylint: disable=fixme
     """
@@ -275,9 +284,9 @@ class ParametricVariations:
         amount of simulations executed will be (m x n). If it is set to False, the amount of values of all variations
         has to be equal, and they are combined according to their order.
     """
-    combine_all_cases: bool = False
-    _variations: dict = {}
-    _ddck_file_variations: dict = {}
+    combine_all_cases: bool = _dc.field(default=False)
+    _variations: dict = _dc.field(default_factory=dict)
+    _ddck_file_variations: dict = _dc.field(default_factory=dict)
 
     def add_variation(self, variation_name: str, trnsys_variable: str, values: list[float | str]) -> None:
         """
@@ -317,14 +326,14 @@ class PytrnsysConfiguration:  # pylint: disable=too-many-instance-attributes
     Settings for a pytrnsys configuration.
     The subclasses explain their functionality.
     """
-    plotter: PlotterControl = PlotterControl()
-    paths: Paths = Paths()
-    automatic_work: AutomaticWork = AutomaticWork()
-    generic: Generic = Generic()
-    scaling: Scaling = Scaling()
-    variables: Variables = Variables()
-    ddcks: Ddcks = Ddcks()
-    variations: ParametricVariations = ParametricVariations()
+    plotter: PlotterControl = _dc.field(default_factory=PlotterControl)
+    paths: Paths = _dc.field(default_factory=Paths)
+    automatic_work: AutomaticWork = _dc.field(default_factory=AutomaticWork)
+    generic: Generic = _dc.field(default_factory=Generic)
+    scaling: Scaling = _dc.field(default_factory=Scaling)
+    variables: Variables = _dc.field(default_factory=Variables)
+    ddcks: Ddcks = _dc.field(default_factory=Ddcks)
+    variations: ParametricVariations = _dc.field(default_factory=ParametricVariations)
 
 
 class ConfigurationConverter:
