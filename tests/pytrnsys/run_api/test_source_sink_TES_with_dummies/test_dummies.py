@@ -5,7 +5,7 @@ import pytest as _pt
 
 from pytrnsys.run_api import save_config_file, run_pytrnsys
 from ..dummies_only_config import dummies_only_config
-from pytrnsys.run_api.dck_runner import compare_prt_files
+from pytrnsys.run_api.dck_runner import compare_prt_files  # type: ignore[attr-defined]
 
 # TODO: test created dck, if config equal.
 # TODO: test simulation results, if dck equal.

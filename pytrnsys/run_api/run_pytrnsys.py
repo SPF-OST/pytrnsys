@@ -12,7 +12,7 @@ def run_pytrnsys(config_file_path: _pl.Path):
     nameDeck = "run"
     pathBase = _os.getcwd()
 
-    runTool = runTrnsys.RunParallelTrnsys(pathBase, nameDeck)
+    runTool = runTrnsys.RunParallelTrnsys(pathBase, nameDeck)  # type: ignore[attr-defined]
 
     runTool.readConfig(pathBase, str(config_file_path))
     runTool.getConfig()

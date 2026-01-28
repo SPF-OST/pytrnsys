@@ -41,7 +41,7 @@ class PlotterControl:
 
 
 class Variables:
-    _variables_to_change = {}
+    _variables_to_change: dict = {}
 
     def replace_variable_value(self, variable: str, value: float | str) -> None:
         """
@@ -102,7 +102,7 @@ class Ddcks:
         if is_global:
             ddck_line += " global"
         if not label:
-            label = len(self._ddcks.keys())
+            label = len(self._ddcks.keys())  # type: ignore[assignment]
 
         self._ddcks[label] = ddck_line
 
@@ -193,14 +193,14 @@ class Generic:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.leave_n_cpus_available: int = 4
         self.parse_file_created: bool = False
         self.run_cases: bool = True
         self.check_dck: bool = True
-        self.output_level: _tp.LiteralString["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"] = "INFO"
+        self.output_level: _tp.Literal["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"] = "INFO"
         self.base_name_for_dcks: None | str = None
-        self.run_mode: _tp.LiteralString["runFromConfig", "runFromCases", "runFromFolder"] = "runFromConfig"
+        self.run_mode: _tp.Literal["runFromConfig", "runFromCases", "runFromFolder"] = "runFromConfig"
 
 
 class AutomaticWork:
@@ -227,7 +227,7 @@ class Scaling:
     # TODO: add docstring
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.scaling: _tp.Literal["False", "toDemand"] = "False"
         self.scale_hp: None | str = None
         self.scaling_variable: None | str = None
@@ -244,7 +244,7 @@ class Tracking:
         this entry will be overwritten accordingly. Like this one can keep track of which simulations were aborted
         (for whatever reason) after having been launched. To activate this functionality you need to specify the full
         path of the json-file to be created.
-        'trackingFile = "...\[name].json"'
+        'trackingFile = ".../[name].json"'
 
 
     master_file:
@@ -256,7 +256,7 @@ class Tracking:
         then simply launch the same parametric study again and the “master-file” will ensure that no unnecessary
         repetitions of simualtions are executed. To activate this functionality you need to specify the full path of
         the csv-file to be created.
-        'master_file = "...\[name].csv"'
+        'master_file = ".../[name].csv"'
     """
     tracking_file: str | None = None
     master_file: str | None = None
@@ -425,15 +425,16 @@ class ConfigurationConverter:
         return lines
 
     def _tracking_lines(self, tracking: Tracking) -> list[str]:
-        lines = [
+        lines: list[str] = []
+        if tracking.tracking_file is not None:
             self._add_string_line("trackingFile", tracking.tracking_file),
+        if tracking.master_file is not None:
             self._add_string_line("masterFile", tracking.master_file),
-        ]
 
         return lines
 
     def _variation_lines(self, variations: ParametricVariations) -> list[str]:
-        lines = []
+        lines: list[str] = []
         nr_of_variations = len(variations._variations.keys())
         if nr_of_variations == 0 and len(variations._ddck_file_variations.keys()) == 0:
             return lines

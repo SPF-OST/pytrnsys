@@ -1,3 +1,5 @@
+# type: ignore
+
 import enum as _en
 import os as _os
 import pandas as _pd
