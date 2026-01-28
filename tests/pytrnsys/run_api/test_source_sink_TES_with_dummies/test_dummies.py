@@ -81,7 +81,3 @@ class TestDummies:
                                     file_type="timestep", massflow_solver=True)
         if errors:
             raise ExceptionGroup(f'Found {len(errors)} issues:', errors)
-
-
-if __name__ == "__main__":
-    TestDummies().test_dck_equivalent()
