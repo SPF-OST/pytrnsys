@@ -73,7 +73,6 @@ class Ddcks:
         #       - unit_variable already declared <- indicates duplication issue.
         self._assign[unit_variable] = prt_file_path
 
-    # pylint: disable=too-many-positional-arguments
     def add_ddck(self, folder_alias: str, ddck_path: str, component_name: None | str = None, is_global: bool = False,
                  label: str | None = None) -> None:
         """
@@ -110,7 +109,7 @@ class Ddcks:
         self._ddcks[label] = ddck_line
 
     def replace_ddck(self, label: str, folder_alias: str, ddck_path: str, component_name: None | str = None,
-                     is_global: bool = False) -> None:  # pylint: disable=too-many-positional-arguments
+                     is_global: bool = False) -> None:
         # TODO: inconsistent usage of 'folder_alias' and 'path_alias'.  # pylint: disable=fixme
         """
         Replaces a previously declared ddck using the provided label in the 'add_ddck' method.
