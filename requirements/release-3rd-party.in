@@ -7,3 +7,8 @@ bokeh
 dataclasses-jsonschema
 lark
 shortpath83
+
+# Provided for Deck Tests
+pytest
+pytest-cov
+pytest-html
