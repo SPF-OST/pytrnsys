@@ -1,5 +1,6 @@
 # pylint: disable=invalid-name
 
+import os as _os
 import pathlib as _pl
 import unittest as _ut
 
@@ -7,7 +8,7 @@ import pytest as _pt
 from pytrnsys.run_api import save_config_file, run_pytrnsys
 from pytrnsys.run_api.dck_runner import compare_prt_files  # type: ignore[attr-defined]
 
-from ..dummies_only_config import dummies_only_config
+from tests.pytrnsys.run_api.dummies_only_config import dummies_only_config
 
 
 # TODO: test created dck, if config equal.  # pylint: disable=fixme
@@ -50,17 +51,24 @@ class TestDummies:
     def test_dck_equivalent(self):
         dck_file = RESULTS_DIR / "run.dck"
         expected_dck_file = EXPECTED_FILES_DIR / "run.dck"
+        overall_dir = _os.getcwd()
+        _os.chdir(CURRENT_DIR)
 
-        # Replace this when integrated with pytrnsys.
+        errors = []
         error = run_pytrnsys(CONFIG_FILE_PATH)
+        if error is not None:
+            errors.append(error)
+        _os.chdir(overall_dir)
 
-        compare_txt_files(dck_file, expected_dck_file)
+        try:
+            compare_txt_files(dck_file, expected_dck_file)
+        except Exception as e:
+            errors.append(e)
 
-        # This error relates to running the dck.
         # TODO: run separately inside of other test?  # pylint: disable=fixme
         #       Currently, the next test can be rerun by itself to plot the differences.
-        if error is not None:
-            raise error
+        if errors:
+            raise ExceptionGroup(f"Found {len(errors)} issues: ", errors)
 
     def test_simulation_results(self):
         mfr_prt_name = "source_sink_and_TES_Mfr.prt"
@@ -73,3 +81,7 @@ class TestDummies:
                                     file_type="timestep", massflow_solver=True)
         if errors:
             raise ExceptionGroup(f'Found {len(errors)} issues:', errors)
+
+
+if __name__ == "__main__":
+    TestDummies().test_dck_equivalent()
