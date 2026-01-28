@@ -1,1 +1,1 @@
-# pylint: disable=invalid-name
+# pylint: skip-file
