@@ -1,9 +1,10 @@
+# pylint: disable=invalid-name
+
 import pathlib as _pl
 import unittest as _ut
 
 from pytrnsys.run_api import PytrnsysConfiguration, save_config_file
 
-# TODO: adjust to be used directly in pytrnsys.run_api
 
 class TestSimplestConfig(_ut.TestCase):
     def setUp(self):
@@ -60,14 +61,13 @@ class TestSimplestConfig(_ut.TestCase):
         save_config_file(config, config_file_path)
 
         expected_config_file_path = current_dir / "expected_files" / "run.config"
-        with open(expected_config_file_path, "r") as f1:
+        with open(expected_config_file_path, "r", encoding="cp1252") as f1:
             expected_lines = f1.readlines()
 
-        with open(config_file_path, "r") as f2:
+        with open(config_file_path, "r", encoding="cp1252") as f2:
             actual_lines = f2.readlines()
 
         _ut.TestCase().assertListEqual(actual_lines, expected_lines)
 
-# TODO: run config
-# TODO: test error handling for combine_all_cases = False
-# TODO: test error handling for replace_ddck labels.
+# TODO: test error handling for combine_all_cases = False  # pylint: disable=fixme
+# TODO: test error handling for replace_ddck labels.  # pylint: disable=fixme

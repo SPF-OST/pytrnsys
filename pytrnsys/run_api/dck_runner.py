@@ -1,13 +1,16 @@
 # type: ignore
+# pylint: disable=all
 
 import enum as _en
 import os as _os
-import pandas as _pd
 import pathlib as _pl
 import subprocess as _sp
-import unittest as _ut
-import matplotlib.pyplot as _plt
 import typing as _tp
+import unittest as _ut
+
+import matplotlib.pyplot as _plt
+import pandas as _pd
+
 
 # TODO: allow online plotter from test interface.
 # TODO: allow correct naming of files: _hr, _step, _mo

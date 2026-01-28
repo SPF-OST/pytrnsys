@@ -1,21 +1,24 @@
+# pylint: disable=invalid-name
+
 import pathlib as _pl
 import unittest as _ut
 
 import pytest as _pt
-
 from pytrnsys.run_api import save_config_file, run_pytrnsys
-from ..dummies_only_config import dummies_only_config
 from pytrnsys.run_api.dck_runner import compare_prt_files  # type: ignore[attr-defined]
 
-# TODO: test created dck, if config equal.
-# TODO: test simulation results, if dck equal.
+from ..dummies_only_config import dummies_only_config
+
+
+# TODO: test created dck, if config equal.  # pylint: disable=fixme
+# TODO: test simulation results, if dck equal.  # pylint: disable=fixme
 
 
 def compare_txt_files(config_file_path, expected_config_file_path):
-    __tracebackhide__ = True
-    with open(expected_config_file_path, "r") as f1:
+    __tracebackhide__ = True  # pylint: disable=unused-variable
+    with open(expected_config_file_path, "r", encoding="cp1252") as f1:
         expected_lines = f1.readlines()
-    with open(config_file_path, "r") as f2:
+    with open(config_file_path, "r", encoding="cp1252") as f2:
         actual_lines = f2.readlines()
     case = _ut.TestCase()
     case.maxDiff = None
@@ -46,7 +49,6 @@ class TestDummies:
 
     def test_dck_equivalent(self):
         dck_file = RESULTS_DIR / "run.dck"
-        run_py_path = CURRENT_DIR / "run.py"
         expected_dck_file = EXPECTED_FILES_DIR / "run.dck"
 
         # Replace this when integrated with pytrnsys.
@@ -55,13 +57,12 @@ class TestDummies:
         compare_txt_files(dck_file, expected_dck_file)
 
         # This error relates to running the dck.
-        # TODO: run separately inside of other test?
+        # TODO: run separately inside of other test?  # pylint: disable=fixme
         #       Currently, the next test can be rerun by itself to plot the differences.
-        if error:
+        if error is not None:
             raise error
 
     def test_simulation_results(self):
-        show_differences = False  # Manual flag to plot the differences.
         mfr_prt_name = "source_sink_and_TES_Mfr.prt"
         temperature_prt_name = RESULTS_DIR / "source_sink_and_TES_T.prt"
 
@@ -72,8 +73,3 @@ class TestDummies:
                                     file_type="timestep", massflow_solver=True)
         if errors:
             raise ExceptionGroup(f'Found {len(errors)} issues:', errors)
-
-
-# TODO: run config
-# TODO: test error handling for combine_all_cases = False
-# TODO: test error handling for replace_ddck labels.

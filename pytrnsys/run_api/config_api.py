@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 """
 To add new functionality.
 - Find the right subclass, or create a new subclass
@@ -16,7 +18,7 @@ import typing as _tp
 import numpy as _np
 
 
-# TODO: add documentation everywhere.
+# TODO: add documentation everywhere.  # pylint: disable=fixme
 
 
 class PlotterControl:
@@ -37,7 +39,7 @@ class PlotterControl:
     ignore_online_plotter: bool = True
     auto_close_online_plotter: bool = True
     remove_pop_up_window: bool = False
-    # TODO: implement remove_pop_up_window
+    # TODO: implement remove_pop_up_window  # pylint: disable=fixme
 
 
 class Variables:
@@ -60,14 +62,14 @@ class Variables:
 
 
 class Ddcks:
-    # TODO: provide set_global as an input?
+    # TODO: provide set_global as an input?  # pylint: disable=fixme
     _assign: dict = {}
     _ddcks: dict = {}
     head_ddck: str = "DDCK$ generic/head global"
     end_ddck: str = "DDCK$ generic/end"
 
     def add_assign(self, prt_file_path: str, unit_variable: str) -> None:
-        # TODO: error handling / warnings
+        # TODO: error handling / warnings  # pylint: disable=fixme
         #       - unit_variable already declared <- indicates duplication issue.
         self._assign[unit_variable] = prt_file_path
 
@@ -108,7 +110,7 @@ class Ddcks:
 
     def replace_ddck(self, label: str, folder_alias: str, ddck_path: str, component_name: None | str = None,
                      is_global: bool = False) -> None:
-        # TODO: inconsistent usage of 'folder_alias' and 'path_alias'.
+        # TODO: inconsistent usage of 'folder_alias' and 'path_alias'.  # pylint: disable=fixme
         """
         Replaces a previously declared ddck using the provided label in the 'add_ddck' method.
 
@@ -124,7 +126,7 @@ class Ddcks:
         is_global:
             TBD
         """
-        if label not in self._ddcks.keys():
+        if label not in self._ddcks:
             raise ValueError(f"Supplied label not found: {label}")
 
         self.add_ddck(folder_alias, ddck_path, component_name, is_global, label)
@@ -159,7 +161,7 @@ class Paths:
     results_folder: None | str = None
 
     def add_path_alias(self, alias: str, path: str) -> None:
-        # TODO: error handling for $ requirement.
+        # TODO: error handling for $ requirement.  # pylint: disable=fixme
         if "$" not in alias:
             alias += "$"
         self.known_aliases[alias] = path
@@ -214,7 +216,8 @@ class AutomaticWork:
         Generates a file that lists all types used in the simulation.
 
     add_automatic_energy_balance:
-        Automatically adds energy balance equations and printers, based on the naming scheme for the energy balance variables.
+        Automatically adds energy balance equations and printers, based on the naming scheme for
+        the energy balance variables.
 
     """
     do_auto_unit_numbering: bool = True
@@ -263,7 +266,7 @@ class Tracking:
 
 
 class ParametricVariations:
-    # TODO: investigate random variations
+    # TODO: investigate random variations  # pylint: disable=fixme
     """
     Methods and flags related to parametric variations.
     combine_all_cases: bool
@@ -339,9 +342,6 @@ class ConfigurationConverter:
 
     @staticmethod
     def _generic_header() -> list[str]:
-        # TODO: does this "add" anything?
-        # TODO: private methods
-        #
         return ["############# GENERIC #############################"]
 
     @staticmethod
@@ -420,7 +420,7 @@ class ConfigurationConverter:
             lines.append(self._add_string_line("scalingVariable", scaling.scaling_variable))
             lines.append(self._add_string_line("scalingReference", scaling.scaling_reference))
 
-        # TODO: add warning if only one of "scaling_variable" or "scaling_reference" is given.
+        # TODO: add warning if only one of "scaling_variable" or "scaling_reference" is given.  # pylint: disable=fixme
 
         return lines
 
@@ -481,13 +481,12 @@ class ConfigurationConverter:
         return lines
 
     def save_config_file(self, config: PytrnsysConfiguration, path: _pl.Path) -> None:
-        # TODO: make list of headers and Subclasses and automatically run through them.
         lines = self._gather_lines(config)
 
-        # TODO: write to file
         self._write_config_file(lines, path)
 
     def _gather_lines(self, config: PytrnsysConfiguration) -> list[str]:
+        # TODO: make list of headers and Subclasses and automatically run through them.    # pylint: disable=fixme
         lines = []
         lines += self._generic_header()
         lines += self._plotter_lines(config.plotter)

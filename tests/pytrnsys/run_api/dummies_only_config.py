@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 from pytrnsys.run_api import PytrnsysConfiguration, save_config_file
 
 
