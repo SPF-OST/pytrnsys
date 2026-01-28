@@ -1,6 +1,6 @@
 # pylint: disable=invalid-name
 
-from pytrnsys.run_api import PytrnsysConfiguration, save_config_file
+from pytrnsys.run_api import PytrnsysConfiguration
 
 
 def dummies_only_config() -> PytrnsysConfiguration:
@@ -26,12 +26,3 @@ def dummies_only_config() -> PytrnsysConfiguration:
     config.ddcks.add_ddck(ddck_alias, "QSrc/two_port_dummy", label="source")
 
     return config
-
-# config = dummies_only_config()
-# save_config_file(config, config_file_path="")
-#
-# exchange_stuff
-# save_config_file(config, config_file_path="")
-#
-# configs = [config_file_path_1, config_file_path_2]
-# run_pytrnsys(configs)
