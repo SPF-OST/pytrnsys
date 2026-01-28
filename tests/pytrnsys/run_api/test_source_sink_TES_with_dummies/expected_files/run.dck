@@ -1,0 +1,347 @@
+**********************************************************************
+** head.ddck from C:\GIT\dev\pytrnsys-onboarding\config_tests\test_source_sink_TES_with_dummies\..\..\simulations\source_sink_and_TES\ddck\generic 
+**********************************************************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+VERSION 17    
+CONSTANTS 3
+START=0.0 ! value changed from original by executeTrnsys.py
+STOP=10.0 ! value changed from original by executeTrnsys.py
+dtSim=1.0 ! value changed from original by executeTrnsys.py
+CONSTANTS 13
+nIteTrnsys = 30      ! TRNSYS Limit of iterations
+nWarnTrnsys = 12000  ! TRNSYS Limit of warnings
+nCallTraceTrnys = 31 ! TRNSYS limit of calls to a component before it will be traced
+FrInte_Tol = 0.003   ! TRNSYS solver tolerances      
+FrConv_Tol = 0.0005  ! TRNSYS solver tolerances    
+nan_check_bool = 1   ! TRNSYS nan check boolean
+time_report = 1      ! TRNSYS time report
+solver_equation = 0  ! TRNSYS EQUATION SOLVER statement
+debug_statement = 0  ! TRNSYS Overwrite DEBUG statement
+solver_statement = 0 ! TRNSYS Solver statement
+min_relax_factor = 1 ! TRNSYS Minimum relaxation factor
+max_relac_factor = 1 ! TRNSYS Maximum relaxation factor 
+solver_integration = 1    ! TRNSYS numerical integration solver method
+SIMULATION START STOP dtSim     
+TOLERANCES    FrInte_Tol  FrConv_Tol     
+LIMITS nIteTrnsys nWarnTrnsys nCallTraceTrnys ! Limit of Iterations, limit of warnings, limit of calls to a component before it will be traced
+DFQ solver_integration                        ! TRNSYS numerical integration solver method
+WIDTH 132                                     ! TRNSYS output file width, number of characters
+LIST                                          ! NOLIST statement
+SOLVER solver_statement min_relax_factor max_relac_factor      ! Solver statement, Minimum relaxation factor, Maximum relaxation factor
+NAN_CHECK nan_check_bool  ! Nan DEBUG statement
+OVERWRITE_CHECK debug_statement     ! Overwrite DEBUG statement
+EQSOLVER solver_equation           ! EQUATION SOLVER statement
+TIME_REPORT time_report
+CONSTANTS 3
+mfrSolverAbsTol = 1e-8
+mfrSolverRelTol = 1e-8
+mfrTolSwitchThreshold = 1e2
+CONSTANTS 3    
+tStrtUser = START     ! START start time of user defined printer
+tEndUser  = STOP      ! END time of user defined printer
+dtPrUser  = dtSim     ! timestep of user defined printer
+CONSTANTS 6 
+versionDeck = 1 !can be changed from config file to adapt processes and so on
+PI   = 3.1415926     
+Zero = 0
+Nix  = 0
+notused  = 0
+NPlotsPerSim = 18
+CONSTANTS 7 
+CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 °C Tyfocor LS
+RHOBRI = 1016.0  ! density Glycol [kg/m³]; Value for an average pipe temperature with 55 °C Tyfocor L
+CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 °C
+RHOWAT = 998.0   ! density of Water  [kg/m³] at20 °C
+LAMWAT = 0.58    ! heat conductivity W/(mK) 
+CPWAT_SI = CPWAT*1000 ! J/(kgK)    
+CPBRI_SI = CPBRI*1000 ! J/(kgK)    
+**********************************************************************
+** hydraulic.ddck from C:\GIT\dev\pytrnsys-onboarding\config_tests\test_source_sink_TES_with_dummies\..\..\simulations\source_sink_and_TES\ddck\hydraulic 
+**********************************************************************
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+EQUATIONS 4
+TQSrcH=TQSrc
+THtStInH=THtStIn
+THtStOutH=THtStOut
+TQSnkH=TQSnk
+CONSTANTS 1
+spTIni = 20
+UNIT 10 TYPE 9352 !Changed automatically
+PARAMETERS 68
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
+16
+12 6 0 8       !1 : QSrc
+7 0 0 5        !2 : HtStIn
+8 0 0 5        !3 : HtStOut
+11 13 8 2      !4 : Tee
+16 6 7 2       !5 : Tee2
+1 5 0 0        !6 : QSrc_Tee2
+5 2 0 0        !7 : Tee2_HtSt
+3 4 0 0        !8 : HtSt_Tee
+11 12 0 8      !9 : Pump
+15 13 0 8      !10 : Pump2
+4 9 0 0        !11 : Tee_Pump
+9 1 0 0        !12 : Pump_QSrc
+10 4 0 0       !13 : Pump2_Tee
+16 15 0 8      !14 : QSnk
+14 10 0 0      !15 : QSnk_Pump2
+5 14 0 0       !16 : Tee2_QSnk
+INPUTS 16! for Type 9351
+MfrQSrc 0,0 0,0 0,0 0,0 0,0 0,0 0,0 MfrPump MfrPump2 
+0,0 0,0 0,0 MfrQSnk 0,0 0,0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 
+EQUATIONS 32	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MQSrc_A=[10,1] !Changed automatically
+MQSrc_B=[10,2] !Changed automatically
+MHtStIn_A=[10,4] !Changed automatically
+MHtStOut_A=[10,7] !Changed automatically
+MTee_A=[10,10] !Changed automatically
+MTee_B=[10,11] !Changed automatically
+MTee_C=[10,12] !Changed automatically
+MTee2_A=[10,13] !Changed automatically
+MTee2_B=[10,14] !Changed automatically
+MTee2_C=[10,15] !Changed automatically
+MQSrc_Tee2_A=[10,16] !Changed automatically
+MQSrc_Tee2_B=[10,17] !Changed automatically
+MTee2_HtSt_A=[10,19] !Changed automatically
+MTee2_HtSt_B=[10,20] !Changed automatically
+MHtSt_Tee_A=[10,22] !Changed automatically
+MHtSt_Tee_B=[10,23] !Changed automatically
+MPump_A=[10,25] !Changed automatically
+MPump_B=[10,26] !Changed automatically
+MPump2_A=[10,28] !Changed automatically
+MPump2_B=[10,29] !Changed automatically
+MTee_Pump_A=[10,31] !Changed automatically
+MTee_Pump_B=[10,32] !Changed automatically
+MPump_QSrc_A=[10,34] !Changed automatically
+MPump_QSrc_B=[10,35] !Changed automatically
+MPump2_Tee_A=[10,37] !Changed automatically
+MPump2_Tee_B=[10,38] !Changed automatically
+MQSnk_A=[10,40] !Changed automatically
+MQSnk_B=[10,41] !Changed automatically
+MQSnk_Pump2_A=[10,43] !Changed automatically
+MQSnk_Pump2_B=[10,44] !Changed automatically
+MTee2_QSnk_A=[10,46] !Changed automatically
+MTee2_QSnk_B=[10,47] !Changed automatically
+EQUATIONS 4
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+EQUATIONS 2
+Lloop3Rho = FwaterRho
+Lloop3Cp = FwaterCp
+UNIT 11 TYPE 929 !Changed automatically
+INPUTS 6
+MTee_A
+MTee_B
+MTee_C
+TTee_Pump
+TPump2_Tee
+THtSt_Tee
+0
+0
+0
+20.0
+20.0
+20.0
+EQUATIONS 1
+TTee = [11,1] !Changed automatically
+UNIT 12 TYPE 929 !Changed automatically
+INPUTS 6
+MTee2_A
+MTee2_B
+MTee2_C
+TTee2_QSnk
+TQSrc_Tee2
+TTee2_HtSt
+0
+0
+0
+20.0
+20.0
+20.0
+EQUATIONS 1
+TTee2 = [12,1] !Changed automatically
+UNIT 13 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MQSrc_Tee2_A TQSrcH TTee2
+0 spTIni spTIni
+EQUATIONS 2
+TQSrc_Tee2 = [13,1] !Changed automatically
+MQSrc_Tee2 = MQSrc_Tee2_A
+UNIT 14 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MTee2_HtSt_A TTee2 THtStInH
+0 spTIni spTIni
+EQUATIONS 2
+TTee2_HtSt = [14,1] !Changed automatically
+MTee2_HtSt = MTee2_HtSt_A
+UNIT 15 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MHtSt_Tee_A THtStOutH TTee
+0 spTIni spTIni
+EQUATIONS 2
+THtSt_Tee = [15,1] !Changed automatically
+MHtSt_Tee = MHtSt_Tee_A
+UNIT 16 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump_A TTee_Pump TPump_QSrc
+0 spTIni spTIni
+EQUATIONS 2
+TPump = [16,1] !Changed automatically
+MPump = MPump_A
+UNIT 17 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump2_A TQSnk_Pump2 TPump2_Tee
+0 spTIni spTIni
+EQUATIONS 2
+TPump2 = [17,1] !Changed automatically
+MPump2 = MPump2_A
+UNIT 18 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MTee_Pump_A TTee TPump
+0 spTIni spTIni
+EQUATIONS 2
+TTee_Pump = [18,1] !Changed automatically
+MTee_Pump = MTee_Pump_A
+UNIT 19 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump_QSrc_A TPump TQSrcH
+0 spTIni spTIni
+EQUATIONS 2
+TPump_QSrc = [19,1] !Changed automatically
+MPump_QSrc = MPump_QSrc_A
+UNIT 20 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump2_Tee_A TPump2 TTee
+0 spTIni spTIni
+EQUATIONS 2
+TPump2_Tee = [20,1] !Changed automatically
+MPump2_Tee = MPump2_Tee_A
+UNIT 21 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MQSnk_Pump2_A TQSnkH TPump2
+0 spTIni spTIni
+EQUATIONS 2
+TQSnk_Pump2 = [21,1] !Changed automatically
+MQSnk_Pump2 = MQSnk_Pump2_A
+UNIT 22 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MTee2_QSnk_A TTee2 TQSnkH
+0 spTIni spTIni
+EQUATIONS 2
+TTee2_QSnk = [22,1] !Changed automatically
+MTee2_QSnk = MTee2_QSnk_A
+ASSIGN source_sink_and_TES_Mfr.prt 463
+UNIT 23 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+463! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+INPUTS 8
+MQSrc_Tee2 MTee2_HtSt MHtSt_Tee MTee_Pump MPump_QSrc MPump2_Tee MQSnk_Pump2 MTee2_QSnk
+MQSrc_Tee2 MTee2_HtSt MHtSt_Tee MTee_Pump MPump_QSrc MPump2_Tee MQSnk_Pump2 MTee2_QSnk
+ASSIGN source_sink_and_TES_T.prt 464
+UNIT 24 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+464! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+INPUTS 8
+TQSrc_Tee2 TTee2_HtSt THtSt_Tee TTee_Pump TPump_QSrc TPump2_Tee TQSnk_Pump2 TTee2_QSnk
+TQSrc_Tee2 TTee2_HtSt THtSt_Tee TTee_Pump TPump_QSrc TPump2_Tee TQSnk_Pump2 TTee2_QSnk
+**********************************************************************
+** hydraulic_control.ddck from C:\GIT\dev\pytrnsys-onboarding\config_tests\test_source_sink_TES_with_dummies\..\..\simulations\source_sink_and_TES\ddck\control 
+**********************************************************************
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+EQUATIONS 4
+MfrQSrc = 500
+MfrPump = 500.0
+MfrPump2 = 500.0
+MfrQSnk = 500
+**********************************************************************
+** two_port_dummy.ddck from C:\GIT\dev\pytrnsys-onboarding\config_tests\test_source_sink_TES_with_dummies\..\..\simulations\source_sink_and_TES\ddck\HtSt 
+**********************************************************************
+*******************************
+**BEGIN two_port_dummy.ddck
+*******************************
+EQUATIONS 2
+THtStIn = TTee2_HtSt
+THtStOut = TTee2_HtSt
+**********************************************************************
+** two_port_dummy.ddck from C:\GIT\dev\pytrnsys-onboarding\config_tests\test_source_sink_TES_with_dummies\..\..\simulations\source_sink_and_TES\ddck\QSnk 
+**********************************************************************
+*******************************
+**BEGIN two_port_dummy.ddck
+*******************************
+EQUATIONS 1
+TQSnk = TTee2_QSnk
+**********************************************************************
+** two_port_dummy.ddck from C:\GIT\dev\pytrnsys-onboarding\config_tests\test_source_sink_TES_with_dummies\..\..\simulations\source_sink_and_TES\ddck\QSrc 
+**********************************************************************
+*******************************
+**BEGIN two_port_dummy.ddck
+*******************************
+EQUATIONS 1
+TQSrc = TPump_QSrc
+**********************************************************************
+** end.ddck from C:\GIT\dev\pytrnsys-onboarding\config_tests\test_source_sink_TES_with_dummies\..\..\simulations\source_sink_and_TES\ddck\generic 
+**********************************************************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+END
