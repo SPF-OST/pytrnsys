@@ -17,6 +17,8 @@ import typing as _tp
 
 import numpy as _np
 
+# TODO: rename dck_runner to appropriate: deck_test_methods?
+# TODO: simplify deck_tests so Users only pass the minimum required.
 
 # TODO: add documentation everywhere.  # pylint: disable=fixme
 
