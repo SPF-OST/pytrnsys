@@ -14,6 +14,8 @@ from tests.pytrnsys.run_api.dummies_only_config import dummies_only_config
 # TODO: test created dck, if config equal.  # pylint: disable=fixme
 # TODO: test simulation results, if dck equal.  # pylint: disable=fixme
 
+# TODO: Should this live in dck_runner?
+# TODO: Add case where ddcks are replaced using simulated pipes.
 
 def compare_txt_files(config_file_path, expected_config_file_path):
     __tracebackhide__ = True  # pylint: disable=unused-variable
