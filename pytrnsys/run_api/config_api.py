@@ -1,5 +1,3 @@
-# pylint: disable=invalid-name
-
 """
 To add new functionality.
 - Find the right subclass, or create a new subclass
@@ -18,7 +16,8 @@ import typing as _tp
 import numpy as _np
 
 
-# TODO: add documentation everywhere.  # pylint: disable=fixme
+# TODO: add documentation everywhere.
+
 
 @_dc.dataclass
 class PlotterControl:
@@ -36,10 +35,11 @@ class PlotterControl:
         Online plotters as well as the progress bar window are suppressed during the simulations, which corresponds to
         the TRNSYS hidden mode.
     """
+
     ignore_online_plotter: bool = _dc.field(default=True)
     auto_close_online_plotter: bool = _dc.field(default=True)
     remove_pop_up_window: bool = _dc.field(default=False)
-    # TODO: implement remove_pop_up_window  # pylint: disable=fixme
+    # TODO: implement remove_pop_up_window
 
 
 @_dc.dataclass
@@ -64,19 +64,25 @@ class Variables:
 
 @_dc.dataclass
 class Ddcks:
-    # TODO: provide set_global as an input?  # pylint: disable=fixme
+    # TODO: provide set_global as an input?
     _assign: dict = _dc.field(default_factory=dict)
     _ddcks: dict = _dc.field(default_factory=dict)
     head_ddck: str = _dc.field(default="DDCK$ generic/head global")
     end_ddck: str = _dc.field(default="DDCK$ generic/end")
 
     def add_assign(self, prt_file_path: str, unit_variable: str) -> None:
-        # TODO: error handling / warnings  # pylint: disable=fixme
+        # TODO: error handling / warnings
         #       - unit_variable already declared <- indicates duplication issue.
         self._assign[unit_variable] = prt_file_path
 
-    def add_ddck(self, folder_alias: str, ddck_path: str, component_name: None | str = None, is_global: bool = False,
-                 label: str | None = None) -> None:
+    def add_ddck(
+        self,
+        folder_alias: str,
+        ddck_path: str,
+        component_name: None | str = None,
+        is_global: bool = False,
+        label: str | None = None,
+    ) -> None:
         """
 
         folder_alias:
@@ -110,9 +116,10 @@ class Ddcks:
 
         self._ddcks[label] = ddck_line
 
-    def replace_ddck(self, label: str, folder_alias: str, ddck_path: str, component_name: None | str = None,
-                     is_global: bool = False) -> None:
-        # TODO: inconsistent usage of 'folder_alias' and 'path_alias'.  # pylint: disable=fixme
+    def replace_ddck(
+        self, label: str, folder_alias: str, ddck_path: str, component_name: None | str = None, is_global: bool = False
+    ) -> None:
+        # TODO: inconsistent usage of 'folder_alias' and 'path_alias'.
         """
         Replaces a previously declared ddck using the provided label in the 'add_ddck' method.
 
@@ -156,6 +163,7 @@ class Paths:
         The default alias for the ddck folder is "DDCK$"
 
     """
+
     ddck_folder: str = _dc.field(default="ddck")
     path_to_connection_info: str = _dc.field(default="./DdckPlaceHolderValues.json")
     project_path: str = _dc.field(default=".")
@@ -167,7 +175,7 @@ class Paths:
         self.known_aliases = {"DDCK$": self.ddck_folder}
 
     def add_path_alias(self, alias: str, path: str) -> None:
-        # TODO: error handling for $ requirement.  # pylint: disable=fixme
+        # TODO: error handling for $ requirement.
         if "$" not in alias:
             alias += "$"
         self.known_aliases[alias] = path
@@ -227,6 +235,7 @@ class AutomaticWork:
         the energy balance variables.
 
     """
+
     do_auto_unit_numbering: bool = _dc.field(default=True)
     generate_unit_types_used: bool = _dc.field(default=True)
     add_automatic_energy_balance: bool = _dc.field(default=True)
@@ -269,13 +278,14 @@ class Tracking:
         the csv-file to be created.
         'master_file = ".../[name].csv"'
     """
+
     tracking_file: str | None = _dc.field(default=None)
     master_file: str | None = _dc.field(default=None)
 
 
 @_dc.dataclass
 class ParametricVariations:
-    # TODO: investigate random variations  # pylint: disable=fixme
+    # TODO: investigate random variations
     """
     Methods and flags related to parametric variations.
     combine_all_cases: bool
@@ -321,11 +331,12 @@ class ParametricVariations:
 
 
 @_dc.dataclass
-class PytrnsysConfiguration:  # pylint: disable=too-many-instance-attributes
+class PytrnsysConfiguration:
     """
     Settings for a pytrnsys configuration.
     The subclasses explain their functionality.
     """
+
     plotter: PlotterControl = _dc.field(default_factory=PlotterControl)
     paths: Paths = _dc.field(default_factory=Paths)
     automatic_work: AutomaticWork = _dc.field(default_factory=AutomaticWork)
@@ -381,7 +392,7 @@ class ConfigurationConverter:
         return [
             self._add_bool_line("ignoreOnlinePlotter", plotter.ignore_online_plotter),
             self._add_bool_line("autoCloseOnlinePlotter", plotter.auto_close_online_plotter),
-            self._add_bool_line("removePopUpWindow", plotter.remove_pop_up_window)
+            self._add_bool_line("removePopUpWindow", plotter.remove_pop_up_window),
         ]
 
     def _path_lines(self, paths: Paths) -> list[str]:
@@ -429,7 +440,7 @@ class ConfigurationConverter:
             lines.append(self._add_string_line("scalingVariable", scaling.scaling_variable))
             lines.append(self._add_string_line("scalingReference", scaling.scaling_reference))
 
-        # TODO: add warning if only one of "scaling_variable" or "scaling_reference" is given.  # pylint: disable=fixme
+        # TODO: add warning if only one of "scaling_variable" or "scaling_reference" is given.
 
         return lines
 
@@ -444,8 +455,8 @@ class ConfigurationConverter:
 
     def _variation_lines(self, variations: ParametricVariations) -> list[str]:
         lines: list[str] = []
-        nr_of_variations = len(variations._variations.keys())  # pylint: disable=protected-access
-        if nr_of_variations == 0 and len(variations._ddck_file_variations.keys()) == 0:  # pylint: disable=protected-access
+        nr_of_variations = len(variations._variations.keys())
+        if nr_of_variations == 0 and len(variations._ddck_file_variations.keys()) == 0:
             return lines
 
         if nr_of_variations > 0:
@@ -453,25 +464,27 @@ class ConfigurationConverter:
 
         if variations.combine_all_cases is False:
             n_values = []
-            for _, variation in variations._variations.items():  # pylint: disable=protected-access
+            for _, variation in variations._variations.items():
                 n_values.append(len(variation["values"]))
 
             if not len(_np.unique(n_values)) == 1:
-                raise ValueError(f"Inconsistent variation lengths received for 'combine_all_cases' = False. "
-                                 f"Lengths of the variations: {n_values}")
+                raise ValueError(
+                    f"Inconsistent variation lengths received for 'combine_all_cases' = False. "
+                    f"Lengths of the variations: {n_values}"
+                )
 
-        for _, variation in variations._variations.items():  # pylint: disable=protected-access
-            lines.append(f"variation {variation["trnsys_variable"]} {" ".join(map(str, variation["values"]))}")
+        for _, variation in variations._variations.items():
+            lines.append(f'variation {variation["trnsys_variable"]} {" ".join(map(str, variation["values"]))}')
 
-        for original_ddck, ddcks in variations._ddck_file_variations.items():  # pylint: disable=protected-access
-            lines.append(f"changeDDckFile {original_ddck}{" ".join(map(str, ddcks))}")
+        for original_ddck, ddcks in variations._ddck_file_variations.items():
+            lines.append(f'changeDDckFile {original_ddck}{" ".join(map(str, ddcks))}')
 
         return lines
 
     @staticmethod
     def _variable_lines(deck: Variables) -> list[str]:
         lines = []
-        for variable, value in deck._variables_to_change.items():  # pylint: disable=protected-access
+        for variable, value in deck._variables_to_change.items():
             lines.append(f"deck {variable} {value}")
 
         return lines
@@ -479,10 +492,10 @@ class ConfigurationConverter:
     @staticmethod
     def _ddcks_lines(ddcks: Ddcks) -> list[str]:
         lines = [ddcks.head_ddck]
-        for ddck in ddcks._ddcks.values():  # pylint: disable=protected-access
+        for ddck in ddcks._ddcks.values():
             lines.append(ddck)
 
-        for unit_variable, prt_file_path in ddcks._assign.items():  # pylint: disable=protected-access
+        for unit_variable, prt_file_path in ddcks._assign.items():
             lines.append(f"assign {prt_file_path} {unit_variable}")
 
         lines.append(ddcks.end_ddck)
@@ -495,7 +508,7 @@ class ConfigurationConverter:
         self._write_config_file(lines, path)
 
     def _gather_lines(self, config: PytrnsysConfiguration) -> list[str]:
-        # TODO: make list of headers and Subclasses and automatically run through them.    # pylint: disable=fixme
+        # TODO: make list of headers and Subclasses and automatically run through them.
         lines = []
         lines += self._generic_header()
         lines += self._plotter_lines(config.plotter)

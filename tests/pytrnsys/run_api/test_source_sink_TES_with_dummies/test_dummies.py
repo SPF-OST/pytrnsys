@@ -34,7 +34,6 @@ RESULTS_DIR = CURRENT_DIR / "results" / "run"
 
 @_pt.mark.incremental
 class TestDummies:
-
     def test_dummies_config(self):
         config = dummies_only_config()
 
@@ -75,9 +74,14 @@ class TestDummies:
         temperature_prt_name = RESULTS_DIR / "source_sink_and_TES_T.prt"
 
         errors = []
-        errors += compare_prt_files(EXPECTED_FILES_DIR / mfr_prt_name, RESULTS_DIR / mfr_prt_name,
-                                    file_type="timestep", massflow_solver=True)
-        errors += compare_prt_files(EXPECTED_FILES_DIR / temperature_prt_name, RESULTS_DIR / temperature_prt_name,
-                                    file_type="timestep", massflow_solver=True)
+        errors += compare_prt_files(
+            EXPECTED_FILES_DIR / mfr_prt_name, RESULTS_DIR / mfr_prt_name, file_type="timestep", massflow_solver=True
+        )
+        errors += compare_prt_files(
+            EXPECTED_FILES_DIR / temperature_prt_name,
+            RESULTS_DIR / temperature_prt_name,
+            file_type="timestep",
+            massflow_solver=True,
+        )
         if errors:
-            raise ExceptionGroup(f'Found {len(errors)} issues:', errors)
+            raise ExceptionGroup(f"Found {len(errors)} issues:", errors)
