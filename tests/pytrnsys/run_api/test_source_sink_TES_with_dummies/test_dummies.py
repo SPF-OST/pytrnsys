@@ -49,7 +49,7 @@ class TestDummies:
 
     def test_dck_equivalent(self):
         dck_file = RESULTS_DIR / "run.dck"
-        expected_dck_file = EXPECTED_FILES_DIR / "run.dck"
+
         overall_dir = _os.getcwd()
         _os.chdir(CURRENT_DIR)
 
@@ -58,6 +58,9 @@ class TestDummies:
         if error is not None:
             errors.append(error)
         _os.chdir(overall_dir)
+
+        expected_dck_file = EXPECTED_FILES_DIR / "run.dck"
+        self._create_expected_dck_file_from_template(expected_dck_file)
 
         try:
             compare_txt_files(dck_file, expected_dck_file)
@@ -68,6 +71,15 @@ class TestDummies:
         #       Currently, the next test can be rerun by itself to plot the differences.
         if errors:
             raise ExceptionGroup(f"Found {len(errors)} issues: ", errors)
+
+    @staticmethod
+    def _create_expected_dck_file_from_template(expected_dck_file: _pl.Path) -> None:
+        expected_dck_file_template = EXPECTED_FILES_DIR / "run.dck.template"
+        expected_deck_file_template_content = expected_dck_file_template.read_text(encoding="windows-1251")
+        expected_deck_file_content = expected_deck_file_template_content.replace(
+            "<CONTAINING_DIR_PATH>", str(CURRENT_DIR.parents[4])
+        )
+        expected_dck_file.write_text(expected_deck_file_content, encoding="windows-1251")
 
     def test_simulation_results(self):
         mfr_prt_name = "source_sink_and_TES_Mfr.prt"
