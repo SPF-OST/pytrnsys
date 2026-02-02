@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 import pathlib as _pl
 import os as _os
 

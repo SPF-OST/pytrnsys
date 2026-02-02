@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 """
 To add new functionality.
 - Find the right subclass, or create a new subclass

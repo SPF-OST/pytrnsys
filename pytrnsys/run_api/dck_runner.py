@@ -1,5 +1,5 @@
 # type: ignore
-
+# pylint: disable=all
 
 import enum as _en
 import os as _os

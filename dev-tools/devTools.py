@@ -17,12 +17,6 @@ _SOURCE_DIRS = ["pytrnsys", "tests", "dev-tools"]
 
 _EXCLUDED_PATH_PATTERNS = [
     "^tests/(.+/)?data/.*",
-    # The "run API" uses snake case (unlike the rest of the code base
-    # which uses camel case), so we need to figure out how to treat it
-    # separately during CI. Also, more generally, it's a bit in a rough
-    # state because we had to merge it hurriedly, so we disable `pylint`
-    # and `mypy` on it for now.
-    "^pytrnsys/run_api/.*",
 ]
 
 
