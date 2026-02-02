@@ -1,5 +1,5 @@
 **********************************************************************
-** head.ddck from C:\GIT\dev\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\generic 
+** head.ddck from <CONTAINING_DIR_PATH>\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\generic 
 **********************************************************************
 *******************************
 **BEGIN Head.ddck
@@ -58,7 +58,7 @@ LAMWAT = 0.58    ! heat conductivity W/(mK)
 CPWAT_SI = CPWAT*1000 ! J/(kgK)    
 CPBRI_SI = CPBRI*1000 ! J/(kgK)    
 **********************************************************************
-** hydraulic.ddck from C:\GIT\dev\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\hydraulic 
+** hydraulic.ddck from <CONTAINING_DIR_PATH>\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\hydraulic 
 **********************************************************************
 *************************************
 ** BEGIN hydraulic.ddck
@@ -303,7 +303,7 @@ INPUTS 8
 TQSrc_Tee2 TTee2_HtSt THtSt_Tee TTee_Pump TPump_QSrc TPump2_Tee TQSnk_Pump2 TTee2_QSnk
 TQSrc_Tee2 TTee2_HtSt THtSt_Tee TTee_Pump TPump_QSrc TPump2_Tee TQSnk_Pump2 TTee2_QSnk
 **********************************************************************
-** hydraulic_control.ddck from C:\GIT\dev\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\control 
+** hydraulic_control.ddck from <CONTAINING_DIR_PATH>\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\control 
 **********************************************************************
 *************************************
 **BEGIN hydraulic_control.ddck
@@ -314,7 +314,7 @@ MfrPump = 500.0
 MfrPump2 = 500.0
 MfrQSnk = 500
 **********************************************************************
-** two_port_dummy.ddck from C:\GIT\dev\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\HtSt 
+** two_port_dummy.ddck from <CONTAINING_DIR_PATH>\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\HtSt 
 **********************************************************************
 *******************************
 **BEGIN two_port_dummy.ddck
@@ -323,7 +323,7 @@ EQUATIONS 2
 THtStIn = TTee2_HtSt
 THtStOut = TTee2_HtSt
 **********************************************************************
-** two_port_dummy.ddck from C:\GIT\dev\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\QSnk 
+** two_port_dummy.ddck from <CONTAINING_DIR_PATH>\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\QSnk 
 **********************************************************************
 *******************************
 **BEGIN two_port_dummy.ddck
@@ -331,7 +331,7 @@ THtStOut = TTee2_HtSt
 EQUATIONS 1
 TQSnk = TTee2_QSnk
 **********************************************************************
-** two_port_dummy.ddck from C:\GIT\dev\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\QSrc 
+** two_port_dummy.ddck from <CONTAINING_DIR_PATH>\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\QSrc 
 **********************************************************************
 *******************************
 **BEGIN two_port_dummy.ddck
@@ -339,7 +339,7 @@ TQSnk = TTee2_QSnk
 EQUATIONS 1
 TQSrc = TPump_QSrc
 **********************************************************************
-** end.ddck from C:\GIT\dev\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\generic 
+** end.ddck from <CONTAINING_DIR_PATH>\pytrnsys\tests\pytrnsys\run_api\test_source_sink_TES_with_dummies\..\source_sink_and_TES\ddck\generic 
 **********************************************************************
 *******************************
 **BEGIN Head.ddck

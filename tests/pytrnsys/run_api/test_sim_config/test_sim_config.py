@@ -55,8 +55,9 @@ class TestSimplestConfig(_ut.TestCase):
 
         config.variations.add_ddck_variation("CityBAS_dryK ", ["CityBAS_dryK", "CityCDF_dryK", "CityLUG_dryK"])
 
-        config.ddcks.replace_ddck(label="hydraulic", folder_alias=ddck_alias, ddck_path="hydraulic/hydraulic_dual_loop",
-                                  is_global=True)
+        config.ddcks.replace_ddck(
+            label="hydraulic", folder_alias=ddck_alias, ddck_path="hydraulic/hydraulic_dual_loop", is_global=True
+        )
 
         save_config_file(config, config_file_path)
 
@@ -68,6 +69,7 @@ class TestSimplestConfig(_ut.TestCase):
             actual_lines = f2.readlines()
 
         _ut.TestCase().assertListEqual(actual_lines, expected_lines)
+
 
 # TODO: test error handling for combine_all_cases = False  # pylint: disable=fixme
 # TODO: test error handling for replace_ddck labels.  # pylint: disable=fixme
