@@ -1,10 +1,13 @@
 # pylint: disable=invalid-name
 
 from pytrnsys.run_api import PytrnsysConfiguration
+from tests.helper import getTrnExeFilePath
 
 
 def dummies_only_config() -> PytrnsysConfiguration:
     config = PytrnsysConfiguration()
+
+    config.paths.trnsys_exe_path = str(getTrnExeFilePath())
 
     config.generic.run_cases = True
     config.generic.base_name_for_dcks = "dummies_only"

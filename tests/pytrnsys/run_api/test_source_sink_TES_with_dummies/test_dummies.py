@@ -9,6 +9,7 @@ from pytrnsys.run_api import save_config_file, run_pytrnsys
 from pytrnsys.run_api.dck_runner import compare_prt_files  # type: ignore[attr-defined]
 
 from tests.pytrnsys.run_api.dummies_only_config import dummies_only_config
+from tests.helper import is_run_during_ci
 
 
 # TODO: test created dck, if config equal.  # pylint: disable=fixme
@@ -46,8 +47,10 @@ class TestDummies:
         config.automatic_work.add_automatic_energy_balance = False
 
         save_config_file(config, CONFIG_FILE_PATH)
-
-        expected_config_file_path = EXPECTED_FILES_DIR / "run.config"
+        if is_run_during_ci():
+            expected_config_file_path = EXPECTED_FILES_DIR / "run_ci.config"
+        else:
+            expected_config_file_path = EXPECTED_FILES_DIR / "run.config"
         compare_txt_files(CONFIG_FILE_PATH, expected_config_file_path)
 
     def test_dck_equivalent(self):
