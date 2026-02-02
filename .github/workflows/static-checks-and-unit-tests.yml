@@ -11,7 +11,7 @@ jobs:
 
     runs-on:
       - self-hosted
-      - spf-windows-gh-runners
+      - etna
 
     env:
       PY_COLORS: "1"
