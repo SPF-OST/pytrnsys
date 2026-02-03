@@ -29,7 +29,6 @@ def compare_txt_files(config_file_path, expected_config_file_path):
 CURRENT_DIR = _pl.Path(__file__).parent
 EXPECTED_FILES_DIR = CURRENT_DIR / "expected_files"
 CONFIG_FILE_PATH = CURRENT_DIR / "run.config"
-RESULTS_DIR = CURRENT_DIR / "results" / "run"
 
 
 @_pt.mark.incremental
@@ -50,7 +49,12 @@ class TestDummies:
         compare_txt_files(CONFIG_FILE_PATH, expected_config_file_path)
 
     def test_dck_equivalent(self):
-        dck_file = RESULTS_DIR / "run.dck"
+        results_dir = CURRENT_DIR / "results" / "run"
+        dck_file = results_dir / "run.dck"
+
+        print("")
+        print(dck_file)
+        print("")
 
         overall_dir = _os.getcwd()
         _os.chdir(CURRENT_DIR)
@@ -84,16 +88,17 @@ class TestDummies:
         expected_dck_file.write_text(expected_deck_file_content, encoding="windows-1251")
 
     def test_simulation_results(self):
+        results_dir = CURRENT_DIR / "results" / "run"
         mfr_prt_name = "source_sink_and_TES_Mfr.prt"
-        temperature_prt_name = RESULTS_DIR / "source_sink_and_TES_T.prt"
+        temperature_prt_name = results_dir / "source_sink_and_TES_T.prt"
 
         errors = []
         errors += compare_prt_files(
-            EXPECTED_FILES_DIR / mfr_prt_name, RESULTS_DIR / mfr_prt_name, file_type="timestep", massflow_solver=True
+            EXPECTED_FILES_DIR / mfr_prt_name, results_dir / mfr_prt_name, file_type="timestep", massflow_solver=True
         )
         errors += compare_prt_files(
             EXPECTED_FILES_DIR / temperature_prt_name,
-            RESULTS_DIR / temperature_prt_name,
+            results_dir / temperature_prt_name,
             file_type="timestep",
             massflow_solver=True,
         )
