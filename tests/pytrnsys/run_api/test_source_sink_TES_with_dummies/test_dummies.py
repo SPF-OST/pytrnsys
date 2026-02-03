@@ -6,7 +6,7 @@ import unittest as _ut
 
 import pytest as _pt
 from pytrnsys.run_api import save_config_file, run_pytrnsys
-from pytrnsys.run_api.dck_runner import compare_prt_files  # type: ignore[attr-defined]
+from pytrnsys.run_api.deck_test_methods import compare_prt_files  # type: ignore[attr-defined]
 
 from tests.pytrnsys.run_api.dummies_only_config import dummies_only_config
 from tests.helper import is_run_during_ci
