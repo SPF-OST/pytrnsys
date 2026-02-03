@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 import os as _os
 import pathlib as _pl
 import typing as _tp
@@ -211,7 +213,7 @@ _INPUTS_PROCESS_WITH_RELATIVE_PATHS2 = _getInputs(basePath=_RELATIVE_PATH2, conf
 
 
 class TestReadConfigTrnsys:
-    def setup(self):
+    def setup_method(self):
         self.reader = _rct.ReadConfigTrnsys()  # pylint: disable=attribute-defined-outside-init
         self.inputs = {}  # pylint: disable=attribute-defined-outside-init
 

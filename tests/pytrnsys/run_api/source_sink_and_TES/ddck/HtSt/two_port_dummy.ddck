@@ -1,0 +1,17 @@
+*******************************
+**BEGIN two_port_dummy.ddck
+*******************************
+
+***************************************************************************
+** Description:
+** Dummy ddck to easily turn off a component with two ports during development.
+** It passes along input values to output.
+***************************************************************************
+
+EQUATIONS 2
+$THtStIn = @temp(InIn)
+@temp(OutOut) = @temp(InIn)
+
+*******************************
+**END two_port_dummy.ddck
+*******************************

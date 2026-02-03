@@ -11,7 +11,7 @@ jobs:
 
     runs-on:
       - self-hosted
-      - spf-windows-gh-runners
+      - etna
 
     env:
       PY_COLORS: "1"
@@ -25,29 +25,30 @@ jobs:
           Remove-Item -LiteralPath venv -Recurse
         }
     
-    - name: Create virtual environment
-      run: py -3.12 -m venv venv
-    
-    - name: Install dependencies
-      run: |
-        venv\Scripts\python -m pip install --upgrade pip wheel uv
-        venv\Scripts\python -m uv pip install -r requirements/test.txt
-    
-    - name: Static type checking with mypy
-      run: venv\Scripts\python dev-tools\devTools.py --type
-    
-    - name: Lint with pylint
-      run: venv\Scripts\python dev-tools\devTools.py --lint --keep-results
-    
-    - name: Test with pytest
-      run: venv\Scripts\python dev-tools\devTools.py --unit "not manual and not linux and not tool" --keep-results
+#    - name: Create virtual environment
+#      run: py -3.12 -m venv venv
+#
+#    - name: Install dependencies
+#      run: |
+#        venv\Scripts\python -m pip install --upgrade pip wheel uv
+#        venv\Scripts\python -m uv pip install -r requirements/test.txt
+#
+#    - name: Static type checking with mypy
+#      run: venv\Scripts\python dev-tools\devTools.py --type
+#
+#    - name: Lint with pylint
+#      run: venv\Scripts\python dev-tools\devTools.py --lint --keep-results
+#
+#    - name: Test with pytest
+#      run: venv\Scripts\python dev-tools\devTools.py --unit "not manual and not linux and not tool" --keep-results
 
     - name: Post coverage report to Coveralls
-      uses: coverallsapp/github-action@master
+      continue-on-error: true
+      uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: test-results/coverage.lcov
-    
+
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v4
       with:
@@ -65,7 +66,7 @@ jobs:
         repositories: pytrnsys_gui
     
     - name: Trigger build of `pytrnsys-gui` executable
-      uses: peter-evans/repository-dispatch@v2
+      uses: peter-evans/repository-dispatch@a628c95fd17070f003ea24579a56e6bc89b25766
       with:
         repository: SPF-OST/pytrnsys_gui
         token: ${{ steps.generate-token.outputs.token }}

@@ -1,0 +1,10 @@
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+EQUATIONS 4
+*** Massflowrates
+MfrQSrc = 500
+MfrPump = 500.0
+MfrPump2 = 500.0
+MfrQSnk = 500
+
