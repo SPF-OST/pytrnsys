@@ -11,12 +11,9 @@ from pytrnsys.run_api.dck_runner import compare_prt_files  # type: ignore[attr-d
 from tests.pytrnsys.run_api.dummies_only_config import dummies_only_config
 from tests.helper import is_run_during_ci
 
+# TODO: Should this live in dck_runner?  # pylint: disable=fixme
+# TODO: Add case where ddcks are replaced using simulated pipes.  # pylint: disable=fixme
 
-# TODO: test created dck, if config equal.  # pylint: disable=fixme
-# TODO: test simulation results, if dck equal.  # pylint: disable=fixme
-
-# TODO: Should this live in dck_runner?
-# TODO: Add case where ddcks are replaced using simulated pipes.
 
 def compare_txt_files(config_file_path, expected_config_file_path):
     __tracebackhide__ = True  # pylint: disable=unused-variable
@@ -32,7 +29,7 @@ def compare_txt_files(config_file_path, expected_config_file_path):
 CURRENT_DIR = _pl.Path(__file__).parent
 EXPECTED_FILES_DIR = CURRENT_DIR / "expected_files"
 CONFIG_FILE_PATH = CURRENT_DIR / "run.config"
-RESULTS_DIR = CURRENT_DIR / "results" / "run"
+RESULTS_DIR = CURRENT_DIR / "results"
 
 
 @_pt.mark.incremental
