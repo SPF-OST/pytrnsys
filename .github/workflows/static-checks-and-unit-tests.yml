@@ -65,7 +65,7 @@ jobs:
         repositories: pytrnsys_gui
     
     - name: Trigger build of `pytrnsys-gui` executable
-      uses: peter-evans/repository-dispatch@v4
+      uses: peter-evans/repository-dispatch@@a628c95fd17070f003ea24579a56e6bc89b25766
       with:
         repository: SPF-OST/pytrnsys_gui
         token: ${{ steps.generate-token.outputs.token }}
