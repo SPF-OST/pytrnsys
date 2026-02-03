@@ -25,22 +25,22 @@ jobs:
           Remove-Item -LiteralPath venv -Recurse
         }
     
-#    - name: Create virtual environment
-#      run: py -3.12 -m venv venv
-#
-#    - name: Install dependencies
-#      run: |
-#        venv\Scripts\python -m pip install --upgrade pip wheel uv
-#        venv\Scripts\python -m uv pip install -r requirements/test.txt
-#
-#    - name: Static type checking with mypy
-#      run: venv\Scripts\python dev-tools\devTools.py --type
-#
-#    - name: Lint with pylint
-#      run: venv\Scripts\python dev-tools\devTools.py --lint --keep-results
-#
-#    - name: Test with pytest
-#      run: venv\Scripts\python dev-tools\devTools.py --unit "not manual and not linux and not tool" --keep-results
+    - name: Create virtual environment
+      run: py -3.12 -m venv venv
+
+    - name: Install dependencies
+      run: |
+        venv\Scripts\python -m pip install --upgrade pip wheel uv
+        venv\Scripts\python -m uv pip install -r requirements/test.txt
+
+    - name: Static type checking with mypy
+      run: venv\Scripts\python dev-tools\devTools.py --type
+
+    - name: Lint with pylint
+      run: venv\Scripts\python dev-tools\devTools.py --lint --keep-results
+
+    - name: Test with pytest
+      run: venv\Scripts\python dev-tools\devTools.py --unit "not manual and not linux and not tool" --keep-results
 
     - name: Post coverage report to Coveralls
       continue-on-error: true
