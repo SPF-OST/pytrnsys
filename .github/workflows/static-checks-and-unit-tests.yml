@@ -43,7 +43,8 @@ jobs:
       run: venv\Scripts\python dev-tools\devTools.py --unit "not manual and not linux and not tool" --keep-results
 
     - name: Post coverage report to Coveralls
-      uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b
+      continue-on-error: true
+      uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: test-results/coverage.lcov
