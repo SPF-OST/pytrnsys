@@ -17,6 +17,12 @@ from tests.helper import is_run_during_ci
 
 def compare_txt_files(config_file_path, expected_config_file_path):
     __tracebackhide__ = True  # pylint: disable=unused-variable
+    print("")
+    print(f"config_file_path: {config_file_path}")
+    print("")
+    print("")
+    print(f"expected_config_file_path: {expected_config_file_path}")
+    print("")
     with open(str(expected_config_file_path), "r", encoding="cp1252") as f1:
         expected_lines = f1.readlines()
     with open(str(config_file_path), "r", encoding="cp1252") as f2:
