@@ -14,9 +14,6 @@ def run_pytrnsys(configFilePath: _pl.Path) -> Exception | None:
 
     nameDeck = "run"
     pathBase = _os.getcwd()
-    print("")
-    print(f"pathBase {pathBase}")
-    print("")
 
     runTool = runTrnsys.RunParallelTrnsys(pathBase, nameDeck)  # type: ignore[attr-defined]
     error = None
