@@ -43,7 +43,7 @@ jobs:
       run: venv\Scripts\python dev-tools\devTools.py --unit "not manual and not linux and not tool" --keep-results
 
     - name: Post coverage report to Coveralls
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: test-results/coverage.lcov
@@ -65,7 +65,7 @@ jobs:
         repositories: pytrnsys_gui
     
     - name: Trigger build of `pytrnsys-gui` executable
-      uses: peter-evans/repository-dispatch@v2
+      uses: peter-evans/repository-dispatch@v4@a628c95fd17070f003ea24579a56e6bc89b25766
       with:
         repository: SPF-OST/pytrnsys_gui
         token: ${{ steps.generate-token.outputs.token }}
