@@ -17,9 +17,9 @@ from tests.helper import is_run_during_ci
 
 def compare_txt_files(config_file_path, expected_config_file_path):
     __tracebackhide__ = True  # pylint: disable=unused-variable
-    with open(expected_config_file_path, "r", encoding="cp1252") as f1:
+    with open(str(expected_config_file_path), "r", encoding="cp1252") as f1:
         expected_lines = f1.readlines()
-    with open(config_file_path, "r", encoding="cp1252") as f2:
+    with open(str(config_file_path), "r", encoding="cp1252") as f2:
         actual_lines = f2.readlines()
     case = _ut.TestCase()
     case.maxDiff = None
@@ -29,7 +29,7 @@ def compare_txt_files(config_file_path, expected_config_file_path):
 CURRENT_DIR = _pl.Path(__file__).parent
 EXPECTED_FILES_DIR = CURRENT_DIR / "expected_files"
 CONFIG_FILE_PATH = CURRENT_DIR / "run.config"
-RESULTS_DIR = CURRENT_DIR / "results"
+RESULTS_DIR = CURRENT_DIR / "results" / "run"
 
 
 @_pt.mark.incremental
