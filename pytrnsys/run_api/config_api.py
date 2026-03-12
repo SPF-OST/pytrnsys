@@ -10,7 +10,6 @@ To add new functionality.
 """
 
 import dataclasses as _dc
-import os as _os
 import pathlib as _pl
 import subprocess as _sp
 import typing as _tp
@@ -27,15 +26,15 @@ import numpy as _np
 class PlotterControl:
     """
     Control flags for the online plotter.
-    ignore_online_plotter:
+    ignore_online_plotter: bool
         If set to True, the TRNSYS online plotters are commented out in all the dck-files. No online plotters are shown
         during the simulation run. The TRNSYS progress bar window is still displayed.
 
-    auto_close_online_plotter:
+    auto_close_online_plotter: bool
         If set to False, the TRNSYS online plotters will be left open until they are closed manually.
         This requires ignore_online_plotter to be set to False at the same time.
 
-    remove_pop_up_window:
+    remove_pop_up_window: bool
         Online plotters as well as the progress bar window are suppressed during the simulations, which corresponds to
         the TRNSYS hidden mode.
     """
@@ -53,10 +52,10 @@ class Variables:
     def replace_variable_value(self, variable: str, value: float | str) -> None:
         """
         Overwrites the right-hand side of the equation related to the declared TRNSYS variable.
-        variable:
+        variable: str
             TRNSYS variable name in final .dck.
 
-        value:
+        value: float | str
             Single value or equation for the value, which the variable should take.
             0.5
             "2/60"
@@ -69,12 +68,43 @@ class Variables:
 @_dc.dataclass
 class Ddcks:
     # TODO: provide set_global as an input?  # pylint: disable=fixme
+    """
+    Settings class to include ddcks and change file assignments for, e.g. printers.
+
+    Parameters
+    __________
+    head_ddck: str
+        String path to the location of the "head.ddck" using a known alias.
+        This defaults to "DDCK$ generic/head global".
+
+    end_ddck: str
+        String path to the location of the "end.ddck" using a known alias.
+        This defaults to "DDCK$ generic/end".
+    """
     _assign: dict = _dc.field(default_factory=dict)
     _ddcks: dict = _dc.field(default_factory=dict)
     head_ddck: str = _dc.field(default="DDCK$ generic/head global")
     end_ddck: str = _dc.field(default="DDCK$ generic/end")
 
     def add_assign(self, prt_file_path: str, unit_variable: str) -> None:
+        """
+        Assigns overwrite a ddck's path to a file, by providing the unit_variable and the new path.
+
+        Example:
+        __________
+        "ASSIGN to_be_replaced.prt unitBalancePrinter"
+
+        Will be replaced by:
+        "ASSIGN actual_file.prt unitBalancePrinter"
+
+        Parameters
+        __________
+        prt_file_path: str
+            Path to the file where the printer should save the results.
+
+        unit_variable: str
+            Variable that provides the unit nr for TRNSYS to open the file.
+        """
         # TODO: error handling / warnings  # pylint: disable=fixme
         #       - unit_variable already declared <- indicates duplication issue.
         self._assign[unit_variable] = prt_file_path
@@ -87,22 +117,34 @@ class Ddcks:
         is_global: bool = False,
         label: str | None = None,
     ) -> None:
-        """
+        f"""
+        This method is used to sequentially add ddck files to the TRNSYS simulation.
 
-        folder_alias:
-            TBD
+        folder_alias: str
+            A known alias declared in "Paths.add_path_alias".
+            This is a shorter name, that points to a specific folder, e.g. "DDCK$".
+            A list of known aliases can be obtained using "print(Paths.known_aliases)".
 
-        ddck_path:
-            TBD
+        ddck_path: str
+            The path to the desired ddck relative to the provided folder_alias.
 
-        component_name:
-            TBD
+        component_name: str | None
+            Optional short name you would like to use to adjust the ddck variables.
+            This short name is added in front of each variable in the ddck, except when "is_global = True".
+            Tin -> HPTin
+            
+            If component_name is None, then the name of the folder will be used.
+            
 
-        is_global:
-            TBD
+        is_global: bool
+            If True, this leaves the names of the variables untouched in the chosen ddck, except when explicitly specified.
+            Tin -> Tin
+            :Tin -> HPTin
 
-        label:
-            TBD
+        label: str | None
+            Providing a label to the specific ddck makes it easier to find and replace the ddck 
+            when preparing multiple configurations.
+            This can be done using "Ddcks.replace_ddck".
 
         """
         if component_name and is_global:
@@ -127,17 +169,32 @@ class Ddcks:
         """
         Replaces a previously declared ddck using the provided label in the 'add_ddck' method.
 
-        label:
-            TBD
+        Parameters
+        __________
 
-        folder_alias:
-            TBD
-        ddck_path:
-            TBD
-        component_name:
-            TBD
-        is_global:
-            TBD
+        label: str
+            Label used to find the ddck.
+            For this method to work, this label must have been declared when using "Ddck.add_ddck".
+
+        folder_alias: str
+            A known alias declared in "Paths.add_path_alias".
+            This is a shorter name, that points to a specific folder, e.g. "DDCK$".
+            A list of known aliases can be obtained using "print(Paths.known_aliases)".
+
+        ddck_path: str
+            The path to the desired ddck relative to the provided folder_alias.
+
+        component_name: str | None
+            Optional short name you would like to use to adjust the ddck variables.
+            This short name is added in front of each variable in the ddck, except when "is_global = True".
+            Tin -> HPTin
+
+            If component_name is None, then the name of the folder will be used.
+
+        is_global: str | None
+            If True, this leaves the names of the variables untouched in the chosen ddck, except when explicitly specified.
+            Tin -> Tin
+            :Tin -> HPTin
         """
         if label not in self._ddcks:
             raise ValueError(f"Supplied label not found: {label}")
@@ -150,22 +207,33 @@ class Paths:
     """
     Settings for the required paths:
 
-    ddck_folder:
-        TBD
+    Parameters
+    __________
 
-    path_to_connection_info:
-        TBD
+    ddck_folder: str
+        Main folder where the ddcks for this project are found.
+        This defaults to "./ddck" and is relative to the current working directory.
+        Additional folders can be included using "Paths.add_path_alias".
 
-    project_path:
-        TBD
+    path_to_connection_info: str
+        Path to the DdckPlaceHolderValues.json. This defaults to the local working directory.
 
-    trnsys_exe_path:
-        TBD
+    project_path: str
+        Path to the project. This defaults to the local working directory.
 
-    known_aliases:
-        Gathers a list of aliases (filled with add_path_alias).
+    trnsys_exe_path: str
+        Path to your TRNSYS installation. This defaults to "C:/Trnsys18/Exe/TRNExe.exe"
+
+    known_aliases: dict[str, str]
+        Gathers a list of aliases (filled with "Paths.add_path_alias").
         The default alias for the ddck folder is "DDCK$"
+        Can be helpful if you want to print the currently known aliases.
 
+    results_folder: str | None
+        Path where you would like the results to be saved.
+        Pytrnsys will add folders for each simulation into this folder.
+        If only a single simulation is run, and "results_folder = None",
+        then pytrnsys will put the results in a folder with the project's name.
     """
 
     ddck_folder: str = _dc.field(default="ddck")
@@ -179,6 +247,22 @@ class Paths:
         self.known_aliases = {"DDCK$": self.ddck_folder}
 
     def add_path_alias(self, alias: str, path: str) -> None:
+        """
+        Method to add folders where ddcks are located.
+        The "DDCK$" alias is known by default.
+
+        Parameters
+        __________
+        alias:
+            Short alias you would like to use when adding ddcks,
+            e.g. "COMMON$" for ddcks common between different simulations.
+
+        path:
+            The folder path that the alias points to.
+            This is often relative to the project location,
+            e.g. "../common_ddcks"
+
+        """
         # TODO: error handling for $ requirement.  # pylint: disable=fixme
         if "$" not in alias:
             alias += "$"
