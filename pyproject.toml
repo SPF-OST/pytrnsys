@@ -30,8 +30,8 @@ namespaces = false
 
 [tool.setuptools.package-data]
 pytrnsys = ["py.typed"]
-"pytrnsys.plot.stylesheets" = ["*"]
-"pytrnsys.report.latex_doc" = ["*"]
+"pytrnsys.plot.stylesheets" = ["*.mplstyle"]
+"pytrnsys.report.latex_doc" = ["*.png", "*.json", "*.jpg", "*.cls"]
 "pytrnsys.ddck.parse" = ["ddck.lark"]
 
 [tool.uv]
