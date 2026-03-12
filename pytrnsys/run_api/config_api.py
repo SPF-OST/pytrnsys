@@ -117,7 +117,7 @@ class Ddcks:
         is_global: bool = False,
         label: str | None = None,
     ) -> None:
-        f"""
+        """
         This method is used to sequentially add ddck files to the TRNSYS simulation.
 
         folder_alias: str
@@ -132,17 +132,18 @@ class Ddcks:
             Optional short name you would like to use to adjust the ddck variables.
             This short name is added in front of each variable in the ddck, except when "is_global = True".
             Tin -> HPTin
-            
+
             If component_name is None, then the name of the folder will be used.
-            
+
 
         is_global: bool
-            If True, this leaves the names of the variables untouched in the chosen ddck, except when explicitly specified.
+            If True, this leaves the names of the variables untouched in the chosen ddck,
+            except when explicitly specified.
             Tin -> Tin
             :Tin -> HPTin
 
         label: str | None
-            Providing a label to the specific ddck makes it easier to find and replace the ddck 
+            Providing a label to the specific ddck makes it easier to find and replace the ddck
             when preparing multiple configurations.
             This can be done using "Ddcks.replace_ddck".
 
@@ -192,7 +193,8 @@ class Ddcks:
             If component_name is None, then the name of the folder will be used.
 
         is_global: str | None
-            If True, this leaves the names of the variables untouched in the chosen ddck, except when explicitly specified.
+            If True, this leaves the names of the variables untouched in the chosen ddck,
+            except when explicitly specified.
             Tin -> Tin
             :Tin -> HPTin
         """
@@ -573,7 +575,8 @@ class ConfigurationConverter:
     def _variation_lines(self, variations: ParametricVariations) -> list[str]:
         lines: list[str] = []
         nr_of_variations = len(variations._variations.keys())  # pylint: disable=protected-access
-        if nr_of_variations == 0 and len(variations._ddck_file_variations.keys()) == 0:  # pylint: disable=protected-access
+        nr_of_keys = len(variations._ddck_file_variations.keys())  # pylint: disable=protected-access
+        if nr_of_variations == 0 and nr_of_keys == 0:
             return lines
 
         if nr_of_variations > 0:
