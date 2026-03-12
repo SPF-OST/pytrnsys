@@ -275,27 +275,44 @@ class Generic:
     General settings to control pytrnsys behavior.
 
     leave_n_cpus_available:
-        TBD
+        Ensure several CPUs are available for the operating system to keep working.
+        Pytrnsys will only use all other CPUs, if that many simulations are requested.
+        If more simulations are requested, they will be cued and started automatically when
+        the resources become available.
+        leave_n_cpus_available defaults to 4.
 
-    parse_file_created:
-        TBD
+    parse_file_created: bool
+        Old functionality, that saves the parsed ddck.
+        This used to be helpful when "Generic.check_dck" finds errors.
+        Nowadays, the feedback is helpful enough to do without.
+        parse_file_created defaults to False.
 
-    run_cases:
-        TBD
+    run_cases: bool
+        When True, pytrnsys will prepare the simulation files and then automatically start running the simulations.
+        When False, only the simulation files will be prepared.
+        run_cases defaults to True.
 
-    check_dck:
-        TBD
+    check_dck: bool
+        When True, pytrnsys will check the correctness of the final dck.
+        This first check finds many common issues and will not find all issues.
+        check_dck defaults to True.
 
-    output_level:
+    output_level: str
         Output message level according to the logging package. (Options: “DEBUG”, “INFO” (default), “WARNING”, “ERROR”,
         and “CRITICAL”)
 
-    base_name_4_dcks:
-        TBD
+    base_name_4_dcks: str | None
+        Change the starting part of the name of the simulation folders, e.g.
+        Bad_rappenau_VTes_40 -> sim_VTES_40
+        base_name_4_dcks defaults to None.
 
-    run_mode:
-        "runFromConfig", "runFromCases", "runFromFolder"
-
+    run_mode: str
+        Changes what starting point pytrnsys uses to run the simulations.
+        The options are: "runFromConfig", "runFromCases", "runFromFolder".
+        "runFromConfig" reads the settings prepared by this api, or from a config file.
+        "runFromCases" starts the simulations from the prepared files.
+        "runFromFolder" starts the simulation of a specific folder.
+        run_mode defaults to "runFromConfig".
     """
 
     leave_n_cpus_available: int = _dc.field(default=4)
