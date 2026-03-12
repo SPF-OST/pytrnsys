@@ -290,6 +290,7 @@ class Generic:
     run_cases: bool
         When True, pytrnsys will prepare the simulation files and then automatically start running the simulations.
         When False, only the simulation files will be prepared.
+        This is often helpful when developing the simulation, to check e.g. the correct naming of variables.
         run_cases defaults to True.
 
     check_dck: bool
@@ -329,15 +330,18 @@ class AutomaticWork:
     """
     Settings for automatic work.
 
-    do_auto_unit_numbering:
+    do_auto_unit_numbering: bool
         Automatically renumbers the units in the final .dck file.
+        do_auto_unit_numbering defaults to True
 
-    generate_unit_types_used:
+    generate_unit_types_used: bool
         Generates a file that lists all types used in the simulation.
+        generate_unit_types_used defaults to True
 
-    add_automatic_energy_balance:
+    add_automatic_energy_balance: bool
         Automatically adds energy balance equations and printers, based on the naming scheme for
         the energy balance variables.
+        add_automatic_energy_balance defaults to True
 
     """
 
@@ -363,16 +367,17 @@ class Tracking:
     """
     Paths and flags related to tracking parametric simulations.
 
-    tracking_file:
+    tracking_file: str | None
         When running multiple simulations the status of each simulation can be tracked with the help of a json-file.
         When a simulation is started, this is entered with a timestamp into this file. Once the simulation is finished
         this entry will be overwritten accordingly. Like this one can keep track of which simulations were aborted
         (for whatever reason) after having been launched. To activate this functionality you need to specify the full
         path of the json-file to be created.
         'trackingFile = ".../[name].json"'
+        tracking_file defaults to None.
 
 
-    master_file:
+    master_file: str | None
         If several simulations are run from different instances, the tracking can be taken one step further by
         employing a “master-file” in the form of a csv-file. It also tracks the status of different simulations based
         on the tracking json-files. One important feature is that, when it is used, simulations (identified by the
@@ -382,6 +387,7 @@ class Tracking:
         repetitions of simualtions are executed. To activate this functionality you need to specify the full path of
         the csv-file to be created.
         'master_file = ".../[name].csv"'
+        master_file defaults to None.
     """
 
     tracking_file: str | None = _dc.field(default=None)
@@ -393,11 +399,13 @@ class ParametricVariations:
     # TODO: investigate random variations  # pylint: disable=fixme
     """
     Methods and flags related to parametric variations.
+
     combine_all_cases: bool
         If several variations are defined, this parameter controls their combination. If it is set to True, all
         combinations are created. So if n values are given for variation 1 and m values are in variation 2 the total
         amount of simulations executed will be (m x n). If it is set to False, the amount of values of all variations
         has to be equal, and they are combined according to their order.
+        combine_all_cases defaults to False.
     """
     combine_all_cases: bool = _dc.field(default=False)
     _variations: dict = _dc.field(default_factory=dict)
@@ -407,13 +415,17 @@ class ParametricVariations:
         """
         Adds a parametric variation, i.e. several TRNSYS simulations with different values for a certain trnsysVariable.
 
-        variation_name:
+        variation_name: str
             Defines how the variation will be noted in the names of the dck-files to be generated.
 
-        trnsys_variable:
+        trnsys_variable: str
             The specific variable in the .dck where the values should change.
+            Note that this needs to take the renaming of variables into account.
+            Tin -> HPTin
+            So HPTin needs to be used.
+            Here it is often helpful to check the final .dck file for correctness.
 
-        values:
+        values: list[float | str]
             The specific values, the trnsys_variable should take.
             This could either be floats, or equations:
             [1440, 4367, 6575, 8040]
@@ -426,11 +438,11 @@ class ParametricVariations:
         """
         Adds a variation where a specific ddck is changed between simulations.
 
-        original_ddck:
+        original_ddck: str
             The ddck that should be replaced in each simulation.
 
-        ddcks:
-            The ddcks that should replace the 'original_ddck'
+        ddcks: list[str]
+            A list of ddcks that should replace the 'original_ddck'
         """
         self._ddck_file_variations[original_ddck] = ddcks
 
@@ -647,17 +659,17 @@ class ConfigurationConverter:
 
 
 def save_config_file(config: PytrnsysConfiguration, config_file_path: _pl.Path) -> None:
+    """
+    Method to save the configuration file using the configuration.
+    Pytrnsys will read this configuration file to prepare the simulations and run them.
+
+    Parameters
+    __________
+    config: PytrnsysConfiguration
+        Settings class holding the desired simulation configuration.
+
+    config_file_path: pathlib.Path
+        Path where you would like the config file to be stored.
+
+    """
     ConfigurationConverter().save_config_file(config, config_file_path)
-
-
-def run_pytrnsys(pytrnsys_path: _pl.Path, run_py_path: _pl.Path):
-    exception = None
-    try:
-        if run_py_path.is_file():
-            _sp.run([pytrnsys_path, run_py_path, "/H"], shell=True, check=True)
-        else:
-            raise FileNotFoundError("File not found: " + str(run_py_path))
-    except Exception as e:
-        exception = e
-
-    return exception
