@@ -30,8 +30,19 @@ namespaces = false
 
 [tool.setuptools.package-data]
 pytrnsys = ["py.typed"]
-"pytrnsys.plot.stylesheets" = ["*.mplstyle"]
-"pytrnsys.report.latex_doc" = ["*.png", "*.json", "*.jpg", "*.cls"]
+"pytrnsys.plot.stylesheets" = ["word.mplstyle"]
+"pytrnsys.report.latex_doc" = [
+    "EU_Flag_320_213.png",
+    "latexNames.json",
+    "LOGOTYPE+EULOGO.png",
+    "LOGOTYPE_COMPLETE_BLUE_EULOGO.png",
+    "OST_logo.jpg",
+    "SPFlogo.jpg",
+    "SPFShortReport.cls",
+    "SPFShortReportIndex.cls",
+    "TriHpLogo.png",
+    "TriHpShortReport.cls",
+]
 "pytrnsys.ddck.parse" = ["ddck.lark"]
 
 [tool.uv]
