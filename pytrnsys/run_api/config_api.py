@@ -80,6 +80,7 @@ class Ddcks:
         String path to the location of the "end.ddck" using a known alias.
         This defaults to "DDCK$ generic/end".
     """
+
     _assign: dict = _dc.field(default_factory=dict)
     _ddcks: dict = _dc.field(default_factory=dict)
     head_ddck: str = _dc.field(default="DDCK$ generic/head global")
@@ -271,7 +272,7 @@ class Paths:
 
 
 @_dc.dataclass
-class Generic:
+class Generic:  # pylint: disable=too-many-instance-attributes
     """
     General settings to control pytrnsys behavior.
 
@@ -542,7 +543,7 @@ class ConfigurationConverter:
             self._add_bool_line("checkDeck", generic.check_dck),
             self._add_string_line("outputLevel", generic.output_level),
             self._add_string_line("runType", generic.run_mode),
-            self._add_string_line("defaultVisibility", generic.default_visibility)
+            self._add_string_line("defaultVisibility", generic.default_visibility),
         ]
 
         if generic.base_name_for_dcks is not None:
@@ -601,7 +602,9 @@ class ConfigurationConverter:
                 )
 
         for variation_name, variation in variations._variations.items():  # pylint: disable=protected-access
-            lines.append(f'variation {variation_name} {variation["trnsys_variable"]} {" ".join(map(str, variation["values"]))}')
+            lines.append(
+                f'variation {variation_name} {variation["trnsys_variable"]} {" ".join(map(str, variation["values"]))}'
+            )
 
         for original_ddck, ddcks in variations._ddck_file_variations.items():  # pylint: disable=protected-access
             lines.append(f'changeDDckFile {original_ddck}{" ".join(map(str, ddcks))}')
