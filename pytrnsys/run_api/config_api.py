@@ -67,7 +67,6 @@ class Variables:
 
 @_dc.dataclass
 class Ddcks:
-    # TODO: provide set_global as an input?  # pylint: disable=fixme
     """
     Settings class to include ddcks and change file assignments for, e.g. printers.
 
@@ -81,6 +80,7 @@ class Ddcks:
         String path to the location of the "end.ddck" using a known alias.
         This defaults to "DDCK$ generic/end".
     """
+
     _assign: dict = _dc.field(default_factory=dict)
     _ddcks: dict = _dc.field(default_factory=dict)
     head_ddck: str = _dc.field(default="DDCK$ generic/head global")
@@ -272,7 +272,7 @@ class Paths:
 
 
 @_dc.dataclass
-class Generic:
+class Generic:  # pylint: disable=too-many-instance-attributes
     """
     General settings to control pytrnsys behavior.
 
@@ -316,6 +316,12 @@ class Generic:
         "runFromCases" starts the simulations from the prepared files.
         "runFromFolder" starts the simulation of a specific folder.
         run_mode defaults to "runFromConfig".
+
+    default_visibility: str
+        Flag to use local or global variables for ddcks by default.
+        When using "global", individual ddcks can be set to local using "component_name" in "ddcks.add_ddck".
+        When using "local", individual ddcks can be set to global using "is_global" in "ddcks.add_ddck".
+        This is "local" by default.
     """
 
     leave_n_cpus_available: int = _dc.field(default=4)
@@ -325,6 +331,7 @@ class Generic:
     output_level: _tp.Literal["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"] = _dc.field(default="INFO")
     base_name_for_dcks: None | str = _dc.field(default=None)
     run_mode: _tp.Literal["runFromConfig", "runFromCases", "runFromFolder"] = _dc.field(default="runFromConfig")
+    default_visibility: _tp.Literal["global", "local"] = _dc.field(default="local")
 
 
 @_dc.dataclass
@@ -536,6 +543,7 @@ class ConfigurationConverter:
             self._add_bool_line("checkDeck", generic.check_dck),
             self._add_string_line("outputLevel", generic.output_level),
             self._add_string_line("runType", generic.run_mode),
+            self._add_string_line("defaultVisibility", generic.default_visibility),
         ]
 
         if generic.base_name_for_dcks is not None:
@@ -593,8 +601,10 @@ class ConfigurationConverter:
                     f"Lengths of the variations: {n_values}"
                 )
 
-        for _, variation in variations._variations.items():  # pylint: disable=protected-access
-            lines.append(f'variation {variation["trnsys_variable"]} {" ".join(map(str, variation["values"]))}')
+        for variation_name, variation in variations._variations.items():  # pylint: disable=protected-access
+            lines.append(
+                f'variation {variation_name} {variation["trnsys_variable"]} {" ".join(map(str, variation["values"]))}'
+            )
 
         for original_ddck, ddcks in variations._ddck_file_variations.items():  # pylint: disable=protected-access
             lines.append(f'changeDDckFile {original_ddck}{" ".join(map(str, ddcks))}')
