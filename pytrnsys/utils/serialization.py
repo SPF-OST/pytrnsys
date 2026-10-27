@@ -51,6 +51,17 @@ schema =
 
 
 class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
+    """Base of a model's first versioned version.
+
+    This version also covers the step from unversioned dicts, so `__version__` is optional (but checked if
+    present). Don't override `_doesRequireVersion` to make it required: `from_dict` removes the version before
+    validating against a schema that would then require it.
+
+    The schema doesn't allow additional properties (see `additionalProperties`). So don't extend a model by
+    subclassing its dataclass: `dataclasses_jsonschema` combines the schemas of the subclass and the base class
+    with `allOf`, and the base class's schema then rejects the new fields. Declare all fields again instead.
+    """
+
     @classmethod
     def from_dict(
         cls: _tp.Type[_S],
