@@ -129,6 +129,26 @@ Without `--no-upgrade`, all pinned versions are upgraded to the latest ones.
 Write editable requirements in the `.in` files without an `#egg=` suffix (e.g. `-e file:.`): with the suffix,
 `pip-compile-multi` compiles them into non-editable ones.
 
+#### Static checks and unit tests
+
+Run `black`, `pylint` and `mypy` only through `devTools.py`, as CI does, not directly or on single files: their
+settings, e.g. black's line length, are only set there.
+
+Show all options:
+```commandline
+python .\dev-tools\devTools.py --help
+```
+
+Format code with `black`:
+```commandline
+python .\dev-tools\devTools.py --black=""
+```
+
+Run the static checks (`black`, `pylint` and `mypy`) and the unit tests:
+```commandline
+python .\dev-tools\devTools.py -s -u
+```
+
 
 ## About
 
