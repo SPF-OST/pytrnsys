@@ -118,6 +118,17 @@ Beware that `pytrnsys` can only be run from within the virtual environment you c
 step 1, i.e., whenever you open a new console window from which you want to run it you 
 first need to active the environment (step 2. above).
 
+#### Managing requirements
+
+After changing an `.in` file in `requirements`, recompile the `.txt` files from within the virtual environment:
+```commandline
+pip-compile-multi --use-cache --backtracking --uv --no-upgrade -d .\requirements\
+```
+Without `--no-upgrade`, all pinned versions are upgraded to the latest ones.
+
+Write editable requirements in the `.in` files without an `#egg=` suffix (e.g. `-e file:.`): with the suffix,
+`pip-compile-multi` compiles them into non-editable ones.
+
 
 ## About
 
