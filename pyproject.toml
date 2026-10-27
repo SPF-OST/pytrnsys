@@ -47,3 +47,9 @@ pytrnsys = ["py.typed"]
 
 [tool.uv]
 config-settings = { editable_mode = "compat" }
+# Rebuild whenever one of the files the build reads changes: by default, uv only considers
+# `pyproject.toml`, `setup.py` and `setup.cfg`.
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "requirements/release-3rd-party.in" },
+]

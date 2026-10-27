@@ -6,4 +6,4 @@
 #    requirements upgrade
 #
 -r test-3rd-party.txt
-file:.#egg=pytrnsys
+-e file:.
