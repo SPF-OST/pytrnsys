@@ -14,6 +14,7 @@ class _DestDirSourceFilePath:
     sourceFilePath: str
 
 
+# Files read here must be listed in `tool.uv.cache-keys` in `pyproject.toml`.
 def _getDataFilePairs():
     dataDirPath = _pl.Path(__file__).parent / "data"
 
@@ -33,7 +34,6 @@ def _getDataFilePairs():
 
 
 _st.setup(
-    version_config=True,
     url="https://pytrnsys.readthedocs.io",
     data_files=_getDataFilePairs(),
 )

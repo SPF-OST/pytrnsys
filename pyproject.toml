@@ -1,9 +1,10 @@
 [build-system]
-requires = ["setuptools >= 64", "setuptools-git-versioning"]
+requires = ["setuptools >= 64"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pytrnsys"
+version = "0.0.0"
 authors = [
     { name = "Institute for Solar Technology (SPF), OST Rapperswil", email = "damian.birchler@ost.ch" },
 ]
@@ -16,7 +17,7 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
 ]
 
-dynamic = ["dependencies", "version"]
+dynamic = ["dependencies"]
 
 requires-python = ">=3.12"
 
@@ -51,5 +52,9 @@ config-settings = { editable_mode = "compat" }
 # `pyproject.toml`, `setup.py` and `setup.cfg`.
 cache-keys = [
     { file = "pyproject.toml" },
+    { file = "setup.py" },
+    { file = "README.md" },
     { file = "requirements/release-3rd-party.in" },
+    # uv may miss deleted or locally renamed files under a glob key.
+    { file = "data/**/*" },
 ]
