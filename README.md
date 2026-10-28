@@ -15,20 +15,18 @@ The documentation can be found on [pytrnsys.readthedocs.io](https://pytrnsys.rea
 
 ## Installation
 
-In the following all commands should be run from the `pytrnsys` directory. The command should be run in a 
-"Windows Command Prompt" for Windows environment. The commands should be very similar should you wish to install on
-Linux.
+If you want to use pytrnsys, follow the "User installation". If you want to
+develop the code, follow the "Installation from source / Developer installation".
+The commands are for a Windows environment and very similar for Linux.
 
-If you want to install pytrnsys as a python package, follow the "Binary installation / User installation". If you want 
-to develop the code, you will need git. Then you should follow the "Installation from source / Developer installation". 
-
-### Binary installation / User installation
+### User installation
 
 #### Prerequisites
 
 ##### Required
 
 1. [Python 3.12](https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe)
+2. [Git](https://git-scm.com/downloads)
 
 #### Getting started
 
@@ -40,12 +38,12 @@ to develop the code, you will need git. Then you should follow the "Installation
     ```commandline
     cd [your-directory]
     ```
-   Replace `[your-directory]` (including the brackets []) with your directory of choice: if your
-directory is called `foo` then `pytrnsys` will be installed to `foo\pytrnsys`.
-   
+   Replace `[your-directory]` (including the brackets []) with your directory of choice:
+   if your directory is called `foo` then `pytrnsys` will be installed to `foo\pytrnsys`.
+
 3. Create a virtual environment:
     ```commandline
-    py -3.12 -m venv venv
+    py -3.12 -m venv pytrnsys
     ```
 4. Activate it:
     ```commandline
@@ -55,10 +53,10 @@ directory is called `foo` then `pytrnsys` will be installed to `foo\pytrnsys`.
     ```commandline
     pip install wheel
     ```
-         
+
 6. Install `pytrnsys` and its requirements:
     ```commandline
-    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys/v0.6.4-reqs/requirements/releases/v0.6.4/requirements.txt
+    pip install git+https://github.com/SPF-OST/pytrnsys -r https://raw.githubusercontent.com/SPF-OST/pytrnsys/master/requirements/release-3rd-party.txt
     ```
 You can now close the command prompt opened in the first step.
 
