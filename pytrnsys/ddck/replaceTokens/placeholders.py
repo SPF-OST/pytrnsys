@@ -18,6 +18,10 @@ class _WithPlaceholdersJSONCollectTokensVisitor(_common.CollectTokensVisitorBase
         computedVariable = _common.createComputedVariable(tree, "@temp")
         self.computedHydraulicVariables.append(computedVariable)
 
+    def computed_output_pel_var(self, tree: _lark.Tree) -> None:  # pylint: disable=invalid-name
+        computedVariable = _common.createComputedVariable(tree, "@pel")
+        self.computedHydraulicVariables.append(computedVariable)
+
 
 def replaceTokens(
     inputDdckFilePath: _pl.Path,

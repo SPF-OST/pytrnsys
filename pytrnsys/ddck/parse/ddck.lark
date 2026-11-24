@@ -192,9 +192,11 @@ logical_unit: INT | explicit_var
 
 computed_var: PORT_PROPERTY "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ]")"
 
-?computed_output_var: computed_output_temp_var | computed_output_energy_var
+?computed_output_var: computed_output_temp_var | computed_output_pel_var | computed_output_energy_var
 
 computed_output_temp_var: "@temp" "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ] ")"
+
+computed_output_pel_var: "@pel" "(" PORT_NAME [","  DEFAULT_VARIABLE_NAME ] ")"
 
 computed_output_energy_var: "@energy" "(" ENERGY_DIRECTION "," ENERGY_QUALITY "," CATEGORY_OR_LOCAL ("," CATEGORY)* ")"
 
@@ -212,7 +214,7 @@ FILE_PATH: /[A-Za-z0-9_\-\\:\.$]+/
 
 PORT_NAME: NAME
 
-PORT_PROPERTY: "@" ("temp" | "revtemp" | "mfr" | "cp" | "rho")
+PORT_PROPERTY: "@" ("temp" | "revtemp" | "mfr" | "cp" | "rho" | "pelsign" | "pel")
 
 DEFAULT_VARIABLE_NAME: NAME
 

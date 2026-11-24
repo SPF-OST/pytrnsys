@@ -72,10 +72,12 @@ class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(_lvis.Visitor_Recurs
 
         assignmentTarget = tree.children[0]
         assert isinstance(assignmentTarget, _lark.Tree)
-        if assignmentTarget.data != "computed_output_temp_var":
+        portProperties = {"computed_output_temp_var": "@temp", "computed_output_pel_var": "@pel"}
+        portProperty = portProperties.get(assignmentTarget.data)
+        if not portProperty:
             return
 
-        computedVariable = _common.createComputedVariable(assignmentTarget, "@temp")
+        computedVariable = _common.createComputedVariable(assignmentTarget, portProperty)
 
         tokenAndReplacement: _tp.Tuple[_tokens.Token, str]
 
@@ -88,7 +90,8 @@ class _WithoutPlaceholdersJSONCollectEquationsTokensVisitor(_lvis.Visitor_Recurs
         self.nComputedOutputVariablesWithoutDefaults += 1
 
         portName = _vh.getChildTokenValue("PORT_NAME", assignmentTarget, str)
-        replacement = f"! Assignment to temperature at `{portName}` removed by pytrnsys"
+        quantity = "temperature" if portProperty == "@temp" else "electrical power"
+        replacement = f"! Assignment to {quantity} at `{portName}` removed by pytrnsys"
 
         token = _tokens.Token.fromTree(tree)
 
