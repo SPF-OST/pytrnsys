@@ -1,4 +1,7 @@
 import pytest
+import matplotlib
+
+matplotlib.use("Agg")
 
 # store history of failures per test class name and per index in parametrize (if parametrize used)
 _test_failed_incremental: dict[str, dict[tuple[int, ...], str]] = {}
